@@ -35,6 +35,7 @@
 
     <string name="memory_status">Bellek durumu</string>
     <string name="memory_available">%1$s kullanılabilir RAM • bu uygulama: %2$s</string>
+    <string name="memory_compact_subtitle">%1$s kullanılabilir • Akıllı Temizleyici %2$s</string>
     <string name="last_scan">Son tarama</string>
     <string name="last_scan_summary">%1$d öneri • %2$s</string>
 
@@ -52,6 +53,30 @@
     <string name="clean_action">%1$s TEMİZLE</string>
     <string name="category_summary">%1$d öğe • %2$s</string>
     <string name="file_confidence">%1$s • Güven: %%%2$d</string>
+
+    <string name="cache_manager_title">Uygulama Önbelleği Yöneticisi</string>
+    <string name="cache_manager_subtitle">Yüklü uygulamalardaki gerçek önbellek kullanımını bul</string>
+    <string name="cache_access_required">Önbellek erişimi kapalı</string>
+    <string name="cache_access_explanation">Akıllı Temizleyici’nin uygulama depolama toplamlarını okuyabilmesi için Kullanım Erişimi ver. Kişisel içerikler okunmaz.</string>
+    <string name="cache_grant_action">Önbellek taramasına izin ver</string>
+    <string name="cache_scanning">Uygulama önbellekleri taranıyor…</string>
+    <string name="cache_summary">%1$s cihaz önbelleği • %2$d uygulama listelendi</string>
+    <string name="cache_empty">Şu anda bildirilen uygulama önbelleği yok.</string>
+    <string name="cache_unsupported">Uygulama önbelleği toplamları Android 8.0 veya üstünü gerektirir.</string>
+    <string name="cache_refresh">Yenile</string>
+    <string name="cache_other_apps">En çok önbellek kullanan uygulamalar</string>
+    <string name="cache_open_settings_hint">Uygulamaya dokun, ardından Depolama ve önbellek › Önbelleği temizle seç</string>
+    <string name="cache_own_app">Akıllı Temizleyici önbelleği</string>
+    <string name="cache_own_app_subtitle">%1$s doğrudan ve güvenle silinebilir</string>
+    <string name="cache_manual_notice">Android her uygulamanın özel dosyalarını korur. Akıllı Temizleyici gerçek önbelleği ölçer, ardından kontrol sende kalsın diye Android’in resmî uygulama ekranını açar.</string>
+    <string name="cache_detected_title">Uygulama önbelleği bulundu</string>
+    <string name="cache_detected_description">Android %1$s önbellek bildiriyor; incelemek için %2$d büyük uygulama listelendi.</string>
+    <string name="cache_scan_not_enabled">Uygulama önbelleklerini Akıllı Tarama’ya katmak için önbellek taramasını etkinleştir.</string>
+    <string name="review_cache">Uygulama önbelleklerini incele</string>
+    <string name="media_cleanup">Fotoğraf, video ve indirilenler</string>
+    <string name="media_cleanup_subtitle">Birebir kopyaları, büyük videoları, eski indirilenleri ve APK paketlerini bul</string>
+    <string name="space_found">BULUNAN ALAN</string>
+    <string name="scan_space_breakdown">%1$s seçilebilir dosya • %2$s incelenecek uygulama önbelleği</string>
 
     <string name="tools_title">Cihaz araçları</string>
     <string name="tools_subtitle">Gerçek Android kontrolleri ve güvenli cihaz içi temizlik.</string>

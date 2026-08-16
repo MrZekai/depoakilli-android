@@ -9,6 +9,8 @@ captures/
 .cxx/
 *.jks
 *.keystore
+# Public, non-production QA key: keeps GitHub Actions test APK updates installable.
+!keystore/depoakilli-ci-qa.jks
 keystore.properties
 release-secrets.properties
 

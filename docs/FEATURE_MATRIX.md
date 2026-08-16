@@ -5,7 +5,9 @@
 | Depolama göstergesi | Evet | `StatFs` ile gerçek toplam/boş alan |
 | RAM göstergesi | Evet | `ActivityManager.MemoryInfo` |
 | Uygulama RAM optimizasyonu | Evet | Tarama sonuçları ve yüklü tam ekran reklam referansları bırakılır; `Debug.MemoryInfo.totalPss` ile önce/sonra ölçülür |
-| Uygulama cache temizliği | Evet | Uygulamanın kendi cache dizinleri |
+| Bu uygulamanın cache temizliği | Evet | Uygulamanın kendi cache dizinleri doğrudan silinir |
+| Diğer uygulamaların cache ölçümü | Evet | Kullanıcı Kullanım Erişimi verdikten sonra `StorageStatsManager.cacheBytes`; ana ekran uygulamalarıyla sınırlı görünürlük |
+| Diğer uygulamanın cache yönetimi | Evet | En büyük önbellekler sıralanır ve Android'in resmî uygulama ayrıntıları ekranı açılır |
 | Uygulama depolama detayları | Evet | Android'in bu uygulamaya ait resmî ayar ekranı |
 | Sistem ve uygulama depolama yönetimi | Evet | Android'in depolama/uygulamalar ayar ekranları |
 | Başka uygulamanın özel cache'ini sessiz silme | Hayır | Android tarafından engellenir |

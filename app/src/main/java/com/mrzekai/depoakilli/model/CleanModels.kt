@@ -64,6 +64,26 @@ data class MemorySnapshot(
         get() = if (totalBytes == 0L) 0f else usedBytes.toFloat() / totalBytes.toFloat()
 }
 
+data class AppCacheEntry(
+    val packageName: String,
+    val label: String,
+    val cacheBytes: Long,
+)
+
+data class AppCacheSnapshot(
+    val supported: Boolean = true,
+    val accessGranted: Boolean = false,
+    val entries: List<AppCacheEntry> = emptyList(),
+    val scannedAppCount: Int = 0,
+    val reportedOtherAppsCacheBytes: Long = 0L,
+) {
+    val totalCacheBytes: Long
+        get() = maxOf(
+            reportedOtherAppsCacheBytes,
+            entries.sumOf(AppCacheEntry::cacheBytes),
+        )
+}
+
 data class ScanSummary(
     val items: List<CleanableItem> = emptyList(),
     val scannedFileCount: Int = 0,

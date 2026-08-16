@@ -35,6 +35,7 @@
 
     <string name="memory_status">Memory status</string>
     <string name="memory_available">%1$s RAM available • this app: %2$s</string>
+    <string name="memory_compact_subtitle">%1$s available • Smart Cleaner %2$s</string>
     <string name="last_scan">Last scan</string>
     <string name="last_scan_summary">%1$d suggestions • %2$s</string>
 
@@ -52,6 +53,30 @@
     <string name="clean_action">%1$s CLEAN</string>
     <string name="category_summary">%1$d items • %2$s</string>
     <string name="file_confidence">%1$s • %2$d%% confidence</string>
+
+    <string name="cache_manager_title">App Cache Manager</string>
+    <string name="cache_manager_subtitle">Find real cache usage across your installed apps</string>
+    <string name="cache_access_required">Cache access is off</string>
+    <string name="cache_access_explanation">Allow Usage Access so Smart Cleaner can read app storage totals. No personal content is read.</string>
+    <string name="cache_grant_action">Allow cache scan</string>
+    <string name="cache_scanning">Scanning app caches…</string>
+    <string name="cache_summary">%1$s device cache • %2$d apps listed</string>
+    <string name="cache_empty">No app cache is currently reported.</string>
+    <string name="cache_unsupported">App cache totals require Android 8.0 or newer.</string>
+    <string name="cache_refresh">Refresh</string>
+    <string name="cache_other_apps">Apps using the most cache</string>
+    <string name="cache_open_settings_hint">Tap an app, then choose Storage &amp; cache › Clear cache</string>
+    <string name="cache_own_app">Smart Cleaner cache</string>
+    <string name="cache_own_app_subtitle">%1$s can be removed directly and safely</string>
+    <string name="cache_manual_notice">Android protects every app’s private files. Smart Cleaner measures the real cache, then opens Android’s official app screen so you stay in control.</string>
+    <string name="cache_detected_title">App cache found</string>
+    <string name="cache_detected_description">Android reports %1$s of cache; %2$d large apps are listed for review.</string>
+    <string name="cache_scan_not_enabled">Enable the cache scan to include app caches in Smart Scan.</string>
+    <string name="review_cache">Review app caches</string>
+    <string name="media_cleanup">Photos, videos &amp; downloads</string>
+    <string name="media_cleanup_subtitle">Find exact duplicates, large videos, old downloads, and APK installers</string>
+    <string name="space_found">SPACE FOUND</string>
+    <string name="scan_space_breakdown">%1$s selectable files • %2$s app cache to review</string>
 
     <string name="tools_title">Device tools</string>
     <string name="tools_subtitle">Use real Android controls and safe on-device cleanup.</string>

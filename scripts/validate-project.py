@@ -4,6 +4,7 @@ from __future__ import annotations
 import pathlib
 import sys
 import xml.etree.ElementTree as ET
+import hashlib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -28,6 +29,7 @@ required = [
     "app/src/main/AndroidManifest.xml",
     "app/src/main/res/values/strings.xml",
     "app/src/main/res/values-tr/strings.xml",
+    "app/src/main/res/values/styles.xml",
     "app/src/main/res/xml/backup_rules.xml",
     "app/src/main/res/xml/data_extraction_rules.xml",
     "app/src/main/res/xml/locales_config.xml",
@@ -35,6 +37,10 @@ required = [
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
     "docs/AD_PLACEMENTS.md",
+    "docs/QA_SIGNING.md",
+    "keystore/depoakilli-ci-qa.jks",
+    "app/src/debug/res/values/strings.xml",
+    "app/src/debug/res/values-tr/strings.xml",
 ]
 for relative in required:
     require(relative)
@@ -57,6 +63,14 @@ for forbidden in (
 
 if 'android:localeConfig="@xml/locales_config"' not in manifest:
     errors.append("manifest must declare the English/Turkish locale configuration")
+
+for expected in (
+    'android.permission.PACKAGE_USAGE_STATS',
+    'android.intent.category.LAUNCHER',
+    '<queries>',
+):
+    if expected not in manifest:
+        errors.append(f"missing scoped app-cache visibility invariant: {expected}")
 
 default_strings_file = ROOT / "app/src/main/res/values/strings.xml"
 turkish_strings_file = ROOT / "app/src/main/res/values-tr/strings.xml"
@@ -85,6 +99,10 @@ for expected in (
     "validateReleaseAds",
     'buildConfigField("String", "ADMOB_MEDIUM_RECTANGLE_ID"',
     'buildConfigField("String", "ADMOB_APP_OPEN_ID"',
+    'applicationIdSuffix = ".qa"',
+    'storeFile = qaKeystore',
+    'signingConfig = signingConfigs.getByName("debug")',
+    'signingConfig = signingConfigs.findByName("release")',
 ):
     if expected not in build_file:
         errors.append(f"missing build invariant: {expected}")
@@ -115,6 +133,19 @@ if "implementation(libs.androidx.fragment)" not in build_file:
 
 if "implementation(libs.androidx.lifecycle.process)" not in build_file:
     errors.append("lifecycle-process is required for foreground-aware App Open ads")
+
+if 'applicationIdSuffix = ".debug"' in build_file:
+    errors.append("ephemeral .debug package must be replaced by the stable .qa test package")
+
+qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
+if qa_keystore.is_file():
+    qa_keystore_sha256 = hashlib.sha256(qa_keystore.read_bytes()).hexdigest()
+    if qa_keystore_sha256 != "d6e453480cd6e99fb7bbfd7192eef1719328979f09d6dba383249dbc46b5eac8":
+        errors.append("QA keystore bytes changed; CI update signing continuity would be broken")
+
+gitignore_text = (ROOT / ".gitignore").read_text(encoding="utf-8")
+if "!keystore/depoakilli-ci-qa.jks" not in gitignore_text:
+    errors.append("stable QA keystore must be explicitly unignored for CI checkout")
 
 for expected in (
     "abortOnError = true",
@@ -163,6 +194,9 @@ for expected in (
     "continue-on-error: true",
     "app/build/reports/lint-results-debug.txt",
     "Enforce lint and APK build results",
+    "Verify stable QA signing certificate",
+    "508e012197da76d516bad24880b67c6f067fcd646c51a043a11c0c345e6ead54",
+    "depoakilli-qa-apk-${{ github.run_number }}",
 ):
     if expected not in workflow_text:
         errors.append(f"missing CI invariant: {expected}")
@@ -210,6 +244,11 @@ for expected in (
     "releaseForMemoryOptimization",
     "Settings.ACTION_APPLICATION_DETAILS_SETTINGS",
     "Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS",
+    "StorageStatsManager",
+    "queryStatsForPackage",
+    "AppOpsManager.OPSTR_GET_USAGE_STATS",
+    "Settings.ACTION_USAGE_ACCESS_SETTINGS",
+    "fun refreshAppCaches()",
 ):
     if expected not in source_text:
         errors.append(f"missing global tools/ads invariant: {expected}")
@@ -222,6 +261,28 @@ for forbidden in (
 ):
     if forbidden in source_text:
         errors.append(f"obsolete or non-functional tool action present: {forbidden}")
+
+cleaner_app_text = (
+    ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt"
+).read_text(encoding="utf-8")
+for expected in (
+    "val showAnchoredBanner = adsCanBeShown",
+    "CacheManagerPanel(",
+    "AppCacheRow(",
+):
+    if expected not in cleaner_app_text:
+        errors.append(f"missing visible app-cache/banner UI invariant: {expected}")
+
+if "MediumRectangleAd(" in cleaner_app_text:
+    errors.append("Home must use the visible anchored banner instead of a 300x250 MREC")
+
+styles_text = (ROOT / "app/src/main/res/values/styles.xml").read_text(encoding="utf-8")
+for expected in (
+    '<item name="android:windowLightStatusBar">true</item>',
+    '<item name="android:windowLightNavigationBar">true</item>',
+):
+    if expected not in styles_text:
+        errors.append(f"missing light system-bar invariant: {expected}")
 
 for kotlin_file in (ROOT / "app/src").rglob("*.kt"):
     kotlin_text = kotlin_file.read_text(encoding="utf-8")

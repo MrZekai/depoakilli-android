@@ -1,16 +1,18 @@
-# DepoAkıllı Gizlilik Politikası Taslağı
+# Akıllı Temizleyici Gizlilik Politikası Taslağı
 
-Son güncelleme: 16 Ağustos 2026
+Son güncelleme: 17 Ağustos 2026
 
-DepoAkıllı, kullanıcının cihazındaki depolama alanını analiz ederek temizleme önerileri sunar. Fotoğraf, video ve dosya içeriği analiz amacıyla geliştiricinin sunucularına yüklenmez. Analiz cihaz üzerinde gerçekleştirilir.
+Akıllı Temizleyici, kullanıcının cihazındaki depolama alanını analiz ederek temizleme önerileri sunar. Fotoğraf, video ve dosya içeriği analiz amacıyla geliştiricinin sunucularına yüklenmez. Analiz cihaz üzerinde gerçekleştirilir.
 
 ## Erişilen veriler
 
 Uygulama, kullanıcının izniyle fotoğraf ve video dosyalarının ad, boyut, tarih, tür ve içerik parmak izi gibi teknik özelliklerini işler. Bu bilgiler temizlik önerisi üretmek için cihaz üzerinde kullanılır.
 
+Android 8.0 ve üzerinde isteğe bağlı Uygulama Önbelleği Yöneticisi, Android'in sunduğu uygulama depolama istatistiklerini okuyabilmek için Kullanım Erişimi ister. Uygulama etiketi, paket adı ve bildirilen önbellek bayt toplamı yalnız cihazda işlenir; kişisel dosya içeriği okunmaz ve geliştiriciye yüklenmez. Paket görünürlüğü kullanıcı tarafından başlatılabilen uygulamalarla sınırlıdır; geniş `QUERY_ALL_PACKAGES` erişimi istenmez. Kullanım Erişimi Android Ayarları'ndan her zaman kaldırılabilir.
+
 ## Dosya silme
 
-DepoAkıllı kullanıcı seçimi olmadan dosya silmez. Desteklenen Android sürümlerinde silme işlemi ayrıca Android'in sistem onay ekranından geçirilir.
+Akıllı Temizleyici kullanıcı seçimi olmadan dosya silmez. Desteklenen Android sürümlerinde silme işlemi ayrıca Android'in sistem onay ekranından geçirilir. Başka bir uygulamanın önbelleği için Android'in resmî uygulama ayrıntıları ekranını açar; işlemi kullanıcı seçer.
 
 ## Reklamlar
 

@@ -13,9 +13,12 @@ Record the device model, Android version, app version, and result for every run.
 
 ## Cache tools
 
-- Open “Clear app cache”; verify a success/empty message appears and its displayed size becomes 0 B or near zero.
-- Open “App storage details”; verify Android opens this app's own storage/cache page.
-- Open “Memory and apps”; verify Android opens the installed-app management screen.
+- Open App Cache Manager with Usage Access denied; verify the explanatory card and button appear and no fake cache total is shown.
+- Grant Usage Access, return to the app, and verify scanning starts automatically without blocking the UI.
+- Compare at least three displayed app-cache values with Android Settings > Apps > [app] > Storage & cache. OEM rounding differences are acceptable; a persistent multi-gigabyte discrepancy is not.
+- Tap a listed app; verify Android opens that exact package's official app-details screen. Clear its cache through Android, return, refresh, and verify the total decreases.
+- Revoke Usage Access; verify the manager returns to the permission state without crashing or retaining a misleading total.
+- Clear Smart Cleaner's own cache; verify a success/empty message appears and its displayed size becomes 0 B or near zero.
 - Open “Storage settings” and “App language”; verify each lands on a relevant Android screen and the Back button returns safely.
 
 ## Scan and deletion
@@ -31,8 +34,7 @@ Record the device model, Android version, app version, and result for every run.
 - Clear app data, launch twice, and confirm no App Open ad is shown.
 - On the third foreground transition, confirm a Google test App Open ad may appear if loaded; app startup must continue if it is unavailable.
 - Confirm a second App Open ad cannot appear within two hours.
-- Confirm the Home screen shows one 300×250 MREC and no anchored banner at the same time.
-- Confirm AI Clean and Tools use the anchored banner and that no ad covers controls.
+- Confirm Home, AI Clean, and Tools show one anchored 320×50 banner above navigation and no 300×250 MREC.
 - Deny UMP consent where applicable and confirm the implementation follows the resulting `canRequestAds` state.
 
 ## Localization and resilience

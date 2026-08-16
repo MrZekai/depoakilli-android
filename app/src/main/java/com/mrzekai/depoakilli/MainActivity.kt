@@ -89,14 +89,15 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     onClearAppCache = cleanerViewModel::clearAppCache,
+                    onRefreshAppCaches = cleanerViewModel::refreshAppCaches,
                     onOptimizeMemory = {
                         cleanerViewModel.optimizeMemory {
                             interstitialAds.releaseForMemoryOptimization()
                             (application as DepoAkilliApplication).releaseAdMemory()
                         }
                     },
-                    onOpenAppStorageDetails = ::openAppStorageDetails,
-                    onOpenManageApps = ::openManageApps,
+                    onOpenPackageStorageDetails = ::openPackageStorageDetails,
+                    onOpenUsageAccessSettings = ::openUsageAccessSettings,
                     onOpenStorageSettings = ::openStorageSettings,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = { consentManager.showPrivacyOptions(this) },
@@ -109,6 +110,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         permissionRevision++
         cleanerViewModel.refreshDeviceState()
+        cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.load()
     }
 
@@ -150,6 +152,21 @@ class MainActivity : ComponentActivity() {
             Uri.parse("package:$packageName"),
         )
         startFirstAvailable(intent, Intent(Settings.ACTION_APPLICATION_SETTINGS))
+    }
+
+    private fun openPackageStorageDetails(targetPackageName: String) {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:$targetPackageName"),
+        )
+        startFirstAvailable(intent, Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS))
+    }
+
+    private fun openUsageAccessSettings() {
+        startFirstAvailable(
+            Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS),
+        )
     }
 
     private fun openManageApps() {

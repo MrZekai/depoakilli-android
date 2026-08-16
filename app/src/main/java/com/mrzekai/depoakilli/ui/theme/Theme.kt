@@ -1,17 +1,17 @@
 package com.mrzekai.depoakilli.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DepoColors = darkColorScheme(
+private val DepoColors = lightColorScheme(
     primary = Lime400,
-    onPrimary = Forest950,
+    onPrimary = Color.White,
     primaryContainer = Forest700,
-    onPrimaryContainer = Lime300,
-    secondary = Mint100,
-    onSecondary = Forest950,
+    onPrimaryContainer = WhiteSoft,
+    secondary = Teal500,
+    onSecondary = Color.White,
     background = Forest950,
     onBackground = WhiteSoft,
     surface = Forest900,
@@ -19,7 +19,7 @@ private val DepoColors = darkColorScheme(
     surfaceVariant = Forest800,
     onSurfaceVariant = Mint100,
     error = Red400,
-    outline = Color(0xFF719187),
+    outline = Color(0xFF8291A7),
 )
 
 @Composable

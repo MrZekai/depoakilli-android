@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
+import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.MemorySnapshot
@@ -15,14 +16,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 data class CleanerUiState(
     val storage: StorageSnapshot = StorageSnapshot(),
     val memory: MemorySnapshot = MemorySnapshot(),
     val ownCacheBytes: Long = 0L,
+    val appCache: AppCacheSnapshot = AppCacheSnapshot(),
     val summary: ScanSummary = ScanSummary(),
     val scanning: Boolean = false,
+    val scanningAppCaches: Boolean = false,
     val optimizingMemory: Boolean = false,
     val lastScanCompleted: Boolean = false,
     val message: String? = null,
@@ -32,11 +36,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private val repository = DeviceRepository(application)
     private val _state = MutableStateFlow(CleanerUiState())
     private var pendingDeletionBytes = 0L
+    private var appCacheRefreshJob: Job? = null
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
 
     init {
         refreshDeviceState()
+        refreshAppCaches()
     }
 
     fun refreshDeviceState() {
@@ -49,16 +55,42 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun refreshAppCaches() {
+        if (appCacheRefreshJob?.isActive == true || _state.value.scanning) return
+        _state.update { it.copy(scanningAppCaches = true) }
+        appCacheRefreshJob = viewModelScope.launch {
+            runCatching { repository.appCacheSnapshot() }
+                .onSuccess { snapshot ->
+                    _state.update {
+                        it.copy(appCache = snapshot, scanningAppCaches = false)
+                    }
+                }
+                .onFailure {
+                    _state.update { it.copy(scanningAppCaches = false) }
+                }
+        }
+    }
+
     fun scan(limitedAccess: Boolean) {
         if (_state.value.scanning) return
-        _state.update { it.copy(scanning = true, message = null) }
+        appCacheRefreshJob?.cancel()
+        _state.update {
+            it.copy(scanning = true, scanningAppCaches = true, message = null)
+        }
         viewModelScope.launch {
-            runCatching { repository.scan(limitedAccess) }
-                .onSuccess { summary ->
+            runCatching {
+                val summary = repository.scan(limitedAccess)
+                val appCache = runCatching { repository.appCacheSnapshot() }
+                    .getOrDefault(_state.value.appCache)
+                summary to appCache
+            }
+                .onSuccess { (summary, appCache) ->
                     _state.update {
                         it.copy(
                             summary = summary,
+                            appCache = appCache,
                             scanning = false,
+                            scanningAppCaches = false,
                             lastScanCompleted = true,
                             storage = repository.storageSnapshot(),
                             memory = repository.memorySnapshot(),
@@ -69,6 +101,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     _state.update { current ->
                         current.copy(
                             scanning = false,
+                            scanningAppCaches = false,
                             message = getApplication<Application>().getString(R.string.message_scan_failed),
                         )
                     }

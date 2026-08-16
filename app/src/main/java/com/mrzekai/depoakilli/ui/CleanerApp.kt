@@ -33,7 +33,6 @@ import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PhotoLibrary
@@ -48,7 +47,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -69,7 +67,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
@@ -83,7 +80,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.BannerAd
-import com.mrzekai.depoakilli.ads.MediumRectangleAd
+import com.mrzekai.depoakilli.model.AppCacheEntry
+import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -111,9 +109,10 @@ fun CleanerApp(
     onRequestMediaAccess: () -> Unit,
     onPrepareCleanup: () -> Unit,
     onClearAppCache: () -> Unit,
+    onRefreshAppCaches: () -> Unit,
     onOptimizeMemory: () -> Unit,
-    onOpenAppStorageDetails: () -> Unit,
-    onOpenManageApps: () -> Unit,
+    onOpenPackageStorageDetails: (String) -> Unit,
+    onOpenUsageAccessSettings: () -> Unit,
     onOpenStorageSettings: () -> Unit,
     onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
@@ -123,7 +122,7 @@ fun CleanerApp(
     val snackbarHostState = remember { SnackbarHostState() }
     val hasMediaAccess = hasFullMediaAccess || hasLimitedMediaAccess
     val adsCanBeShown = canRequestAds && hasMediaAccess && !state.scanning
-    val showAnchoredBanner = adsCanBeShown && selectedTabIndex != AppTab.HOME.ordinal
+    val showAnchoredBanner = adsCanBeShown
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -179,14 +178,13 @@ fun CleanerApp(
             AppTab.HOME -> HomeScreen(
                 state = state,
                 hasAccess = hasMediaAccess,
-                showMediumRectangleAd = adsCanBeShown,
                 onRequestAccess = onRequestMediaAccess,
                 onScan = {
                     selectedTabIndex = AppTab.CLEAN.ordinal
                     viewModel.scan(limitedAccess = !hasFullMediaAccess)
                 },
-                onClearAppCache = onClearAppCache,
                 onOptimizeMemory = onOptimizeMemory,
+                onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal },
                 modifier = Modifier.padding(padding),
             )
 
@@ -199,6 +197,7 @@ fun CleanerApp(
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
                 onClean = onPrepareCleanup,
+                onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal },
                 modifier = Modifier.padding(padding),
             )
 
@@ -206,9 +205,10 @@ fun CleanerApp(
                 state = state,
                 privacyOptionsRequired = privacyOptionsRequired,
                 onClearAppCache = onClearAppCache,
+                onRefreshAppCaches = onRefreshAppCaches,
                 onOptimizeMemory = onOptimizeMemory,
-                onOpenAppStorageDetails = onOpenAppStorageDetails,
-                onOpenManageApps = onOpenManageApps,
+                onOpenPackageStorageDetails = onOpenPackageStorageDetails,
+                onOpenUsageAccessSettings = onOpenUsageAccessSettings,
                 onOpenStorageSettings = onOpenStorageSettings,
                 onOpenLanguageSettings = onOpenLanguageSettings,
                 onShowPrivacyOptions = onShowPrivacyOptions,
@@ -222,11 +222,10 @@ fun CleanerApp(
 private fun HomeScreen(
     state: CleanerUiState,
     hasAccess: Boolean,
-    showMediumRectangleAd: Boolean,
     onRequestAccess: () -> Unit,
     onScan: () -> Unit,
-    onClearAppCache: () -> Unit,
     onOptimizeMemory: () -> Unit,
+    onOpenCacheManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -256,6 +255,13 @@ private fun HomeScreen(
             }
         }
         item {
+            AppCacheOverviewCard(
+                cache = state.appCache,
+                scanning = state.scanningAppCaches,
+                onClick = onOpenCacheManager,
+            )
+        }
+        item {
             MemoryCard(
                 memory = state.memory,
                 optimizing = state.optimizingMemory,
@@ -263,84 +269,15 @@ private fun HomeScreen(
             )
         }
         item {
-            Text(
-                stringResource(R.string.cleaning_center),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            ToolRow(
+                title = stringResource(R.string.media_cleanup),
+                subtitle = stringResource(R.string.media_cleanup_subtitle),
+                icon = Icons.Outlined.PhotoLibrary,
+                onClick = onScan,
             )
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard(
-                    stringResource(R.string.photos),
-                    stringResource(R.string.photos_subtitle),
-                    Icons.Outlined.PhotoLibrary,
-                    Modifier.weight(1f),
-                    onScan,
-                )
-                QuickActionCard(
-                    stringResource(R.string.large_videos),
-                    stringResource(R.string.large_videos_subtitle),
-                    Icons.Outlined.VideoFile,
-                    Modifier.weight(1f),
-                    onScan,
-                )
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard(
-                    stringResource(R.string.apk_packages),
-                    stringResource(R.string.apk_packages_subtitle),
-                    Icons.Outlined.Inventory2,
-                    Modifier.weight(1f),
-                    onScan,
-                )
-                QuickActionCard(
-                    stringResource(R.string.downloads),
-                    stringResource(R.string.downloads_subtitle),
-                    Icons.Outlined.Folder,
-                    Modifier.weight(1f),
-                    onScan,
-                )
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard(
-                    stringResource(R.string.app_cache_quick),
-                    stringResource(
-                        R.string.app_cache_quick_subtitle,
-                        ByteFormatter.format(state.ownCacheBytes),
-                    ),
-                    Icons.Outlined.CleaningServices,
-                    Modifier.weight(1f),
-                    onClearAppCache,
-                )
-                QuickActionCard(
-                    stringResource(R.string.memory_tools_quick),
-                    stringResource(R.string.memory_tools_quick_subtitle),
-                    Icons.Outlined.Memory,
-                    Modifier.weight(1f),
-                    onOptimizeMemory,
-                )
-            }
         }
         if (state.lastScanCompleted) {
             item { LastScanCard(state.summary, onScan) }
-        }
-        if (showMediumRectangleAd) {
-            item {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        stringResource(R.string.sponsored),
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline,
-                    )
-                    MediumRectangleAd(canRequestAds = true)
-                }
-            }
         }
     }
 }
@@ -443,6 +380,61 @@ private fun PermissionCard(onRequestAccess: () -> Unit) {
 }
 
 @Composable
+private fun AppCacheOverviewCard(
+    cache: AppCacheSnapshot,
+    scanning: Boolean,
+    onClick: () -> Unit,
+) {
+    val subtitle = when {
+        !cache.supported -> stringResource(R.string.cache_unsupported)
+        scanning -> stringResource(R.string.cache_scanning)
+        !cache.accessGranted -> stringResource(R.string.cache_access_explanation)
+        cache.totalCacheBytes == 0L -> stringResource(R.string.cache_empty)
+        else -> stringResource(
+            R.string.cache_summary,
+            ByteFormatter.format(cache.totalCacheBytes),
+            cache.entries.size,
+        )
+    }
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = RoundedCornerShape(22.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(color = MaterialTheme.colorScheme.primary, shape = CircleShape) {
+                Icon(
+                    Icons.Outlined.CleaningServices,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.padding(10.dp),
+                )
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.cache_manager_title),
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (scanning) {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+            } else {
+                Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+            }
+        }
+    }
+}
+
+@Composable
 private fun MemoryCard(
     memory: MemorySnapshot,
     optimizing: Boolean,
@@ -454,76 +446,41 @@ private fun MemoryCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(22.dp),
     ) {
-        Column(Modifier.fillMaxWidth().padding(18.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(color = Forest800, shape = CircleShape) {
                 Icon(
                     Icons.Outlined.Memory,
                     contentDescription = null,
                     tint = if (memory.lowMemory) Amber400 else Lime400,
+                    modifier = Modifier.padding(10.dp),
                 )
-                Spacer(Modifier.width(10.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
                 Text(
                     stringResource(
                         if (optimizing) R.string.memory_optimizing else R.string.memory_status,
                     ),
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
                 )
-                if (optimizing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        strokeWidth = 2.dp,
-                    )
-                } else {
-                    Text("%${(memory.usedFraction * 100).toInt()}", fontWeight = FontWeight.Bold)
-                }
+                Text(
+                    stringResource(
+                        R.string.memory_compact_subtitle,
+                        ByteFormatter.format(memory.availableBytes),
+                        ByteFormatter.format(memory.appUsedBytes),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-            Spacer(Modifier.height(12.dp))
-            LinearProgressIndicator(
-                progress = { memory.usedFraction.coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
-                color = if (memory.lowMemory) Amber400 else Lime400,
-                trackColor = Forest800,
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                stringResource(
-                    R.string.memory_available,
-                    ByteFormatter.format(memory.availableBytes),
-                    ByteFormatter.format(memory.appUsedBytes),
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun QuickActionCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    modifier: Modifier,
-    onClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(22.dp),
-    ) {
-        Column(Modifier.padding(16.dp)) {
-            Surface(color = Forest800, shape = CircleShape) {
-                Icon(icon, contentDescription = null, tint = Lime400, modifier = Modifier.padding(10.dp))
+            if (optimizing) {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+            } else {
+                Text("%${(memory.usedFraction * 100).toInt()}", fontWeight = FontWeight.Bold)
             }
-            Spacer(Modifier.height(14.dp))
-            Text(title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(
-                subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }
@@ -567,6 +524,7 @@ private fun CleanScreen(
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
     onClean: () -> Unit,
+    onOpenCacheManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -591,10 +549,12 @@ private fun CleanScreen(
 
         else -> ScanResults(
             summary = state.summary,
+            appCache = state.appCache,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
             onScan = onScan,
             onClean = onClean,
+            onOpenCacheManager = onOpenCacheManager,
             modifier = modifier,
         )
     }
@@ -646,10 +606,12 @@ private fun EmptyScanState(
 @Composable
 private fun ScanResults(
     summary: ScanSummary,
+    appCache: AppCacheSnapshot,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
     onScan: () -> Unit,
     onClean: () -> Unit,
+    onOpenCacheManager: () -> Unit,
     modifier: Modifier,
 ) {
     Column(modifier.fillMaxSize()) {
@@ -675,12 +637,14 @@ private fun ScanResults(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(20.dp)) {
                         Text(
-                            stringResource(R.string.cleanable_space),
+                            stringResource(R.string.space_found),
                             style = MaterialTheme.typography.labelMedium,
                             color = Mint100,
                         )
                         Text(
-                            ByteFormatter.format(summary.selectedBytes),
+                            ByteFormatter.format(
+                                summary.selectedBytes + appCache.totalCacheBytes,
+                            ),
                             fontSize = 38.sp,
                             fontWeight = FontWeight.Black,
                             color = Lime400,
@@ -692,10 +656,28 @@ private fun ScanResults(
                                 summary.selectedItems.size,
                             ),
                         )
+                        Text(
+                            stringResource(
+                                R.string.scan_space_breakdown,
+                                ByteFormatter.format(summary.selectedBytes),
+                                ByteFormatter.format(appCache.totalCacheBytes),
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
-            if (summary.items.isEmpty()) {
+            if (!appCache.accessGranted || appCache.totalCacheBytes > 0L) {
+                item {
+                    CacheScanResultCard(appCache, onOpenCacheManager)
+                }
+            }
+            if (
+                summary.items.isEmpty() &&
+                appCache.accessGranted &&
+                appCache.totalCacheBytes == 0L
+            ) {
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                         Column(
@@ -745,6 +727,48 @@ private fun ScanResults(
                         fontWeight = FontWeight.Black,
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CacheScanResultCard(
+    cache: AppCacheSnapshot,
+    onOpenCacheManager: () -> Unit,
+) {
+    val title = if (cache.accessGranted) {
+        stringResource(R.string.cache_detected_title)
+    } else {
+        stringResource(R.string.cache_access_required)
+    }
+    val description = when {
+        !cache.supported -> stringResource(R.string.cache_unsupported)
+        !cache.accessGranted -> stringResource(R.string.cache_scan_not_enabled)
+        else -> stringResource(
+            R.string.cache_detected_description,
+            ByteFormatter.format(cache.totalCacheBytes),
+            cache.entries.size,
+        )
+    }
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = Lime400)
+                Spacer(Modifier.width(10.dp))
+                Text(title, fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            TextButton(onClick = onOpenCacheManager, modifier = Modifier.align(Alignment.End)) {
+                Text(stringResource(R.string.review_cache))
             }
         }
     }
@@ -852,9 +876,10 @@ private fun ToolsScreen(
     state: CleanerUiState,
     privacyOptionsRequired: Boolean,
     onClearAppCache: () -> Unit,
+    onRefreshAppCaches: () -> Unit,
     onOptimizeMemory: () -> Unit,
-    onOpenAppStorageDetails: () -> Unit,
-    onOpenManageApps: () -> Unit,
+    onOpenPackageStorageDetails: (String) -> Unit,
+    onOpenUsageAccessSettings: () -> Unit,
     onOpenStorageSettings: () -> Unit,
     onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
@@ -877,6 +902,48 @@ private fun ToolsScreen(
             )
         }
         item {
+            CacheManagerPanel(
+                cache = state.appCache,
+                scanning = state.scanningAppCaches,
+                onGrantAccess = onOpenUsageAccessSettings,
+                onRefresh = onRefreshAppCaches,
+            )
+        }
+        if (state.appCache.accessGranted && state.appCache.entries.isNotEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.cache_other_apps),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    stringResource(R.string.cache_open_settings_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            items(
+                items = state.appCache.entries.take(MAX_DISPLAYED_CACHE_APPS),
+                key = AppCacheEntry::packageName,
+            ) { entry ->
+                AppCacheRow(
+                    entry = entry,
+                    onClick = { onOpenPackageStorageDetails(entry.packageName) },
+                )
+            }
+        }
+        item {
+            ToolRow(
+                title = stringResource(R.string.cache_own_app),
+                subtitle = stringResource(
+                    R.string.cache_own_app_subtitle,
+                    ByteFormatter.format(state.ownCacheBytes),
+                ),
+                icon = Icons.Outlined.CleaningServices,
+                onClick = onClearAppCache,
+            )
+        }
+        item {
             ToolRow(
                 title = if (state.optimizingMemory) {
                     stringResource(R.string.memory_optimizing)
@@ -895,41 +962,10 @@ private fun ToolsScreen(
         }
         item {
             ToolRow(
-                title = stringResource(R.string.clear_app_cache),
-                subtitle = stringResource(
-                    R.string.clear_app_cache_subtitle,
-                    ByteFormatter.format(state.ownCacheBytes),
-                ),
-                icon = Icons.Outlined.CleaningServices,
-                onClick = onClearAppCache,
-            )
-        }
-        item {
-            ToolRow(
-                title = stringResource(R.string.app_storage_details),
-                subtitle = stringResource(R.string.app_storage_details_subtitle),
-                icon = Icons.Outlined.Info,
-                onClick = onOpenAppStorageDetails,
-            )
-        }
-        item {
-            ToolRow(
                 title = stringResource(R.string.storage_settings),
                 subtitle = stringResource(R.string.storage_settings_subtitle),
                 icon = Icons.Outlined.Storage,
                 onClick = onOpenStorageSettings,
-            )
-        }
-        item {
-            ToolRow(
-                title = stringResource(R.string.memory_and_apps),
-                subtitle = stringResource(
-                    R.string.memory_and_apps_subtitle,
-                    ByteFormatter.format(state.memory.availableBytes),
-                    ByteFormatter.format(state.memory.totalBytes),
-                ),
-                icon = Icons.Outlined.Memory,
-                onClick = onOpenManageApps,
             )
         }
         item {
@@ -957,12 +993,143 @@ private fun ToolsScreen(
             Row(verticalAlignment = Alignment.Top) {
                 Icon(Icons.Outlined.Info, contentDescription = null, tint = Lime400)
                 Spacer(Modifier.width(12.dp))
-                Text(
-                    stringResource(R.string.honest_memory_note),
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(
+                        stringResource(R.string.cache_manual_notice),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Text(
+                        stringResource(R.string.honest_memory_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CacheManagerPanel(
+    cache: AppCacheSnapshot,
+    scanning: Boolean,
+    onGrantAccess: () -> Unit,
+    onRefresh: () -> Unit,
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = RoundedCornerShape(22.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(color = MaterialTheme.colorScheme.primary, shape = CircleShape) {
+                    Icon(
+                        Icons.Outlined.CleaningServices,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(10.dp),
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.cache_manager_title),
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        stringResource(R.string.cache_manager_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            when {
+                !cache.supported -> Text(
+                    stringResource(R.string.cache_unsupported),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
+                scanning -> Row(verticalAlignment = Alignment.CenterVertically) {
+                    CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.cache_scanning))
+                }
+
+                !cache.accessGranted -> {
+                    Text(
+                        stringResource(R.string.cache_access_explanation),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Button(onClick = onGrantAccess, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.cache_grant_action))
+                    }
+                }
+
+                else -> {
+                    Text(
+                        if (cache.totalCacheBytes == 0L) {
+                            stringResource(R.string.cache_empty)
+                        } else {
+                            stringResource(
+                                R.string.cache_summary,
+                                ByteFormatter.format(cache.totalCacheBytes),
+                                cache.entries.size,
+                            )
+                        },
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    TextButton(onClick = onRefresh, modifier = Modifier.align(Alignment.End)) {
+                        Text(stringResource(R.string.cache_refresh))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppCacheRow(
+    entry: AppCacheEntry,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(18.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(color = Forest800, shape = CircleShape) {
+                Icon(
+                    Icons.Outlined.Android,
+                    contentDescription = null,
+                    tint = Lime400,
+                    modifier = Modifier.padding(9.dp),
                 )
             }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    entry.label,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    ByteFormatter.format(entry.cacheBytes),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
         }
     }
 }
@@ -1006,3 +1173,5 @@ private fun ToolRow(
         }
     }
 }
+
+private const val MAX_DISPLAYED_CACHE_APPS = 12

@@ -4,21 +4,14 @@ Tüm reklam biçimleri yalnızca UMP izin akışı reklam isteğine izin verdiğ
 Debug derlemeleri Google'ın resmî test kimliklerini kullanır; canlı kimlikler yalnız
 imzalı release iş akışında GitHub Secrets üzerinden sağlanır.
 
-## Ana Sayfa: orta dikdörtgen (MREC)
-
-- Boyut: 300 × 250 (`AdSize.MEDIUM_RECTANGLE`).
-- Konum: Ana Sayfa akışında araç kartları ve son tarama bilgisinden sonra.
-- Aynı anda alttaki sabit banner gösterilmez. Böylece reklam yoğunluğu ve yanlış
-  tıklama riski azaltılır.
-- Medya erişimi verilmeden, UMP izin vermeden veya tarama sürerken gösterilmez.
-- Reklam alanı açıkça “Sponsorlu / Sponsored” olarak etiketlenir.
-
-## AI Temizlik ve Araçlar: sabit banner
+## Tüm ana sekmeler: sabit banner
 
 - Boyut: 320 × 50 standart banner.
 - Konum: Alt navigasyonun hemen üstü.
-- Ana Sayfa'da MREC bulunduğu için bu banner gizlenir.
+- Ana Sayfa, AI Temizlik ve Araçlar sekmelerinde aynı görünür konumu kullanır.
 - Medya erişimi verilmeden, UMP izin vermeden veya tarama sürerken gösterilmez.
+- Ana Sayfa'daki 300 × 250 MREC kaldırılmıştır; böylece içerik tekrarı ve reklam
+  yoğunluğu azaltılırken küçük banner her zaman bulunabilir kalır.
 
 ## Temizlik sonrası geçiş reklamı
 

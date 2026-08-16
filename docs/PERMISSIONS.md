@@ -12,6 +12,17 @@
 
 Bu izinler uygulamanın temel işlevi olan fotoğraf/video depolama yönetimi için kullanılır. İçerik analizi cihaz üzerinde gerçekleşir.
 
+## Uygulama önbelleği ölçümü
+
+`PACKAGE_USAGE_STATS`, Android 8.0 ve üzerindeki cihazlarda diğer kullanıcı uygulamalarının bildirdiği önbellek toplamlarını `StorageStatsManager` ile okuyabilmek için bildirilir. Bu normal bir çalışma zamanı izni değildir; kullanıcı Android'in Kullanım Erişimi ekranından ayrıca etkinleştirir.
+
+- Yalnız uygulama etiketi, paket adı ve toplam önbellek baytı işlenir.
+- Kişisel dosya içeriği, kullanım zamanı veya kullanım geçmişi okunmaz.
+- Sorgu arka plan iş parçacığında ve yalnız uygulama açıldığında, geri dönüldüğünde, kullanıcı yenilediğinde veya Akıllı Tarama başlatıldığında çalışır.
+- Başka uygulamaların özel önbelleği sessizce silinmez. Kullanıcı ilgili uygulamaya dokunduğunda Android'in resmî uygulama ayrıntıları ekranı açılır.
+
+Paket görünürlüğü `QUERY_ALL_PACKAGES` ile genişletilmez. Manifestte yalnız ana ekranda başlatılabilen kullanıcı uygulamaları için kapsamlı bir `MAIN` + `LAUNCHER` sorgusu bulunur.
+
 ## Bilinçli olarak istenmeyen izinler
 
 - `MANAGE_EXTERNAL_STORAGE`

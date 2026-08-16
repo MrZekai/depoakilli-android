@@ -2,14 +2,14 @@
 
 `com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi. Paket kimliği kalıcıdır; görünen global marka adı ASO ve marka araştırmasından sonra kesinleşecektir.
 
-Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulamanın kendi önbelleğini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
+Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulama önbelleklerini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
 
 ## Çalışan ilk sürüm
 
 - Android 16 / API 36 hedefi
 - İngilizce varsayılan arayüz ve tam Türkçe yerelleştirme
 - Android 13+ uygulama dili ayarı
-- Modern koyu zümrüt Compose arayüzü
+- Modern açık mavi/turkuaz Compose arayüzü ve sadeleştirilmiş ana ekran
 - Depolama ve gerçek RAM durumu
 - Gerçek PSS ölçümlü uygulama RAM optimizasyonu; geçici tarama ve tam ekran reklam belleğini serbest bırakma
 - Cihaz-içi, açıklanabilir AI temizlik puanı
@@ -19,20 +19,23 @@ Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in
 - Aynı boyuttaki adaylarda tam SHA-256 içerik doğrulamalı yinelenen dosya tespiti
 - Android 11+ toplu silme onay ekranı
 - Uygulamanın kendi önbelleğini doğrudan ve güvenli temizleme
+- Kullanıcı Kullanım Erişimi verdikten sonra Android `StorageStatsManager` ile cihaz geneli gerçek cache toplamı
+- Ana ekranda başlatılabilen uygulamaları cache boyutuna göre sıralayan ve doğru Android uygulama ekranını açan önbellek yöneticisi
 - Uygulama depolama, cihaz depolama, bellek/uygulama ve dil ayarlarına çalışan yönlendirmeler
 - Google Mobile Ads 25.4.0 test entegrasyonu
 - UMP 4.0.0 reklam gizlilik/onay akışı
-- Ana Sayfa'da 300×250 MREC, diğer sekmelerde sabit banner
+- Ana Sayfa dâhil üç sekmede navigasyon üstünde görünür sabit banner
 - Temizlik sonrasında aralıklı geçiş reklamı
 - İlk iki kullanımı bölmeyen, iki saat sıklık sınırlı uygulama açılış reklamı
 - Test AdMob kimlikleriyle release üretimini durduran koruma
 - GitHub Actions debug APK ve manuel imzalı AAB iş akışları
+- Aynı sertifikayla güncellenebilen, production'dan ayrı `com.mrzekai.depoakilli.qa` test APK'sı
 
 ## Teknik sınırlar
 
-Android 11 ve üzeri, bir uygulamanın başka uygulamaların özel dizinlerini ve önbelleğini sessizce silmesini engeller. Bu nedenle uygulama:
+Android, normal bir Play uygulamasının başka uygulamaların özel dizinlerini ve önbelleğini sessizce silmesini engeller. Bu nedenle uygulama:
 
-- başka uygulamaların özel cache dizinlerini doğrudan silmez;
+- başka uygulamaların gerçek cache toplamını ölçer ancak özel cache dizinlerini doğrudan silmez; ilgili Android ekranını açar;
 - RAM'i zorla boşaltmış gibi davranmaz;
 - kullanıcı görmeden dosya silmez;
 - `MANAGE_EXTERNAL_STORAGE` iznini ilk Play sürümünde istemez;
@@ -56,6 +59,11 @@ Debug APK:
 ```text
 app/build/outputs/apk/debug/app-debug.apk
 ```
+
+GitHub Actions test APK'sı kalıcı QA sertifikasıyla imzalanır ve görünür adı
+`Akıllı Temizleyici QA` olur. Eski `.debug` test uygulamasının yanına kurulabilir;
+sonraki `.qa` APK'lar veri silmeden güncelleme olur. QA ve Play release imzalarının
+ayrımı [`docs/QA_SIGNING.md`](docs/QA_SIGNING.md) içinde açıklanmıştır.
 
 ## AdMob
 

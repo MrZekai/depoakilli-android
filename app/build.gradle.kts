@@ -21,6 +21,7 @@ val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
 val releaseKeyPassword = providers.environmentVariable("ANDROID_KEY_PASSWORD")
+val qaKeystore = rootProject.file("keystore/depoakilli-ci-qa.jks")
 
 android {
     namespace = "com.mrzekai.depoakilli"
@@ -30,8 +31,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 23
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -44,6 +45,12 @@ android {
     }
 
     signingConfigs {
+        getByName("debug") {
+            storeFile = qaKeystore
+            storePassword = "depoakilli-qa"
+            keyAlias = "depoakilliQa"
+            keyPassword = "depoakilli-qa"
+        }
         if (
             releaseKeystorePath.isPresent &&
             releaseKeystorePassword.isPresent &&
@@ -61,9 +68,10 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = true

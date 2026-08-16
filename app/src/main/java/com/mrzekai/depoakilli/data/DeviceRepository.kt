@@ -1,17 +1,26 @@
 package com.mrzekai.depoakilli.data
 
 import android.app.ActivityManager
+import android.app.AppOpsManager
 import android.app.PendingIntent
+import android.app.usage.StorageStatsManager
 import android.content.ContentUris
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Debug
 import android.os.Environment
+import android.os.Process
 import android.os.StatFs
+import android.os.storage.StorageManager
 import android.provider.MediaStore
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AiAssessment
+import com.mrzekai.depoakilli.model.AppCacheEntry
+import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.IndexedFile
@@ -57,6 +66,88 @@ class DeviceRepository(
 
     fun ownCacheSize(): Long = directorySize(context.cacheDir) +
         (context.externalCacheDir?.let(::directorySize) ?: 0L)
+
+    @Suppress("DEPRECATION")
+    fun hasUsageAccess(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            appOps.unsafeCheckOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                Process.myUid(),
+                context.packageName,
+            )
+        } else {
+            appOps.checkOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                Process.myUid(),
+                context.packageName,
+            )
+        }
+        return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    suspend fun appCacheSnapshot(): AppCacheSnapshot = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return@withContext AppCacheSnapshot(supported = false)
+        }
+        if (!hasUsageAccess()) {
+            return@withContext AppCacheSnapshot(supported = true, accessGranted = false)
+        }
+
+        val packageManager = context.packageManager
+        val launcherIntent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
+        val resolveInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentActivities(
+                launcherIntent,
+                PackageManager.ResolveInfoFlags.of(0L),
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.queryIntentActivities(launcherIntent, 0)
+        }
+        val applications = resolveInfos
+            .mapNotNull { it.activityInfo?.applicationInfo }
+            .filterNot { it.packageName == context.packageName }
+            .distinctBy(ApplicationInfo::packageName)
+
+        val storageStats = context.getSystemService(StorageStatsManager::class.java)
+        val user = Process.myUserHandle()
+        val reportedOtherAppsCacheBytes = runCatching {
+            val allAppsCache = storageStats.queryStatsForUser(
+                StorageManager.UUID_DEFAULT,
+                user,
+            ).cacheBytes
+            (allAppsCache - ownCacheSize()).coerceAtLeast(0L)
+        }.getOrDefault(0L)
+        val entries = applications.mapNotNull { application ->
+            coroutineContext.ensureActive()
+            runCatching {
+                val volume = application.storageUuid ?: StorageManager.UUID_DEFAULT
+                val cacheBytes = storageStats.queryStatsForPackage(
+                    volume,
+                    application.packageName,
+                    user,
+                ).cacheBytes.coerceAtLeast(0L)
+                if (cacheBytes == 0L) return@runCatching null
+                AppCacheEntry(
+                    packageName = application.packageName,
+                    label = application.loadLabel(packageManager).toString().ifBlank {
+                        application.packageName
+                    },
+                    cacheBytes = cacheBytes,
+                )
+            }.getOrNull()
+        }
+
+        AppCacheSnapshot(
+            supported = true,
+            accessGranted = true,
+            entries = entries.sortedByDescending(AppCacheEntry::cacheBytes),
+            scannedAppCount = applications.size,
+            reportedOtherAppsCacheBytes = reportedOtherAppsCacheBytes,
+        )
+    }
 
     suspend fun clearOwnCache(): Long = withContext(Dispatchers.IO) {
         val before = ownCacheSize()
