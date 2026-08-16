@@ -90,6 +90,15 @@ for expected in (
     if expected not in workflow_text:
         errors.append(f"missing CI invariant: {expected}")
 
+for kotlin_file in (ROOT / "app/src").rglob("*.kt"):
+    kotlin_text = kotlin_file.read_text(encoding="utf-8")
+    if "import androidx.compose.foundation.layout.weight" in kotlin_text:
+        errors.append(
+            "forbidden Compose scope-member import in "
+            f"{kotlin_file.relative_to(ROOT)}: remove the weight import and call "
+            "Modifier.weight only inside a RowScope or ColumnScope",
+        )
+
 if errors:
     print("Project validation failed:", file=sys.stderr)
     for error in errors:
