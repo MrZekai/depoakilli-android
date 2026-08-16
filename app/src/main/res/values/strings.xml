@@ -1,4 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DepoAkıllı</string>
+    <string name="app_name">Smart Cleaner</string>
+    <string name="app_tagline">AI PHONE CLEANER</string>
+
+    <string name="tab_home">Home</string>
+    <string name="tab_clean">AI Clean</string>
+    <string name="tab_tools">Tools</string>
+
+    <string name="scan_primary">START SMART AI SCAN</string>
+    <string name="scan_primary_subtitle">Analyze safe suggestions on your device</string>
+    <string name="cleaning_center">Cleaning center</string>
+    <string name="photos">Photos</string>
+    <string name="photos_subtitle">Similar and old</string>
+    <string name="large_videos">Large videos</string>
+    <string name="large_videos_subtitle">Over 150 MB</string>
+    <string name="apk_packages">APK packages</string>
+    <string name="apk_packages_subtitle">Old installers</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloads_subtitle">Old files</string>
+    <string name="app_cache_quick">App cache</string>
+    <string name="app_cache_quick_subtitle">%1$s temporary files</string>
+    <string name="memory_tools_quick">RAM optimization</string>
+    <string name="memory_tools_quick_subtitle">Release temporary app memory</string>
+
+    <string name="storage_full">FULL</string>
+    <string name="phone_storage">Phone storage</string>
+    <string name="storage_used">%1$s used</string>
+    <string name="storage_free">%1$s free</string>
+    <string name="storage_total">Total %1$s</string>
+
+    <string name="media_access_required">Media access required</string>
+    <string name="media_access_explanation">Photos and videos are analyzed only on your device.</string>
+    <string name="grant_access">Allow</string>
+
+    <string name="memory_status">Memory status</string>
+    <string name="memory_available">%1$s RAM available • this app: %2$s</string>
+    <string name="last_scan">Last scan</string>
+    <string name="last_scan_summary">%1$d suggestions • %2$s</string>
+
+    <string name="scan_in_progress">AI is analyzing files…</string>
+    <string name="scan_private">Your content never leaves the device</string>
+    <string name="safe_ai_cleaning">Safe AI cleaning</string>
+    <string name="safe_ai_cleaning_description">File age, size, type, and content fingerprints are analyzed on your device. You always make the final decision.</string>
+    <string name="start_scan">Start scan</string>
+    <string name="grant_and_scan">Allow access and scan</string>
+    <string name="limited_access_notice">Limited access: only the media you selected was analyzed.</string>
+    <string name="cleanable_space">CLEANABLE SPACE</string>
+    <string name="scan_stats">%1$d files scanned • %2$d selected</string>
+    <string name="no_safe_suggestions">Great! No safe cleaning suggestions were found.</string>
+    <string name="scan_again">Scan again</string>
+    <string name="clean_action">%1$s CLEAN</string>
+    <string name="category_summary">%1$d items • %2$s</string>
+    <string name="file_confidence">%1$s • %2$d%% confidence</string>
+
+    <string name="tools_title">Device tools</string>
+    <string name="tools_subtitle">Use real Android controls and safe on-device cleanup.</string>
+    <string name="clear_app_cache">Clear app cache</string>
+    <string name="clear_app_cache_subtitle">Remove %1$s of safe temporary files now</string>
+    <string name="app_storage_details">App storage details</string>
+    <string name="app_storage_details_subtitle">Open Android storage and cache controls for this app</string>
+    <string name="storage_settings">Storage settings</string>
+    <string name="storage_settings_subtitle">Manage device and application storage usage</string>
+    <string name="memory_and_apps">Memory and apps</string>
+    <string name="memory_and_apps_subtitle">%1$s available / %2$s total • review installed apps</string>
+    <string name="memory_optimizer">Optimize app memory</string>
+    <string name="memory_optimizer_subtitle">%1$s available • this app uses %2$s</string>
+    <string name="memory_optimizing">Optimizing memory…</string>
+    <string name="language_settings">App language</string>
+    <string name="language_settings_subtitle">Choose English, Turkish, or the device default</string>
+    <string name="ad_privacy_preferences">Ad privacy preferences</string>
+    <string name="ad_privacy_preferences_subtitle">Change consent and personalization choices</string>
+    <string name="honest_memory_note">RAM optimization releases this app’s scan results and preloaded full-screen ads, then measures its real PSS memory again. Android 14+ prevents third-party apps from killing other apps; device-wide process reclamation remains under Android’s control.</string>
+    <string name="sponsored">Sponsored</string>
+
+    <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
+    <string name="message_select_item">Select at least one item to clean.</string>
+    <string name="message_cleanup_cancelled">Cleanup was cancelled.</string>
+    <string name="message_cleanup_complete">Cleanup complete.</string>
+    <string name="message_cache_cleared">%1$s of temporary app cache cleared.</string>
+    <string name="message_cache_already_empty">The app cache is already empty.</string>
+    <string name="message_memory_optimized">%1$s of this app’s memory released • %2$s RAM available</string>
+    <string name="message_memory_optimized_stable">Temporary app memory released • %1$s RAM available</string>
+
+    <string name="category_duplicates">Duplicates</string>
+    <string name="category_duplicates_description">Unnecessary copies with identical content</string>
+    <string name="category_screenshots">Screenshots</string>
+    <string name="category_screenshots_description">Older screenshots</string>
+    <string name="category_large_videos">Large videos</string>
+    <string name="category_large_videos_description">Videos using the most storage</string>
+    <string name="category_old_downloads">Old downloads</string>
+    <string name="category_old_downloads_description">Files left in Downloads for a long time</string>
+    <string name="category_apk_packages">APK packages</string>
+    <string name="category_apk_packages_description">Installer packages left after installation</string>
+    <string name="category_app_cache">Cache</string>
+    <string name="category_app_cache_description">Safe temporary app files</string>
+
+    <string name="reason_old_installer">%1$d-day-old installer package</string>
+    <string name="reason_downloaded_installer">Downloaded installer package</string>
+    <string name="reason_old_screenshot">%1$d-day-old screenshot</string>
+    <string name="reason_large_video">%1$d-day-old large video</string>
+    <string name="reason_old_download">In Downloads for %1$d days</string>
+    <string name="reason_exact_duplicate">Content fingerprint is an exact match</string>
+    <string name="reason_probable_duplicate">Size and content samples match</string>
+    <string name="cache_item_name">Smart Cleaner cache</string>
+    <string name="cache_item_path">App cache</string>
+    <string name="reason_safe_cache">Safe temporary files</string>
+    <string name="unnamed_file">Unnamed file</string>
 </resources>

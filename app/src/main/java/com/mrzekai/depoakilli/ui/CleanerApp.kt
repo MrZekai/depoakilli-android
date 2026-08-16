@@ -2,6 +2,7 @@
 
 package com.mrzekai.depoakilli.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Inventory2
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
@@ -73,12 +75,15 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.BannerAd
+import com.mrzekai.depoakilli.ads.MediumRectangleAd
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -90,10 +95,10 @@ import com.mrzekai.depoakilli.ui.theme.Forest800
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import com.mrzekai.depoakilli.ui.theme.Mint100
 
-private enum class AppTab(val title: String, val icon: ImageVector) {
-    HOME("Ana Sayfa", Icons.Outlined.Home),
-    CLEAN("AI Temizlik", Icons.Outlined.CleaningServices),
-    TOOLS("Araçlar", Icons.Outlined.Settings),
+private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
+    HOME(R.string.tab_home, Icons.Outlined.Home),
+    CLEAN(R.string.tab_clean, Icons.Outlined.CleaningServices),
+    TOOLS(R.string.tab_tools, Icons.Outlined.Settings),
 }
 
 @Composable
@@ -105,15 +110,20 @@ fun CleanerApp(
     privacyOptionsRequired: Boolean,
     onRequestMediaAccess: () -> Unit,
     onPrepareCleanup: () -> Unit,
-    onOpenSystemCache: () -> Unit,
+    onClearAppCache: () -> Unit,
+    onOptimizeMemory: () -> Unit,
+    onOpenAppStorageDetails: () -> Unit,
+    onOpenManageApps: () -> Unit,
     onOpenStorageSettings: () -> Unit,
+    onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
     val hasMediaAccess = hasFullMediaAccess || hasLimitedMediaAccess
-    val showBannerAd = canRequestAds && hasMediaAccess && !state.scanning
+    val adsCanBeShown = canRequestAds && hasMediaAccess && !state.scanning
+    val showAnchoredBanner = adsCanBeShown && selectedTabIndex != AppTab.HOME.ordinal
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -129,9 +139,9 @@ fun CleanerApp(
             TopAppBar(
                 title = {
                     Column {
-                        Text("DepoAkıllı", fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.app_name), fontWeight = FontWeight.Black)
                         Text(
-                            "AI TELEFON TEMİZLEYİCİ",
+                            stringResource(R.string.app_tagline),
                             style = MaterialTheme.typography.labelSmall,
                             color = Lime400,
                             letterSpacing = 1.2.sp,
@@ -150,16 +160,15 @@ fun CleanerApp(
                     .background(MaterialTheme.colorScheme.surface)
                     .navigationBarsPadding(),
             ) {
-                // Fixed placement: above bottom navigation. Hidden before media
-                // access and while the AI scan is actively running.
-                BannerAd(canRequestAds = showBannerAd)
+                BannerAd(canRequestAds = showAnchoredBanner)
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                     AppTab.entries.forEachIndexed { index, tab ->
+                        val tabTitle = stringResource(tab.titleRes)
                         NavigationBarItem(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
-                            icon = { Icon(tab.icon, contentDescription = tab.title) },
-                            label = { Text(tab.title) },
+                            icon = { Icon(tab.icon, contentDescription = tabTitle) },
+                            label = { Text(tabTitle) },
                         )
                     }
                 }
@@ -170,11 +179,14 @@ fun CleanerApp(
             AppTab.HOME -> HomeScreen(
                 state = state,
                 hasAccess = hasMediaAccess,
+                showMediumRectangleAd = adsCanBeShown,
                 onRequestAccess = onRequestMediaAccess,
                 onScan = {
                     selectedTabIndex = AppTab.CLEAN.ordinal
                     viewModel.scan(limitedAccess = !hasFullMediaAccess)
                 },
+                onClearAppCache = onClearAppCache,
+                onOptimizeMemory = onOptimizeMemory,
                 modifier = Modifier.padding(padding),
             )
 
@@ -193,8 +205,12 @@ fun CleanerApp(
             AppTab.TOOLS -> ToolsScreen(
                 state = state,
                 privacyOptionsRequired = privacyOptionsRequired,
-                onOpenSystemCache = onOpenSystemCache,
+                onClearAppCache = onClearAppCache,
+                onOptimizeMemory = onOptimizeMemory,
+                onOpenAppStorageDetails = onOpenAppStorageDetails,
+                onOpenManageApps = onOpenManageApps,
                 onOpenStorageSettings = onOpenStorageSettings,
+                onOpenLanguageSettings = onOpenLanguageSettings,
                 onShowPrivacyOptions = onShowPrivacyOptions,
                 modifier = Modifier.padding(padding),
             )
@@ -206,8 +222,11 @@ fun CleanerApp(
 private fun HomeScreen(
     state: CleanerUiState,
     hasAccess: Boolean,
+    showMediumRectangleAd: Boolean,
     onRequestAccess: () -> Unit,
     onScan: () -> Unit,
+    onClearAppCache: () -> Unit,
+    onOptimizeMemory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -228,29 +247,100 @@ private fun HomeScreen(
                 Icon(Icons.Outlined.AutoAwesome, contentDescription = null)
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text("AI AKILLI TARAMAYI BAŞLAT", fontWeight = FontWeight.Black)
-                    Text("Güvenli önerileri cihazında analiz et", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.scan_primary), fontWeight = FontWeight.Black)
+                    Text(
+                        stringResource(R.string.scan_primary_subtitle),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
         }
-        item { MemoryCard(state.memory) }
         item {
-            Text("Temizlik merkezi", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            MemoryCard(
+                memory = state.memory,
+                optimizing = state.optimizingMemory,
+                onClick = onOptimizeMemory,
+            )
+        }
+        item {
+            Text(
+                stringResource(R.string.cleaning_center),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard("Fotoğraflar", "Benzer ve eski", Icons.Outlined.PhotoLibrary, Modifier.weight(1f), onScan)
-                QuickActionCard("Büyük videolar", "150 MB üzeri", Icons.Outlined.VideoFile, Modifier.weight(1f), onScan)
+                QuickActionCard(
+                    stringResource(R.string.photos),
+                    stringResource(R.string.photos_subtitle),
+                    Icons.Outlined.PhotoLibrary,
+                    Modifier.weight(1f),
+                    onScan,
+                )
+                QuickActionCard(
+                    stringResource(R.string.large_videos),
+                    stringResource(R.string.large_videos_subtitle),
+                    Icons.Outlined.VideoFile,
+                    Modifier.weight(1f),
+                    onScan,
+                )
             }
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickActionCard("APK paketleri", "Eski kurulumlar", Icons.Outlined.Inventory2, Modifier.weight(1f), onScan)
-                QuickActionCard("İndirilenler", "Eski dosyalar", Icons.Outlined.Folder, Modifier.weight(1f), onScan)
+                QuickActionCard(
+                    stringResource(R.string.apk_packages),
+                    stringResource(R.string.apk_packages_subtitle),
+                    Icons.Outlined.Inventory2,
+                    Modifier.weight(1f),
+                    onScan,
+                )
+                QuickActionCard(
+                    stringResource(R.string.downloads),
+                    stringResource(R.string.downloads_subtitle),
+                    Icons.Outlined.Folder,
+                    Modifier.weight(1f),
+                    onScan,
+                )
+            }
+        }
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                QuickActionCard(
+                    stringResource(R.string.app_cache_quick),
+                    stringResource(
+                        R.string.app_cache_quick_subtitle,
+                        ByteFormatter.format(state.ownCacheBytes),
+                    ),
+                    Icons.Outlined.CleaningServices,
+                    Modifier.weight(1f),
+                    onClearAppCache,
+                )
+                QuickActionCard(
+                    stringResource(R.string.memory_tools_quick),
+                    stringResource(R.string.memory_tools_quick_subtitle),
+                    Icons.Outlined.Memory,
+                    Modifier.weight(1f),
+                    onOptimizeMemory,
+                )
             }
         }
         if (state.lastScanCompleted) {
             item { LastScanCard(state.summary, onScan) }
+        }
+        if (showMediumRectangleAd) {
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        stringResource(R.string.sponsored),
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.outline,
+                    )
+                    MediumRectangleAd(canRequestAds = true)
+                }
+            }
         }
     }
 }
@@ -288,24 +378,36 @@ private fun StorageHero(storage: StorageSnapshot) {
                     )
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("%${(storage.usedFraction * 100).toInt()}", fontSize = 28.sp, fontWeight = FontWeight.Black)
-                    Text("DOLU", style = MaterialTheme.typography.labelSmall, color = Lime400)
+                    Text(
+                        "%${(storage.usedFraction * 100).toInt()}",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Text(
+                        stringResource(R.string.storage_full),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Lime400,
+                    )
                 }
             }
             Spacer(Modifier.width(22.dp))
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Telefon depolaması", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Text(
-                    "${ByteFormatter.format(storage.usedBytes)} kullanılıyor",
+                    stringResource(R.string.phone_storage),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    stringResource(R.string.storage_used, ByteFormatter.format(storage.usedBytes)),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    "${ByteFormatter.format(storage.availableBytes)} boş alan",
+                    stringResource(R.string.storage_free, ByteFormatter.format(storage.availableBytes)),
                     color = Lime400,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    "Toplam ${ByteFormatter.format(storage.totalBytes)}",
+                    stringResource(R.string.storage_total, ByteFormatter.format(storage.totalBytes)),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline,
                 )
@@ -327,26 +429,54 @@ private fun PermissionCard(onRequestAccess: () -> Unit) {
             Icon(Icons.Outlined.Security, contentDescription = null, tint = Lime400)
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text("Medya erişimi gerekli", fontWeight = FontWeight.Bold)
-                Text("Fotoğraf ve videolar yalnızca cihazında analiz edilir.", style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.media_access_required), fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.media_access_explanation),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-            TextButton(onClick = onRequestAccess) { Text("İzin ver") }
+            TextButton(onClick = onRequestAccess) {
+                Text(stringResource(R.string.grant_access))
+            }
         }
     }
 }
 
 @Composable
-private fun MemoryCard(memory: MemorySnapshot) {
+private fun MemoryCard(
+    memory: MemorySnapshot,
+    optimizing: Boolean,
+    onClick: () -> Unit,
+) {
     Card(
+        onClick = onClick,
+        enabled = !optimizing,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(22.dp),
     ) {
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.Memory, contentDescription = null, tint = if (memory.lowMemory) Amber400 else Lime400)
+                Icon(
+                    Icons.Outlined.Memory,
+                    contentDescription = null,
+                    tint = if (memory.lowMemory) Amber400 else Lime400,
+                )
                 Spacer(Modifier.width(10.dp))
-                Text("Bellek durumu", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Text("%${(memory.usedFraction * 100).toInt()}", fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(
+                        if (optimizing) R.string.memory_optimizing else R.string.memory_status,
+                    ),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
+                if (optimizing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Text("%${(memory.usedFraction * 100).toInt()}", fontWeight = FontWeight.Bold)
+                }
             }
             Spacer(Modifier.height(12.dp))
             LinearProgressIndicator(
@@ -357,7 +487,11 @@ private fun MemoryCard(memory: MemorySnapshot) {
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "${ByteFormatter.format(memory.availableBytes)} kullanılabilir RAM • Android belleği otomatik yönetir",
+                stringResource(
+                    R.string.memory_available,
+                    ByteFormatter.format(memory.availableBytes),
+                    ByteFormatter.format(memory.appUsedBytes),
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -385,7 +519,11 @@ private fun QuickActionCard(
             }
             Spacer(Modifier.height(14.dp))
             Text(title, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -397,13 +535,20 @@ private fun LastScanCard(summary: ScanSummary, onScan: () -> Unit) {
         colors = CardDefaults.cardColors(containerColor = Forest800),
         shape = RoundedCornerShape(22.dp),
     ) {
-        Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth().padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(Icons.Outlined.DeleteSweep, contentDescription = null, tint = Lime400)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text("Son tarama", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.last_scan), fontWeight = FontWeight.Bold)
                 Text(
-                    "${summary.items.size} öneri • ${ByteFormatter.format(summary.totalSuggestedBytes)}",
+                    stringResource(
+                        R.string.last_scan_summary,
+                        summary.items.size,
+                        ByteFormatter.format(summary.totalSuggestedBytes),
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -429,8 +574,11 @@ private fun CleanScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = Lime400, modifier = Modifier.size(64.dp))
                 Spacer(Modifier.height(20.dp))
-                Text("AI dosyaları analiz ediyor…", fontWeight = FontWeight.Bold)
-                Text("İçerik cihazından çıkmıyor", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.scan_in_progress), fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.scan_private),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
 
@@ -462,18 +610,34 @@ private fun EmptyScanState(
     Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Surface(color = Forest800, shape = CircleShape) {
-                Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = Lime400, modifier = Modifier.padding(24.dp).size(56.dp))
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    contentDescription = null,
+                    tint = Lime400,
+                    modifier = Modifier.padding(24.dp).size(56.dp),
+                )
             }
             Spacer(Modifier.height(24.dp))
-            Text("Güvenli AI temizlik", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
+            Text(
+                stringResource(R.string.safe_ai_cleaning),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Black,
+            )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Dosya yaşı, boyutu, türü ve içerik parmak izleri cihazında analiz edilir. Son kararı her zaman sen verirsin.",
+                stringResource(R.string.safe_ai_cleaning_description),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(24.dp))
-            Button(onClick = if (hasAccess) onScan else onRequestAccess, modifier = Modifier.fillMaxWidth()) {
-                Text(if (hasAccess) "Taramayı başlat" else "Erişim ver ve tara")
+            Button(
+                onClick = if (hasAccess) onScan else onRequestAccess,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(
+                        if (hasAccess) R.string.start_scan else R.string.grant_and_scan,
+                    ),
+                )
             }
         }
     }
@@ -492,7 +656,7 @@ private fun ScanResults(
         if (summary.limitedAccess) {
             Surface(color = Amber400.copy(alpha = .14f), modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    "Sınırlı erişim: yalnızca izin verdiğin medya analiz edildi.",
+                    stringResource(R.string.limited_access_notice),
                     modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
                     color = Amber400,
                     style = MaterialTheme.typography.bodySmall,
@@ -505,21 +669,50 @@ private fun ScanResults(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item {
-                Card(colors = CardDefaults.cardColors(containerColor = Forest800), shape = RoundedCornerShape(24.dp)) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Forest800),
+                    shape = RoundedCornerShape(24.dp),
+                ) {
                     Column(Modifier.fillMaxWidth().padding(20.dp)) {
-                        Text("TEMİZLENEBİLİR ALAN", style = MaterialTheme.typography.labelMedium, color = Mint100)
-                        Text(ByteFormatter.format(summary.selectedBytes), fontSize = 38.sp, fontWeight = FontWeight.Black, color = Lime400)
-                        Text("${summary.scannedFileCount} dosya tarandı • ${summary.selectedItems.size} öğe seçili")
+                        Text(
+                            stringResource(R.string.cleanable_space),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Mint100,
+                        )
+                        Text(
+                            ByteFormatter.format(summary.selectedBytes),
+                            fontSize = 38.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Lime400,
+                        )
+                        Text(
+                            stringResource(
+                                R.string.scan_stats,
+                                summary.scannedFileCount,
+                                summary.selectedItems.size,
+                            ),
+                        )
                     }
                 }
             }
             if (summary.items.isEmpty()) {
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                        Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(Icons.Outlined.Security, contentDescription = null, tint = Lime400, modifier = Modifier.size(42.dp))
+                        Column(
+                            Modifier.fillMaxWidth().padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Icon(
+                                Icons.Outlined.Security,
+                                contentDescription = null,
+                                tint = Lime400,
+                                modifier = Modifier.size(42.dp),
+                            )
                             Spacer(Modifier.height(12.dp))
-                            Text("Harika! Güvenli bir temizlik önerisi bulunmadı.", fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(R.string.no_safe_suggestions),
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                 }
@@ -533,7 +726,9 @@ private fun ScanResults(
                 }
             }
             item {
-                TextButton(onClick = onScan, modifier = Modifier.fillMaxWidth()) { Text("Yeniden tara") }
+                TextButton(onClick = onScan, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.scan_again))
+                }
             }
         }
         AnimatedVisibility(summary.selectedItems.isNotEmpty()) {
@@ -545,7 +740,10 @@ private fun ScanResults(
                 ) {
                     Icon(Icons.Outlined.DeleteSweep, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
-                    Text("${ByteFormatter.format(summary.selectedBytes)} TEMİZLE", fontWeight = FontWeight.Black)
+                    Text(
+                        stringResource(R.string.clean_action, ByteFormatter.format(summary.selectedBytes)),
+                        fontWeight = FontWeight.Black,
+                    )
                 }
             }
         }
@@ -559,13 +757,20 @@ private fun CategoryHeader(
     onToggleCategory: (CleanCategory) -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable { onToggleCategory(category) }.padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggleCategory(category) }
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(category.title, fontWeight = FontWeight.Bold)
+            Text(stringResource(category.titleRes), fontWeight = FontWeight.Bold)
             Text(
-                "${items.size} öğe • ${ByteFormatter.format(items.sumOf { it.sizeBytes })}",
+                stringResource(
+                    R.string.category_summary,
+                    items.size,
+                    ByteFormatter.format(items.sumOf { it.sizeBytes }),
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -579,12 +784,19 @@ private fun CategoryHeader(
 
 @Composable
 private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
+    val reason = stringResource(
+        item.assessment.reasonRes,
+        *item.assessment.reasonArgs.toTypedArray(),
+    )
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().clickable { onToggleItem(item.id) }.padding(14.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onToggleItem(item.id) }
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(color = Forest800, shape = RoundedCornerShape(12.dp)) {
@@ -597,15 +809,31 @@ private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(item.name, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(item.assessment.reason, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    "${ByteFormatter.format(item.sizeBytes)} • Güven %${item.assessment.safetyScore}",
+                    item.name,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    reason,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    stringResource(
+                        R.string.file_confidence,
+                        ByteFormatter.format(item.sizeBytes),
+                        item.assessment.safetyScore,
+                    ),
                     style = MaterialTheme.typography.labelSmall,
                     color = if (item.assessment.safetyScore >= 85) Lime400 else Amber400,
                 )
             }
-            Checkbox(checked = item.selected, onCheckedChange = { onToggleItem(item.id) })
+            Checkbox(
+                checked = item.selected,
+                onCheckedChange = { onToggleItem(item.id) },
+            )
         }
     }
 }
@@ -623,8 +851,12 @@ private fun categoryIcon(category: CleanCategory): ImageVector = when (category)
 private fun ToolsScreen(
     state: CleanerUiState,
     privacyOptionsRequired: Boolean,
-    onOpenSystemCache: () -> Unit,
+    onClearAppCache: () -> Unit,
+    onOptimizeMemory: () -> Unit,
+    onOpenAppStorageDetails: () -> Unit,
+    onOpenManageApps: () -> Unit,
     onOpenStorageSettings: () -> Unit,
+    onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -634,38 +866,85 @@ private fun ToolsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text("Cihaz araçları", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-            Text("Android'in güvenli sistem ekranlarıyla alan aç.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        item {
-            ToolRow(
-                title = "Sistem önbelleği",
-                subtitle = "Android'in onaylı önbellek temizleme ekranını aç",
-                icon = Icons.Outlined.CleaningServices,
-                onClick = onOpenSystemCache,
+            Text(
+                stringResource(R.string.tools_title),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Black,
+            )
+            Text(
+                stringResource(R.string.tools_subtitle),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         item {
             ToolRow(
-                title = "Depolama ayarları",
-                subtitle = "Uygulama ve sistem alan kullanımını yönet",
+                title = if (state.optimizingMemory) {
+                    stringResource(R.string.memory_optimizing)
+                } else {
+                    stringResource(R.string.memory_optimizer)
+                },
+                subtitle = stringResource(
+                    R.string.memory_optimizer_subtitle,
+                    ByteFormatter.format(state.memory.availableBytes),
+                    ByteFormatter.format(state.memory.appUsedBytes),
+                ),
+                icon = Icons.Outlined.Memory,
+                onClick = onOptimizeMemory,
+                enabled = !state.optimizingMemory,
+            )
+        }
+        item {
+            ToolRow(
+                title = stringResource(R.string.clear_app_cache),
+                subtitle = stringResource(
+                    R.string.clear_app_cache_subtitle,
+                    ByteFormatter.format(state.ownCacheBytes),
+                ),
+                icon = Icons.Outlined.CleaningServices,
+                onClick = onClearAppCache,
+            )
+        }
+        item {
+            ToolRow(
+                title = stringResource(R.string.app_storage_details),
+                subtitle = stringResource(R.string.app_storage_details_subtitle),
+                icon = Icons.Outlined.Info,
+                onClick = onOpenAppStorageDetails,
+            )
+        }
+        item {
+            ToolRow(
+                title = stringResource(R.string.storage_settings),
+                subtitle = stringResource(R.string.storage_settings_subtitle),
                 icon = Icons.Outlined.Storage,
                 onClick = onOpenStorageSettings,
             )
         }
         item {
             ToolRow(
-                title = "RAM bilgisi",
-                subtitle = "${ByteFormatter.format(state.memory.availableBytes)} kullanılabilir / ${ByteFormatter.format(state.memory.totalBytes)} toplam",
+                title = stringResource(R.string.memory_and_apps),
+                subtitle = stringResource(
+                    R.string.memory_and_apps_subtitle,
+                    ByteFormatter.format(state.memory.availableBytes),
+                    ByteFormatter.format(state.memory.totalBytes),
+                ),
                 icon = Icons.Outlined.Memory,
-                onClick = {},
+                onClick = onOpenManageApps,
+            )
+        }
+        item {
+            ToolRow(
+                title = stringResource(R.string.language_settings),
+                subtitle = stringResource(R.string.language_settings_subtitle),
+                icon = Icons.Outlined.Language,
+                onClick = onOpenLanguageSettings,
             )
         }
         if (privacyOptionsRequired) {
             item {
                 ToolRow(
-                    title = "Reklam gizlilik tercihleri",
-                    subtitle = "Onay ve kişiselleştirme seçimlerini değiştir",
+                    title = stringResource(R.string.ad_privacy_preferences),
+                    subtitle = stringResource(R.string.ad_privacy_preferences_subtitle),
                     icon = Icons.Outlined.Security,
                     onClick = onShowPrivacyOptions,
                 )
@@ -679,7 +958,7 @@ private fun ToolsScreen(
                 Icon(Icons.Outlined.Info, contentDescription = null, tint = Lime400)
                 Spacer(Modifier.width(12.dp))
                 Text(
-                    "DepoAkıllı başka uygulamaları zorla kapatmaz ve sahte hızlandırma iddiasında bulunmaz. Android belleği kendisi yönetir; uygulama gerçek depolama verileri ve kullanıcı onaylı temizlik sunar.",
+                    stringResource(R.string.honest_memory_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -694,20 +973,34 @@ private fun ToolRow(
     subtitle: String,
     icon: ImageVector,
     onClick: () -> Unit,
+    enabled: Boolean = true,
 ) {
     Card(
         onClick = onClick,
+        enabled = enabled,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(20.dp),
     ) {
-        Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth().padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Surface(color = Forest800, shape = CircleShape) {
-                Icon(icon, contentDescription = null, tint = Lime400, modifier = Modifier.padding(10.dp))
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = Lime400,
+                    modifier = Modifier.padding(10.dp),
+                )
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.Bold)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
         }

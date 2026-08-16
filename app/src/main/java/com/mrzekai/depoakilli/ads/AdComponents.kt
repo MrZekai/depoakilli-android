@@ -21,6 +21,7 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.appopen.AppOpenAd
 import com.mrzekai.depoakilli.BuildConfig
 
 @Composable
@@ -28,12 +29,43 @@ fun BannerAd(
     canRequestAds: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    FixedBannerAd(
+        canRequestAds = canRequestAds,
+        adUnitId = BuildConfig.ADMOB_BANNER_ID,
+        adSize = AdSize.BANNER,
+        heightDp = 54,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun MediumRectangleAd(
+    canRequestAds: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    FixedBannerAd(
+        canRequestAds = canRequestAds,
+        adUnitId = BuildConfig.ADMOB_MEDIUM_RECTANGLE_ID,
+        adSize = AdSize.MEDIUM_RECTANGLE,
+        heightDp = 250,
+        modifier = modifier,
+    )
+}
+
+@Composable
+private fun FixedBannerAd(
+    canRequestAds: Boolean,
+    adUnitId: String,
+    adSize: AdSize,
+    heightDp: Int,
+    modifier: Modifier,
+) {
     if (!canRequestAds) return
     val context = LocalContext.current
-    val adView = remember {
+    val adView = remember(context, adUnitId, adSize) {
         AdView(context).apply {
-            adUnitId = BuildConfig.ADMOB_BANNER_ID
-            setAdSize(AdSize.BANNER)
+            this.adUnitId = adUnitId
+            setAdSize(adSize)
             loadAd(AdRequest.Builder().build())
         }
     }
@@ -41,7 +73,7 @@ fun BannerAd(
         onDispose { adView.destroy() }
     }
     Box(
-        modifier = modifier.fillMaxWidth().height(54.dp),
+        modifier = modifier.fillMaxWidth().height(heightDp.dp),
         contentAlignment = Alignment.Center,
     ) {
         AndroidView(factory = { adView })
@@ -104,7 +136,126 @@ class InterstitialAdController(private val context: Context) {
         ad.show(activity)
     }
 
+    fun releaseForMemoryOptimization() {
+        interstitial = null
+        loading = false
+    }
+
     companion object {
         private const val MIN_INTERVAL_MILLIS = 5L * 60L * 1000L
+    }
+}
+
+class AppOpenAdController(private val context: Context) {
+    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private var appOpenAd: AppOpenAd? = null
+    private var loading = false
+    private var loadTime = 0L
+    private var adsAllowed = false
+
+    var isShowingAd: Boolean = false
+        private set
+
+    fun setAdsAllowed(allowed: Boolean) {
+        adsAllowed = allowed
+        if (allowed) {
+            load()
+        } else {
+            appOpenAd = null
+            loading = false
+        }
+    }
+
+    fun onAppForeground(activity: Activity) {
+        val foregroundCount = preferences.getInt(KEY_FOREGROUND_COUNT, 0) + 1
+        preferences.edit().putInt(KEY_FOREGROUND_COUNT, foregroundCount).apply()
+
+        if (!adsAllowed || foregroundCount < MIN_FOREGROUNDS_BEFORE_FIRST_AD) {
+            load()
+            return
+        }
+
+        val lastShownAt = preferences.getLong(KEY_LAST_SHOWN_AT, 0L)
+        if (System.currentTimeMillis() - lastShownAt < MIN_SHOW_INTERVAL_MILLIS) {
+            load()
+            return
+        }
+        showIfAvailable(activity)
+    }
+
+    fun load() {
+        if (!adsAllowed || loading || isAdAvailable()) return
+        appOpenAd = null
+        loading = true
+        AppOpenAd.load(
+            context,
+            BuildConfig.ADMOB_APP_OPEN_ID,
+            AdRequest.Builder().build(),
+            object : AppOpenAd.AppOpenAdLoadCallback() {
+                override fun onAdLoaded(ad: AppOpenAd) {
+                    loading = false
+                    if (adsAllowed) {
+                        appOpenAd = ad
+                        loadTime = System.currentTimeMillis()
+                    }
+                }
+
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    loading = false
+                    appOpenAd = null
+                }
+            },
+        )
+    }
+
+    fun releaseForMemoryOptimization() {
+        if (!isShowingAd) {
+            appOpenAd = null
+        }
+        loading = false
+    }
+
+    private fun showIfAvailable(activity: Activity) {
+        if (isShowingAd || activity.isFinishing || activity.isDestroyed) return
+        val ad = appOpenAd
+        if (ad == null || !isAdAvailable()) {
+            appOpenAd = null
+            load()
+            return
+        }
+
+        appOpenAd = null
+        isShowingAd = true
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                finishShowing()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                finishShowing()
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                preferences.edit().putLong(KEY_LAST_SHOWN_AT, System.currentTimeMillis()).apply()
+            }
+        }
+        ad.show(activity)
+    }
+
+    private fun finishShowing() {
+        isShowingAd = false
+        load()
+    }
+
+    private fun isAdAvailable(): Boolean =
+        appOpenAd != null && System.currentTimeMillis() - loadTime < APP_OPEN_EXPIRY_MILLIS
+
+    private companion object {
+        private const val PREFERENCES_NAME = "app_open_ads"
+        private const val KEY_FOREGROUND_COUNT = "foreground_count"
+        private const val KEY_LAST_SHOWN_AT = "last_shown_at"
+        private const val MIN_FOREGROUNDS_BEFORE_FIRST_AD = 3
+        private const val MIN_SHOW_INTERVAL_MILLIS = 2L * 60L * 60L * 1000L
+        private const val APP_OPEN_EXPIRY_MILLIS = 4L * 60L * 60L * 1000L
     }
 }

@@ -4,13 +4,13 @@ import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.ContentUris
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Debug
 import android.os.Environment
 import android.os.StatFs
-import android.os.storage.StorageManager
 import android.provider.MediaStore
+import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AiAssessment
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -44,10 +44,13 @@ class DeviceRepository(
     fun memorySnapshot(): MemorySnapshot {
         val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val info = ActivityManager.MemoryInfo()
+        val processMemoryInfo = Debug.MemoryInfo()
         manager.getMemoryInfo(info)
+        Debug.getMemoryInfo(processMemoryInfo)
         return MemorySnapshot(
             totalBytes = info.totalMem,
             availableBytes = info.availMem,
+            appUsedBytes = processMemoryInfo.totalPss.toLong() * 1024L,
             lowMemory = info.lowMemory,
         )
     }
@@ -61,8 +64,6 @@ class DeviceRepository(
         context.externalCacheDir?.listFiles()?.forEach(File::deleteRecursively)
         before - ownCacheSize()
     }
-
-    fun systemCacheIntent(): Intent = Intent(StorageManager.ACTION_CLEAR_APP_CACHE)
 
     suspend fun scan(limitedAccess: Boolean): ScanSummary = withContext(Dispatchers.IO) {
         val indexed = buildList {
@@ -82,15 +83,15 @@ class DeviceRepository(
             assessed += CleanableItem(
                 id = "app-cache",
                 uri = APP_CACHE_URI,
-                name = "DepoAkıllı önbelleği",
+                name = context.getString(R.string.cache_item_name),
                 sizeBytes = cacheBytes,
                 mimeType = "application/x-cache",
                 modifiedAtMillis = System.currentTimeMillis(),
-                relativePath = "Uygulama önbelleği",
+                relativePath = context.getString(R.string.cache_item_path),
                 assessment = AiAssessment(
                     category = CleanCategory.APP_CACHE,
                     safetyScore = 100,
-                    reason = "Silinmesi güvenli geçici dosyalar",
+                    reasonRes = R.string.reason_safe_cache,
                     recommended = true,
                 ),
             )
@@ -179,7 +180,9 @@ class DeviceRepository(
                     val id = cursor.getLong(idColumn)
                     output += IndexedFile(
                         uri = ContentUris.withAppendedId(collection, id).toString(),
-                        name = cursor.getString(nameColumn).orEmpty().ifBlank { "Adsız dosya" },
+                        name = cursor.getString(nameColumn).orEmpty().ifBlank {
+                            context.getString(R.string.unnamed_file)
+                        },
                         sizeBytes = size,
                         mimeType = cursor.getString(mimeColumn).orEmpty(),
                         modifiedAtMillis = cursor.getLong(dateColumn) * 1000L,

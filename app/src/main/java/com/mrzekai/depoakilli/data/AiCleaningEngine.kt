@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.data
 
+import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AiAssessment
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.IndexedFile
@@ -29,7 +30,8 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.APK_PACKAGE,
                 safetyScore = score,
-                reason = if (ageDays >= 7) "$ageDays günlük kurulum paketi" else "İndirilen kurulum paketi",
+                reasonRes = if (ageDays >= 7) R.string.reason_old_installer else R.string.reason_downloaded_installer,
+                reasonArgs = if (ageDays >= 7) listOf(ageDays) else emptyList(),
                 recommended = ageDays >= 7,
             )
         }
@@ -42,7 +44,8 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
                 safetyScore = if (ageDays >= 90) 91 else 82,
-                reason = "$ageDays günlük ekran görüntüsü",
+                reasonRes = R.string.reason_old_screenshot,
+                reasonArgs = listOf(ageDays),
                 recommended = true,
             )
         }
@@ -56,7 +59,8 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.LARGE_VIDEO,
                 safetyScore = score,
-                reason = "${ageDays.coerceAtLeast(0)} günlük büyük video",
+                reasonRes = R.string.reason_large_video,
+                reasonArgs = listOf(ageDays.coerceAtLeast(0)),
                 recommended = ageDays >= 30,
             )
         }
@@ -66,7 +70,8 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.OLD_DOWNLOAD,
                 safetyScore = if (ageDays >= 365) 90 else 76,
-                reason = "$ageDays gündür indirilenlerde",
+                reasonRes = R.string.reason_old_download,
+                reasonArgs = listOf(ageDays),
                 recommended = true,
             )
         }
@@ -77,7 +82,7 @@ class AiCleaningEngine(
     fun duplicateAssessment(isExact: Boolean): AiAssessment = AiAssessment(
         category = CleanCategory.DUPLICATE,
         safetyScore = if (isExact) 99 else 72,
-        reason = if (isExact) "İçerik parmak izi birebir aynı" else "Boyut ve içerik örnekleri aynı",
+        reasonRes = if (isExact) R.string.reason_exact_duplicate else R.string.reason_probable_duplicate,
         recommended = isExact,
     )
 

@@ -9,10 +9,14 @@ plugins {
 val sampleAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
 val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
+val sampleMediumRectangleId = "ca-app-pub-3940256099942544/6300978111"
+val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
 
 val admobAppId = providers.gradleProperty("ADMOB_APP_ID").orElse(sampleAdMobAppId)
 val admobBannerId = providers.gradleProperty("ADMOB_BANNER_ID").orElse(sampleBannerId)
 val admobInterstitialId = providers.gradleProperty("ADMOB_INTERSTITIAL_ID").orElse(sampleInterstitialId)
+val admobMediumRectangleId = providers.gradleProperty("ADMOB_MEDIUM_RECTANGLE_ID").orElse(sampleMediumRectangleId)
+val admobAppOpenId = providers.gradleProperty("ADMOB_APP_OPEN_ID").orElse(sampleAppOpenId)
 val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -35,6 +39,8 @@ android {
 
         buildConfigField("String", "ADMOB_BANNER_ID", "\"${admobBannerId.get()}\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"${admobInterstitialId.get()}\"")
+        buildConfigField("String", "ADMOB_MEDIUM_RECTANGLE_ID", "\"${admobMediumRectangleId.get()}\"")
+        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"${admobAppOpenId.get()}\"")
     }
 
     signingConfigs {
@@ -122,6 +128,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.foundation)
@@ -146,9 +153,15 @@ val validateReleaseAds by tasks.registering {
     group = "verification"
     description = "Fails release builds that still use Google sample AdMob IDs."
     doLast {
-        val values = listOf(admobAppId.get(), admobBannerId.get(), admobInterstitialId.get())
+        val values = listOf(
+            admobAppId.get(),
+            admobBannerId.get(),
+            admobInterstitialId.get(),
+            admobMediumRectangleId.get(),
+            admobAppOpenId.get(),
+        )
         check(values.none { it.contains("3940256099942544") }) {
-            "Release blocked: configure live ADMOB_APP_ID, ADMOB_BANNER_ID and ADMOB_INTERSTITIAL_ID."
+            "Release blocked: configure all five live AdMob IDs."
         }
     }
 }

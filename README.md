@@ -1,31 +1,36 @@
-# DepoAkıllı: AI Telefon Temizleyici
+# Smart Cleaner / Akıllı Temizleyici (çalışma adı)
 
-`com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi.
+`com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi. Paket kimliği kalıcıdır; görünen global marka adı ASO ve marka araştırmasından sonra kesinleşecektir.
 
-DepoAkıllı; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulamanın kendi önbelleğini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
+Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulamanın kendi önbelleğini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
 
 ## Çalışan ilk sürüm
 
 - Android 16 / API 36 hedefi
+- İngilizce varsayılan arayüz ve tam Türkçe yerelleştirme
+- Android 13+ uygulama dili ayarı
 - Modern koyu zümrüt Compose arayüzü
 - Depolama ve gerçek RAM durumu
+- Gerçek PSS ölçümlü uygulama RAM optimizasyonu; geçici tarama ve tam ekran reklam belleğini serbest bırakma
 - Cihaz-içi, açıklanabilir AI temizlik puanı
 - Eski ekran görüntüsü önerileri
 - 150 MB üzerindeki eski video önerileri
 - Eski indirilen dosya ve erişilebilen APK paketi taraması
 - Aynı boyuttaki adaylarda tam SHA-256 içerik doğrulamalı yinelenen dosya tespiti
-- DepoAkıllı önbelleğini doğrudan temizleme
 - Android 11+ toplu silme onay ekranı
-- Android sistem önbellek ve depolama ayarlarına güvenli yönlendirme
+- Uygulamanın kendi önbelleğini doğrudan ve güvenli temizleme
+- Uygulama depolama, cihaz depolama, bellek/uygulama ve dil ayarlarına çalışan yönlendirmeler
 - Google Mobile Ads 25.4.0 test entegrasyonu
 - UMP 4.0.0 reklam gizlilik/onay akışı
-- Banner reklam ve temizlik sonrasında en az beş dakika aralıklı geçiş reklamı
+- Ana Sayfa'da 300×250 MREC, diğer sekmelerde sabit banner
+- Temizlik sonrasında aralıklı geçiş reklamı
+- İlk iki kullanımı bölmeyen, iki saat sıklık sınırlı uygulama açılış reklamı
 - Test AdMob kimlikleriyle release üretimini durduran koruma
 - GitHub Actions debug APK ve manuel imzalı AAB iş akışları
 
 ## Teknik sınırlar
 
-Android 11 ve üzeri, bir uygulamanın başka uygulamaların özel dizinlerini ve önbelleğini sessizce silmesini engeller. Bu nedenle DepoAkıllı:
+Android 11 ve üzeri, bir uygulamanın başka uygulamaların özel dizinlerini ve önbelleğini sessizce silmesini engeller. Bu nedenle uygulama:
 
 - başka uygulamaların özel cache dizinlerini doğrudan silmez;
 - RAM'i zorla boşaltmış gibi davranmaz;
@@ -62,6 +67,8 @@ Release için aşağıdaki Gradle özellikleri gerekir:
 ADMOB_APP_ID
 ADMOB_BANNER_ID
 ADMOB_INTERSTITIAL_ID
+ADMOB_MEDIUM_RECTANGLE_ID
+ADMOB_APP_OPEN_ID
 ```
 
 GitHub Actions tarafında aynı adlarla repository secret oluşturulur. Canlı kimlikler eksikse `bundleRelease` durur.
@@ -81,6 +88,8 @@ ANDROID_KEY_PASSWORD
 ADMOB_APP_ID
 ADMOB_BANNER_ID
 ADMOB_INTERSTITIAL_ID
+ADMOB_MEDIUM_RECTANGLE_ID
+ADMOB_APP_OPEN_ID
 ```
 
 Upload key hiçbir zaman repoya eklenmemelidir. Yeni uygulamanın ilk AAB'sinde kullanılan upload key güvenli biçimde yedeklenmeli ve sonraki tüm güncellemelerde aynı anahtar kullanılmalıdır.
@@ -94,4 +103,4 @@ Upload key hiçbir zaman repoya eklenmemelidir. Yeni uygulamanın ilk AAB'sinde 
 5. Play izin değerlendirmesinden sonra gelişmiş dosya/paket tarama
 6. Türkçe Play Store görselleri ve kapalı test
 
-Detaylar için [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md) ve [`docs/PLAY_RELEASE_CHECKLIST.md`](docs/PLAY_RELEASE_CHECKLIST.md) dosyalarına bakın.
+Detaylar için [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md), [`docs/DEVICE_QA_CHECKLIST.md`](docs/DEVICE_QA_CHECKLIST.md) ve [`docs/PLAY_RELEASE_CHECKLIST.md`](docs/PLAY_RELEASE_CHECKLIST.md) dosyalarına bakın.

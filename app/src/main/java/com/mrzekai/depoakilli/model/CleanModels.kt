@@ -1,15 +1,18 @@
 package com.mrzekai.depoakilli.model
 
+import androidx.annotation.StringRes
+import com.mrzekai.depoakilli.R
+
 enum class CleanCategory(
-    val title: String,
-    val shortDescription: String,
+    @StringRes val titleRes: Int,
+    @StringRes val shortDescriptionRes: Int,
 ) {
-    DUPLICATE("Yinelenenler", "Aynı içeriğin gereksiz kopyaları"),
-    SCREENSHOT("Ekran görüntüleri", "Eski ekran görüntüleri"),
-    LARGE_VIDEO("Büyük videolar", "Depolamayı en çok kullanan videolar"),
-    OLD_DOWNLOAD("Eski indirilenler", "Uzun süredir açılmayan dosyalar"),
-    APK_PACKAGE("APK paketleri", "Kurulumdan kalan paketler"),
-    APP_CACHE("Önbellek", "DepoAkıllı geçici dosyaları"),
+    DUPLICATE(R.string.category_duplicates, R.string.category_duplicates_description),
+    SCREENSHOT(R.string.category_screenshots, R.string.category_screenshots_description),
+    LARGE_VIDEO(R.string.category_large_videos, R.string.category_large_videos_description),
+    OLD_DOWNLOAD(R.string.category_old_downloads, R.string.category_old_downloads_description),
+    APK_PACKAGE(R.string.category_apk_packages, R.string.category_apk_packages_description),
+    APP_CACHE(R.string.category_app_cache, R.string.category_app_cache_description),
 }
 
 data class IndexedFile(
@@ -24,7 +27,8 @@ data class IndexedFile(
 data class AiAssessment(
     val category: CleanCategory,
     val safetyScore: Int,
-    val reason: String,
+    @StringRes val reasonRes: Int,
+    val reasonArgs: List<Any> = emptyList(),
     val recommended: Boolean,
 )
 
@@ -52,6 +56,7 @@ data class StorageSnapshot(
 data class MemorySnapshot(
     val totalBytes: Long = 0,
     val availableBytes: Long = 0,
+    val appUsedBytes: Long = 0,
     val lowMemory: Boolean = false,
 ) {
     val usedBytes: Long get() = (totalBytes - availableBytes).coerceAtLeast(0)

@@ -20,11 +20,13 @@
 ## AdMob
 
 - [ ] AdMob uygulaması oluşturuldu
-- [ ] Banner ve interstitial birimleri oluşturuldu
+- [ ] Banner, MREC, interstitial ve App Open birimleri oluşturuldu
 - [ ] UMP Avrupa düzenlemeleri mesajı yayımlandı
 - [ ] Canlı kimlikler yalnızca GitHub secrets içinde
 - [ ] Reklamlar sistem silme onayıyla karıştırılmıyor
 - [ ] Geçiş reklamı temizleme sonucundan sonra ve seyrek gösteriliyor
+- [ ] App Open ilk iki kullanımı bölmüyor, UMP öncesi istek yapmıyor ve iki saat sınırına uyuyor
+- [ ] Ana Sayfa MREC ile sabit banner aynı anda gösterilmiyor
 
 ## Play politikaları
 
@@ -39,5 +41,6 @@
 - [ ] 512×512 uygulama ikonu
 - [ ] 1024×500 feature graphic
 - [ ] En az dört telefon ekran görüntüsü
-- [ ] Türkçe kısa ve uzun açıklama
+- [ ] İngilizce ve Türkçe kısa/uzun açıklama
+- [ ] Global marka adı için ASO, alan adı ve marka ön taraması tamamlandı
 - [ ] Destek e-postası ve HTTPS web sayfası

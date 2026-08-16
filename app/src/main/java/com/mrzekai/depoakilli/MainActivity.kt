@@ -2,9 +2,9 @@ package com.mrzekai.depoakilli
 
 import android.Manifest
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
+                (application as DepoAkilliApplication).setAppOpenAdsAllowed(canRequestAds)
             }
 
             DepoAkilliTheme {
@@ -87,8 +88,17 @@ class MainActivity : ComponentActivity() {
                             },
                         )
                     },
-                    onOpenSystemCache = ::openSystemCache,
+                    onClearAppCache = cleanerViewModel::clearAppCache,
+                    onOptimizeMemory = {
+                        cleanerViewModel.optimizeMemory {
+                            interstitialAds.releaseForMemoryOptimization()
+                            (application as DepoAkilliApplication).releaseAdMemory()
+                        }
+                    },
+                    onOpenAppStorageDetails = ::openAppStorageDetails,
+                    onOpenManageApps = ::openManageApps,
                     onOpenStorageSettings = ::openStorageSettings,
+                    onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = { consentManager.showPrivacyOptions(this) },
                 )
             }
@@ -134,22 +144,49 @@ class MainActivity : ComponentActivity() {
 
     private fun hasAnyMediaAccess(): Boolean = hasFullMediaAccess() || hasLimitedMediaAccess()
 
-    private fun openSystemCache() {
-        val intent = cleanerViewModel.systemCacheIntent()
-        try {
-            startActivity(intent)
-        } catch (_: ActivityNotFoundException) {
-            openStorageSettings()
-        } catch (_: SecurityException) {
-            openStorageSettings()
-        }
+    private fun openAppStorageDetails() {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:$packageName"),
+        )
+        startFirstAvailable(intent, Intent(Settings.ACTION_APPLICATION_SETTINGS))
+    }
+
+    private fun openManageApps() {
+        startFirstAvailable(
+            Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS),
+            Intent(Settings.ACTION_APPLICATION_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS),
+        )
     }
 
     private fun openStorageSettings() {
-        val intents = listOf(
+        startFirstAvailable(
             Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS),
             Intent(Settings.ACTION_SETTINGS),
         )
-        intents.firstOrNull { it.resolveActivity(packageManager) != null }?.let(::startActivity)
+    }
+
+    private fun openLanguageSettings() {
+        val appLanguageIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Intent(
+                Settings.ACTION_APP_LOCALE_SETTINGS,
+                Uri.parse("package:$packageName"),
+            )
+        } else {
+            Intent(Settings.ACTION_LOCALE_SETTINGS)
+        }
+        startFirstAvailable(appLanguageIntent, Intent(Settings.ACTION_LOCALE_SETTINGS))
+    }
+
+    private fun startFirstAvailable(vararg intents: Intent) {
+        intents.firstOrNull { it.resolveActivity(packageManager) != null }?.let { intent ->
+            runCatching { startActivity(intent) }
+                .onFailure {
+                    if (intent.action != Settings.ACTION_SETTINGS) {
+                        runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) }
+                    }
+                }
+        }
     }
 }

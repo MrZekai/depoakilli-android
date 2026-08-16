@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Akıllı Temizleyici</string>
+    <string name="app_tagline">AI TELEFON TEMİZLEYİCİ</string>
+
+    <string name="tab_home">Ana Sayfa</string>
+    <string name="tab_clean">AI Temizlik</string>
+    <string name="tab_tools">Araçlar</string>
+
+    <string name="scan_primary">AI AKILLI TARAMAYI BAŞLAT</string>
+    <string name="scan_primary_subtitle">Güvenli önerileri cihazında analiz et</string>
+    <string name="cleaning_center">Temizlik merkezi</string>
+    <string name="photos">Fotoğraflar</string>
+    <string name="photos_subtitle">Benzer ve eski</string>
+    <string name="large_videos">Büyük videolar</string>
+    <string name="large_videos_subtitle">150 MB üzeri</string>
+    <string name="apk_packages">APK paketleri</string>
+    <string name="apk_packages_subtitle">Eski kurulumlar</string>
+    <string name="downloads">İndirilenler</string>
+    <string name="downloads_subtitle">Eski dosyalar</string>
+    <string name="app_cache_quick">Uygulama önbelleği</string>
+    <string name="app_cache_quick_subtitle">%1$s geçici dosya</string>
+    <string name="memory_tools_quick">RAM optimizasyonu</string>
+    <string name="memory_tools_quick_subtitle">Geçici uygulama belleğini serbest bırak</string>
+
+    <string name="storage_full">DOLU</string>
+    <string name="phone_storage">Telefon depolaması</string>
+    <string name="storage_used">%1$s kullanılıyor</string>
+    <string name="storage_free">%1$s boş alan</string>
+    <string name="storage_total">Toplam %1$s</string>
+
+    <string name="media_access_required">Medya erişimi gerekli</string>
+    <string name="media_access_explanation">Fotoğraf ve videolar yalnızca cihazında analiz edilir.</string>
+    <string name="grant_access">İzin ver</string>
+
+    <string name="memory_status">Bellek durumu</string>
+    <string name="memory_available">%1$s kullanılabilir RAM • bu uygulama: %2$s</string>
+    <string name="last_scan">Son tarama</string>
+    <string name="last_scan_summary">%1$d öneri • %2$s</string>
+
+    <string name="scan_in_progress">AI dosyaları analiz ediyor…</string>
+    <string name="scan_private">İçerik cihazından çıkmıyor</string>
+    <string name="safe_ai_cleaning">Güvenli AI temizlik</string>
+    <string name="safe_ai_cleaning_description">Dosya yaşı, boyutu, türü ve içerik parmak izleri cihazında analiz edilir. Son kararı her zaman sen verirsin.</string>
+    <string name="start_scan">Taramayı başlat</string>
+    <string name="grant_and_scan">Erişim ver ve tara</string>
+    <string name="limited_access_notice">Sınırlı erişim: yalnızca izin verdiğin medya analiz edildi.</string>
+    <string name="cleanable_space">TEMİZLENEBİLİR ALAN</string>
+    <string name="scan_stats">%1$d dosya tarandı • %2$d öğe seçili</string>
+    <string name="no_safe_suggestions">Harika! Güvenli bir temizlik önerisi bulunmadı.</string>
+    <string name="scan_again">Yeniden tara</string>
+    <string name="clean_action">%1$s TEMİZLE</string>
+    <string name="category_summary">%1$d öğe • %2$s</string>
+    <string name="file_confidence">%1$s • Güven: %%%2$d</string>
+
+    <string name="tools_title">Cihaz araçları</string>
+    <string name="tools_subtitle">Gerçek Android kontrolleri ve güvenli cihaz içi temizlik.</string>
+    <string name="clear_app_cache">Uygulama önbelleğini temizle</string>
+    <string name="clear_app_cache_subtitle">%1$s güvenli geçici dosyayı şimdi sil</string>
+    <string name="app_storage_details">Uygulama depolama detayları</string>
+    <string name="app_storage_details_subtitle">Bu uygulamanın Android depolama ve önbellek ekranını aç</string>
+    <string name="storage_settings">Depolama ayarları</string>
+    <string name="storage_settings_subtitle">Cihaz ve uygulama alan kullanımını yönet</string>
+    <string name="memory_and_apps">Bellek ve uygulamalar</string>
+    <string name="memory_and_apps_subtitle">%1$s kullanılabilir / %2$s toplam • yüklü uygulamaları incele</string>
+    <string name="memory_optimizer">Uygulama belleğini optimize et</string>
+    <string name="memory_optimizer_subtitle">%1$s kullanılabilir • bu uygulama %2$s kullanıyor</string>
+    <string name="memory_optimizing">Bellek optimize ediliyor…</string>
+    <string name="language_settings">Uygulama dili</string>
+    <string name="language_settings_subtitle">Türkçe, İngilizce veya cihaz varsayılanını seç</string>
+    <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
+    <string name="ad_privacy_preferences_subtitle">Onay ve kişiselleştirme seçimlerini değiştir</string>
+    <string name="honest_memory_note">RAM optimizasyonu bu uygulamanın tarama sonuçlarını ve önceden yüklenen tam ekran reklamlarını serbest bırakır, ardından gerçek PSS bellek kullanımını yeniden ölçer. Android 14+ diğer uygulamaların kapatılmasını engeller; cihaz genelindeki süreç yönetimi Android’dedir.</string>
+    <string name="sponsored">Sponsorlu</string>
+
+    <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
+    <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
+    <string name="message_cleanup_cancelled">Temizlik işlemi iptal edildi.</string>
+    <string name="message_cleanup_complete">Temizlik tamamlandı.</string>
+    <string name="message_cache_cleared">%1$s geçici uygulama önbelleği temizlendi.</string>
+    <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
+    <string name="message_memory_optimized">Bu uygulamanın %1$s belleği serbest bırakıldı • %2$s RAM kullanılabilir</string>
+    <string name="message_memory_optimized_stable">Geçici uygulama belleği serbest bırakıldı • %1$s RAM kullanılabilir</string>
+
+    <string name="category_duplicates">Yinelenenler</string>
+    <string name="category_duplicates_description">Aynı içeriğin gereksiz kopyaları</string>
+    <string name="category_screenshots">Ekran görüntüleri</string>
+    <string name="category_screenshots_description">Eski ekran görüntüleri</string>
+    <string name="category_large_videos">Büyük videolar</string>
+    <string name="category_large_videos_description">Depolamayı en çok kullanan videolar</string>
+    <string name="category_old_downloads">Eski indirilenler</string>
+    <string name="category_old_downloads_description">Uzun süredir İndirilenler klasöründe kalan dosyalar</string>
+    <string name="category_apk_packages">APK paketleri</string>
+    <string name="category_apk_packages_description">Kurulumdan kalan paketler</string>
+    <string name="category_app_cache">Önbellek</string>
+    <string name="category_app_cache_description">Güvenli geçici uygulama dosyaları</string>
+
+    <string name="reason_old_installer">%1$d günlük kurulum paketi</string>
+    <string name="reason_downloaded_installer">İndirilen kurulum paketi</string>
+    <string name="reason_old_screenshot">%1$d günlük ekran görüntüsü</string>
+    <string name="reason_large_video">%1$d günlük büyük video</string>
+    <string name="reason_old_download">%1$d gündür İndirilenler klasöründe</string>
+    <string name="reason_exact_duplicate">İçerik parmak izi birebir aynı</string>
+    <string name="reason_probable_duplicate">Boyut ve içerik örnekleri aynı</string>
+    <string name="cache_item_name">Akıllı Temizleyici önbelleği</string>
+    <string name="cache_item_path">Uygulama önbelleği</string>
+    <string name="reason_safe_cache">Silinmesi güvenli geçici dosyalar</string>
+    <string name="unnamed_file">Adsız dosya</string>
+</resources>
