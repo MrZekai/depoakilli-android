@@ -113,6 +113,8 @@ fun CleanerApp(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val hasMediaAccess = hasFullMediaAccess || hasLimitedMediaAccess
+    val showBannerAd = canRequestAds && hasMediaAccess && !state.scanning
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -149,7 +151,9 @@ fun CleanerApp(
                     .background(MaterialTheme.colorScheme.surface)
                     .navigationBarsPadding(),
             ) {
-                BannerAd(canRequestAds = canRequestAds)
+                // Fixed placement: above bottom navigation. Hidden before media
+                // access and while the AI scan is actively running.
+                BannerAd(canRequestAds = showBannerAd)
                 NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                     AppTab.entries.forEachIndexed { index, tab ->
                         NavigationBarItem(
@@ -166,7 +170,7 @@ fun CleanerApp(
         when (AppTab.entries[selectedTabIndex]) {
             AppTab.HOME -> HomeScreen(
                 state = state,
-                hasAccess = hasFullMediaAccess || hasLimitedMediaAccess,
+                hasAccess = hasMediaAccess,
                 onRequestAccess = onRequestMediaAccess,
                 onScan = {
                     selectedTabIndex = AppTab.CLEAN.ordinal

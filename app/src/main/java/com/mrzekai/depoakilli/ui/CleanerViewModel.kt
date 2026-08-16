@@ -94,7 +94,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun prepareCleanup(onPlanReady: (DeviceRepository.DeletePlan) -> Unit) {
+    fun prepareCleanup(
+        onPlanReady: (DeviceRepository.DeletePlan) -> Unit,
+        onCleanupCompleted: () -> Unit,
+    ) {
         val selected = _state.value.summary.selectedItems
         if (selected.isEmpty()) {
             _state.update { it.copy(message = "Temizlenecek en az bir öğe seç.") }
@@ -106,8 +109,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             if (cacheSelected) repository.clearOwnCache()
             val plan = repository.createDeleteRequest(selected)
             when (plan) {
-                is DeviceRepository.DeletePlan.Completed -> completeCleanup(true)
-                DeviceRepository.DeletePlan.NoMediaFiles -> completeCleanup(true)
+                is DeviceRepository.DeletePlan.Completed -> {
+                    completeCleanup(true)
+                    onCleanupCompleted()
+                }
+                DeviceRepository.DeletePlan.NoMediaFiles -> {
+                    completeCleanup(true)
+                    onCleanupCompleted()
+                }
                 is DeviceRepository.DeletePlan.RequiresConsent -> onPlanReady(plan)
             }
         }

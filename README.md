@@ -66,6 +66,9 @@ ADMOB_INTERSTITIAL_ID
 
 GitHub Actions tarafında aynı adlarla repository secret oluşturulur. Canlı kimlikler eksikse `bundleRelease` durur.
 
+Banner ve geçiş reklamının gösterildiği/gösterilmediği noktalar
+[`docs/AD_PLACEMENTS.md`](docs/AD_PLACEMENTS.md) dosyasında sabitlenmiştir.
+
 ## İmzalı AAB
 
 `.github/workflows/release-aab.yml` aşağıdaki secrets değerlerini bekler:

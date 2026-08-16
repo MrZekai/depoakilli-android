@@ -16,6 +16,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -50,9 +52,20 @@ class InterstitialAdController(private val context: Context) {
     private var interstitial: InterstitialAd? = null
     private var loading = false
     private var lastShownAt = 0L
+    private var adsAllowed = false
+
+    fun setAdsAllowed(allowed: Boolean) {
+        adsAllowed = allowed
+        if (allowed) {
+            load()
+        } else {
+            interstitial = null
+            loading = false
+        }
+    }
 
     fun load() {
-        if (loading || interstitial != null) return
+        if (!adsAllowed || loading || interstitial != null) return
         loading = true
         InterstitialAd.load(
             context,
@@ -61,7 +74,7 @@ class InterstitialAdController(private val context: Context) {
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     loading = false
-                    interstitial = ad
+                    if (adsAllowed) interstitial = ad
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
@@ -73,13 +86,22 @@ class InterstitialAdController(private val context: Context) {
     }
 
     fun showAfterCleanup(activity: Activity) {
+        if (!adsAllowed || activity.isFinishing || activity.isDestroyed) return
         val now = System.currentTimeMillis()
         val ad = interstitial ?: return
         if (now - lastShownAt < MIN_INTERVAL_MILLIS) return
         interstitial = null
         lastShownAt = now
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                load()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                load()
+            }
+        }
         ad.show(activity)
-        load()
     }
 
     companion object {

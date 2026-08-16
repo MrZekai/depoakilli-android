@@ -12,16 +12,17 @@ jobs:
     timeout-minutes: 35
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout sources
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Validate required secrets
         env:
@@ -32,7 +33,7 @@ jobs:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID }}
           ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_INTERSTITIAL_ID }}
-        run: ./scripts/validate-release-env.sh
+        run: bash ./scripts/validate-release-env.sh
 
       - name: Decode upload key
         env:
@@ -53,7 +54,7 @@ jobs:
             -PADMOB_INTERSTITIAL_ID='${{ secrets.ADMOB_INTERSTITIAL_ID }}'
 
       - name: Upload signed AAB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: depoakilli-release-aab-${{ github.run_number }}
           path: app/build/outputs/bundle/release/app-release.aab

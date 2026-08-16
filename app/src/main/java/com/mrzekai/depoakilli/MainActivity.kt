@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
             val revision = permissionRevision
 
             LaunchedEffect(canRequestAds) {
-                if (canRequestAds) interstitialAds.load()
+                interstitialAds.setAdsAllowed(canRequestAds)
             }
 
             DepoAkilliTheme {
@@ -74,13 +74,18 @@ class MainActivity : ComponentActivity() {
                     privacyOptionsRequired = consentManager.privacyOptionsRequired,
                     onRequestMediaAccess = ::requestMediaAccess,
                     onPrepareCleanup = {
-                        cleanerViewModel.prepareCleanup { plan ->
-                            if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
-                                deleteLauncher.launch(
-                                    IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
-                                )
-                            }
-                        }
+                        cleanerViewModel.prepareCleanup(
+                            onPlanReady = { plan ->
+                                if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
+                                    deleteLauncher.launch(
+                                        IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
+                                    )
+                                }
+                            },
+                            onCleanupCompleted = {
+                                interstitialAds.showAfterCleanup(this)
+                            },
+                        )
                     },
                     onOpenSystemCache = ::openSystemCache,
                     onOpenStorageSettings = ::openStorageSettings,
@@ -94,6 +99,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         permissionRevision++
         cleanerViewModel.refreshDeviceState()
+        if (::interstitialAds.isInitialized) interstitialAds.load()
     }
 
     private fun requestMediaAccess() {

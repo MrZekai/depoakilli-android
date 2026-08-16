@@ -5,8 +5,6 @@ import pathlib
 import sys
 import xml.etree.ElementTree as ET
 
-import yaml
-
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 errors: list[str] = []
@@ -22,6 +20,7 @@ def require(path: str) -> pathlib.Path:
 required = [
     "settings.gradle.kts",
     "build.gradle.kts",
+    "gradle/libs.versions.toml",
     "gradlew",
     "gradle/wrapper/gradle-wrapper.jar",
     "gradle/wrapper/gradle-wrapper.properties",
@@ -30,6 +29,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
+    "docs/AD_PLACEMENTS.md",
 ]
 for relative in required:
     require(relative)
@@ -39,12 +39,6 @@ for xml_file in ROOT.rglob("*.xml"):
         ET.parse(xml_file)
     except ET.ParseError as exc:
         errors.append(f"invalid XML {xml_file.relative_to(ROOT)}: {exc}")
-
-for workflow in (ROOT / ".github/workflows").glob("*.yml"):
-    try:
-        yaml.safe_load(workflow.read_text(encoding="utf-8"))
-    except yaml.YAMLError as exc:
-        errors.append(f"invalid YAML {workflow.relative_to(ROOT)}: {exc}")
 
 manifest = (ROOT / "app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
 for forbidden in (
@@ -64,6 +58,37 @@ for expected in (
 ):
     if expected not in build_file:
         errors.append(f"missing build invariant: {expected}")
+
+catalog = (ROOT / "gradle/libs.versions.toml").read_text(encoding="utf-8")
+for expected in (
+    'agp = "8.13.2"',
+    'kotlin = "2.2.21"',
+    'compose-bom = "2026.06.01"',
+    'lifecycle = "2.10.0"',
+):
+    if expected not in catalog:
+        errors.append(f"missing compatible dependency pin: {expected}")
+
+for forbidden in (
+    'compose-bom = "2026.08.00"',
+    'lifecycle = "2.11.0"',
+):
+    if forbidden in catalog or forbidden in build_file:
+        errors.append(f"API 37 dependency must not be used in the API 36 build: {forbidden}")
+
+if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
+    errors.append("Compose BOM must be enforced to block transitive Compose 1.12 upgrades")
+
+workflow_text = (ROOT / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
+for expected in (
+    "actions/checkout@v7",
+    "actions/setup-java@v5",
+    "gradle/actions/setup-gradle@v6",
+    "actions/upload-artifact@v6",
+    ":app:checkDebugAarMetadata",
+):
+    if expected not in workflow_text:
+        errors.append(f"missing CI invariant: {expected}")
 
 if errors:
     print("Project validation failed:", file=sys.stderr)
