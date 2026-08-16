@@ -36,6 +36,9 @@ jobs:
       - name: Verify Android dependency metadata
         run: ./gradlew --stacktrace :app:checkDebugAarMetadata
 
+      - name: Verify resolved Fragment runtime version
+        run: ./gradlew :app:dependencyInsight --configuration debugRuntimeClasspath --dependency androidx.fragment:fragment
+
       - name: Run unit tests
         run: ./gradlew --stacktrace testDebugUnitTest
 

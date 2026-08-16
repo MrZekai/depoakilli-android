@@ -66,6 +66,7 @@ for expected in (
     'agp = "8.13.2"',
     'kotlin = "2.2.21"',
     'compose-bom = "2026.06.01"',
+    'fragment = "1.9.0"',
     'lifecycle = "2.10.0"',
 ):
     if expected not in catalog:
@@ -80,6 +81,9 @@ for forbidden in (
 
 if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
     errors.append("Compose BOM must be enforced to block transitive Compose 1.12 upgrades")
+
+if "implementation(libs.androidx.fragment)" not in build_file:
+    errors.append("Fragment must be explicit to keep Activity Result APIs on Fragment 1.3.0 or newer")
 
 for expected in (
     "abortOnError = true",
@@ -124,6 +128,7 @@ for expected in (
     "gradle/actions/setup-gradle@v6",
     "actions/upload-artifact@v6",
     ":app:checkDebugAarMetadata",
+    ":app:dependencyInsight --configuration debugRuntimeClasspath --dependency androidx.fragment:fragment",
     "continue-on-error: true",
     "app/build/reports/lint-results-debug.txt",
     "Enforce lint and APK build results",
