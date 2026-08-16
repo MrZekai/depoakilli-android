@@ -26,6 +26,8 @@ required = [
     "gradle/wrapper/gradle-wrapper.properties",
     "app/build.gradle.kts",
     "app/src/main/AndroidManifest.xml",
+    "app/src/main/res/xml/backup_rules.xml",
+    "app/src/main/res/xml/data_extraction_rules.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
@@ -79,6 +81,42 @@ for forbidden in (
 if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
     errors.append("Compose BOM must be enforced to block transitive Compose 1.12 upgrades")
 
+for expected in (
+    "abortOnError = true",
+    "checkDependencies = true",
+    "warningsAsErrors = false",
+    "textReport = true",
+    'textOutput = file("build/reports/lint-results-debug.txt")',
+):
+    if expected not in build_file:
+        errors.append(f"missing lint reporting invariant: {expected}")
+
+valid_backup_domains = {
+    "root",
+    "file",
+    "database",
+    "sharedpref",
+    "external",
+    "device_root",
+    "device_file",
+    "device_database",
+    "device_sharedpref",
+}
+for relative in (
+    "app/src/main/res/xml/backup_rules.xml",
+    "app/src/main/res/xml/data_extraction_rules.xml",
+):
+    rules_file = ROOT / relative
+    if not rules_file.is_file():
+        continue
+    rules_root = ET.parse(rules_file).getroot()
+    for rule in rules_root.iter():
+        if rule.tag not in {"include", "exclude"}:
+            continue
+        domain = rule.attrib.get("domain")
+        if domain not in valid_backup_domains:
+            errors.append(f"invalid Android backup domain in {relative}: {domain!r}")
+
 workflow_text = (ROOT / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
 for expected in (
     "actions/checkout@v7",
@@ -86,6 +124,9 @@ for expected in (
     "gradle/actions/setup-gradle@v6",
     "actions/upload-artifact@v6",
     ":app:checkDebugAarMetadata",
+    "continue-on-error: true",
+    "app/build/reports/lint-results-debug.txt",
+    "Enforce lint and APK build results",
 ):
     if expected not in workflow_text:
         errors.append(f"missing CI invariant: {expected}")

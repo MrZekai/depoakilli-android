@@ -87,6 +87,16 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    lint {
+        abortOnError = true
+        checkDependencies = true
+        warningsAsErrors = false
+        textReport = true
+        textOutput = file("build/reports/lint-results-debug.txt")
+        htmlReport = true
+        xmlReport = true
+    }
 }
 
 kotlin {
