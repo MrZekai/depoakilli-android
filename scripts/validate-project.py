@@ -182,6 +182,23 @@ source_text = "\n".join(
     path.read_text(encoding="utf-8")
     for path in (ROOT / "app/src/main/java").rglob("*.kt")
 )
+
+application_text = (
+    ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt"
+).read_text(encoding="utf-8")
+for expected in (
+    "private val processObserver = object : DefaultLifecycleObserver",
+    "addObserver(processObserver)",
+    "super.onCreate()",
+):
+    if expected not in application_text:
+        errors.append(f"missing collision-free Application lifecycle invariant: {expected}")
+
+if "Application.ActivityLifecycleCallbacks,\n    DefaultLifecycleObserver" in application_text:
+    errors.append(
+        "DepoAkilliApplication must keep DefaultLifecycleObserver in a separate "
+        "processObserver object to avoid ambiguous Android lifecycle super calls",
+    )
 for expected in (
     "class AppOpenAdController",
     "AdSize.MEDIUM_RECTANGLE",

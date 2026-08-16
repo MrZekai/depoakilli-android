@@ -10,17 +10,21 @@ import com.mrzekai.depoakilli.ads.AppOpenAdController
 
 class DepoAkilliApplication :
     Application(),
-    Application.ActivityLifecycleCallbacks,
-    DefaultLifecycleObserver {
+    Application.ActivityLifecycleCallbacks {
 
     private lateinit var appOpenAds: AppOpenAdController
     private var currentActivity: Activity? = null
+    private val processObserver = object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
+            currentActivity?.let(appOpenAds::onAppForeground)
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
         appOpenAds = AppOpenAdController(this)
         registerActivityLifecycleCallbacks(this)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(processObserver)
     }
 
     fun setAppOpenAdsAllowed(allowed: Boolean) {
@@ -29,10 +33,6 @@ class DepoAkilliApplication :
 
     fun releaseAdMemory() {
         appOpenAds.releaseForMemoryOptimization()
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        currentActivity?.let(appOpenAds::onAppForeground)
     }
 
     override fun onActivityStarted(activity: Activity) {
