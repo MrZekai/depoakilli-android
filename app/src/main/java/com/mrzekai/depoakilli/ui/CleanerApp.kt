@@ -102,11 +102,13 @@ import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 
 private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
     HOME(R.string.tab_home, Icons.Outlined.Home),
-    CLEAN(R.string.tab_clean, Icons.Outlined.CleaningServices),
-    TOOLS(R.string.tab_tools, Icons.Outlined.Settings),
+    TOOLS(R.string.tab_tools, Icons.Outlined.CleaningServices),
+    SECURITY(R.string.tab_security, Icons.Outlined.Security),
+    PROFILE(R.string.tab_profile, Icons.Outlined.Android),
 }
 
 private enum class DetailScreen(@StringRes val titleRes: Int) {
+    CLEAN_RESULTS(R.string.clean_results_title),
     WHATSAPP(R.string.whatsapp_cleaner_title),
     APP_CACHE(R.string.cache_manager_title),
     APP_MANAGER(R.string.app_manager_title),
@@ -147,10 +149,11 @@ fun CleanerApp(
     }
 
     fun launchScan(focus: ScanFocus) {
+        detailScreen = DetailScreen.CLEAN_RESULTS
         if (!state.hasAllFilesAccess) {
+            viewModel.queueScanAfterPermission(focus)
             onRequestAllFilesAccess()
         } else {
-            selectedTabIndex = AppTab.CLEAN.ordinal
             viewModel.scan(focus)
         }
     }
@@ -189,7 +192,7 @@ fun CleanerApp(
                     BannerAd(canRequestAds = canRequestAds)
                     Spacer(Modifier.height(8.dp))
                     HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
-                    NavigationBar(containerColor = Color.White) {
+                    NavigationBar(containerColor = Color(0xFF07132C)) {
                         AppTab.entries.forEachIndexed { index, tab ->
                             val title = stringResource(tab.titleRes)
                             NavigationBarItem(
@@ -200,7 +203,7 @@ fun CleanerApp(
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = ElectricBlue,
                                     selectedTextColor = ElectricBlue,
-                                    indicatorColor = Color(0xFFE2ECFF),
+                                    indicatorColor = Color(0xFF123A75),
                                 ),
                             )
                         }
@@ -210,6 +213,16 @@ fun CleanerApp(
         },
     ) { padding ->
         when (detailScreen) {
+            DetailScreen.CLEAN_RESULTS -> CleanScreen(
+                state = state,
+                onRequestAllFilesAccess = onRequestAllFilesAccess,
+                onScan = { viewModel.scan(state.scanFocus) },
+                onToggleItem = viewModel::toggleItem,
+                onToggleCategory = viewModel::toggleCategory,
+                onClean = onPrepareCleanup,
+                modifier = Modifier.padding(padding),
+            )
+
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
                 state = state,
                 onRequestAccess = onRequestAllFilesAccess,
@@ -267,7 +280,25 @@ fun CleanerApp(
             )
 
             null -> when (AppTab.entries[selectedTabIndex]) {
-                AppTab.HOME -> HomeScreen(
+                AppTab.HOME -> NeonDashboardScreen(
+                    state = state,
+                    onOpenProfile = { selectedTabIndex = AppTab.PROFILE.ordinal },
+                    onSmartClean = { launchScan(ScanFocus.SMART) },
+                    onOpenWhatsApp = {
+                        detailScreen = DetailScreen.WHATSAPP
+                        if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
+                    },
+                    onDuplicates = { launchScan(ScanFocus.DUPLICATES) },
+                    onLargeFiles = { launchScan(ScanFocus.LARGE_FILES) },
+                    onApks = { launchScan(ScanFocus.APKS) },
+                    onMedia = { launchScan(ScanFocus.MEDIA) },
+                    onDeepClean = { launchScan(ScanFocus.DEEP) },
+                    onOpenAppCache = { detailScreen = DetailScreen.APP_CACHE },
+                    onRamOptimize = onOptimizeMemory,
+                    modifier = Modifier.padding(padding),
+                )
+
+                AppTab.TOOLS -> DeviceCenterScreen(
                     state = state,
                     onScan = ::launchScan,
                     onRequestAllFilesAccess = onRequestAllFilesAccess,
@@ -276,33 +307,37 @@ fun CleanerApp(
                         if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
                     },
                     onOpenCache = { detailScreen = DetailScreen.APP_CACHE },
-                    onOptimizeMemory = onOptimizeMemory,
-                    onOpenSettings = { detailScreen = DetailScreen.SETTINGS },
-                    modifier = Modifier.padding(padding),
-                )
-
-                AppTab.CLEAN -> CleanScreen(
-                    state = state,
-                    onRequestAllFilesAccess = onRequestAllFilesAccess,
-                    onScan = { viewModel.scan(state.scanFocus) },
-                    onToggleItem = viewModel::toggleItem,
-                    onToggleCategory = viewModel::toggleCategory,
-                    onClean = onPrepareCleanup,
-                    modifier = Modifier.padding(padding),
-                )
-
-                AppTab.TOOLS -> DeviceCenterScreen(
-                    state = state,
-                    onScan = ::launchScan,
-                    onRequestAllFilesAccess = onRequestAllFilesAccess,
-                    onOpenWhatsApp = { detailScreen = DetailScreen.WHATSAPP },
-                    onOpenCache = { detailScreen = DetailScreen.APP_CACHE },
                     onOpenAppManager = {
                         detailScreen = DetailScreen.APP_MANAGER
                         viewModel.refreshInstalledApps()
                     },
                     onOptimizeMemory = onOptimizeMemory,
-                    onOpenSettings = { detailScreen = DetailScreen.SETTINGS },
+                    onOpenSettings = { selectedTabIndex = AppTab.PROFILE.ordinal },
+                    modifier = Modifier.padding(padding),
+                )
+
+                AppTab.SECURITY -> SecurityCenterScreen(
+                    state = state,
+                    onRequestAllFilesAccess = onRequestAllFilesAccess,
+                    onRequestUsageAccess = onRequestUsageAccess,
+                    onOpenPrivacy = { detailScreen = DetailScreen.PRIVACY },
+                    modifier = Modifier.padding(padding),
+                )
+
+                AppTab.PROFILE -> SettingsDetailScreen(
+                    privacyOptionsRequired = privacyOptionsRequired,
+                    onOpenLanguageSettings = onOpenLanguageSettings,
+                    onRateApp = onRateApp,
+                    onSendFeedback = onSendFeedback,
+                    onShareApp = onShareApp,
+                    onShowPrivacyOptions = onShowPrivacyOptions,
+                    onOpenLegalPage = { page ->
+                        detailScreen = when (page) {
+                            LegalPage.PRIVACY -> DetailScreen.PRIVACY
+                            LegalPage.TERMS -> DetailScreen.TERMS
+                            LegalPage.ABOUT -> DetailScreen.ABOUT
+                        }
+                    },
                     modifier = Modifier.padding(padding),
                 )
             }
@@ -534,7 +569,7 @@ private fun StorageRing(storage: StorageSnapshot) {
 @Composable
 private fun AllFilesAccessCard(onRequest: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3D8)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2414)),
         shape = RoundedCornerShape(22.dp),
     ) {
         Row(
@@ -734,11 +769,11 @@ private fun ScanResults(
                 }
             }
         }
-        if (summary.items.isEmpty()) {
+        if (summary.items.isEmpty() && state.scanFocus != ScanFocus.ANALYZE) {
             item {
                 Text(stringResource(R.string.no_safe_suggestions), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-        } else {
+        } else if (summary.items.isNotEmpty()) {
             summary.byCategory.forEach { (category, categoryItems) ->
                 item(key = "header-${category.name}") {
                     CategoryHeader(category, categoryItems, onToggle = { onToggleCategory(category) })
@@ -856,22 +891,28 @@ private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
 
 private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
     ScanFocus.SMART -> R.string.scan_focus_smart
+    ScanFocus.DEEP -> R.string.scan_focus_deep
     ScanFocus.JUNK -> R.string.scan_focus_junk
     ScanFocus.DUPLICATES -> R.string.scan_focus_duplicates
     ScanFocus.LARGE_FILES -> R.string.scan_focus_large
     ScanFocus.WHATSAPP -> R.string.scan_focus_whatsapp
     ScanFocus.MEDIA -> R.string.scan_focus_media
     ScanFocus.DOWNLOADS -> R.string.scan_focus_downloads
+    ScanFocus.APKS -> R.string.scan_focus_apks
+    ScanFocus.ANALYZE -> R.string.scan_focus_analyze
 }
 
 private fun categoryFocusIcon(focus: ScanFocus): ImageVector = when (focus) {
     ScanFocus.SMART -> Icons.Outlined.AutoAwesome
+    ScanFocus.DEEP -> Icons.Outlined.CleaningServices
     ScanFocus.JUNK -> Icons.Outlined.DeleteSweep
     ScanFocus.DUPLICATES -> Icons.Outlined.ContentCopy
     ScanFocus.LARGE_FILES -> Icons.Outlined.VideoFile
     ScanFocus.WHATSAPP -> Icons.Outlined.Chat
     ScanFocus.MEDIA -> Icons.Outlined.PhotoLibrary
     ScanFocus.DOWNLOADS -> Icons.Outlined.Download
+    ScanFocus.APKS -> Icons.Outlined.Android
+    ScanFocus.ANALYZE -> Icons.Outlined.Storage
 }
 
 private fun categoryIcon(category: CleanCategory): ImageVector = when (category) {

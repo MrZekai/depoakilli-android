@@ -99,6 +99,71 @@ class AiCleaningEngine(
         return null
     }
 
+    /**
+     * Broader review rules for Deep Clean.
+     *
+     * Deep Clean intentionally surfaces more candidates than Smart Clean, but
+     * never preselects these lower-confidence review items.
+     */
+    fun assessDeep(file: IndexedFile): AiAssessment? {
+        assess(file)?.let { return it }
+
+        val ageDays = ageDays(file.modifiedAtMillis)
+        val path = normalize(file.relativePath)
+        val name = file.name.lowercase()
+
+        val isWhatsAppSent = path.contains("whatsapp") &&
+            (path.contains("/sent/") || path.endsWith("/sent"))
+        if (isWhatsAppSent && ageDays >= DEEP_WHATSAPP_SENT_DAYS) {
+            return AiAssessment(
+                category = CleanCategory.WHATSAPP_MEDIA,
+                safetyScore = 64,
+                reasonRes = R.string.reason_whatsapp_sent,
+                reasonArgs = listOf(ageDays),
+                recommended = false,
+            )
+        }
+
+        val isScreenshot = path.contains("/screenshots/") ||
+            name.startsWith("screenshot") ||
+            name.startsWith("ekran_görüntüsü") ||
+            name.startsWith("ekran görüntüsü")
+        if (isScreenshot && ageDays >= DEEP_SCREENSHOT_DAYS) {
+            return AiAssessment(
+                category = CleanCategory.SCREENSHOT,
+                safetyScore = 62,
+                reasonRes = R.string.reason_old_screenshot,
+                reasonArgs = listOf(ageDays),
+                recommended = false,
+            )
+        }
+
+        val isDownload = path.contains("/download/") ||
+            path.contains("/downloads/") ||
+            path.contains("/indirilen")
+        if (isDownload && ageDays >= DEEP_DOWNLOAD_DAYS) {
+            return AiAssessment(
+                category = CleanCategory.OLD_DOWNLOAD,
+                safetyScore = 58,
+                reasonRes = R.string.reason_old_download,
+                reasonArgs = listOf(ageDays),
+                recommended = false,
+            )
+        }
+
+        if (file.sizeBytes >= DEEP_LARGE_FILE_BYTES) {
+            return AiAssessment(
+                category = CleanCategory.LARGE_FILE,
+                safetyScore = 50,
+                reasonRes = R.string.reason_large_file,
+                reasonArgs = listOf(ageDays.coerceAtLeast(0)),
+                recommended = false,
+            )
+        }
+
+        return null
+    }
+
     fun duplicateAssessment(automaticSelectionIsSafe: Boolean): AiAssessment = AiAssessment(
         category = CleanCategory.DUPLICATE,
         safetyScore = if (automaticSelectionIsSafe) 99 else 86,
@@ -131,6 +196,10 @@ class AiCleaningEngine(
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
+        private const val DEEP_LARGE_FILE_BYTES = 50L * 1024L * 1024L
+        private const val DEEP_SCREENSHOT_DAYS = 7L
+        private const val DEEP_DOWNLOAD_DAYS = 30L
+        private const val DEEP_WHATSAPP_SENT_DAYS = 14L
         private const val TEMP_MIN_AGE_DAYS = 3L
         private val TEMP_EXTENSIONS = listOf(".tmp", ".temp", ".part", ".crdownload", ".download", ".cache")
     }

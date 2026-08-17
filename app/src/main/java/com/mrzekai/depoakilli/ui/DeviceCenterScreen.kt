@@ -105,7 +105,7 @@ internal fun DeviceCenterScreen(
                 subtitle = stringResource(R.string.deep_cleaner_subtitle),
                 icon = Icons.Outlined.AutoAwesome,
                 accent = Color(0xFF0A67DF),
-                onClick = { onScan(ScanFocus.SMART) },
+                onClick = { onScan(ScanFocus.DEEP) },
             )
         }
         item {
@@ -186,7 +186,7 @@ internal fun DeviceCenterScreen(
                 subtitle = stringResource(R.string.storage_analyzer_subtitle),
                 icon = Icons.Outlined.Storage,
                 accent = Color(0xFF5E4BBA),
-                onClick = { onScan(ScanFocus.SMART) },
+                onClick = { onScan(ScanFocus.ANALYZE) },
             )
         }
         item {
@@ -250,7 +250,7 @@ private fun StatusPill(text: String, active: Boolean) {
 
 @Composable
 private fun PermissionToolCard(title: String, subtitle: String, action: String, onClick: () -> Unit) {
-    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3D8)), shape = RoundedCornerShape(20.dp)) {
+    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2414)), shape = RoundedCornerShape(20.dp)) {
         Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Outlined.Security, contentDescription = null, tint = Color(0xFF9A6500))
             Spacer(Modifier.width(12.dp))
@@ -292,7 +292,7 @@ private fun ToolActionCard(
 
 @Composable
 private fun RamOptimizerCard(state: CleanerUiState, onOptimizeMemory: () -> Unit) {
-    Card(shape = RoundedCornerShape(21.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFE9F8F2))) {
+    Card(shape = RoundedCornerShape(21.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2A25))) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(color = Color(0xFF0C9C70), shape = RoundedCornerShape(15.dp)) {
@@ -391,7 +391,7 @@ internal fun AppCacheManagerScreen(
             TextButton(onClick = onRefresh, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.cache_refresh)) }
         }
         item {
-            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFFF3F5F8)), shape = RoundedCornerShape(18.dp)) {
+            Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF101E3D)), shape = RoundedCornerShape(18.dp)) {
                 Column(Modifier.fillMaxWidth().padding(15.dp)) {
                     Text(stringResource(R.string.cache_own_app), fontWeight = FontWeight.Bold)
                     Text(stringResource(R.string.cache_own_app_subtitle, ByteFormatter.format(state.ownCacheBytes)), style = MaterialTheme.typography.bodySmall)

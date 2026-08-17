@@ -34,6 +34,8 @@ data class CleanerUiState(
     val appCache: AppCacheSnapshot = AppCacheSnapshot(),
     val installedApps: List<InstalledAppEntry> = emptyList(),
     val summary: ScanSummary = ScanSummary(),
+    val dashboardCleanableBytes: Long = 0L,
+    val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
     val scanning: Boolean = false,
     val scanProgressFiles: Int = 0,
     val scanProgressDirectories: Int = 0,
@@ -42,6 +44,7 @@ data class CleanerUiState(
     val optimizingMemory: Boolean = false,
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
+    val pendingScanFocus: ScanFocus? = null,
     val hasAllFilesAccess: Boolean = false,
     val hasUsageAccess: Boolean = false,
     val hasWhatsAppAccess: Boolean = false,
@@ -127,6 +130,17 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun queueScanAfterPermission(focus: ScanFocus) {
+        _state.update { it.copy(scanFocus = focus, pendingScanFocus = focus) }
+    }
+
+    fun resumePendingScanAfterPermission() {
+        val focus = _state.value.pendingScanFocus ?: return
+        if (!repository.hasAllFilesAccess()) return
+        _state.update { it.copy(pendingScanFocus = null) }
+        scan(focus)
+    }
+
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
         refreshDeviceState()
@@ -146,6 +160,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 scanProgressFiles = 0,
                 scanProgressDirectories = 0,
                 scanFocus = focus,
+                pendingScanFocus = null,
                 lastScanCompleted = false,
                 message = null,
             )
@@ -162,8 +177,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onSuccess { summary ->
                 _state.update {
+                    val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
                     it.copy(
                         summary = summary,
+                        dashboardCleanableBytes = if (comprehensive) {
+                            summary.totalSuggestedBytes
+                        } else {
+                            it.dashboardCleanableBytes
+                        },
+                        dashboardCategoryBytes = if (comprehensive) {
+                            summary.byCategory.mapValues { (_, items) -> items.sumOf(CleanableItem::sizeBytes) }
+                        } else {
+                            it.dashboardCategoryBytes
+                        },
                         scanning = false,
                         lastScanCompleted = true,
                         storage = repository.storageSnapshot(),
@@ -370,8 +396,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         clearPending: Boolean = true,
     ) {
         _state.update { state ->
+            val deletedItems = items.filter { it.id in deletedIds }
+            val deletedByCategory = deletedItems
+                .groupBy { it.assessment.category }
+                .mapValues { (_, categoryItems) -> categoryItems.sumOf(CleanableItem::sizeBytes) }
             state.copy(
                 summary = state.summary.copy(items = state.summary.items.filterNot { it.id in deletedIds }),
+                dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedBytes).coerceAtLeast(0L),
+                dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
+                    (bytes - (deletedByCategory[category] ?: 0L)).coerceAtLeast(0L)
+                },
                 storage = repository.storageSnapshot(),
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
@@ -400,8 +434,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun optimizeMemory(releaseHeavyResources: () -> Unit) {
         if (_state.value.scanning || _state.value.optimizingMemory) return
         val before = repository.memorySnapshot()
-        _state.update { it.copy(optimizingMemory = true, message = null) }
+        _state.update {
+            it.copy(
+                optimizingMemory = true,
+                message = null,
+                summary = it.summary.copy(items = emptyList()),
+                whatsAppSummary = it.whatsAppSummary.copy(items = emptyList()),
+            )
+        }
         runCatching(releaseHeavyResources)
+        runCatching { Runtime.getRuntime().gc() }
         viewModelScope.launch {
             delay(MEMORY_MEASUREMENT_DELAY_MILLIS)
             val after = repository.memorySnapshot()

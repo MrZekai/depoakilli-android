@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Akıllı Temizleyici</string>
     <string name="app_tagline">HIZLI • GÜVENLİ • CİHAZ İÇİNDE</string>
@@ -356,4 +355,32 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="whatsapp_category_statuses_description">Paylaşılan depolamadaki geçici WhatsApp durum medyaları</string>
     <string name="whatsapp_cleaner_subtitle_v050">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde tara</string>
     <string name="cleaner_engine_badge">TEMİZLİK MOTORU 0.5</string>
+    <string name="tab_security">Güvenlik</string>
+    <string name="tab_profile">Ben</string>
+    <string name="dashboard_total_cleanable">Toplam Temizlenebilir</string>
+    <string name="dashboard_cleaning_score">TEMİZLİK SKORU</string>
+    <string name="dashboard_cleanable_unknown">Gerçek temizlenebilir alanı hesaplamak için Akıllı Temizlik çalıştır</string>
+    <string name="dashboard_cleanable_ready">%1$s temizlenebilir</string>
+    <string name="smart_clean_primary">AKILLI TEMİZLİK</string>
+    <string name="smart_clean_primary_subtitle">Çöp, kopya, APK, medya ve büyük dosyaları tara</string>
+    <string name="dashboard_scanning">TARANIYOR…</string>
+    <string name="dashboard_access_hint">Kapsamlı temizlik için tam depolama erişimi bir kez istenir.</string>
+    <string name="dashboard_more_space_title">Önemli şeyler için daha fazla alan açın</string>
+    <string name="dashboard_more_space_subtitle">Daha eski, daha büyük ve inceleme gerektiren adaylar için Derin Temizlik kullanın.</string>
+    <string name="security_center_title">Güvenlik ve erişim</string>
+    <string name="security_center_subtitle">Her temizleme özelliğini hangi Android izninin çalıştırdığını açıkça görün.</string>
+    <string name="security_storage_access">Tam depolama yönetimi</string>
+    <string name="security_usage_access">Kullanım Erişimi</string>
+    <string name="security_storage_access_desc">Çöp, kopya, büyük dosya, APK, indirilenler ve WhatsApp paylaşılan medyası için kullanılır.</string>
+    <string name="security_usage_access_desc">İsteğe bağlıdır. Yalnız uygulama önbellek/depolama toplamları ve son kullanım bilgisi için kullanılır.</string>
+    <string name="security_local_processing">Cihaz içi analiz</string>
+    <string name="security_local_processing_desc">Temizlik taramaları ve kopya parmak izleri bu cihazda kalır.</string>
+    <string name="status_ready">Hazır</string>
+    <string name="status_needed">Gerekli</string>
+    <string name="scan_focus_deep">Derin temizlik sonucu</string>
+    <string name="scan_focus_apks">APK temizliği sonucu</string>
+    <string name="scan_focus_analyze">Depolama analizi</string>
+    <string name="clean_results_title">Temizlik sonuçları</string>
+    <string name="dashboard_deep_detail">Detaylı Tara</string>
+    <string name="dashboard_ram_available">%1$s kullanılabilir</string>
 </resources>

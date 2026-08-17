@@ -19,12 +19,15 @@ enum class CleanCategory(
 
 enum class ScanFocus {
     SMART,
+    DEEP,
     JUNK,
     DUPLICATES,
     LARGE_FILES,
     WHATSAPP,
     MEDIA,
     DOWNLOADS,
+    APKS,
+    ANALYZE,
 }
 
 enum class WhatsAppMediaCategory(

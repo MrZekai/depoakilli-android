@@ -1,4 +1,3 @@
-<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Smart Cleaner</string>
     <string name="app_tagline">FAST • SAFE • ON-DEVICE</string>
@@ -356,4 +355,32 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="whatsapp_category_statuses_description">Temporary WhatsApp status media stored in shared storage</string>
     <string name="whatsapp_cleaner_subtitle_v050">Scan WhatsApp and WhatsApp Business shared Media directly inside Smart Cleaner</string>
     <string name="cleaner_engine_badge">CLEANER ENGINE 0.5</string>
+    <string name="tab_security">Security</string>
+    <string name="tab_profile">Me</string>
+    <string name="dashboard_total_cleanable">Total cleanable</string>
+    <string name="dashboard_cleaning_score">CLEANING SCORE</string>
+    <string name="dashboard_cleanable_unknown">Run Smart Clean to calculate real cleanable space</string>
+    <string name="dashboard_cleanable_ready">%1$s cleanable</string>
+    <string name="smart_clean_primary">SMART CLEAN</string>
+    <string name="smart_clean_primary_subtitle">Scan junk, duplicates, APKs, media and large files</string>
+    <string name="dashboard_scanning">SCANNING…</string>
+    <string name="dashboard_access_hint">Full storage access will be requested once for comprehensive cleaning.</string>
+    <string name="dashboard_more_space_title">Make room for what matters</string>
+    <string name="dashboard_more_space_subtitle">Use Deep Clean to review older, larger and lower-confidence candidates.</string>
+    <string name="security_center_title">Security &amp; access</string>
+    <string name="security_center_subtitle">See exactly which Android permissions power each cleaner feature.</string>
+    <string name="security_storage_access">Full storage management</string>
+    <string name="security_usage_access">Usage Access</string>
+    <string name="security_storage_access_desc">Used for junk, duplicates, large files, APKs, downloads and WhatsApp shared media.</string>
+    <string name="security_usage_access_desc">Optional. Used only for app cache/storage totals and last-used information.</string>
+    <string name="security_local_processing">On-device analysis</string>
+    <string name="security_local_processing_desc">Cleaner scans and duplicate fingerprints stay on this device.</string>
+    <string name="status_ready">Ready</string>
+    <string name="status_needed">Needed</string>
+    <string name="scan_focus_deep">Deep clean result</string>
+    <string name="scan_focus_apks">APK cleaner result</string>
+    <string name="scan_focus_analyze">Storage analysis</string>
+    <string name="clean_results_title">Cleaning results</string>
+    <string name="dashboard_deep_detail">Detailed scan</string>
+    <string name="dashboard_ram_available">%1$s available</string>
 </resources>

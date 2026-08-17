@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
+    private var pendingDeepCacheAfterStorageAccess = false
 
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -34,6 +35,13 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshDeviceState()
         if (Environment.isExternalStorageManager()) {
             cleanerViewModel.showMessage(R.string.message_all_files_granted)
+            cleanerViewModel.resumePendingScanAfterPermission()
+            if (pendingDeepCacheAfterStorageAccess) {
+                pendingDeepCacheAfterStorageAccess = false
+                requestDeepCacheCleanup()
+            }
+        } else {
+            pendingDeepCacheAfterStorageAccess = false
         }
     }
 
@@ -148,6 +156,7 @@ class MainActivity : ComponentActivity() {
 
     private fun requestDeepCacheCleanup() {
         if (!Environment.isExternalStorageManager()) {
+            pendingDeepCacheAfterStorageAccess = true
             cleanerViewModel.showMessage(R.string.message_all_files_required_for_cache)
             requestAllFilesAccess()
             return

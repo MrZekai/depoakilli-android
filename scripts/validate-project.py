@@ -39,12 +39,16 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifierTest.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/DuplicatePolicyTest.kt",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
     "docs/CLEANER_ENGINE_V050.md",
+    "docs/NEON_DASHBOARD_V051.md",
+    "docs/REVISION_NOTES_V051.md",
     "docs/PLAY_PERMISSIONS_V050.md",
     "docs/PERMISSIONS.md",
     "docs/ANDROID_CACHE_LIMITS.md",
@@ -123,8 +127,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 7",
-    'versionName = "0.5.0"',
+    "versionCode = 8",
+    'versionName = "0.5.1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -156,6 +160,10 @@ for expected in (
     "MAX_INDEXED_FILES = 200_000",
     "MAX_WHATSAPP_FILES = 100_000",
     "CleanCategory.LARGE_FILE",
+    "ScanFocus.DEEP",
+    "ScanFocus.APKS",
+    "ScanFocus.ANALYZE",
+    "assessDeep(file",
 ):
     if expected not in repository:
         errors.append(f"missing Cleaner Engine repository invariant: {expected}")
@@ -187,6 +195,18 @@ if "setContent {" in main_activity and "import androidx.activity.compose.setCont
     errors.append("MainActivity uses setContent without androidx.activity.compose.setContent import")
 if "distinctBy(File::absolutePath)" in repository:
     errors.append("DeviceRepository must not use unsupported synthetic Java property reference File::absolutePath")
+dashboard = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt").read_text(encoding="utf-8")
+for expected in (
+    "smart_clean_primary",
+    "DashboardToolTile",
+    "DashboardHero",
+    "CleaningScoreRing",
+):
+    if expected not in dashboard:
+        errors.append(f"missing v0.5.1 dashboard invariant: {expected}")
+if "PRO" in dashboard or "Premium" in dashboard:
+    errors.append("v0.5.1 dashboard must not advertise a non-existent Pro/Premium tier")
+
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
 if "TopAppBar(" in cleaner_app:
     if "ExperimentalMaterial3Api" not in cleaner_app or "@OptIn(ExperimentalMaterial3Api::class)" not in cleaner_app:
@@ -230,4 +250,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Cleaner Engine 0.5 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Cleaner Engine 0.5.1 project structure, permissions, resources, CI and safety guardrails are valid.")

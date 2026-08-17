@@ -121,7 +121,7 @@ private fun WhatsAppAccessScreen(
 ) {
     Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFEAFBF1)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2A25)),
             shape = RoundedCornerShape(28.dp),
         ) {
             Column(
@@ -200,7 +200,7 @@ private fun WhatsAppScanningScreen(
 ) {
     Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFEAFBF1)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2A25)),
             shape = RoundedCornerShape(28.dp),
         ) {
             Column(
@@ -400,7 +400,7 @@ private fun WhatsAppCategoryHeader(
     val selectedCount = items.count(WhatsAppMediaItem::selected)
     Card(
         modifier = Modifier.clickable(onClick = onToggle),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFEAFBF1)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2A25)),
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(

@@ -258,20 +258,33 @@ class DeviceRepository(
             }
         }
 
-        if (focus == ScanFocus.SMART || focus == ScanFocus.DUPLICATES) {
-            assessments += findDuplicates(indexed)
+        if (
+            focus == ScanFocus.SMART ||
+            focus == ScanFocus.DEEP ||
+            focus == ScanFocus.DUPLICATES ||
+            focus == ScanFocus.MEDIA
+        ) {
+            val duplicateSource = if (focus == ScanFocus.MEDIA) {
+                indexed.filter { it.mimeType.startsWith("image/") || it.mimeType.startsWith("video/") }
+            } else {
+                indexed
+            }
+            assessments += findDuplicates(duplicateSource)
         }
 
         val focusedItems = assessments.asSequence()
             .filter { item ->
                 when (focus) {
-                    ScanFocus.SMART -> true
-                    ScanFocus.JUNK -> item.assessment.category in JUNK_CATEGORIES
+                    ScanFocus.SMART,
+                    ScanFocus.DEEP -> true
+                    ScanFocus.JUNK -> item.assessment.category == CleanCategory.JUNK
                     ScanFocus.DUPLICATES -> item.assessment.category == CleanCategory.DUPLICATE
                     ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
                     ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
                     ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
                     ScanFocus.DOWNLOADS -> item.assessment.category in DOWNLOAD_CATEGORIES
+                    ScanFocus.APKS -> item.assessment.category == CleanCategory.APK_PACKAGE
+                    ScanFocus.ANALYZE -> false
                 }
             }
             .distinctBy(CleanableItem::uri)
@@ -374,6 +387,20 @@ class DeviceRepository(
 
     private fun assessmentForFocus(file: IndexedFile, focus: ScanFocus): AiAssessment? {
         return when (focus) {
+            ScanFocus.SMART -> aiEngine.assess(file)
+            ScanFocus.DEEP -> aiEngine.assessDeep(file)
+
+            ScanFocus.JUNK -> aiEngine.assess(file)?.takeIf {
+                it.category == CleanCategory.JUNK
+            }
+
+            ScanFocus.DUPLICATES,
+            ScanFocus.ANALYZE -> null
+
+            ScanFocus.APKS -> aiEngine.assess(file)?.takeIf {
+                it.category == CleanCategory.APK_PACKAGE
+            }
+
             ScanFocus.LARGE_FILES -> if (file.sizeBytes >= LARGE_FILE_BYTES) {
                 AiAssessment(
                     category = CleanCategory.LARGE_FILE,
@@ -390,7 +417,7 @@ class DeviceRepository(
                 if (!file.mimeType.startsWith("image/") && !file.mimeType.startsWith("video/")) {
                     null
                 } else {
-                    aiEngine.assess(file)?.takeIf {
+                    aiEngine.assessDeep(file)?.takeIf {
                         it.category == CleanCategory.SCREENSHOT || it.category == CleanCategory.LARGE_FILE
                     }
                 }
@@ -401,20 +428,20 @@ class DeviceRepository(
                 if (!normalized.contains("/download/") && !normalized.contains("/downloads/")) {
                     null
                 } else {
-                    aiEngine.assess(file)?.takeIf {
-                        it.category == CleanCategory.APK_PACKAGE || it.category == CleanCategory.OLD_DOWNLOAD || it.category == CleanCategory.JUNK
+                    aiEngine.assessDeep(file)?.takeIf {
+                        it.category == CleanCategory.APK_PACKAGE ||
+                            it.category == CleanCategory.OLD_DOWNLOAD ||
+                            it.category == CleanCategory.JUNK
                     }
                 }
             }
 
-            ScanFocus.WHATSAPP -> aiEngine.assess(file) ?: AiAssessment(
+            ScanFocus.WHATSAPP -> aiEngine.assessDeep(file) ?: AiAssessment(
                 category = CleanCategory.WHATSAPP_MEDIA,
                 safetyScore = 55,
                 reasonRes = R.string.reason_whatsapp_review,
                 recommended = false,
             )
-
-            else -> aiEngine.assess(file)
         }
     }
 

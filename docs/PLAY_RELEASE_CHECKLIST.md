@@ -4,7 +4,7 @@
 
 - [ ] `python scripts/validate-project.py` passes.
 - [ ] GitHub Actions passes `testDebugUnitTest`, `lintDebug`, `assembleDebug` and QA signing verification.
-- [ ] QA APK reports version `0.5.0` / versionCode `7`.
+- [ ] QA APK reports version `0.5.1` / versionCode `8`.
 - [ ] Physical-device checklist in `docs/DEVICE_QA_CHECKLIST.md` is recorded before Production.
 - [ ] Android 11–16 permission return paths are tested where devices are available.
 - [ ] No scan/delete path causes ANR or silently drops failed items.

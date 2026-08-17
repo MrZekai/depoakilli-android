@@ -79,6 +79,37 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `deep clean surfaces a seven day screenshot that smart clean protects`() {
+        val candidate = file(
+            "Screenshot_recent.png",
+            "image/png",
+            10,
+            "Pictures/Screenshots/",
+        )
+
+        assertNull(engine.assess(candidate))
+        val deep = engine.assessDeep(candidate)
+        assertEquals(CleanCategory.SCREENSHOT, deep?.category)
+        assertFalse(requireNotNull(deep).recommended)
+    }
+
+    @Test
+    fun `deep clean surfaces a fifty megabyte review file without auto selecting it`() {
+        val candidate = file(
+            "archive.bin",
+            "application/octet-stream",
+            5,
+            "Backups/",
+            70L * 1024L * 1024L,
+        )
+
+        assertNull(engine.assess(candidate))
+        val deep = engine.assessDeep(candidate)
+        assertEquals(CleanCategory.LARGE_FILE, deep?.category)
+        assertFalse(requireNotNull(deep).recommended)
+    }
+
+    @Test
     fun `whatsapp status is a safe temporary recommendation`() {
         val result = engine.assess(
             file(

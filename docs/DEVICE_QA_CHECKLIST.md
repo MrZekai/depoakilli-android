@@ -92,5 +92,5 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 
 - `python scripts/validate-project.py` must pass.
 - `testDebugUnitTest`, `lintDebug`, `assembleDebug` and QA signing verification must all pass in GitHub Actions.
-- Install the generated `depoakilli-test-apk-*` artifact over the prior QA build and verify version `0.5.0` / versionCode `7`.
+- Install the generated `depoakilli-test-apk-*` artifact over the prior QA build and verify version `0.5.1` / versionCode `8`.
 - Do not promote to Production until the physical-device cases above are recorded on Android 11, 12, 13, 14, 15 and 16 where devices are available.
