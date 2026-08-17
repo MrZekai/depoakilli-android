@@ -185,6 +185,7 @@ data class ScanSummary(
     val limitedAccess: Boolean = false,
     val scanLimitReached: Boolean = false,
     val storageTypes: List<StorageTypeStat> = emptyList(),
+    val storagePreviews: Map<StorageFileType, List<IndexedFile>> = emptyMap(),
 ) {
     val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
     val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)

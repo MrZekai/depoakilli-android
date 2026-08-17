@@ -40,6 +40,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifierTest.kt",
@@ -127,8 +128,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 8",
-    'versionName = "0.5.1"',
+    "versionCode = 9",
+    'versionName = "0.5.2"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -203,9 +204,28 @@ for expected in (
     "CleaningScoreRing",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.1 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.2 dashboard invariant: {expected}")
 if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.1 dashboard must not advertise a non-existent Pro/Premium tier")
+    errors.append("v0.5.2 dashboard must not advertise a non-existent Pro/Premium tier")
+
+smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
+for expected in (
+    "SmartCleanSummaryCard",
+    "CleanupConfirmationDialog",
+    "StorageDetailDialog",
+    "FilePreviewDialog",
+    "summary.storagePreviews",
+):
+    if expected not in smart_results:
+        errors.append(f"missing v0.5.2 Smart Clean results invariant: {expected}")
+
+for strings_path in (
+    ROOT / "app/src/main/res/values/strings.xml",
+    ROOT / "app/src/main/res/values-tr/strings.xml",
+):
+    visible_strings = strings_path.read_text(encoding="utf-8")
+    if "Cleaner Engine" in visible_strings or "CLEANER ENGINE" in visible_strings:
+        errors.append(f"user-visible Cleaner Engine branding remains in {strings_path}")
 
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
 if "TopAppBar(" in cleaner_app:
@@ -250,4 +270,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Cleaner Engine 0.5.1 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.2 project structure, permissions, resources, CI and safety guardrails are valid.")

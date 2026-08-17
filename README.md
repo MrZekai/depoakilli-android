@@ -1,6 +1,6 @@
 # Smart Cleaner / Akıllı Temizleyici
 
-Android storage-management and file-maintenance app. Current development line: **v0.5.1 Neon Cleaner Dashboard**.
+Android storage-management and file-maintenance app. Current development line: **v0.5.2 Smart Clean Results UX**.
 
 ## Cleaner Engine 0.5
 
@@ -42,8 +42,8 @@ See:
 - package: `com.mrzekai.depoakilli`
 - minSdk: 30 (Android 11)
 - target/compile SDK: 36
-- versionName: `0.5.1`
-- versionCode: `8`
+- versionName: `0.5.2`
+- versionCode: `9`
 - debug package: `com.mrzekai.depoakilli.qa`
 
 GitHub Actions runs project validation, dependency checks, unit tests, lint, debug APK build and stable QA-signing verification. The debug artifact is named `depoakilli-test-apk-*`.

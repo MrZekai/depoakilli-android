@@ -166,8 +166,13 @@ fun CleanerApp(
             if (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME) {
                 TopAppBar(
                     title = {
+                        val titleRes = if (detailScreen == DetailScreen.CLEAN_RESULTS && state.scanFocus == ScanFocus.SMART) {
+                            R.string.smart_clean_results_title
+                        } else {
+                            detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
+                        }
                         Text(
-                            stringResource(detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes),
+                            stringResource(titleRes),
                             fontWeight = FontWeight.Black,
                         )
                     },
@@ -676,6 +681,19 @@ private fun CleanScreen(
     onClean: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    if (state.scanFocus == ScanFocus.SMART) {
+        SmartCleanResultsScreen(
+            state = state,
+            onRequestAllFilesAccess = onRequestAllFilesAccess,
+            onScan = onScan,
+            onToggleItem = onToggleItem,
+            onToggleCategory = onToggleCategory,
+            onClean = onClean,
+            modifier = modifier,
+        )
+        return
+    }
+
     when {
         !state.hasAllFilesAccess -> Box(modifier.fillMaxSize().padding(22.dp), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {

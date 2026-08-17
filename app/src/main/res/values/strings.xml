@@ -253,7 +253,7 @@
     <string name="about_app_body">Smart Cleaner %1$s\n\nA privacy-conscious Android cleaner focused on real storage measurements, exact duplicate detection, large-file review, WhatsApp Media management, safe cache cleanup for this app, and transparent device information.\n\nPackage identity: com.mrzekai.depoakilli</string>
     <string name="about_app_body_v050">Smart Cleaner %1$s
 
-Cleaner Engine 0.5 is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.
+Smart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.
 
 Package: com.mrzekai.depoakilli</string>
     <string name="access_files_missing">File access needed</string>
@@ -302,7 +302,7 @@ Package: com.mrzekai.depoakilli</string>
     <string name="media_cleaner_subtitle">Review old screenshots and storage-heavy photos/videos</string>
     <string name="media_cleaner_title">Media Cleaner</string>
     <string name="message_all_files_granted">Full storage management access is ready.</string>
-    <string name="message_all_files_required">Enable All files access to run the full Cleaner Engine.</string>
+    <string name="message_all_files_required">Enable All files access so Smart Cleaner can perform a full device storage scan.</string>
     <string name="message_all_files_required_for_cache">Deep cache cleanup requires Android All files access first.</string>
     <string name="message_cache_cleanup_cancelled">Device cache cleanup was cancelled.</string>
     <string name="message_cleanup_complete_detail">%1$s was cleaned.</string>
@@ -325,20 +325,20 @@ Google Mobile Ads and the consent platform may process advertising identifiers, 
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Regeneratable thumbnail cache • %1$d days old</string>
     <string name="reason_whatsapp_review">WhatsApp shared media — review before deletion</string>
-    <string name="safe_ai_cleaning_description_v050">Cleaner Engine indexes accessible shared storage on-device, applies conservative cleanup rules, verifies exact duplicates by content and leaves user-created files unselected unless deletion is clearly safe.</string>
+    <string name="safe_ai_cleaning_description_v050">Smart Cleaner analyzes accessible shared storage on-device, applies conservative cleanup rules, verifies exact duplicates by content and leaves user-created files unselected unless deletion is clearly safe.</string>
     <string name="scan_focus_downloads">Downloads &amp; APK result</string>
     <string name="scan_focus_media">Media cleaner result</string>
-    <string name="scan_in_progress_v050">Cleaner Engine is indexing shared storage…</string>
+    <string name="scan_in_progress_v050">Smart Cleaner is scanning your accessible storage…</string>
     <string name="scan_limit_note_v050">The safety ceiling of 200,000 indexed files was reached. Results are real but the device contains more files than this pass indexed.</string>
     <string name="scan_live_counter">%1$d files discovered • %2$d folders visited</string>
     <string name="scan_stats_v050">%1$d files • %2$s indexed • %3$d selected</string>
     <string name="settings_subtitle_v050">Language, privacy, support and product information.</string>
     <string name="smart_clean_action_v050">START DEEP SMART SCAN</string>
-    <string name="storage_analyzer_subtitle">See storage by file type while the cleaner engine scans the device</string>
+    <string name="storage_analyzer_subtitle">See storage by file type and inspect the files behind each category</string>
     <string name="storage_analyzer_title">Storage Analyzer</string>
     <string name="storage_type_apk">APK installers</string>
     <string name="storage_type_archives">Archives</string>
-    <string name="storage_type_audio">Audio</string>
+    <string name="storage_type_audio">Audio &amp; music</string>
     <string name="storage_type_documents">Documents</string>
     <string name="storage_type_images">Images</string>
     <string name="storage_type_other">Other files</string>
@@ -354,7 +354,7 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="whatsapp_category_statuses">Statuses</string>
     <string name="whatsapp_category_statuses_description">Temporary WhatsApp status media stored in shared storage</string>
     <string name="whatsapp_cleaner_subtitle_v050">Scan WhatsApp and WhatsApp Business shared Media directly inside Smart Cleaner</string>
-    <string name="cleaner_engine_badge">CLEANER ENGINE 0.5</string>
+    <string name="cleaner_engine_badge">SMART CLEANER</string>
     <string name="tab_security">Security</string>
     <string name="tab_profile">Me</string>
     <string name="dashboard_total_cleanable">Total cleanable</string>
@@ -383,4 +383,33 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="clean_results_title">Cleaning results</string>
     <string name="dashboard_deep_detail">Detailed scan</string>
     <string name="dashboard_ram_available">%1$s available</string>
+    <string name="smart_clean_results_title">Smart Clean Results</string>
+    <string name="smart_clean_results_empty_intro">Run Smart Clean to see reviewable cleanup suggestions and a tappable storage breakdown.</string>
+    <string name="smart_scan_progress_title">Smart Cleaner is scanning your phone</string>
+    <string name="smart_scan_progress_subtitle">Checking junk, duplicates, large files, downloads, APKs and accessible media on this device.</string>
+    <string name="smart_clean_suggestions_title">Cleanup suggestions</string>
+    <string name="smart_clean_suggestions_subtitle">Each category shows a few items first. Open a category to review everything before deleting.</string>
+    <string name="smart_clean_results_tap_hint">Tap to review exactly what will be deleted</string>
+    <string name="smart_clean_summary_detail">%1$s total suggestions • %2$d items selected • %3$d files scanned</string>
+    <string name="smart_selected_for_cleanup">Selected for cleanup</string>
+    <string name="smart_review_and_clean">Review &amp; clean</string>
+    <string name="smart_show_all_count">View all (%1$d)</string>
+    <string name="smart_storage_analyzer_subtitle">Tap Photos, Videos, Audio, Documents, APKs or other categories to see the files behind the numbers.</string>
+    <string name="smart_storage_file_count">%1$d files</string>
+    <string name="smart_cleanup_confirm_title">Clean selected items?</string>
+    <string name="smart_cleanup_confirm_body">You selected %1$s across %2$d items. Review the breakdown below before continuing.</string>
+    <string name="smart_cleanup_confirm_warning">Deletion cannot be undone. Android may show its own confirmation for protected media.</string>
+    <string name="smart_cleanup_confirm_action">Clean selected</string>
+    <string name="smart_preview_tap_hint">Tap a file to preview it. Use the checkbox only when you want it included in cleanup.</string>
+    <string name="smart_storage_preview_note">Showing up to %1$d of the largest files found in this category. Storage analysis does not select these files for cleanup automatically.</string>
+    <string name="smart_storage_preview_empty">No previewable files were captured for this category.</string>
+    <string name="smart_included_in_cleanup">Included in cleanup</string>
+    <string name="smart_not_included_in_cleanup">Not included in cleanup</string>
+    <string name="smart_audio_play">Play audio</string>
+    <string name="smart_audio_pause">Pause audio</string>
+    <string name="smart_generic_preview_title">File details</string>
+
+    <string name="smart_cleanup_selected_examples">Selected file examples</string>
+    <string name="smart_cleanup_more_items">+%1$d more selected items</string>
+
 </resources>

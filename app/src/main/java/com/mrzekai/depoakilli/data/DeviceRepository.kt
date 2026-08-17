@@ -302,6 +302,7 @@ class DeviceRepository(
             limitedAccess = false,
             scanLimitReached = indexed.size >= MAX_INDEXED_FILES,
             storageTypes = storageTypeStats(indexed),
+            storagePreviews = storageTypePreviews(indexed),
         )
     }
 
@@ -655,6 +656,15 @@ class DeviceRepository(
             .sortedByDescending(StorageTypeStat::totalBytes)
     }
 
+    private fun storageTypePreviews(files: List<IndexedFile>): Map<StorageFileType, List<IndexedFile>> {
+        return files.groupBy(::storageFileType)
+            .mapValues { (_, typedFiles) ->
+                typedFiles
+                    .sortedByDescending(IndexedFile::sizeBytes)
+                    .take(MAX_STORAGE_PREVIEWS_PER_TYPE)
+            }
+    }
+
     private fun storageFileType(file: IndexedFile): StorageFileType {
         val mime = file.mimeType.lowercase()
         val extension = file.name.substringAfterLast('.', "").lowercase()
@@ -759,6 +769,7 @@ class DeviceRepository(
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val MAX_INDEXED_FILES = 200_000
         private const val MAX_WHATSAPP_FILES = 100_000
+        private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
         private const val MAX_RESULT_ITEMS = 4_000
         private const val HASH_BUFFER_BYTES = 256 * 1024
         private const val HASH_SAMPLE_BYTES = 64 * 1024
