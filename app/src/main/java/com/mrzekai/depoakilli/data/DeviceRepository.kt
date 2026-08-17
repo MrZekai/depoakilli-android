@@ -513,7 +513,7 @@ class DeviceRepository(
             File(root, "Android/media/com.whatsapp.w4b/WhatsApp/Media"),
             File(root, "WhatsApp/Media"),
             File(root, "WhatsApp Business/Media"),
-        ).distinctBy(File::absolutePath)
+        ).distinctBy { it.absolutePath }
     }
 
     private suspend fun findDuplicates(files: List<IndexedFile>): List<CleanableItem> {

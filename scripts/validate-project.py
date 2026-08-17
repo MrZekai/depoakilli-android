@@ -182,6 +182,16 @@ for expected in (
 if "OpenDocumentTree" in main_activity:
     errors.append("WhatsApp must not use OpenDocumentTree in v0.5")
 
+# Compile-guard invariants caught by the first real Android CI run.
+if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
+    errors.append("MainActivity uses setContent without androidx.activity.compose.setContent import")
+if "distinctBy(File::absolutePath)" in repository:
+    errors.append("DeviceRepository must not use unsupported synthetic Java property reference File::absolutePath")
+cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
+if "TopAppBar(" in cleaner_app:
+    if "ExperimentalMaterial3Api" not in cleaner_app or "@OptIn(ExperimentalMaterial3Api::class)" not in cleaner_app:
+        errors.append("CleanerApp TopAppBar requires ExperimentalMaterial3Api opt-in")
+
 strings_default = ROOT / "app/src/main/res/values/strings.xml"
 strings_tr = ROOT / "app/src/main/res/values-tr/strings.xml"
 if strings_default.is_file() and strings_tr.is_file():
