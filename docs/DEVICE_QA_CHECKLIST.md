@@ -1,58 +1,96 @@
-# Physical device QA checklist
+# Cleaner Engine 0.5 physical-device QA checklist
 
-Record the device model, Android version, app version, and result for every run.
+Record device model, Android version, app version, available storage, WhatsApp/Business presence, and pass/fail evidence for every run.
 
-## Storage and memory accuracy
+## 1. First-run access and recovery
 
-- Compare the app's total/free storage with Android Settings > Storage. Small differences caused by rounding or live writes are acceptable; multi-gigabyte differences are not.
-- Capture `adb shell df -B1 /data` and compare the total/available byte values with the app.
-- Observe the RAM card three times, one minute apart. Available RAM may change continuously because Android reclaims memory; total RAM should remain stable.
-- Run app-memory cleanup after a completed scan. Confirm scan results and selections remain intact, the progress indicator finishes, and the result reports measured app PSS and available RAM without inventing a fixed saving.
-- Repeat RAM optimization with no scan results. It must still finish safely and must not claim that other applications were closed.
-- Capture `adb shell dumpsys meminfo | head -n 20` for a diagnostic comparison. Do not expect the value to match consumer “RAM booster” apps.
+- Launch with All Files Access disabled. Home and Tools must explain why storage-management access is needed; Smart Scan must not fabricate results.
+- Grant All Files Access through Android's official settings screen, return to Smart Cleaner, and confirm the app resumes to its own UI without a folder picker.
+- Revoke All Files Access while the app is backgrounded, return, and confirm scans are gated safely rather than crashing.
+- Grant and revoke Usage Access. Cache/App Manager sizes may become unavailable, but file cleaning must continue to work.
+- On Android 13+, open app-language settings from Smart Cleaner. On Android 11–12, the fallback must open device language settings instead of crashing.
 
-## Cache tools
+## 2. Smart Scan / Deep Cleaner
 
-- Run Smart Scan with several gigabytes of other-app cache reported by Android. Verify the large protected-cache value is shown separately and is never added to the green cleanable total or the Clean button.
-- Select Smart Cleaner’s own cache and accessible files. Confirm the Clean button equals exactly the sum of those selected items.
-- Approve cleanup and verify the result never claims that another app’s private cache was deleted.
-- Revoke Usage Access and confirm Smart Scan still works without a fake other-app cache total.
+- Seed the device with temp files, old Downloads, APK installers, screenshots, large files, exact duplicates, documents, archives, audio and video.
+- Run Smart Scan from Home. Progress must show real scanned file/folder counts and remain responsive on a large library.
+- Verify the cleanable total contains only accessible selected files; another application's protected/private cache must never be counted as directly deletable storage.
+- Verify categories match the actual files found: Junk, Duplicates, Screenshots/Media, Large Files, Old Downloads, APK packages and WhatsApp media where applicable.
+- Cancel a cleanup confirmation and verify no file is deleted.
+- Approve cleanup and verify only selected files are removed and the free-space change is plausible.
+- Run the same scan again and verify deleted items do not reappear from stale state.
 
-## WhatsApp Cleaner
+## 3. Junk / Downloads / APK
 
-- With no folder connected, open WhatsApp Cleaner and verify the in-app explanation appears before Android’s folder picker.
-- Test both WhatsApp and WhatsApp Business Media trees. Reject an unrelated directory and verify a clear error message.
-- Scan a Media tree containing at least one image, video, document, audio file, voice note, sticker/GIF, and unknown file. Verify every item appears under the correct category.
-- Confirm the progress UI reaches 100% only after traversal and classification finish.
-- Confirm no item is preselected and image/video thumbnails load without blocking scrolling.
-- Select a whole category, deselect one item, open the deletion confirmation, and cancel. No file may disappear.
-- Confirm deletion and verify only selected documents are removed from the provider and the displayed/free-space totals update.
-- Include a read-only or provider-rejected document; verify partial cleanup reports the failed count without hiding that row.
+- Test `.tmp`, `.temp`, `.part`, `.crdownload`, `.download`, `.cache` and old temp-folder files. Only conservative, old temporary files may be preselected.
+- Put old and new APK files in shared storage. Old installers should be discoverable; recent installers must not be silently auto-deleted.
+- Put old personal documents in Downloads. They may be recommended for review but must not be preselected merely because they are old.
+- Verify protected paths such as other apps' private `/Android/data` and `/Android/obb` are not traversed or represented as directly cleanable.
 
-## Scan and deletion
+## 4. Duplicate Cleaner
 
-- Test full media permission, limited photo access (Android 14+), denial, and permission revocation.
-- Run the scan with at least 2,000 media items; the UI must remain responsive.
-- Confirm every suggested duplicate is actually identical before deletion.
-- Cancel Android's deletion confirmation; no item may disappear from the results.
-- Approve deletion; confirm only selected files disappear and free storage increases plausibly.
+- Create byte-identical copies in Camera, Download, Documents and a large-file folder, including files larger than 40 MB.
+- Verify the scanner finds large duplicates; the old 40 MB, 20-file group and 100-hash-group limits must not exist.
+- For identical Camera and Download files, verify the Camera/original candidate is protected and a safer duplicate is selected.
+- Create same-size but different-content files; they must not be reported as exact duplicates.
+- Test very large files and confirm streaming hashing does not load the whole file into memory or freeze the UI.
 
-## Ads and consent
+## 5. WhatsApp Cleaner — entirely in Smart Cleaner after access
 
-- Clear app data, launch twice, and confirm no App Open ad is shown.
-- On the third foreground transition, confirm a Google test App Open ad may appear if loaded; app startup must continue if it is unavailable.
-- Confirm a second App Open ad cannot appear within two hours.
-- Confirm Home, Clean, and Tools show one anchored 320×50 banner above navigation and no 300×250 MREC.
-- Start and finish a scan while watching the bottom bar. Banner space and navigation must not jump; no new banner request should be caused solely by scan state.
-- Return from media permission, WhatsApp SAF selection, Android Settings, and the system delete confirmation. App Open must be suppressed and cleanup may evaluate at most one interstitial.
-- On a 5,000+ item media library, confirm the oldest/large-file pass finds eligible old screenshots or large videos and displays the bounded-scan note.
-- For an exact copy in `DCIM/Camera` and `Download`, confirm only the downloaded copy is preselected and the Camera original is named as protected.
-- Deny UMP consent where applicable and confirm the implementation follows the resulting `canRequestAds` state.
+- With All Files Access granted, open WhatsApp Cleaner. It must NOT launch `OpenDocumentTree`, Android's folder picker or SAF directory navigation.
+- Test WhatsApp and WhatsApp Business under supported `Android/media` layouts.
+- Scan a library containing Images, Videos, Documents, Audio, Voice Notes, Stickers/GIFs, Sent media, Status media and large files.
+- Progress must reach 100% only after direct traversal/classification completes.
+- Image, sticker/GIF and video rows should show in-app thumbnails when the local format supports Android thumbnail decoding; other files use category icons.
+- Open category selection, deselect individual items, cancel deletion, then confirm deletion. Only selected files may disappear.
+- Include an unreadable or deletion-failed file; partial failure must be reported rather than pretending the entire cleanup succeeded.
+- Reopen WhatsApp Cleaner after app restart. It must remain usable without reconnecting a folder as long as All Files Access remains granted.
 
-## Localization and resilience
+## 6. Deep App Cache
 
-- Switch between English and Turkish on Android 13+ and verify navigation, scan reasons, messages, and tool labels.
-- Test a small-screen device and the largest system font; buttons and ad containers must not overlap.
-- Rotate only through supported orientation behavior, background/foreground the app repeatedly, and check for crashes or ANRs.
-- Open Device Center and compare storage/RAM with Android Settings; verify battery, Android/API, CPU ABI/core count, resolution, and app version are populated.
-- Open Settings and verify rate, feedback, share, Privacy Policy, Terms of Service, About, and available ad privacy controls.
+- Grant Usage Access and compare measured app cache/storage sizes with Android Settings for several launcher apps. Small timing differences are acceptable; fabricated totals are not.
+- Trigger Deep App Cache cleanup. Android's official `ACTION_CLEAR_APP_CACHE` confirmation may appear; Smart Cleaner must not claim silent deletion of protected internal caches.
+- Cancel the system action and confirm Smart Cleaner does not report bytes as deleted.
+- Complete the supported system action and refresh cache measurements.
+- Clear Smart Cleaner's own cache separately and verify it is explicitly labelled as this app's cache, never as the phone-wide cache cleaner.
+
+## 7. Large Files / Media Cleaner / Storage Analyzer
+
+- Place large ZIP, PDF, APK, audio, video and backup files in shared storage. Large Files must not be video-only.
+- Storage Analyzer totals by Images, Videos, Audio, Documents, Archives, APK and Other should reconcile plausibly with indexed shared-storage bytes.
+- Media Cleaner must identify review candidates without automatically deleting personal photos merely for age or size.
+- Test a 10,000+ file library and watch for ANR, runaway memory or permanently stuck scan progress.
+
+## 8. App Manager
+
+- With Usage Access granted, verify visible launcher apps show package/name and available storage/cache/last-use data where Android permits it.
+- The implementation must not depend on `QUERY_ALL_PACKAGES`.
+- Trigger uninstall and verify Android's official uninstall confirmation handles the operation; cancellation must return safely to Smart Cleaner.
+
+## 9. RAM Optimization
+
+- Run RAM Optimization before and after a scan. It may release Smart Cleaner's own heavy/ad resources and report measured state, but must not claim it killed other apps or recovered fabricated gigabytes.
+- Repeat multiple times and verify no fixed percentage speedup or fake RAM saving is shown.
+- Background/foreground the app after optimization and ensure ads, scan state and navigation recover normally.
+
+## 10. UI / tools / localization
+
+- Home must prominently expose Smart Scan plus real cleaner modules: Junk, Duplicates, Large Files, Media, WhatsApp, Deep App Cache and Downloads/APK.
+- Tools must contain actionable cleaner/storage modules, not battery/CPU/RAM status cards disguised as cleaning tools.
+- Test Home, Clean, Tools, Settings, App Manager, App Cache and WhatsApp at largest system font and on a small screen.
+- English is the default/fallback language. Turkish devices use Turkish resources. Unsupported locales must fall back cleanly to English without broken resource keys.
+- Verify RTL/system layout remains usable even when the text falls back to English.
+
+## 11. Ads / consent / navigation
+
+- Clear app data and verify consent flow, banner placement and App Open/interstitial cooldown behavior remain intact.
+- No ad should cover a cleanup confirmation, system permission rationale, selection checkbox or primary cleaner CTA.
+- Return from All Files Access, Usage Access, Deep Cache system action, language settings and uninstall confirmation. The app must resume without immediately stacking App Open/interstitial ads.
+- Confirm no obsolete 300x250 MREC configuration exists.
+
+## 12. Regression / release gate
+
+- `python scripts/validate-project.py` must pass.
+- `testDebugUnitTest`, `lintDebug`, `assembleDebug` and QA signing verification must all pass in GitHub Actions.
+- Install the generated `depoakilli-test-apk-*` artifact over the prior QA build and verify version `0.5.0` / versionCode `7`.
+- Do not promote to Production until the physical-device cases above are recorded on Android 11, 12, 13, 14, 15 and 16 where devices are available.

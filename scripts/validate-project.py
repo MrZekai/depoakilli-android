@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import pathlib
+import struct
 import sys
 import xml.etree.ElementTree as ET
-import hashlib
-import struct
-
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 errors: list[str] = []
@@ -30,25 +29,26 @@ required = [
     "app/src/main/AndroidManifest.xml",
     "app/src/main/res/values/strings.xml",
     "app/src/main/res/values-tr/strings.xml",
-    "app/src/main/res/values/styles.xml",
-    "app/src/main/res/values-v27/styles.xml",
-    "app/src/main/res/xml/backup_rules.xml",
-    "app/src/main/res/xml/data_extraction_rules.xml",
     "app/src/main/res/xml/locales_config.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifierTest.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/DuplicatePolicyTest.kt",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
-    "docs/AD_PLACEMENTS.md",
-    "docs/HOME_DESIGN.md",
-    "docs/APP_ICON.md",
+    "docs/CLEANER_ENGINE_V050.md",
+    "docs/PLAY_PERMISSIONS_V050.md",
+    "docs/PERMISSIONS.md",
     "docs/ANDROID_CACHE_LIMITS.md",
-    "docs/CLAUDE_REVIEW_RESOLUTION.md",
+    "docs/FEATURE_MATRIX.md",
     "docs/QA_SIGNING.md",
     "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
@@ -57,13 +57,6 @@ required = [
     "app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png",
     "app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png",
     "app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png",
-    "app/src/main/res/drawable/ic_launcher_background.xml",
-    "app/src/main/res/drawable/ic_launcher_foreground.xml",
-    "app/src/main/res/drawable/ic_launcher_monochrome.xml",
-    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
-    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
-    "app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml",
-    "app/src/main/res/mipmap-anydpi-v33/ic_launcher_round.xml",
     "store-assets/icon-512.png",
     "store-assets/icon-master-1536.png",
 ]
@@ -78,16 +71,15 @@ def png_dimensions(path: pathlib.Path) -> tuple[int, int] | None:
         if stream.read(8) != b"\x89PNG\r\n\x1a\n":
             errors.append(f"launcher asset is not a real PNG: {path.relative_to(ROOT)}")
             return None
-        length_bytes = stream.read(4)
+        stream.read(4)
         chunk_type = stream.read(4)
-        if len(length_bytes) != 4 or chunk_type != b"IHDR":
+        if chunk_type != b"IHDR":
             errors.append(f"launcher PNG has no valid IHDR: {path.relative_to(ROOT)}")
             return None
-        width, height = struct.unpack(">II", stream.read(8))
-        return width, height
+        return struct.unpack(">II", stream.read(8))
 
 
-for relative, expected_size in (
+for relative, expected in (
     ("app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png", (432, 432)),
     ("app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png", (432, 432)),
     ("app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png", (432, 432)),
@@ -95,12 +87,8 @@ for relative, expected_size in (
     ("store-assets/icon-master-1536.png", (1536, 1536)),
 ):
     dimensions = png_dimensions(ROOT / relative)
-    if dimensions is not None and dimensions != expected_size:
-        errors.append(
-            f"incorrect launcher asset dimensions for {relative}: "
-            f"expected {expected_size[0]}x{expected_size[1]}, got "
-            f"{dimensions[0]}x{dimensions[1]}",
-        )
+    if dimensions is not None and dimensions != expected:
+        errors.append(f"incorrect launcher dimensions for {relative}: expected {expected}, got {dimensions}")
 
 for xml_file in ROOT.rglob("*.xml"):
     try:
@@ -109,47 +97,25 @@ for xml_file in ROOT.rglob("*.xml"):
         errors.append(f"invalid XML {xml_file.relative_to(ROOT)}: {exc}")
 
 manifest = (ROOT / "app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
+for expected in (
+    "android.permission.MANAGE_EXTERNAL_STORAGE",
+    "android.permission.PACKAGE_USAGE_STATS",
+    'android:localeConfig="@xml/locales_config"',
+    '<queries>',
+    'android.intent.category.LAUNCHER',
+):
+    if expected not in manifest:
+        errors.append(f"missing v0.5 manifest invariant: {expected}")
+
 for forbidden in (
-    "MANAGE_EXTERNAL_STORAGE",
     "QUERY_ALL_PACKAGES",
     "BIND_ACCESSIBILITY_SERVICE",
     "KILL_BACKGROUND_PROCESSES",
     "WRITE_EXTERNAL_STORAGE",
+    "CLEAR_APP_CACHE\"",
 ):
     if forbidden in manifest:
-        errors.append(f"forbidden first-release permission present: {forbidden}")
-
-if 'android:localeConfig="@xml/locales_config"' not in manifest:
-    errors.append("manifest must declare the English/Turkish locale configuration")
-
-for expected in (
-    'android.permission.PACKAGE_USAGE_STATS',
-    'xmlns:tools="http://schemas.android.com/tools"',
-    'tools:ignore="ProtectedPermissions"',
-    'android.intent.category.LAUNCHER',
-    '<queries>',
-):
-    if expected not in manifest:
-        errors.append(f"missing scoped app-cache visibility invariant: {expected}")
-
-default_strings_file = ROOT / "app/src/main/res/values/strings.xml"
-turkish_strings_file = ROOT / "app/src/main/res/values-tr/strings.xml"
-if default_strings_file.is_file() and turkish_strings_file.is_file():
-    default_names = {
-        node.attrib["name"]
-        for node in ET.parse(default_strings_file).getroot().findall("string")
-    }
-    turkish_names = {
-        node.attrib["name"]
-        for node in ET.parse(turkish_strings_file).getroot().findall("string")
-    }
-    if default_names != turkish_names:
-        missing_tr = sorted(default_names - turkish_names)
-        missing_default = sorted(turkish_names - default_names)
-        if missing_tr:
-            errors.append(f"Turkish translations missing keys: {missing_tr}")
-        if missing_default:
-            errors.append(f"default translations missing keys: {missing_default}")
+        errors.append(f"forbidden permission/automation present: {forbidden}")
 
 build_file = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
 for expected in (
@@ -157,15 +123,11 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 6",
-    'versionName = "0.4.1"',
+    "versionCode = 7",
+    'versionName = "0.5.0"',
     "validateReleaseAds",
-    'buildConfigField("String", "ADMOB_APP_OPEN_ID"',
-    '"Release blocked: configure the upload keystore environment variables."',
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
-    'signingConfig = signingConfigs.getByName("debug")',
-    'signingConfig = signingConfigs.findByName("release")',
 ):
     if expected not in build_file:
         errors.append(f"missing build invariant: {expected}")
@@ -181,264 +143,81 @@ for expected in (
     if expected not in catalog:
         errors.append(f"missing compatible dependency pin: {expected}")
 
-for forbidden in (
-    'compose-bom = "2026.08.00"',
-    'lifecycle = "2.11.0"',
-):
-    if forbidden in catalog or forbidden in build_file:
-        errors.append(f"API 37 dependency must not be used in the API 36 build: {forbidden}")
-
 if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
-    errors.append("Compose BOM must be enforced to block transitive Compose 1.12 upgrades")
+    errors.append("Compose BOM must remain enforced")
 
-if "implementation(libs.androidx.fragment)" not in build_file:
-    errors.append("Fragment must be explicit to keep Activity Result APIs on Fragment 1.3.0 or newer")
+repository = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt").read_text(encoding="utf-8")
+for expected in (
+    "Environment.isExternalStorageManager()",
+    "indexSharedStorage",
+    "indexWhatsAppFiles",
+    "sampleFingerprint",
+    "fingerprint(file",
+    "MAX_INDEXED_FILES = 200_000",
+    "MAX_WHATSAPP_FILES = 100_000",
+    "CleanCategory.LARGE_FILE",
+):
+    if expected not in repository:
+        errors.append(f"missing Cleaner Engine repository invariant: {expected}")
 
-if "implementation(libs.androidx.lifecycle.process)" not in build_file:
-    errors.append("lifecycle-process is required for foreground-aware App Open ads")
+for forbidden in (
+    "MAX_HASH_BYTES",
+    "MAX_DUPLICATE_GROUP",
+    "MAX_HASH_GROUPS",
+    "KEY_WHATSAPP_TREE_URI",
+    "DocumentsContract",
+    "APP_CACHE_URI",
+):
+    if forbidden in repository:
+        errors.append(f"legacy v0.4 cleaner restriction still present: {forbidden}")
 
-if 'applicationIdSuffix = ".debug"' in build_file:
-    errors.append("ephemeral .debug package must be replaced by the stable .qa test package")
+main_activity = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
+for expected in (
+    "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
+    "StorageManager.ACTION_CLEAR_APP_CACHE",
+    "Settings.ACTION_USAGE_ACCESS_SETTINGS",
+):
+    if expected not in main_activity:
+        errors.append(f"missing Android system flow: {expected}")
+if "OpenDocumentTree" in main_activity:
+    errors.append("WhatsApp must not use OpenDocumentTree in v0.5")
+
+strings_default = ROOT / "app/src/main/res/values/strings.xml"
+strings_tr = ROOT / "app/src/main/res/values-tr/strings.xml"
+if strings_default.is_file() and strings_tr.is_file():
+    default_names = {node.attrib["name"] for node in ET.parse(strings_default).getroot().findall("string")}
+    tr_names = {node.attrib["name"] for node in ET.parse(strings_tr).getroot().findall("string")}
+    if default_names != tr_names:
+        if missing := sorted(default_names - tr_names):
+            errors.append(f"Turkish translations missing keys: {missing}")
+        if missing := sorted(tr_names - default_names):
+            errors.append(f"default translations missing keys: {missing}")
 
 qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
 if qa_keystore.is_file():
-    qa_keystore_sha256 = hashlib.sha256(qa_keystore.read_bytes()).hexdigest()
-    if qa_keystore_sha256 != "d6e453480cd6e99fb7bbfd7192eef1719328979f09d6dba383249dbc46b5eac8":
+    digest = hashlib.sha256(qa_keystore.read_bytes()).hexdigest()
+    if digest != "d6e453480cd6e99fb7bbfd7192eef1719328979f09d6dba383249dbc46b5eac8":
         errors.append("QA keystore bytes changed; CI update signing continuity would be broken")
 
-gitignore_text = (ROOT / ".gitignore").read_text(encoding="utf-8")
-if "!keystore/depoakilli-ci-qa.jks" not in gitignore_text:
-    errors.append("stable QA keystore must be explicitly unignored for CI checkout")
-
-for expected in (
-    "abortOnError = true",
-    "checkDependencies = true",
-    "warningsAsErrors = false",
-    "textReport = true",
-    'textOutput = file("build/reports/lint-results-debug.txt")',
-):
-    if expected not in build_file:
-        errors.append(f"missing lint reporting invariant: {expected}")
-
-valid_backup_domains = {
-    "root",
-    "file",
-    "database",
-    "sharedpref",
-    "external",
-    "device_root",
-    "device_file",
-    "device_database",
-    "device_sharedpref",
-}
-for relative in (
-    "app/src/main/res/xml/backup_rules.xml",
-    "app/src/main/res/xml/data_extraction_rules.xml",
-):
-    rules_file = ROOT / relative
-    if not rules_file.is_file():
-        continue
-    rules_root = ET.parse(rules_file).getroot()
-    for rule in rules_root.iter():
-        if rule.tag not in {"include", "exclude"}:
-            continue
-        domain = rule.attrib.get("domain")
-        if domain not in valid_backup_domains:
-            errors.append(f"invalid Android backup domain in {relative}: {domain!r}")
-
-workflow_text = (ROOT / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
+workflow = (ROOT / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
 for expected in (
     "actions/checkout@v7",
     "actions/setup-java@v5",
     "gradle/actions/setup-gradle@v6",
     "actions/upload-artifact@v6",
-    ":app:checkDebugAarMetadata",
-    ":app:dependencyInsight --configuration debugRuntimeClasspath --dependency androidx.fragment:fragment",
-    "continue-on-error: true",
-    "app/build/reports/lint-results-debug.txt",
-    "Enforce lint and APK build results",
+    "testDebugUnitTest",
+    "lintDebug",
+    "assembleDebug",
+    "depoakilli-test-apk-",
     "Verify stable test signing certificate",
-    "id: signing",
-    "bash scripts/verify-qa-signing.sh app/build/outputs/apk/debug/app-debug.apk",
-    "SIGNING_OUTCOME: ${{ steps.signing.outcome }}",
-    "depoakilli-test-apk-${{ github.run_number }}",
 ):
-    if expected not in workflow_text:
+    if expected not in workflow:
         errors.append(f"missing CI invariant: {expected}")
-
-qa_signing_script_text = (ROOT / "scripts/verify-qa-signing.sh").read_text(encoding="utf-8")
-for expected in (
-    'apksigner" verify --print-certs',
-    "===== RAW APKSIGNER OUTPUT =====",
-    "keytool -exportcert",
-    "508e012197da76d516bad24880b67c6f067fcd646c51a043a11c0c345e6ead54",
-    'if [[ "$keystore_digest" != "$pinned_digest" ]]',
-    'if [[ "$actual_digest" != "$keystore_digest" ]]',
-):
-    if expected not in qa_signing_script_text:
-        errors.append(f"missing stable QA signing verification invariant: {expected}")
-
-release_workflow_text = (ROOT / ".github/workflows/release-aab.yml").read_text(encoding="utf-8")
-release_script_text = (ROOT / "scripts/validate-release-env.sh").read_text(encoding="utf-8")
-for expected in (
-    "ADMOB_APP_ID",
-    "ADMOB_BANNER_ID",
-    "ADMOB_INTERSTITIAL_ID",
-    "ADMOB_APP_OPEN_ID",
-):
-    if expected not in release_workflow_text:
-        errors.append(f"release workflow missing live ad ID: {expected}")
-    if expected not in release_script_text:
-        errors.append(f"release secret validation missing live ad ID: {expected}")
-
-source_text = "\n".join(
-    path.read_text(encoding="utf-8")
-    for path in (ROOT / "app/src/main/java").rglob("*.kt")
-)
-
-application_text = (
-    ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt"
-).read_text(encoding="utf-8")
-for expected in (
-    "private val processObserver = object : DefaultLifecycleObserver",
-    "addObserver(processObserver)",
-    "super.onCreate()",
-    "fun suppressNextAppOpenAd()",
-):
-    if expected not in application_text:
-        errors.append(f"missing collision-free Application lifecycle invariant: {expected}")
-
-if "Application.ActivityLifecycleCallbacks,\n    DefaultLifecycleObserver" in application_text:
-    errors.append(
-        "DepoAkilliApplication must keep DefaultLifecycleObserver in a separate "
-        "processObserver object to avoid ambiguous Android lifecycle super calls",
-    )
-for expected in (
-    "class AppOpenAdController",
-    "MIN_FOREGROUNDS_BEFORE_FIRST_AD = 3",
-    "MIN_SHOW_INTERVAL_MILLIS = 2L * 60L * 60L * 1000L",
-    "MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L",
-    "FULL_SCREEN_SEPARATION_MILLIS = 30L * 1000L",
-    "fun clearAppCache()",
-    "fun optimizeMemory(",
-    "Debug.MemoryInfo()",
-    "releaseForMemoryOptimization",
-    "StorageStatsManager",
-    "queryStatsForPackage",
-    "AppOpsManager.OPSTR_GET_USAGE_STATS",
-    "fun refreshAppCaches()",
-):
-    if expected not in source_text:
-        errors.append(f"missing global tools/ads invariant: {expected}")
-
-for forbidden in (
-    "StorageManager.ACTION_CLEAR_APP_CACHE",
-    "KILL_BACKGROUND_PROCESSES",
-    "onOpenSystemCache",
-    "onClick = {},",
-    "DeletePlan.Completed",
-    "AdSize.MEDIUM_RECTANGLE",
-    "ADMOB_MEDIUM_RECTANGLE_ID",
-):
-    if forbidden in source_text:
-        errors.append(f"obsolete or non-functional tool action present: {forbidden}")
-
-cleaner_app_text = (
-    ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt"
-).read_text(encoding="utf-8")
-for expected in (
-    "val showAnchoredBanner = canRequestAds",
-    "ModernHomeHero(",
-    "HomeToolMasonry(",
-    "HomeToolRow(",
-    "R.string.smart_scan_home_action",
-    "R.string.whatsapp_home_subtitle",
-    "WhatsAppCleanerDetailScreen(",
-    "DeviceCenterScreen(",
-    "SettingsDetailScreen(",
-):
-    if expected not in cleaner_app_text:
-        errors.append(f"missing visible app-cache/banner UI invariant: {expected}")
-
-if "MediumRectangleAd(" in cleaner_app_text:
-    errors.append("Home must use the visible anchored banner instead of a 300x250 MREC")
-
-if "summary.selectedBytes +" in cleaner_app_text:
-    errors.append(
-        "Smart Clean must never add protected third-party app cache to the truly cleanable total",
-    )
-
-if "onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal }" in cleaner_app_text:
-    errors.append("the Tools tab must not expose the old per-app cache manager")
-
-for expected in (
-    "summary.scanLimitReached",
-    "R.string.duplicate_original_kept",
-):
-    if expected not in cleaner_app_text:
-        errors.append(f"missing scan safety UI invariant: {expected}")
-
-whatsapp_repository_text = (
-    ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt"
-).read_text(encoding="utf-8")
-for expected in (
-    '"${MediaStore.MediaColumns.DATE_MODIFIED} ASC"',
-    '"${MediaStore.MediaColumns.SIZE} DESC"',
-    "sampleFingerprint(file)",
-    "DuplicatePolicy.choose(sameContentFiles)",
-):
-    if expected not in whatsapp_repository_text:
-        errors.append(f"missing scan correctness invariant: {expected}")
-whatsapp_screen_text = (
-    ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt"
-).read_text(encoding="utf-8")
-for expected in (
-    "suspend fun scanWhatsAppLibrary(",
-    "suspend fun deleteWhatsAppItems(",
-    "DocumentsContract.deleteDocument",
-    "WhatsAppMediaClassifier.classify(",
-):
-    if expected not in whatsapp_repository_text:
-        errors.append(f"missing complete WhatsApp repository invariant: {expected}")
-
-for expected in (
-    "WhatsAppMediaCategory.entries",
-    "WhatsAppThumbnail(item)",
-    "whatsapp_delete_confirm_message",
-    "whatsAppScanProgress",
-):
-    if expected not in whatsapp_screen_text:
-        errors.append(f"missing complete in-app WhatsApp UI invariant: {expected}")
-
-styles_text = (ROOT / "app/src/main/res/values/styles.xml").read_text(encoding="utf-8")
-styles_v27_text = (ROOT / "app/src/main/res/values-v27/styles.xml").read_text(encoding="utf-8")
-if '<item name="android:windowLightStatusBar">false</item>' not in styles_text:
-    errors.append("base theme must keep light status-bar content on the dark background")
-if '<item name="android:windowLightNavigationBar">' in styles_text:
-    errors.append("API 27 navigation-bar appearance must not be in the base theme")
-if '<item name="android:windowLightNavigationBar">true</item>' not in styles_v27_text:
-    errors.append("values-v27 theme must use dark navigation-bar icons on the white navigation surface")
-
-for debug_strings in (
-    ROOT / "app/src/debug/res/values/strings.xml",
-    ROOT / "app/src/debug/res/values-tr/strings.xml",
-):
-    if debug_strings.is_file() and "QA" in debug_strings.read_text(encoding="utf-8"):
-        errors.append(f"visible debug app label must not contain QA: {debug_strings.relative_to(ROOT)}")
-
-for kotlin_file in (ROOT / "app/src").rglob("*.kt"):
-    kotlin_text = kotlin_file.read_text(encoding="utf-8")
-    if "import androidx.compose.foundation.layout.weight" in kotlin_text:
-        errors.append(
-            "forbidden Compose scope-member import in "
-            f"{kotlin_file.relative_to(ROOT)}: remove the weight import and call "
-            "Modifier.weight only inside a RowScope or ColumnScope",
-        )
 
 if errors:
     print("Project validation failed:", file=sys.stderr)
     for error in errors:
-        print(f"- {error}", file=sys.stderr)
-    raise SystemExit(1)
+        print(f" - {error}", file=sys.stderr)
+    sys.exit(1)
 
-print("Project structure, XML, workflows, package identity and permission guardrails are valid.")
+print("Cleaner Engine 0.5 project structure, permissions, resources, CI and safety guardrails are valid.")

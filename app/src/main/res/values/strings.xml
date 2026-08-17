@@ -1,12 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Smart Cleaner</string>
     <string name="app_tagline">FAST • SAFE • ON-DEVICE</string>
-
     <string name="tab_home">Home</string>
     <string name="tab_clean">Clean</string>
     <string name="tab_tools">Tools</string>
-
     <string name="scan_primary">START SMART CLEAN</string>
     <string name="scan_primary_subtitle">Analyze safe suggestions on your device</string>
     <string name="cleaning_center">Cleaning center</string>
@@ -22,7 +20,6 @@
     <string name="app_cache_quick_subtitle">%1$s temporary files</string>
     <string name="memory_tools_quick">App memory</string>
     <string name="memory_tools_quick_subtitle">Release temporary app memory</string>
-
     <string name="smart_clean_ready">SMART CLEAN</string>
     <string name="smart_clean_title">Your Phone Is Ready</string>
     <string name="smart_clean_subtitle">Scan junk, duplicates and large files in one pass</string>
@@ -60,23 +57,19 @@
     <string name="large_files_tool_subtitle">Review videos using the most space</string>
     <string name="cache_tool_title">App Cache</string>
     <string name="cache_tool_subtitle">Measure cache and open Android cleanup controls</string>
-
     <string name="storage_full">FULL</string>
     <string name="phone_storage">Phone storage</string>
     <string name="storage_used">%1$s used</string>
     <string name="storage_free">%1$s free</string>
     <string name="storage_total">Total %1$s</string>
-
     <string name="media_access_required">Media access required</string>
     <string name="media_access_explanation">Photos and videos are analyzed only on your device.</string>
     <string name="grant_access">Allow</string>
-
     <string name="memory_status">Memory status</string>
     <string name="memory_available">%1$s RAM available • this app: %2$s</string>
     <string name="memory_compact_subtitle">%1$s available • Smart Cleaner %2$s</string>
     <string name="last_scan">Last scan</string>
     <string name="last_scan_summary">%1$d suggestions • %2$s</string>
-
     <string name="scan_in_progress">Smart Cleaner is analyzing files…</string>
     <string name="scan_private">Your content never leaves the device</string>
     <string name="safe_ai_cleaning">Safe smart cleaning</string>
@@ -92,7 +85,6 @@
     <string name="clean_action">%1$s CLEAN</string>
     <string name="category_summary">%1$d items • %2$s</string>
     <string name="file_confidence">%1$s • %2$d%% confidence</string>
-
     <string name="cache_manager_title">App Cache Manager</string>
     <string name="cache_manager_subtitle">Find real cache usage across your installed apps</string>
     <string name="cache_access_required">Cache access is off</string>
@@ -123,7 +115,6 @@
     <string name="scan_focus_duplicates">Duplicate scan result</string>
     <string name="scan_focus_large">Large-file scan result</string>
     <string name="scan_focus_whatsapp">WhatsApp cleaner result</string>
-
     <string name="tools_title">Device tools</string>
     <string name="tools_subtitle">Use real Android controls and safe on-device cleanup.</string>
     <string name="clear_app_cache">Clear app cache</string>
@@ -138,12 +129,11 @@
     <string name="memory_optimizer_subtitle">%1$s available • this app uses %2$s</string>
     <string name="memory_optimizing">Optimizing memory…</string>
     <string name="language_settings">App language</string>
-    <string name="language_settings_subtitle">Choose English, Turkish, or the device default</string>
+    <string name="language_settings_subtitle">Use the phone’s supported app-language setting; unsupported locales fall back to English.</string>
     <string name="ad_privacy_preferences">Ad privacy preferences</string>
     <string name="ad_privacy_preferences_subtitle">Change consent and personalization choices</string>
     <string name="honest_memory_note">App memory cleanup releases temporary full-screen ad resources without discarding your scan selections, then measures this app’s real PSS memory again. Android keeps device-wide process reclamation under system control.</string>
     <string name="sponsored">Sponsored</string>
-
     <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
     <string name="message_select_item">Select at least one item to clean.</string>
     <string name="message_cleanup_cancelled">Cleanup was cancelled.</string>
@@ -159,7 +149,6 @@
     <string name="message_screen_unavailable">This screen could not be opened on your device.</string>
     <string name="message_whatsapp_cleanup_complete">%1$s of selected WhatsApp files deleted • %2$d failed</string>
     <string name="message_whatsapp_cleanup_partial">%1$s deleted • Android couldn’t delete %2$d selected files</string>
-
     <string name="category_duplicates">Duplicates</string>
     <string name="category_duplicates_description">Unnecessary copies with identical content</string>
     <string name="category_screenshots">Screenshots</string>
@@ -174,7 +163,6 @@
     <string name="category_app_cache_description">Safe temporary app files</string>
     <string name="category_whatsapp">WhatsApp media</string>
     <string name="category_whatsapp_description">Temporary statuses and older sent-media copies</string>
-
     <string name="reason_old_installer">%1$d-day-old installer package</string>
     <string name="reason_downloaded_installer">Downloaded installer package</string>
     <string name="reason_old_screenshot">%1$d-day-old screenshot</string>
@@ -190,19 +178,18 @@
     <string name="reason_whatsapp_status">Temporary WhatsApp status file</string>
     <string name="reason_whatsapp_sent">Sent-media copy from %1$d days ago; review before deleting</string>
     <string name="unnamed_file">Unnamed file</string>
-
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
     <string name="delete_selected">Delete selected</string>
-    <string name="whatsapp_access_title">Connect WhatsApp Media</string>
-    <string name="whatsapp_access_description">Choose the WhatsApp or WhatsApp Business Media folder once. Smart Cleaner will then classify images, videos, documents, audio, voice notes, stickers, and GIFs inside the app.</string>
-    <string name="whatsapp_choose_folder">Choose Media folder</string>
-    <string name="whatsapp_access_once">Android’s folder picker is required only to grant safe access. Your files stay on this device.</string>
-    <string name="whatsapp_ready_title">WhatsApp Media is connected</string>
-    <string name="whatsapp_ready_description">Run a complete on-device scan and review every category before deleting anything.</string>
+    <string name="whatsapp_access_title">Enable storage access for WhatsApp</string>
+    <string name="whatsapp_access_description">WhatsApp Cleaner reads WhatsApp and WhatsApp Business shared Media directly inside Smart Cleaner after Android grants All files access. No folder picker is used.</string>
+    <string name="whatsapp_choose_folder">Enable full storage access</string>
+    <string name="whatsapp_access_once">Android shows the special All files access setting only when permission is needed. After that, WhatsApp scanning stays inside Smart Cleaner.</string>
+    <string name="whatsapp_ready_title">WhatsApp Media is ready</string>
+    <string name="whatsapp_ready_description">Scan WhatsApp and WhatsApp Business shared Media directly inside Smart Cleaner and review every category before deletion.</string>
     <string name="whatsapp_scan_action">Scan WhatsApp files</string>
     <string name="whatsapp_scanning_title">Analyzing WhatsApp Media</string>
-    <string name="whatsapp_scanning_description">Reading folders, classifying file types, and preparing safe previews…</string>
+    <string name="whatsapp_scanning_description">Reading WhatsApp shared Media directly, classifying files and preparing previews…</string>
     <string name="whatsapp_scan_complete">WHATSAPP MEDIA FOUND</string>
     <string name="whatsapp_scan_stats">%1$d files classified on this device</string>
     <string name="whatsapp_selection_safe">Nothing is preselected. You decide exactly what will be deleted.</string>
@@ -226,7 +213,6 @@
     <string name="whatsapp_delete_action">DELETE %1$s</string>
     <string name="whatsapp_delete_confirm_title">Delete selected WhatsApp files?</string>
     <string name="whatsapp_delete_confirm_message">%1$d files using %2$s will be permanently deleted. This can’t be undone.</string>
-
     <string name="device_center_title">Device Center</string>
     <string name="device_center_live_status">Live device status</string>
     <string name="device_android_summary">Android %1$s • API %2$d</string>
@@ -244,7 +230,6 @@
     <string name="device_screen">Screen</string>
     <string name="device_app_version">App version</string>
     <string name="device_center_note">Values are read from Android in real time. Smart Cleaner does not invent performance scores or claim to kill protected apps.</string>
-
     <string name="settings_center">Settings and support</string>
     <string name="settings_center_subtitle">Privacy, feedback, sharing, rating, and app information</string>
     <string name="settings_title">Settings</string>
@@ -267,4 +252,108 @@
     <string name="privacy_policy_body">Smart Cleaner analyzes accessible files on your device. Media contents and fingerprints used for cleaning are not uploaded by the cleaning engine. Access to a WhatsApp Media folder is granted by you through Android’s system picker and remains limited to that selected folder.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics, and consent choices under Google’s policies. Smart Cleaner does not sell your personal files. You can change advertising privacy choices from Settings when the option is available.\n\nDeleting files is performed only after your selection and confirmation. Other apps’ private caches are protected by Android and are never presented as if Smart Cleaner silently deleted them.</string>
     <string name="terms_of_service_body">Smart Cleaner provides on-device storage analysis and deletion tools. Scan results are suggestions, not backups. Review selected files before confirming deletion because deleted documents and WhatsApp media may not be recoverable.\n\nThe app does not promise to delete private data belonging to other apps, force-stop protected processes, cool the CPU, or create storage that Android does not actually release. Availability can vary by Android version, device maker, file provider, and permissions granted by you.\n\nBy using the deletion tools, you confirm that you are authorized to manage the selected files.</string>
     <string name="about_app_body">Smart Cleaner %1$s\n\nA privacy-conscious Android cleaner focused on real storage measurements, exact duplicate detection, large-file review, WhatsApp Media management, safe cache cleanup for this app, and transparent device information.\n\nPackage identity: com.mrzekai.depoakilli</string>
+    <string name="about_app_body_v050">Smart Cleaner %1$s
+
+Cleaner Engine 0.5 is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.
+
+Package: com.mrzekai.depoakilli</string>
+    <string name="access_files_missing">File access needed</string>
+    <string name="access_files_ready">Files ready</string>
+    <string name="access_usage_optional">Usage access optional</string>
+    <string name="access_usage_ready">App stats ready</string>
+    <string name="all_files_access_clean_screen">Smart Cleaner needs Android All files access to scan shared storage comprehensively without making you pick folders one by one.</string>
+    <string name="all_files_access_description">Required for the core file-management and maintenance engine: junk, duplicates, large files, downloads, APKs and WhatsApp shared media.</string>
+    <string name="all_files_access_title">Full storage management access</string>
+    <string name="app_manager_intro">Review launchable apps, storage usage and cache in Smart Cleaner. Removing an app always uses Android’s official uninstall confirmation.</string>
+    <string name="app_manager_size_detail">%1$s total • %2$s cache</string>
+    <string name="app_manager_subtitle">Review installed apps, storage size, cache and unused candidates</string>
+    <string name="app_manager_title">App Manager</string>
+    <string name="app_manager_usage_description">Usage Access lets Smart Cleaner show app storage totals and last-used information. Personal app content is not read.</string>
+    <string name="app_manager_usage_title">Enable app usage statistics</string>
+    <string name="apps_found">%1$d apps found</string>
+    <string name="cache_access_explanation_v050">Usage Access lets Smart Cleaner measure cache across launchable apps and report the device cache total without reading personal app content.</string>
+    <string name="category_junk">Junk files</string>
+    <string name="category_junk_description">Old temporary, thumbnail and incomplete download artifacts</string>
+    <string name="category_large_files">Large files</string>
+    <string name="category_large_files_description">Files over 100 MB across accessible shared storage</string>
+    <string name="cleaner_engine_tools">Cleaner tools</string>
+    <string name="cleaner_engine_tools_subtitle">Every card below performs a real storage-management task.</string>
+    <string name="cleaning_tools_subtitle_v050">Real storage tools — not status cards disguised as cleaners</string>
+    <string name="clear_only_smart_cleaner_cache">Clear only Smart Cleaner cache</string>
+    <string name="deep_cache_detected">Device cache reported by Android</string>
+    <string name="deep_cache_home_metric">%1$s app cache detected</string>
+    <string name="deep_cache_measured">%1$s device cache measured • review and clean with Android confirmation</string>
+    <string name="deep_cache_subtitle">Measure app caches and request Android’s official device cache cleanup</string>
+    <string name="deep_cache_system_action">REQUEST DEEP CACHE CLEAN</string>
+    <string name="deep_cache_system_action_description">Android 11+ provides an official cache-cleaning action for storage managers. Smart Cleaner requests it; Android shows the required confirmation and performs the cache cleanup.</string>
+    <string name="deep_cache_system_action_title">Device app cache cleanup</string>
+    <string name="deep_cache_system_confirmation_note">Android requires a system confirmation for this operation. Smart Cleaner cannot and will not fake a silent private-cache deletion.</string>
+    <string name="deep_cache_title">Deep App Cache</string>
+    <string name="deep_cleaner_subtitle">One pass across accessible shared storage: junk, duplicates, large files, APKs, downloads, media and WhatsApp</string>
+    <string name="deep_cleaner_title">Deep Cleaner</string>
+    <string name="downloads_apk_subtitle">Review old downloads, installers and incomplete download artifacts</string>
+    <string name="downloads_apk_title">Downloads &amp; APK</string>
+    <string name="duplicates_tool_subtitle_v050">Find exact copies of any accessible file type with sample + full SHA-256 verification</string>
+    <string name="full_storage_access_needed">Full storage scan not enabled</string>
+    <string name="full_storage_access_ready">Full shared-storage engine ready</string>
+    <string name="hero_performance_v050">Maximum cleaning, honest Android limits.</string>
+    <string name="junk_cleaner_subtitle_v050">Temporary files, thumbnails, stale installers and old download candidates</string>
+    <string name="language_settings_subtitle_v050">Use Android app-language settings. Unsupported languages safely fall back to English.</string>
+    <string name="large_files_tool_subtitle_v050">Find files over 100 MB — video, archive, APK, audio, documents and more</string>
+    <string name="media_cleaner_subtitle">Review old screenshots and storage-heavy photos/videos</string>
+    <string name="media_cleaner_title">Media Cleaner</string>
+    <string name="message_all_files_granted">Full storage management access is ready.</string>
+    <string name="message_all_files_required">Enable All files access to run the full Cleaner Engine.</string>
+    <string name="message_all_files_required_for_cache">Deep cache cleanup requires Android All files access first.</string>
+    <string name="message_cache_cleanup_cancelled">Device cache cleanup was cancelled.</string>
+    <string name="message_cleanup_complete_detail">%1$s was cleaned.</string>
+    <string name="message_cleanup_partial_detail">%1$s cleaned • %2$d items could not be removed.</string>
+    <string name="message_deep_cache_complete">Android completed the requested device cache cleanup.</string>
+    <string name="message_own_cache_cleared">%1$s of Smart Cleaner cache was removed.</string>
+    <string name="message_whatsapp_not_found">No supported WhatsApp or WhatsApp Business Media folder was found in shared storage.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.
+
+All files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.
+
+Usage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.
+
+Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.</string>
+    <string name="ram_optimize_action">Optimize Smart Cleaner memory</string>
+    <string name="ram_optimizer_policy_note">RAM Optimization releases Smart Cleaner’s temporary heavy resources and remeasures available RAM. Android does not allow us to claim that protected third-party processes were force-closed.</string>
+    <string name="ram_optimizer_subtitle_v050">%1$s RAM currently available</string>
+    <string name="ram_optimizer_title_v050">RAM Optimization</string>
+    <string name="reason_large_file">Large file • %1$d days old</string>
+    <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
+    <string name="reason_thumbnail_cache">Regeneratable thumbnail cache • %1$d days old</string>
+    <string name="reason_whatsapp_review">WhatsApp shared media — review before deletion</string>
+    <string name="safe_ai_cleaning_description_v050">Cleaner Engine indexes accessible shared storage on-device, applies conservative cleanup rules, verifies exact duplicates by content and leaves user-created files unselected unless deletion is clearly safe.</string>
+    <string name="scan_focus_downloads">Downloads &amp; APK result</string>
+    <string name="scan_focus_media">Media cleaner result</string>
+    <string name="scan_in_progress_v050">Cleaner Engine is indexing shared storage…</string>
+    <string name="scan_limit_note_v050">The safety ceiling of 200,000 indexed files was reached. Results are real but the device contains more files than this pass indexed.</string>
+    <string name="scan_live_counter">%1$d files discovered • %2$d folders visited</string>
+    <string name="scan_stats_v050">%1$d files • %2$s indexed • %3$d selected</string>
+    <string name="settings_subtitle_v050">Language, privacy, support and product information.</string>
+    <string name="smart_clean_action_v050">START DEEP SMART SCAN</string>
+    <string name="storage_analyzer_subtitle">See storage by file type while the cleaner engine scans the device</string>
+    <string name="storage_analyzer_title">Storage Analyzer</string>
+    <string name="storage_type_apk">APK installers</string>
+    <string name="storage_type_archives">Archives</string>
+    <string name="storage_type_audio">Audio</string>
+    <string name="storage_type_documents">Documents</string>
+    <string name="storage_type_images">Images</string>
+    <string name="storage_type_other">Other files</string>
+    <string name="storage_type_videos">Videos</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.
+
+Smart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. Deep App Cache uses Android’s official system action and may display a required Android confirmation.
+
+RAM Optimization releases this app’s temporary resources and does not promise to kill protected third-party apps or create fictional performance gains. Availability can vary by Android version and device manufacturer.</string>
+    <string name="tools_rebuilt_status">%1$s free • %2$s app cache reported</string>
+    <string name="tools_rebuilt_title">Real cleaning tools, one engine</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="whatsapp_category_statuses">Statuses</string>
+    <string name="whatsapp_category_statuses_description">Temporary WhatsApp status media stored in shared storage</string>
+    <string name="whatsapp_cleaner_subtitle_v050">Scan WhatsApp and WhatsApp Business shared Media directly inside Smart Cleaner</string>
+    <string name="cleaner_engine_badge">CLEANER ENGINE 0.5</string>
 </resources>

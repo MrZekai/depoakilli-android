@@ -1,36 +1,11 @@
-# Android uygulama önbelleği sınırı
+# Android cache behavior — v0.5.0
 
-## Ürün kararı
+Normal Play applications cannot directly and silently delete protected private cache directories belonging to arbitrary third-party apps.
 
-Akıllı Temizleyici, başka uygulamaların özel önbelleğini kendi arayüzünden
-sessizce silmiş gibi davranmaz. Akıllı Tarama'da görülen büyük uygulama
-önbelleği değeri yalnız ölçümdür; temizlenebilir toplam ve Temizle düğmesi
-yalnız uygulamanın gerçekten silebildiği seçili dosyaları içerir.
+Cleaner Engine 0.5 therefore separates three concepts:
 
-## Teknik neden
+1. **Cache measurement** — `StorageStatsManager` + optional Usage Access reports device/app cache sizes.
+2. **Smart Cleaner's own cache** — can be deleted directly because it belongs to this application.
+3. **Device app-cache cleanup** — Android 11+ `StorageManager.ACTION_CLEAR_APP_CACHE` is requested by Smart Cleaner when All files access is granted. Android shows the required system confirmation and performs the cache cleanup.
 
-- Android `StorageStatsManager`, başka paketlerin depolama ve cache
-  istatistiklerini yalnız kullanıcının Ayarlar'dan verdiği Kullanım Erişimiyle
-  sorgulamaya izin verir. Bu API ölçüm sunar; silme API'si değildir.
-- Başka uygulamanın özel cache dizini o uygulamanın sandbox'ındadır. Normal bir
-  Play uygulamasına cihaz genelinde `CLEAR_APP_CACHE` ayrıcalığı verilmez.
-- Accessibility ile Ayarlar ekranlarına otomatik tıklama veya kullanıcıdan
-  habersiz toplu silme uygulanmaz. Bu yaklaşım kırılgan, yanıltıcı ve Play
-  politikası açısından yüksek risklidir.
-
-Resmî Android kaynakları:
-
-- https://developer.android.com/reference/android/app/usage/StorageStatsManager
-- https://developer.android.com/training/data-storage/shared/documents-files
-
-## Gerçek temizlik kapsamı
-
-Uygulama aşağıdaki alanları gerçek olarak temizler:
-
-- kendi iç ve dış cache dizinleri;
-- kullanıcının MediaStore üzerinden seçip Android silme onayını verdiği medya;
-- kullanıcı tarafından bağlanan WhatsApp/WhatsApp Business Media ağacındaki,
-  uygulama içinde seçilip kalıcı silme onayı verilen belgeler;
-- MediaStore'un gerçekten gösterebildiği eski indirilen medya ve tam içerik
-  eşleşmeli kopyalar. Android'in göstermediği belge/APK dosyaları bulunmuş gibi
-  raporlanmaz.
+The Smart Scan cleanable-file total never substitutes Smart Cleaner's own cache for the entire phone's app cache.

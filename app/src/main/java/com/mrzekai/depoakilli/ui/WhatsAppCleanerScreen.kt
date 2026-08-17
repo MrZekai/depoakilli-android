@@ -1,8 +1,10 @@
 package com.mrzekai.depoakilli.ui
 
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.util.Size
+import android.media.ThumbnailUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,6 +71,7 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
+import java.io.File
 import java.text.DateFormat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -488,16 +491,29 @@ private fun WhatsAppThumbnail(item: WhatsAppMediaItem) {
         WhatsAppMediaCategory.IMAGES,
         WhatsAppMediaCategory.VIDEOS,
         WhatsAppMediaCategory.STICKERS_GIFS,
+        WhatsAppMediaCategory.STATUSES,
     )
     val bitmap by produceState<ImageBitmap?>(initialValue = null, item.uri, canShowThumbnail) {
-        value = if (canShowThumbnail && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        value = if (canShowThumbnail) {
             withContext(Dispatchers.IO) {
                 runCatching {
-                    context.contentResolver.loadThumbnail(
-                        Uri.parse(item.uri),
-                        Size(160, 160),
-                        null,
-                    ).asImageBitmap()
+                    val uri = Uri.parse(item.uri)
+                    val bitmap = if (uri.scheme == "file") {
+                        val file = File(requireNotNull(uri.path))
+                        val extension = file.extension.lowercase()
+                        val looksLikeVideo = item.category == WhatsAppMediaCategory.VIDEOS ||
+                            extension in setOf("mp4", "mkv", "3gp", "webm", "mov", "avi")
+                        if (looksLikeVideo && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            ThumbnailUtils.createVideoThumbnail(file, Size(160, 160), null)
+                        } else {
+                            BitmapFactory.decodeFile(file.absolutePath)
+                        }
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        context.contentResolver.loadThumbnail(uri, Size(160, 160), null)
+                    } else {
+                        context.contentResolver.openInputStream(uri)?.use(BitmapFactory::decodeStream)
+                    }
+                    bitmap?.asImageBitmap()
                 }.getOrNull()
             }
         } else {
@@ -535,5 +551,6 @@ private fun whatsAppCategoryIcon(category: WhatsAppMediaCategory): ImageVector =
     WhatsAppMediaCategory.AUDIO -> Icons.Outlined.Chat
     WhatsAppMediaCategory.VOICE_NOTES -> Icons.Outlined.Chat
     WhatsAppMediaCategory.STICKERS_GIFS -> Icons.Outlined.PhotoLibrary
+    WhatsAppMediaCategory.STATUSES -> Icons.Outlined.PhotoLibrary
     WhatsAppMediaCategory.OTHER -> Icons.Outlined.Folder
 }

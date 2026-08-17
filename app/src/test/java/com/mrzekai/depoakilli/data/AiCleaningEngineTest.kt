@@ -31,13 +31,13 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `old screenshot is recommended`() {
+    fun `old screenshot is review only`() {
         val result = engine.assess(
             file("Screenshot_2026.png", "image/png", 40, "Pictures/Screenshots/"),
         )
 
         assertEquals(CleanCategory.SCREENSHOT, result?.category)
-        assertTrue(requireNotNull(result).recommended)
+        assertFalse(requireNotNull(result).recommended)
     }
 
     @Test
@@ -48,13 +48,34 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `large old video is recommended`() {
+    fun `large old video is review only`() {
         val result = engine.assess(
             file("clip.mp4", "video/mp4", 75, "Movies/", 300L * 1024L * 1024L),
         )
 
-        assertEquals(CleanCategory.LARGE_VIDEO, result?.category)
+        assertEquals(CleanCategory.LARGE_FILE, result?.category)
+        assertFalse(requireNotNull(result).recommended)
+    }
+
+
+    @Test
+    fun `temporary artifact is high confidence junk`() {
+        val result = engine.assess(
+            file("partial.crdownload", "application/octet-stream", 5, "Download/"),
+        )
+
+        assertEquals(CleanCategory.JUNK, result?.category)
         assertTrue(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `large archive is discovered as a large file`() {
+        val result = engine.assess(
+            file("backup.zip", "application/zip", 10, "Backups/", 600L * 1024L * 1024L),
+        )
+
+        assertEquals(CleanCategory.LARGE_FILE, result?.category)
+        assertFalse(requireNotNull(result).recommended)
     }
 
     @Test

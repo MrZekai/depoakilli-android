@@ -1,22 +1,19 @@
 package com.mrzekai.depoakilli
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.storage.StorageManager
+import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.InterstitialAdController
@@ -24,39 +21,33 @@ import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
-import com.mrzekai.depoakilli.model.ScanFocus
 
 class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
-    private var permissionRevision by mutableIntStateOf(0)
-    private var pendingMediaScanFocus = ScanFocus.SMART
 
-    private val permissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions(),
+    private val allFilesAccessLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
     ) {
-        permissionRevision++
-        if (hasAnyMediaAccess()) {
-            cleanerViewModel.scan(
-                limitedAccess = hasLimitedMediaAccess(),
-                focus = pendingMediaScanFocus,
-            )
+        cleanerViewModel.refreshDeviceState()
+        if (Environment.isExternalStorageManager()) {
+            cleanerViewModel.showMessage(R.string.message_all_files_granted)
         }
     }
 
-    private val whatsappFolderLauncher = registerForActivityResult(
-        ActivityResultContracts.OpenDocumentTree(),
-    ) { uri ->
-        if (uri == null) return@registerForActivityResult
-        val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        val persisted = runCatching {
-            contentResolver.takePersistableUriPermission(uri, flags)
-        }.isSuccess
-        if (persisted && cleanerViewModel.connectWhatsAppFolder(uri)) {
-            cleanerViewModel.scanWhatsAppLibrary()
-        }
+    private val usageAccessLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        cleanerViewModel.refreshDeviceState()
+        cleanerViewModel.refreshAppCaches(force = true)
+        cleanerViewModel.refreshInstalledApps()
+    }
+
+    private val deepCacheLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        cleanerViewModel.onDeepCacheCleanupResult(result.resultCode == Activity.RESULT_OK)
     }
 
     private val deleteLauncher = registerForActivityResult(
@@ -76,8 +67,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
-            @Suppress("UNUSED_VARIABLE")
-            val revision = permissionRevision
 
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
@@ -87,12 +76,11 @@ class MainActivity : ComponentActivity() {
             DepoAkilliTheme {
                 CleanerApp(
                     viewModel = cleanerViewModel,
-                    hasFullMediaAccess = hasFullMediaAccess(),
-                    hasLimitedMediaAccess = hasLimitedMediaAccess(),
                     canRequestAds = canRequestAds,
                     privacyOptionsRequired = consentManager.privacyOptionsRequired,
-                    onRequestMediaAccess = ::requestMediaAccess,
-                    onRequestWhatsAppAccess = ::requestWhatsAppFolder,
+                    onRequestAllFilesAccess = ::requestAllFilesAccess,
+                    onRequestUsageAccess = ::requestUsageAccess,
+                    onClearAllAppCaches = ::requestDeepCacheCleanup,
                     onPrepareCleanup = {
                         cleanerViewModel.prepareCleanup(
                             onPlanReady = { plan ->
@@ -114,6 +102,8 @@ class MainActivity : ComponentActivity() {
                             (application as DepoAkilliApplication).releaseAdMemory()
                         }
                     },
+                    onUninstallApp = ::uninstallApp,
+                    onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
                     onRateApp = ::rateApp,
                     onSendFeedback = ::sendFeedback,
@@ -125,47 +115,70 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        permissionRevision++
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.load()
     }
 
-    private fun requestMediaAccess(focus: ScanFocus) {
-        pendingMediaScanFocus = focus
+    private fun requestAllFilesAccess() {
         suppressNextAppOpenAd()
-        permissionLauncher.launch(requiredMediaPermissions())
-    }
-
-    private fun requestWhatsAppFolder() {
-        val initialUri = Uri.parse(WHATSAPP_MEDIA_INITIAL_URI)
-        suppressNextAppOpenAd()
-        runCatching { whatsappFolderLauncher.launch(initialUri) }
-            .onFailure { whatsappFolderLauncher.launch(null) }
-    }
-
-    private fun requiredMediaPermissions(): Array<String> = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
-            Manifest.permission.READ_MEDIA_IMAGES,
-            Manifest.permission.READ_MEDIA_VIDEO,
+        val appIntent = Intent(
+            Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+            Uri.parse("package:$packageName"),
         )
-
-        else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        val fallback = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+        if (runCatching { allFilesAccessLauncher.launch(appIntent) }.isFailure) {
+            runCatching { allFilesAccessLauncher.launch(fallback) }
+                .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
+        }
     }
 
-    private fun hasFullMediaAccess(): Boolean = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ->
-            checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.READ_MEDIA_VIDEO) == PackageManager.PERMISSION_GRANTED
-
-        else -> checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    private fun requestUsageAccess() {
+        suppressNextAppOpenAd()
+        val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
+            data = Uri.parse("package:$packageName")
+        }
+        runCatching { usageAccessLauncher.launch(intent) }
+            .onFailure {
+                runCatching { usageAccessLauncher.launch(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)) }
+                    .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
+            }
     }
 
-    private fun hasLimitedMediaAccess(): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-            checkSelfPermission(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+    private fun requestDeepCacheCleanup() {
+        if (!Environment.isExternalStorageManager()) {
+            cleanerViewModel.showMessage(R.string.message_all_files_required_for_cache)
+            requestAllFilesAccess()
+            return
+        }
+        suppressNextAppOpenAd()
+        runCatching {
+            deepCacheLauncher.launch(Intent(StorageManager.ACTION_CLEAR_APP_CACHE))
+        }.onFailure {
+            cleanerViewModel.showMessage(R.string.message_screen_unavailable)
+        }
+    }
 
-    private fun hasAnyMediaAccess(): Boolean = hasFullMediaAccess() || hasLimitedMediaAccess()
+    private fun uninstallApp(packageName: String) {
+        suppressNextAppOpenAd()
+        val intent = Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName"))
+        runCatching { startActivity(intent) }
+            .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
+    }
+
+    private fun openLanguageSettings() {
+        suppressNextAppOpenAd()
+        val intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            Intent(
+                Settings.ACTION_APP_LOCALE_SETTINGS,
+                Uri.parse("package:$packageName"),
+            )
+        } else {
+            Intent(Settings.ACTION_LOCALE_SETTINGS)
+        }
+        runCatching { startActivity(intent) }
+            .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
+    }
 
     private fun rateApp() {
         val marketIntent = Intent(
@@ -187,9 +200,9 @@ class MainActivity : ComponentActivity() {
                 Intent.EXTRA_TEXT,
                 getString(
                     R.string.feedback_template,
-                    Build.MANUFACTURER,
-                    Build.MODEL,
-                    Build.VERSION.RELEASE,
+                    android.os.Build.MANUFACTURER,
+                    android.os.Build.MODEL,
+                    android.os.Build.VERSION.RELEASE,
                 ),
             )
         }
@@ -233,9 +246,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        const val WHATSAPP_MEDIA_INITIAL_URI =
-            "content://com.android.externalstorage.documents/document/" +
-                "primary%3AAndroid%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia"
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
     }
 }

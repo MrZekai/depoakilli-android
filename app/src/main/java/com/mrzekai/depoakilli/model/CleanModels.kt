@@ -7,9 +7,10 @@ enum class CleanCategory(
     @StringRes val titleRes: Int,
     @StringRes val shortDescriptionRes: Int,
 ) {
+    JUNK(R.string.category_junk, R.string.category_junk_description),
     DUPLICATE(R.string.category_duplicates, R.string.category_duplicates_description),
     SCREENSHOT(R.string.category_screenshots, R.string.category_screenshots_description),
-    LARGE_VIDEO(R.string.category_large_videos, R.string.category_large_videos_description),
+    LARGE_FILE(R.string.category_large_files, R.string.category_large_files_description),
     OLD_DOWNLOAD(R.string.category_old_downloads, R.string.category_old_downloads_description),
     APK_PACKAGE(R.string.category_apk_packages, R.string.category_apk_packages_description),
     APP_CACHE(R.string.category_app_cache, R.string.category_app_cache_description),
@@ -22,6 +23,8 @@ enum class ScanFocus {
     DUPLICATES,
     LARGE_FILES,
     WHATSAPP,
+    MEDIA,
+    DOWNLOADS,
 }
 
 enum class WhatsAppMediaCategory(
@@ -34,7 +37,18 @@ enum class WhatsAppMediaCategory(
     AUDIO(R.string.whatsapp_category_audio, R.string.whatsapp_category_audio_description),
     VOICE_NOTES(R.string.whatsapp_category_voice, R.string.whatsapp_category_voice_description),
     STICKERS_GIFS(R.string.whatsapp_category_stickers, R.string.whatsapp_category_stickers_description),
+    STATUSES(R.string.whatsapp_category_statuses, R.string.whatsapp_category_statuses_description),
     OTHER(R.string.whatsapp_category_other, R.string.whatsapp_category_other_description),
+}
+
+enum class StorageFileType(@StringRes val titleRes: Int) {
+    IMAGES(R.string.storage_type_images),
+    VIDEOS(R.string.storage_type_videos),
+    AUDIO(R.string.storage_type_audio),
+    DOCUMENTS(R.string.storage_type_documents),
+    ARCHIVES(R.string.storage_type_archives),
+    APK(R.string.storage_type_apk),
+    OTHER(R.string.storage_type_other),
 }
 
 data class IndexedFile(
@@ -144,11 +158,30 @@ data class AppCacheSnapshot(
         )
 }
 
+data class InstalledAppEntry(
+    val packageName: String,
+    val label: String,
+    val appBytes: Long = 0L,
+    val dataBytes: Long = 0L,
+    val cacheBytes: Long = 0L,
+    val lastUsedMillis: Long = 0L,
+) {
+    val totalBytes: Long get() = (appBytes + dataBytes).coerceAtLeast(cacheBytes)
+}
+
+data class StorageTypeStat(
+    val type: StorageFileType,
+    val fileCount: Int,
+    val totalBytes: Long,
+)
+
 data class ScanSummary(
     val items: List<CleanableItem> = emptyList(),
     val scannedFileCount: Int = 0,
+    val scannedBytes: Long = 0L,
     val limitedAccess: Boolean = false,
     val scanLimitReached: Boolean = false,
+    val storageTypes: List<StorageTypeStat> = emptyList(),
 ) {
     val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
     val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)
