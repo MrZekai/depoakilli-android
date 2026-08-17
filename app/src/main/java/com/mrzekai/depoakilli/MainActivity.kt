@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     ) { result ->
         val approved = result.resultCode == Activity.RESULT_OK
         cleanerViewModel.completeCleanup(approved)
-        if (approved) interstitialAds.showAfterCleanup(this)
+        if (approved) cleanerViewModel.refreshAfterCleanup()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,21 +90,7 @@ class MainActivity : ComponentActivity() {
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
-                    onPrepareCleanup = {
-                        cleanerViewModel.prepareCleanup(
-                            onPlanReady = { plan ->
-                                if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
-                                    suppressNextAppOpenAd()
-                                    deleteLauncher.launch(
-                                        IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
-                                    )
-                                }
-                            },
-                            onCleanupCompleted = {
-                                interstitialAds.showAfterCleanup(this)
-                            },
-                        )
-                    },
+                    onPrepareCleanup = ::showCleanupInterstitialThenDelete,
                     onOptimizeMemory = {
                         cleanerViewModel.optimizeMemory {
                             interstitialAds.releaseForMemoryOptimization()
@@ -127,6 +113,34 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.load()
+    }
+
+    private fun showCleanupInterstitialThenDelete() {
+        suppressNextAppOpenAd()
+        interstitialAds.showBeforeCleanup(this) {
+            executeCleanupPlan()
+        }
+    }
+
+    private fun executeCleanupPlan() {
+        cleanerViewModel.prepareCleanup(
+            onPlanReady = { plan ->
+                if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
+                    suppressNextAppOpenAd()
+                    runCatching {
+                        deleteLauncher.launch(
+                            IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
+                        )
+                    }.onFailure {
+                        cleanerViewModel.completeCleanup(false)
+                        cleanerViewModel.showMessage(R.string.message_screen_unavailable)
+                    }
+                }
+            },
+            onCleanupCompleted = {
+                cleanerViewModel.refreshAfterCleanup()
+            },
+        )
     }
 
     private fun requestAllFilesAccess() {

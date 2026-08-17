@@ -412,4 +412,14 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_cleanup_selected_examples">Selected file examples</string>
     <string name="smart_cleanup_more_items">+%1$d more selected items</string>
 
+    <string name="smart_clean_hero_subtitle">Review what will be removed before cleanup starts.</string>
+    <string name="smart_items_selected">items selected</string>
+    <string name="smart_total_suggestions">total suggested</string>
+    <string name="smart_files_scanned">files scanned</string>
+
+    <string name="smart_cleanup_in_progress">Cleaning…</string>
+    <string name="message_cleanup_failed">Cleanup could not be completed. Nothing else was changed.</string>
+
+    <string name="smart_cleanup_ad_notice">If an interstitial is ready, it appears after this confirmation. Cleanup starts automatically when the ad closes.</string>
+
 </resources>

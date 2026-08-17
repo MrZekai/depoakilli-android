@@ -188,29 +188,42 @@ fun CleanerApp(
             }
         },
         bottomBar = {
-            if (detailScreen == null) {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .navigationBarsPadding(),
-                ) {
-                    BannerAd(canRequestAds = canRequestAds)
-                    Spacer(Modifier.height(8.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
-                    NavigationBar(containerColor = Color(0xFF07132C)) {
-                        AppTab.entries.forEachIndexed { index, tab ->
-                            val title = stringResource(tab.titleRes)
-                            NavigationBarItem(
-                                selected = selectedTabIndex == index,
-                                onClick = { selectedTabIndex = index },
-                                icon = { Icon(tab.icon, contentDescription = title) },
-                                label = { Text(title) },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = ElectricBlue,
-                                    selectedTextColor = ElectricBlue,
-                                    indicatorColor = Color(0xFF123A75),
-                                ),
-                            )
+            when {
+                detailScreen == DetailScreen.CLEAN_RESULTS -> {
+                    Column(
+                        modifier = Modifier
+                            .background(Color(0xFF06112A))
+                            .navigationBarsPadding(),
+                    ) {
+                        HorizontalDivider(color = Color.White.copy(alpha = .10f))
+                        BannerAd(canRequestAds = canRequestAds)
+                    }
+                }
+
+                detailScreen == null -> {
+                    Column(
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.surface)
+                            .navigationBarsPadding(),
+                    ) {
+                        BannerAd(canRequestAds = canRequestAds)
+                        Spacer(Modifier.height(8.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
+                        NavigationBar(containerColor = Color(0xFF07132C)) {
+                            AppTab.entries.forEachIndexed { index, tab ->
+                                val title = stringResource(tab.titleRes)
+                                NavigationBarItem(
+                                    selected = selectedTabIndex == index,
+                                    onClick = { selectedTabIndex = index },
+                                    icon = { Icon(tab.icon, contentDescription = title) },
+                                    label = { Text(title) },
+                                    colors = NavigationBarItemDefaults.colors(
+                                        selectedIconColor = ElectricBlue,
+                                        selectedTextColor = ElectricBlue,
+                                        indicatorColor = Color(0xFF123A75),
+                                    ),
+                                )
+                            }
                         }
                     }
                 }

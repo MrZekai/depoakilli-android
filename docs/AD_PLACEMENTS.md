@@ -1,7 +1,7 @@
-# Ad placements — v0.5.0
+# Ad placements — v0.5.4
 
-- Anchored banner remains above the bottom navigation with reserved layout space.
+- Anchored adaptive banner has dedicated reserved layout space. On Smart Clean Results it sits below the sticky selected-size / Review & clean action; on the home shell it remains above bottom navigation.
 - App Open remains subject to consent and foreground guards.
-- Interstitial remains post-cleanup only; it must never interrupt scanning, permission education, Android All files access, Android cache-clean confirmation, WhatsApp review, or deletion confirmation.
+- Smart Clean interstitial is eligible only after the user finishes review and explicitly confirms cleanup. If a preloaded ad is available, it is shown at that transition; deletion starts from the dismissal/failure callback. If no ad is available, cleanup proceeds without blocking the user.
 - Cleaner Engine permission/system-control transitions suppress the next App Open ad where appropriate.
 - No ad may visually imitate a cleaner action, delete button, permission button, result card or system confirmation.

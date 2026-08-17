@@ -3,6 +3,7 @@ package com.mrzekai.depoakilli.ads
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -29,40 +30,31 @@ fun BannerAd(
     canRequestAds: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    FixedBannerAd(
-        canRequestAds = canRequestAds,
-        adUnitId = BuildConfig.ADMOB_BANNER_ID,
-        adSize = AdSize.BANNER,
-        heightDp = 54,
-        modifier = modifier,
-    )
-}
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val context = LocalContext.current
+        val widthDp = maxWidth.value.toInt().coerceAtLeast(1)
+        val adSize = remember(context, widthDp) {
+            AdSize.getLargeAnchoredAdaptiveBannerAdSize(context, widthDp)
+        }
+        val reservedHeight = adSize.height.coerceAtLeast(50).dp
 
-@Composable
-private fun FixedBannerAd(
-    canRequestAds: Boolean,
-    adUnitId: String,
-    adSize: AdSize,
-    heightDp: Int,
-    modifier: Modifier,
-) {
-    Box(
-        modifier = modifier.fillMaxWidth().height(heightDp.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (canRequestAds) {
-            val context = LocalContext.current
-            val adView = remember(context, adUnitId, adSize) {
-                AdView(context).apply {
-                    this.adUnitId = adUnitId
-                    setAdSize(adSize)
-                    loadAd(AdRequest.Builder().build())
+        Box(
+            modifier = Modifier.fillMaxWidth().height(reservedHeight),
+            contentAlignment = Alignment.Center,
+        ) {
+            if (canRequestAds) {
+                val adView = remember(context, BuildConfig.ADMOB_BANNER_ID, adSize) {
+                    AdView(context).apply {
+                        adUnitId = BuildConfig.ADMOB_BANNER_ID
+                        setAdSize(adSize)
+                        loadAd(AdRequest.Builder().build())
+                    }
                 }
+                DisposableEffect(adView) {
+                    onDispose { adView.destroy() }
+                }
+                AndroidView(factory = { adView })
             }
-            DisposableEffect(adView) {
-                onDispose { adView.destroy() }
-            }
-            AndroidView(factory = { adView })
         }
     }
 }
@@ -106,25 +98,57 @@ class InterstitialAdController(private val context: Context) {
         )
     }
 
-    fun showAfterCleanup(activity: Activity) {
-        if (!adsAllowed || activity.isFinishing || activity.isDestroyed) return
+    fun showBeforeCleanup(
+        activity: Activity,
+        onFinished: () -> Unit = {},
+    ) {
+        if (!adsAllowed || activity.isFinishing || activity.isDestroyed) {
+            onFinished()
+            return
+        }
         val now = System.currentTimeMillis()
-        val ad = interstitial ?: return
-        if (now - lastShownAt < MIN_INTERVAL_MILLIS) return
-        if (AppOpenAdController.wasShownWithin(context, FULL_SCREEN_SEPARATION_MILLIS)) return
+        val ad = interstitial
+        if (ad == null) {
+            load()
+            onFinished()
+            return
+        }
+        if (now - lastShownAt < MIN_INTERVAL_MILLIS) {
+            onFinished()
+            return
+        }
+        if (AppOpenAdController.wasShownWithin(context, FULL_SCREEN_SEPARATION_MILLIS)) {
+            onFinished()
+            return
+        }
+
         interstitial = null
         lastShownAt = now
+        var completed = false
+        fun finishFlow() {
+            if (completed) return
+            completed = true
+            load()
+            onFinished()
+        }
+
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
-                load()
+                finishFlow()
             }
 
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                load()
+                finishFlow()
             }
         }
-        ad.show(activity)
+        runCatching { ad.show(activity) }
+            .onFailure { finishFlow() }
     }
+
+    fun showAfterCleanup(
+        activity: Activity,
+        onFinished: () -> Unit = {},
+    ) = showBeforeCleanup(activity, onFinished)
 
     fun releaseForMemoryOptimization() {
         interstitial = null

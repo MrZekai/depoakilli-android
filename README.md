@@ -1,8 +1,19 @@
 # Smart Cleaner / Akıllı Temizleyici
 
-Android storage-management and file-maintenance app. Current development line: **v0.5.2 Smart Clean Results UX**.
+Android storage-management and file-maintenance app. Current development line: **v0.5.4 Smart Clean Final Results Template**.
 
 ## Cleaner Engine 0.5
+
+## v0.5.4 Smart Clean results
+
+- selected neon results template aligned with the home dashboard;
+- vertical category stack with horizontal real-file preview strips;
+- file preview and checkbox selection are separate actions;
+- category select-all and full-category review;
+- sticky selected-size + Review & clean footer above the anchored adaptive banner;
+- final review -> interstitial (when eligible/loaded) -> automatic deletion -> Android consent when required -> automatic rescan;
+- duplicate cleanup execution guard.
+
 
 ## v0.5.1 dashboard
 
@@ -42,8 +53,8 @@ See:
 - package: `com.mrzekai.depoakilli`
 - minSdk: 30 (Android 11)
 - target/compile SDK: 36
-- versionName: `0.5.2`
-- versionCode: `9`
+- versionName: `0.5.4`
+- versionCode: `11`
 - debug package: `com.mrzekai.depoakilli.qa`
 
 GitHub Actions runs project validation, dependency checks, unit tests, lint, debug APK build and stable QA-signing verification. The debug artifact is named `depoakilli-test-apk-*`.

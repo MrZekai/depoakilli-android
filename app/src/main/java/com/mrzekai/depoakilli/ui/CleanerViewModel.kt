@@ -42,6 +42,7 @@ data class CleanerUiState(
     val scanningAppCaches: Boolean = false,
     val loadingApps: Boolean = false,
     val optimizingMemory: Boolean = false,
+    val cleanupInProgress: Boolean = false,
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
     val pendingScanFocus: ScanFocus? = null,
@@ -348,28 +349,40 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         onPlanReady: (DeviceRepository.DeletePlan) -> Unit,
         onCleanupCompleted: () -> Unit,
     ) {
+        if (_state.value.cleanupInProgress) return
         val selected = _state.value.summary.selectedItems
         if (selected.isEmpty()) {
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
+        _state.update { it.copy(cleanupInProgress = true, message = null) }
         viewModelScope.launch {
-            val direct = repository.deleteDirectItems(selected)
-            val remaining = selected.filterNot { it.id in direct.attemptedIds }
-            val plan = repository.createDeleteRequest(remaining)
-            if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
-                finishCleanup(selected, direct.deletedIds, direct.deletedBytes, direct.failedCount)
-                onCleanupCompleted()
-            } else {
-                pendingConsentItems = remaining
-                finishCleanup(
-                    items = selected.filter { it.id in direct.attemptedIds },
-                    deletedIds = direct.deletedIds,
-                    deletedBytes = direct.deletedBytes,
-                    failedCount = direct.failedCount,
-                    clearPending = false,
-                )
-                onPlanReady(plan)
+            runCatching {
+                val direct = repository.deleteDirectItems(selected)
+                val remaining = selected.filterNot { it.id in direct.attemptedIds }
+                val plan = repository.createDeleteRequest(remaining)
+                if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
+                    finishCleanup(selected, direct.deletedIds, direct.deletedBytes, direct.failedCount)
+                    onCleanupCompleted()
+                } else {
+                    pendingConsentItems = remaining
+                    finishCleanup(
+                        items = selected.filter { it.id in direct.attemptedIds },
+                        deletedIds = direct.deletedIds,
+                        deletedBytes = direct.deletedBytes,
+                        failedCount = direct.failedCount,
+                        clearPending = false,
+                    )
+                    onPlanReady(plan)
+                }
+            }.onFailure {
+                pendingConsentItems = emptyList()
+                _state.update { state ->
+                    state.copy(
+                        cleanupInProgress = false,
+                        message = getApplication<Application>().getString(R.string.message_cleanup_failed),
+                    )
+                }
             }
         }
     }
@@ -379,13 +392,24 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         pendingConsentItems = emptyList()
         if (!approved) {
             _state.update {
-                it.copy(message = getApplication<Application>().getString(R.string.message_cleanup_cancelled))
+                it.copy(
+                    cleanupInProgress = false,
+                    message = getApplication<Application>().getString(R.string.message_cleanup_cancelled),
+                )
             }
             return
         }
         val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
         val removedBytes = pending.sumOf(CleanableItem::sizeBytes)
         finishCleanup(pending, removedIds, removedBytes, 0)
+    }
+
+    fun refreshAfterCleanup() {
+        refreshDeviceState()
+        val focus = _state.value.scanFocus
+        if (repository.hasAllFilesAccess() && _state.value.lastScanCompleted) {
+            scan(focus)
+        }
     }
 
     private fun finishCleanup(
@@ -409,6 +433,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 storage = repository.storageSnapshot(),
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
+                cleanupInProgress = if (clearPending) false else state.cleanupInProgress,
                 message = getApplication<Application>().getString(
                     if (failedCount == 0) R.string.message_cleanup_complete_detail else R.string.message_cleanup_partial_detail,
                     ByteFormatter.format(deletedBytes),

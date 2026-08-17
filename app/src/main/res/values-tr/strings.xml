@@ -412,4 +412,14 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_cleanup_selected_examples">Seçilen dosyalardan örnekler</string>
     <string name="smart_cleanup_more_items">+%1$d seçili öğe daha</string>
 
+    <string name="smart_clean_hero_subtitle">Temizlik başlamadan önce nelerin silineceğini incele.</string>
+    <string name="smart_items_selected">öğe seçildi</string>
+    <string name="smart_total_suggestions">toplam öneri</string>
+    <string name="smart_files_scanned">dosya tarandı</string>
+
+    <string name="smart_cleanup_in_progress">Temizleniyor…</string>
+    <string name="message_cleanup_failed">Temizlik tamamlanamadı. Başka bir değişiklik yapılmadı.</string>
+
+    <string name="smart_cleanup_ad_notice">Hazır bir geçiş reklamı varsa bu onaydan sonra gösterilir. Reklam kapandığında temizlik otomatik başlar.</string>
+
 </resources>
