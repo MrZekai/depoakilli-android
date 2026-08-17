@@ -14,8 +14,14 @@ class DepoAkilliApplication :
 
     private lateinit var appOpenAds: AppOpenAdController
     private var currentActivity: Activity? = null
+    private var suppressNextAppOpenAd = false
     private val processObserver = object : DefaultLifecycleObserver {
         override fun onStart(owner: LifecycleOwner) {
+            if (suppressNextAppOpenAd) {
+                suppressNextAppOpenAd = false
+                appOpenAds.load()
+                return
+            }
             currentActivity?.let(appOpenAds::onAppForeground)
         }
     }
@@ -33,6 +39,10 @@ class DepoAkilliApplication :
 
     fun releaseAdMemory() {
         appOpenAds.releaseForMemoryOptimization()
+    }
+
+    fun suppressNextAppOpenAd() {
+        suppressNextAppOpenAd = true
     }
 
     override fun onActivityStarted(activity: Activity) {

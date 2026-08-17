@@ -8,7 +8,7 @@
 
 - Android 13+: `READ_MEDIA_IMAGES`, `READ_MEDIA_VIDEO`
 - Android 14+: kullanıcı kısmi erişimi seçerse `READ_MEDIA_VISUAL_USER_SELECTED`
-- Android 12 ve altı: sürüme uygun eski medya erişimi
+- Android 11–12: `READ_EXTERNAL_STORAGE`
 
 Bu izinler uygulamanın temel işlevi olan fotoğraf/video depolama yönetimi için kullanılır. İçerik analizi cihaz üzerinde gerçekleşir.
 
@@ -16,7 +16,7 @@ Ana ekrandaki Çöp Temizliği ve uygulamanın kendi önbellek temizliği medya 
 
 ## WhatsApp klasörü
 
-WhatsApp Temizleyici bir manifest izni veya geniş dosya erişimi istemez. Android'in sistem klasör seçicisi açılır ve kullanıcı yalnız WhatsApp/WhatsApp Business Medya klasörünü seçer. `ACTION_OPEN_DOCUMENT_TREE` tarafından verilen kalıcı okuma/yazma yetkisi yalnız seçilen klasörle sınırlıdır. Geçici durumlar ve eski `Sent` kopyaları cihaz üzerinde taranır; silme yalnız kullanıcı seçiminden sonra yapılır.
+WhatsApp Temizleyici bir manifest izni veya geniş dosya erişimi istemez. Android'in sistem klasör seçicisi açılır ve kullanıcı yalnız WhatsApp/WhatsApp Business Medya klasörünü seçer. `ACTION_OPEN_DOCUMENT_TREE` tarafından verilen kalıcı okuma/yazma yetkisi yalnız seçilen klasörle sınırlıdır. Erişilebilir tüm dosyalar cihaz içinde türlerine göre sınıflandırılır. Hiçbir dosya önceden seçilmez; silme uygulama içindeki kategori/öğe seçimi ve kalıcı silme onayından sonra `DocumentsContract.deleteDocument` ile yapılır.
 
 ## Uygulama önbelleği ölçümü
 
@@ -26,10 +26,12 @@ Manifestteki `tools:ignore="ProtectedPermissions"` yalnız bu bilinçli AppOps k
 
 - Yalnız uygulama etiketi, paket adı ve toplam önbellek baytı işlenir.
 - Kişisel dosya içeriği, kullanım zamanı veya kullanım geçmişi okunmaz.
-- Sorgu arka plan iş parçacığında ve yalnız uygulama açıldığında, geri dönüldüğünde, kullanıcı yenilediğinde veya Akıllı Tarama başlatıldığında çalışır.
-- Başka uygulamaların özel önbelleği sessizce silinmez. Kullanıcı ilgili uygulamaya dokunduğunda Android'in resmî uygulama ayrıntıları ekranı açılır.
+- Sorgu arka plan iş parçacığında çalışır; başarılı ölçümler arasında en az 60 saniye bırakılır.
+- Başka uygulamaların özel önbelleği sessizce silinmez ve Akıllı Tarama'nın temizlenebilir toplamına katılmaz. Ölçülen toplam yalnız ayrı bir korunan alan bilgisi olarak gösterilir.
 
 Android'in `CLEAR_APP_CACHE` izni `signature|privileged` korumasındadır ve normal Play uygulamalarına verilmez. Bu nedenle özellik çalışıyormuş gibi sahte bir sessiz temizlik sonucu gösterilmez.
+
+Bu teknik sınırın resmî kaynakları ve ürün kararı [`ANDROID_CACHE_LIMITS.md`](ANDROID_CACHE_LIMITS.md) içinde kayıt altındadır.
 
 Paket görünürlüğü `QUERY_ALL_PACKAGES` ile genişletilmez. Manifestte yalnız ana ekranda başlatılabilen kullanıcı uygulamaları için kapsamlı bir `MAIN` + `LAUNCHER` sorgusu bulunur.
 

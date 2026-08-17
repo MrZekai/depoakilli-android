@@ -39,20 +39,6 @@ fun BannerAd(
 }
 
 @Composable
-fun MediumRectangleAd(
-    canRequestAds: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    FixedBannerAd(
-        canRequestAds = canRequestAds,
-        adUnitId = BuildConfig.ADMOB_MEDIUM_RECTANGLE_ID,
-        adSize = AdSize.MEDIUM_RECTANGLE,
-        heightDp = 250,
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun FixedBannerAd(
     canRequestAds: Boolean,
     adUnitId: String,
@@ -60,23 +46,24 @@ private fun FixedBannerAd(
     heightDp: Int,
     modifier: Modifier,
 ) {
-    if (!canRequestAds) return
-    val context = LocalContext.current
-    val adView = remember(context, adUnitId, adSize) {
-        AdView(context).apply {
-            this.adUnitId = adUnitId
-            setAdSize(adSize)
-            loadAd(AdRequest.Builder().build())
-        }
-    }
-    DisposableEffect(adView) {
-        onDispose { adView.destroy() }
-    }
     Box(
         modifier = modifier.fillMaxWidth().height(heightDp.dp),
         contentAlignment = Alignment.Center,
     ) {
-        AndroidView(factory = { adView })
+        if (canRequestAds) {
+            val context = LocalContext.current
+            val adView = remember(context, adUnitId, adSize) {
+                AdView(context).apply {
+                    this.adUnitId = adUnitId
+                    setAdSize(adSize)
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+            DisposableEffect(adView) {
+                onDispose { adView.destroy() }
+            }
+            AndroidView(factory = { adView })
+        }
     }
 }
 
@@ -84,6 +71,7 @@ class InterstitialAdController(private val context: Context) {
     private var interstitial: InterstitialAd? = null
     private var loading = false
     private var lastShownAt = 0L
+    private var lastReleasedAt = 0L
     private var adsAllowed = false
 
     fun setAdsAllowed(allowed: Boolean) {
@@ -98,6 +86,7 @@ class InterstitialAdController(private val context: Context) {
 
     fun load() {
         if (!adsAllowed || loading || interstitial != null) return
+        if (System.currentTimeMillis() - lastReleasedAt < MIN_RELOAD_AFTER_RELEASE_MILLIS) return
         loading = true
         InterstitialAd.load(
             context,
@@ -122,6 +111,7 @@ class InterstitialAdController(private val context: Context) {
         val now = System.currentTimeMillis()
         val ad = interstitial ?: return
         if (now - lastShownAt < MIN_INTERVAL_MILLIS) return
+        if (AppOpenAdController.wasShownWithin(context, FULL_SCREEN_SEPARATION_MILLIS)) return
         interstitial = null
         lastShownAt = now
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -139,10 +129,13 @@ class InterstitialAdController(private val context: Context) {
     fun releaseForMemoryOptimization() {
         interstitial = null
         loading = false
+        lastReleasedAt = System.currentTimeMillis()
     }
 
     companion object {
         private const val MIN_INTERVAL_MILLIS = 5L * 60L * 1000L
+        private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L
+        private const val FULL_SCREEN_SEPARATION_MILLIS = 30L * 1000L
     }
 }
 
@@ -151,6 +144,7 @@ class AppOpenAdController(private val context: Context) {
     private var appOpenAd: AppOpenAd? = null
     private var loading = false
     private var loadTime = 0L
+    private var lastReleasedAt = 0L
     private var adsAllowed = false
 
     var isShowingAd: Boolean = false
@@ -185,6 +179,7 @@ class AppOpenAdController(private val context: Context) {
 
     fun load() {
         if (!adsAllowed || loading || isAdAvailable()) return
+        if (System.currentTimeMillis() - lastReleasedAt < MIN_RELOAD_AFTER_RELEASE_MILLIS) return
         appOpenAd = null
         loading = true
         AppOpenAd.load(
@@ -213,6 +208,7 @@ class AppOpenAdController(private val context: Context) {
             appOpenAd = null
         }
         loading = false
+        lastReleasedAt = System.currentTimeMillis()
     }
 
     private fun showIfAvailable(activity: Activity) {
@@ -250,12 +246,21 @@ class AppOpenAdController(private val context: Context) {
     private fun isAdAvailable(): Boolean =
         appOpenAd != null && System.currentTimeMillis() - loadTime < APP_OPEN_EXPIRY_MILLIS
 
-    private companion object {
+    companion object {
         private const val PREFERENCES_NAME = "app_open_ads"
         private const val KEY_FOREGROUND_COUNT = "foreground_count"
         private const val KEY_LAST_SHOWN_AT = "last_shown_at"
         private const val MIN_FOREGROUNDS_BEFORE_FIRST_AD = 3
         private const val MIN_SHOW_INTERVAL_MILLIS = 2L * 60L * 60L * 1000L
         private const val APP_OPEN_EXPIRY_MILLIS = 4L * 60L * 60L * 1000L
+        private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L
+
+        fun wasShownWithin(context: Context, intervalMillis: Long): Boolean {
+            val lastShownAt = context.getSharedPreferences(
+                PREFERENCES_NAME,
+                Context.MODE_PRIVATE,
+            ).getLong(KEY_LAST_SHOWN_AT, 0L)
+            return System.currentTimeMillis() - lastShownAt < intervalMillis
+        }
     }
 }

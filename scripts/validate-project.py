@@ -36,11 +36,19 @@ required = [
     "app/src/main/res/xml/data_extraction_rules.xml",
     "app/src/main/res/xml/locales_config.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifierTest.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/data/DuplicatePolicyTest.kt",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
     "docs/AD_PLACEMENTS.md",
     "docs/HOME_DESIGN.md",
     "docs/APP_ICON.md",
+    "docs/ANDROID_CACHE_LIMITS.md",
+    "docs/CLAUDE_REVIEW_RESOLUTION.md",
     "docs/QA_SIGNING.md",
     "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
@@ -106,6 +114,7 @@ for forbidden in (
     "QUERY_ALL_PACKAGES",
     "BIND_ACCESSIBILITY_SERVICE",
     "KILL_BACKGROUND_PROCESSES",
+    "WRITE_EXTERNAL_STORAGE",
 ):
     if forbidden in manifest:
         errors.append(f"forbidden first-release permission present: {forbidden}")
@@ -145,13 +154,14 @@ if default_strings_file.is_file() and turkish_strings_file.is_file():
 build_file = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
 for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
+    "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 4",
-    'versionName = "0.3.0"',
+    "versionCode = 6",
+    'versionName = "0.4.1"',
     "validateReleaseAds",
-    'buildConfigField("String", "ADMOB_MEDIUM_RECTANGLE_ID"',
     'buildConfigField("String", "ADMOB_APP_OPEN_ID"',
+    '"Release blocked: configure the upload keystore environment variables."',
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
     'signingConfig = signingConfigs.getByName("debug")',
@@ -271,7 +281,9 @@ for expected in (
 release_workflow_text = (ROOT / ".github/workflows/release-aab.yml").read_text(encoding="utf-8")
 release_script_text = (ROOT / "scripts/validate-release-env.sh").read_text(encoding="utf-8")
 for expected in (
-    "ADMOB_MEDIUM_RECTANGLE_ID",
+    "ADMOB_APP_ID",
+    "ADMOB_BANNER_ID",
+    "ADMOB_INTERSTITIAL_ID",
     "ADMOB_APP_OPEN_ID",
 ):
     if expected not in release_workflow_text:
@@ -291,6 +303,7 @@ for expected in (
     "private val processObserver = object : DefaultLifecycleObserver",
     "addObserver(processObserver)",
     "super.onCreate()",
+    "fun suppressNextAppOpenAd()",
 ):
     if expected not in application_text:
         errors.append(f"missing collision-free Application lifecycle invariant: {expected}")
@@ -302,19 +315,17 @@ if "Application.ActivityLifecycleCallbacks,\n    DefaultLifecycleObserver" in ap
     )
 for expected in (
     "class AppOpenAdController",
-    "AdSize.MEDIUM_RECTANGLE",
     "MIN_FOREGROUNDS_BEFORE_FIRST_AD = 3",
     "MIN_SHOW_INTERVAL_MILLIS = 2L * 60L * 60L * 1000L",
+    "MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L",
+    "FULL_SCREEN_SEPARATION_MILLIS = 30L * 1000L",
     "fun clearAppCache()",
     "fun optimizeMemory(",
     "Debug.MemoryInfo()",
     "releaseForMemoryOptimization",
-    "Settings.ACTION_APPLICATION_DETAILS_SETTINGS",
-    "Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS",
     "StorageStatsManager",
     "queryStatsForPackage",
     "AppOpsManager.OPSTR_GET_USAGE_STATS",
-    "Settings.ACTION_USAGE_ACCESS_SETTINGS",
     "fun refreshAppCaches()",
 ):
     if expected not in source_text:
@@ -325,6 +336,9 @@ for forbidden in (
     "KILL_BACKGROUND_PROCESSES",
     "onOpenSystemCache",
     "onClick = {},",
+    "DeletePlan.Completed",
+    "AdSize.MEDIUM_RECTANGLE",
+    "ADMOB_MEDIUM_RECTANGLE_ID",
 ):
     if forbidden in source_text:
         errors.append(f"obsolete or non-functional tool action present: {forbidden}")
@@ -333,20 +347,68 @@ cleaner_app_text = (
     ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt"
 ).read_text(encoding="utf-8")
 for expected in (
-    "val showAnchoredBanner = adsCanBeShown",
+    "val showAnchoredBanner = canRequestAds",
     "ModernHomeHero(",
     "HomeToolMasonry(",
     "HomeToolRow(",
     "R.string.smart_scan_home_action",
     "R.string.whatsapp_home_subtitle",
-    "CacheManagerPanel(",
-    "AppCacheRow(",
+    "WhatsAppCleanerDetailScreen(",
+    "DeviceCenterScreen(",
+    "SettingsDetailScreen(",
 ):
     if expected not in cleaner_app_text:
         errors.append(f"missing visible app-cache/banner UI invariant: {expected}")
 
 if "MediumRectangleAd(" in cleaner_app_text:
     errors.append("Home must use the visible anchored banner instead of a 300x250 MREC")
+
+if "summary.selectedBytes +" in cleaner_app_text:
+    errors.append(
+        "Smart Clean must never add protected third-party app cache to the truly cleanable total",
+    )
+
+if "onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal }" in cleaner_app_text:
+    errors.append("the Tools tab must not expose the old per-app cache manager")
+
+for expected in (
+    "summary.scanLimitReached",
+    "R.string.duplicate_original_kept",
+):
+    if expected not in cleaner_app_text:
+        errors.append(f"missing scan safety UI invariant: {expected}")
+
+whatsapp_repository_text = (
+    ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt"
+).read_text(encoding="utf-8")
+for expected in (
+    '"${MediaStore.MediaColumns.DATE_MODIFIED} ASC"',
+    '"${MediaStore.MediaColumns.SIZE} DESC"',
+    "sampleFingerprint(file)",
+    "DuplicatePolicy.choose(sameContentFiles)",
+):
+    if expected not in whatsapp_repository_text:
+        errors.append(f"missing scan correctness invariant: {expected}")
+whatsapp_screen_text = (
+    ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt"
+).read_text(encoding="utf-8")
+for expected in (
+    "suspend fun scanWhatsAppLibrary(",
+    "suspend fun deleteWhatsAppItems(",
+    "DocumentsContract.deleteDocument",
+    "WhatsAppMediaClassifier.classify(",
+):
+    if expected not in whatsapp_repository_text:
+        errors.append(f"missing complete WhatsApp repository invariant: {expected}")
+
+for expected in (
+    "WhatsAppMediaCategory.entries",
+    "WhatsAppThumbnail(item)",
+    "whatsapp_delete_confirm_message",
+    "whatsAppScanProgress",
+):
+    if expected not in whatsapp_screen_text:
+        errors.append(f"missing complete in-app WhatsApp UI invariant: {expected}")
 
 styles_text = (ROOT / "app/src/main/res/values/styles.xml").read_text(encoding="utf-8")
 styles_v27_text = (ROOT / "app/src/main/res/values-v27/styles.xml").read_text(encoding="utf-8")

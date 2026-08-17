@@ -14,7 +14,7 @@ için karar kaydıdır.
   düğmesi ana odaktır.
 - Araç alanı aynı kartların tekrarından oluşmaz:
   - Büyük mavi `Çöp Temizliği` kartı
-  - Yeşil `RAM Hızlandır` kartı
+  - Yeşil `Uygulama belleğini boşalt` kartı
   - Mor `Kopyaları Sil` kartı
   - Ayrı yatay `WhatsApp Temizleyici`, `Büyük Dosyalar` ve
     `Uygulama Önbelleği` satırları

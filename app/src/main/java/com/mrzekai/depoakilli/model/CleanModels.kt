@@ -24,6 +24,19 @@ enum class ScanFocus {
     WHATSAPP,
 }
 
+enum class WhatsAppMediaCategory(
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int,
+) {
+    IMAGES(R.string.whatsapp_category_images, R.string.whatsapp_category_images_description),
+    VIDEOS(R.string.whatsapp_category_videos, R.string.whatsapp_category_videos_description),
+    DOCUMENTS(R.string.whatsapp_category_documents, R.string.whatsapp_category_documents_description),
+    AUDIO(R.string.whatsapp_category_audio, R.string.whatsapp_category_audio_description),
+    VOICE_NOTES(R.string.whatsapp_category_voice, R.string.whatsapp_category_voice_description),
+    STICKERS_GIFS(R.string.whatsapp_category_stickers, R.string.whatsapp_category_stickers_description),
+    OTHER(R.string.whatsapp_category_other, R.string.whatsapp_category_other_description),
+}
+
 data class IndexedFile(
     val uri: String,
     val name: String,
@@ -51,7 +64,31 @@ data class CleanableItem(
     val relativePath: String,
     val assessment: AiAssessment,
     val selected: Boolean = true,
+    val protectedDuplicateName: String? = null,
 )
+
+data class WhatsAppMediaItem(
+    val id: String,
+    val uri: String,
+    val name: String,
+    val sizeBytes: Long,
+    val mimeType: String,
+    val modifiedAtMillis: Long,
+    val relativePath: String,
+    val category: WhatsAppMediaCategory,
+    val selected: Boolean = false,
+)
+
+data class WhatsAppLibrarySummary(
+    val items: List<WhatsAppMediaItem> = emptyList(),
+    val scannedFileCount: Int = 0,
+) {
+    val totalBytes: Long get() = items.sumOf(WhatsAppMediaItem::sizeBytes)
+    val selectedItems: List<WhatsAppMediaItem> get() = items.filter(WhatsAppMediaItem::selected)
+    val selectedBytes: Long get() = selectedItems.sumOf(WhatsAppMediaItem::sizeBytes)
+    val byCategory: Map<WhatsAppMediaCategory, List<WhatsAppMediaItem>>
+        get() = items.groupBy(WhatsAppMediaItem::category)
+}
 
 data class StorageSnapshot(
     val totalBytes: Long = 0,
@@ -72,6 +109,20 @@ data class MemorySnapshot(
     val usedFraction: Float
         get() = if (totalBytes == 0L) 0f else usedBytes.toFloat() / totalBytes.toFloat()
 }
+
+data class DeviceInfoSnapshot(
+    val manufacturer: String = "",
+    val model: String = "",
+    val androidVersion: String = "",
+    val sdkLevel: Int = 0,
+    val cpuAbi: String = "",
+    val cpuCores: Int = 0,
+    val screenResolution: String = "",
+    val batteryPercent: Int = 0,
+    val batteryTemperatureCelsius: Float = 0f,
+    val batteryCharging: Boolean = false,
+    val appVersion: String = "",
+)
 
 data class AppCacheEntry(
     val packageName: String,
@@ -97,6 +148,7 @@ data class ScanSummary(
     val items: List<CleanableItem> = emptyList(),
     val scannedFileCount: Int = 0,
     val limitedAccess: Boolean = false,
+    val scanLimitReached: Boolean = false,
 ) {
     val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
     val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)
@@ -111,8 +163,8 @@ object ByteFormatter {
         if (bytes <= 0) return "0 B"
         var value = bytes.toDouble()
         var unitIndex = 0
-        while (value >= 1024 && unitIndex < units.lastIndex) {
-            value /= 1024
+        while (value >= 1000 && unitIndex < units.lastIndex) {
+            value /= 1000
             unitIndex++
         }
         return if (value >= 100 || unitIndex == 0) {

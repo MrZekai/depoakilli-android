@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -56,10 +55,7 @@ class MainActivity : ComponentActivity() {
             contentResolver.takePersistableUriPermission(uri, flags)
         }.isSuccess
         if (persisted && cleanerViewModel.connectWhatsAppFolder(uri)) {
-            cleanerViewModel.scan(
-                limitedAccess = hasLimitedMediaAccess(),
-                focus = ScanFocus.WHATSAPP,
-            )
+            cleanerViewModel.scanWhatsAppLibrary()
         }
     }
 
@@ -101,6 +97,7 @@ class MainActivity : ComponentActivity() {
                         cleanerViewModel.prepareCleanup(
                             onPlanReady = { plan ->
                                 if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
+                                    suppressNextAppOpenAd()
                                     deleteLauncher.launch(
                                         IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
                                     )
@@ -111,18 +108,16 @@ class MainActivity : ComponentActivity() {
                             },
                         )
                     },
-                    onClearAppCache = cleanerViewModel::clearAppCache,
-                    onRefreshAppCaches = cleanerViewModel::refreshAppCaches,
                     onOptimizeMemory = {
                         cleanerViewModel.optimizeMemory {
                             interstitialAds.releaseForMemoryOptimization()
                             (application as DepoAkilliApplication).releaseAdMemory()
                         }
                     },
-                    onOpenPackageStorageDetails = ::openPackageStorageDetails,
-                    onOpenUsageAccessSettings = ::openUsageAccessSettings,
-                    onOpenStorageSettings = ::openStorageSettings,
-                    onShowPrivacyOptions = { consentManager.showPrivacyOptions(this) },
+                    onShowPrivacyOptions = ::showPrivacyOptions,
+                    onRateApp = ::rateApp,
+                    onSendFeedback = ::sendFeedback,
+                    onShareApp = ::shareApp,
                 )
             }
         }
@@ -138,11 +133,13 @@ class MainActivity : ComponentActivity() {
 
     private fun requestMediaAccess(focus: ScanFocus) {
         pendingMediaScanFocus = focus
+        suppressNextAppOpenAd()
         permissionLauncher.launch(requiredMediaPermissions())
     }
 
     private fun requestWhatsAppFolder() {
         val initialUri = Uri.parse(WHATSAPP_MEDIA_INITIAL_URI)
+        suppressNextAppOpenAd()
         runCatching { whatsappFolderLauncher.launch(initialUri) }
             .onFailure { whatsappFolderLauncher.launch(null) }
     }
@@ -151,11 +148,6 @@ class MainActivity : ComponentActivity() {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
             Manifest.permission.READ_MEDIA_IMAGES,
             Manifest.permission.READ_MEDIA_VIDEO,
-        )
-
-        Build.VERSION.SDK_INT <= Build.VERSION_CODES.P -> arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
         )
 
         else -> arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -175,58 +167,75 @@ class MainActivity : ComponentActivity() {
 
     private fun hasAnyMediaAccess(): Boolean = hasFullMediaAccess() || hasLimitedMediaAccess()
 
-    private fun openAppStorageDetails() {
-        val intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.parse("package:$packageName"),
+    private fun rateApp() {
+        val marketIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=$PLAY_PACKAGE_NAME"),
         )
-        startFirstAvailable(intent, Intent(Settings.ACTION_APPLICATION_SETTINGS))
+        val webIntent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=$PLAY_PACKAGE_NAME"),
+        )
+        startFirstAvailable(marketIntent, webIntent)
     }
 
-    private fun openPackageStorageDetails(targetPackageName: String) {
-        val intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.parse("package:$targetPackageName"),
-        )
-        startFirstAvailable(intent, Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS))
+    private fun sendFeedback() {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("mailto:")
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
+            putExtra(
+                Intent.EXTRA_TEXT,
+                getString(
+                    R.string.feedback_template,
+                    Build.MANUFACTURER,
+                    Build.MODEL,
+                    Build.VERSION.RELEASE,
+                ),
+            )
+        }
+        startFirstAvailable(intent)
     }
 
-    private fun openUsageAccessSettings() {
-        startFirstAvailable(
-            Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS),
-            Intent(Settings.ACTION_SETTINGS),
-        )
+    private fun shareApp() {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(
+                Intent.EXTRA_TEXT,
+                getString(
+                    R.string.share_app_message,
+                    "https://play.google.com/store/apps/details?id=$PLAY_PACKAGE_NAME",
+                ),
+            )
+        }
+        suppressNextAppOpenAd()
+        runCatching {
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
+        }.onFailure {
+            cleanerViewModel.showMessage(R.string.message_screen_unavailable)
+        }
     }
 
-    private fun openManageApps() {
-        startFirstAvailable(
-            Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS),
-            Intent(Settings.ACTION_APPLICATION_SETTINGS),
-            Intent(Settings.ACTION_SETTINGS),
-        )
-    }
-
-    private fun openStorageSettings() {
-        startFirstAvailable(
-            Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS),
-            Intent(Settings.ACTION_SETTINGS),
-        )
+    private fun showPrivacyOptions() {
+        suppressNextAppOpenAd()
+        consentManager.showPrivacyOptions(this)
     }
 
     private fun startFirstAvailable(vararg intents: Intent) {
-        intents.firstOrNull { it.resolveActivity(packageManager) != null }?.let { intent ->
-            runCatching { startActivity(intent) }
-                .onFailure {
-                    if (intent.action != Settings.ACTION_SETTINGS) {
-                        runCatching { startActivity(Intent(Settings.ACTION_SETTINGS)) }
-                    }
-                }
+        for (intent in intents) {
+            suppressNextAppOpenAd()
+            if (runCatching { startActivity(intent) }.isSuccess) return
         }
+        cleanerViewModel.showMessage(R.string.message_screen_unavailable)
+    }
+
+    private fun suppressNextAppOpenAd() {
+        (application as DepoAkilliApplication).suppressNextAppOpenAd()
     }
 
     private companion object {
         const val WHATSAPP_MEDIA_INITIAL_URI =
             "content://com.android.externalstorage.documents/document/" +
                 "primary%3AAndroid%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia"
+        const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
     }
 }

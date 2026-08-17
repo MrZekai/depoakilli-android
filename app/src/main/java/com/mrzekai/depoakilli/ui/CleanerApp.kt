@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Bolt
@@ -38,7 +39,6 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.PhotoLibrary
@@ -53,6 +53,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -69,6 +70,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -90,7 +92,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.BannerAd
-import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
@@ -116,6 +117,14 @@ private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
     TOOLS(R.string.tab_tools, Icons.Outlined.Settings),
 }
 
+private enum class DetailScreen(@StringRes val titleRes: Int) {
+    WHATSAPP(R.string.whatsapp_cleaner_title),
+    SETTINGS(R.string.settings_title),
+    PRIVACY(R.string.privacy_policy),
+    TERMS(R.string.terms_of_service),
+    ABOUT(R.string.about_app),
+}
+
 @Composable
 fun CleanerApp(
     viewModel: CleanerViewModel,
@@ -126,20 +135,18 @@ fun CleanerApp(
     onRequestMediaAccess: (ScanFocus) -> Unit,
     onRequestWhatsAppAccess: () -> Unit,
     onPrepareCleanup: () -> Unit,
-    onClearAppCache: () -> Unit,
-    onRefreshAppCaches: () -> Unit,
     onOptimizeMemory: () -> Unit,
-    onOpenPackageStorageDetails: (String) -> Unit,
-    onOpenUsageAccessSettings: () -> Unit,
-    onOpenStorageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
+    onRateApp: () -> Unit,
+    onSendFeedback: () -> Unit,
+    onShareApp: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val hasMediaAccess = hasFullMediaAccess || hasLimitedMediaAccess
-    val adsCanBeShown = canRequestAds && !state.scanning
-    val showAnchoredBanner = adsCanBeShown
+    val showAnchoredBanner = canRequestAds
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -153,13 +160,25 @@ fun CleanerApp(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            if (AppTab.entries[selectedTabIndex] != AppTab.HOME) {
+            if (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME) {
                 TopAppBar(
                     title = {
                         Text(
-                            stringResource(AppTab.entries[selectedTabIndex].titleRes),
+                            stringResource(
+                                detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes,
+                            ),
                             fontWeight = FontWeight.Black,
                         )
+                    },
+                    navigationIcon = {
+                        if (detailScreen != null) {
+                            IconButton(onClick = { detailScreen = null }) {
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.ArrowBack,
+                                    contentDescription = stringResource(R.string.back),
+                                )
+                            }
+                        }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
@@ -169,34 +188,77 @@ fun CleanerApp(
             }
         },
         bottomBar = {
-            Column(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .navigationBarsPadding(),
-            ) {
-                BannerAd(canRequestAds = showAnchoredBanner)
-                NavigationBar(containerColor = Color.White) {
-                    AppTab.entries.forEachIndexed { index, tab ->
-                        val tabTitle = stringResource(tab.titleRes)
-                        NavigationBarItem(
-                            selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index },
-                            icon = { Icon(tab.icon, contentDescription = tabTitle) },
-                            label = { Text(tabTitle) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = ElectricBlue,
-                                selectedTextColor = ElectricBlue,
-                                indicatorColor = Color(0xFFE2ECFF),
-                                unselectedIconColor = Color(0xFF566176),
-                                unselectedTextColor = Color(0xFF566176),
-                            ),
-                        )
+            if (detailScreen == null) {
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding(),
+                ) {
+                    BannerAd(canRequestAds = showAnchoredBanner)
+                    Spacer(Modifier.height(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .2f))
+                    NavigationBar(containerColor = Color.White) {
+                        AppTab.entries.forEachIndexed { index, tab ->
+                            val tabTitle = stringResource(tab.titleRes)
+                            NavigationBarItem(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index },
+                                icon = { Icon(tab.icon, contentDescription = tabTitle) },
+                                label = { Text(tabTitle) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = ElectricBlue,
+                                    selectedTextColor = ElectricBlue,
+                                    indicatorColor = Color(0xFFE2ECFF),
+                                    unselectedIconColor = Color(0xFF566176),
+                                    unselectedTextColor = Color(0xFF566176),
+                                ),
+                            )
+                        }
                     }
                 }
             }
         },
     ) { padding ->
-        when (AppTab.entries[selectedTabIndex]) {
+        when (detailScreen) {
+            DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
+                state = state,
+                onRequestAccess = onRequestWhatsAppAccess,
+                onScan = viewModel::scanWhatsAppLibrary,
+                onToggleItem = viewModel::toggleWhatsAppItem,
+                onToggleCategory = viewModel::toggleWhatsAppCategory,
+                onDeleteSelected = viewModel::deleteSelectedWhatsApp,
+                modifier = Modifier.padding(padding),
+            )
+
+            DetailScreen.SETTINGS -> SettingsDetailScreen(
+                privacyOptionsRequired = privacyOptionsRequired,
+                onRateApp = onRateApp,
+                onSendFeedback = onSendFeedback,
+                onShareApp = onShareApp,
+                onShowPrivacyOptions = onShowPrivacyOptions,
+                onOpenLegalPage = { page ->
+                    detailScreen = when (page) {
+                        LegalPage.PRIVACY -> DetailScreen.PRIVACY
+                        LegalPage.TERMS -> DetailScreen.TERMS
+                        LegalPage.ABOUT -> DetailScreen.ABOUT
+                    }
+                },
+                modifier = Modifier.padding(padding),
+            )
+
+            DetailScreen.PRIVACY,
+            DetailScreen.TERMS,
+            DetailScreen.ABOUT -> LegalDetailScreen(
+                page = when (detailScreen) {
+                    DetailScreen.PRIVACY -> LegalPage.PRIVACY
+                    DetailScreen.TERMS -> LegalPage.TERMS
+                    else -> LegalPage.ABOUT
+                },
+                info = state.deviceInfo,
+                modifier = Modifier.padding(padding),
+            )
+
+            null -> when (AppTab.entries[selectedTabIndex]) {
             AppTab.HOME -> HomeScreen(
                 state = state,
                 hasMediaAccess = hasMediaAccess,
@@ -205,8 +267,12 @@ fun CleanerApp(
                     onRequestMediaAccess(focus)
                 },
                 onRequestWhatsAppAccess = {
-                    selectedTabIndex = AppTab.CLEAN.ordinal
+                    detailScreen = DetailScreen.WHATSAPP
                     onRequestWhatsAppAccess()
+                },
+                onOpenWhatsAppCleaner = {
+                    detailScreen = DetailScreen.WHATSAPP
+                    viewModel.scanWhatsAppLibrary()
                 },
                 onScan = { focus ->
                     selectedTabIndex = AppTab.CLEAN.ordinal
@@ -216,8 +282,7 @@ fun CleanerApp(
                     )
                 },
                 onOptimizeMemory = onOptimizeMemory,
-                onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal },
-                onOpenTools = { selectedTabIndex = AppTab.TOOLS.ordinal },
+                onOpenSettings = { detailScreen = DetailScreen.SETTINGS },
                 modifier = Modifier.padding(padding),
             )
 
@@ -235,22 +300,16 @@ fun CleanerApp(
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
                 onClean = onPrepareCleanup,
-                onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal },
                 modifier = Modifier.padding(padding),
             )
 
-            AppTab.TOOLS -> ToolsScreen(
+            AppTab.TOOLS -> DeviceCenterScreen(
                 state = state,
-                privacyOptionsRequired = privacyOptionsRequired,
-                onClearAppCache = onClearAppCache,
-                onRefreshAppCaches = onRefreshAppCaches,
                 onOptimizeMemory = onOptimizeMemory,
-                onOpenPackageStorageDetails = onOpenPackageStorageDetails,
-                onOpenUsageAccessSettings = onOpenUsageAccessSettings,
-                onOpenStorageSettings = onOpenStorageSettings,
-                onShowPrivacyOptions = onShowPrivacyOptions,
+                onOpenSettings = { detailScreen = DetailScreen.SETTINGS },
                 modifier = Modifier.padding(padding),
             )
+            }
         }
     }
 }
@@ -261,10 +320,10 @@ private fun HomeScreen(
     hasMediaAccess: Boolean,
     onRequestMediaAccess: (ScanFocus) -> Unit,
     onRequestWhatsAppAccess: () -> Unit,
+    onOpenWhatsAppCleaner: () -> Unit,
     onScan: (ScanFocus) -> Unit,
     onOptimizeMemory: () -> Unit,
-    onOpenCacheManager: () -> Unit,
-    onOpenTools: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -278,7 +337,7 @@ private fun HomeScreen(
                 memory = state.memory,
                 scanning = state.scanning,
                 onScan = { onScan(ScanFocus.SMART) },
-                onOpenTools = onOpenTools,
+                onOpenSettings = onOpenSettings,
             )
         }
         item {
@@ -313,7 +372,7 @@ private fun HomeScreen(
                     background = listOf(Color(0xFFF0FFF6), Color(0xFFE7FBF0)),
                     onClick = {
                         if (state.hasWhatsAppAccess) {
-                            onScan(ScanFocus.WHATSAPP)
+                            onOpenWhatsAppCleaner()
                         } else {
                             onRequestWhatsAppAccess()
                         }
@@ -339,25 +398,6 @@ private fun HomeScreen(
                 )
             }
         }
-        item {
-            Box(Modifier.padding(horizontal = 14.dp)) {
-                HomeToolRow(
-                    title = stringResource(R.string.cache_tool_title),
-                    subtitle = if (state.appCache.accessGranted) {
-                        stringResource(
-                            R.string.cache_home_measured,
-                            ByteFormatter.format(state.appCache.totalCacheBytes),
-                        )
-                    } else {
-                        stringResource(R.string.cache_home_subtitle)
-                    },
-                    icon = Icons.Outlined.CleaningServices,
-                    accent = ElectricBlue,
-                    background = listOf(Color(0xFFF2F7FF), Color(0xFFE8F1FF)),
-                    onClick = onOpenCacheManager,
-                )
-            }
-        }
         if (state.lastScanCompleted) {
             item {
                 Box(Modifier.padding(horizontal = 14.dp)) {
@@ -374,7 +414,7 @@ private fun ModernHomeHero(
     memory: MemorySnapshot,
     scanning: Boolean,
     onScan: () -> Unit,
-    onOpenTools: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -419,7 +459,7 @@ private fun ModernHomeHero(
                 Surface(
                     modifier = Modifier
                         .size(42.dp)
-                        .clickable(onClick = onOpenTools),
+                        .clickable(onClick = onOpenSettings),
                     shape = CircleShape,
                     color = Color.White.copy(alpha = .12f),
                 ) {
@@ -1059,7 +1099,6 @@ private fun CleanScreen(
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
     onClean: () -> Unit,
-    onOpenCacheManager: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -1091,7 +1130,6 @@ private fun CleanScreen(
             onToggleCategory = onToggleCategory,
             onScan = onScan,
             onClean = onClean,
-            onOpenCacheManager = onOpenCacheManager,
             modifier = modifier,
         )
     }
@@ -1151,10 +1189,9 @@ private fun ScanResults(
     onToggleCategory: (CleanCategory) -> Unit,
     onScan: () -> Unit,
     onClean: () -> Unit,
-    onOpenCacheManager: () -> Unit,
     modifier: Modifier,
 ) {
-    val reviewedAppCacheBytes = if (includeAppCache) appCache.totalCacheBytes else 0L
+    val protectedAppCacheBytes = if (includeAppCache) appCache.totalCacheBytes else 0L
     Column(modifier.fillMaxSize()) {
         if (summary.limitedAccess) {
             Surface(color = Amber400.copy(alpha = .14f), modifier = Modifier.fillMaxWidth()) {
@@ -1183,9 +1220,7 @@ private fun ScanResults(
                             color = Mint100,
                         )
                         Text(
-                            ByteFormatter.format(
-                                summary.selectedBytes + reviewedAppCacheBytes,
-                            ),
+                            ByteFormatter.format(summary.selectedBytes),
                             fontSize = 38.sp,
                             fontWeight = FontWeight.Black,
                             color = Lime400,
@@ -1198,11 +1233,18 @@ private fun ScanResults(
                             ),
                         )
                         Text(
-                            stringResource(
-                                R.string.scan_space_breakdown,
-                                ByteFormatter.format(summary.selectedBytes),
-                                ByteFormatter.format(reviewedAppCacheBytes),
-                            ),
+                            if (protectedAppCacheBytes > 0L) {
+                                stringResource(
+                                    R.string.scan_space_breakdown,
+                                    ByteFormatter.format(summary.selectedBytes),
+                                    ByteFormatter.format(protectedAppCacheBytes),
+                                )
+                            } else {
+                                stringResource(
+                                    R.string.scan_selectable_only,
+                                    ByteFormatter.format(summary.selectedBytes),
+                                )
+                            },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -1211,15 +1253,31 @@ private fun ScanResults(
             }
             if (
                 includeAppCache &&
-                (!appCache.accessGranted || appCache.totalCacheBytes > 0L)
+                appCache.accessGranted &&
+                appCache.totalCacheBytes > 0L
             ) {
                 item {
-                    CacheScanResultCard(appCache, onOpenCacheManager)
+                    CacheScanResultCard(appCache)
+                }
+            }
+            if (summary.scanLimitReached) {
+                item {
+                    Surface(
+                        color = ElectricBlue.copy(alpha = .08f),
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text(
+                            stringResource(R.string.scan_limit_note),
+                            modifier = Modifier.padding(14.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
             if (
                 summary.items.isEmpty() &&
-                (!includeAppCache || (appCache.accessGranted && appCache.totalCacheBytes == 0L))
+                (!includeAppCache || !appCache.accessGranted || appCache.totalCacheBytes == 0L)
             ) {
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
@@ -1287,7 +1345,6 @@ private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
 @Composable
 private fun CacheScanResultCard(
     cache: AppCacheSnapshot,
-    onOpenCacheManager: () -> Unit,
 ) {
     val title = if (cache.accessGranted) {
         stringResource(R.string.cache_detected_title)
@@ -1319,9 +1376,12 @@ private fun CacheScanResultCard(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            TextButton(onClick = onOpenCacheManager, modifier = Modifier.align(Alignment.End)) {
-                Text(stringResource(R.string.review_cache))
-            }
+            Text(
+                stringResource(R.string.cache_not_in_clean_total),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
     }
 }
@@ -1396,6 +1456,14 @@ private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                item.protectedDuplicateName?.let { protectedName ->
+                    Text(
+                        stringResource(R.string.duplicate_original_kept, protectedName),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = ElectricBlue,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
                 Text(
                     stringResource(
                         R.string.file_confidence,
@@ -1423,299 +1491,3 @@ private fun categoryIcon(category: CleanCategory): ImageVector = when (category)
     CleanCategory.APP_CACHE -> Icons.Outlined.CleaningServices
     CleanCategory.WHATSAPP_MEDIA -> Icons.Outlined.Chat
 }
-
-@Composable
-private fun ToolsScreen(
-    state: CleanerUiState,
-    privacyOptionsRequired: Boolean,
-    onClearAppCache: () -> Unit,
-    onRefreshAppCaches: () -> Unit,
-    onOptimizeMemory: () -> Unit,
-    onOpenPackageStorageDetails: (String) -> Unit,
-    onOpenUsageAccessSettings: () -> Unit,
-    onOpenStorageSettings: () -> Unit,
-    onShowPrivacyOptions: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            Text(
-                stringResource(R.string.tools_title),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Black,
-            )
-            Text(
-                stringResource(R.string.tools_subtitle),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        item {
-            CacheManagerPanel(
-                cache = state.appCache,
-                scanning = state.scanningAppCaches,
-                onGrantAccess = onOpenUsageAccessSettings,
-                onRefresh = onRefreshAppCaches,
-            )
-        }
-        if (state.appCache.accessGranted && state.appCache.entries.isNotEmpty()) {
-            item {
-                Text(
-                    stringResource(R.string.cache_other_apps),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    stringResource(R.string.cache_open_settings_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            items(
-                items = state.appCache.entries.take(MAX_DISPLAYED_CACHE_APPS),
-                key = AppCacheEntry::packageName,
-            ) { entry ->
-                AppCacheRow(
-                    entry = entry,
-                    onClick = { onOpenPackageStorageDetails(entry.packageName) },
-                )
-            }
-        }
-        item {
-            ToolRow(
-                title = stringResource(R.string.cache_own_app),
-                subtitle = stringResource(
-                    R.string.cache_own_app_subtitle,
-                    ByteFormatter.format(state.ownCacheBytes),
-                ),
-                icon = Icons.Outlined.CleaningServices,
-                onClick = onClearAppCache,
-            )
-        }
-        item {
-            ToolRow(
-                title = if (state.optimizingMemory) {
-                    stringResource(R.string.memory_optimizing)
-                } else {
-                    stringResource(R.string.memory_optimizer)
-                },
-                subtitle = stringResource(
-                    R.string.memory_optimizer_subtitle,
-                    ByteFormatter.format(state.memory.availableBytes),
-                    ByteFormatter.format(state.memory.appUsedBytes),
-                ),
-                icon = Icons.Outlined.Memory,
-                onClick = onOptimizeMemory,
-                enabled = !state.optimizingMemory,
-            )
-        }
-        item {
-            ToolRow(
-                title = stringResource(R.string.storage_settings),
-                subtitle = stringResource(R.string.storage_settings_subtitle),
-                icon = Icons.Outlined.Storage,
-                onClick = onOpenStorageSettings,
-            )
-        }
-        if (privacyOptionsRequired) {
-            item {
-                ToolRow(
-                    title = stringResource(R.string.ad_privacy_preferences),
-                    subtitle = stringResource(R.string.ad_privacy_preferences_subtitle),
-                    icon = Icons.Outlined.Security,
-                    onClick = onShowPrivacyOptions,
-                )
-            }
-        }
-        item {
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .25f))
-        }
-        item {
-            Row(verticalAlignment = Alignment.Top) {
-                Icon(Icons.Outlined.Info, contentDescription = null, tint = Lime400)
-                Spacer(Modifier.width(12.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(
-                        stringResource(R.string.cache_manual_notice),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Text(
-                        stringResource(R.string.honest_memory_note),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun CacheManagerPanel(
-    cache: AppCacheSnapshot,
-    scanning: Boolean,
-    onGrantAccess: () -> Unit,
-    onRefresh: () -> Unit,
-) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = RoundedCornerShape(22.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(color = MaterialTheme.colorScheme.primary, shape = CircleShape) {
-                    Icon(
-                        Icons.Outlined.CleaningServices,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(10.dp),
-                    )
-                }
-                Spacer(Modifier.width(12.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        stringResource(R.string.cache_manager_title),
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        stringResource(R.string.cache_manager_subtitle),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            when {
-                !cache.supported -> Text(
-                    stringResource(R.string.cache_unsupported),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-
-                scanning -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
-                    Spacer(Modifier.width(10.dp))
-                    Text(stringResource(R.string.cache_scanning))
-                }
-
-                !cache.accessGranted -> {
-                    Text(
-                        stringResource(R.string.cache_access_explanation),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                    Button(onClick = onGrantAccess, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.cache_grant_action))
-                    }
-                }
-
-                else -> {
-                    Text(
-                        if (cache.totalCacheBytes == 0L) {
-                            stringResource(R.string.cache_empty)
-                        } else {
-                            stringResource(
-                                R.string.cache_summary,
-                                ByteFormatter.format(cache.totalCacheBytes),
-                                cache.entries.size,
-                            )
-                        },
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    TextButton(onClick = onRefresh, modifier = Modifier.align(Alignment.End)) {
-                        Text(stringResource(R.string.cache_refresh))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AppCacheRow(
-    entry: AppCacheEntry,
-    onClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(18.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(color = Forest800, shape = CircleShape) {
-                Icon(
-                    Icons.Outlined.Android,
-                    contentDescription = null,
-                    tint = Lime400,
-                    modifier = Modifier.padding(9.dp),
-                )
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    entry.label,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    ByteFormatter.format(entry.cacheBytes),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-        }
-    }
-}
-
-@Composable
-private fun ToolRow(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    enabled: Boolean = true,
-) {
-    Card(
-        onClick = onClick,
-        enabled = enabled,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Row(
-            Modifier.fillMaxWidth().padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(color = Forest800, shape = CircleShape) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = Lime400,
-                    modifier = Modifier.padding(10.dp),
-                )
-            }
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Bold)
-                Text(
-                    subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
-        }
-    }
-}
-
-private const val MAX_DISPLAYED_CACHE_APPS = 12

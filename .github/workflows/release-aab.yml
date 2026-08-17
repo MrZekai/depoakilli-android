@@ -33,7 +33,6 @@ jobs:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID }}
           ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_INTERSTITIAL_ID }}
-          ADMOB_MEDIUM_RECTANGLE_ID: ${{ secrets.ADMOB_MEDIUM_RECTANGLE_ID }}
           ADMOB_APP_OPEN_ID: ${{ secrets.ADMOB_APP_OPEN_ID }}
         run: bash ./scripts/validate-release-env.sh
 
@@ -54,7 +53,6 @@ jobs:
             -PADMOB_APP_ID='${{ secrets.ADMOB_APP_ID }}' \
             -PADMOB_BANNER_ID='${{ secrets.ADMOB_BANNER_ID }}' \
             -PADMOB_INTERSTITIAL_ID='${{ secrets.ADMOB_INTERSTITIAL_ID }}' \
-            -PADMOB_MEDIUM_RECTANGLE_ID='${{ secrets.ADMOB_MEDIUM_RECTANGLE_ID }}' \
             -PADMOB_APP_OPEN_ID='${{ secrets.ADMOB_APP_OPEN_ID }}'
 
       - name: Upload signed AAB

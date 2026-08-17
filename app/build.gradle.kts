@@ -9,13 +9,11 @@ plugins {
 val sampleAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
 val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
-val sampleMediumRectangleId = "ca-app-pub-3940256099942544/6300978111"
 val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
 
 val admobAppId = providers.gradleProperty("ADMOB_APP_ID").orElse(sampleAdMobAppId)
 val admobBannerId = providers.gradleProperty("ADMOB_BANNER_ID").orElse(sampleBannerId)
 val admobInterstitialId = providers.gradleProperty("ADMOB_INTERSTITIAL_ID").orElse(sampleInterstitialId)
-val admobMediumRectangleId = providers.gradleProperty("ADMOB_MEDIUM_RECTANGLE_ID").orElse(sampleMediumRectangleId)
 val admobAppOpenId = providers.gradleProperty("ADMOB_APP_OPEN_ID").orElse(sampleAppOpenId)
 val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
@@ -29,10 +27,10 @@ android {
 
     defaultConfig {
         applicationId = "com.mrzekai.depoakilli"
-        minSdk = 23
+        minSdk = 30
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.3.0"
+        versionCode = 6
+        versionName = "0.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -40,7 +38,6 @@ android {
 
         buildConfigField("String", "ADMOB_BANNER_ID", "\"${admobBannerId.get()}\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"${admobInterstitialId.get()}\"")
-        buildConfigField("String", "ADMOB_MEDIUM_RECTANGLE_ID", "\"${admobMediumRectangleId.get()}\"")
         buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"${admobAppOpenId.get()}\"")
     }
 
@@ -165,11 +162,18 @@ val validateReleaseAds by tasks.registering {
             admobAppId.get(),
             admobBannerId.get(),
             admobInterstitialId.get(),
-            admobMediumRectangleId.get(),
             admobAppOpenId.get(),
         )
         check(values.none { it.contains("3940256099942544") }) {
-            "Release blocked: configure all five live AdMob IDs."
+            "Release blocked: configure all four live AdMob IDs."
+        }
+        check(
+            releaseKeystorePath.isPresent &&
+                releaseKeystorePassword.isPresent &&
+                releaseKeyAlias.isPresent &&
+                releaseKeyPassword.isPresent,
+        ) {
+            "Release blocked: configure the upload keystore environment variables."
         }
     }
 }

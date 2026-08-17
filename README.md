@@ -2,30 +2,35 @@
 
 `com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi. Görünen marka adı Türkçe cihazlarda `Akıllı Temizleyici`, diğer desteklenmeyen dillerde varsayılan olarak `Smart Cleaner` olur.
 
-Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulama önbelleklerini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
+Uygulama, sahte hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, erişilebilir indirilen medya ve kendi uygulama önbelleğini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
 
 ## Çalışan ilk sürüm
 
-- Android 16 / API 36 hedefi
+- Android 11+ desteği, Android 16 / API 36 hedefi
 - İngilizce varsayılan arayüz ve tam Türkçe yerelleştirme
 - Android 13+ uygulama dili ayarı
 - Kullanıcının seçtiği 4 numaralı lacivert–mavi–turkuaz ana ekran tasarımı
 - Kullanıcının seçtiği mavi kalkan, beyaz temizlik fırçası ve turkuaz yörüngeli kalıcı uygulama ikonu
 - Depolama ve gerçek RAM durumu
-- Gerçek PSS ölçümlü uygulama RAM optimizasyonu; geçici tarama ve tam ekran reklam belleğini serbest bırakma
+- Gerçek PSS ölçümlü uygulama belleği temizliği; tarama seçimlerini koruyarak geçici tam ekran reklam kaynaklarını bırakma
 - Cihaz-içi, açıklanabilir akıllı temizlik puanı
 - Eski ekran görüntüsü önerileri
 - 150 MB üzerindeki eski video önerileri
-- Eski indirilen dosya ve erişilebilen APK paketi taraması
-- Aynı boyuttaki adaylarda tam SHA-256 içerik doğrulamalı yinelenen dosya tespiti
+- Erişilebilir eski indirilen medya taraması; kapsam dışı belge/APK dosyaları için sonuç vaadi vermeyen dürüst yüzey
+- 64 KB baş/son örnek parmak izi ardından yalnız eşleşen adaylarda tam SHA-256 doğrulamalı yinelenen dosya tespiti
+- DCIM/Camera orijinalini koruyan ve belirsiz grupları otomatik seçmeyen kopya güvenlik politikası
 - Android 11+ toplu silme onay ekranı
 - Uygulamanın kendi önbelleğini doğrudan ve güvenli temizleme
 - Kullanıcı Kullanım Erişimi verdikten sonra Android `StorageStatsManager` ile cihaz geneli gerçek cache toplamı
-- Ana ekranda başlatılabilen uygulamaları cache boyutuna göre sıralayan ve doğru Android uygulama ekranını açan önbellek yöneticisi
-- Uygulama depolama, cihaz depolama, bellek/uygulama ve dil ayarlarına çalışan yönlendirmeler
+- Android'in koruduğu diğer uygulama önbelleklerini temizlenebilir toplamdan ayrı gösteren ölçüm
 - Google Mobile Ads 25.4.0 test entegrasyonu
 - UMP 4.0.0 reklam gizlilik/onay akışı
 - Ana Sayfa dâhil üç sekmede navigasyon üstünde görünür sabit banner
+- Akıllı Tarama’da yalnız gerçekten seçilip silinebilen dosyaları temizlenebilir toplama katan dürüst alan hesabı
+- WhatsApp Medya klasörünü Görseller, Videolar, Belgeler, Ses/Müzik, Sesli Mesajlar, Çıkartmalar/GIF’ler ve Diğer olarak sınıflandıran uygulama içi temizlik ekranı
+- Yüzde ilerlemeli WhatsApp taraması, gerçek küçük önizlemeler, kategori/öğe seçimi ve kalıcı silme onayı
+- Depolama, RAM, pil, Android, CPU, ekran ve uygulama sürümünü gösteren Cihaz Merkezi
+- Değerlendirme, geri bildirim, paylaşma, uygulama içi Gizlilik Politikası, Hizmet Şartları ve Hakkında ekranı
 - Temizlik sonrasında aralıklı geçiş reklamı
 - İlk iki kullanımı bölmeyen, iki saat sıklık sınırlı uygulama açılış reklamı
 - Test AdMob kimlikleriyle release üretimini durduran koruma
@@ -76,7 +81,6 @@ Release için aşağıdaki Gradle özellikleri gerekir:
 ADMOB_APP_ID
 ADMOB_BANNER_ID
 ADMOB_INTERSTITIAL_ID
-ADMOB_MEDIUM_RECTANGLE_ID
 ADMOB_APP_OPEN_ID
 ```
 
@@ -97,7 +101,6 @@ ANDROID_KEY_PASSWORD
 ADMOB_APP_ID
 ADMOB_BANNER_ID
 ADMOB_INTERSTITIAL_ID
-ADMOB_MEDIUM_RECTANGLE_ID
 ADMOB_APP_OPEN_ID
 ```
 

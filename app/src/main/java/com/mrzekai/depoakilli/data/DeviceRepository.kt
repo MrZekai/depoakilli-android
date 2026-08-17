@@ -4,9 +4,11 @@ import android.app.ActivityManager
 import android.app.AppOpsManager
 import android.app.PendingIntent
 import android.app.usage.StorageStatsManager
+import android.os.BatteryManager
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,11 +26,14 @@ import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageSnapshot
+import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
+import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import java.io.File
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -64,6 +69,51 @@ class DeviceRepository(
             availableBytes = info.availMem,
             appUsedBytes = processMemoryInfo.totalPss.toLong() * 1024L,
             lowMemory = info.lowMemory,
+        )
+    }
+
+    @Suppress("DEPRECATION")
+    fun deviceInfoSnapshot(): DeviceInfoSnapshot {
+        val battery = context.registerReceiver(
+            null,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+        )
+        val batteryLevel = battery?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
+        val batteryScale = battery?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100
+        val batteryPercent = if (batteryLevel >= 0 && batteryScale > 0) {
+            (batteryLevel * 100 / batteryScale).coerceIn(0, 100)
+        } else {
+            0
+        }
+        val batteryStatus = battery?.getIntExtra(
+            BatteryManager.EXTRA_STATUS,
+            BatteryManager.BATTERY_STATUS_UNKNOWN,
+        ) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
+        val metrics = context.resources.displayMetrics
+        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getPackageInfo(
+                context.packageName,
+                PackageManager.PackageInfoFlags.of(0L),
+            )
+        } else {
+            context.packageManager.getPackageInfo(context.packageName, 0)
+        }
+        return DeviceInfoSnapshot(
+            manufacturer = Build.MANUFACTURER.orEmpty(),
+            model = Build.MODEL.orEmpty(),
+            androidVersion = Build.VERSION.RELEASE.orEmpty(),
+            sdkLevel = Build.VERSION.SDK_INT,
+            cpuAbi = Build.SUPPORTED_ABIS.firstOrNull().orEmpty(),
+            cpuCores = Runtime.getRuntime().availableProcessors().coerceAtLeast(1),
+            screenResolution = "${metrics.widthPixels} × ${metrics.heightPixels}",
+            batteryPercent = batteryPercent,
+            batteryTemperatureCelsius = (battery?.getIntExtra(
+                BatteryManager.EXTRA_TEMPERATURE,
+                0,
+            ) ?: 0) / 10f,
+            batteryCharging = batteryStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
+                batteryStatus == BatteryManager.BATTERY_STATUS_FULL,
+            appVersion = packageInfo.versionName.orEmpty(),
         )
     }
 
@@ -177,6 +227,67 @@ class DeviceRepository(
         before - ownCacheSize()
     }
 
+    suspend fun scanWhatsAppLibrary(
+        onProgress: (Int) -> Unit = {},
+    ): WhatsAppLibrarySummary = withContext(Dispatchers.IO) {
+        onProgress(3)
+        val indexed = queryWhatsAppFiles { visitedDirectories, discoveredFiles ->
+            val traversalProgress = 5 + (visitedDirectories * 4) + (discoveredFiles / 50)
+            onProgress(traversalProgress.coerceIn(5, 72))
+        }
+        onProgress(75)
+        val total = indexed.size.coerceAtLeast(1)
+        val items = indexed.mapIndexed { index, file ->
+            coroutineContext.ensureActive()
+            if (index % 25 == 0) {
+                onProgress(75 + (index * 23 / total))
+            }
+            WhatsAppMediaItem(
+                id = file.uri,
+                uri = file.uri,
+                name = file.name,
+                sizeBytes = file.sizeBytes,
+                mimeType = file.mimeType,
+                modifiedAtMillis = file.modifiedAtMillis,
+                relativePath = file.relativePath,
+                category = WhatsAppMediaClassifier.classify(
+                    name = file.name,
+                    mimeType = file.mimeType,
+                    relativePath = file.relativePath,
+                ),
+            )
+        }.sortedWith(
+            compareBy<WhatsAppMediaItem> { it.category.ordinal }
+                .thenByDescending(WhatsAppMediaItem::sizeBytes),
+        )
+        onProgress(100)
+        WhatsAppLibrarySummary(
+            items = items,
+            scannedFileCount = indexed.size,
+        )
+    }
+
+    suspend fun deleteWhatsAppItems(items: List<WhatsAppMediaItem>): WhatsAppDeleteResult =
+        withContext(Dispatchers.IO) {
+            val deletedIds = hashSetOf<String>()
+            var deletedBytes = 0L
+            items.forEach { item ->
+                coroutineContext.ensureActive()
+                val deleted = runCatching {
+                    DocumentsContract.deleteDocument(resolver, Uri.parse(item.uri))
+                }.getOrDefault(false)
+                if (deleted) {
+                    deletedIds += item.id
+                    deletedBytes += item.sizeBytes
+                }
+            }
+            WhatsAppDeleteResult(
+                attemptedCount = items.size,
+                deletedIds = deletedIds,
+                deletedBytes = deletedBytes,
+            )
+        }
+
     suspend fun scan(
         limitedAccess: Boolean,
         focus: ScanFocus = ScanFocus.SMART,
@@ -250,6 +361,7 @@ class DeviceRepository(
                 .take(MAX_SUGGESTIONS),
             scannedFileCount = indexed.size,
             limitedAccess = limitedAccess,
+            scanLimitReached = indexed.size >= MAX_FILES_PER_PASS,
         )
     }
 
@@ -261,17 +373,8 @@ class DeviceRepository(
 
         if (mediaUris.isEmpty()) return DeletePlan.NoMediaFiles
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val pendingIntent: PendingIntent = MediaStore.createDeleteRequest(resolver, mediaUris)
-            return DeletePlan.RequiresConsent(pendingIntent)
-        }
-
-        var deletedBytes = 0L
-        mediaUris.zip(mediaItems).forEach { (uri, item) ->
-            runCatching { resolver.delete(uri, null, null) }
-                .onSuccess { if (it > 0) deletedBytes += item.sizeBytes }
-        }
-        return DeletePlan.Completed(deletedBytes)
+        val pendingIntent: PendingIntent = MediaStore.createDeleteRequest(resolver, mediaUris)
+        return DeletePlan.RequiresConsent(pendingIntent)
     }
 
     fun isDocumentItem(item: CleanableItem): Boolean = runCatching {
@@ -308,17 +411,32 @@ class DeviceRepository(
             MediaStore.MediaColumns.DATE_MODIFIED,
             pathColumn,
         )
-        return query(collection, projection, pathColumn)
+        val oldest = query(
+            collection = collection,
+            projection = projection,
+            pathColumnName = pathColumn,
+            sortOrder = "${MediaStore.MediaColumns.DATE_MODIFIED} ASC",
+            maxRecords = MAX_FILES_PER_PASS,
+        )
+        val largest = query(
+            collection = collection,
+            projection = projection,
+            pathColumnName = pathColumn,
+            sortOrder = "${MediaStore.MediaColumns.SIZE} DESC",
+            maxRecords = MAX_FILES_PER_PASS,
+        )
+        return (oldest + largest).distinctBy(IndexedFile::uri)
     }
 
     private fun queryDownloads(): List<IndexedFile> {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return emptyList()
         return runCatching {
             queryCollection(MediaStore.Downloads.EXTERNAL_CONTENT_URI)
         }.getOrDefault(emptyList())
     }
 
-    private fun queryWhatsAppFiles(): List<IndexedFile> {
+    private fun queryWhatsAppFiles(
+        onTraversalProgress: ((visitedDirectories: Int, discoveredFiles: Int) -> Unit)? = null,
+    ): List<IndexedFile> {
         val stored = preferences.getString(KEY_WHATSAPP_TREE_URI, null) ?: return emptyList()
         val treeUri = runCatching { Uri.parse(stored) }.getOrNull() ?: return emptyList()
         if (!hasWhatsAppTreeAccess()) return emptyList()
@@ -336,8 +454,12 @@ class DeviceRepository(
             DocumentsContract.Document.COLUMN_LAST_MODIFIED,
         )
 
+        var visitedDirectories = 0
+
         while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
             val directory = pending.removeFirst()
+            visitedDirectories++
+            onTraversalProgress?.invoke(visitedDirectories, output.size)
             val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
                 treeUri,
                 directory.documentId,
@@ -387,6 +509,9 @@ class DeviceRepository(
                                     modifiedAtMillis = cursor.getLong(modifiedColumn).coerceAtLeast(0L),
                                     relativePath = path,
                                 )
+                                if (output.size % 25 == 0) {
+                                    onTraversalProgress?.invoke(visitedDirectories, output.size)
+                                }
                             }
                         }
                     }
@@ -400,6 +525,8 @@ class DeviceRepository(
         collection: Uri,
         projection: Array<String>,
         pathColumnName: String,
+        sortOrder: String,
+        maxRecords: Int,
     ): List<IndexedFile> {
         val output = ArrayList<IndexedFile>()
         runCatching {
@@ -408,7 +535,7 @@ class DeviceRepository(
                 projection,
                 null,
                 null,
-                "${MediaStore.MediaColumns.DATE_MODIFIED} DESC",
+                sortOrder,
             )?.use { cursor ->
                 val idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID)
                 val nameColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
@@ -418,7 +545,7 @@ class DeviceRepository(
                 val pathColumn = cursor.getColumnIndexOrThrow(pathColumnName)
 
                 var count = 0
-                while (cursor.moveToNext() && count < MAX_FILES_PER_COLLECTION) {
+                while (cursor.moveToNext() && count < maxRecords) {
                     val size = cursor.getLong(sizeColumn).coerceAtLeast(0)
                     if (size == 0L) continue
                     val id = cursor.getLong(idColumn)
@@ -451,18 +578,71 @@ class DeviceRepository(
             .forEach { sameSizeFiles ->
                 coroutineContext.ensureActive()
                 sameSizeFiles
-                    .mapNotNull { file -> fingerprint(file)?.let { it to file } }
+                    .mapNotNull { file -> sampleFingerprint(file)?.let { it to file } }
                     .groupBy({ it.first }, { it.second })
                     .values
                     .filter { it.size > 1 }
-                    .forEach { sameContentFiles ->
-                        val keep = sameContentFiles.maxByOrNull(IndexedFile::modifiedAtMillis)
-                        sameContentFiles.filterNot { it.uri == keep?.uri }.forEach { duplicate ->
-                            duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(isExact = true))
+                    .forEach { sameSampleFiles ->
+                        sameSampleFiles
+                            .mapNotNull { file -> fingerprint(file)?.let { it to file } }
+                            .groupBy({ it.first }, { it.second })
+                            .values
+                            .filter { it.size > 1 }
+                            .forEach { sameContentFiles ->
+                                val decision = DuplicatePolicy.choose(sameContentFiles)
+                                    ?: error("Duplicate group unexpectedly contained fewer than two files")
+                                val assessment = aiEngine.duplicateAssessment(isExact = true).let {
+                                    if (decision.automaticSelectionIsSafe) {
+                                        it
+                                    } else {
+                                        it.copy(recommended = false)
+                                    }
+                                }
+                                sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
+                                    duplicates += duplicate.toCleanable(assessment).copy(
+                                        protectedDuplicateName = decision.keep.name,
+                                    )
+                                }
+                            }
                         }
-                    }
             }
         return duplicates
+    }
+
+    private fun sampleFingerprint(file: IndexedFile): String? = runCatching {
+        resolver.openFileDescriptor(Uri.parse(file.uri), "r")?.use { descriptor ->
+            FileInputStream(descriptor.fileDescriptor).use { input ->
+                val digest = MessageDigest.getInstance("SHA-256")
+                digest.update(ByteBuffer.allocate(Long.SIZE_BYTES).putLong(file.sizeBytes).array())
+                val channel = input.channel
+                updateDigestFromChannel(channel, digest, 0L, HASH_SAMPLE_BYTES)
+                if (file.sizeBytes > HASH_SAMPLE_BYTES) {
+                    updateDigestFromChannel(
+                        channel,
+                        digest,
+                        (file.sizeBytes - HASH_SAMPLE_BYTES).coerceAtLeast(0L),
+                        HASH_SAMPLE_BYTES,
+                    )
+                }
+                digest.digest().joinToString("") { "%02x".format(it) }
+            }
+        }
+    }.getOrNull()
+
+    private fun updateDigestFromChannel(
+        channel: java.nio.channels.FileChannel,
+        digest: MessageDigest,
+        position: Long,
+        byteCount: Int,
+    ) {
+        channel.position(position)
+        val buffer = ByteBuffer.allocate(byteCount)
+        while (buffer.hasRemaining()) {
+            val read = channel.read(buffer)
+            if (read <= 0) break
+        }
+        buffer.flip()
+        digest.update(buffer)
     }
 
     private fun fingerprint(file: IndexedFile): String? = runCatching {
@@ -511,7 +691,6 @@ class DeviceRepository(
 
     sealed interface DeletePlan {
         data class RequiresConsent(val pendingIntent: PendingIntent) : DeletePlan
-        data class Completed(val deletedBytes: Long) : DeletePlan
         data object NoMediaFiles : DeletePlan
     }
 
@@ -520,17 +699,27 @@ class DeviceRepository(
         val deletedIds: Set<String>,
     )
 
+    data class WhatsAppDeleteResult(
+        val attemptedCount: Int,
+        val deletedIds: Set<String>,
+        val deletedBytes: Long,
+    ) {
+        val failedCount: Int get() = attemptedCount - deletedIds.size
+    }
+
     companion object {
         const val APP_CACHE_URI = "app-cache://internal"
         private const val PREFERENCES_NAME = "cleaner_access"
         private const val KEY_WHATSAPP_TREE_URI = "whatsapp_tree_uri"
         private const val MAX_FILES_PER_COLLECTION = 4_000
+        private const val MAX_FILES_PER_PASS = MAX_FILES_PER_COLLECTION / 2
         private const val MAX_WHATSAPP_FILES = 4_000
         private const val MAX_WHATSAPP_DEPTH = 8
         private const val MAX_SUGGESTIONS = 500
         private const val MAX_DUPLICATE_GROUP = 20
         private const val MAX_HASH_GROUPS = 100
         private const val HASH_BUFFER_BYTES = 128 * 1024
+        private const val HASH_SAMPLE_BYTES = 64 * 1024
         private const val MIN_DUPLICATE_BYTES = 32L * 1024L
         private const val MAX_HASH_BYTES = 40L * 1024L * 1024L
         private const val MIN_CACHE_SUGGESTION_BYTES = 1L * 1024L * 1024L
