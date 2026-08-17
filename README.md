@@ -1,6 +1,6 @@
-# Smart Cleaner / Akıllı Temizleyici (çalışma adı)
+# Smart Cleaner / Akıllı Temizleyici
 
-`com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi. Paket kimliği kalıcıdır; görünen global marka adı ASO ve marka araştırmasından sonra kesinleşecektir.
+`com.mrzekai.depoakilli` paket kimlikli, Kotlin ve Jetpack Compose ile geliştirilen Android depolama düzenleyicisi. Görünen marka adı Türkçe cihazlarda `Akıllı Temizleyici`, diğer desteklenmeyen dillerde varsayılan olarak `Smart Cleaner` olur.
 
 Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in izin verdiği gerçek depolama işlemlerini sunar. Fotoğraf, video, ekran görüntüsü, indirilen dosya, APK paketi ve uygulama önbelleklerini cihaz üzerinde analiz eder. Silme işlemleri kullanıcı seçimi ve Android sistem onayı olmadan başlamaz.
 
@@ -9,10 +9,10 @@ Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in
 - Android 16 / API 36 hedefi
 - İngilizce varsayılan arayüz ve tam Türkçe yerelleştirme
 - Android 13+ uygulama dili ayarı
-- Modern açık mavi/turkuaz Compose arayüzü ve sadeleştirilmiş ana ekran
+- Kullanıcının seçtiği 4 numaralı lacivert–mavi–turkuaz ana ekran tasarımı
 - Depolama ve gerçek RAM durumu
 - Gerçek PSS ölçümlü uygulama RAM optimizasyonu; geçici tarama ve tam ekran reklam belleğini serbest bırakma
-- Cihaz-içi, açıklanabilir AI temizlik puanı
+- Cihaz-içi, açıklanabilir akıllı temizlik puanı
 - Eski ekran görüntüsü önerileri
 - 150 MB üzerindeki eski video önerileri
 - Eski indirilen dosya ve erişilebilen APK paketi taraması
@@ -60,8 +60,8 @@ Debug APK:
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-GitHub Actions test APK'sı kalıcı QA sertifikasıyla imzalanır ve görünür adı
-`Akıllı Temizleyici QA` olur. Eski `.debug` test uygulamasının yanına kurulabilir;
+GitHub Actions test APK'sı kalıcı QA sertifikasıyla imzalanır ve görünen adı
+`Akıllı Temizleyici` olur. Eski `.debug` test uygulamasının yanına kurulabilir;
 sonraki `.qa` APK'lar veri silmeden güncelleme olur. QA ve Play release imzalarının
 ayrımı [`docs/QA_SIGNING.md`](docs/QA_SIGNING.md) içinde açıklanmıştır.
 
@@ -112,3 +112,6 @@ Upload key hiçbir zaman repoya eklenmemelidir. Yeni uygulamanın ilk AAB'sinde 
 6. Türkçe Play Store görselleri ve kapalı test
 
 Detaylar için [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md), [`docs/DEVICE_QA_CHECKLIST.md`](docs/DEVICE_QA_CHECKLIST.md) ve [`docs/PLAY_RELEASE_CHECKLIST.md`](docs/PLAY_RELEASE_CHECKLIST.md) dosyalarına bakın.
+
+Ana ekranın kullanıcı tarafından seçilen sabit görsel ve davranış kuralları
+[`docs/HOME_DESIGN.md`](docs/HOME_DESIGN.md) içinde kayıt altındadır.

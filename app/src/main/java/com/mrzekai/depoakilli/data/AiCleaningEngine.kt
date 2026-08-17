@@ -21,6 +21,25 @@ class AiCleaningEngine(
         val name = file.name.lowercase()
         val mime = file.mimeType.lowercase()
 
+        val isWhatsApp = path.contains("whatsapp")
+        val isWhatsAppStatus = isWhatsApp && path.contains(".statuses")
+        val isWhatsAppSent = isWhatsApp && (
+            path.contains("/sent/") || path.endsWith("/sent")
+        )
+        if (isWhatsAppStatus || (isWhatsAppSent && ageDays >= 30)) {
+            return AiAssessment(
+                category = CleanCategory.WHATSAPP_MEDIA,
+                safetyScore = if (isWhatsAppStatus) 96 else 78,
+                reasonRes = if (isWhatsAppStatus) {
+                    R.string.reason_whatsapp_status
+                } else {
+                    R.string.reason_whatsapp_sent
+                },
+                reasonArgs = if (isWhatsAppStatus) emptyList() else listOf(ageDays),
+                recommended = isWhatsAppStatus,
+            )
+        }
+
         if (name.endsWith(".apk") || mime == APK_MIME) {
             val score = when {
                 ageDays >= 30 -> 96

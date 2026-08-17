@@ -2,9 +2,9 @@
 <resources>
     <style name="Theme.DepoAkilli.Base" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">#F5F7FB</item>
-        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">#090C48</item>
+        <item name="android:navigationBarColor">#090C48</item>
         <item name="android:windowActionModeOverlay">true</item>
     </style>
 

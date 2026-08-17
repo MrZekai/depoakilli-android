@@ -12,6 +12,12 @@
 
 Bu izinler uygulamanın temel işlevi olan fotoğraf/video depolama yönetimi için kullanılır. İçerik analizi cihaz üzerinde gerçekleşir.
 
+Ana ekrandaki Çöp Temizliği ve uygulamanın kendi önbellek temizliği medya izni verilmeden de çalışır. Kopyalar ve büyük video araçları seçildiğinde medya erişimi ayrıca istenir.
+
+## WhatsApp klasörü
+
+WhatsApp Temizleyici bir manifest izni veya geniş dosya erişimi istemez. Android'in sistem klasör seçicisi açılır ve kullanıcı yalnız WhatsApp/WhatsApp Business Medya klasörünü seçer. `ACTION_OPEN_DOCUMENT_TREE` tarafından verilen kalıcı okuma/yazma yetkisi yalnız seçilen klasörle sınırlıdır. Geçici durumlar ve eski `Sent` kopyaları cihaz üzerinde taranır; silme yalnız kullanıcı seçiminden sonra yapılır.
+
 ## Uygulama önbelleği ölçümü
 
 `PACKAGE_USAGE_STATS`, Android 8.0 ve üzerindeki cihazlarda diğer kullanıcı uygulamalarının bildirdiği önbellek toplamlarını `StorageStatsManager` ile okuyabilmek için bildirilir. Bu normal bir çalışma zamanı izni değildir; kullanıcı Android'in Kullanım Erişimi ekranından ayrıca etkinleştirir.
@@ -22,6 +28,8 @@ Manifestteki `tools:ignore="ProtectedPermissions"` yalnız bu bilinçli AppOps k
 - Kişisel dosya içeriği, kullanım zamanı veya kullanım geçmişi okunmaz.
 - Sorgu arka plan iş parçacığında ve yalnız uygulama açıldığında, geri dönüldüğünde, kullanıcı yenilediğinde veya Akıllı Tarama başlatıldığında çalışır.
 - Başka uygulamaların özel önbelleği sessizce silinmez. Kullanıcı ilgili uygulamaya dokunduğunda Android'in resmî uygulama ayrıntıları ekranı açılır.
+
+Android'in `CLEAR_APP_CACHE` izni `signature|privileged` korumasındadır ve normal Play uygulamalarına verilmez. Bu nedenle özellik çalışıyormuş gibi sahte bir sessiz temizlik sonucu gösterilmez.
 
 Paket görünürlüğü `QUERY_ALL_PACKAGES` ile genişletilmez. Manifestte yalnız ana ekranda başlatılabilen kullanıcı uygulamaları için kapsamlı bir `MAIN` + `LAUNCHER` sorgusu bulunur.
 

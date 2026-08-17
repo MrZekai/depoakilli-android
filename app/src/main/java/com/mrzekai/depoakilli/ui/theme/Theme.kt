@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DepoColors = lightColorScheme(
-    primary = Lime400,
+    primary = ElectricBlue,
     onPrimary = Color.White,
     primaryContainer = Forest700,
-    onPrimaryContainer = WhiteSoft,
+    onPrimaryContainer = Color(0xFF0A235C),
     secondary = Teal500,
     onSecondary = Color.White,
     background = Forest950,
@@ -19,7 +19,7 @@ private val DepoColors = lightColorScheme(
     surfaceVariant = Forest800,
     onSurfaceVariant = Mint100,
     error = Red400,
-    outline = Color(0xFF8291A7),
+    outline = Color(0xFFB8C3D5),
 )
 
 @Composable

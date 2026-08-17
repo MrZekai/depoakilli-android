@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,13 +31,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.outlined.Bolt
+import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.CleaningServices
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Memory
+import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
@@ -50,6 +56,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -67,9 +74,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -87,11 +97,18 @@ import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanSummary
+import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.ui.theme.Amber400
+import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Forest800
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import com.mrzekai.depoakilli.ui.theme.Mint100
+import com.mrzekai.depoakilli.ui.theme.Purple500
+import com.mrzekai.depoakilli.ui.theme.Red400
+import com.mrzekai.depoakilli.ui.theme.Rose500
+import com.mrzekai.depoakilli.ui.theme.Teal500
+import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 
 private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
     HOME(R.string.tab_home, Icons.Outlined.Home),
@@ -106,7 +123,8 @@ fun CleanerApp(
     hasLimitedMediaAccess: Boolean,
     canRequestAds: Boolean,
     privacyOptionsRequired: Boolean,
-    onRequestMediaAccess: () -> Unit,
+    onRequestMediaAccess: (ScanFocus) -> Unit,
+    onRequestWhatsAppAccess: () -> Unit,
     onPrepareCleanup: () -> Unit,
     onClearAppCache: () -> Unit,
     onRefreshAppCaches: () -> Unit,
@@ -114,14 +132,13 @@ fun CleanerApp(
     onOpenPackageStorageDetails: (String) -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
     onOpenStorageSettings: () -> Unit,
-    onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
     val hasMediaAccess = hasFullMediaAccess || hasLimitedMediaAccess
-    val adsCanBeShown = canRequestAds && hasMediaAccess && !state.scanning
+    val adsCanBeShown = canRequestAds && !state.scanning
     val showAnchoredBanner = adsCanBeShown
 
     LaunchedEffect(state.message) {
@@ -133,25 +150,23 @@ fun CleanerApp(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(stringResource(R.string.app_name), fontWeight = FontWeight.Black)
+            if (AppTab.entries[selectedTabIndex] != AppTab.HOME) {
+                TopAppBar(
+                    title = {
                         Text(
-                            stringResource(R.string.app_tagline),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Lime400,
-                            letterSpacing = 1.2.sp,
+                            stringResource(AppTab.entries[selectedTabIndex].titleRes),
+                            fontWeight = FontWeight.Black,
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-            )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    ),
+                )
+            }
         },
         bottomBar = {
             Column(
@@ -160,7 +175,7 @@ fun CleanerApp(
                     .navigationBarsPadding(),
             ) {
                 BannerAd(canRequestAds = showAnchoredBanner)
-                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+                NavigationBar(containerColor = Color.White) {
                     AppTab.entries.forEachIndexed { index, tab ->
                         val tabTitle = stringResource(tab.titleRes)
                         NavigationBarItem(
@@ -168,6 +183,13 @@ fun CleanerApp(
                             onClick = { selectedTabIndex = index },
                             icon = { Icon(tab.icon, contentDescription = tabTitle) },
                             label = { Text(tabTitle) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = ElectricBlue,
+                                selectedTextColor = ElectricBlue,
+                                indicatorColor = Color(0xFFE2ECFF),
+                                unselectedIconColor = Color(0xFF566176),
+                                unselectedTextColor = Color(0xFF566176),
+                            ),
                         )
                     }
                 }
@@ -177,14 +199,25 @@ fun CleanerApp(
         when (AppTab.entries[selectedTabIndex]) {
             AppTab.HOME -> HomeScreen(
                 state = state,
-                hasAccess = hasMediaAccess,
-                onRequestAccess = onRequestMediaAccess,
-                onScan = {
+                hasMediaAccess = hasMediaAccess,
+                onRequestMediaAccess = { focus ->
                     selectedTabIndex = AppTab.CLEAN.ordinal
-                    viewModel.scan(limitedAccess = !hasFullMediaAccess)
+                    onRequestMediaAccess(focus)
+                },
+                onRequestWhatsAppAccess = {
+                    selectedTabIndex = AppTab.CLEAN.ordinal
+                    onRequestWhatsAppAccess()
+                },
+                onScan = { focus ->
+                    selectedTabIndex = AppTab.CLEAN.ordinal
+                    viewModel.scan(
+                        limitedAccess = hasLimitedMediaAccess,
+                        focus = focus,
+                    )
                 },
                 onOptimizeMemory = onOptimizeMemory,
                 onOpenCacheManager = { selectedTabIndex = AppTab.TOOLS.ordinal },
+                onOpenTools = { selectedTabIndex = AppTab.TOOLS.ordinal },
                 modifier = Modifier.padding(padding),
             )
 
@@ -192,8 +225,13 @@ fun CleanerApp(
                 state = state,
                 hasFullAccess = hasFullMediaAccess,
                 hasLimitedAccess = hasLimitedMediaAccess,
-                onRequestAccess = onRequestMediaAccess,
-                onScan = { viewModel.scan(limitedAccess = !hasFullMediaAccess) },
+                onRequestAccess = { onRequestMediaAccess(state.scanFocus) },
+                onScan = {
+                    viewModel.scan(
+                        limitedAccess = hasLimitedMediaAccess,
+                        focus = state.scanFocus,
+                    )
+                },
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
                 onClean = onPrepareCleanup,
@@ -210,7 +248,6 @@ fun CleanerApp(
                 onOpenPackageStorageDetails = onOpenPackageStorageDetails,
                 onOpenUsageAccessSettings = onOpenUsageAccessSettings,
                 onOpenStorageSettings = onOpenStorageSettings,
-                onOpenLanguageSettings = onOpenLanguageSettings,
                 onShowPrivacyOptions = onShowPrivacyOptions,
                 modifier = Modifier.padding(padding),
             )
@@ -221,64 +258,562 @@ fun CleanerApp(
 @Composable
 private fun HomeScreen(
     state: CleanerUiState,
-    hasAccess: Boolean,
-    onRequestAccess: () -> Unit,
-    onScan: () -> Unit,
+    hasMediaAccess: Boolean,
+    onRequestMediaAccess: (ScanFocus) -> Unit,
+    onRequestWhatsAppAccess: () -> Unit,
+    onScan: (ScanFocus) -> Unit,
     onOptimizeMemory: () -> Unit,
     onOpenCacheManager: () -> Unit,
+    onOpenTools: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = PaddingValues(bottom = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { StorageHero(state.storage) }
-        if (!hasAccess) {
-            item { PermissionCard(onRequestAccess) }
+        item {
+            ModernHomeHero(
+                storage = state.storage,
+                memory = state.memory,
+                scanning = state.scanning,
+                onScan = { onScan(ScanFocus.SMART) },
+                onOpenTools = onOpenTools,
+            )
         }
         item {
-            Button(
-                onClick = onScan,
-                modifier = Modifier.fillMaxWidth().height(62.dp),
-                shape = RoundedCornerShape(20.dp),
+            Box(Modifier.padding(horizontal = 14.dp)) {
+                HomeToolMasonry(
+                    state = state,
+                    onJunk = { onScan(ScanFocus.JUNK) },
+                    onRam = onOptimizeMemory,
+                    onDuplicates = {
+                        if (hasMediaAccess) {
+                            onScan(ScanFocus.DUPLICATES)
+                        } else {
+                            onRequestMediaAccess(ScanFocus.DUPLICATES)
+                        }
+                    },
+                )
+            }
+        }
+        item {
+            Box(Modifier.padding(horizontal = 14.dp)) {
+                HomeToolRow(
+                    title = stringResource(R.string.whatsapp_cleaner_title),
+                    subtitle = stringResource(
+                        if (state.hasWhatsAppAccess) {
+                            R.string.whatsapp_cleaner_connected
+                        } else {
+                            R.string.whatsapp_home_subtitle
+                        },
+                    ),
+                    icon = Icons.Outlined.Chat,
+                    accent = WhatsAppGreen,
+                    background = listOf(Color(0xFFF0FFF6), Color(0xFFE7FBF0)),
+                    onClick = {
+                        if (state.hasWhatsAppAccess) {
+                            onScan(ScanFocus.WHATSAPP)
+                        } else {
+                            onRequestWhatsAppAccess()
+                        }
+                    },
+                )
+            }
+        }
+        item {
+            Box(Modifier.padding(horizontal = 14.dp)) {
+                HomeToolRow(
+                    title = stringResource(R.string.large_files_tool_title),
+                    subtitle = stringResource(R.string.large_files_home_subtitle),
+                    icon = Icons.Outlined.Folder,
+                    accent = Amber400,
+                    background = listOf(Color(0xFFFFFBEE), Color(0xFFFFF4D9)),
+                    onClick = {
+                        if (hasMediaAccess) {
+                            onScan(ScanFocus.LARGE_FILES)
+                        } else {
+                            onRequestMediaAccess(ScanFocus.LARGE_FILES)
+                        }
+                    },
+                )
+            }
+        }
+        item {
+            Box(Modifier.padding(horizontal = 14.dp)) {
+                HomeToolRow(
+                    title = stringResource(R.string.cache_tool_title),
+                    subtitle = if (state.appCache.accessGranted) {
+                        stringResource(
+                            R.string.cache_home_measured,
+                            ByteFormatter.format(state.appCache.totalCacheBytes),
+                        )
+                    } else {
+                        stringResource(R.string.cache_home_subtitle)
+                    },
+                    icon = Icons.Outlined.CleaningServices,
+                    accent = ElectricBlue,
+                    background = listOf(Color(0xFFF2F7FF), Color(0xFFE8F1FF)),
+                    onClick = onOpenCacheManager,
+                )
+            }
+        }
+        if (state.lastScanCompleted) {
+            item {
+                Box(Modifier.padding(horizontal = 14.dp)) {
+                    LastScanCard(state.summary) { onScan(state.scanFocus) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModernHomeHero(
+    storage: StorageSnapshot,
+    memory: MemorySnapshot,
+    scanning: Boolean,
+    onScan: () -> Unit,
+    onOpenTools: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(bottomStart = 34.dp, bottomEnd = 34.dp))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF090C48),
+                        Color(0xFF0758D8),
+                        Color(0xFF12CFC4),
+                    ),
+                    start = Offset.Zero,
+                    end = Offset(1200f, 1200f),
+                ),
+            )
+            .statusBarsPadding()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(Icons.Outlined.AutoAwesome, contentDescription = null)
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    contentDescription = null,
+                    tint = Color(0xFF54F0E4),
+                    modifier = Modifier.size(28.dp),
+                )
                 Spacer(Modifier.width(10.dp))
-                Column {
-                    Text(stringResource(R.string.scan_primary), fontWeight = FontWeight.Black)
+                Text(
+                    stringResource(R.string.app_name),
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(Modifier.weight(1f))
+                Surface(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clickable(onClick = onOpenTools),
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = .12f),
+                ) {
+                    Icon(
+                        Icons.Outlined.Settings,
+                        contentDescription = stringResource(R.string.tab_tools),
+                        tint = Color.White,
+                        modifier = Modifier.padding(9.dp),
+                    )
+                }
+            }
+            DeviceSummaryBar(storage = storage, memory = memory)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     Text(
-                        stringResource(R.string.scan_primary_subtitle),
-                        style = MaterialTheme.typography.labelMedium,
+                        stringResource(
+                            if (scanning) R.string.smart_clean_scanning_title else R.string.smart_clean_title,
+                        ),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 34.sp,
+                        lineHeight = 36.sp,
+                    )
+                    Box(
+                        Modifier
+                            .width(58.dp)
+                            .height(5.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF38E7D5)),
+                    )
+                    Text(
+                        stringResource(R.string.hero_performance),
+                        color = Color.White.copy(alpha = .82f),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                HeroShieldIllustration(scanning = scanning)
+            }
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(68.dp)
+                    .clickable(enabled = !scanning, onClick = onScan),
+                shape = RoundedCornerShape(34.dp),
+                color = Color.White,
+                shadowElevation = 10.dp,
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 22.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        stringResource(
+                            if (scanning) R.string.smart_clean_scanning else R.string.smart_scan_home_action,
+                        ),
+                        modifier = Modifier.weight(1f),
+                        color = Color(0xFF0B1648),
+                        fontWeight = FontWeight.Black,
+                        fontSize = 20.sp,
+                    )
+                    Surface(
+                        shape = CircleShape,
+                        color = Color(0xFF13C7BD),
+                        modifier = Modifier.size(46.dp),
+                    ) {
+                        if (scanning) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                strokeWidth = 3.dp,
+                                modifier = Modifier.padding(11.dp),
+                            )
+                        } else {
+                            Icon(
+                                Icons.AutoMirrored.Outlined.ArrowForward,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.padding(10.dp),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeviceSummaryBar(
+    storage: StorageSnapshot,
+    memory: MemorySnapshot,
+) {
+    Surface(
+        color = Color(0xFF07145C).copy(alpha = .64f),
+        shape = RoundedCornerShape(22.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 13.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            HeroMetric(
+                icon = Icons.Outlined.Storage,
+                label = stringResource(R.string.home_storage_label),
+                value = stringResource(
+                    R.string.home_storage_percent,
+                    (storage.usedFraction * 100).toInt(),
+                ),
+                progress = storage.usedFraction,
+                accent = Color(0xFF22D7C4),
+                modifier = Modifier.weight(1f),
+            )
+            Box(
+                Modifier
+                    .width(1.dp)
+                    .height(52.dp)
+                    .background(Color.White.copy(alpha = .28f)),
+            )
+            HeroMetric(
+                icon = Icons.Outlined.Memory,
+                label = stringResource(R.string.home_ram_label),
+                value = ByteFormatter.format(memory.availableBytes),
+                progress = if (memory.totalBytes == 0L) 0f else {
+                    memory.availableBytes.toFloat() / memory.totalBytes.toFloat()
+                },
+                accent = Color(0xFF2CA8FF),
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HeroMetric(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    progress: Float,
+    accent: Color,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Surface(shape = RoundedCornerShape(14.dp), color = Color.White) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.padding(8.dp).size(24.dp),
+            )
+        }
+        Spacer(Modifier.width(9.dp))
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Text(value, color = accent, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                Spacer(Modifier.width(5.dp))
+                Text(label, color = Color.White, style = MaterialTheme.typography.labelSmall)
+            }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(7.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = .16f)),
+            ) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(progress.coerceIn(0.04f, 1f))
+                        .height(7.dp)
+                        .clip(CircleShape)
+                        .background(accent),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroShieldIllustration(scanning: Boolean) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(142.dp)) {
+        Canvas(Modifier.fillMaxSize()) {
+            drawCircle(color = Color(0xFF23E1D3).copy(alpha = .18f), radius = size.minDimension * .46f)
+            drawArc(
+                color = Color.White.copy(alpha = .65f),
+                startAngle = 205f,
+                sweepAngle = 245f,
+                useCenter = false,
+                topLeft = Offset(size.width * .06f, size.height * .20f),
+                size = Size(size.width * .88f, size.height * .60f),
+                style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round),
+            )
+        }
+        Icon(
+            Icons.Outlined.Security,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(112.dp),
+        )
+        if (scanning) {
+            CircularProgressIndicator(
+                color = Color(0xFF49F1E4),
+                strokeWidth = 5.dp,
+                modifier = Modifier.size(58.dp),
+            )
+        } else {
+            Surface(shape = CircleShape, color = Color(0xFF115EDC), modifier = Modifier.size(58.dp)) {
+                Icon(
+                    Icons.Outlined.CleaningServices,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.padding(12.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeToolMasonry(
+    state: CleanerUiState,
+    onJunk: () -> Unit,
+    onRam: () -> Unit,
+    onDuplicates: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(276.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        HomeFeatureCard(
+            title = stringResource(R.string.junk_cleaner_title),
+            subtitle = stringResource(R.string.junk_home_subtitle),
+            badge = stringResource(R.string.reclaim_space),
+            icon = Icons.Outlined.DeleteSweep,
+            colors = listOf(Color(0xFF0757E8), Color(0xFF0E87F3)),
+            onClick = onJunk,
+            modifier = Modifier.weight(1f).fillMaxSize(),
+            large = true,
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            HomeFeatureCard(
+                title = stringResource(R.string.ram_booster_title),
+                subtitle = if (state.optimizingMemory) {
+                    stringResource(R.string.memory_optimizing)
+                } else {
+                    stringResource(
+                        R.string.ram_available_home,
+                        ByteFormatter.format(state.memory.availableBytes),
+                    )
+                },
+                icon = Icons.Outlined.Bolt,
+                colors = listOf(Color(0xFF08B978), Color(0xFF22D999)),
+                enabled = !state.optimizingMemory,
+                onClick = onRam,
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            )
+            HomeFeatureCard(
+                title = stringResource(R.string.duplicates_tool_title),
+                subtitle = stringResource(R.string.duplicates_home_subtitle),
+                icon = Icons.Outlined.ContentCopy,
+                colors = listOf(Color(0xFF7047E8), Color(0xFF9A6CF4)),
+                onClick = onDuplicates,
+                modifier = Modifier.fillMaxWidth().weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeFeatureCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    colors: List<Color>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    large: Boolean = false,
+    badge: String? = null,
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(24.dp))
+            .background(Brush.linearGradient(colors))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(16.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    title,
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                    style = if (large) MaterialTheme.typography.titleLarge else MaterialTheme.typography.titleMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = .86f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = .96f),
+                    modifier = Modifier.size(if (large) 104.dp else 60.dp),
+                )
+            }
+            if (badge != null) {
+                Surface(shape = CircleShape, color = Color(0xFF092B77).copy(alpha = .72f)) {
+                    Text(
+                        badge,
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 11.dp, vertical = 7.dp),
                     )
                 }
             }
         }
-        item {
-            AppCacheOverviewCard(
-                cache = state.appCache,
-                scanning = state.scanningAppCaches,
-                onClick = onOpenCacheManager,
+    }
+}
+
+@Composable
+private fun HomeToolRow(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    accent: Color,
+    background: List<Color>,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(Brush.horizontalGradient(background))
+            .border(1.dp, accent.copy(alpha = .12f), RoundedCornerShape(22.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Surface(shape = RoundedCornerShape(17.dp), color = accent) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.padding(12.dp).size(28.dp),
             )
         }
-        item {
-            MemoryCard(
-                memory = state.memory,
-                optimizing = state.optimizingMemory,
-                onClick = onOptimizeMemory,
+        Spacer(Modifier.width(13.dp))
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(
+                title,
+                color = Color(0xFF121D35),
+                fontWeight = FontWeight.Black,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                subtitle,
+                color = Color(0xFF5F6B80),
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
-        item {
-            ToolRow(
-                title = stringResource(R.string.media_cleanup),
-                subtitle = stringResource(R.string.media_cleanup_subtitle),
-                icon = Icons.Outlined.PhotoLibrary,
-                onClick = onScan,
-            )
-        }
-        if (state.lastScanCompleted) {
-            item { LastScanCard(state.summary, onScan) }
-        }
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = accent.copy(alpha = .26f),
+            modifier = Modifier.size(48.dp),
+        )
+        Icon(
+            Icons.AutoMirrored.Outlined.ArrowForward,
+            contentDescription = null,
+            tint = Color(0xFF526079),
+            modifier = Modifier.size(21.dp),
+        )
     }
 }
 
@@ -550,6 +1085,8 @@ private fun CleanScreen(
         else -> ScanResults(
             summary = state.summary,
             appCache = state.appCache,
+            includeAppCache = state.scanFocus == ScanFocus.SMART,
+            scanFocus = state.scanFocus,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
             onScan = onScan,
@@ -590,14 +1127,15 @@ private fun EmptyScanState(
             )
             Spacer(Modifier.height(24.dp))
             Button(
-                onClick = if (hasAccess) onScan else onRequestAccess,
+                onClick = onScan,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(
-                    stringResource(
-                        if (hasAccess) R.string.start_scan else R.string.grant_and_scan,
-                    ),
-                )
+                Text(stringResource(R.string.start_scan))
+            }
+            if (!hasAccess) {
+                TextButton(onClick = onRequestAccess) {
+                    Text(stringResource(R.string.enable_media_scan))
+                }
             }
         }
     }
@@ -607,6 +1145,8 @@ private fun EmptyScanState(
 private fun ScanResults(
     summary: ScanSummary,
     appCache: AppCacheSnapshot,
+    includeAppCache: Boolean,
+    scanFocus: ScanFocus,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
     onScan: () -> Unit,
@@ -614,6 +1154,7 @@ private fun ScanResults(
     onOpenCacheManager: () -> Unit,
     modifier: Modifier,
 ) {
+    val reviewedAppCacheBytes = if (includeAppCache) appCache.totalCacheBytes else 0L
     Column(modifier.fillMaxSize()) {
         if (summary.limitedAccess) {
             Surface(color = Amber400.copy(alpha = .14f), modifier = Modifier.fillMaxWidth()) {
@@ -637,13 +1178,13 @@ private fun ScanResults(
                 ) {
                     Column(Modifier.fillMaxWidth().padding(20.dp)) {
                         Text(
-                            stringResource(R.string.space_found),
+                            stringResource(scanFocusTitleRes(scanFocus)),
                             style = MaterialTheme.typography.labelMedium,
                             color = Mint100,
                         )
                         Text(
                             ByteFormatter.format(
-                                summary.selectedBytes + appCache.totalCacheBytes,
+                                summary.selectedBytes + reviewedAppCacheBytes,
                             ),
                             fontSize = 38.sp,
                             fontWeight = FontWeight.Black,
@@ -660,7 +1201,7 @@ private fun ScanResults(
                             stringResource(
                                 R.string.scan_space_breakdown,
                                 ByteFormatter.format(summary.selectedBytes),
-                                ByteFormatter.format(appCache.totalCacheBytes),
+                                ByteFormatter.format(reviewedAppCacheBytes),
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -668,15 +1209,17 @@ private fun ScanResults(
                     }
                 }
             }
-            if (!appCache.accessGranted || appCache.totalCacheBytes > 0L) {
+            if (
+                includeAppCache &&
+                (!appCache.accessGranted || appCache.totalCacheBytes > 0L)
+            ) {
                 item {
                     CacheScanResultCard(appCache, onOpenCacheManager)
                 }
             }
             if (
                 summary.items.isEmpty() &&
-                appCache.accessGranted &&
-                appCache.totalCacheBytes == 0L
+                (!includeAppCache || (appCache.accessGranted && appCache.totalCacheBytes == 0L))
             ) {
                 item {
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
@@ -730,6 +1273,15 @@ private fun ScanResults(
             }
         }
     }
+}
+
+@StringRes
+private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
+    ScanFocus.SMART -> R.string.scan_focus_smart
+    ScanFocus.JUNK -> R.string.scan_focus_junk
+    ScanFocus.DUPLICATES -> R.string.scan_focus_duplicates
+    ScanFocus.LARGE_FILES -> R.string.scan_focus_large
+    ScanFocus.WHATSAPP -> R.string.scan_focus_whatsapp
 }
 
 @Composable
@@ -869,6 +1421,7 @@ private fun categoryIcon(category: CleanCategory): ImageVector = when (category)
     CleanCategory.OLD_DOWNLOAD -> Icons.Outlined.Folder
     CleanCategory.APK_PACKAGE -> Icons.Outlined.Android
     CleanCategory.APP_CACHE -> Icons.Outlined.CleaningServices
+    CleanCategory.WHATSAPP_MEDIA -> Icons.Outlined.Chat
 }
 
 @Composable
@@ -881,7 +1434,6 @@ private fun ToolsScreen(
     onOpenPackageStorageDetails: (String) -> Unit,
     onOpenUsageAccessSettings: () -> Unit,
     onOpenStorageSettings: () -> Unit,
-    onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -966,14 +1518,6 @@ private fun ToolsScreen(
                 subtitle = stringResource(R.string.storage_settings_subtitle),
                 icon = Icons.Outlined.Storage,
                 onClick = onOpenStorageSettings,
-            )
-        }
-        item {
-            ToolRow(
-                title = stringResource(R.string.language_settings),
-                subtitle = stringResource(R.string.language_settings_subtitle),
-                icon = Icons.Outlined.Language,
-                onClick = onOpenLanguageSettings,
             )
         }
         if (privacyOptionsRequired) {

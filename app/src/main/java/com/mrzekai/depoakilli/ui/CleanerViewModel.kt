@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
@@ -8,7 +9,9 @@ import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.MemorySnapshot
+import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,13 +32,15 @@ data class CleanerUiState(
     val scanningAppCaches: Boolean = false,
     val optimizingMemory: Boolean = false,
     val lastScanCompleted: Boolean = false,
+    val scanFocus: ScanFocus = ScanFocus.SMART,
+    val hasWhatsAppAccess: Boolean = false,
     val message: String? = null,
 )
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = DeviceRepository(application)
     private val _state = MutableStateFlow(CleanerUiState())
-    private var pendingDeletionBytes = 0L
+    private var pendingDeletionItems: List<CleanableItem> = emptyList()
     private var appCacheRefreshJob: Job? = null
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
@@ -51,6 +56,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 storage = repository.storageSnapshot(),
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
+                hasWhatsAppAccess = repository.hasWhatsAppTreeAccess(),
             )
         }
     }
@@ -71,17 +77,29 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun scan(limitedAccess: Boolean) {
+    fun scan(
+        limitedAccess: Boolean,
+        focus: ScanFocus = ScanFocus.SMART,
+    ) {
         if (_state.value.scanning) return
         appCacheRefreshJob?.cancel()
         _state.update {
-            it.copy(scanning = true, scanningAppCaches = true, message = null)
+            it.copy(
+                scanning = true,
+                scanningAppCaches = focus == ScanFocus.SMART,
+                scanFocus = focus,
+                message = null,
+            )
         }
         viewModelScope.launch {
             runCatching {
-                val summary = repository.scan(limitedAccess)
-                val appCache = runCatching { repository.appCacheSnapshot() }
-                    .getOrDefault(_state.value.appCache)
+                val summary = repository.scan(limitedAccess, focus)
+                val appCache = if (focus == ScanFocus.SMART) {
+                    runCatching { repository.appCacheSnapshot() }
+                        .getOrDefault(_state.value.appCache)
+                } else {
+                    _state.value.appCache
+                }
                 summary to appCache
             }
                 .onSuccess { (summary, appCache) ->
@@ -94,6 +112,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                             lastScanCompleted = true,
                             storage = repository.storageSnapshot(),
                             memory = repository.memorySnapshot(),
+                            hasWhatsAppAccess = repository.hasWhatsAppTreeAccess(),
                         )
                     }
                 }
@@ -107,6 +126,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
         }
+    }
+
+    fun connectWhatsAppFolder(uri: Uri): Boolean {
+        val accepted = repository.saveWhatsAppTree(uri)
+        _state.update {
+            it.copy(
+                hasWhatsAppAccess = accepted && repository.hasWhatsAppTreeAccess(),
+                message = if (accepted) null else {
+                    getApplication<Application>().getString(R.string.message_whatsapp_folder_invalid)
+                },
+            )
+        }
+        return accepted
     }
 
     fun toggleItem(id: String) {
@@ -146,18 +178,20 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }
             return
         }
-        pendingDeletionBytes = selected.sumOf { it.sizeBytes }
+        pendingDeletionItems = selected
         viewModelScope.launch {
             val cacheSelected = selected.any { it.uri == DeviceRepository.APP_CACHE_URI }
             if (cacheSelected) repository.clearOwnCache()
             val plan = repository.createDeleteRequest(selected)
             when (plan) {
                 is DeviceRepository.DeletePlan.Completed -> {
-                    completeCleanup(true)
+                    val documentResult = repository.deleteDocumentItems(selected)
+                    finishCleanup(selected, documentResult)
                     onCleanupCompleted()
                 }
                 DeviceRepository.DeletePlan.NoMediaFiles -> {
-                    completeCleanup(true)
+                    val documentResult = repository.deleteDocumentItems(selected)
+                    finishCleanup(selected, documentResult)
                     onCleanupCompleted()
                 }
                 is DeviceRepository.DeletePlan.RequiresConsent -> onPlanReady(plan)
@@ -167,23 +201,46 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun completeCleanup(approved: Boolean) {
         if (!approved) {
-            pendingDeletionBytes = 0L
+            pendingDeletionItems = emptyList()
             _state.update {
                 it.copy(message = getApplication<Application>().getString(R.string.message_cleanup_cancelled))
             }
             return
         }
-        val selectedIds = _state.value.summary.selectedItems.mapTo(hashSetOf()) { it.id }
+        val items = pendingDeletionItems
+        viewModelScope.launch {
+            val documentResult = repository.deleteDocumentItems(items)
+            finishCleanup(items, documentResult)
+        }
+    }
+
+    private fun finishCleanup(
+        items: List<CleanableItem>,
+        documentResult: DeviceRepository.DocumentDeleteResult = DeviceRepository.DocumentDeleteResult(
+            attemptedIds = emptySet(),
+            deletedIds = emptySet(),
+        ),
+    ) {
+        val allIds = items.mapTo(hashSetOf()) { it.id }
+        val nonDocumentIds = allIds - documentResult.attemptedIds
+        val removedIds = nonDocumentIds + documentResult.deletedIds
+        val failedDocumentCount = documentResult.attemptedIds.size - documentResult.deletedIds.size
         _state.update { state ->
             state.copy(
-                summary = state.summary.copy(items = state.summary.items.filterNot { it.id in selectedIds }),
+                summary = state.summary.copy(items = state.summary.items.filterNot { it.id in removedIds }),
                 storage = repository.storageSnapshot(),
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
-                message = getApplication<Application>().getString(R.string.message_cleanup_complete),
+                message = getApplication<Application>().getString(
+                    if (failedDocumentCount == 0) {
+                        R.string.message_cleanup_complete
+                    } else {
+                        R.string.message_cleanup_partial
+                    },
+                ),
             )
         }
-        pendingDeletionBytes = 0L
+        pendingDeletionItems = emptyList()
     }
 
     fun consumeMessage() {
@@ -193,7 +250,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun optimizeMemory(releaseHeavyResources: () -> Unit) {
         if (_state.value.scanning || _state.value.optimizingMemory) return
         val before = repository.memorySnapshot()
-        pendingDeletionBytes = 0L
+        pendingDeletionItems = emptyList()
         _state.update {
             it.copy(
                 summary = ScanSummary(),

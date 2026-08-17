@@ -16,6 +16,7 @@ import android.os.Environment
 import android.os.Process
 import android.os.StatFs
 import android.os.storage.StorageManager
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AiAssessment
@@ -26,6 +27,7 @@ import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanSummary
+import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import java.io.File
 import java.io.FileInputStream
@@ -41,6 +43,7 @@ class DeviceRepository(
     private val aiEngine: AiCleaningEngine = AiCleaningEngine(),
 ) {
     private val resolver = context.contentResolver
+    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 
     fun storageSnapshot(): StorageSnapshot {
         val stats = StatFs(Environment.getDataDirectory().absolutePath)
@@ -66,6 +69,24 @@ class DeviceRepository(
 
     fun ownCacheSize(): Long = directorySize(context.cacheDir) +
         (context.externalCacheDir?.let(::directorySize) ?: 0L)
+
+    fun saveWhatsAppTree(uri: Uri): Boolean {
+        val treeId = runCatching { DocumentsContract.getTreeDocumentId(uri) }
+            .getOrNull()
+            ?.lowercase()
+            ?: return false
+        if (!treeId.contains("whatsapp") && !treeId.contains("com.whatsapp")) return false
+        preferences.edit().putString(KEY_WHATSAPP_TREE_URI, uri.toString()).apply()
+        return true
+    }
+
+    fun hasWhatsAppTreeAccess(): Boolean {
+        val stored = preferences.getString(KEY_WHATSAPP_TREE_URI, null) ?: return false
+        val uri = runCatching { Uri.parse(stored) }.getOrNull() ?: return false
+        return resolver.persistedUriPermissions.any { permission ->
+            permission.uri == uri && permission.isReadPermission && permission.isWritePermission
+        }
+    }
 
     @Suppress("DEPRECATION")
     fun hasUsageAccess(): Boolean {
@@ -156,11 +177,30 @@ class DeviceRepository(
         before - ownCacheSize()
     }
 
-    suspend fun scan(limitedAccess: Boolean): ScanSummary = withContext(Dispatchers.IO) {
+    suspend fun scan(
+        limitedAccess: Boolean,
+        focus: ScanFocus = ScanFocus.SMART,
+    ): ScanSummary = withContext(Dispatchers.IO) {
         val indexed = buildList {
-            addAll(queryCollection(MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
-            addAll(queryCollection(MediaStore.Video.Media.EXTERNAL_CONTENT_URI))
-            addAll(queryDownloads())
+            when (focus) {
+                ScanFocus.SMART, ScanFocus.DUPLICATES -> {
+                    addAll(queryCollection(MediaStore.Images.Media.EXTERNAL_CONTENT_URI))
+                    addAll(queryCollection(MediaStore.Video.Media.EXTERNAL_CONTENT_URI))
+                    addAll(queryDownloads())
+                    addAll(queryWhatsAppFiles())
+                }
+
+                ScanFocus.JUNK -> {
+                    addAll(queryDownloads())
+                    addAll(queryWhatsAppFiles())
+                }
+
+                ScanFocus.LARGE_FILES -> {
+                    addAll(queryCollection(MediaStore.Video.Media.EXTERNAL_CONTENT_URI))
+                }
+
+                ScanFocus.WHATSAPP -> addAll(queryWhatsAppFiles())
+            }
         }.distinctBy(IndexedFile::uri)
 
         val assessed = indexed.mapNotNull { file ->
@@ -168,9 +208,14 @@ class DeviceRepository(
             aiEngine.assess(file)?.let { assessment -> file.toCleanable(assessment) }
         }.toMutableList()
 
-        assessed += findDuplicates(indexed)
+        if (focus == ScanFocus.SMART || focus == ScanFocus.DUPLICATES) {
+            assessed += findDuplicates(indexed)
+        }
         val cacheBytes = ownCacheSize()
-        if (cacheBytes > MIN_CACHE_SUGGESTION_BYTES) {
+        if (
+            cacheBytes > MIN_CACHE_SUGGESTION_BYTES &&
+            (focus == ScanFocus.SMART || focus == ScanFocus.JUNK)
+        ) {
             assessed += CleanableItem(
                 id = "app-cache",
                 uri = APP_CACHE_URI,
@@ -188,8 +233,18 @@ class DeviceRepository(
             )
         }
 
+        val focusedItems = assessed.filter { item ->
+            when (focus) {
+                ScanFocus.SMART -> true
+                ScanFocus.JUNK -> item.assessment.category in JUNK_CATEGORIES
+                ScanFocus.DUPLICATES -> item.assessment.category == CleanCategory.DUPLICATE
+                ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_VIDEO
+                ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
+            }
+        }
+
         ScanSummary(
-            items = assessed
+            items = focusedItems
                 .sortedWith(compareByDescending<CleanableItem> { it.assessment.safetyScore }.thenByDescending { it.sizeBytes })
                 .distinctBy(CleanableItem::uri)
                 .take(MAX_SUGGESTIONS),
@@ -199,8 +254,8 @@ class DeviceRepository(
     }
 
     fun createDeleteRequest(items: List<CleanableItem>): DeletePlan {
-        val mediaItems = items
-            .filterNot { it.uri == APP_CACHE_URI }
+        val contentItems = items.filterNot { it.uri == APP_CACHE_URI }
+        val mediaItems = contentItems.filterNot(::isDocumentItem)
         val mediaUris = mediaItems
             .map { Uri.parse(it.uri) }
 
@@ -218,6 +273,26 @@ class DeviceRepository(
         }
         return DeletePlan.Completed(deletedBytes)
     }
+
+    fun isDocumentItem(item: CleanableItem): Boolean = runCatching {
+        DocumentsContract.isDocumentUri(context, Uri.parse(item.uri))
+    }.getOrDefault(false)
+
+    suspend fun deleteDocumentItems(items: List<CleanableItem>): DocumentDeleteResult =
+        withContext(Dispatchers.IO) {
+            val documentItems = items.filter(::isDocumentItem)
+            val deletedIds = documentItems.mapNotNullTo(hashSetOf()) { item ->
+                coroutineContext.ensureActive()
+                val deleted = runCatching {
+                    DocumentsContract.deleteDocument(resolver, Uri.parse(item.uri))
+                }.getOrDefault(false)
+                item.id.takeIf { deleted }
+            }
+            DocumentDeleteResult(
+                attemptedIds = documentItems.mapTo(hashSetOf(), CleanableItem::id),
+                deletedIds = deletedIds,
+            )
+        }
 
     private fun queryCollection(collection: Uri): List<IndexedFile> {
         val pathColumn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -241,6 +316,84 @@ class DeviceRepository(
         return runCatching {
             queryCollection(MediaStore.Downloads.EXTERNAL_CONTENT_URI)
         }.getOrDefault(emptyList())
+    }
+
+    private fun queryWhatsAppFiles(): List<IndexedFile> {
+        val stored = preferences.getString(KEY_WHATSAPP_TREE_URI, null) ?: return emptyList()
+        val treeUri = runCatching { Uri.parse(stored) }.getOrNull() ?: return emptyList()
+        if (!hasWhatsAppTreeAccess()) return emptyList()
+        val rootDocumentId = runCatching { DocumentsContract.getTreeDocumentId(treeUri) }
+            .getOrNull()
+            ?: return emptyList()
+        val output = ArrayList<IndexedFile>()
+        val pending = ArrayDeque<WhatsAppDirectory>()
+        pending.add(WhatsAppDirectory(rootDocumentId, "WhatsApp", 0))
+        val projection = arrayOf(
+            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+            DocumentsContract.Document.COLUMN_MIME_TYPE,
+            DocumentsContract.Document.COLUMN_SIZE,
+            DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+        )
+
+        while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
+            val directory = pending.removeFirst()
+            val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+                treeUri,
+                directory.documentId,
+            )
+            runCatching {
+                resolver.query(childrenUri, projection, null, null, null)?.use { cursor ->
+                    val idColumn = cursor.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                    )
+                    val nameColumn = cursor.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+                    )
+                    val mimeColumn = cursor.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_MIME_TYPE,
+                    )
+                    val sizeColumn = cursor.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_SIZE,
+                    )
+                    val modifiedColumn = cursor.getColumnIndexOrThrow(
+                        DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+                    )
+                    while (cursor.moveToNext() && output.size < MAX_WHATSAPP_FILES) {
+                        val documentId = cursor.getString(idColumn)
+                        val name = cursor.getString(nameColumn).orEmpty().ifBlank {
+                            context.getString(R.string.unnamed_file)
+                        }
+                        val mimeType = cursor.getString(mimeColumn).orEmpty()
+                        val path = "${directory.relativePath}/$name"
+                        if (
+                            mimeType == DocumentsContract.Document.MIME_TYPE_DIR &&
+                            directory.depth < MAX_WHATSAPP_DEPTH
+                        ) {
+                            pending.add(
+                                WhatsAppDirectory(documentId, path, directory.depth + 1),
+                            )
+                        } else if (mimeType != DocumentsContract.Document.MIME_TYPE_DIR) {
+                            val size = cursor.getLong(sizeColumn).coerceAtLeast(0L)
+                            if (size > 0L) {
+                                output += IndexedFile(
+                                    uri = DocumentsContract.buildDocumentUriUsingTree(
+                                        treeUri,
+                                        documentId,
+                                    ).toString(),
+                                    name = name,
+                                    sizeBytes = size,
+                                    mimeType = mimeType,
+                                    modifiedAtMillis = cursor.getLong(modifiedColumn).coerceAtLeast(0L),
+                                    relativePath = path,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return output
     }
 
     private fun query(
@@ -362,9 +515,18 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
+    data class DocumentDeleteResult(
+        val attemptedIds: Set<String>,
+        val deletedIds: Set<String>,
+    )
+
     companion object {
         const val APP_CACHE_URI = "app-cache://internal"
+        private const val PREFERENCES_NAME = "cleaner_access"
+        private const val KEY_WHATSAPP_TREE_URI = "whatsapp_tree_uri"
         private const val MAX_FILES_PER_COLLECTION = 4_000
+        private const val MAX_WHATSAPP_FILES = 4_000
+        private const val MAX_WHATSAPP_DEPTH = 8
         private const val MAX_SUGGESTIONS = 500
         private const val MAX_DUPLICATE_GROUP = 20
         private const val MAX_HASH_GROUPS = 100
@@ -372,5 +534,17 @@ class DeviceRepository(
         private const val MIN_DUPLICATE_BYTES = 32L * 1024L
         private const val MAX_HASH_BYTES = 40L * 1024L * 1024L
         private const val MIN_CACHE_SUGGESTION_BYTES = 1L * 1024L * 1024L
+        private val JUNK_CATEGORIES = setOf(
+            CleanCategory.OLD_DOWNLOAD,
+            CleanCategory.APK_PACKAGE,
+            CleanCategory.APP_CACHE,
+            CleanCategory.WHATSAPP_MEDIA,
+        )
     }
+
+    private data class WhatsAppDirectory(
+        val documentId: String,
+        val relativePath: String,
+        val depth: Int,
+    )
 }

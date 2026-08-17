@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Akıllı Temizleyici</string>
-    <string name="app_tagline">AI TELEFON TEMİZLEYİCİ</string>
+    <string name="app_tagline">HIZLI • GÜVENLİ • CİHAZ İÇİNDE</string>
 
     <string name="tab_home">Ana Sayfa</string>
-    <string name="tab_clean">AI Temizlik</string>
+    <string name="tab_clean">Temizlik</string>
     <string name="tab_tools">Araçlar</string>
 
-    <string name="scan_primary">AI AKILLI TARAMAYI BAŞLAT</string>
+    <string name="scan_primary">AKILLI TEMİZLİĞİ BAŞLAT</string>
     <string name="scan_primary_subtitle">Güvenli önerileri cihazında analiz et</string>
     <string name="cleaning_center">Temizlik merkezi</string>
     <string name="photos">Fotoğraflar</string>
@@ -22,6 +22,44 @@
     <string name="app_cache_quick_subtitle">%1$s geçici dosya</string>
     <string name="memory_tools_quick">RAM optimizasyonu</string>
     <string name="memory_tools_quick_subtitle">Geçici uygulama belleğini serbest bırak</string>
+
+    <string name="smart_clean_ready">AKILLI TEMİZLİK</string>
+    <string name="smart_clean_title">Telefonun Hazır</string>
+    <string name="smart_clean_subtitle">Çöp, kopya ve büyük dosyaları tek taramada bul</string>
+    <string name="smart_clean_action">ŞİMDİ TARA</string>
+    <string name="smart_clean_scanning">TARANIYOR</string>
+    <string name="smart_clean_scanning_title">Telefonun taranıyor</string>
+    <string name="smart_scan_home_action">AKILLI TARAMA</string>
+    <string name="hero_performance">Daha fazla alan, daha hızlı performans.</string>
+    <string name="home_storage_label">Depolama</string>
+    <string name="home_storage_percent">%%%1$d</string>
+    <string name="home_ram_label">RAM boş</string>
+    <string name="reclaim_space">Alanını Geri Kazan</string>
+    <string name="junk_home_subtitle">Gereksiz dosyaları temizle ve alan aç.</string>
+    <string name="ram_available_home">%1$s kullanılabilir</string>
+    <string name="duplicates_home_subtitle">Aynı dosyaların kopyalarını bul ve sil.</string>
+    <string name="whatsapp_home_subtitle">Gereksiz medya dosyalarını incele ve temizle.</string>
+    <string name="large_files_home_subtitle">Büyük boyutlu dosyaları bul ve yer aç.</string>
+    <string name="cache_home_subtitle">Önbellek kullanımını ölç ve güvenle yönet.</string>
+    <string name="cache_home_measured">%1$s önbellek ölçüldü; uygulamaları incele.</string>
+    <string name="device_overview">Cihaz özeti</string>
+    <string name="storage_short">%1$s boş</string>
+    <string name="ram_short">%1$s RAM boş</string>
+    <string name="cleaning_tools_title">Temizlik araçları</string>
+    <string name="cleaning_tools_subtitle">Her araç ayrı ve hedef odaklı bir işlem yapar</string>
+    <string name="junk_cleaner_title">Çöp Temizliği</string>
+    <string name="junk_cleaner_subtitle">Önbellek, eski indirmeler ve APK kalıntıları</string>
+    <string name="ram_booster_title">RAM Hızlandır</string>
+    <string name="ram_booster_subtitle">Geçici uygulama belleğini bırak ve RAM’i yeniden ölç</string>
+    <string name="duplicates_tool_title">Kopyaları Sil</string>
+    <string name="duplicates_tool_subtitle">İçerik parmak iziyle birebir kopyaları bul</string>
+    <string name="whatsapp_cleaner_title">WhatsApp Temizleyici</string>
+    <string name="whatsapp_cleaner_subtitle">Medya klasörünü bağla ve geçici öğeleri incele</string>
+    <string name="whatsapp_cleaner_connected">Klasör bağlı • geçici medyayı tara</string>
+    <string name="large_files_tool_title">Büyük Dosyalar</string>
+    <string name="large_files_tool_subtitle">En çok alan kullanan videoları incele</string>
+    <string name="cache_tool_title">Uygulama Önbelleği</string>
+    <string name="cache_tool_subtitle">Önbelleği ölç ve Android temizlik kontrollerini aç</string>
 
     <string name="storage_full">DOLU</string>
     <string name="phone_storage">Telefon depolaması</string>
@@ -39,12 +77,13 @@
     <string name="last_scan">Son tarama</string>
     <string name="last_scan_summary">%1$d öneri • %2$s</string>
 
-    <string name="scan_in_progress">AI dosyaları analiz ediyor…</string>
+    <string name="scan_in_progress">Akıllı Temizleyici dosyaları analiz ediyor…</string>
     <string name="scan_private">İçerik cihazından çıkmıyor</string>
-    <string name="safe_ai_cleaning">Güvenli AI temizlik</string>
+    <string name="safe_ai_cleaning">Güvenli akıllı temizlik</string>
     <string name="safe_ai_cleaning_description">Dosya yaşı, boyutu, türü ve içerik parmak izleri cihazında analiz edilir. Son kararı her zaman sen verirsin.</string>
     <string name="start_scan">Taramayı başlat</string>
     <string name="grant_and_scan">Erişim ver ve tara</string>
+    <string name="enable_media_scan">Fotoğraf ve video taramasını etkinleştir</string>
     <string name="limited_access_notice">Sınırlı erişim: yalnızca izin verdiğin medya analiz edildi.</string>
     <string name="cleanable_space">TEMİZLENEBİLİR ALAN</string>
     <string name="scan_stats">%1$d dosya tarandı • %2$d öğe seçili</string>
@@ -77,6 +116,11 @@
     <string name="media_cleanup_subtitle">Birebir kopyaları, büyük videoları, eski indirilenleri ve APK paketlerini bul</string>
     <string name="space_found">BULUNAN ALAN</string>
     <string name="scan_space_breakdown">%1$s seçilebilir dosya • %2$s incelenecek uygulama önbelleği</string>
+    <string name="scan_focus_smart">Akıllı temizlik sonucu</string>
+    <string name="scan_focus_junk">Çöp temizliği sonucu</string>
+    <string name="scan_focus_duplicates">Kopya taraması sonucu</string>
+    <string name="scan_focus_large">Büyük dosya taraması sonucu</string>
+    <string name="scan_focus_whatsapp">WhatsApp temizliği sonucu</string>
 
     <string name="tools_title">Cihaz araçları</string>
     <string name="tools_subtitle">Gerçek Android kontrolleri ve güvenli cihaz içi temizlik.</string>
@@ -102,10 +146,12 @@
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
     <string name="message_cleanup_cancelled">Temizlik işlemi iptal edildi.</string>
     <string name="message_cleanup_complete">Temizlik tamamlandı.</string>
+    <string name="message_cleanup_partial">Temizlik tamamlandı; ancak Android seçilen bazı dosyaları silemedi.</string>
     <string name="message_cache_cleared">%1$s geçici uygulama önbelleği temizlendi.</string>
     <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
     <string name="message_memory_optimized">Bu uygulamanın %1$s belleği serbest bırakıldı • %2$s RAM kullanılabilir</string>
     <string name="message_memory_optimized_stable">Geçici uygulama belleği serbest bırakıldı • %1$s RAM kullanılabilir</string>
+    <string name="message_whatsapp_folder_invalid">WhatsApp veya WhatsApp Business Medya klasörünü seçin.</string>
 
     <string name="category_duplicates">Yinelenenler</string>
     <string name="category_duplicates_description">Aynı içeriğin gereksiz kopyaları</string>
@@ -119,6 +165,8 @@
     <string name="category_apk_packages_description">Kurulumdan kalan paketler</string>
     <string name="category_app_cache">Önbellek</string>
     <string name="category_app_cache_description">Güvenli geçici uygulama dosyaları</string>
+    <string name="category_whatsapp">WhatsApp medyası</string>
+    <string name="category_whatsapp_description">Geçici durumlar ve eski gönderilen medya kopyaları</string>
 
     <string name="reason_old_installer">%1$d günlük kurulum paketi</string>
     <string name="reason_downloaded_installer">İndirilen kurulum paketi</string>
@@ -130,5 +178,7 @@
     <string name="cache_item_name">Akıllı Temizleyici önbelleği</string>
     <string name="cache_item_path">Uygulama önbelleği</string>
     <string name="reason_safe_cache">Silinmesi güvenli geçici dosyalar</string>
+    <string name="reason_whatsapp_status">Geçici WhatsApp durum dosyası</string>
+    <string name="reason_whatsapp_sent">%1$d gün önce gönderilmiş medya kopyası; silmeden önce inceleyin</string>
     <string name="unnamed_file">Adsız dosya</string>
 </resources>

@@ -34,7 +34,7 @@ Record the device model, Android version, app version, and result for every run.
 - Clear app data, launch twice, and confirm no App Open ad is shown.
 - On the third foreground transition, confirm a Google test App Open ad may appear if loaded; app startup must continue if it is unavailable.
 - Confirm a second App Open ad cannot appear within two hours.
-- Confirm Home, AI Clean, and Tools show one anchored 320×50 banner above navigation and no 300×250 MREC.
+- Confirm Home, Clean, and Tools show one anchored 320×50 banner above navigation and no 300×250 MREC.
 - Deny UMP consent where applicable and confirm the implementation follows the resulting `canRequestAds` state.
 
 ## Localization and resilience

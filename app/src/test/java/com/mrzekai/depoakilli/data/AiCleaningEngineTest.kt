@@ -57,6 +57,36 @@ class AiCleaningEngineTest {
         assertTrue(requireNotNull(result).recommended)
     }
 
+    @Test
+    fun `whatsapp status is a safe temporary recommendation`() {
+        val result = engine.assess(
+            file(
+                "status.jpg",
+                "image/jpeg",
+                1,
+                "WhatsApp/Media/.Statuses/",
+            ),
+        )
+
+        assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
+        assertTrue(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `old whatsapp sent media is visible but not preselected`() {
+        val result = engine.assess(
+            file(
+                "sent-video.mp4",
+                "video/mp4",
+                45,
+                "WhatsApp/Media/WhatsApp Video/Sent/",
+            ),
+        )
+
+        assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
+        assertFalse(requireNotNull(result).recommended)
+    }
+
     private fun file(
         name: String,
         mime: String,

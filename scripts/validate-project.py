@@ -38,6 +38,7 @@ required = [
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
     "docs/AD_PLACEMENTS.md",
+    "docs/HOME_DESIGN.md",
     "docs/QA_SIGNING.md",
     "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
@@ -100,6 +101,8 @@ for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
     "targetSdk = 36",
     "compileSdk = 36",
+    "versionCode = 4",
+    'versionName = "0.3.0"',
     "validateReleaseAds",
     'buildConfigField("String", "ADMOB_MEDIUM_RECTANGLE_ID"',
     'buildConfigField("String", "ADMOB_APP_OPEN_ID"',
@@ -198,11 +201,11 @@ for expected in (
     "continue-on-error: true",
     "app/build/reports/lint-results-debug.txt",
     "Enforce lint and APK build results",
-    "Verify stable QA signing certificate",
+    "Verify stable test signing certificate",
     "id: signing",
     "bash scripts/verify-qa-signing.sh app/build/outputs/apk/debug/app-debug.apk",
     "SIGNING_OUTCOME: ${{ steps.signing.outcome }}",
-    "depoakilli-qa-apk-${{ github.run_number }}",
+    "depoakilli-test-apk-${{ github.run_number }}",
 ):
     if expected not in workflow_text:
         errors.append(f"missing CI invariant: {expected}")
@@ -285,6 +288,11 @@ cleaner_app_text = (
 ).read_text(encoding="utf-8")
 for expected in (
     "val showAnchoredBanner = adsCanBeShown",
+    "ModernHomeHero(",
+    "HomeToolMasonry(",
+    "HomeToolRow(",
+    "R.string.smart_scan_home_action",
+    "R.string.whatsapp_home_subtitle",
     "CacheManagerPanel(",
     "AppCacheRow(",
 ):
@@ -296,12 +304,19 @@ if "MediumRectangleAd(" in cleaner_app_text:
 
 styles_text = (ROOT / "app/src/main/res/values/styles.xml").read_text(encoding="utf-8")
 styles_v27_text = (ROOT / "app/src/main/res/values-v27/styles.xml").read_text(encoding="utf-8")
-if '<item name="android:windowLightStatusBar">true</item>' not in styles_text:
-    errors.append("base theme must keep light status-bar icons for API 23+")
-if '<item name="android:windowLightNavigationBar">true</item>' in styles_text:
-    errors.append("API 27 light navigation-bar attribute must not be in the base theme")
+if '<item name="android:windowLightStatusBar">false</item>' not in styles_text:
+    errors.append("base theme must keep light status-bar content on the dark background")
+if '<item name="android:windowLightNavigationBar">' in styles_text:
+    errors.append("API 27 navigation-bar appearance must not be in the base theme")
 if '<item name="android:windowLightNavigationBar">true</item>' not in styles_v27_text:
-    errors.append("values-v27 theme must enable light navigation-bar icons")
+    errors.append("values-v27 theme must use dark navigation-bar icons on the white navigation surface")
+
+for debug_strings in (
+    ROOT / "app/src/debug/res/values/strings.xml",
+    ROOT / "app/src/debug/res/values-tr/strings.xml",
+):
+    if debug_strings.is_file() and "QA" in debug_strings.read_text(encoding="utf-8"):
+        errors.append(f"visible debug app label must not contain QA: {debug_strings.relative_to(ROOT)}")
 
 for kotlin_file in (ROOT / "app/src").rglob("*.kt"):
     kotlin_text = kotlin_file.read_text(encoding="utf-8")

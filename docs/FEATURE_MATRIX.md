@@ -15,6 +15,7 @@
 | Ekran görüntüsü temizliği | Evet | MediaStore + yaş/kaynak sinyalleri |
 | Büyük video temizliği | Evet | MediaStore + boyut/yaş sinyalleri |
 | Tam yinelenen dosya | Evet | Boyut ön elemesi + tam SHA-256 |
+| WhatsApp geçici medya temizliği | Evet | Kullanıcının Android klasör seçicisiyle bağladığı Media klasöründe durumlar ve eski Sent kopyaları; kullanıcı seçimiyle silme |
 | Benzer fakat aynı olmayan fotoğraf | Sıradaki faz | Algısal hash ve kalite puanı |
 | Toplu silme | Evet | Android 11+ `MediaStore.createDeleteRequest` |
 | Fotoğraf/video sıkıştırma | Sıradaki faz | Media3/codec tabanlı, önizlemeli |
@@ -23,7 +24,7 @@
 | İngilizce/Türkçe arayüz | Evet | İngilizce varsayılan, `values-tr` Türkçe |
 | App Open reklamı | Evet | Üçüncü ön plan gelişinden sonra, iki saat sıklık sınırı |
 
-## AI motoru
+## Akıllı öneri motoru
 
 İlk sürüm, dosyaları bir sunucuya yüklemeyen açıklanabilir bir puanlama motoru kullanır:
 
@@ -35,4 +36,4 @@
 - tam içerik parmak izi;
 - yakın zamanda oluşturulan dosyalara koruma cezası.
 
-Her öneri kullanıcıya neden gösterir ve güven puanı verir. “AI” hiçbir zaman otomatik/sessiz silme anlamına gelmez.
+Her öneri kullanıcıya neden gösterir ve güven puanı verir. “Akıllı” ifadesi hiçbir zaman otomatik veya sessiz silme anlamına gelmez.

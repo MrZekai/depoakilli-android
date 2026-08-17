@@ -25,19 +25,41 @@ import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
+import com.mrzekai.depoakilli.model.ScanFocus
 
 class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
     private var permissionRevision by mutableIntStateOf(0)
+    private var pendingMediaScanFocus = ScanFocus.SMART
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) {
         permissionRevision++
         if (hasAnyMediaAccess()) {
-            cleanerViewModel.scan(limitedAccess = !hasFullMediaAccess())
+            cleanerViewModel.scan(
+                limitedAccess = hasLimitedMediaAccess(),
+                focus = pendingMediaScanFocus,
+            )
+        }
+    }
+
+    private val whatsappFolderLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocumentTree(),
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        val persisted = runCatching {
+            contentResolver.takePersistableUriPermission(uri, flags)
+        }.isSuccess
+        if (persisted && cleanerViewModel.connectWhatsAppFolder(uri)) {
+            cleanerViewModel.scan(
+                limitedAccess = hasLimitedMediaAccess(),
+                focus = ScanFocus.WHATSAPP,
+            )
         }
     }
 
@@ -74,6 +96,7 @@ class MainActivity : ComponentActivity() {
                     canRequestAds = canRequestAds,
                     privacyOptionsRequired = consentManager.privacyOptionsRequired,
                     onRequestMediaAccess = ::requestMediaAccess,
+                    onRequestWhatsAppAccess = ::requestWhatsAppFolder,
                     onPrepareCleanup = {
                         cleanerViewModel.prepareCleanup(
                             onPlanReady = { plan ->
@@ -99,7 +122,6 @@ class MainActivity : ComponentActivity() {
                     onOpenPackageStorageDetails = ::openPackageStorageDetails,
                     onOpenUsageAccessSettings = ::openUsageAccessSettings,
                     onOpenStorageSettings = ::openStorageSettings,
-                    onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = { consentManager.showPrivacyOptions(this) },
                 )
             }
@@ -114,8 +136,15 @@ class MainActivity : ComponentActivity() {
         if (::interstitialAds.isInitialized) interstitialAds.load()
     }
 
-    private fun requestMediaAccess() {
+    private fun requestMediaAccess(focus: ScanFocus) {
+        pendingMediaScanFocus = focus
         permissionLauncher.launch(requiredMediaPermissions())
+    }
+
+    private fun requestWhatsAppFolder() {
+        val initialUri = Uri.parse(WHATSAPP_MEDIA_INITIAL_URI)
+        runCatching { whatsappFolderLauncher.launch(initialUri) }
+            .onFailure { whatsappFolderLauncher.launch(null) }
     }
 
     private fun requiredMediaPermissions(): Array<String> = when {
@@ -184,18 +213,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun openLanguageSettings() {
-        val appLanguageIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Intent(
-                Settings.ACTION_APP_LOCALE_SETTINGS,
-                Uri.parse("package:$packageName"),
-            )
-        } else {
-            Intent(Settings.ACTION_LOCALE_SETTINGS)
-        }
-        startFirstAvailable(appLanguageIntent, Intent(Settings.ACTION_LOCALE_SETTINGS))
-    }
-
     private fun startFirstAvailable(vararg intents: Intent) {
         intents.firstOrNull { it.resolveActivity(packageManager) != null }?.let { intent ->
             runCatching { startActivity(intent) }
@@ -205,5 +222,11 @@ class MainActivity : ComponentActivity() {
                     }
                 }
         }
+    }
+
+    private companion object {
+        const val WHATSAPP_MEDIA_INITIAL_URI =
+            "content://com.android.externalstorage.documents/document/" +
+                "primary%3AAndroid%2Fmedia%2Fcom.whatsapp%2FWhatsApp%2FMedia"
     }
 }

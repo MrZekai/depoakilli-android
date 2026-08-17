@@ -13,6 +13,15 @@ enum class CleanCategory(
     OLD_DOWNLOAD(R.string.category_old_downloads, R.string.category_old_downloads_description),
     APK_PACKAGE(R.string.category_apk_packages, R.string.category_apk_packages_description),
     APP_CACHE(R.string.category_app_cache, R.string.category_app_cache_description),
+    WHATSAPP_MEDIA(R.string.category_whatsapp, R.string.category_whatsapp_description),
+}
+
+enum class ScanFocus {
+    SMART,
+    JUNK,
+    DUPLICATES,
+    LARGE_FILES,
+    WHATSAPP,
 }
 
 data class IndexedFile(

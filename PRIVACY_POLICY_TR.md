@@ -8,11 +8,13 @@ Akıllı Temizleyici, kullanıcının cihazındaki depolama alanını analiz ede
 
 Uygulama, kullanıcının izniyle fotoğraf ve video dosyalarının ad, boyut, tarih, tür ve içerik parmak izi gibi teknik özelliklerini işler. Bu bilgiler temizlik önerisi üretmek için cihaz üzerinde kullanılır.
 
+İsteğe bağlı WhatsApp Temizleyici, Android'in sistem klasör seçicisini kullanır. Kullanıcı WhatsApp veya WhatsApp Business Medya klasörünü açıkça seçer. Android yalnız seçilen klasör için kalıcı okuma/yazma erişimi verir. Geçici durum dosyaları ve eski gönderilen medya kopyaları cihaz üzerinde analiz edilir; geliştiriciye yüklenmez. Klasör erişimi Android Ayarları'ndan veya uygulama verileri temizlenerek kaldırılabilir.
+
 Android 8.0 ve üzerinde isteğe bağlı Uygulama Önbelleği Yöneticisi, Android'in sunduğu uygulama depolama istatistiklerini okuyabilmek için Kullanım Erişimi ister. Uygulama etiketi, paket adı ve bildirilen önbellek bayt toplamı yalnız cihazda işlenir; kişisel dosya içeriği okunmaz ve geliştiriciye yüklenmez. Paket görünürlüğü kullanıcı tarafından başlatılabilen uygulamalarla sınırlıdır; geniş `QUERY_ALL_PACKAGES` erişimi istenmez. Kullanım Erişimi Android Ayarları'ndan her zaman kaldırılabilir.
 
 ## Dosya silme
 
-Akıllı Temizleyici kullanıcı seçimi olmadan dosya silmez. Desteklenen Android sürümlerinde silme işlemi ayrıca Android'in sistem onay ekranından geçirilir. Başka bir uygulamanın önbelleği için Android'in resmî uygulama ayrıntıları ekranını açar; işlemi kullanıcı seçer.
+Akıllı Temizleyici kullanıcı seçimi olmadan dosya silmez. Desteklenen Android sürümlerinde MediaStore silme işlemi ayrıca Android'in sistem onay ekranından geçirilir. Android klasör seçicisiyle açıkça bağlanan klasördeki dosyalar yalnız sonuç listesinden kullanıcı tarafından seçildikten sonra silinir. Başka bir uygulamanın önbelleği için Android'in resmî uygulama ayrıntıları ekranını açar; işlemi kullanıcı seçer.
 
 ## Reklamlar
 

@@ -6,7 +6,7 @@ release AAB aynı uygulama değildir ve aynı anahtarı kullanmaz.
 ## QA APK
 
 - Paket kimliği: `com.mrzekai.depoakilli.qa`
-- Görünen ad: `Smart Cleaner QA` / `Akıllı Temizleyici QA`
+- Görünen ad: `Smart Cleaner` / `Akıllı Temizleyici`
 - Anahtar: `keystore/depoakilli-ci-qa.jks`
 - Sertifika SHA-256:
   `50:8E:01:21:97:DA:76:D5:16:BA:D2:48:80:B6:7C:6F:06:7F:CD:64:6C:51:A0:43:A1:1C:0C:34:5E:6E:AD:54`
@@ -15,6 +15,9 @@ QA anahtarı yalnız `.qa` paketini imzalar. Bu anahtar bilerek repoda tutulur;
 production veya Google Play anahtarı değildir. Böylece her GitHub Actions
 çalıştırması aynı sertifikayı kullanır ve yeni QA APK, önceki QA APK'nın üzerine
 veri silmeden güncelleme olarak kurulabilir.
+
+`QA` yalnız paket kimliğinde kalır; kullanıcıya görünen uygulama adına eklenmez.
+Test ve Play uygulaması cihazda yan yana bulunursa paket kimlikleri farklıdır.
 
 Eski CI APK'sı `com.mrzekai.depoakilli.debug` paketini kullanıyorsa yeni QA
 APK onun yanına kurulabilir; eski uygulamayı kaldırmak zorunlu değildir.
