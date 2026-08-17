@@ -3,7 +3,6 @@ package com.mrzekai.depoakilli.ads
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -30,31 +29,25 @@ fun BannerAd(
     canRequestAds: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
-        val context = LocalContext.current
-        val widthDp = maxWidth.value.toInt().coerceAtLeast(1)
-        val adSize = remember(context, widthDp) {
-            AdSize.getLargeAnchoredAdaptiveBannerAdSize(context, widthDp)
-        }
-        val reservedHeight = adSize.height.coerceAtLeast(50).dp
+    val context = LocalContext.current
+    val adSize = AdSize.BANNER
 
-        Box(
-            modifier = Modifier.fillMaxWidth().height(reservedHeight),
-            contentAlignment = Alignment.Center,
-        ) {
-            if (canRequestAds) {
-                val adView = remember(context, BuildConfig.ADMOB_BANNER_ID, adSize) {
-                    AdView(context).apply {
-                        adUnitId = BuildConfig.ADMOB_BANNER_ID
-                        setAdSize(adSize)
-                        loadAd(AdRequest.Builder().build())
-                    }
+    Box(
+        modifier = modifier.fillMaxWidth().height(50.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (canRequestAds) {
+            val adView = remember(context, BuildConfig.ADMOB_BANNER_ID) {
+                AdView(context).apply {
+                    adUnitId = BuildConfig.ADMOB_BANNER_ID
+                    setAdSize(adSize)
+                    loadAd(AdRequest.Builder().build())
                 }
-                DisposableEffect(adView) {
-                    onDispose { adView.destroy() }
-                }
-                AndroidView(factory = { adView })
             }
+            DisposableEffect(adView) {
+                onDispose { adView.destroy() }
+            }
+            AndroidView(factory = { adView })
         }
     }
 }

@@ -385,8 +385,8 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="dashboard_ram_available">%1$s available</string>
     <string name="smart_clean_results_title">Smart Clean Results</string>
     <string name="smart_clean_results_empty_intro">Run Smart Clean to see reviewable cleanup suggestions and a tappable storage breakdown.</string>
-    <string name="smart_scan_progress_title">Smart Cleaner is scanning your phone</string>
-    <string name="smart_scan_progress_subtitle">Checking junk, duplicates, large files, downloads, APKs and accessible media on this device.</string>
+    <string name="smart_scan_progress_title">Smart Clean scan in progress</string>
+    <string name="smart_scan_progress_subtitle">Analyzing junk, duplicates, large files, APKs and accessible media to build a safe cleanup plan.</string>
     <string name="smart_clean_suggestions_title">Cleanup suggestions</string>
     <string name="smart_clean_suggestions_subtitle">Each category shows a few items first. Open a category to review everything before deleting.</string>
     <string name="smart_clean_results_tap_hint">Tap to review exactly what will be deleted</string>
@@ -421,5 +421,34 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="message_cleanup_failed">Cleanup could not be completed. Nothing else was changed.</string>
 
     <string name="smart_cleanup_ad_notice">If an interstitial is ready, it appears after this confirmation. Cleanup starts automatically when the ad closes.</string>
+
+
+    <string name="smart_scan_live_title">Live scan</string>
+    <string name="smart_scan_files_label">Files found</string>
+    <string name="smart_scan_folders_label">Folders checked</string>
+    <string name="smart_scan_on_device_value">LOCAL</string>
+    <string name="smart_scan_on_device_label">On-device</string>
+    <string name="smart_scan_checking_title">Now checking</string>
+    <string name="smart_scan_media_stage">Media &amp; downloads</string>
+    <string name="smart_detail_selected_summary">%1$d of %2$d selected • %3$s</string>
+    <string name="smart_detail_grid_hint">Tap a card to preview it. Use the checkbox only to include or exclude it from cleanup.</string>
+    <string name="smart_detail_select_all">Select all</string>
+    <string name="smart_detail_unselect_all">Clear all selections</string>
+    <string name="smart_detail_selected_label">Selected for cleanup</string>
+    <string name="smart_detail_empty">No files were found in this category.</string>
+    <string name="done">Done</string>
+    <string name="smart_selection_remove_hint">This file will be deleted during cleanup. Tap to keep it.</string>
+    <string name="smart_selection_add_hint">This file is currently protected. Tap to include it in cleanup.</string>
+    <string name="smart_path_unknown">Location unavailable</string>
+    <string name="smart_file_type_image">Image</string>
+    <string name="smart_file_type_video">Video</string>
+    <string name="smart_file_type_audio">Audio</string>
+    <string name="smart_file_type_apk">APK</string>
+    <string name="smart_file_type_archive">Archive</string>
+    <string name="smart_file_type_document">Document</string>
+    <string name="smart_file_type_other">Other file</string>
+    <string name="smart_video_play">Play video</string>
+    <string name="smart_video_pause">Pause video</string>
+    <string name="smart_video_preview_error">This video could not be played on this device.</string>
 
 </resources>

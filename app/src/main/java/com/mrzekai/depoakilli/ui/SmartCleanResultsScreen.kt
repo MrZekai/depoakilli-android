@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Size
-import android.widget.MediaController
 import android.widget.VideoView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +25,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -195,40 +197,244 @@ private fun SmartScanningState(state: CleanerUiState, modifier: Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF02091D), Color(0xFF071E55), Color(0xFF051631))))
-            .padding(24.dp),
-        contentAlignment = Alignment.Center,
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFF03091B),
+                        Color(0xFF071A4B),
+                        Color(0xFF05142E),
+                    ),
+                ),
+            )
+            .padding(horizontal = 18.dp, vertical = 14.dp),
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(98.dp),
-                    strokeWidth = 8.dp,
-                    color = SmartGreen,
-                    trackColor = Color.White.copy(alpha = .12f),
-                )
-                Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = Color.White, modifier = Modifier.size(38.dp))
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            Card(
+                shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF071B45)),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.linearGradient(
+                                listOf(
+                                    Color(0xFF0A2D87),
+                                    Color(0xFF0B59C9),
+                                    Color(0xFF0B8B86),
+                                ),
+                            ),
+                        )
+                        .padding(20.dp),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(100.dp),
+                                strokeWidth = 8.dp,
+                                color = SmartGreen,
+                                trackColor = Color.White.copy(alpha = .14f),
+                            )
+                            Surface(
+                                color = Color(0xFF071B45).copy(alpha = .84f),
+                                shape = CircleShape,
+                            ) {
+                                Icon(
+                                    Icons.Outlined.CleaningServices,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.padding(18.dp).size(38.dp),
+                                )
+                            }
+                        }
+                        Spacer(Modifier.width(18.dp))
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(7.dp),
+                        ) {
+                            Text(
+                                stringResource(R.string.smart_scan_progress_title),
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Black,
+                            )
+                            Text(
+                                stringResource(R.string.smart_scan_progress_subtitle),
+                                color = Color.White.copy(alpha = .86f),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
             }
+
             Text(
-                stringResource(R.string.smart_scan_progress_title),
+                stringResource(R.string.smart_scan_live_title),
                 color = Color.White,
-                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black,
+                style = MaterialTheme.typography.titleMedium,
             )
-            Text(
-                stringResource(R.string.smart_scan_progress_subtitle),
-                color = SmartTextSecondary,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            Surface(color = Color.White.copy(alpha = .09f), shape = RoundedCornerShape(18.dp)) {
-                Text(
-                    stringResource(R.string.scan_live_counter, state.scanProgressFiles, state.scanProgressDirectories),
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    fontWeight = FontWeight.Bold,
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                ScanMetricCard(
+                    value = state.scanProgressFiles.toString(),
+                    label = stringResource(R.string.smart_scan_files_label),
+                    icon = Icons.Outlined.InsertDriveFile,
+                    modifier = Modifier.weight(1f),
+                )
+                ScanMetricCard(
+                    value = state.scanProgressDirectories.toString(),
+                    label = stringResource(R.string.smart_scan_folders_label),
+                    icon = Icons.Outlined.Folder,
+                    modifier = Modifier.weight(1f),
+                )
+                ScanMetricCard(
+                    value = stringResource(R.string.smart_scan_on_device_value),
+                    label = stringResource(R.string.smart_scan_on_device_label),
+                    icon = Icons.Outlined.Security,
+                    modifier = Modifier.weight(1f),
                 )
             }
-            Text(stringResource(R.string.scan_private), color = SmartCyan, style = MaterialTheme.typography.bodySmall)
+
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = SmartCard),
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        stringResource(R.string.smart_scan_checking_title),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        ScanStagePill(
+                            title = stringResource(CleanCategory.JUNK.titleRes),
+                            accent = Color(0xFF35BFFF),
+                            modifier = Modifier.weight(1f),
+                        )
+                        ScanStagePill(
+                            title = stringResource(CleanCategory.DUPLICATE.titleRes),
+                            accent = Color(0xFF9A63FF),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        ScanStagePill(
+                            title = stringResource(CleanCategory.LARGE_FILE.titleRes),
+                            accent = Color(0xFFFFB02E),
+                            modifier = Modifier.weight(1f),
+                        )
+                        ScanStagePill(
+                            title = stringResource(CleanCategory.APK_PACKAGE.titleRes),
+                            accent = Color(0xFF6ADE48),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                    ScanStagePill(
+                        title = stringResource(R.string.smart_scan_media_stage),
+                        accent = Color(0xFF31E0D0),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color(0xFF09224E),
+                shape = RoundedCornerShape(18.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Outlined.Security, contentDescription = null, tint = SmartGreen, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(9.dp))
+                    Text(
+                        stringResource(R.string.scan_private),
+                        color = Color.White.copy(alpha = .90f),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScanMetricCard(
+    value: String,
+    label: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier.height(86.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(12.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Icon(icon, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(22.dp))
+            Column {
+                Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, maxLines = 1)
+                Text(label, color = SmartTextSecondary, fontSize = 10.sp, maxLines = 1)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ScanStagePill(
+    title: String,
+    accent: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        color = accent.copy(alpha = .13f),
+        shape = RoundedCornerShape(15.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .45f)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(accent),
+            )
+            Spacer(Modifier.width(7.dp))
+            Text(
+                title,
+                color = Color.White,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -942,34 +1148,145 @@ private fun CategoryDetailDialog(
     onToggleItem: (String) -> Unit,
     onPreview: (CleanableItem) -> Unit,
 ) {
+    val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
+    val selectedCount = items.count(CleanableItem::selected)
+    val selectedBytes = items.asSequence().filter(CleanableItem::selected).sumOf(CleanableItem::sizeBytes)
+    val allSelected = items.isNotEmpty() && selectedCount == items.size
+    val accent = categoryAccent(category)
+
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
-            modifier = Modifier.fillMaxSize().padding(14.dp),
-            shape = RoundedCornerShape(26.dp),
-            color = Color(0xFF07152B),
+            modifier = Modifier.fillMaxSize(),
+            color = SmartBackground,
         ) {
             Column(Modifier.fillMaxSize()) {
                 DialogHeader(title = stringResource(category.titleRes), onBack = onDismiss)
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
+                    shape = RoundedCornerShape(22.dp),
+                    colors = CardDefaults.cardColors(containerColor = SmartCard),
                 ) {
-                    Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.category_summary, items.size, ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes))), color = Color.White, fontWeight = FontWeight.Bold)
-                        Text(stringResource(R.string.smart_preview_tap_hint), style = MaterialTheme.typography.bodySmall, color = Color(0xFFA9B9D5))
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(
+                                        R.string.smart_detail_selected_summary,
+                                        selectedCount,
+                                        items.size,
+                                        ByteFormatter.format(selectedBytes),
+                                    ),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Black,
+                                )
+                                Text(
+                                    stringResource(R.string.smart_detail_grid_hint),
+                                    color = SmartTextSecondary,
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                            Surface(
+                                color = accent.copy(alpha = .16f),
+                                shape = RoundedCornerShape(16.dp),
+                            ) {
+                                Text(
+                                    ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes)),
+                                    color = accent,
+                                    fontWeight = FontWeight.Black,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                )
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFF102850))
+                                .clickable { onToggleCategory() }
+                                .padding(horizontal = 10.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Checkbox(
+                                checked = allSelected,
+                                onCheckedChange = { onToggleCategory() },
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = ElectricBlue,
+                                    uncheckedColor = Color(0xFFA7B8D6),
+                                    checkmarkColor = Color.White,
+                                ),
+                            )
+                            Spacer(Modifier.width(5.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Text(
+                                    stringResource(R.string.smart_preview_tap_hint),
+                                    color = Color(0xFFB8C8E2),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
                     }
-                    Checkbox(
-                        checked = items.isNotEmpty() && items.all(CleanableItem::selected),
-                        onCheckedChange = { onToggleCategory() },
-                    )
                 }
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+
+                if (displayItems.isEmpty()) {
+                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        Text(stringResource(R.string.smart_detail_empty), color = SmartTextSecondary)
+                    }
+                } else {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        gridItems(displayItems, key = CleanableItem::id) { item ->
+                            CategoryGridItem(
+                                item = item,
+                                accent = accent,
+                                onPreview = { onPreview(item) },
+                                onToggle = { onToggleItem(item.id) },
+                            )
+                        }
+                    }
+                }
+
+                Surface(
+                    color = Color(0xFF06132F),
+                    shadowElevation = 12.dp,
                 ) {
-                    items(items, key = CleanableItem::id) { item ->
-                        DetailedCleanableRow(item = item, onPreview = { onPreview(item) }, onToggle = { onToggleItem(item.id) })
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.smart_detail_selected_label),
+                                color = SmartTextSecondary,
+                                fontSize = 11.sp,
+                            )
+                            Text(
+                                "$selectedCount • ${ByteFormatter.format(selectedBytes)}",
+                                color = SmartGreen,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 18.sp,
+                            )
+                        }
+                        Button(onClick = onDismiss) {
+                            Text(stringResource(R.string.done))
+                        }
                     }
                 }
             }
@@ -978,23 +1295,130 @@ private fun CategoryDetailDialog(
 }
 
 @Composable
-private fun DetailedCleanableRow(item: CleanableItem, onPreview: () -> Unit, onToggle: () -> Unit) {
+private fun CategoryGridItem(
+    item: CleanableItem,
+    accent: Color,
+    onPreview: () -> Unit,
+    onToggle: () -> Unit,
+) {
+    val context = LocalContext.current
+    val preview = item.toSmartPreview()
+    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri, key2 = item.mimeType) {
+        value = loadPreviewThumbnail(context, preview)
+    }
+
     Card(
+        modifier = Modifier.fillMaxWidth().height(196.dp),
         onClick = onPreview,
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2147)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
     ) {
-        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = Color(0xFF183A6C), shape = RoundedCornerShape(12.dp)) {
-                Icon(fileVisual(item.mimeType, item.name), contentDescription = null, tint = ElectricBlue, modifier = Modifier.padding(9.dp).size(25.dp))
+        Column(Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(112.dp)
+                    .background(Color(0xFF091A3B)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap = requireNotNull(bitmap),
+                        contentDescription = item.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.Transparent, Color(0x5503091B)),
+                                ),
+                            ),
+                    )
+                } else {
+                    Surface(
+                        color = accent.copy(alpha = .16f),
+                        shape = RoundedCornerShape(18.dp),
+                    ) {
+                        Icon(
+                            fileVisual(item.mimeType, item.name),
+                            contentDescription = null,
+                            tint = accent,
+                            modifier = Modifier.padding(18.dp).size(38.dp),
+                        )
+                    }
+                }
+
+                if (item.mimeType.startsWith("video/")) {
+                    Surface(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color(0xCC06132F),
+                        shape = CircleShape,
+                    ) {
+                        Text(
+                            "▶",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        )
+                    }
+                }
+
+                Checkbox(
+                    checked = item.selected,
+                    onCheckedChange = { onToggle() },
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = ElectricBlue,
+                        uncheckedColor = Color.White,
+                        checkmarkColor = Color.White,
+                    ),
+                )
+
+                Surface(
+                    modifier = Modifier.align(Alignment.BottomStart).padding(7.dp),
+                    color = Color(0xD9030B20),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text(
+                        ByteFormatter.format(item.sizeBytes),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+                    )
+                }
             }
-            Spacer(Modifier.width(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(item.relativePath, style = MaterialTheme.typography.bodySmall, color = Color(0xFFA9B9D5), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(ByteFormatter.format(item.sizeBytes), style = MaterialTheme.typography.labelMedium, color = Color(0xFF54B8FF))
+
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    item.name,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    compactRelativePath(item.relativePath),
+                    color = Color(0xFF9FB4D7),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 10.sp,
+                )
+                Text(
+                    stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
+                    color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
             }
-            Checkbox(checked = item.selected, onCheckedChange = { onToggle() })
         }
     }
 }
@@ -1075,19 +1499,19 @@ private fun FilePreviewDialog(
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
-            shape = RoundedCornerShape(28.dp),
-            color = Color(0xFF07152B),
+            modifier = Modifier.fillMaxSize(),
+            color = SmartBackground,
         ) {
             Column(Modifier.fillMaxSize()) {
                 DialogHeader(title = file.name, onBack = onDismiss)
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(horizontal = 14.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color(0xFF07152B)),
+                        .clip(RoundedCornerShape(22.dp))
+                        .background(Color(0xFF06132F)),
                     contentAlignment = Alignment.Center,
                 ) {
                     when {
@@ -1097,31 +1521,115 @@ private fun FilePreviewDialog(
                         else -> GenericFilePreview(file)
                     }
                 }
-                Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(file.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text(file.relativePath, color = Color(0xFFA9B9D5), style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                    Text(ByteFormatter.format(file.sizeBytes), color = Color(0xFF54B8FF), fontWeight = FontWeight.Bold)
-                    if (selected != null && onToggleSelection != null) {
+
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    shape = RoundedCornerShape(22.dp),
+                    colors = CardDefaults.cardColors(containerColor = SmartCard),
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            file.name,
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 17.sp,
+                        )
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(if (selected) Color(0xFFE4F8ED) else Color(0xFFF0F2F7))
-                                .clickable(onClick = onToggleSelection)
-                                .padding(10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Checkbox(checked = selected, onCheckedChange = { onToggleSelection() })
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                stringResource(if (selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
-                                fontWeight = FontWeight.Bold,
+                            PreviewInfoPill(
+                                text = ByteFormatter.format(file.sizeBytes),
+                                accent = SmartCyan,
+                                modifier = Modifier.weight(1f),
                             )
+                            PreviewInfoPill(
+                                text = previewKindLabel(file),
+                                accent = Color(0xFF9A63FF),
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        Text(
+                            file.relativePath.ifBlank { stringResource(R.string.smart_path_unknown) },
+                            color = Color(0xFFA9B9D5),
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+
+                        if (selected != null && onToggleSelection != null) {
+                            val selectionColor = if (selected) Color(0xFF0F4938) else Color(0xFF152C52)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(selectionColor)
+                                    .border(
+                                        width = 1.dp,
+                                        color = if (selected) SmartGreen.copy(alpha = .72f) else Color(0xFF6B85AD),
+                                        shape = RoundedCornerShape(18.dp),
+                                    )
+                                    .clickable(onClick = onToggleSelection)
+                                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Checkbox(
+                                    checked = selected,
+                                    onCheckedChange = { onToggleSelection() },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = SmartGreen,
+                                        uncheckedColor = Color(0xFFB7C6DE),
+                                        checkmarkColor = Color(0xFF03120D),
+                                    ),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text(
+                                        stringResource(if (selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Black,
+                                    )
+                                    Text(
+                                        stringResource(if (selected) R.string.smart_selection_remove_hint else R.string.smart_selection_add_hint),
+                                        color = Color(0xFFC0CEE4),
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PreviewInfoPill(
+    text: String,
+    accent: Color,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        color = accent.copy(alpha = .14f),
+        shape = RoundedCornerShape(12.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .36f)),
+    ) {
+        Text(
+            text,
+            color = Color.White,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 7.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -1145,21 +1653,98 @@ private fun ImageFilePreview(file: SmartPreviewFile) {
 
 @Composable
 private fun VideoFilePreview(file: SmartPreviewFile) {
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            VideoView(context).apply {
-                val controller = MediaController(context)
-                controller.setAnchorView(this)
-                setMediaController(controller)
-                setVideoURI(Uri.parse(file.uri))
-                setOnPreparedListener { player -> player.isLooping = false }
+    var videoView by remember(file.uri) { mutableStateOf<VideoView?>(null) }
+    var prepared by remember(file.uri) { mutableStateOf(false) }
+    var playing by remember(file.uri) { mutableStateOf(false) }
+    var failed by remember(file.uri) { mutableStateOf(false) }
+
+    DisposableEffect(file.uri) {
+        onDispose {
+            runCatching { videoView?.stopPlayback() }
+            videoView = null
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.Black),
+        contentAlignment = Alignment.Center,
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                VideoView(context).apply {
+                    setBackgroundColor(android.graphics.Color.BLACK)
+                    setVideoURI(Uri.parse(file.uri))
+                    setOnPreparedListener { player ->
+                        prepared = true
+                        failed = false
+                        player.isLooping = false
+                        seekTo(1)
+                    }
+                    setOnCompletionListener {
+                        playing = false
+                        seekTo(1)
+                    }
+                    setOnErrorListener { _, _, _ ->
+                        failed = true
+                        prepared = false
+                        playing = false
+                        true
+                    }
+                    videoView = this
+                }
+            },
+        )
+
+        if (!prepared && !failed) {
+            CircularProgressIndicator(color = SmartCyan)
+        }
+
+        if (failed) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Icon(Icons.Outlined.VideoFile, contentDescription = null, tint = Color(0xFFFFB45B), modifier = Modifier.size(56.dp))
+                Text(
+                    stringResource(R.string.smart_video_preview_error),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
             }
-        },
-        update = { view ->
-            if (!view.isPlaying) view.seekTo(1)
-        },
-    )
+        } else {
+            Surface(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(18.dp),
+                color = Color(0xDD06132F),
+                shape = RoundedCornerShape(18.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .24f)),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clickable(enabled = prepared) {
+                            val active = videoView ?: return@clickable
+                            if (active.isPlaying) {
+                                active.pause()
+                                playing = false
+                            } else {
+                                active.start()
+                                playing = true
+                            }
+                        }
+                        .padding(horizontal = 18.dp, vertical = 11.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(9.dp),
+                ) {
+                    Text(if (playing) "Ⅱ" else "▶", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                    Text(
+                        stringResource(if (playing) R.string.smart_video_pause else R.string.smart_video_play),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -1243,6 +1828,31 @@ private suspend fun loadSampledBitmap(uriString: String): ImageBitmap? = withCon
         val options = BitmapFactory.Options().apply { inSampleSize = sample }
         BitmapFactory.decodeFile(file.absolutePath, options)?.asImageBitmap()
     }.getOrNull()
+}
+
+private fun compactRelativePath(path: String): String {
+    val clean = path.trim().trim('/')
+    if (clean.isBlank()) return "—"
+    val parts = clean.split('/').filter(String::isNotBlank)
+    return when {
+        parts.size <= 2 -> parts.joinToString("/")
+        else -> parts.takeLast(2).joinToString("/")
+    }
+}
+
+@Composable
+private fun previewKindLabel(file: SmartPreviewFile): String {
+    val extension = file.name.substringAfterLast('.', "").lowercase()
+    return when {
+        file.mimeType.startsWith("image/") -> stringResource(R.string.smart_file_type_image)
+        file.mimeType.startsWith("video/") -> stringResource(R.string.smart_file_type_video)
+        file.mimeType.startsWith("audio/") -> stringResource(R.string.smart_file_type_audio)
+        extension == "apk" -> stringResource(R.string.smart_file_type_apk)
+        extension in setOf("zip", "rar", "7z", "tar", "gz") -> stringResource(R.string.smart_file_type_archive)
+        file.mimeType.startsWith("text/") || extension in setOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt") ->
+            stringResource(R.string.smart_file_type_document)
+        else -> stringResource(R.string.smart_file_type_other)
+    }
 }
 
 private fun categoryAccent(category: CleanCategory): Color = when (category) {

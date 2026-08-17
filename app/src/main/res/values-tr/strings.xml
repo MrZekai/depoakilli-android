@@ -385,8 +385,8 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="dashboard_ram_available">%1$s kullanılabilir</string>
     <string name="smart_clean_results_title">Akıllı Temizlik Sonuçları</string>
     <string name="smart_clean_results_empty_intro">Temizlenebilir önerileri ve tıklanabilir depolama dökümünü görmek için Akıllı Temizlik taramasını başlat.</string>
-    <string name="smart_scan_progress_title">Akıllı Temizleyici telefonunu tarıyor</string>
-    <string name="smart_scan_progress_subtitle">Çöp, kopya, büyük dosya, indirilenler, APK ve erişilebilir medyalar cihaz içinde kontrol ediliyor.</string>
+    <string name="smart_scan_progress_title">Akıllı Temizlik taraması sürüyor</string>
+    <string name="smart_scan_progress_subtitle">Çöp, kopya, büyük dosya, APK ve erişilebilir medya güvenli bir temizlik planı için analiz ediliyor.</string>
     <string name="smart_clean_suggestions_title">Temizlik önerileri</string>
     <string name="smart_clean_suggestions_subtitle">Her kategori önce birkaç dosya gösterir. Silmeden önce tamamını açıp inceleyebilirsin.</string>
     <string name="smart_clean_results_tap_hint">Nelerin silineceğini görmek için dokun</string>
@@ -421,5 +421,34 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="message_cleanup_failed">Temizlik tamamlanamadı. Başka bir değişiklik yapılmadı.</string>
 
     <string name="smart_cleanup_ad_notice">Hazır bir geçiş reklamı varsa bu onaydan sonra gösterilir. Reklam kapandığında temizlik otomatik başlar.</string>
+
+
+    <string name="smart_scan_live_title">Canlı tarama</string>
+    <string name="smart_scan_files_label">Bulunan dosya</string>
+    <string name="smart_scan_folders_label">Gezilen klasör</string>
+    <string name="smart_scan_on_device_value">YEREL</string>
+    <string name="smart_scan_on_device_label">Cihaz içinde</string>
+    <string name="smart_scan_checking_title">Şu anda kontrol ediliyor</string>
+    <string name="smart_scan_media_stage">Medya ve indirilenler</string>
+    <string name="smart_detail_selected_summary">%1$d / %2$d seçili • %3$s</string>
+    <string name="smart_detail_grid_hint">Önizlemek için karta dokun. Yalnız silme seçimini değiştirmek için seçim kutusunu kullan.</string>
+    <string name="smart_detail_select_all">Tümünü seç</string>
+    <string name="smart_detail_unselect_all">Tüm seçimleri kaldır</string>
+    <string name="smart_detail_selected_label">Temizliğe seçilen</string>
+    <string name="smart_detail_empty">Bu kategoride dosya bulunamadı.</string>
+    <string name="done">Tamam</string>
+    <string name="smart_selection_remove_hint">Bu dosya temizlikte silinecek. Korumak için dokun.</string>
+    <string name="smart_selection_add_hint">Bu dosya şu anda korunuyor. Temizliğe eklemek için dokun.</string>
+    <string name="smart_path_unknown">Konum bilgisi yok</string>
+    <string name="smart_file_type_image">Görsel</string>
+    <string name="smart_file_type_video">Video</string>
+    <string name="smart_file_type_audio">Ses</string>
+    <string name="smart_file_type_apk">APK</string>
+    <string name="smart_file_type_archive">Arşiv</string>
+    <string name="smart_file_type_document">Belge</string>
+    <string name="smart_file_type_other">Diğer dosya</string>
+    <string name="smart_video_play">Videoyu oynat</string>
+    <string name="smart_video_pause">Videoyu duraklat</string>
+    <string name="smart_video_preview_error">Bu video bu cihazda oynatılamadı.</string>
 
 </resources>
