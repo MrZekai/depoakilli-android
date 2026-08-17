@@ -30,6 +30,7 @@ required = [
     "app/src/main/res/values/strings.xml",
     "app/src/main/res/values-tr/strings.xml",
     "app/src/main/res/values/styles.xml",
+    "app/src/main/res/values-v27/styles.xml",
     "app/src/main/res/xml/backup_rules.xml",
     "app/src/main/res/xml/data_extraction_rules.xml",
     "app/src/main/res/xml/locales_config.xml",
@@ -66,6 +67,8 @@ if 'android:localeConfig="@xml/locales_config"' not in manifest:
 
 for expected in (
     'android.permission.PACKAGE_USAGE_STATS',
+    'xmlns:tools="http://schemas.android.com/tools"',
+    'tools:ignore="ProtectedPermissions"',
     'android.intent.category.LAUNCHER',
     '<queries>',
 ):
@@ -277,12 +280,13 @@ if "MediumRectangleAd(" in cleaner_app_text:
     errors.append("Home must use the visible anchored banner instead of a 300x250 MREC")
 
 styles_text = (ROOT / "app/src/main/res/values/styles.xml").read_text(encoding="utf-8")
-for expected in (
-    '<item name="android:windowLightStatusBar">true</item>',
-    '<item name="android:windowLightNavigationBar">true</item>',
-):
-    if expected not in styles_text:
-        errors.append(f"missing light system-bar invariant: {expected}")
+styles_v27_text = (ROOT / "app/src/main/res/values-v27/styles.xml").read_text(encoding="utf-8")
+if '<item name="android:windowLightStatusBar">true</item>' not in styles_text:
+    errors.append("base theme must keep light status-bar icons for API 23+")
+if '<item name="android:windowLightNavigationBar">true</item>' in styles_text:
+    errors.append("API 27 light navigation-bar attribute must not be in the base theme")
+if '<item name="android:windowLightNavigationBar">true</item>' not in styles_v27_text:
+    errors.append("values-v27 theme must enable light navigation-bar icons")
 
 for kotlin_file in (ROOT / "app/src").rglob("*.kt"):
     kotlin_text = kotlin_file.read_text(encoding="utf-8")

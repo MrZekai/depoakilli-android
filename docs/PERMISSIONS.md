@@ -16,6 +16,8 @@ Bu izinler uygulamanın temel işlevi olan fotoğraf/video depolama yönetimi i�
 
 `PACKAGE_USAGE_STATS`, Android 8.0 ve üzerindeki cihazlarda diğer kullanıcı uygulamalarının bildirdiği önbellek toplamlarını `StorageStatsManager` ile okuyabilmek için bildirilir. Bu normal bir çalışma zamanı izni değildir; kullanıcı Android'in Kullanım Erişimi ekranından ayrıca etkinleştirir.
 
+Manifestteki `tools:ignore="ProtectedPermissions"` yalnız bu bilinçli AppOps kullanımını Android Lint'e açıklar. İzni kullanıcı adına vermez, sistem ayrıcalığı sağlamaz ve başka lint kontrollerini kapatmaz.
+
 - Yalnız uygulama etiketi, paket adı ve toplam önbellek baytı işlenir.
 - Kişisel dosya içeriği, kullanım zamanı veya kullanım geçmişi okunmaz.
 - Sorgu arka plan iş parçacığında ve yalnız uygulama açıldığında, geri dönüldüğünde, kullanıcı yenilediğinde veya Akıllı Tarama başlatıldığında çalışır.
