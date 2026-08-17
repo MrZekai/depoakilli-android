@@ -39,6 +39,7 @@ required = [
     ".github/workflows/release-aab.yml",
     "docs/AD_PLACEMENTS.md",
     "docs/QA_SIGNING.md",
+    "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
     "app/src/debug/res/values/strings.xml",
     "app/src/debug/res/values-tr/strings.xml",
@@ -198,11 +199,25 @@ for expected in (
     "app/build/reports/lint-results-debug.txt",
     "Enforce lint and APK build results",
     "Verify stable QA signing certificate",
-    "508e012197da76d516bad24880b67c6f067fcd646c51a043a11c0c345e6ead54",
+    "id: signing",
+    "bash scripts/verify-qa-signing.sh app/build/outputs/apk/debug/app-debug.apk",
+    "SIGNING_OUTCOME: ${{ steps.signing.outcome }}",
     "depoakilli-qa-apk-${{ github.run_number }}",
 ):
     if expected not in workflow_text:
         errors.append(f"missing CI invariant: {expected}")
+
+qa_signing_script_text = (ROOT / "scripts/verify-qa-signing.sh").read_text(encoding="utf-8")
+for expected in (
+    'apksigner" verify --print-certs',
+    "===== RAW APKSIGNER OUTPUT =====",
+    "keytool -exportcert",
+    "508e012197da76d516bad24880b67c6f067fcd646c51a043a11c0c345e6ead54",
+    'if [[ "$keystore_digest" != "$pinned_digest" ]]',
+    'if [[ "$actual_digest" != "$keystore_digest" ]]',
+):
+    if expected not in qa_signing_script_text:
+        errors.append(f"missing stable QA signing verification invariant: {expected}")
 
 release_workflow_text = (ROOT / ".github/workflows/release-aab.yml").read_text(encoding="utf-8")
 release_script_text = (ROOT / "scripts/validate-release-env.sh").read_text(encoding="utf-8")

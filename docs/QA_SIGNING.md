@@ -28,5 +28,11 @@ APK onun yanına kurulabilir; eski uygulamayı kaldırmak zorunlu değildir.
 - İlk Play AAB gönderilmeden önce upload keystore oluşturulmalı, güvenli biçimde
   yedeklenmeli ve sonraki bütün sürümlerde aynı anahtar kullanılmalıdır.
 
-CI, üretilen QA APK'nın sertifika özetini `apksigner` ile doğrular. Beklenmeyen
-bir anahtar kullanılırsa iş akışı başarısız olur.
+CI üç değeri karşılaştırır: kaynakta sabitlenen sertifika parmak izi, depodaki
+QA keystore'dan `keytool -exportcert` ile çalışma anında hesaplanan parmak izi
+ve üretilen APK'dan `apksigner --print-certs` ile okunan parmak izi. Üç değer
+aynı değilse iş akışı başarısız olur.
+
+Ham `apksigner` çıktısı CI günlüğüne yazılır. Çıktı biçimi değişirse parmak
+izinin okunamaması ile gerçekten farklı bir sertifika kullanılması ayrı hata
+mesajlarıyla raporlanır.

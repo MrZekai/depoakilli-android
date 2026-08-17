@@ -69,17 +69,11 @@ jobs:
         run: ./gradlew --stacktrace assembleDebug
 
       - name: Verify stable QA signing certificate
+        id: signing
         if: steps.assemble.outcome == 'success'
+        continue-on-error: true
         shell: bash
-        run: |
-          build_tools="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"
-          actual_digest="$("$build_tools/apksigner" verify --print-certs app/build/outputs/apk/debug/app-debug.apk | sed -n 's/^Signer #1 certificate SHA-256 digest: //p' | tr '[:upper:]' '[:lower:]')"
-          expected_digest="508e012197da76d516bad24880b67c6f067fcd646c51a043a11c0c345e6ead54"
-          if [[ "$actual_digest" != "$expected_digest" ]]; then
-            echo "Unexpected QA signing certificate: $actual_digest"
-            exit 1
-          fi
-          echo "Stable QA signing certificate verified."
+        run: bash scripts/verify-qa-signing.sh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload debug APK
         if: always()
@@ -119,6 +113,7 @@ jobs:
         env:
           LINT_OUTCOME: ${{ steps.lint.outcome }}
           ASSEMBLE_OUTCOME: ${{ steps.assemble.outcome }}
+          SIGNING_OUTCOME: ${{ steps.signing.outcome }}
         run: |
           failed=0
           if [[ "$LINT_OUTCOME" != "success" ]]; then
@@ -129,8 +124,12 @@ jobs:
             echo "Debug APK build outcome: $ASSEMBLE_OUTCOME"
             failed=1
           fi
+          if [[ "$SIGNING_OUTCOME" != "success" && "$SIGNING_OUTCOME" != "skipped" ]]; then
+            echo "QA signing verification outcome: $SIGNING_OUTCOME"
+            failed=1
+          fi
           if [[ "$failed" -ne 0 ]]; then
-            echo "CI failed after collecting both lint and APK build results."
+            echo "CI failed after collecting lint, APK build and signing results."
             exit 1
           fi
-          echo "Android lint and debug APK build both passed."
+          echo "Android lint, debug APK build and QA signing checks passed."
