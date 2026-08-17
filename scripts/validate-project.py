@@ -218,6 +218,8 @@ for expected in (
 ):
     if expected not in smart_results:
         errors.append(f"missing v0.5.2 Smart Clean results invariant: {expected}")
+if "import androidx.compose.foundation.layout.weight" in smart_results:
+    errors.append("SmartCleanResultsScreen must not import the internal Compose layout weight symbol")
 
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
