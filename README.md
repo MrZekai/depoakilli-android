@@ -10,6 +10,7 @@ Uygulama; sahte RAM hızlandırma veya CPU soğutma iddiaları yerine Android'in
 - İngilizce varsayılan arayüz ve tam Türkçe yerelleştirme
 - Android 13+ uygulama dili ayarı
 - Kullanıcının seçtiği 4 numaralı lacivert–mavi–turkuaz ana ekran tasarımı
+- Kullanıcının seçtiği mavi kalkan, beyaz temizlik fırçası ve turkuaz yörüngeli kalıcı uygulama ikonu
 - Depolama ve gerçek RAM durumu
 - Gerçek PSS ölçümlü uygulama RAM optimizasyonu; geçici tarama ve tam ekran reklam belleğini serbest bırakma
 - Cihaz-içi, açıklanabilir akıllı temizlik puanı
@@ -115,3 +116,6 @@ Detaylar için [`docs/FEATURE_MATRIX.md`](docs/FEATURE_MATRIX.md), [`docs/DEVICE
 
 Ana ekranın kullanıcı tarafından seçilen sabit görsel ve davranış kuralları
 [`docs/HOME_DESIGN.md`](docs/HOME_DESIGN.md) içinde kayıt altındadır.
+
+Seçilen adaptive, eski Android, temalı Android 13+ ve 512×512 Play Store ikon
+kaynakları [`docs/APP_ICON.md`](docs/APP_ICON.md) içinde kayıt altındadır.

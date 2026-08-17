@@ -5,6 +5,7 @@ import pathlib
 import sys
 import xml.etree.ElementTree as ET
 import hashlib
+import struct
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -39,14 +40,59 @@ required = [
     ".github/workflows/release-aab.yml",
     "docs/AD_PLACEMENTS.md",
     "docs/HOME_DESIGN.md",
+    "docs/APP_ICON.md",
     "docs/QA_SIGNING.md",
     "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
     "app/src/debug/res/values/strings.xml",
     "app/src/debug/res/values-tr/strings.xml",
+    "app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png",
+    "app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png",
+    "app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png",
+    "app/src/main/res/drawable/ic_launcher_background.xml",
+    "app/src/main/res/drawable/ic_launcher_foreground.xml",
+    "app/src/main/res/drawable/ic_launcher_monochrome.xml",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+    "app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml",
+    "app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml",
+    "app/src/main/res/mipmap-anydpi-v33/ic_launcher_round.xml",
+    "store-assets/icon-512.png",
+    "store-assets/icon-master-1536.png",
 ]
 for relative in required:
     require(relative)
+
+
+def png_dimensions(path: pathlib.Path) -> tuple[int, int] | None:
+    if not path.is_file():
+        return None
+    with path.open("rb") as stream:
+        if stream.read(8) != b"\x89PNG\r\n\x1a\n":
+            errors.append(f"launcher asset is not a real PNG: {path.relative_to(ROOT)}")
+            return None
+        length_bytes = stream.read(4)
+        chunk_type = stream.read(4)
+        if len(length_bytes) != 4 or chunk_type != b"IHDR":
+            errors.append(f"launcher PNG has no valid IHDR: {path.relative_to(ROOT)}")
+            return None
+        width, height = struct.unpack(">II", stream.read(8))
+        return width, height
+
+
+for relative, expected_size in (
+    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png", (432, 432)),
+    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png", (432, 432)),
+    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png", (432, 432)),
+    ("store-assets/icon-512.png", (512, 512)),
+    ("store-assets/icon-master-1536.png", (1536, 1536)),
+):
+    dimensions = png_dimensions(ROOT / relative)
+    if dimensions is not None and dimensions != expected_size:
+        errors.append(
+            f"incorrect launcher asset dimensions for {relative}: "
+            f"expected {expected_size[0]}x{expected_size[1]}, got "
+            f"{dimensions[0]}x{dimensions[1]}",
+        )
 
 for xml_file in ROOT.rglob("*.xml"):
     try:

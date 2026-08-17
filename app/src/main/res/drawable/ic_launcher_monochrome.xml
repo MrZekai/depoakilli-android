@@ -3,6 +3,6 @@
     <item>
         <bitmap
             android:gravity="fill"
-            android:src="@drawable/ic_launcher_foreground_art" />
+            android:src="@drawable/ic_launcher_monochrome_art" />
     </item>
 </layer-list>
