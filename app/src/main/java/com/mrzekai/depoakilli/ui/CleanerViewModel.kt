@@ -468,6 +468,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun setItemsSelected(ids: Set<String>, selected: Boolean) {
+        if (ids.isEmpty()) return
+        _state.update { state ->
+            state.copy(
+                summary = state.summary.copy(
+                    items = state.summary.items.map { item ->
+                        if (item.id in ids && item.selected != selected) item.copy(selected = selected) else item
+                    },
+                ),
+            )
+        }
+    }
+
     fun prepareCleanup(
         itemIds: Set<String>? = null,
         onPlanReady: (DeviceRepository.DeletePlan) -> Unit,

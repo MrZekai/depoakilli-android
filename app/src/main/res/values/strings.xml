@@ -110,9 +110,9 @@
     <string name="scan_selectable_only">%1$s is selected and can be cleaned after your confirmation.</string>
     <string name="cache_not_in_clean_total">Protected cache from other apps is informational and is not included in the Clean button total.</string>
     <string name="scan_focus_smart">Smart clean result</string>
-    <string name="scan_focus_junk">Junk cleaner result</string>
-    <string name="scan_focus_duplicates">Duplicate scan result</string>
-    <string name="scan_focus_large">Large-file scan result</string>
+    <string name="scan_focus_junk">Junk Cleaner</string>
+    <string name="scan_focus_duplicates">Duplicate Cleaner</string>
+    <string name="scan_focus_large">Large Files</string>
     <string name="scan_focus_whatsapp">WhatsApp cleaner result</string>
     <string name="tools_title">Device tools</string>
     <string name="tools_subtitle">Use real Android controls and safe on-device cleanup.</string>
@@ -326,8 +326,8 @@ Google Mobile Ads and the consent platform may process advertising identifiers, 
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
     <string name="reason_whatsapp_review">WhatsApp shared media — review before deletion</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner analyzes accessible shared storage on-device, applies conservative cleanup rules, verifies exact duplicates by content and leaves user-created files unselected unless deletion is clearly safe.</string>
-    <string name="scan_focus_downloads">Downloads &amp; APK result</string>
-    <string name="scan_focus_media">Media cleaner result</string>
+    <string name="scan_focus_downloads">Downloads</string>
+    <string name="scan_focus_media">Media Cleaner</string>
     <string name="scan_in_progress_v050">Smart Cleaner is scanning your accessible storage…</string>
     <string name="scan_limit_note_v050">The safety ceiling of 200,000 indexed files was reached. Results are real but the device contains more files than this pass indexed.</string>
     <string name="scan_live_counter">%1$d files discovered • %2$d folders visited</string>
@@ -380,8 +380,8 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="security_local_processing_desc">Cleaner scans and duplicate fingerprints stay on this device.</string>
     <string name="status_ready">Ready</string>
     <string name="status_needed">Needed</string>
-    <string name="scan_focus_deep">Deep clean result</string>
-    <string name="scan_focus_apks">APK cleaner result</string>
+    <string name="scan_focus_deep">Deep Clean</string>
+    <string name="scan_focus_apks">APK Packages</string>
     <string name="scan_focus_analyze">Storage analysis</string>
     <string name="clean_results_title">Cleaning results</string>
     <string name="dashboard_deep_detail">Detailed scan</string>
@@ -500,4 +500,35 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="whatsapp_audio_preview_error">This audio file could not be played on this device.</string>
     <string name="whatsapp_file_preview">File details</string>
 
+
+    <string name="premium_tool_scanning">Scanning this tool on your device…</string>
+    <string name="premium_tool_on_device_title">On-device analysis</string>
+    <string name="premium_tool_nothing_found">Nothing to review</string>
+    <string name="premium_tool_nothing_found_detail">No matching files were found in accessible shared storage.</string>
+    <string name="premium_tool_found_size">Total review size</string>
+    <string name="premium_tool_candidates">Candidates</string>
+    <string name="premium_tool_selected">Selected</string>
+    <string name="premium_tool_scanned">Scanned</string>
+    <string name="premium_tool_selected_count">%1$d items</string>
+    <string name="premium_sort_largest">Largest first</string>
+    <string name="premium_sort_newest">Newest first</string>
+    <string name="premium_sort_selected">Selected first</string>
+    <string name="premium_duplicates_subtitle">Exact-content matches are grouped so you can keep the original and remove only extra copies.</string>
+    <string name="premium_large_subtitle">Review the files using the most storage before deciding what should be removed.</string>
+    <string name="premium_apk_subtitle">Review downloaded Android installer packages without affecting installed apps.</string>
+    <string name="premium_media_subtitle">Review screenshots, large media and exact duplicate photos or videos in one visual workspace.</string>
+    <string name="premium_junk_subtitle">High-confidence temporary and disposable files are shown with a clear reason before cleanup.</string>
+    <string name="premium_downloads_subtitle">Review older downloads and installer files instead of deleting personal files automatically.</string>
+    <string name="premium_deep_subtitle">A broader review of old, large and duplicate files. Lower-confidence items are never silently selected.</string>
+    <string name="premium_duplicates_original_safe">The protected original is never placed in the delete selection. Only verified extra copies are shown here.</string>
+    <string name="premium_duplicates_kept_short">Original protected</string>
+    <string name="premium_duplicate_unknown_original">protected original</string>
+    <string name="premium_duplicate_group_title">Copies of %1$s</string>
+    <string name="premium_apk_installer_note">Deleting an APK here removes only the installer file. It does not uninstall the app already installed on your phone.</string>
+    <string name="premium_apk_old">Older installers</string>
+    <string name="premium_apk_recent">Recent installers</string>
+    <string name="premium_documents_archives">Documents &amp; archives</string>
+    <string name="premium_media_review">Other media review</string>
+
+    <string name="premium_duplicate_more_groups">More duplicate groups</string>
 </resources>

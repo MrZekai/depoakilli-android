@@ -110,9 +110,9 @@
     <string name="scan_selectable_only">%1$s seçildi ve onayınızdan sonra gerçekten temizlenebilir.</string>
     <string name="cache_not_in_clean_total">Diğer uygulamaların korunan önbelleği yalnız bilgi amaçlıdır ve Temizle düğmesinin toplamına katılmaz.</string>
     <string name="scan_focus_smart">Akıllı temizlik sonucu</string>
-    <string name="scan_focus_junk">Çöp temizliği sonucu</string>
-    <string name="scan_focus_duplicates">Kopya taraması sonucu</string>
-    <string name="scan_focus_large">Büyük dosya taraması sonucu</string>
+    <string name="scan_focus_junk">Çöp Temizliği</string>
+    <string name="scan_focus_duplicates">Kopyaları Sil</string>
+    <string name="scan_focus_large">Büyük Dosyalar</string>
     <string name="scan_focus_whatsapp">WhatsApp temizliği sonucu</string>
     <string name="tools_title">Cihaz araçları</string>
     <string name="tools_subtitle">Gerçek Android kontrolleri ve güvenli cihaz içi temizlik.</string>
@@ -326,8 +326,8 @@ Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tan�
     <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
     <string name="reason_whatsapp_review">WhatsApp paylaşılan medyası — silmeden önce incele</string>
     <string name="safe_ai_cleaning_description_v050">Akıllı Temizleyici erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
-    <string name="scan_focus_downloads">İndirilenler ve APK sonucu</string>
-    <string name="scan_focus_media">Medya temizleyici sonucu</string>
+    <string name="scan_focus_downloads">İndirilenler</string>
+    <string name="scan_focus_media">Medya Temizleyici</string>
     <string name="scan_in_progress_v050">Akıllı Temizleyici erişilebilir depolamayı tarıyor…</string>
     <string name="scan_limit_note_v050">200.000 dosyalık güvenlik tavanına ulaşıldı. Sonuçlar gerçektir ancak cihaz bu geçişte indekslenenden daha fazla dosya içeriyor.</string>
     <string name="scan_live_counter">%1$d dosya bulundu • %2$d klasör gezildi</string>
@@ -380,8 +380,8 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="security_local_processing_desc">Temizlik taramaları ve kopya parmak izleri bu cihazda kalır.</string>
     <string name="status_ready">Hazır</string>
     <string name="status_needed">Gerekli</string>
-    <string name="scan_focus_deep">Derin temizlik sonucu</string>
-    <string name="scan_focus_apks">APK temizliği sonucu</string>
+    <string name="scan_focus_deep">Derin Temizlik</string>
+    <string name="scan_focus_apks">APK Paketleri</string>
     <string name="scan_focus_analyze">Depolama analizi</string>
     <string name="clean_results_title">Temizlik sonuçları</string>
     <string name="dashboard_deep_detail">Detaylı Tara</string>
@@ -500,4 +500,35 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="whatsapp_audio_preview_error">Bu ses dosyası bu cihazda oynatılamadı.</string>
     <string name="whatsapp_file_preview">Dosya ayrıntıları</string>
 
+
+    <string name="premium_tool_scanning">Bu araç cihazında taranıyor…</string>
+    <string name="premium_tool_on_device_title">Cihaz içi analiz</string>
+    <string name="premium_tool_nothing_found">İncelenecek öğe bulunamadı</string>
+    <string name="premium_tool_nothing_found_detail">Erişilebilir paylaşılan depolamada bu araca uygun dosya bulunamadı.</string>
+    <string name="premium_tool_found_size">Toplam inceleme alanı</string>
+    <string name="premium_tool_candidates">Aday</string>
+    <string name="premium_tool_selected">Seçilen</string>
+    <string name="premium_tool_scanned">Tarandı</string>
+    <string name="premium_tool_selected_count">%1$d öğe</string>
+    <string name="premium_sort_largest">En büyükler</string>
+    <string name="premium_sort_newest">En yeniler</string>
+    <string name="premium_sort_selected">Seçilenler önce</string>
+    <string name="premium_duplicates_subtitle">Aynı içeriğe sahip kopyalar gruplanır; orijinali koruyup yalnız fazladan kopyaları silebilirsin.</string>
+    <string name="premium_large_subtitle">Silmeden önce depolamada en çok yer kullanan dosyaları görsel olarak incele.</string>
+    <string name="premium_apk_subtitle">Yüklü uygulamalara dokunmadan indirilen Android kurulum paketlerini incele.</string>
+    <string name="premium_media_subtitle">Ekran görüntülerini, büyük medyaları ve birebir kopya fotoğraf veya videoları tek görsel çalışma alanında incele.</string>
+    <string name="premium_junk_subtitle">Yüksek güvenli geçici ve gereksiz dosyalar, temizlemeden önce nedenleriyle birlikte gösterilir.</string>
+    <string name="premium_downloads_subtitle">Kişisel dosyaları otomatik silmeden eski indirmeleri ve kurulum dosyalarını incele.</string>
+    <string name="premium_deep_subtitle">Eski, büyük ve kopya dosyaların daha geniş incelemesi. Düşük güvenli öğeler sessizce seçilmez.</string>
+    <string name="premium_duplicates_original_safe">Korunan orijinal silme seçimine hiçbir zaman eklenmez. Burada yalnız doğrulanmış fazladan kopyalar gösterilir.</string>
+    <string name="premium_duplicates_kept_short">Orijinal korunuyor</string>
+    <string name="premium_duplicate_unknown_original">korunan orijinal</string>
+    <string name="premium_duplicate_group_title">%1$s kopyaları</string>
+    <string name="premium_apk_installer_note">Buradaki APK’yı silmek yalnız kurulum dosyasını kaldırır. Telefonda yüklü uygulamayı kaldırmaz.</string>
+    <string name="premium_apk_old">Eski kurulum paketleri</string>
+    <string name="premium_apk_recent">Yeni kurulum paketleri</string>
+    <string name="premium_documents_archives">Belgeler ve arşivler</string>
+    <string name="premium_media_review">Diğer medya incelemesi</string>
+
+    <string name="premium_duplicate_more_groups">Diğer kopya grupları</string>
 </resources>

@@ -39,6 +39,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
@@ -53,6 +54,7 @@ required = [
     "docs/REVISION_NOTES_V051.md",
     "docs/REVISION_NOTES_V057.md",
     "docs/REVISION_NOTES_V058.md",
+    "docs/REVISION_NOTES_V059.md",
     "docs/PLAY_PERMISSIONS_V050.md",
     "docs/PERMISSIONS.md",
     "docs/ANDROID_CACHE_LIMITS.md",
@@ -131,8 +133,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 15",
-    'versionName = "0.5.8"',
+    "versionCode = 16",
+    'versionName = "0.5.9"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -337,6 +339,45 @@ if "deleteSelectedWhatsApp(onCompleted: (Boolean) -> Unit = {})" not in view_mod
 if "whatsapp_cleanup_ad_notice" not in whatsapp_ui:
     errors.append("WhatsApp final confirmation must disclose the eligible pre-delete interstitial")
 
+
+
+premium_tools = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt").read_text(encoding="utf-8")
+for expected in (
+    "PremiumCleanerToolScreen",
+    "PremiumToolHero",
+    "PremiumToolSectionCard",
+    "PremiumToolDetailPage",
+    "PremiumToolPreviewDialog",
+    "LazyRow(",
+    "LazyVerticalGrid(",
+    "ExoPlayer.Builder",
+    "ToolThumbnailCache",
+    "premium_duplicates_original_safe",
+    "premium_apk_installer_note",
+):
+    if expected not in premium_tools:
+        errors.append(f"missing v0.5.9 premium tool review invariant: {expected}")
+for focus in (
+    "ScanFocus.DUPLICATES",
+    "ScanFocus.LARGE_FILES",
+    "ScanFocus.APKS",
+    "ScanFocus.MEDIA",
+    "ScanFocus.JUNK",
+    "ScanFocus.DOWNLOADS",
+    "ScanFocus.DEEP",
+):
+    if focus not in premium_tools and focus not in cleaner_app:
+        errors.append(f"premium tool routing missing for {focus}")
+if "PremiumCleanerToolScreen(" not in cleaner_app:
+    errors.append("non-Smart cleaner tools must route through PremiumCleanerToolScreen")
+if "setItemsSelected" not in view_model_source or "onSetItemsSelected" not in cleaner_app:
+    errors.append("premium tool select-all must use one batched state update instead of per-file toggles")
+if "FileResultRow(item" in cleaner_app and "PremiumCleanerToolScreen(" not in cleaner_app:
+    errors.append("legacy generic cleaner rows must not be the primary UI for premium tools")
+for forbidden_visible in ("Kopyaları Sil", "Büyük Dosyalar", "APK Paketleri", "İncele ve temizle"):
+    if forbidden_visible in premium_tools:
+        errors.append(f"premium tool UI must not hard-code Turkish copy: {forbidden_visible}")
+
 for forbidden_visible in ("Görseller", "Gönderilenler", "İncele ve temizle", "Temizliğe dahil"):
     if forbidden_visible in whatsapp_ui:
         errors.append(f"WhatsApp UI must not hard-code Turkish copy: {forbidden_visible}")
@@ -382,4 +423,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.8 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.9 project structure, permissions, resources, CI and safety guardrails are valid.")

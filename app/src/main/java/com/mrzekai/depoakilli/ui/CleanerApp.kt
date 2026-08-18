@@ -177,6 +177,8 @@ fun CleanerApp(
                                 categoryReviewTitle
                             detailScreen == DetailScreen.CLEAN_RESULTS && state.scanFocus == ScanFocus.SMART ->
                                 R.string.smart_clean_results_title
+                            detailScreen == DetailScreen.CLEAN_RESULTS ->
+                                scanFocusTitleRes(state.scanFocus)
                             else -> detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
                         }
                         Text(
@@ -255,6 +257,7 @@ fun CleanerApp(
                 onScan = { viewModel.scan(state.scanFocus) },
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
+                onSetItemsSelected = viewModel::setItemsSelected,
                 onOpenCategoryReview = viewModel::openSmartCategoryReview,
                 onOpenStorageReview = viewModel::openStorageReview,
                 onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
@@ -722,6 +725,7 @@ private fun CleanScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
+    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
     onOpenCategoryReview: (CleanCategory) -> Unit,
     onOpenStorageReview: (com.mrzekai.depoakilli.model.StorageFileType) -> Unit,
     onToggleStorageReviewItem: (String) -> Unit,
@@ -743,6 +747,28 @@ private fun CleanScreen(
             onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
             onClean = onClean,
             onCleanStorage = onCleanStorage,
+            modifier = modifier,
+        )
+        return
+    }
+
+    if (state.scanFocus in setOf(
+            ScanFocus.DEEP,
+            ScanFocus.JUNK,
+            ScanFocus.DUPLICATES,
+            ScanFocus.LARGE_FILES,
+            ScanFocus.MEDIA,
+            ScanFocus.DOWNLOADS,
+            ScanFocus.APKS,
+        )
+    ) {
+        PremiumCleanerToolScreen(
+            state = state,
+            onRequestAllFilesAccess = onRequestAllFilesAccess,
+            onScan = onScan,
+            onToggleItem = onToggleItem,
+            onSetItemsSelected = onSetItemsSelected,
+            onClean = onClean,
             modifier = modifier,
         )
         return
