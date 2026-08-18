@@ -118,15 +118,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showCleanupInterstitialThenDelete(itemIds: Set<String>? = null) {
-        suppressNextAppOpenAd()
-        interstitialAds.showBeforeCleanup(this) {
+        runCleanupAdGate {
             executeCleanupPlan(itemIds)
         }
     }
 
     private fun showStorageCleanupInterstitialThenDelete() {
-        suppressNextAppOpenAd()
-        interstitialAds.showBeforeCleanup(this) {
+        runCleanupAdGate {
             cleanerViewModel.deleteSelectedStorageReview {
                 cleanerViewModel.refreshDeviceState()
             }
@@ -134,12 +132,18 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showWhatsAppCleanupInterstitialThenDelete(onFinished: (Boolean) -> Unit) {
-        suppressNextAppOpenAd()
-        interstitialAds.showBeforeCleanup(this) {
+        runCleanupAdGate {
             cleanerViewModel.deleteSelectedWhatsApp { changed ->
                 cleanerViewModel.refreshDeviceState()
                 onFinished(changed)
             }
+        }
+    }
+
+    private fun runCleanupAdGate(afterAd: () -> Unit) {
+        suppressNextAppOpenAd()
+        interstitialAds.showBeforeCleanup(this) {
+            afterAd()
         }
     }
 

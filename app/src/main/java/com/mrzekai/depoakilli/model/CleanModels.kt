@@ -208,15 +208,29 @@ data class ScanSummary(
     val storageTypes: List<StorageTypeStat> = emptyList(),
     val storagePreviews: Map<StorageFileType, List<IndexedFile>> = emptyMap(),
 ) {
-    val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
-    val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)
-    val safeSuggestedBytes: Long get() = items.asSequence()
-        .filter { it.assessment.recommended }
-        .sumOf(CleanableItem::sizeBytes)
-    val reviewItems: List<CleanableItem> get() = items.filterNot { it.assessment.recommended }
-    val reviewBytes: Long get() = reviewItems.sumOf(CleanableItem::sizeBytes)
-    val totalSuggestedBytes: Long get() = items.sumOf(CleanableItem::sizeBytes)
-    val byCategory: Map<CleanCategory, List<CleanableItem>> get() = items.groupBy { it.assessment.category }
+    val selectedItems: List<CleanableItem> by lazy(LazyThreadSafetyMode.NONE) {
+        items.filter(CleanableItem::selected)
+    }
+    val selectedBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
+        selectedItems.sumOf(CleanableItem::sizeBytes)
+    }
+    val safeSuggestedBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
+        items.asSequence()
+            .filter { it.assessment.recommended }
+            .sumOf(CleanableItem::sizeBytes)
+    }
+    val reviewItems: List<CleanableItem> by lazy(LazyThreadSafetyMode.NONE) {
+        items.filterNot { it.assessment.recommended }
+    }
+    val reviewBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
+        reviewItems.sumOf(CleanableItem::sizeBytes)
+    }
+    val totalSuggestedBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
+        items.sumOf(CleanableItem::sizeBytes)
+    }
+    val byCategory: Map<CleanCategory, List<CleanableItem>> by lazy(LazyThreadSafetyMode.NONE) {
+        items.groupBy { it.assessment.category }
+    }
 }
 
 object ByteFormatter {

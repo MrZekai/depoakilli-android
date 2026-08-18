@@ -212,7 +212,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         hasWhatsAppAccess = repository.hasWhatsAppAccess(),
                     )
                 }
-                refreshAppCaches(force = true)
+                if (focus != ScanFocus.SMART) {
+                    refreshAppCaches()
+                }
             }.onFailure {
                 _state.update { current ->
                     current.copy(

@@ -18,6 +18,7 @@ import android.os.Debug
 import android.os.Environment
 import android.os.Process
 import android.os.StatFs
+import android.os.SystemClock
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
@@ -260,8 +261,9 @@ class DeviceRepository(
             }
         }
 
+        // Smart Clean must stay fast: exact whole-file duplicate hashing belongs
+        // to the dedicated Duplicate Cleaner and deeper review tools.
         if (
-            focus == ScanFocus.SMART ||
             focus == ScanFocus.DEEP ||
             focus == ScanFocus.DUPLICATES ||
             focus == ScanFocus.MEDIA
@@ -502,6 +504,9 @@ class DeviceRepository(
         val pending = ArrayDeque<File>()
         pending.add(root)
         var visitedDirectories = 0
+        var lastProgressDirectories = 0
+        var lastProgressFiles = 0
+        var lastProgressAt = 0L
 
         while (pending.isNotEmpty() && output.size < MAX_INDEXED_FILES) {
             coroutineContext.ensureActive()
@@ -519,9 +524,21 @@ class DeviceRepository(
                     if (output.size >= MAX_INDEXED_FILES) break
                 }
             }
-            if (visitedDirectories % 10 == 0 || output.size % 250 == 0) {
+
+            val now = SystemClock.elapsedRealtime()
+            val enoughProgress =
+                visitedDirectories - lastProgressDirectories >= 12 ||
+                    output.size - lastProgressFiles >= 300
+            if (enoughProgress && now - lastProgressAt >= SCAN_PROGRESS_THROTTLE_MILLIS) {
                 onTraversalProgress(visitedDirectories, output.size)
+                lastProgressDirectories = visitedDirectories
+                lastProgressFiles = output.size
+                lastProgressAt = now
             }
+        }
+
+        if (visitedDirectories != lastProgressDirectories || output.size != lastProgressFiles) {
+            onTraversalProgress(visitedDirectories, output.size)
         }
         return output
     }
@@ -819,6 +836,7 @@ class DeviceRepository(
         private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
         private const val MAX_RESULT_ITEMS = 4_000
+        private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
         private const val HASH_BUFFER_BYTES = 256 * 1024
         private const val HASH_SAMPLE_BYTES = 64 * 1024
         private const val MIN_DUPLICATE_BYTES = 32L * 1024L

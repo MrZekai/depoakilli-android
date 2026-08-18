@@ -509,7 +509,8 @@ private fun SmartResultsContent(
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
     var expandedCategories by remember {
-        mutableStateOf(setOf(CleanCategory.WHATSAPP_MEDIA, CleanCategory.DUPLICATE))
+        // Keep heavy media rails collapsed on first paint.
+        mutableStateOf(setOf(CleanCategory.JUNK))
     }
 
     val category = activeCategoryReview

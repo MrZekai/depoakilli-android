@@ -134,8 +134,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 16",
-    'versionName = "0.5.9"',
+    "versionCode = 17",
+    'versionName = "0.5.10"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -172,6 +172,7 @@ for expected in (
     "ScanFocus.APKS",
     "ScanFocus.ANALYZE",
     "assessDeep(file",
+    "SCAN_PROGRESS_THROTTLE_MILLIS = 120L",
 ):
     if expected not in repository:
         errors.append(f"missing Cleaner Engine repository invariant: {expected}")
@@ -200,6 +201,7 @@ for expected in (
     "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
     "StorageManager.ACTION_CLEAR_APP_CACHE",
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
+    "runCleanupAdGate",
 ):
     if expected not in main_activity:
         errors.append(f"missing Android system flow: {expected}")
