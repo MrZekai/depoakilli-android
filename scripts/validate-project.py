@@ -51,6 +51,7 @@ required = [
     "docs/CLEANER_ENGINE_V050.md",
     "docs/NEON_DASHBOARD_V051.md",
     "docs/REVISION_NOTES_V051.md",
+    "docs/REVISION_NOTES_V057.md",
     "docs/PLAY_PERMISSIONS_V050.md",
     "docs/PERMISSIONS.md",
     "docs/ANDROID_CACHE_LIMITS.md",
@@ -129,8 +130,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 13",
-    'versionName = "0.5.6"',
+    "versionCode = 14",
+    'versionName = "0.5.7"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -171,6 +172,14 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing Cleaner Engine repository invariant: {expected}")
 
+for expected in (
+    "scanStorageReview",
+    "deleteStorageReviewItems",
+    "MAX_STORAGE_REVIEW_ITEMS = 50_000",
+):
+    if expected not in repository:
+        errors.append(f"missing v0.5.7 storage review repository invariant: {expected}")
+
 for forbidden in (
     "MAX_HASH_BYTES",
     "MAX_DUPLICATE_GROUP",
@@ -206,9 +215,9 @@ for expected in (
     "CleaningScoreRing",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.6 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.7 dashboard invariant: {expected}")
 if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.6 dashboard must not advertise a non-existent Pro/Premium tier")
+    errors.append("v0.5.7 dashboard must not advertise a non-existent Pro/Premium tier")
 
 smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (
@@ -217,29 +226,33 @@ for expected in (
     "SmartHorizontalPreviewTile",
     "SmartCleanBottomAction",
     "CleanupConfirmationDialog",
-    "StorageDetailDialog",
+    "CategoryDetailPage",
+    "StorageDetailPage",
+    "StorageReviewGridItem",
+    "StorageReviewListItem",
+    "ReviewCleanupFooter",
+    "StorageCleanupConfirmationDialog",
     "FilePreviewDialog",
     "CategoryGridItem",
     "LazyVerticalGrid(",
     "VideoFilePreview",
     "smart_video_play",
-    "summary.storagePreviews",
     "LazyRow(",
 ):
     if expected not in smart_results:
-        errors.append(f"missing v0.5.6 Smart Clean template invariant: {expected}")
+        errors.append(f"missing v0.5.7 Smart Clean/storage review invariant: {expected}")
 if "import androidx.compose.foundation.layout.weight" in smart_results:
     errors.append("SmartCleanResultsScreen must not import the internal Compose layout weight symbol")
 if "Smart Clean scan in progress" not in (ROOT / "app/src/main/res/values/strings.xml").read_text(encoding="utf-8"):
-    errors.append("v0.5.6 must use the upgraded Smart Clean scan-progress copy")
+    errors.append("v0.5.7 must use the upgraded Smart Clean scan-progress copy")
 if "smart_detail_grid_hint" not in smart_results:
-    errors.append("v0.5.6 category detail must use the visual review grid guidance")
+    errors.append("v0.5.7 category detail must use the visual review grid guidance")
 if "ExoPlayer.Builder" not in smart_results or "MediaItem.fromUri" not in smart_results:
-    errors.append("v0.5.6 video preview must use Jetpack Media3 ExoPlayer")
+    errors.append("v0.5.7 video preview must use Jetpack Media3 ExoPlayer")
 if "VideoView" in smart_results:
-    errors.append("legacy VideoView must not remain in v0.5.6 Smart Clean preview")
+    errors.append("legacy VideoView must not remain in v0.5.7 Smart Clean preview")
 if "R.layout.smart_video_player" not in smart_results:
-    errors.append("v0.5.6 video preview must use the TextureView-backed PlayerView layout")
+    errors.append("v0.5.7 video preview must use the TextureView-backed PlayerView layout")
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
     ROOT / "app/src/main/res/values-tr/strings.xml",
@@ -251,7 +264,7 @@ for strings_path in (
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
 ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
 view_model_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
-if "dashboardReviewBytes" not in view_model_source or "summary.selectedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
+if "dashboardReviewBytes" not in view_model_source or "summary.safeSuggestedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
     errors.append("dashboard must separate safely selected cleanup bytes from review-only candidate bytes")
 if "dashboard_safe_cleanable" not in dashboard or "dashboard_review_ready" not in dashboard:
     errors.append("dashboard must label safe cleanup and review candidates separately")
@@ -263,9 +276,9 @@ if 'val generatedThumbnail = path.contains("/.thumbnails/")' not in ai_engine_so
 if "detailScreen == DetailScreen.CLEAN_RESULTS" not in cleaner_app or "BannerAd(canRequestAds = canRequestAds)" not in cleaner_app:
     errors.append("Smart Clean results must reserve an anchored banner slot")
 if "AdSize.BANNER" not in ads_source:
-    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.6")
+    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.7")
 if "getLargeAnchoredAdaptiveBannerAdSize" in ads_source:
-    errors.append("v0.5.6 must not reserve the oversized large adaptive banner")
+    errors.append("v0.5.7 must not reserve the oversized large adaptive banner")
 main_activity_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
 if "showBeforeCleanup" not in ads_source or "onFinished: () -> Unit" not in ads_source:
     errors.append("cleanup interstitial must run before deletion and expose a completion callback")
@@ -275,6 +288,18 @@ if "cleanupInProgress: Boolean = false" not in view_model_source or "if (_state.
     errors.append("cleanup must guard against duplicate concurrent delete executions")
 if "refreshAfterCleanup" not in view_model_source:
     errors.append("cleanup must refresh results after deletion completes")
+if "smartCategoryReview" not in view_model_source or "openSmartCategoryReview" not in view_model_source:
+    errors.append("Smart Clean View all must use in-screen category review navigation")
+if "StorageReviewSummary" not in view_model_source or "openStorageReview" not in view_model_source:
+    errors.append("Storage Analysis must load a full selectable review state")
+if "toggleStorageReviewItem" not in view_model_source or "toggleAllStorageReviewItems" not in view_model_source:
+    errors.append("Storage Analysis must support per-file and select-all selection")
+if "deleteSelectedStorageReview" not in view_model_source:
+    errors.append("Storage Analysis must support real selected-file deletion")
+if "showStorageCleanupInterstitialThenDelete" not in main_activity_source:
+    errors.append("Storage Analysis deletion must reuse the disclosed interstitial-before-delete flow")
+if "storage_analyzer_action_hint" not in smart_results or "storage_review_manual_reason" not in smart_results:
+    errors.append("Storage Analysis must explain manual review and non-automatic selection")
 if "TopAppBar(" in cleaner_app:
     if "ExperimentalMaterial3Api" not in cleaner_app or "@OptIn(ExperimentalMaterial3Api::class)" not in cleaner_app:
         errors.append("CleanerApp TopAppBar requires ExperimentalMaterial3Api opt-in")
@@ -317,4 +342,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.6 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.7 project structure, permissions, resources, CI and safety guardrails are valid.")

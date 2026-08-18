@@ -457,4 +457,16 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_video_preview_error">Bu video bu cihazda oynatılamadı.</string>
     <string name="smart_video_no_picture">Video görüntüsü bu cihazdaki codec tarafından desteklenmiyor.</string>
 
+    <string name="storage_analyzer_action_hint">Bir kategori açarak dosyaları önizleyebilir, seçebilir ve manuel olarak silebilirsin. Burada hiçbir dosya otomatik seçilmez.</string>
+    <string name="storage_review_manual_reason">Depolama Analizi yalnızca manuel incelemedir. Sen temizliğe seçmediğin sürece bu dosya korunur.</string>
+    <string name="storage_review_scanning">Kategorinin tamamı hazırlanıyor…</string>
+    <string name="storage_review_summary">%1$d dosya • %2$s</string>
+    <string name="storage_review_no_auto_select">Burada hiçbir şey otomatik seçilmez. Önizlemek için dosyaya, silmek istediğinde yalnızca seçim kutusuna dokun.</string>
+    <string name="storage_review_scan_progress">%1$d dosya indekslendi • %2$d klasör gezildi</string>
+    <string name="storage_review_selected_summary">Seçili: %1$d • %2$s</string>
+    <string name="storage_review_loading_hint">Bu depolama kategorisinin tam ve seçilebilir görünümü hazırlanıyor…</string>
+    <string name="storage_review_limit_note">Çok büyük kategori güvenlik gösterim sınırına ulaştı. Bir miktar temizlikten sonra analizi yeniden çalıştırabilirsin.</string>
+    <string name="storage_review_delete_title">Seçili depolama dosyaları silinsin mi?</string>
+    <string name="storage_review_delete_body">%1$d dosya seçtin; toplam %2$s. Devam etmeden önce aşağıdaki örnekleri kontrol et.</string>
+    <string name="storage_review_delete_warning">Bunlar otomatik çöp değil, senin seçtiğin dosyalardır. Silme işlemi geri alınamaz.</string>
 </resources>

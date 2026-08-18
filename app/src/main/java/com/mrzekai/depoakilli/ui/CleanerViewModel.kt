@@ -16,6 +16,9 @@ import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
+import com.mrzekai.depoakilli.model.StorageFileType
+import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
@@ -37,6 +40,10 @@ data class CleanerUiState(
     val dashboardCleanableBytes: Long = 0L,
     val dashboardReviewBytes: Long = 0L,
     val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
+    val smartCategoryReview: CleanCategory? = null,
+    val storageReview: StorageReviewSummary = StorageReviewSummary(),
+    val storageReviewProgressFiles: Int = 0,
+    val storageReviewProgressDirectories: Int = 0,
     val scanning: Boolean = false,
     val scanProgressFiles: Int = 0,
     val scanProgressDirectories: Int = 0,
@@ -183,7 +190,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     it.copy(
                         summary = summary,
                         dashboardCleanableBytes = if (comprehensive) {
-                            summary.selectedBytes
+                            summary.safeSuggestedBytes
                         } else {
                             it.dashboardCleanableBytes
                         },
@@ -325,6 +332,100 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun openSmartCategoryReview(category: CleanCategory) {
+        _state.update { it.copy(smartCategoryReview = category) }
+    }
+
+    fun closeSmartCategoryReview() {
+        _state.update { it.copy(smartCategoryReview = null) }
+    }
+
+    fun openStorageReview(type: StorageFileType) {
+        if (_state.value.storageReview.loading && _state.value.storageReview.type == type) return
+        if (!repository.hasAllFilesAccess()) {
+            _state.update {
+                it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
+            }
+            return
+        }
+        _state.update {
+            it.copy(
+                storageReview = StorageReviewSummary(type = type, loading = true),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+                message = null,
+            )
+        }
+        viewModelScope.launch {
+            runCatching {
+                repository.scanStorageReview(type) { directories, files ->
+                    _state.update { state ->
+                        if (state.storageReview.type == type) {
+                            state.copy(
+                                storageReviewProgressDirectories = directories,
+                                storageReviewProgressFiles = files,
+                            )
+                        } else {
+                            state
+                        }
+                    }
+                }
+            }.onSuccess { review ->
+                _state.update { state ->
+                    if (state.storageReview.type == type) {
+                        state.copy(
+                            storageReview = review,
+                            storageReviewProgressFiles = review.scannedFileCount,
+                        )
+                    } else {
+                        state
+                    }
+                }
+            }.onFailure {
+                _state.update { state ->
+                    state.copy(
+                        storageReview = StorageReviewSummary(type = type, loading = false),
+                        message = getApplication<Application>().getString(R.string.message_scan_failed),
+                    )
+                }
+            }
+        }
+    }
+
+    fun closeStorageReview() {
+        _state.update {
+            it.copy(
+                storageReview = StorageReviewSummary(),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+            )
+        }
+    }
+
+    fun toggleStorageReviewItem(id: String) {
+        _state.update { state ->
+            state.copy(
+                storageReview = state.storageReview.copy(
+                    items = state.storageReview.items.map { item ->
+                        if (item.id == id) item.copy(selected = !item.selected) else item
+                    },
+                ),
+            )
+        }
+    }
+
+    fun toggleAllStorageReviewItems() {
+        _state.update { state ->
+            val items = state.storageReview.items
+            val select = items.any { !it.selected }
+            state.copy(
+                storageReview = state.storageReview.copy(
+                    items = items.map { it.copy(selected = select) },
+                ),
+            )
+        }
+    }
+
     fun toggleItem(id: String) {
         _state.update { state ->
             state.copy(
@@ -352,11 +453,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun prepareCleanup(
+        itemIds: Set<String>? = null,
         onPlanReady: (DeviceRepository.DeletePlan) -> Unit,
         onCleanupCompleted: () -> Unit,
     ) {
         if (_state.value.cleanupInProgress) return
-        val selected = _state.value.summary.selectedItems
+        val selected = if (itemIds == null) {
+            _state.value.summary.selectedItems
+        } else {
+            _state.value.summary.items.filter { it.id in itemIds && it.selected }
+        }
         if (selected.isEmpty()) {
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
@@ -390,6 +496,36 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }
             }
+        }
+    }
+
+    fun deleteSelectedStorageReview(onCleanupCompleted: () -> Unit) {
+        if (_state.value.cleanupInProgress) return
+        val selected = _state.value.storageReview.selectedItems
+        if (selected.isEmpty()) {
+            _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
+            return
+        }
+        _state.update { it.copy(cleanupInProgress = true, message = null) }
+        viewModelScope.launch {
+            runCatching { repository.deleteStorageReviewItems(selected) }
+                .onSuccess { result ->
+                    finishStorageReviewCleanup(
+                        attempted = selected,
+                        deletedIds = result.deletedIds,
+                        deletedBytes = result.deletedBytes,
+                        failedCount = result.failedCount,
+                    )
+                    onCleanupCompleted()
+                }
+                .onFailure {
+                    _state.update { state ->
+                        state.copy(
+                            cleanupInProgress = false,
+                            message = getApplication<Application>().getString(R.string.message_cleanup_failed),
+                        )
+                    }
+                }
         }
     }
 
@@ -457,6 +593,65 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         if (clearPending) pendingConsentItems = emptyList()
+    }
+
+    private fun finishStorageReviewCleanup(
+        attempted: List<StorageReviewItem>,
+        deletedIds: Set<String>,
+        deletedBytes: Long,
+        failedCount: Int,
+    ) {
+        _state.update { state ->
+            val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
+            val deletedUris = deletedFiles.mapTo(hashSetOf()) { it.uri }
+            val remainingSmartItems = state.summary.items.filterNot { it.uri in deletedUris }
+            val reviewType = state.storageReview.type
+            val deletedStorageBytes = deletedFiles.sumOf { it.sizeBytes }
+            val deletedStorageCount = deletedFiles.size
+            val updatedStorageTypes = state.summary.storageTypes.map { stat ->
+                if (reviewType != null && stat.type == reviewType) {
+                    stat.copy(
+                        fileCount = (stat.fileCount - deletedStorageCount).coerceAtLeast(0),
+                        totalBytes = (stat.totalBytes - deletedStorageBytes).coerceAtLeast(0L),
+                    )
+                } else {
+                    stat
+                }
+            }.filter { it.fileCount > 0 || it.totalBytes > 0L }
+
+            state.copy(
+                summary = state.summary.copy(
+                    items = remainingSmartItems,
+                    storageTypes = updatedStorageTypes,
+                    storagePreviews = state.summary.storagePreviews.mapValues { (_, files) ->
+                        files.filterNot { it.uri in deletedUris }
+                    },
+                ),
+                dashboardCleanableBytes = remainingSmartItems
+                    .asSequence()
+                    .filter { it.assessment.recommended }
+                    .sumOf(CleanableItem::sizeBytes),
+                dashboardReviewBytes = remainingSmartItems
+                    .asSequence()
+                    .filterNot { it.assessment.recommended }
+                    .sumOf(CleanableItem::sizeBytes),
+                dashboardCategoryBytes = remainingSmartItems
+                    .groupBy { it.assessment.category }
+                    .mapValues { (_, items) -> items.sumOf(CleanableItem::sizeBytes) },
+                storageReview = state.storageReview.copy(
+                    items = state.storageReview.items.filterNot { it.id in deletedIds },
+                    loading = false,
+                ),
+                storage = repository.storageSnapshot(),
+                memory = repository.memorySnapshot(),
+                cleanupInProgress = false,
+                message = getApplication<Application>().getString(
+                    if (failedCount == 0) R.string.message_cleanup_complete_detail else R.string.message_cleanup_partial_detail,
+                    ByteFormatter.format(deletedBytes),
+                    failedCount,
+                ),
+            )
+        }
     }
 
     fun onDeepCacheCleanupResult(approved: Boolean) {

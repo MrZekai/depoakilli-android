@@ -91,6 +91,7 @@ class MainActivity : ComponentActivity() {
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
                     onPrepareCleanup = ::showCleanupInterstitialThenDelete,
+                    onPrepareStorageCleanup = ::showStorageCleanupInterstitialThenDelete,
                     onOptimizeMemory = {
                         cleanerViewModel.optimizeMemory {
                             interstitialAds.releaseForMemoryOptimization()
@@ -115,15 +116,25 @@ class MainActivity : ComponentActivity() {
         if (::interstitialAds.isInitialized) interstitialAds.load()
     }
 
-    private fun showCleanupInterstitialThenDelete() {
+    private fun showCleanupInterstitialThenDelete(itemIds: Set<String>? = null) {
         suppressNextAppOpenAd()
         interstitialAds.showBeforeCleanup(this) {
-            executeCleanupPlan()
+            executeCleanupPlan(itemIds)
         }
     }
 
-    private fun executeCleanupPlan() {
+    private fun showStorageCleanupInterstitialThenDelete() {
+        suppressNextAppOpenAd()
+        interstitialAds.showBeforeCleanup(this) {
+            cleanerViewModel.deleteSelectedStorageReview {
+                cleanerViewModel.refreshDeviceState()
+            }
+        }
+    }
+
+    private fun executeCleanupPlan(itemIds: Set<String>? = null) {
         cleanerViewModel.prepareCleanup(
+            itemIds = itemIds,
             onPlanReady = { plan ->
                 if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
                     suppressNextAppOpenAd()

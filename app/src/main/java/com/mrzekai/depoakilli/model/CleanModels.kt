@@ -63,6 +63,27 @@ data class IndexedFile(
     val relativePath: String,
 )
 
+
+
+data class StorageReviewItem(
+    val file: IndexedFile,
+    val selected: Boolean = false,
+) {
+    val id: String get() = file.uri
+}
+
+data class StorageReviewSummary(
+    val type: StorageFileType? = null,
+    val items: List<StorageReviewItem> = emptyList(),
+    val scannedFileCount: Int = 0,
+    val scanLimitReached: Boolean = false,
+    val loading: Boolean = false,
+) {
+    val totalBytes: Long get() = items.sumOf { it.file.sizeBytes }
+    val selectedItems: List<StorageReviewItem> get() = items.filter(StorageReviewItem::selected)
+    val selectedBytes: Long get() = selectedItems.sumOf { it.file.sizeBytes }
+}
+
 data class AiAssessment(
     val category: CleanCategory,
     val safetyScore: Int,
@@ -189,7 +210,10 @@ data class ScanSummary(
 ) {
     val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
     val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)
-    val reviewItems: List<CleanableItem> get() = items.filterNot(CleanableItem::selected)
+    val safeSuggestedBytes: Long get() = items.asSequence()
+        .filter { it.assessment.recommended }
+        .sumOf(CleanableItem::sizeBytes)
+    val reviewItems: List<CleanableItem> get() = items.filterNot { it.assessment.recommended }
     val reviewBytes: Long get() = reviewItems.sumOf(CleanableItem::sizeBytes)
     val totalSuggestedBytes: Long get() = items.sumOf(CleanableItem::sizeBytes)
     val byCategory: Map<CleanCategory, List<CleanableItem>> get() = items.groupBy { it.assessment.category }

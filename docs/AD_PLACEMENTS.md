@@ -1,11 +1,14 @@
-# Ad placements — v0.5.5
+# Ad placements — v0.5.7
 
-- Anchored adaptive banner has dedicated reserved layout space. On Smart Clean Results it sits below the sticky selected-size / Review & clean action; on the home shell it remains above bottom navigation.
+- The home shell and Clean Results shell reserve one standard `AdSize.BANNER` 320x50 mobile banner slot.
+- Smart Clean category "View all" and Storage Analysis review pages render inside the Clean Results shell; they do **not** create a second banner or a hidden ad behind a modal dialog.
 - App Open remains subject to consent and foreground guards.
-- Smart Clean interstitial is eligible only after the user finishes review and explicitly confirms cleanup. If a preloaded ad is available, it is shown at that transition; deletion starts from the dismissal/failure callback. If no ad is available, cleanup proceeds without blocking the user.
-- Cleaner Engine permission/system-control transitions suppress the next App Open ad where appropriate.
+- Smart Clean and Storage Analysis interstitials are eligible only after the user explicitly selects files, opens the final irreversible-delete confirmation, and confirms cleanup.
+- The confirmation discloses that an eligible interstitial can appear before deletion. The interstitial dismissal/failure callback continues the delete action. If no ad is loaded, the delete action proceeds without blocking.
+- The existing interstitial cooldown and App Open separation remain active.
 - No ad may visually imitate a cleaner action, delete button, permission button, result card or system confirmation.
+- No ad is shown simply because a user opened a Storage Analysis category or previewed a file.
 
-## v0.5.5 banner sizing
+## Banner sizing
 
-Home and Smart Clean result screens reserve a standard `AdSize.BANNER` 320x50 mobile banner slot. The app no longer reserves the taller large-adaptive container on phones.
+The app reserves a standard `AdSize.BANNER` 320x50 mobile banner slot. It does not reserve the taller large-adaptive container on phones.

@@ -457,4 +457,16 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_video_preview_error">This video could not be played on this device.</string>
     <string name="smart_video_no_picture">This device codec cannot render the video track.</string>
 
+    <string name="storage_analyzer_action_hint">Open a category to preview, select and delete files manually. Nothing here is selected automatically.</string>
+    <string name="storage_review_manual_reason">Storage Analysis is manual review only. This file is protected unless you select it for cleanup.</string>
+    <string name="storage_review_scanning">Preparing the full category…</string>
+    <string name="storage_review_summary">%1$d files • %2$s</string>
+    <string name="storage_review_no_auto_select">Nothing is auto-selected here. Tap a file to preview it; use the checkbox only when you want to delete it.</string>
+    <string name="storage_review_scan_progress">Indexed %1$d files across %2$d folders</string>
+    <string name="storage_review_selected_summary">Selected: %1$d • %2$s</string>
+    <string name="storage_review_loading_hint">Building a full, selectable view of this storage category…</string>
+    <string name="storage_review_limit_note">A very large category reached the safety display limit. Refine the folder or run the analysis again after cleaning.</string>
+    <string name="storage_review_delete_title">Delete selected storage files?</string>
+    <string name="storage_review_delete_body">You selected %1$d files using %2$s. Review the examples below before continuing.</string>
+    <string name="storage_review_delete_warning">These are user-selected files, not automatic junk. Deletion cannot be undone.</string>
 </resources>

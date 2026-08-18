@@ -34,6 +34,8 @@ import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
+import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.StorageTypeStat
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -306,6 +308,32 @@ class DeviceRepository(
         )
     }
 
+    suspend fun scanStorageReview(
+        type: StorageFileType,
+        onProgress: (Int, Int) -> Unit = { _, _ -> },
+    ): StorageReviewSummary = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess()) {
+            return@withContext StorageReviewSummary(type = type)
+        }
+        val indexed = indexSharedStorage { visitedDirectories, discoveredFiles ->
+            onProgress(visitedDirectories, discoveredFiles)
+        }
+        val typed = indexed
+            .asSequence()
+            .filter { storageFileType(it) == type }
+            .sortedByDescending(IndexedFile::sizeBytes)
+            .take(MAX_STORAGE_REVIEW_ITEMS)
+            .map { StorageReviewItem(file = it, selected = false) }
+            .toList()
+        StorageReviewSummary(
+            type = type,
+            items = typed,
+            scannedFileCount = indexed.size,
+            scanLimitReached = indexed.size >= MAX_INDEXED_FILES || typed.size >= MAX_STORAGE_REVIEW_ITEMS,
+            loading = false,
+        )
+    }
+
     suspend fun scanWhatsAppLibrary(
         onProgress: (Int) -> Unit = {},
     ): WhatsAppLibrarySummary = withContext(Dispatchers.IO) {
@@ -354,6 +382,25 @@ class DeviceRepository(
             }
             WhatsAppDeleteResult(
                 attemptedCount = items.size,
+                deletedIds = deletedIds,
+                deletedBytes = deletedBytes,
+            )
+        }
+
+    suspend fun deleteStorageReviewItems(items: List<StorageReviewItem>): DirectDeleteResult =
+        withContext(Dispatchers.IO) {
+            val attemptedIds = items.mapTo(hashSetOf(), StorageReviewItem::id)
+            val deletedIds = hashSetOf<String>()
+            var deletedBytes = 0L
+            items.forEach { item ->
+                coroutineContext.ensureActive()
+                if (deleteUriDirectly(item.file.uri)) {
+                    deletedIds += item.id
+                    deletedBytes += item.file.sizeBytes
+                }
+            }
+            DirectDeleteResult(
+                attemptedIds = attemptedIds,
                 deletedIds = deletedIds,
                 deletedBytes = deletedBytes,
             )
@@ -770,6 +817,7 @@ class DeviceRepository(
         private const val MAX_INDEXED_FILES = 200_000
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
+        private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
         private const val MAX_RESULT_ITEMS = 4_000
         private const val HASH_BUFFER_BYTES = 256 * 1024
         private const val HASH_SAMPLE_BYTES = 64 * 1024

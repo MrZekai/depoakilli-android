@@ -102,6 +102,8 @@ import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
+import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import java.io.File
@@ -150,7 +152,12 @@ internal fun SmartCleanResultsScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onClean: () -> Unit,
+    onOpenCategoryReview: (CleanCategory) -> Unit,
+    onOpenStorageReview: (StorageFileType) -> Unit,
+    onToggleStorageReviewItem: (String) -> Unit,
+    onToggleAllStorageReviewItems: () -> Unit,
+    onClean: (Set<String>?) -> Unit,
+    onCleanStorage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -163,11 +170,20 @@ internal fun SmartCleanResultsScreen(
         !state.lastScanCompleted -> SmartEmptyState(onScan = onScan, modifier = modifier)
         else -> SmartResultsContent(
             summary = state.summary,
+            activeCategoryReview = state.smartCategoryReview,
+            storageReview = state.storageReview,
+            storageReviewProgressFiles = state.storageReviewProgressFiles,
+            storageReviewProgressDirectories = state.storageReviewProgressDirectories,
             cleanupInProgress = state.cleanupInProgress,
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
+            onOpenCategoryReview = onOpenCategoryReview,
+            onOpenStorageReview = onOpenStorageReview,
+            onToggleStorageReviewItem = onToggleStorageReviewItem,
+            onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
             onClean = onClean,
+            onCleanStorage = onCleanStorage,
             modifier = modifier,
         )
     }
@@ -473,20 +489,81 @@ private fun SmartEmptyState(onScan: () -> Unit, modifier: Modifier) {
 @Composable
 private fun SmartResultsContent(
     summary: ScanSummary,
+    activeCategoryReview: CleanCategory?,
+    storageReview: StorageReviewSummary,
+    storageReviewProgressFiles: Int,
+    storageReviewProgressDirectories: Int,
     cleanupInProgress: Boolean,
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onClean: () -> Unit,
+    onOpenCategoryReview: (CleanCategory) -> Unit,
+    onOpenStorageReview: (StorageFileType) -> Unit,
+    onToggleStorageReviewItem: (String) -> Unit,
+    onToggleAllStorageReviewItems: () -> Unit,
+    onClean: (Set<String>?) -> Unit,
+    onCleanStorage: () -> Unit,
     modifier: Modifier,
 ) {
     var confirmCleanup by remember { mutableStateOf(false) }
-    var openCategory by remember { mutableStateOf<CleanCategory?>(null) }
-    var openStorageType by remember { mutableStateOf<StorageFileType?>(null) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
-    var previewStorageFile by remember { mutableStateOf<IndexedFile?>(null) }
+    var previewStorageItemId by remember { mutableStateOf<String?>(null) }
     var expandedCategories by remember {
         mutableStateOf(setOf(CleanCategory.WHATSAPP_MEDIA, CleanCategory.DUPLICATE))
+    }
+
+    val category = activeCategoryReview
+    if (category != null) {
+        CategoryDetailPage(
+            category = category,
+            items = summary.byCategory[category].orEmpty(),
+            cleanupInProgress = cleanupInProgress,
+            onToggleCategory = { onToggleCategory(category) },
+            onToggleItem = onToggleItem,
+            onPreview = { previewItemId = it.id },
+            onCleanSelected = { ids -> onClean(ids) },
+            modifier = modifier,
+        )
+        previewItemId?.let { itemId ->
+            summary.items.firstOrNull { it.id == itemId }?.let { item ->
+                FilePreviewDialog(
+                    file = item.toSmartPreview(),
+                    selected = item.selected,
+                    reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    onToggleSelection = { onToggleItem(item.id) },
+                    onDismiss = { previewItemId = null },
+                )
+            }
+        }
+        return
+    }
+
+    val storageType = storageReview.type
+    if (storageType != null) {
+        StorageDetailPage(
+            type = storageType,
+            review = storageReview,
+            progressFiles = storageReviewProgressFiles,
+            progressDirectories = storageReviewProgressDirectories,
+            cleanupInProgress = cleanupInProgress,
+            onToggleItem = onToggleStorageReviewItem,
+            onToggleAll = onToggleAllStorageReviewItems,
+            onPreview = { previewStorageItemId = it.id },
+            onCleanSelected = onCleanStorage,
+            modifier = modifier,
+        )
+        previewStorageItemId?.let { itemId ->
+            storageReview.items.firstOrNull { it.id == itemId }?.let { item ->
+                FilePreviewDialog(
+                    file = item.file.toSmartPreview(),
+                    selected = item.selected,
+                    reason = stringResource(R.string.storage_review_manual_reason),
+                    onToggleSelection = { onToggleStorageReviewItem(item.id) },
+                    onDismiss = { previewStorageItemId = null },
+                )
+            }
+        }
+        return
     }
 
     Column(
@@ -524,24 +601,24 @@ private fun SmartResultsContent(
                     }
                 }
             } else {
-                orderedSmartCategories(summary).forEach { category ->
-                    val categoryItems = summary.byCategory[category].orEmpty()
+                orderedSmartCategories(summary).forEach { smartCategory ->
+                    val categoryItems = summary.byCategory[smartCategory].orEmpty()
                     if (categoryItems.isNotEmpty()) {
-                        item(key = "smart-category-${category.name}") {
+                        item(key = "smart-category-${smartCategory.name}") {
                             SmartCategoryStripCard(
-                                category = category,
+                                category = smartCategory,
                                 items = categoryItems,
-                                expanded = category in expandedCategories,
+                                expanded = smartCategory in expandedCategories,
                                 onExpandToggle = {
-                                    expandedCategories = if (category in expandedCategories) {
-                                        expandedCategories - category
+                                    expandedCategories = if (smartCategory in expandedCategories) {
+                                        expandedCategories - smartCategory
                                     } else {
-                                        expandedCategories + category
+                                        expandedCategories + smartCategory
                                     }
                                 },
-                                onToggleCategory = { onToggleCategory(category) },
+                                onToggleCategory = { onToggleCategory(smartCategory) },
                                 onPreview = { previewItemId = it.id },
-                                onOpenAll = { openCategory = category },
+                                onOpenAll = { onOpenCategoryReview(smartCategory) },
                                 onToggleItem = onToggleItem,
                             )
                         }
@@ -550,13 +627,19 @@ private fun SmartResultsContent(
             }
 
             item {
-                Text(
-                    stringResource(R.string.storage_analyzer_title),
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Black,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 2.dp),
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        stringResource(R.string.storage_analyzer_title),
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Text(
+                        stringResource(R.string.storage_analyzer_action_hint),
+                        color = SmartTextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
 
             val storageRows = summary.storageTypes.chunked(3)
@@ -571,7 +654,10 @@ private fun SmartResultsContent(
                                 type = stat.type,
                                 count = stat.fileCount,
                                 bytes = stat.totalBytes,
-                                onClick = { openStorageType = stat.type },
+                                onClick = {
+                                    previewStorageItemId = null
+                                    onOpenStorageReview(stat.type)
+                                },
                                 modifier = Modifier.weight(1f),
                             )
                         }
@@ -613,28 +699,8 @@ private fun SmartResultsContent(
             onDismiss = { confirmCleanup = false },
             onConfirm = {
                 confirmCleanup = false
-                onClean()
+                onClean(null)
             },
-        )
-    }
-
-    openCategory?.let { category ->
-        CategoryDetailDialog(
-            category = category,
-            items = summary.byCategory[category].orEmpty(),
-            onDismiss = { openCategory = null },
-            onToggleCategory = { onToggleCategory(category) },
-            onToggleItem = onToggleItem,
-            onPreview = { previewItemId = it.id },
-        )
-    }
-
-    openStorageType?.let { type ->
-        StorageDetailDialog(
-            type = type,
-            files = summary.storagePreviews[type].orEmpty(),
-            onDismiss = { openStorageType = null },
-            onPreview = { previewStorageFile = it },
         )
     }
 
@@ -648,16 +714,6 @@ private fun SmartResultsContent(
                 onDismiss = { previewItemId = null },
             )
         }
-    }
-
-    previewStorageFile?.let { file ->
-        FilePreviewDialog(
-            file = file.toSmartPreview(),
-            selected = null,
-            reason = null,
-            onToggleSelection = null,
-            onDismiss = { previewStorageFile = null },
-        )
     }
 }
 
@@ -1158,157 +1214,212 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
 }
 
 @Composable
-private fun CategoryDetailDialog(
-    category: CleanCategory,
+private fun CleanupItemsConfirmationDialog(
     items: List<CleanableItem>,
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val bytes = items.sumOf(CleanableItem::sizeBytes)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Outlined.DeleteSweep, contentDescription = null, tint = ElectricBlue) },
+        title = { Text(stringResource(R.string.smart_cleanup_confirm_title), fontWeight = FontWeight.Black) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                Text(
+                    stringResource(
+                        R.string.smart_cleanup_confirm_body,
+                        ByteFormatter.format(bytes),
+                        items.size,
+                    ),
+                )
+                items.take(5).forEach { item ->
+                    Text(
+                        "• ${item.name}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                if (items.size > 5) {
+                    Text(
+                        stringResource(R.string.smart_cleanup_more_items, items.size - 5),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                Text(
+                    stringResource(R.string.smart_cleanup_ad_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF2867D8),
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    stringResource(R.string.smart_cleanup_confirm_warning),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(stringResource(R.string.smart_cleanup_confirm_action))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+    )
+}
+
+@Composable
+private fun CategoryDetailPage(
+    category: CleanCategory,
+    items: List<CleanableItem>,
+    cleanupInProgress: Boolean,
     onToggleCategory: () -> Unit,
     onToggleItem: (String) -> Unit,
     onPreview: (CleanableItem) -> Unit,
+    onCleanSelected: (Set<String>) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
+    var confirmCleanup by remember { mutableStateOf(false) }
     val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
-    val selectedCount = items.count(CleanableItem::selected)
-    val selectedBytes = items.asSequence().filter(CleanableItem::selected).sumOf(CleanableItem::sizeBytes)
+    val selectedItems = items.filter(CleanableItem::selected)
+    val selectedCount = selectedItems.size
+    val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
     val allSelected = items.isNotEmpty() && selectedCount == items.size
     val accent = categoryAccent(category)
 
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = SmartBackground,
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF02081A), Color(0xFF061633), Color(0xFF030A1E)),
+                ),
+            ),
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = SmartCard),
         ) {
-            Column(Modifier.fillMaxSize()) {
-                DialogHeader(title = stringResource(category.titleRes), onBack = onDismiss)
-
-                Card(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
-                    shape = RoundedCornerShape(22.dp),
-                    colors = CardDefaults.cardColors(containerColor = SmartCard),
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringResource(
+                                R.string.smart_detail_selected_summary,
+                                selectedCount,
+                                items.size,
+                                ByteFormatter.format(selectedBytes),
+                            ),
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                        )
+                        Text(
+                            stringResource(R.string.smart_detail_grid_hint),
+                            color = SmartTextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Surface(
+                        color = accent.copy(alpha = .16f),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(
-                                        R.string.smart_detail_selected_summary,
-                                        selectedCount,
-                                        items.size,
-                                        ByteFormatter.format(selectedBytes),
-                                    ),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Black,
-                                )
-                                Text(
-                                    stringResource(R.string.smart_detail_grid_hint),
-                                    color = SmartTextSecondary,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
-                            Surface(
-                                color = accent.copy(alpha = .16f),
-                                shape = RoundedCornerShape(16.dp),
-                            ) {
-                                Text(
-                                    ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes)),
-                                    color = accent,
-                                    fontWeight = FontWeight.Black,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                )
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color(0xFF102850))
-                                .clickable { onToggleCategory() }
-                                .padding(horizontal = 10.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Checkbox(
-                                checked = allSelected,
-                                onCheckedChange = { onToggleCategory() },
-                                colors = CheckboxDefaults.colors(
-                                    checkedColor = ElectricBlue,
-                                    uncheckedColor = Color(0xFFA7B8D6),
-                                    checkmarkColor = Color.White,
-                                ),
-                            )
-                            Spacer(Modifier.width(5.dp))
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                                Text(
-                                    stringResource(R.string.smart_preview_tap_hint),
-                                    color = Color(0xFFB8C8E2),
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
-                        }
+                        Text(
+                            ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes)),
+                            color = accent,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        )
                     }
                 }
 
-                if (displayItems.isEmpty()) {
-                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.smart_detail_empty), color = SmartTextSecondary)
-                    }
-                } else {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.weight(1f).fillMaxWidth(),
-                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        gridItems(displayItems, key = CleanableItem::id) { item ->
-                            CategoryGridItem(
-                                item = item,
-                                accent = accent,
-                                onPreview = { onPreview(item) },
-                                onToggle = { onToggleItem(item.id) },
-                            )
-                        }
-                    }
-                }
-
-                Surface(
-                    color = Color(0xFF06132F),
-                    shadowElevation = 12.dp,
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF102850))
+                        .clickable { onToggleCategory() }
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.smart_detail_selected_label),
-                                color = SmartTextSecondary,
-                                fontSize = 11.sp,
-                            )
-                            Text(
-                                "$selectedCount • ${ByteFormatter.format(selectedBytes)}",
-                                color = SmartGreen,
-                                fontWeight = FontWeight.Black,
-                                fontSize = 18.sp,
-                            )
-                        }
-                        Button(onClick = onDismiss) {
-                            Text(stringResource(R.string.done))
-                        }
+                    Checkbox(
+                        checked = allSelected,
+                        onCheckedChange = { onToggleCategory() },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = ElectricBlue,
+                            uncheckedColor = Color(0xFFA7B8D6),
+                            checkmarkColor = Color.White,
+                        ),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            stringResource(R.string.smart_preview_tap_hint),
+                            color = Color(0xFFB8C8E2),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
                     }
                 }
             }
         }
+
+        if (displayItems.isEmpty()) {
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.smart_detail_empty), color = SmartTextSecondary)
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                gridItems(displayItems, key = CleanableItem::id) { item ->
+                    CategoryGridItem(
+                        item = item,
+                        accent = accent,
+                        onPreview = { onPreview(item) },
+                        onToggle = { onToggleItem(item.id) },
+                    )
+                }
+            }
+        }
+
+        ReviewCleanupFooter(
+            selectedCount = selectedCount,
+            selectedBytes = selectedBytes,
+            enabled = selectedItems.isNotEmpty() && !cleanupInProgress,
+            inProgress = cleanupInProgress,
+            onClick = { confirmCleanup = true },
+        )
+    }
+
+    if (confirmCleanup) {
+        CleanupItemsConfirmationDialog(
+            items = selectedItems,
+            onDismiss = { confirmCleanup = false },
+            onConfirm = {
+                confirmCleanup = false
+                onCleanSelected(selectedItems.mapTo(linkedSetOf(), CleanableItem::id))
+            },
+        )
     }
 }
 
@@ -1449,57 +1560,509 @@ private fun CategoryGridItem(
 }
 
 @Composable
-private fun StorageDetailDialog(
+private fun StorageDetailPage(
     type: StorageFileType,
-    files: List<IndexedFile>,
-    onDismiss: () -> Unit,
-    onPreview: (IndexedFile) -> Unit,
+    review: StorageReviewSummary,
+    progressFiles: Int,
+    progressDirectories: Int,
+    cleanupInProgress: Boolean,
+    onToggleItem: (String) -> Unit,
+    onToggleAll: () -> Unit,
+    onPreview: (StorageReviewItem) -> Unit,
+    onCleanSelected: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(
-            modifier = Modifier.fillMaxSize().padding(14.dp),
-            shape = RoundedCornerShape(26.dp),
-            color = Color(0xFF07152B),
+    var confirmCleanup by remember { mutableStateOf(false) }
+    val selectedItems = review.selectedItems
+    val selectedCount = selectedItems.size
+    val selectedBytes = review.selectedBytes
+    val allSelected = review.items.isNotEmpty() && selectedCount == review.items.size
+    val accent = storageAccent(type)
+    val visualType = type == StorageFileType.IMAGES || type == StorageFileType.VIDEOS
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF02081A), Color(0xFF061633), Color(0xFF030A1E)),
+                ),
+            ),
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = SmartCard),
         ) {
-            Column(Modifier.fillMaxSize()) {
-                DialogHeader(title = stringResource(type.titleRes), onBack = onDismiss)
-                Text(
-                    stringResource(R.string.smart_storage_preview_note, files.size),
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFFA9B9D5),
-                )
-                if (files.isEmpty()) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.smart_storage_preview_empty), color = Color(0xFFA9B9D5))
-                    }
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Surface(
+                        color = accent.copy(alpha = .16f),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
-                        items(files, key = IndexedFile::uri) { file ->
-                            Card(
-                                onClick = { onPreview(file) },
-                                shape = RoundedCornerShape(18.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2147)),
-                            ) {
-                                Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(fileVisual(file.mimeType, file.name), contentDescription = null, tint = storageAccent(type), modifier = Modifier.size(28.dp))
-                                    Spacer(Modifier.width(11.dp))
-                                    Column(Modifier.weight(1f)) {
-                                        Text(file.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                        Text(file.relativePath, style = MaterialTheme.typography.bodySmall, color = Color(0xFFA9B9D5), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                    }
-                                    Text(ByteFormatter.format(file.sizeBytes), color = Color.White, fontWeight = FontWeight.Bold)
-                                }
-                            }
+                        Icon(
+                            storageTypeVisual(type),
+                            contentDescription = null,
+                            tint = accent,
+                            modifier = Modifier.padding(10.dp).size(28.dp),
+                        )
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            if (review.loading) {
+                                stringResource(R.string.storage_review_scanning)
+                            } else {
+                                stringResource(
+                                    R.string.storage_review_summary,
+                                    review.items.size,
+                                    ByteFormatter.format(review.totalBytes),
+                                )
+                            },
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                        )
+                        Text(
+                            stringResource(R.string.storage_review_no_auto_select),
+                            color = SmartTextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                }
+
+                if (review.loading) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color(0xFF102850))
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 3.dp,
+                            color = SmartCyan,
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Text(
+                            stringResource(
+                                R.string.storage_review_scan_progress,
+                                progressFiles,
+                                progressDirectories,
+                            ),
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                } else if (review.items.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color(0xFF102850))
+                            .clickable { onToggleAll() }
+                            .padding(horizontal = 10.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Checkbox(
+                            checked = allSelected,
+                            onCheckedChange = { onToggleAll() },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = ElectricBlue,
+                                uncheckedColor = Color(0xFFA7B8D6),
+                                checkmarkColor = Color.White,
+                            ),
+                        )
+                        Spacer(Modifier.width(5.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.storage_review_selected_summary,
+                                    selectedCount,
+                                    ByteFormatter.format(selectedBytes),
+                                ),
+                                color = if (selectedCount > 0) SmartGreen else SmartTextSecondary,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
                         }
                     }
                 }
             }
         }
+
+        when {
+            review.loading -> {
+                Box(
+                    Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        stringResource(R.string.storage_review_loading_hint),
+                        color = SmartTextSecondary,
+                    )
+                }
+            }
+
+            review.items.isEmpty() -> {
+                Box(
+                    Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        stringResource(R.string.smart_storage_preview_empty),
+                        color = SmartTextSecondary,
+                    )
+                }
+            }
+
+            visualType -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    gridItems(review.items, key = StorageReviewItem::id) { item ->
+                        StorageReviewGridItem(
+                            item = item,
+                            accent = accent,
+                            onPreview = { onPreview(item) },
+                            onToggle = { onToggleItem(item.id) },
+                        )
+                    }
+                }
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                    verticalArrangement = Arrangement.spacedBy(9.dp),
+                ) {
+                    items(review.items, key = StorageReviewItem::id) { item ->
+                        StorageReviewListItem(
+                            item = item,
+                            accent = accent,
+                            onPreview = { onPreview(item) },
+                            onToggle = { onToggleItem(item.id) },
+                        )
+                    }
+                }
+            }
+        }
+
+        if (review.scanLimitReached) {
+            Text(
+                stringResource(R.string.storage_review_limit_note),
+                color = Color(0xFFFFB45B),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
+            )
+        }
+
+        ReviewCleanupFooter(
+            selectedCount = selectedCount,
+            selectedBytes = selectedBytes,
+            enabled = selectedItems.isNotEmpty() && !cleanupInProgress,
+            inProgress = cleanupInProgress,
+            onClick = { confirmCleanup = true },
+        )
     }
+
+    if (confirmCleanup) {
+        StorageCleanupConfirmationDialog(
+            items = selectedItems,
+            onDismiss = { confirmCleanup = false },
+            onConfirm = {
+                confirmCleanup = false
+                onCleanSelected()
+            },
+        )
+    }
+}
+
+@Composable
+private fun StorageReviewGridItem(
+    item: StorageReviewItem,
+    accent: Color,
+    onPreview: () -> Unit,
+    onToggle: () -> Unit,
+) {
+    val file = item.file
+    val context = LocalContext.current
+    val preview = file.toSmartPreview()
+    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = file.uri, key2 = file.mimeType) {
+        value = loadPreviewThumbnail(context, preview)
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth().height(210.dp),
+        onClick = onPreview,
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(126.dp)
+                    .background(Color(0xFF091A3B)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap = requireNotNull(bitmap),
+                        contentDescription = file.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                } else {
+                    Icon(
+                        fileVisual(file.mimeType, file.name),
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(42.dp),
+                    )
+                }
+                if (file.mimeType.startsWith("video/")) {
+                    Surface(color = Color(0xCC06132F), shape = CircleShape) {
+                        Text("▶", color = Color.White, fontSize = 20.sp, modifier = Modifier.padding(8.dp))
+                    }
+                }
+                Checkbox(
+                    checked = item.selected,
+                    onCheckedChange = { onToggle() },
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = ElectricBlue,
+                        uncheckedColor = Color.White,
+                        checkmarkColor = Color.White,
+                    ),
+                )
+                Surface(
+                    modifier = Modifier.align(Alignment.BottomStart).padding(7.dp),
+                    color = Color(0xD9030B20),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text(
+                        ByteFormatter.format(file.sizeBytes),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    file.name,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    compactRelativePath(file.relativePath),
+                    color = Color(0xFF9FB4D7),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 10.sp,
+                )
+                Text(
+                    stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
+                    color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StorageReviewListItem(
+    item: StorageReviewItem,
+    accent: Color,
+    onPreview: () -> Unit,
+    onToggle: () -> Unit,
+) {
+    val file = item.file
+    Card(
+        onClick = onPreview,
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = accent.copy(alpha = .16f),
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                Icon(
+                    fileVisual(file.mimeType, file.name),
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.padding(10.dp).size(28.dp),
+                )
+            }
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    file.name,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    compactRelativePath(file.relativePath),
+                    color = SmartTextSecondary,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    ByteFormatter.format(file.sizeBytes),
+                    color = accent,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+            Checkbox(
+                checked = item.selected,
+                onCheckedChange = { onToggle() },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = ElectricBlue,
+                    uncheckedColor = Color(0xFFA7B8D6),
+                    checkmarkColor = Color.White,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReviewCleanupFooter(
+    selectedCount: Int,
+    selectedBytes: Long,
+    enabled: Boolean,
+    inProgress: Boolean,
+    onClick: () -> Unit,
+) {
+    Surface(
+        color = Color(0xFF030B20),
+        shadowElevation = 16.dp,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Column(Modifier.weight(.42f)) {
+                Text(
+                    stringResource(R.string.smart_detail_selected_label),
+                    color = SmartTextSecondary,
+                    fontSize = 10.sp,
+                )
+                Text(
+                    "$selectedCount • ${ByteFormatter.format(selectedBytes)}",
+                    color = if (selectedCount > 0) SmartGreen else Color(0xFF8193B0),
+                    fontWeight = FontWeight.Black,
+                    fontSize = 17.sp,
+                )
+            }
+            Button(
+                onClick = onClick,
+                enabled = enabled,
+                modifier = Modifier.weight(.58f).height(54.dp),
+                shape = RoundedCornerShape(20.dp),
+            ) {
+                Icon(Icons.Outlined.CleaningServices, contentDescription = null)
+                Spacer(Modifier.width(7.dp))
+                Text(
+                    stringResource(if (inProgress) R.string.smart_cleanup_in_progress else R.string.smart_review_and_clean),
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StorageCleanupConfirmationDialog(
+    items: List<StorageReviewItem>,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    val bytes = items.sumOf { it.file.sizeBytes }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Outlined.DeleteSweep, contentDescription = null, tint = ElectricBlue) },
+        title = { Text(stringResource(R.string.storage_review_delete_title), fontWeight = FontWeight.Black) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                Text(
+                    stringResource(
+                        R.string.storage_review_delete_body,
+                        items.size,
+                        ByteFormatter.format(bytes),
+                    ),
+                )
+                items.take(5).forEach { item ->
+                    Text(
+                        "• ${item.file.name}",
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                if (items.size > 5) {
+                    Text(
+                        stringResource(R.string.smart_cleanup_more_items, items.size - 5),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                Text(
+                    stringResource(R.string.smart_cleanup_ad_notice),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF2867D8),
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    stringResource(R.string.storage_review_delete_warning),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(stringResource(R.string.smart_cleanup_confirm_action))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+    )
 }
 
 @Composable

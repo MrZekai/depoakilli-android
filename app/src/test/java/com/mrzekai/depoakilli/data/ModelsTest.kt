@@ -5,6 +5,10 @@ import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.ScanSummary
+import com.mrzekai.depoakilli.model.IndexedFile
+import com.mrzekai.depoakilli.model.StorageFileType
+import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -55,6 +59,41 @@ class ModelsTest {
 
 
     @Test
+    fun `storage review starts manual and totals only selected files`() {
+        val review = StorageReviewSummary(
+            type = StorageFileType.VIDEOS,
+            items = listOf(
+                StorageReviewItem(
+                    file = IndexedFile(
+                        uri = "file:///video/one.mp4",
+                        name = "one.mp4",
+                        sizeBytes = 10_000L,
+                        mimeType = "video/mp4",
+                        modifiedAtMillis = 1L,
+                        relativePath = "Movies",
+                    ),
+                    selected = false,
+                ),
+                StorageReviewItem(
+                    file = IndexedFile(
+                        uri = "file:///video/two.mp4",
+                        name = "two.mp4",
+                        sizeBytes = 20_000L,
+                        mimeType = "video/mp4",
+                        modifiedAtMillis = 1L,
+                        relativePath = "Movies",
+                    ),
+                    selected = true,
+                ),
+            ),
+        )
+
+        assertEquals(30_000L, review.totalBytes)
+        assertEquals(20_000L, review.selectedBytes)
+        assertEquals(1, review.selectedItems.size)
+    }
+
+    @Test
     fun `scan summary keeps safe selection separate from review candidates`() {
         val summary = ScanSummary(
             items = listOf(
@@ -64,6 +103,7 @@ class ModelsTest {
         )
 
         assertEquals(32_000_000L, summary.selectedBytes)
+        assertEquals(32_000_000L, summary.safeSuggestedBytes)
         assertEquals(5_168_000_000L, summary.reviewBytes)
         assertEquals(5_200_000_000L, summary.totalSuggestedBytes)
     }

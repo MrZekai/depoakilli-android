@@ -127,7 +127,8 @@ fun CleanerApp(
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onClearAllAppCaches: () -> Unit,
-    onPrepareCleanup: () -> Unit,
+    onPrepareCleanup: (Set<String>?) -> Unit,
+    onPrepareStorageCleanup: () -> Unit,
     onOptimizeMemory: () -> Unit,
     onUninstallApp: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -166,10 +167,16 @@ fun CleanerApp(
             if (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME) {
                 TopAppBar(
                     title = {
-                        val titleRes = if (detailScreen == DetailScreen.CLEAN_RESULTS && state.scanFocus == ScanFocus.SMART) {
-                            R.string.smart_clean_results_title
-                        } else {
-                            detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
+                        val storageReviewTitle = state.storageReview.type?.titleRes
+                        val categoryReviewTitle = state.smartCategoryReview?.titleRes
+                        val titleRes = when {
+                            detailScreen == DetailScreen.CLEAN_RESULTS && storageReviewTitle != null ->
+                                storageReviewTitle
+                            detailScreen == DetailScreen.CLEAN_RESULTS && categoryReviewTitle != null ->
+                                categoryReviewTitle
+                            detailScreen == DetailScreen.CLEAN_RESULTS && state.scanFocus == ScanFocus.SMART ->
+                                R.string.smart_clean_results_title
+                            else -> detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
                         }
                         Text(
                             stringResource(titleRes),
@@ -178,7 +185,17 @@ fun CleanerApp(
                     },
                     navigationIcon = {
                         if (detailScreen != null) {
-                            IconButton(onClick = { detailScreen = null }) {
+                            IconButton(
+                                onClick = {
+                                    when {
+                                        detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
+                                            viewModel.closeStorageReview()
+                                        detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null ->
+                                            viewModel.closeSmartCategoryReview()
+                                        else -> detailScreen = null
+                                    }
+                                },
+                            ) {
                                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
                             }
                         }
@@ -237,7 +254,12 @@ fun CleanerApp(
                 onScan = { viewModel.scan(state.scanFocus) },
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
+                onOpenCategoryReview = viewModel::openSmartCategoryReview,
+                onOpenStorageReview = viewModel::openStorageReview,
+                onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
+                onToggleAllStorageReviewItems = viewModel::toggleAllStorageReviewItems,
                 onClean = onPrepareCleanup,
+                onCleanStorage = onPrepareStorageCleanup,
                 modifier = Modifier.padding(padding),
             )
 
@@ -691,7 +713,12 @@ private fun CleanScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onClean: () -> Unit,
+    onOpenCategoryReview: (CleanCategory) -> Unit,
+    onOpenStorageReview: (com.mrzekai.depoakilli.model.StorageFileType) -> Unit,
+    onToggleStorageReviewItem: (String) -> Unit,
+    onToggleAllStorageReviewItems: () -> Unit,
+    onClean: (Set<String>?) -> Unit,
+    onCleanStorage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (state.scanFocus == ScanFocus.SMART) {
@@ -701,7 +728,12 @@ private fun CleanScreen(
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
+            onOpenCategoryReview = onOpenCategoryReview,
+            onOpenStorageReview = onOpenStorageReview,
+            onToggleStorageReviewItem = onToggleStorageReviewItem,
+            onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
             onClean = onClean,
+            onCleanStorage = onCleanStorage,
             modifier = modifier,
         )
         return
@@ -724,7 +756,7 @@ private fun CleanScreen(
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
-            onClean = onClean,
+            onClean = { onClean(null) },
             modifier = modifier,
         )
     }
