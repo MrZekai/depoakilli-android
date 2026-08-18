@@ -308,27 +308,43 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun deleteSelectedWhatsApp() {
+    fun deleteSelectedWhatsApp(onCompleted: (Boolean) -> Unit = {}) {
+        if (_state.value.cleanupInProgress) return
         val selected = _state.value.whatsAppSummary.selectedItems
         if (selected.isEmpty()) {
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
+            onCompleted(false)
             return
         }
+        _state.update { it.copy(cleanupInProgress = true) }
         viewModelScope.launch {
-            val result = repository.deleteWhatsAppItems(selected)
-            _state.update { state ->
-                state.copy(
-                    whatsAppSummary = state.whatsAppSummary.copy(
-                        items = state.whatsAppSummary.items.filterNot { it.id in result.deletedIds },
-                    ),
-                    storage = repository.storageSnapshot(),
-                    message = getApplication<Application>().getString(
-                        if (result.failedCount == 0) R.string.message_whatsapp_cleanup_complete else R.string.message_whatsapp_cleanup_partial,
-                        ByteFormatter.format(result.deletedBytes),
-                        result.failedCount,
-                    ),
-                )
-            }
+            runCatching { repository.deleteWhatsAppItems(selected) }
+                .onSuccess { result ->
+                    _state.update { state ->
+                        state.copy(
+                            whatsAppSummary = state.whatsAppSummary.copy(
+                                items = state.whatsAppSummary.items.filterNot { it.id in result.deletedIds },
+                            ),
+                            storage = repository.storageSnapshot(),
+                            cleanupInProgress = false,
+                            message = getApplication<Application>().getString(
+                                if (result.failedCount == 0) R.string.message_whatsapp_cleanup_complete else R.string.message_whatsapp_cleanup_partial,
+                                ByteFormatter.format(result.deletedBytes),
+                                result.failedCount,
+                            ),
+                        )
+                    }
+                    onCompleted(result.deletedIds.isNotEmpty())
+                }
+                .onFailure {
+                    _state.update { state ->
+                        state.copy(
+                            cleanupInProgress = false,
+                            message = getApplication<Application>().getString(R.string.message_cleanup_failed),
+                        )
+                    }
+                    onCompleted(false)
+                }
         }
     }
 

@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
                     onPrepareCleanup = ::showCleanupInterstitialThenDelete,
                     onPrepareStorageCleanup = ::showStorageCleanupInterstitialThenDelete,
+                    onPrepareWhatsAppCleanup = ::showWhatsAppCleanupInterstitialThenDelete,
                     onOptimizeMemory = {
                         cleanerViewModel.optimizeMemory {
                             interstitialAds.releaseForMemoryOptimization()
@@ -128,6 +129,16 @@ class MainActivity : ComponentActivity() {
         interstitialAds.showBeforeCleanup(this) {
             cleanerViewModel.deleteSelectedStorageReview {
                 cleanerViewModel.refreshDeviceState()
+            }
+        }
+    }
+
+    private fun showWhatsAppCleanupInterstitialThenDelete(onFinished: (Boolean) -> Unit) {
+        suppressNextAppOpenAd()
+        interstitialAds.showBeforeCleanup(this) {
+            cleanerViewModel.deleteSelectedWhatsApp { changed ->
+                cleanerViewModel.refreshDeviceState()
+                onFinished(changed)
             }
         }
     }

@@ -129,6 +129,7 @@ fun CleanerApp(
     onClearAllAppCaches: () -> Unit,
     onPrepareCleanup: (Set<String>?) -> Unit,
     onPrepareStorageCleanup: () -> Unit,
+    onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onOptimizeMemory: () -> Unit,
     onUninstallApp: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -164,7 +165,7 @@ fun CleanerApp(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            if (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME) {
+            if (detailScreen != DetailScreen.WHATSAPP && (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME)) {
                 TopAppBar(
                     title = {
                         val storageReviewTitle = state.storageReview.type?.titleRes
@@ -206,7 +207,7 @@ fun CleanerApp(
         },
         bottomBar = {
             when {
-                detailScreen == DetailScreen.CLEAN_RESULTS -> {
+                detailScreen == DetailScreen.CLEAN_RESULTS || detailScreen == DetailScreen.WHATSAPP -> {
                     Column(
                         modifier = Modifier
                             .background(Color(0xFF06112A))
@@ -265,11 +266,19 @@ fun CleanerApp(
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
                 state = state,
+                onBack = { detailScreen = null },
                 onRequestAccess = onRequestAllFilesAccess,
                 onScan = viewModel::scanWhatsAppLibrary,
                 onToggleItem = viewModel::toggleWhatsAppItem,
                 onToggleCategory = viewModel::toggleWhatsAppCategory,
-                onDeleteSelected = viewModel::deleteSelectedWhatsApp,
+                onDeleteSelected = {
+                    onPrepareWhatsAppCleanup { changed ->
+                        if (changed) {
+                            detailScreen = null
+                            selectedTabIndex = AppTab.HOME.ordinal
+                        }
+                    }
+                },
                 modifier = Modifier.padding(padding),
             )
 

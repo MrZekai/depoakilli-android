@@ -1,8 +1,21 @@
 # Smart Cleaner / Akıllı Temizleyici
 
-Android storage-management and file-maintenance app. Current development line: **v0.5.7 Storage Review & Monetization UX**.
+Android storage-management and file-maintenance app. Current development line: **v0.5.8 WhatsApp Cleaner Premium Review UX**.
 
 ## Cleaner Engine 0.5
+
+## v0.5.8 WhatsApp Cleaner premium review UX
+
+- selected premium WhatsApp Cleaner layout implemented as real Compose UI;
+- three lightweight review groups: Images, Videos, Documents & More;
+- horizontal lazy preview rails on the main page and left-to-right adaptive grids in View all;
+- tap-to-preview is separated from checkbox-to-delete selection;
+- Media3 video preview, audio preview, sampled image preview and generic file details stay inside the app;
+- Incoming / Sent / All filters and Largest / Newest sort modes;
+- small in-memory thumbnail cache and sampled decoding keep browsing responsive;
+- WhatsApp cleanup now follows final review -> eligible interstitial -> real deletion -> result message -> Home;
+- a single standard 320x50 banner is reserved on WhatsApp screens;
+- all new copy uses Android resources: Turkish locale -> Turkish, English/UK -> English, unsupported locales -> English fallback.
 
 ## v0.5.7 storage review & monetization UX
 
@@ -83,8 +96,8 @@ See:
 - package: `com.mrzekai.depoakilli`
 - minSdk: 30 (Android 11)
 - target/compile SDK: 36
-- versionName: `0.5.7`
-- versionCode: `14`
+- versionName: `0.5.8`
+- versionCode: `15`
 - debug package: `com.mrzekai.depoakilli.qa`
 
 GitHub Actions runs project validation, dependency checks, unit tests, lint, debug APK build and stable QA-signing verification. The debug artifact is named `depoakilli-test-apk-*`.

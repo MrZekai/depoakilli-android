@@ -469,4 +469,35 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="storage_review_delete_title">Seçili depolama dosyaları silinsin mi?</string>
     <string name="storage_review_delete_body">%1$d dosya seçtin; toplam %2$s. Devam etmeden önce aşağıdaki örnekleri kontrol et.</string>
     <string name="storage_review_delete_warning">Bunlar otomatik çöp değil, senin seçtiğin dosyalardır. Silme işlemi geri alınamaz.</string>
+
+    <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
+    <string name="whatsapp_scanning_short">Akıllı medya taraması</string>
+    <string name="whatsapp_local_processing_note">Medya bu cihazda analiz edilir.</string>
+    <string name="whatsapp_total_media">TOPLAM WHATSAPP MEDYASI</string>
+    <string name="whatsapp_filter_incoming">Gelenler</string>
+    <string name="whatsapp_filter_sent">Gönderilenler</string>
+    <string name="whatsapp_filter_all">Hepsi</string>
+    <string name="whatsapp_group_images">Görseller</string>
+    <string name="whatsapp_group_videos">Videolar</string>
+    <string name="whatsapp_group_documents_more">Belgeler ve Diğer</string>
+    <string name="whatsapp_view_all">Tümünü Gör</string>
+    <string name="whatsapp_card_hint">Dosyaya dokun: önizle • Kutuyu işaretle: temizliğe ekle</string>
+    <string name="whatsapp_sort_largest">En büyükler</string>
+    <string name="whatsapp_sort_newest">En yeniler</string>
+    <string name="whatsapp_no_files_for_filter">Bu filtreye uyan dosya yok.</string>
+    <string name="whatsapp_selected_size">Seçilen</string>
+    <string name="whatsapp_selected_items_short">%1$d öğe</string>
+    <string name="whatsapp_review_and_clean">İncele ve temizle</string>
+    <string name="whatsapp_cleanup_in_progress">Temizleniyor…</string>
+    <string name="whatsapp_cleanup_ad_notice">Uygun ve hazır bir geçiş reklamı varsa bu onaydan sonra gösterilebilir. Reklam kapandığında temizlik otomatik başlar.</string>
+    <string name="whatsapp_cleanup_irreversible">Seçilen dosyalar paylaşılan depolamadan kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
+    <string name="whatsapp_confirm_and_continue">Devam et</string>
+    <string name="whatsapp_preview_title">Önizleme</string>
+    <string name="whatsapp_included">Temizliğe dahil</string>
+    <string name="whatsapp_not_included">Temizliğe dahil değil</string>
+    <string name="whatsapp_remove_from_cleanup">Bu dosyayı korumak için dokunun.</string>
+    <string name="whatsapp_add_to_cleanup">Bu dosyayı temizliğe eklemek için dokunun.</string>
+    <string name="whatsapp_audio_preview_error">Bu ses dosyası bu cihazda oynatılamadı.</string>
+    <string name="whatsapp_file_preview">Dosya ayrıntıları</string>
+
 </resources>

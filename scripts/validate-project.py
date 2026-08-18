@@ -52,6 +52,7 @@ required = [
     "docs/NEON_DASHBOARD_V051.md",
     "docs/REVISION_NOTES_V051.md",
     "docs/REVISION_NOTES_V057.md",
+    "docs/REVISION_NOTES_V058.md",
     "docs/PLAY_PERMISSIONS_V050.md",
     "docs/PERMISSIONS.md",
     "docs/ANDROID_CACHE_LIMITS.md",
@@ -130,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 14",
-    'versionName = "0.5.7"',
+    "versionCode = 15",
+    'versionName = "0.5.8"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -178,7 +179,7 @@ for expected in (
     "MAX_STORAGE_REVIEW_ITEMS = 50_000",
 ):
     if expected not in repository:
-        errors.append(f"missing v0.5.7 storage review repository invariant: {expected}")
+        errors.append(f"missing v0.5.8 storage review repository invariant: {expected}")
 
 for forbidden in (
     "MAX_HASH_BYTES",
@@ -215,9 +216,9 @@ for expected in (
     "CleaningScoreRing",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.7 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.8 dashboard invariant: {expected}")
 if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.7 dashboard must not advertise a non-existent Pro/Premium tier")
+    errors.append("v0.5.8 dashboard must not advertise a non-existent Pro/Premium tier")
 
 smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (
@@ -240,19 +241,19 @@ for expected in (
     "LazyRow(",
 ):
     if expected not in smart_results:
-        errors.append(f"missing v0.5.7 Smart Clean/storage review invariant: {expected}")
+        errors.append(f"missing v0.5.8 Smart Clean/storage review invariant: {expected}")
 if "import androidx.compose.foundation.layout.weight" in smart_results:
     errors.append("SmartCleanResultsScreen must not import the internal Compose layout weight symbol")
 if "Smart Clean scan in progress" not in (ROOT / "app/src/main/res/values/strings.xml").read_text(encoding="utf-8"):
-    errors.append("v0.5.7 must use the upgraded Smart Clean scan-progress copy")
+    errors.append("v0.5.8 must use the upgraded Smart Clean scan-progress copy")
 if "smart_detail_grid_hint" not in smart_results:
-    errors.append("v0.5.7 category detail must use the visual review grid guidance")
+    errors.append("v0.5.8 category detail must use the visual review grid guidance")
 if "ExoPlayer.Builder" not in smart_results or "MediaItem.fromUri" not in smart_results:
-    errors.append("v0.5.7 video preview must use Jetpack Media3 ExoPlayer")
+    errors.append("v0.5.8 video preview must use Jetpack Media3 ExoPlayer")
 if "VideoView" in smart_results:
-    errors.append("legacy VideoView must not remain in v0.5.7 Smart Clean preview")
+    errors.append("legacy VideoView must not remain in v0.5.8 Smart Clean preview")
 if "R.layout.smart_video_player" not in smart_results:
-    errors.append("v0.5.7 video preview must use the TextureView-backed PlayerView layout")
+    errors.append("v0.5.8 video preview must use the TextureView-backed PlayerView layout")
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
     ROOT / "app/src/main/res/values-tr/strings.xml",
@@ -276,9 +277,9 @@ if 'val generatedThumbnail = path.contains("/.thumbnails/")' not in ai_engine_so
 if "detailScreen == DetailScreen.CLEAN_RESULTS" not in cleaner_app or "BannerAd(canRequestAds = canRequestAds)" not in cleaner_app:
     errors.append("Smart Clean results must reserve an anchored banner slot")
 if "AdSize.BANNER" not in ads_source:
-    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.7")
+    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.8")
 if "getLargeAnchoredAdaptiveBannerAdSize" in ads_source:
-    errors.append("v0.5.7 must not reserve the oversized large adaptive banner")
+    errors.append("v0.5.8 must not reserve the oversized large adaptive banner")
 main_activity_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
 if "showBeforeCleanup" not in ads_source or "onFinished: () -> Unit" not in ads_source:
     errors.append("cleanup interstitial must run before deletion and expose a completion callback")
@@ -303,6 +304,45 @@ if "storage_analyzer_action_hint" not in smart_results or "storage_review_manual
 if "TopAppBar(" in cleaner_app:
     if "ExperimentalMaterial3Api" not in cleaner_app or "@OptIn(ExperimentalMaterial3Api::class)" not in cleaner_app:
         errors.append("CleanerApp TopAppBar requires ExperimentalMaterial3Api opt-in")
+
+whatsapp_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt").read_text(encoding="utf-8")
+for expected in (
+    "WhatsAppHeroCard",
+    "WhatsAppGroupSection",
+    "LazyRow(",
+    "WhatsAppGroupDetailPage",
+    "LazyVerticalGrid(",
+    "WhatsAppMediaCard",
+    "WhatsAppPreviewDialog",
+    "WhatsAppVideoPreview",
+    "ExoPlayer.Builder",
+    "WhatsAppThumbnailCache",
+    "whatsapp_filter_incoming",
+    "whatsapp_review_and_clean",
+):
+    if expected not in whatsapp_ui:
+        errors.append(f"missing v0.5.8 WhatsApp premium review invariant: {expected}")
+if "WhatsAppMediaRow" in whatsapp_ui:
+    errors.append("v0.5.8 WhatsApp UI must not fall back to the legacy plain vertical media rows")
+if "VideoView" in whatsapp_ui:
+    errors.append("v0.5.8 WhatsApp video preview must use Media3, not legacy VideoView")
+if "detailScreen == DetailScreen.CLEAN_RESULTS || detailScreen == DetailScreen.WHATSAPP" not in cleaner_app:
+    errors.append("WhatsApp Cleaner must reserve the single standard banner shell")
+if "onPrepareWhatsAppCleanup" not in cleaner_app:
+    errors.append("WhatsApp cleanup must route through the pre-delete interstitial callback")
+if "showWhatsAppCleanupInterstitialThenDelete" not in main_activity_source:
+    errors.append("MainActivity must route WhatsApp cleanup through the interstitial-before-delete flow")
+if "deleteSelectedWhatsApp(onCompleted: (Boolean) -> Unit = {})" not in view_model_source:
+    errors.append("WhatsApp delete must expose completion state for post-cleanup navigation")
+if "whatsapp_cleanup_ad_notice" not in whatsapp_ui:
+    errors.append("WhatsApp final confirmation must disclose the eligible pre-delete interstitial")
+
+for forbidden_visible in ("Görseller", "Gönderilenler", "İncele ve temizle", "Temizliğe dahil"):
+    if forbidden_visible in whatsapp_ui:
+        errors.append(f"WhatsApp UI must not hard-code Turkish copy: {forbidden_visible}")
+locales_config = (ROOT / "app/src/main/res/xml/locales_config.xml").read_text(encoding="utf-8")
+if 'android:name="en"' not in locales_config or 'android:name="tr"' not in locales_config:
+    errors.append("global locale config must expose English and Turkish resources")
 
 strings_default = ROOT / "app/src/main/res/values/strings.xml"
 strings_tr = ROOT / "app/src/main/res/values-tr/strings.xml"
@@ -342,4 +382,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.7 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.8 project structure, permissions, resources, CI and safety guardrails are valid.")

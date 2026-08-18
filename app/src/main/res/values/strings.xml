@@ -469,4 +469,35 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="storage_review_delete_title">Delete selected storage files?</string>
     <string name="storage_review_delete_body">You selected %1$d files using %2$s. Review the examples below before continuing.</string>
     <string name="storage_review_delete_warning">These are user-selected files, not automatic junk. Deletion cannot be undone.</string>
+
+    <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
+    <string name="whatsapp_scanning_short">Smart media scan</string>
+    <string name="whatsapp_local_processing_note">Media is analyzed on this device.</string>
+    <string name="whatsapp_total_media">TOTAL WHATSAPP MEDIA</string>
+    <string name="whatsapp_filter_incoming">Incoming</string>
+    <string name="whatsapp_filter_sent">Sent</string>
+    <string name="whatsapp_filter_all">All</string>
+    <string name="whatsapp_group_images">Images</string>
+    <string name="whatsapp_group_videos">Videos</string>
+    <string name="whatsapp_group_documents_more">Documents &amp; More</string>
+    <string name="whatsapp_view_all">View all</string>
+    <string name="whatsapp_card_hint">Tap a file to preview • tick the box to add it to cleanup</string>
+    <string name="whatsapp_sort_largest">Largest first</string>
+    <string name="whatsapp_sort_newest">Newest first</string>
+    <string name="whatsapp_no_files_for_filter">No files match this filter.</string>
+    <string name="whatsapp_selected_size">Selected</string>
+    <string name="whatsapp_selected_items_short">%1$d items</string>
+    <string name="whatsapp_review_and_clean">Review &amp; clean</string>
+    <string name="whatsapp_cleanup_in_progress">Cleaning…</string>
+    <string name="whatsapp_cleanup_ad_notice">If an interstitial is ready and allowed, it may appear after this confirmation. Cleanup starts automatically when it closes.</string>
+    <string name="whatsapp_cleanup_irreversible">Selected files are permanently deleted from shared storage. This cannot be undone.</string>
+    <string name="whatsapp_confirm_and_continue">Continue</string>
+    <string name="whatsapp_preview_title">Preview</string>
+    <string name="whatsapp_included">Included in cleanup</string>
+    <string name="whatsapp_not_included">Not included</string>
+    <string name="whatsapp_remove_from_cleanup">Tap to protect this file from cleanup.</string>
+    <string name="whatsapp_add_to_cleanup">Tap to include this file in cleanup.</string>
+    <string name="whatsapp_audio_preview_error">This audio file could not be played on this device.</string>
+    <string name="whatsapp_file_preview">File details</string>
+
 </resources>
