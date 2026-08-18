@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import pathlib
+import re
 import struct
 import sys
 import xml.etree.ElementTree as ET
@@ -395,6 +396,17 @@ if strings_default.is_file() and strings_tr.is_file():
             errors.append(f"Turkish translations missing keys: {missing}")
         if missing := sorted(tr_names - default_names):
             errors.append(f"default translations missing keys: {missing}")
+
+    # Compile-time guard: every Kotlin R.string reference must exist in the default
+    # resource set. This catches unresolved R.string symbols before Gradle/Kotlin CI.
+    kotlin_string_refs: dict[str, set[str]] = {}
+    for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+        source = kotlin_file.read_text(encoding="utf-8")
+        for resource_name in re.findall(r"R\.string\.([A-Za-z0-9_]+)", source):
+            kotlin_string_refs.setdefault(resource_name, set()).add(str(kotlin_file.relative_to(ROOT)))
+    for resource_name in sorted(set(kotlin_string_refs) - default_names):
+        locations = ", ".join(sorted(kotlin_string_refs[resource_name]))
+        errors.append(f"Kotlin references missing default string resource R.string.{resource_name}: {locations}")
 
 qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
 if qa_keystore.is_file():

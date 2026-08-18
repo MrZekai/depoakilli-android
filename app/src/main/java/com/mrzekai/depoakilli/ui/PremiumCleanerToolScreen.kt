@@ -697,7 +697,7 @@ private fun PremiumToolDetailPage(
             }
             TextButton(onClick = onToggleAll) {
                 Text(
-                    stringResource(if (section.items.all(CleanableItem::selected)) R.string.whatsapp_clear_all else R.string.whatsapp_select_all),
+                    stringResource(if (section.items.all(CleanableItem::selected)) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
                     color = section.accent,
                     fontWeight = FontWeight.Black,
                 )
@@ -780,7 +780,7 @@ private fun PremiumToolBottomAction(
                             Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = Color.White)
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.whatsapp_review_clean), color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                        Text(stringResource(R.string.whatsapp_review_and_clean), color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
                         Spacer(Modifier.width(8.dp))
                         Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Color.White)
                     }
