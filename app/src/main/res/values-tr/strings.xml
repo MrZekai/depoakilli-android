@@ -531,4 +531,19 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="premium_media_review">Diğer medya incelemesi</string>
 
     <string name="premium_duplicate_more_groups">Diğer kopya grupları</string>
+
+    <string name="dashboard_ram_optimizer_subtitle">Akıllı Temizleyici’nin geçici belleğini bırak ve gerçek sonucu yeniden ölç</string>
+    <string name="dashboard_ram_available_now">%1$s kullanılabilir RAM</string>
+    <string name="dashboard_ram_optimize_action">RAM’i optimize et</string>
+    <string name="dashboard_ram_optimizing">Bellek optimize ediliyor…</string>
+    <string name="ram_result_title">RAM optimizasyonu tamamlandı</string>
+    <string name="ram_result_app_released">Uygulama belleği serbest bırakıldı</string>
+    <string name="ram_result_available_gain">Kullanılabilir RAM arttı</string>
+    <string name="ram_result_stable">Bellek zaten iyi durumda</string>
+    <string name="ram_result_available_ram">Kullanılabilir RAM</string>
+    <string name="ram_result_app_memory">Akıllı Temizleyici belleği</string>
+    <string name="ram_result_before">Önce</string>
+    <string name="ram_result_after">Sonra</string>
+    <string name="ram_result_measured_note">Bu cihazda ölçüldü. Akıllı Temizleyici yalnız kendi geçici kaynaklarını bırakır; diğer uygulamaların yönetimi Android’de kalır.</string>
+    <string name="ram_result_done">Tamam</string>
 </resources>

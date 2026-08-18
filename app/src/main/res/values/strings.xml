@@ -531,4 +531,19 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="premium_media_review">Other media review</string>
 
     <string name="premium_duplicate_more_groups">More duplicate groups</string>
+
+    <string name="dashboard_ram_optimizer_subtitle">Release temporary Smart Cleaner memory and verify the measured result</string>
+    <string name="dashboard_ram_available_now">%1$s available RAM</string>
+    <string name="dashboard_ram_optimize_action">Optimize RAM</string>
+    <string name="dashboard_ram_optimizing">Optimizing memory…</string>
+    <string name="ram_result_title">RAM optimization complete</string>
+    <string name="ram_result_app_released">App memory released</string>
+    <string name="ram_result_available_gain">Available RAM increased</string>
+    <string name="ram_result_stable">Memory is already in a good state</string>
+    <string name="ram_result_available_ram">Available RAM</string>
+    <string name="ram_result_app_memory">Smart Cleaner memory</string>
+    <string name="ram_result_before">Before</string>
+    <string name="ram_result_after">After</string>
+    <string name="ram_result_measured_note">Measured on this device. Smart Cleaner releases its own temporary resources; Android remains in control of other apps.</string>
+    <string name="ram_result_done">Done</string>
 </resources>

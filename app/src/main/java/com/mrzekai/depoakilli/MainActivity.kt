@@ -21,6 +21,8 @@ import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
+import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
+import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
 
 class MainActivity : ComponentActivity() {
@@ -93,12 +95,7 @@ class MainActivity : ComponentActivity() {
                     onPrepareCleanup = ::showCleanupInterstitialThenDelete,
                     onPrepareStorageCleanup = ::showStorageCleanupInterstitialThenDelete,
                     onPrepareWhatsAppCleanup = ::showWhatsAppCleanupInterstitialThenDelete,
-                    onOptimizeMemory = {
-                        cleanerViewModel.optimizeMemory {
-                            interstitialAds.releaseForMemoryOptimization()
-                            (application as DepoAkilliApplication).releaseAdMemory()
-                        }
-                    },
+                    onOptimizeMemory = ::showMemoryOptimizationInterstitialThenOptimize,
                     onUninstallApp = ::uninstallApp,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
@@ -115,6 +112,17 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.load()
+    }
+
+    private fun showMemoryOptimizationInterstitialThenOptimize() {
+        runCleanupAdGate {
+            cleanerViewModel.optimizeMemory {
+                releaseWhatsAppThumbnailMemory()
+                releasePremiumToolThumbnailMemory()
+                interstitialAds.releaseForMemoryOptimization()
+                (application as DepoAkilliApplication).releaseAdMemory()
+            }
+        }
     }
 
     private fun showCleanupInterstitialThenDelete(itemIds: Set<String>? = null) {

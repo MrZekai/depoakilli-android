@@ -43,6 +43,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
@@ -134,8 +135,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 17",
-    'versionName = "0.5.10"',
+    "versionCode = 18",
+    'versionName = "0.5.11"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -202,6 +203,9 @@ for expected in (
     "StorageManager.ACTION_CLEAR_APP_CACHE",
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
     "runCleanupAdGate",
+    "showMemoryOptimizationInterstitialThenOptimize",
+    "releaseWhatsAppThumbnailMemory",
+    "releasePremiumToolThumbnailMemory",
 ):
     if expected not in main_activity:
         errors.append(f"missing Android system flow: {expected}")
@@ -219,11 +223,39 @@ for expected in (
     "DashboardToolTile",
     "DashboardHero",
     "CleaningScoreRing",
+    "RamOptimizationStrip",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.8 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.11 dashboard invariant: {expected}")
+if "onOpenAppCache" in dashboard:
+    errors.append("v0.5.11 home dashboard must not show the old paired deep-app-cleanup card")
 if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.8 dashboard must not advertise a non-existent Pro/Premium tier")
+    errors.append("v0.5.11 dashboard must not advertise a non-existent Pro/Premium tier")
+
+view_model = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
+for expected in (
+    "MemoryOptimizationResult",
+    "memoryOptimizationResult",
+    "dismissMemoryOptimizationResult",
+):
+    if expected not in view_model:
+        errors.append(f"missing v0.5.11 RAM result invariant: {expected}")
+for forbidden in (
+    "summary = it.summary.copy(items = emptyList())",
+    "whatsAppSummary = it.whatsAppSummary.copy(items = emptyList())",
+):
+    if forbidden in view_model:
+        errors.append(f"RAM optimization must preserve user scan selections: {forbidden}")
+
+memory_result_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt").read_text(encoding="utf-8")
+for expected in (
+    "MemoryOptimizationResultDialog",
+    "ram_result_measured_note",
+    "appMemoryReleasedBytes",
+    "availableRamGainBytes",
+):
+    if expected not in memory_result_ui:
+        errors.append(f"missing v0.5.11 RAM result UI invariant: {expected}")
 
 smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (

@@ -345,7 +345,6 @@ fun CleanerApp(
                     onApks = { launchScan(ScanFocus.APKS) },
                     onMedia = { launchScan(ScanFocus.MEDIA) },
                     onDeepClean = { launchScan(ScanFocus.DEEP) },
-                    onOpenAppCache = { detailScreen = DetailScreen.APP_CACHE },
                     onRamOptimize = onOptimizeMemory,
                     modifier = Modifier.padding(padding),
                 )
@@ -394,6 +393,13 @@ fun CleanerApp(
                 )
             }
         }
+    }
+
+    state.memoryOptimizationResult?.let { result ->
+        MemoryOptimizationResultDialog(
+            result = result,
+            onDismiss = viewModel::dismissMemoryOptimizationResult,
+        )
     }
 }
 

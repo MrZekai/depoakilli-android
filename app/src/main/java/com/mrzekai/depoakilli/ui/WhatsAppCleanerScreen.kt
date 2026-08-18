@@ -143,6 +143,14 @@ private object WhatsAppThumbnailCache {
     fun put(key: String, bitmap: ImageBitmap) {
         synchronized(cache) { cache.put(key, bitmap) }
     }
+
+    fun clear() {
+        synchronized(cache) { cache.evictAll() }
+    }
+}
+
+internal fun releaseWhatsAppThumbnailMemory() {
+    WhatsAppThumbnailCache.clear()
 }
 
 @Composable

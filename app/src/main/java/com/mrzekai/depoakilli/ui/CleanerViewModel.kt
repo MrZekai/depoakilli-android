@@ -30,6 +30,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class MemoryOptimizationResult(
+    val beforeAvailableBytes: Long,
+    val afterAvailableBytes: Long,
+    val beforeAppUsedBytes: Long,
+    val afterAppUsedBytes: Long,
+) {
+    val appMemoryReleasedBytes: Long
+        get() = (beforeAppUsedBytes - afterAppUsedBytes).coerceAtLeast(0L)
+
+    val availableRamGainBytes: Long
+        get() = (afterAvailableBytes - beforeAvailableBytes).coerceAtLeast(0L)
+}
+
 data class CleanerUiState(
     val storage: StorageSnapshot = StorageSnapshot(),
     val memory: MemorySnapshot = MemorySnapshot(),
@@ -50,6 +63,7 @@ data class CleanerUiState(
     val scanningAppCaches: Boolean = false,
     val loadingApps: Boolean = false,
     val optimizingMemory: Boolean = false,
+    val memoryOptimizationResult: MemoryOptimizationResult? = null,
     val cleanupInProgress: Boolean = false,
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
@@ -703,31 +717,38 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         _state.update {
             it.copy(
                 optimizingMemory = true,
+                memoryOptimizationResult = null,
                 message = null,
-                summary = it.summary.copy(items = emptyList()),
-                whatsAppSummary = it.whatsAppSummary.copy(items = emptyList()),
             )
         }
+
+        // Release only Smart Cleaner's temporary/heavy in-memory resources.
+        // Scan selections and user-reviewed file state remain intact.
         runCatching(releaseHeavyResources)
         runCatching { Runtime.getRuntime().gc() }
+
         viewModelScope.launch {
             delay(MEMORY_MEASUREMENT_DELAY_MILLIS)
             val after = repository.memorySnapshot()
-            val releasedAppMemory = (before.appUsedBytes - after.appUsedBytes).coerceAtLeast(0L)
-            val message = if (releasedAppMemory > 0L) {
-                getApplication<Application>().getString(
-                    R.string.message_memory_optimized,
-                    ByteFormatter.format(releasedAppMemory),
-                    ByteFormatter.format(after.availableBytes),
-                )
-            } else {
-                getApplication<Application>().getString(
-                    R.string.message_memory_optimized_stable,
-                    ByteFormatter.format(after.availableBytes),
+            val result = MemoryOptimizationResult(
+                beforeAvailableBytes = before.availableBytes,
+                afterAvailableBytes = after.availableBytes,
+                beforeAppUsedBytes = before.appUsedBytes,
+                afterAppUsedBytes = after.appUsedBytes,
+            )
+            _state.update {
+                it.copy(
+                    memory = after,
+                    optimizingMemory = false,
+                    memoryOptimizationResult = result,
+                    message = null,
                 )
             }
-            _state.update { it.copy(memory = after, optimizingMemory = false, message = message) }
         }
+    }
+
+    fun dismissMemoryOptimizationResult() {
+        _state.update { it.copy(memoryOptimizationResult = null) }
     }
 
     fun clearOwnAppCache() {

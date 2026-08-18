@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -77,7 +78,6 @@ internal fun NeonDashboardScreen(
     onApks: () -> Unit,
     onMedia: () -> Unit,
     onDeepClean: () -> Unit,
-    onOpenAppCache: () -> Unit,
     onRamOptimize: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -94,7 +94,6 @@ internal fun NeonDashboardScreen(
             }
             .sumOf { it.sizeBytes }
     val whatsAppBytes = categoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
-    val cacheBytes = state.appCache.totalCacheBytes
     val cleanableBytes = state.dashboardCleanableBytes
     val reviewBytes = state.dashboardReviewBytes
     val score = cleaningScore(state)
@@ -230,30 +229,10 @@ internal fun NeonDashboardScreen(
                 }
             }
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    DashboardWideTool(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.deep_cache_title),
-                        amount = ByteFormatter.format(cacheBytes),
-                        icon = Icons.Outlined.CleaningServices,
-                        accent = Teal500,
-                        onClick = onOpenAppCache,
-                    )
-                    DashboardWideTool(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.ram_optimizer_title_v050),
-                        amount = stringResource(
-                            R.string.dashboard_ram_available,
-                            ByteFormatter.format(state.memory.availableBytes),
-                        ),
-                        icon = Icons.Outlined.Memory,
-                        accent = Lime400,
-                        onClick = onRamOptimize,
-                    )
-                }
+                RamOptimizationStrip(
+                    state = state,
+                    onClick = onRamOptimize,
+                )
             }
             item {
                 DeepCleanPromo(onClick = onDeepClean)
@@ -623,6 +602,108 @@ private fun DashboardToolTile(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RamOptimizationStrip(
+    state: CleanerUiState,
+    onClick: () -> Unit,
+) {
+    val enabled = !state.optimizingMemory && !state.scanning
+
+    Card(
+        modifier = Modifier.fillMaxWidth().height(124.dp),
+        shape = RoundedCornerShape(26.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFF0B3340),
+                            Color(0xFF0C4B3B),
+                            Color(0xFF0A653C),
+                        ),
+                    ),
+                )
+                .clickable(enabled = enabled, onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = Lime400.copy(alpha = .16f),
+                shape = RoundedCornerShape(20.dp),
+            ) {
+                Icon(
+                    Icons.Outlined.Memory,
+                    contentDescription = null,
+                    tint = Lime400,
+                    modifier = Modifier.padding(13.dp).size(38.dp),
+                )
+            }
+
+            Spacer(Modifier.size(13.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    stringResource(R.string.ram_optimizer_title_v050),
+                    color = Color.White,
+                    fontSize = 21.sp,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    if (state.optimizingMemory) {
+                        stringResource(R.string.dashboard_ram_optimizing)
+                    } else {
+                        stringResource(
+                            R.string.dashboard_ram_available_now,
+                            ByteFormatter.format(state.memory.availableBytes),
+                        )
+                    },
+                    color = Lime400,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    stringResource(R.string.dashboard_ram_optimizer_subtitle),
+                    color = Color(0xFFC5D7E2),
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            Surface(
+                color = Lime400.copy(alpha = .18f),
+                shape = CircleShape,
+            ) {
+                if (state.optimizingMemory) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.padding(12.dp).size(27.dp),
+                        strokeWidth = 3.dp,
+                        color = Lime400,
+                        trackColor = Color.White.copy(alpha = .12f),
+                    )
+                } else {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = stringResource(R.string.dashboard_ram_optimize_action),
+                        tint = Lime400,
+                        modifier = Modifier.padding(13.dp).size(27.dp),
+                    )
                 }
             }
         }
