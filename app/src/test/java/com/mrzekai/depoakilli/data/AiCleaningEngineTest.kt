@@ -68,6 +68,36 @@ class AiCleaningEngineTest {
         assertTrue(requireNotNull(result).recommended)
     }
 
+
+
+    @Test
+    fun `generated hidden thumbnails are high confidence junk`() {
+        val result = engine.assess(
+            file("thumb_1001.jpg", "image/jpeg", 5, "DCIM/.thumbnails/"),
+        )
+
+        assertEquals(CleanCategory.JUNK, result?.category)
+        assertTrue(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `ordinary image inside a user thumbnails folder is not junk`() {
+        val result = engine.assess(
+            file("holiday.jpg", "image/jpeg", 45, "Pictures/Thumbnails/"),
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `ordinary image inside temp folder is not auto classified as junk`() {
+        val result = engine.assess(
+            file("edited-photo.jpg", "image/jpeg", 12, "Pictures/Temp/"),
+        )
+
+        assertNull(result)
+    }
+
     @Test
     fun `large archive is discovered as a large file`() {
         val result = engine.assess(

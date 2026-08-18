@@ -179,11 +179,13 @@ class AiCleaningEngine(
     ): Boolean {
         if (ageDays < TEMP_MIN_AGE_DAYS) return false
         val tempExtension = TEMP_EXTENSIONS.any(name::endsWith)
-        val thumbnail = path.contains("/.thumbnails/") || path.contains("/thumbnails/")
-        val tempFolder = path.contains("/temp/") || path.contains("/tmp/") || path.contains("/temporary/")
+        val generatedThumbnail = path.contains("/.thumbnails/")
+        val mediaFile = file.mimeType.startsWith("image/") || file.mimeType.startsWith("video/")
+        val tempFolder = !mediaFile &&
+            (path.contains("/temp/") || path.contains("/tmp/") || path.contains("/temporary/"))
         val knownTinyArtifact = file.sizeBytes <= 10L * 1024L * 1024L &&
             (name == "thumbs.db" || name.endsWith(".log.old") || name.endsWith(".bak.tmp"))
-        return tempExtension || thumbnail || tempFolder || knownTinyArtifact
+        return tempExtension || generatedThumbnail || tempFolder || knownTinyArtifact
     }
 
     private fun ageDays(modifiedAtMillis: Long): Long {

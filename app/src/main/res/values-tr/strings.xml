@@ -323,7 +323,7 @@ Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tan�
     <string name="ram_optimizer_title_v050">RAM Optimizasyonu</string>
     <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
     <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
-    <string name="reason_thumbnail_cache">Yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
+    <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
     <string name="reason_whatsapp_review">WhatsApp paylaşılan medyası — silmeden önce incele</string>
     <string name="safe_ai_cleaning_description_v050">Akıllı Temizleyici erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
     <string name="scan_focus_downloads">İndirilenler ve APK sonucu</string>
@@ -358,6 +358,9 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="tab_security">Güvenlik</string>
     <string name="tab_profile">Ben</string>
     <string name="dashboard_total_cleanable">Toplam Temizlenebilir</string>
+    <string name="dashboard_safe_cleanable">Güvenle temizlenebilir</string>
+    <string name="dashboard_safe_ready">%1$s güvenle seçildi</string>
+    <string name="dashboard_review_ready">İncelemeyle +%1$s daha</string>
     <string name="dashboard_cleaning_score">TEMİZLİK SKORU</string>
     <string name="dashboard_cleanable_unknown">Gerçek temizlenebilir alanı hesaplamak için Akıllı Temizlik çalıştır</string>
     <string name="dashboard_cleanable_ready">%1$s temizlenebilir</string>
@@ -415,6 +418,8 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_clean_hero_subtitle">Temizlik başlamadan önce nelerin silineceğini incele.</string>
     <string name="smart_items_selected">öğe seçildi</string>
     <string name="smart_total_suggestions">toplam öneri</string>
+    <string name="smart_review_candidates">inceleme önerisi</string>
+    <string name="smart_reason_title">Neden önerildi?</string>
     <string name="smart_files_scanned">dosya tarandı</string>
 
     <string name="smart_cleanup_in_progress">Temizleniyor…</string>
@@ -450,5 +455,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_video_play">Videoyu oynat</string>
     <string name="smart_video_pause">Videoyu duraklat</string>
     <string name="smart_video_preview_error">Bu video bu cihazda oynatılamadı.</string>
+    <string name="smart_video_no_picture">Video görüntüsü bu cihazdaki codec tarafından desteklenmiyor.</string>
 
 </resources>

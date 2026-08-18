@@ -1,6 +1,10 @@
 package com.mrzekai.depoakilli.data
 
+import com.mrzekai.depoakilli.model.AiAssessment
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -47,6 +51,44 @@ class ModelsTest {
         assertEquals(1_000L, summary.selectedBytes)
         assertEquals(1, summary.selectedItems.size)
     }
+
+
+
+    @Test
+    fun `scan summary keeps safe selection separate from review candidates`() {
+        val summary = ScanSummary(
+            items = listOf(
+                cleanableItem("safe", 32_000_000L, recommended = true, selected = true),
+                cleanableItem("review", 5_168_000_000L, recommended = false, selected = false),
+            ),
+        )
+
+        assertEquals(32_000_000L, summary.selectedBytes)
+        assertEquals(5_168_000_000L, summary.reviewBytes)
+        assertEquals(5_200_000_000L, summary.totalSuggestedBytes)
+    }
+
+    private fun cleanableItem(
+        id: String,
+        size: Long,
+        recommended: Boolean,
+        selected: Boolean,
+    ) = CleanableItem(
+        id = id,
+        uri = "file:///test/$id",
+        name = "$id.bin",
+        sizeBytes = size,
+        mimeType = "application/octet-stream",
+        modifiedAtMillis = 1L,
+        relativePath = "Download/",
+        assessment = AiAssessment(
+            category = CleanCategory.JUNK,
+            safetyScore = 90,
+            reasonRes = 0,
+            recommended = recommended,
+        ),
+        selected = selected,
+    )
 
     private fun whatsAppItem(id: String, size: Long, selected: Boolean) = WhatsAppMediaItem(
         id = id,

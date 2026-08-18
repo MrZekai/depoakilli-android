@@ -1,8 +1,18 @@
 # Smart Cleaner / Akıllı Temizleyici
 
-Android storage-management and file-maintenance app. Current development line: **v0.5.5 Smart Clean Review & Preview UX**.
+Android storage-management and file-maintenance app. Current development line: **v0.5.6 Safe Cleanup Accounting & Media3 Video Preview**.
 
 ## Cleaner Engine 0.5
+
+## v0.5.6 safe cleanup accounting & video preview
+
+- dashboard separates automatically selected safe cleanup bytes from review-only candidate bytes;
+- Smart Clean hero reports selected cleanup and review candidates as two different values;
+- junk auto-selection is tightened so ordinary photos/videos in generic user folders are not classified as junk;
+- junk review shows the concrete reason a file was suggested, including regeneratable hidden thumbnails;
+- video preview moved from `VideoView` to Jetpack Media3 ExoPlayer rendered through a TextureView-backed `PlayerView`;
+- failed/unsupported playback shows an explicit error instead of silent audio-only black playback;
+- previous interstitial-before-delete, duplicate safety and 320x50 banner behavior remain unchanged.
 
 ## v0.5.5 Smart Clean review & preview
 
@@ -63,8 +73,8 @@ See:
 - package: `com.mrzekai.depoakilli`
 - minSdk: 30 (Android 11)
 - target/compile SDK: 36
-- versionName: `0.5.5`
-- versionCode: `12`
+- versionName: `0.5.6`
+- versionCode: `13`
 - debug package: `com.mrzekai.depoakilli.qa`
 
 GitHub Actions runs project validation, dependency checks, unit tests, lint, debug APK build and stable QA-signing verification. The debug artifact is named `depoakilli-test-apk-*`.

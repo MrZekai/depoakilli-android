@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Size
-import android.widget.VideoView
+import android.view.LayoutInflater
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -88,6 +88,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
@@ -636,6 +643,7 @@ private fun SmartResultsContent(
             FilePreviewDialog(
                 file = item.toSmartPreview(),
                 selected = item.selected,
+                reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
                 onToggleSelection = { onToggleItem(item.id) },
                 onDismiss = { previewItemId = null },
             )
@@ -646,6 +654,7 @@ private fun SmartResultsContent(
         FilePreviewDialog(
             file = file.toSmartPreview(),
             selected = null,
+            reason = null,
             onToggleSelection = null,
             onDismiss = { previewStorageFile = null },
         )
@@ -748,8 +757,8 @@ private fun SmartCleanHero(summary: ScanSummary) {
                     )
                     HeroStat(
                         icon = Icons.Outlined.AutoAwesome,
-                        value = ByteFormatter.format(summary.totalSuggestedBytes),
-                        label = stringResource(R.string.smart_total_suggestions),
+                        value = ByteFormatter.format(summary.reviewBytes),
+                        label = stringResource(R.string.smart_review_candidates),
                     )
                     HeroStat(
                         icon = Icons.Outlined.Storage,
@@ -827,6 +836,15 @@ private fun SmartCategoryStripCard(
                         color = SmartTextSecondary,
                         fontSize = 12.sp,
                     )
+                    if (category == CleanCategory.JUNK) {
+                        Text(
+                            stringResource(category.shortDescriptionRes),
+                            color = Color(0xFF8FDFFF),
+                            fontSize = 10.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
                 Surface(color = accent.copy(alpha = .18f), shape = RoundedCornerShape(20.dp)) {
                     Text(
@@ -1308,7 +1326,7 @@ private fun CategoryGridItem(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().height(196.dp),
+        modifier = Modifier.fillMaxWidth().height(214.dp),
         onClick = onPreview,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCard),
@@ -1412,6 +1430,13 @@ private fun CategoryGridItem(
                     fontSize = 10.sp,
                 )
                 Text(
+                    stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    color = Color(0xFFBFD0EA),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 9.sp,
+                )
+                Text(
                     stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
                     color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
                     fontSize = 10.sp,
@@ -1494,6 +1519,7 @@ private fun DialogHeader(title: String, onBack: () -> Unit) {
 private fun FilePreviewDialog(
     file: SmartPreviewFile,
     selected: Boolean?,
+    reason: String?,
     onToggleSelection: (() -> Unit)?,
     onDismiss: () -> Unit,
 ) {
@@ -1561,6 +1587,31 @@ private fun FilePreviewDialog(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
+
+                        if (!reason.isNullOrBlank()) {
+                            Surface(
+                                color = Color(0xFF102850),
+                                shape = RoundedCornerShape(14.dp),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, SmartCyan.copy(alpha = .26f)),
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 11.dp, vertical = 9.dp),
+                                    verticalArrangement = Arrangement.spacedBy(3.dp),
+                                ) {
+                                    Text(
+                                        stringResource(R.string.smart_reason_title),
+                                        color = SmartCyan,
+                                        fontWeight = FontWeight.Black,
+                                        fontSize = 11.sp,
+                                    )
+                                    Text(
+                                        reason,
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+                        }
 
                         if (selected != null && onToggleSelection != null) {
                             val selectionColor = if (selected) Color(0xFF0F4938) else Color(0xFF152C52)
@@ -1653,15 +1704,53 @@ private fun ImageFilePreview(file: SmartPreviewFile) {
 
 @Composable
 private fun VideoFilePreview(file: SmartPreviewFile) {
-    var videoView by remember(file.uri) { mutableStateOf<VideoView?>(null) }
+    val context = LocalContext.current
+    val player = remember(file.uri) {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(file.uri))
+            prepare()
+        }
+    }
     var prepared by remember(file.uri) { mutableStateOf(false) }
     var playing by remember(file.uri) { mutableStateOf(false) }
     var failed by remember(file.uri) { mutableStateOf(false) }
+    var noVideoTrack by remember(file.uri) { mutableStateOf(false) }
 
-    DisposableEffect(file.uri) {
+    DisposableEffect(player) {
+        val listener = object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_READY) {
+                    prepared = true
+                    failed = false
+                }
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                playing = isPlaying
+            }
+
+            override fun onTracksChanged(tracks: Tracks) {
+                if (tracks.groups.isEmpty()) return
+                val selectedVideo = tracks.groups.any { group ->
+                    group.type == C.TRACK_TYPE_VIDEO && group.isSelected
+                }
+                noVideoTrack = !selectedVideo
+                if (noVideoTrack) {
+                    playing = false
+                    player.pause()
+                }
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                failed = true
+                prepared = false
+                playing = false
+            }
+        }
+        player.addListener(listener)
         onDispose {
-            runCatching { videoView?.stopPlayback() }
-            videoView = null
+            player.removeListener(listener)
+            player.release()
         }
     }
 
@@ -1671,28 +1760,15 @@ private fun VideoFilePreview(file: SmartPreviewFile) {
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                VideoView(context).apply {
-                    setBackgroundColor(android.graphics.Color.BLACK)
-                    setVideoURI(Uri.parse(file.uri))
-                    setOnPreparedListener { player ->
-                        prepared = true
-                        failed = false
-                        player.isLooping = false
-                        seekTo(1)
-                    }
-                    setOnCompletionListener {
-                        playing = false
-                        seekTo(1)
-                    }
-                    setOnErrorListener { _, _, _ ->
-                        failed = true
-                        prepared = false
-                        playing = false
-                        true
-                    }
-                    videoView = this
+            factory = { viewContext ->
+                (LayoutInflater.from(viewContext)
+                    .inflate(R.layout.smart_video_player, null, false) as PlayerView).apply {
+                    this.player = player
+                    useController = false
                 }
+            },
+            update = { view ->
+                if (view.player !== player) view.player = player
             },
         )
 
@@ -1700,14 +1776,22 @@ private fun VideoFilePreview(file: SmartPreviewFile) {
             CircularProgressIndicator(color = SmartCyan)
         }
 
-        if (failed) {
+        if (failed || noVideoTrack) {
             Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Icon(Icons.Outlined.VideoFile, contentDescription = null, tint = Color(0xFFFFB45B), modifier = Modifier.size(56.dp))
+                Icon(
+                    Icons.Outlined.VideoFile,
+                    contentDescription = null,
+                    tint = Color(0xFFFFB45B),
+                    modifier = Modifier.size(56.dp),
+                )
                 Text(
-                    stringResource(R.string.smart_video_preview_error),
+                    stringResource(if (noVideoTrack) R.string.smart_video_no_picture else R.string.smart_video_preview_error),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                 )
@@ -1715,20 +1799,17 @@ private fun VideoFilePreview(file: SmartPreviewFile) {
         } else {
             Surface(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(18.dp),
-                color = Color(0xDD06132F),
+                color = Color(0xE606132F),
                 shape = RoundedCornerShape(18.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .24f)),
             ) {
                 Row(
                     modifier = Modifier
-                        .clickable(enabled = prepared) {
-                            val active = videoView ?: return@clickable
-                            if (active.isPlaying) {
-                                active.pause()
-                                playing = false
+                        .clickable(enabled = prepared && !noVideoTrack) {
+                            if (player.isPlaying) {
+                                player.pause()
                             } else {
-                                active.start()
-                                playing = true
+                                player.play()
                             }
                         }
                         .padding(horizontal = 18.dp, vertical = 11.dp),

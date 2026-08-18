@@ -189,6 +189,8 @@ data class ScanSummary(
 ) {
     val selectedItems: List<CleanableItem> get() = items.filter(CleanableItem::selected)
     val selectedBytes: Long get() = selectedItems.sumOf(CleanableItem::sizeBytes)
+    val reviewItems: List<CleanableItem> get() = items.filterNot(CleanableItem::selected)
+    val reviewBytes: Long get() = reviewItems.sumOf(CleanableItem::sizeBytes)
     val totalSuggestedBytes: Long get() = items.sumOf(CleanableItem::sizeBytes)
     val byCategory: Map<CleanCategory, List<CleanableItem>> get() = items.groupBy { it.assessment.category }
 }

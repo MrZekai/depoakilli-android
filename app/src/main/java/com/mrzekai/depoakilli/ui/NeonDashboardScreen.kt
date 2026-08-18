@@ -96,6 +96,7 @@ internal fun NeonDashboardScreen(
     val whatsAppBytes = categoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
     val cacheBytes = state.appCache.totalCacheBytes
     val cleanableBytes = state.dashboardCleanableBytes
+    val reviewBytes = state.dashboardReviewBytes
     val score = cleaningScore(state)
 
     Box(
@@ -124,6 +125,8 @@ internal fun NeonDashboardScreen(
             item {
                 DashboardHero(
                     cleanableBytes = cleanableBytes,
+                    reviewBytes = reviewBytes,
+                    hasScanResult = state.lastScanCompleted,
                     cleaningScore = score,
                 )
             }
@@ -312,6 +315,8 @@ private fun DashboardHeader(onOpenProfile: () -> Unit) {
 @Composable
 private fun DashboardHero(
     cleanableBytes: Long,
+    reviewBytes: Long,
+    hasScanResult: Boolean,
     cleaningScore: Int,
 ) {
     Row(
@@ -343,7 +348,7 @@ private fun DashboardHero(
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        stringResource(R.string.dashboard_total_cleanable),
+                        stringResource(R.string.dashboard_safe_cleanable),
                         color = Color(0xFFC7D5FF),
                         fontSize = 15.sp,
                     )
@@ -359,18 +364,31 @@ private fun DashboardHero(
                         color = Color(0xFF6C49C9).copy(alpha = .45f),
                         shape = RoundedCornerShape(18.dp),
                     ) {
-                        Text(
-                            if (cleanableBytes > 0L) {
-                                stringResource(R.string.dashboard_cleanable_ready, ByteFormatter.format(cleanableBytes))
-                            } else {
-                                stringResource(R.string.dashboard_cleanable_unknown)
-                            },
+                        Column(
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            color = Color(0xFFE6EBFF),
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            Text(
+                                if (hasScanResult) {
+                                    stringResource(R.string.dashboard_safe_ready, ByteFormatter.format(cleanableBytes))
+                                } else {
+                                    stringResource(R.string.dashboard_cleanable_unknown)
+                                },
+                                color = Color(0xFFE6EBFF),
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            if (hasScanResult && reviewBytes > 0L) {
+                                Text(
+                                    stringResource(R.string.dashboard_review_ready, ByteFormatter.format(reviewBytes)),
+                                    color = Color(0xFF9FE6FF),
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -489,7 +507,7 @@ private fun SmartCleanButton(
                 )
                 Text(
                     if (cleanableBytes > 0L) {
-                        stringResource(R.string.dashboard_cleanable_ready, ByteFormatter.format(cleanableBytes))
+                        stringResource(R.string.dashboard_safe_ready, ByteFormatter.format(cleanableBytes))
                     } else {
                         stringResource(R.string.smart_clean_primary_subtitle)
                     },

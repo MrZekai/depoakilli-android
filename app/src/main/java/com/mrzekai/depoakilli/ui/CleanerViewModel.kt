@@ -35,6 +35,7 @@ data class CleanerUiState(
     val installedApps: List<InstalledAppEntry> = emptyList(),
     val summary: ScanSummary = ScanSummary(),
     val dashboardCleanableBytes: Long = 0L,
+    val dashboardReviewBytes: Long = 0L,
     val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
     val scanning: Boolean = false,
     val scanProgressFiles: Int = 0,
@@ -182,9 +183,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     it.copy(
                         summary = summary,
                         dashboardCleanableBytes = if (comprehensive) {
-                            summary.totalSuggestedBytes
+                            summary.selectedBytes
                         } else {
                             it.dashboardCleanableBytes
+                        },
+                        dashboardReviewBytes = if (comprehensive) {
+                            summary.reviewBytes
+                        } else {
+                            it.dashboardReviewBytes
                         },
                         dashboardCategoryBytes = if (comprehensive) {
                             summary.byCategory.mapValues { (_, items) -> items.sumOf(CleanableItem::sizeBytes) }
@@ -424,9 +430,18 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             val deletedByCategory = deletedItems
                 .groupBy { it.assessment.category }
                 .mapValues { (_, categoryItems) -> categoryItems.sumOf(CleanableItem::sizeBytes) }
+            val deletedAutoSelectedBytes = deletedItems
+                .asSequence()
+                .filter { it.assessment.recommended }
+                .sumOf(CleanableItem::sizeBytes)
+            val deletedReviewBytes = deletedItems
+                .asSequence()
+                .filterNot { it.assessment.recommended }
+                .sumOf(CleanableItem::sizeBytes)
             state.copy(
                 summary = state.summary.copy(items = state.summary.items.filterNot { it.id in deletedIds }),
-                dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedBytes).coerceAtLeast(0L),
+                dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedAutoSelectedBytes).coerceAtLeast(0L),
+                dashboardReviewBytes = (state.dashboardReviewBytes - deletedReviewBytes).coerceAtLeast(0L),
                 dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
                     (bytes - (deletedByCategory[category] ?: 0L)).coerceAtLeast(0L)
                 },

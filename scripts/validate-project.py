@@ -30,6 +30,7 @@ required = [
     "app/src/main/res/values/strings.xml",
     "app/src/main/res/values-tr/strings.xml",
     "app/src/main/res/xml/locales_config.xml",
+    "app/src/main/res/layout/smart_video_player.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
@@ -128,8 +129,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 12",
-    'versionName = "0.5.5"',
+    "versionCode = 13",
+    'versionName = "0.5.6"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -144,6 +145,7 @@ for expected in (
     'compose-bom = "2026.06.01"',
     'fragment = "1.9.0"',
     'lifecycle = "2.10.0"',
+    'media3 = "1.10.1"',
 ):
     if expected not in catalog:
         errors.append(f"missing compatible dependency pin: {expected}")
@@ -204,9 +206,9 @@ for expected in (
     "CleaningScoreRing",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.5 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.6 dashboard invariant: {expected}")
 if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.5 dashboard must not advertise a non-existent Pro/Premium tier")
+    errors.append("v0.5.6 dashboard must not advertise a non-existent Pro/Premium tier")
 
 smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (
@@ -225,14 +227,19 @@ for expected in (
     "LazyRow(",
 ):
     if expected not in smart_results:
-        errors.append(f"missing v0.5.5 Smart Clean template invariant: {expected}")
+        errors.append(f"missing v0.5.6 Smart Clean template invariant: {expected}")
 if "import androidx.compose.foundation.layout.weight" in smart_results:
     errors.append("SmartCleanResultsScreen must not import the internal Compose layout weight symbol")
 if "Smart Clean scan in progress" not in (ROOT / "app/src/main/res/values/strings.xml").read_text(encoding="utf-8"):
-    errors.append("v0.5.5 must use the upgraded Smart Clean scan-progress copy")
+    errors.append("v0.5.6 must use the upgraded Smart Clean scan-progress copy")
 if "smart_detail_grid_hint" not in smart_results:
-    errors.append("v0.5.5 category detail must use the visual review grid guidance")
-
+    errors.append("v0.5.6 category detail must use the visual review grid guidance")
+if "ExoPlayer.Builder" not in smart_results or "MediaItem.fromUri" not in smart_results:
+    errors.append("v0.5.6 video preview must use Jetpack Media3 ExoPlayer")
+if "VideoView" in smart_results:
+    errors.append("legacy VideoView must not remain in v0.5.6 Smart Clean preview")
+if "R.layout.smart_video_player" not in smart_results:
+    errors.append("v0.5.6 video preview must use the TextureView-backed PlayerView layout")
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
     ROOT / "app/src/main/res/values-tr/strings.xml",
@@ -244,12 +251,21 @@ for strings_path in (
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
 ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
 view_model_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
+if "dashboardReviewBytes" not in view_model_source or "summary.selectedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
+    errors.append("dashboard must separate safely selected cleanup bytes from review-only candidate bytes")
+if "dashboard_safe_cleanable" not in dashboard or "dashboard_review_ready" not in dashboard:
+    errors.append("dashboard must label safe cleanup and review candidates separately")
+ai_engine_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt").read_text(encoding="utf-8")
+if 'path.contains("/thumbnails/")' in ai_engine_source:
+    errors.append("generic user Thumbnails folders must not be auto-classified as junk")
+if 'val generatedThumbnail = path.contains("/.thumbnails/")' not in ai_engine_source:
+    errors.append("hidden generated thumbnail cache rule is missing")
 if "detailScreen == DetailScreen.CLEAN_RESULTS" not in cleaner_app or "BannerAd(canRequestAds = canRequestAds)" not in cleaner_app:
     errors.append("Smart Clean results must reserve an anchored banner slot")
 if "AdSize.BANNER" not in ads_source:
-    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.5")
+    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.6")
 if "getLargeAnchoredAdaptiveBannerAdSize" in ads_source:
-    errors.append("v0.5.5 must not reserve the oversized large adaptive banner")
+    errors.append("v0.5.6 must not reserve the oversized large adaptive banner")
 main_activity_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
 if "showBeforeCleanup" not in ads_source or "onFinished: () -> Unit" not in ads_source:
     errors.append("cleanup interstitial must run before deletion and expose a completion callback")
@@ -301,4 +317,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.5 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.6 project structure, permissions, resources, CI and safety guardrails are valid.")

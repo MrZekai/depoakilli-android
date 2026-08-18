@@ -323,7 +323,7 @@ Google Mobile Ads and the consent platform may process advertising identifiers, 
     <string name="ram_optimizer_title_v050">RAM Optimization</string>
     <string name="reason_large_file">Large file • %1$d days old</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
-    <string name="reason_thumbnail_cache">Regeneratable thumbnail cache • %1$d days old</string>
+    <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
     <string name="reason_whatsapp_review">WhatsApp shared media — review before deletion</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner analyzes accessible shared storage on-device, applies conservative cleanup rules, verifies exact duplicates by content and leaves user-created files unselected unless deletion is clearly safe.</string>
     <string name="scan_focus_downloads">Downloads &amp; APK result</string>
@@ -358,6 +358,9 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="tab_security">Security</string>
     <string name="tab_profile">Me</string>
     <string name="dashboard_total_cleanable">Total cleanable</string>
+    <string name="dashboard_safe_cleanable">Safe to clean</string>
+    <string name="dashboard_safe_ready">%1$s safely selected</string>
+    <string name="dashboard_review_ready">+%1$s more after review</string>
     <string name="dashboard_cleaning_score">CLEANING SCORE</string>
     <string name="dashboard_cleanable_unknown">Run Smart Clean to calculate real cleanable space</string>
     <string name="dashboard_cleanable_ready">%1$s cleanable</string>
@@ -415,6 +418,8 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_clean_hero_subtitle">Review what will be removed before cleanup starts.</string>
     <string name="smart_items_selected">items selected</string>
     <string name="smart_total_suggestions">total suggested</string>
+    <string name="smart_review_candidates">review suggestions</string>
+    <string name="smart_reason_title">Why is this suggested?</string>
     <string name="smart_files_scanned">files scanned</string>
 
     <string name="smart_cleanup_in_progress">Cleaning…</string>
@@ -450,5 +455,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_video_play">Play video</string>
     <string name="smart_video_pause">Pause video</string>
     <string name="smart_video_preview_error">This video could not be played on this device.</string>
+    <string name="smart_video_no_picture">This device codec cannot render the video track.</string>
 
 </resources>
