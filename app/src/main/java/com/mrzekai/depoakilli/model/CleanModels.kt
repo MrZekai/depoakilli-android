@@ -74,6 +74,7 @@ data class StorageReviewItem(
 
 data class StorageReviewSummary(
     val type: StorageFileType? = null,
+    val excludeWhatsAppMedia: Boolean = false,
     val items: List<StorageReviewItem> = emptyList(),
     val scannedFileCount: Int = 0,
     val scanLimitReached: Boolean = false,
@@ -207,6 +208,7 @@ data class ScanSummary(
     val scanLimitReached: Boolean = false,
     val storageTypes: List<StorageTypeStat> = emptyList(),
     val storagePreviews: Map<StorageFileType, List<IndexedFile>> = emptyMap(),
+    val smartMediaTypes: List<StorageTypeStat> = emptyList(),
 ) {
     val selectedItems: List<CleanableItem> by lazy(LazyThreadSafetyMode.NONE) {
         items.filter(CleanableItem::selected)

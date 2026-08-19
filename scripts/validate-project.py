@@ -135,8 +135,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 18",
-    'versionName = "0.5.11"',
+    "versionCode = 19",
+    'versionName = "0.5.12"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -185,6 +185,14 @@ for expected in (
 ):
     if expected not in repository:
         errors.append(f"missing v0.5.8 storage review repository invariant: {expected}")
+
+for expected in (
+    "smartMediaTypeStats",
+    "isWhatsAppSharedMedia",
+    "smartMediaTypes = smartMediaTypeStats(indexed)",
+):
+    if expected not in repository:
+        errors.append(f"missing v0.5.12 no-extra-scan media summary invariant: {expected}")
 
 for forbidden in (
     "MAX_HASH_BYTES",
@@ -291,6 +299,19 @@ if "VideoView" in smart_results:
     errors.append("legacy VideoView must not remain in v0.5.8 Smart Clean preview")
 if "R.layout.smart_video_player" not in smart_results:
     errors.append("v0.5.8 video preview must use the TextureView-backed PlayerView layout")
+for expected in (
+    "SmartStorageSuggestionCard",
+    "UnusedAppsSectionCard",
+    "UnusedAppsReviewDialog",
+    "smartVisibleCategoryItems",
+    "smartMediaPreviews",
+    "UNUSED_APP_DAYS = 60L",
+    "smart_clean_suggestions_subtitle_v0512",
+):
+    if expected not in smart_results:
+        errors.append(f"missing v0.5.12 Smart priority-review invariant: {expected}")
+if "orderedSmartCategories" in smart_results:
+    errors.append("v0.5.12 Smart Clean must not restore the old generic category ordering")
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
     ROOT / "app/src/main/res/values-tr/strings.xml",
@@ -328,8 +349,20 @@ if "refreshAfterCleanup" not in view_model_source:
     errors.append("cleanup must refresh results after deletion completes")
 if "smartCategoryReview" not in view_model_source or "openSmartCategoryReview" not in view_model_source:
     errors.append("Smart Clean View all must use in-screen category review navigation")
+for expected in (
+    "smartCategoryReviewIds",
+    "openSmartCategoryReview(category: CleanCategory, itemIds: Set<String>? = null)",
+):
+    if expected not in view_model_source:
+        errors.append(f"v0.5.12 filtered Smart category review invariant missing: {expected}")
 if "StorageReviewSummary" not in view_model_source or "openStorageReview" not in view_model_source:
     errors.append("Storage Analysis must load a full selectable review state")
+for expected in (
+    "excludeWhatsAppMedia",
+    "scanStorageReview(type, excludeWhatsAppMedia)",
+):
+    if expected not in view_model_source:
+        errors.append(f"v0.5.12 unique Smart media review invariant missing: {expected}")
 if "toggleStorageReviewItem" not in view_model_source or "toggleAllStorageReviewItems" not in view_model_source:
     errors.append("Storage Analysis must support per-file and select-all selection")
 if "deleteSelectedStorageReview" not in view_model_source:

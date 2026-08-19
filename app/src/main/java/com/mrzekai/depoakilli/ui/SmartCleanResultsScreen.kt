@@ -100,6 +100,7 @@ import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.IndexedFile
+import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
@@ -107,6 +108,7 @@ import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import java.io.File
+import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -152,8 +154,12 @@ internal fun SmartCleanResultsScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onOpenCategoryReview: (CleanCategory) -> Unit,
-    onOpenStorageReview: (StorageFileType) -> Unit,
+    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
+    onOpenStorageReview: (StorageFileType, Boolean) -> Unit,
+    onRequestUsageAccess: () -> Unit,
+    onRefreshInstalledApps: () -> Unit,
+    onUninstallApp: (String) -> Unit,
     onToggleStorageReviewItem: (String) -> Unit,
     onToggleAllStorageReviewItems: () -> Unit,
     onClean: (Set<String>?) -> Unit,
@@ -171,6 +177,10 @@ internal fun SmartCleanResultsScreen(
         else -> SmartResultsContent(
             summary = state.summary,
             activeCategoryReview = state.smartCategoryReview,
+            activeCategoryReviewIds = state.smartCategoryReviewIds,
+            installedApps = state.installedApps,
+            loadingApps = state.loadingApps,
+            hasUsageAccess = state.hasUsageAccess,
             storageReview = state.storageReview,
             storageReviewProgressFiles = state.storageReviewProgressFiles,
             storageReviewProgressDirectories = state.storageReviewProgressDirectories,
@@ -178,8 +188,12 @@ internal fun SmartCleanResultsScreen(
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
+            onSetItemsSelected = onSetItemsSelected,
             onOpenCategoryReview = onOpenCategoryReview,
             onOpenStorageReview = onOpenStorageReview,
+            onRequestUsageAccess = onRequestUsageAccess,
+            onRefreshInstalledApps = onRefreshInstalledApps,
+            onUninstallApp = onUninstallApp,
             onToggleStorageReviewItem = onToggleStorageReviewItem,
             onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
             onClean = onClean,
@@ -490,6 +504,10 @@ private fun SmartEmptyState(onScan: () -> Unit, modifier: Modifier) {
 private fun SmartResultsContent(
     summary: ScanSummary,
     activeCategoryReview: CleanCategory?,
+    activeCategoryReviewIds: Set<String>?,
+    installedApps: List<InstalledAppEntry>,
+    loadingApps: Boolean,
+    hasUsageAccess: Boolean,
     storageReview: StorageReviewSummary,
     storageReviewProgressFiles: Int,
     storageReviewProgressDirectories: Int,
@@ -497,8 +515,12 @@ private fun SmartResultsContent(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onOpenCategoryReview: (CleanCategory) -> Unit,
-    onOpenStorageReview: (StorageFileType) -> Unit,
+    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
+    onOpenStorageReview: (StorageFileType, Boolean) -> Unit,
+    onRequestUsageAccess: () -> Unit,
+    onRefreshInstalledApps: () -> Unit,
+    onUninstallApp: (String) -> Unit,
     onToggleStorageReviewItem: (String) -> Unit,
     onToggleAllStorageReviewItems: () -> Unit,
     onClean: (Set<String>?) -> Unit,
@@ -512,14 +534,28 @@ private fun SmartResultsContent(
         // Keep heavy media rails collapsed on first paint.
         mutableStateOf(setOf(CleanCategory.JUNK))
     }
+    var expandedStorageTypes by remember {
+        mutableStateOf(emptySet<StorageFileType>())
+    }
+    var showUnusedAppsReview by remember { mutableStateOf(false) }
+
+    val unusedApps = remember(installedApps, hasUsageAccess) {
+        unusedAppsForSmartReview(installedApps, hasUsageAccess)
+    }
 
     val category = activeCategoryReview
     if (category != null) {
+        val reviewItems = summary.byCategory[category].orEmpty().let { allItems ->
+            activeCategoryReviewIds?.let { ids -> allItems.filter { it.id in ids } } ?: allItems
+        }
         CategoryDetailPage(
             category = category,
-            items = summary.byCategory[category].orEmpty(),
+            items = reviewItems,
             cleanupInProgress = cleanupInProgress,
-            onToggleCategory = { onToggleCategory(category) },
+            onToggleCategory = {
+                val ids = reviewItems.mapTo(linkedSetOf(), CleanableItem::id)
+                onSetItemsSelected(ids, reviewItems.any { !it.selected })
+            },
             onToggleItem = onToggleItem,
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
@@ -585,44 +621,132 @@ private fun SmartResultsContent(
                 SmartCleanHero(summary = summary)
             }
 
-            if (summary.byCategory.isEmpty()) {
-                item {
-                    Card(
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = SmartCard),
-                    ) {
-                        Row(
-                            Modifier.fillMaxWidth().padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = SmartGreen)
-                            Spacer(Modifier.width(10.dp))
-                            Text(stringResource(R.string.no_safe_suggestions), color = Color.White)
-                        }
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(
+                        stringResource(R.string.smart_clean_suggestions_title),
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Text(
+                        stringResource(R.string.smart_clean_suggestions_subtitle_v0512),
+                        color = SmartTextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+
+            val videoStat = summary.smartMediaTypes.firstOrNull { it.type == StorageFileType.VIDEOS }
+            if (videoStat != null && videoStat.fileCount > 0) {
+                item(key = "smart-priority-videos") {
+                    SmartStorageSuggestionCard(
+                        type = StorageFileType.VIDEOS,
+                        count = videoStat.fileCount,
+                        bytes = videoStat.totalBytes,
+                        previews = smartMediaPreviews(summary, StorageFileType.VIDEOS),
+                        expanded = StorageFileType.VIDEOS in expandedStorageTypes,
+                        onExpandToggle = {
+                            expandedStorageTypes = toggleStorageExpansion(
+                                expandedStorageTypes,
+                                StorageFileType.VIDEOS,
+                            )
+                        },
+                        onOpenAll = { onOpenStorageReview(StorageFileType.VIDEOS, true) },
+                    )
+                }
+            }
+
+            val imageStat = summary.smartMediaTypes.firstOrNull { it.type == StorageFileType.IMAGES }
+            if (imageStat != null && imageStat.fileCount > 0) {
+                item(key = "smart-priority-images") {
+                    SmartStorageSuggestionCard(
+                        type = StorageFileType.IMAGES,
+                        count = imageStat.fileCount,
+                        bytes = imageStat.totalBytes,
+                        previews = smartMediaPreviews(summary, StorageFileType.IMAGES),
+                        expanded = StorageFileType.IMAGES in expandedStorageTypes,
+                        onExpandToggle = {
+                            expandedStorageTypes = toggleStorageExpansion(
+                                expandedStorageTypes,
+                                StorageFileType.IMAGES,
+                            )
+                        },
+                        onOpenAll = { onOpenStorageReview(StorageFileType.IMAGES, true) },
+                    )
+                }
+            }
+
+            listOf(
+                CleanCategory.WHATSAPP_MEDIA,
+                CleanCategory.LARGE_FILE,
+            ).forEach { smartCategory ->
+                val categoryItems = smartVisibleCategoryItems(summary, smartCategory)
+                if (categoryItems.isNotEmpty()) {
+                    item(key = "smart-category-${smartCategory.name}") {
+                        val ids = categoryItems.mapTo(linkedSetOf(), CleanableItem::id)
+                        SmartCategoryStripCard(
+                            category = smartCategory,
+                            items = categoryItems,
+                            expanded = smartCategory in expandedCategories,
+                            onExpandToggle = {
+                                expandedCategories = if (smartCategory in expandedCategories) {
+                                    expandedCategories - smartCategory
+                                } else {
+                                    expandedCategories + smartCategory
+                                }
+                            },
+                            onToggleCategory = {
+                                onSetItemsSelected(ids, categoryItems.any { !it.selected })
+                            },
+                            onPreview = { previewItemId = it.id },
+                            onOpenAll = { onOpenCategoryReview(smartCategory, ids) },
+                            onToggleItem = onToggleItem,
+                        )
                     }
                 }
-            } else {
-                orderedSmartCategories(summary).forEach { smartCategory ->
-                    val categoryItems = summary.byCategory[smartCategory].orEmpty()
-                    if (categoryItems.isNotEmpty()) {
-                        item(key = "smart-category-${smartCategory.name}") {
-                            SmartCategoryStripCard(
-                                category = smartCategory,
-                                items = categoryItems,
-                                expanded = smartCategory in expandedCategories,
-                                onExpandToggle = {
-                                    expandedCategories = if (smartCategory in expandedCategories) {
-                                        expandedCategories - smartCategory
-                                    } else {
-                                        expandedCategories + smartCategory
-                                    }
-                                },
-                                onToggleCategory = { onToggleCategory(smartCategory) },
-                                onPreview = { previewItemId = it.id },
-                                onOpenAll = { onOpenCategoryReview(smartCategory) },
-                                onToggleItem = onToggleItem,
-                            )
-                        }
+            }
+
+            item(key = "smart-unused-apps") {
+                UnusedAppsSectionCard(
+                    apps = unusedApps,
+                    installedAppsLoaded = installedApps.isNotEmpty(),
+                    loadingApps = loadingApps,
+                    hasUsageAccess = hasUsageAccess,
+                    onRequestUsageAccess = onRequestUsageAccess,
+                    onAnalyzeApps = onRefreshInstalledApps,
+                    onOpenAll = { showUnusedAppsReview = true },
+                )
+            }
+
+            listOf(
+                CleanCategory.OLD_DOWNLOAD,
+                CleanCategory.APK_PACKAGE,
+                CleanCategory.JUNK,
+                CleanCategory.APP_CACHE,
+            ).forEach { smartCategory ->
+                val categoryItems = smartVisibleCategoryItems(summary, smartCategory)
+                if (categoryItems.isNotEmpty()) {
+                    item(key = "smart-category-${smartCategory.name}") {
+                        val ids = categoryItems.mapTo(linkedSetOf(), CleanableItem::id)
+                        SmartCategoryStripCard(
+                            category = smartCategory,
+                            items = categoryItems,
+                            expanded = smartCategory in expandedCategories,
+                            onExpandToggle = {
+                                expandedCategories = if (smartCategory in expandedCategories) {
+                                    expandedCategories - smartCategory
+                                } else {
+                                    expandedCategories + smartCategory
+                                }
+                            },
+                            onToggleCategory = {
+                                onSetItemsSelected(ids, categoryItems.any { !it.selected })
+                            },
+                            onPreview = { previewItemId = it.id },
+                            onOpenAll = { onOpenCategoryReview(smartCategory, ids) },
+                            onToggleItem = onToggleItem,
+                        )
                     }
                 }
             }
@@ -657,7 +781,7 @@ private fun SmartResultsContent(
                                 bytes = stat.totalBytes,
                                 onClick = {
                                     previewStorageItemId = null
-                                    onOpenStorageReview(stat.type)
+                                    onOpenStorageReview(stat.type, false)
                                 },
                                 modifier = Modifier.weight(1f),
                             )
@@ -716,21 +840,427 @@ private fun SmartResultsContent(
             )
         }
     }
+
+    if (showUnusedAppsReview) {
+        UnusedAppsReviewDialog(
+            apps = unusedApps,
+            onUninstallApp = onUninstallApp,
+            onDismiss = { showUnusedAppsReview = false },
+        )
+    }
 }
 
-private fun orderedSmartCategories(summary: ScanSummary): List<CleanCategory> {
-    val priority = listOf(
-        CleanCategory.WHATSAPP_MEDIA,
-        CleanCategory.DUPLICATE,
-        CleanCategory.LARGE_FILE,
-        CleanCategory.APK_PACKAGE,
-        CleanCategory.SCREENSHOT,
-        CleanCategory.JUNK,
-        CleanCategory.OLD_DOWNLOAD,
-        CleanCategory.APP_CACHE,
-    )
-    return priority.filter { summary.byCategory[it].orEmpty().isNotEmpty() }
+private fun smartVisibleCategoryItems(
+    summary: ScanSummary,
+    category: CleanCategory,
+): List<CleanableItem> {
+    val items = summary.byCategory[category].orEmpty()
+    if (category != CleanCategory.LARGE_FILE) return items
+    return items.filterNot { item ->
+        item.mimeType.startsWith("image/") ||
+            item.mimeType.startsWith("video/") ||
+            item.name.endsWith(".apk", ignoreCase = true) ||
+            isWhatsAppRelativePath(item.relativePath)
+    }
 }
+
+private fun smartMediaPreviews(
+    summary: ScanSummary,
+    type: StorageFileType,
+): List<IndexedFile> {
+    return summary.storagePreviews[type]
+        .orEmpty()
+        .asSequence()
+        .filterNot { isWhatsAppRelativePath(it.relativePath) }
+        .take(4)
+        .toList()
+}
+
+private fun isWhatsAppRelativePath(relativePath: String): Boolean {
+    val path = "/${relativePath.replace('\\', '/').trim('/')}/".lowercase()
+    return path.contains("/android/media/com.whatsapp/") ||
+        path.contains("/android/media/com.whatsapp.w4b/") ||
+        path.startsWith("/whatsapp/") ||
+        path.startsWith("/whatsapp business/")
+}
+
+private fun toggleStorageExpansion(
+    expanded: Set<StorageFileType>,
+    type: StorageFileType,
+): Set<StorageFileType> {
+    return if (type in expanded) expanded - type else expanded + type
+}
+
+private fun unusedAppsForSmartReview(
+    apps: List<InstalledAppEntry>,
+    hasUsageAccess: Boolean,
+): List<InstalledAppEntry> {
+    if (!hasUsageAccess) return emptyList()
+    val now = System.currentTimeMillis()
+    val threshold = TimeUnit.DAYS.toMillis(UNUSED_APP_DAYS)
+    return apps
+        .asSequence()
+        .filter { it.lastUsedMillis > 0L }
+        .filter { now - it.lastUsedMillis >= threshold }
+        .filter { it.totalBytes > 0L }
+        .sortedWith(
+            compareByDescending<InstalledAppEntry> { it.totalBytes }
+                .thenBy { it.label.lowercase() },
+        )
+        .toList()
+}
+
+@Composable
+private fun SmartStorageSuggestionCard(
+    type: StorageFileType,
+    count: Int,
+    bytes: Long,
+    previews: List<IndexedFile>,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onOpenAll: () -> Unit,
+) {
+    val accent = storageAccent(type)
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onExpandToggle)
+                    .padding(horizontal = 12.dp, vertical = 11.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Surface(color = accent.copy(alpha = .17f), shape = RoundedCornerShape(13.dp)) {
+                    Icon(
+                        storageTypeVisual(type),
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.padding(9.dp).size(25.dp),
+                    )
+                }
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(type.titleRes),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 17.sp,
+                    )
+                    Text(
+                        stringResource(R.string.smart_media_priority_summary, count, ByteFormatter.format(bytes)),
+                        color = SmartTextSecondary,
+                        fontSize = 12.sp,
+                    )
+                    Text(
+                        stringResource(R.string.smart_media_priority_note),
+                        color = Color(0xFF8FDFFF),
+                        fontSize = 10.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Surface(color = accent.copy(alpha = .18f), shape = RoundedCornerShape(20.dp)) {
+                    Text(
+                        ByteFormatter.format(bytes),
+                        color = accent,
+                        fontWeight = FontWeight.Black,
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
+                        fontSize = 12.sp,
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Text(if (expanded) "⌃" else "⌄", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+            }
+
+            if (expanded) {
+                if (previews.isNotEmpty()) {
+                    LazyRow(
+                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(previews, key = { it.uri }) { file ->
+                            SmartStoragePreviewTile(
+                                file = file,
+                                accent = accent,
+                                onClick = onOpenAll,
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    TextButton(onClick = onOpenAll) {
+                        Text(stringResource(R.string.smart_show_all_count, count), color = accent, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.width(4.dp))
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent, modifier = Modifier.size(17.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmartStoragePreviewTile(
+    file: IndexedFile,
+    accent: Color,
+    onClick: () -> Unit,
+) {
+    val context = LocalContext.current
+    val preview = file.toSmartPreview()
+    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = file.uri, key2 = file.mimeType) {
+        value = loadPreviewThumbnail(context, preview)
+    }
+
+    Card(
+        modifier = Modifier.width(142.dp).height(116.dp).clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCardAlt),
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            if (bitmap != null) {
+                Image(
+                    bitmap = requireNotNull(bitmap),
+                    contentDescription = file.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+                Box(
+                    Modifier.fillMaxSize().background(
+                        Brush.verticalGradient(listOf(Color.Transparent, Color(0xE6000718))),
+                    ),
+                )
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(10.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(fileVisual(file.mimeType, file.name), contentDescription = null, tint = accent, modifier = Modifier.size(34.dp))
+                    Spacer(Modifier.height(8.dp))
+                    Text(file.name, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
+                }
+            }
+            Column(
+                modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+            ) {
+                if (bitmap != null) {
+                    Text(file.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Text(ByteFormatter.format(file.sizeBytes), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Black)
+            }
+        }
+    }
+}
+
+@Composable
+private fun UnusedAppsSectionCard(
+    apps: List<InstalledAppEntry>,
+    installedAppsLoaded: Boolean,
+    loadingApps: Boolean,
+    hasUsageAccess: Boolean,
+    onRequestUsageAccess: () -> Unit,
+    onAnalyzeApps: () -> Unit,
+    onOpenAll: () -> Unit,
+) {
+    val accent = Color(0xFF70E58E)
+    val totalBytes = apps.sumOf { it.totalBytes }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(color = accent.copy(alpha = .17f), shape = RoundedCornerShape(13.dp)) {
+                    Icon(Icons.Outlined.Android, contentDescription = null, tint = accent, modifier = Modifier.padding(9.dp).size(25.dp))
+                }
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.smart_unused_apps_title),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 17.sp,
+                    )
+                    Text(
+                        when {
+                            !hasUsageAccess -> stringResource(R.string.smart_unused_apps_permission)
+                            loadingApps -> stringResource(R.string.smart_unused_apps_loading)
+                            apps.isNotEmpty() -> stringResource(R.string.smart_unused_apps_summary, apps.size, ByteFormatter.format(totalBytes))
+                            installedAppsLoaded -> stringResource(R.string.smart_unused_apps_none)
+                            else -> stringResource(R.string.smart_unused_apps_ready)
+                        },
+                        color = SmartTextSecondary,
+                        fontSize = 12.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+
+            when {
+                !hasUsageAccess -> {
+                    TextButton(onClick = onRequestUsageAccess) {
+                        Text(stringResource(R.string.smart_unused_apps_permission_action), color = accent, fontWeight = FontWeight.Bold)
+                    }
+                }
+                loadingApps -> {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = accent)
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.smart_unused_apps_loading), color = SmartTextSecondary, fontSize = 11.sp)
+                    }
+                }
+                apps.isNotEmpty() -> {
+                    apps.take(3).forEach { app ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                app.label,
+                                modifier = Modifier.weight(1f),
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                ByteFormatter.format(app.totalBytes),
+                                color = accent,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                    TextButton(onClick = onOpenAll) {
+                        Text(stringResource(R.string.smart_unused_apps_view_all), color = accent, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.width(4.dp))
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent, modifier = Modifier.size(17.dp))
+                    }
+                }
+                !installedAppsLoaded -> {
+                    TextButton(onClick = onAnalyzeApps) {
+                        Text(stringResource(R.string.smart_unused_apps_analyze), color = accent, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            Text(
+                stringResource(R.string.smart_unused_apps_separate_note),
+                color = Color(0xFF8FA9BA),
+                fontSize = 10.sp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun UnusedAppsReviewDialog(
+    apps: List<InstalledAppEntry>,
+    onUninstallApp: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color(0xE603091B)).padding(18.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(26.dp),
+                colors = CardDefaults.cardColors(containerColor = SmartCard),
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        stringResource(R.string.smart_unused_apps_dialog_title),
+                        color = Color.White,
+                        fontSize = 21.sp,
+                        fontWeight = FontWeight.Black,
+                    )
+                    Text(
+                        stringResource(R.string.smart_unused_apps_dialog_note),
+                        color = SmartTextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    LazyColumn(
+                        modifier = Modifier.height(420.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(apps, key = { it.packageName }) { app ->
+                            Surface(
+                                color = SmartCardAlt,
+                                shape = RoundedCornerShape(16.dp),
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Surface(
+                                        color = Color(0xFF70E58E).copy(alpha = .14f),
+                                        shape = RoundedCornerShape(12.dp),
+                                    ) {
+                                        Icon(
+                                            Icons.Outlined.Android,
+                                            contentDescription = null,
+                                            tint = Color(0xFF70E58E),
+                                            modifier = Modifier.padding(8.dp).size(22.dp),
+                                        )
+                                    }
+                                    Spacer(Modifier.width(10.dp))
+                                    Column(Modifier.weight(1f)) {
+                                        Text(app.label, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(
+                                            stringResource(
+                                                R.string.smart_unused_apps_last_used,
+                                                daysSinceLastUse(app.lastUsedMillis),
+                                            ),
+                                            color = SmartTextSecondary,
+                                            fontSize = 10.sp,
+                                        )
+                                        Text(ByteFormatter.format(app.totalBytes), color = Color(0xFF70E58E), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                    }
+                                    TextButton(onClick = { onUninstallApp(app.packageName) }) {
+                                        Text(stringResource(R.string.uninstall), color = Color(0xFFFF8794), fontWeight = FontWeight.Bold)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.done))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun daysSinceLastUse(lastUsedMillis: Long): Long {
+    if (lastUsedMillis <= 0L) return 0L
+    return TimeUnit.MILLISECONDS.toDays(
+        (System.currentTimeMillis() - lastUsedMillis).coerceAtLeast(0L),
+    )
+}
+
+private const val UNUSED_APP_DAYS = 60L
 
 @Composable
 private fun SmartCleanHero(summary: ScanSummary) {

@@ -54,6 +54,7 @@ data class CleanerUiState(
     val dashboardReviewBytes: Long = 0L,
     val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
     val smartCategoryReview: CleanCategory? = null,
+    val smartCategoryReviewIds: Set<String>? = null,
     val storageReview: StorageReviewSummary = StorageReviewSummary(),
     val storageReviewProgressFiles: Int = 0,
     val storageReviewProgressDirectories: Int = 0,
@@ -91,7 +92,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     init {
         refreshDeviceState()
         refreshAppCaches()
-        refreshInstalledApps()
     }
 
     fun refreshDeviceState() {
@@ -226,7 +226,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         hasWhatsAppAccess = repository.hasWhatsAppAccess(),
                     )
                 }
-                if (focus != ScanFocus.SMART) {
+                if (focus == ScanFocus.SMART) {
+                    if (repository.hasUsageAccess()) {
+                        refreshInstalledApps()
+                    }
+                } else {
                     refreshAppCaches()
                 }
             }.onFailure {
@@ -364,16 +368,30 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun openSmartCategoryReview(category: CleanCategory) {
-        _state.update { it.copy(smartCategoryReview = category) }
+    fun openSmartCategoryReview(category: CleanCategory, itemIds: Set<String>? = null) {
+        _state.update {
+            it.copy(
+                smartCategoryReview = category,
+                smartCategoryReviewIds = itemIds,
+            )
+        }
     }
 
     fun closeSmartCategoryReview() {
-        _state.update { it.copy(smartCategoryReview = null) }
+        _state.update {
+            it.copy(
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+            )
+        }
     }
 
-    fun openStorageReview(type: StorageFileType) {
-        if (_state.value.storageReview.loading && _state.value.storageReview.type == type) return
+    fun openStorageReview(type: StorageFileType, excludeWhatsAppMedia: Boolean = false) {
+        if (
+            _state.value.storageReview.loading &&
+            _state.value.storageReview.type == type &&
+            _state.value.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
+        ) return
         if (!repository.hasAllFilesAccess()) {
             _state.update {
                 it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
@@ -382,7 +400,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         _state.update {
             it.copy(
-                storageReview = StorageReviewSummary(type = type, loading = true),
+                storageReview = StorageReviewSummary(
+                    type = type,
+                    excludeWhatsAppMedia = excludeWhatsAppMedia,
+                    loading = true,
+                ),
                 storageReviewProgressFiles = 0,
                 storageReviewProgressDirectories = 0,
                 message = null,
@@ -390,9 +412,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             runCatching {
-                repository.scanStorageReview(type) { directories, files ->
+                repository.scanStorageReview(type, excludeWhatsAppMedia) { directories, files ->
                     _state.update { state ->
-                        if (state.storageReview.type == type) {
+                        if (
+                            state.storageReview.type == type &&
+                            state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
+                        ) {
                             state.copy(
                                 storageReviewProgressDirectories = directories,
                                 storageReviewProgressFiles = files,
@@ -404,7 +429,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onSuccess { review ->
                 _state.update { state ->
-                    if (state.storageReview.type == type) {
+                    if (
+                        state.storageReview.type == type &&
+                        state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
+                    ) {
                         state.copy(
                             storageReview = review,
                             storageReviewProgressFiles = review.scannedFileCount,
@@ -416,7 +444,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }.onFailure {
                 _state.update { state ->
                     state.copy(
-                        storageReview = StorageReviewSummary(type = type, loading = false),
+                        storageReview = StorageReviewSummary(
+                            type = type,
+                            excludeWhatsAppMedia = excludeWhatsAppMedia,
+                            loading = false,
+                        ),
                         message = getApplication<Application>().getString(R.string.message_scan_failed),
                     )
                 }
@@ -664,10 +696,26 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.filter { it.fileCount > 0 || it.totalBytes > 0L }
 
+            val updatedSmartMediaTypes = state.summary.smartMediaTypes.map { stat ->
+                if (
+                    state.storageReview.excludeWhatsAppMedia &&
+                    reviewType != null &&
+                    stat.type == reviewType
+                ) {
+                    stat.copy(
+                        fileCount = (stat.fileCount - deletedStorageCount).coerceAtLeast(0),
+                        totalBytes = (stat.totalBytes - deletedStorageBytes).coerceAtLeast(0L),
+                    )
+                } else {
+                    stat
+                }
+            }.filter { it.fileCount > 0 || it.totalBytes > 0L }
+
             state.copy(
                 summary = state.summary.copy(
                     items = remainingSmartItems,
                     storageTypes = updatedStorageTypes,
+                    smartMediaTypes = updatedSmartMediaTypes,
                     storagePreviews = state.summary.storagePreviews.mapValues { (_, files) ->
                         files.filterNot { it.uri in deletedUris }
                     },

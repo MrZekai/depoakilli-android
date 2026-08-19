@@ -546,4 +546,21 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="ram_result_after">After</string>
     <string name="ram_result_measured_note">Measured on this device. Smart Cleaner releases its own temporary resources; Android remains in control of other apps.</string>
     <string name="ram_result_done">Done</string>
+
+    <string name="smart_clean_suggestions_subtitle_v0512">Priority review: videos, images, WhatsApp, large files, unused apps and safe cleanup candidates. The same file is not repeated across these top sections.</string>
+    <string name="smart_media_priority_summary">%1$d files • %2$s</string>
+    <string name="smart_media_priority_note">Manual review • WhatsApp media is shown separately • nothing is preselected</string>
+    <string name="smart_unused_apps_title">Unused apps</string>
+    <string name="smart_unused_apps_permission">Usage Access is needed to identify apps that have not been used for a long time.</string>
+    <string name="smart_unused_apps_permission_action">Enable Usage Access</string>
+    <string name="smart_unused_apps_loading">Analyzing installed apps in the background…</string>
+    <string name="smart_unused_apps_summary">%1$d apps • %2$s installed size</string>
+    <string name="smart_unused_apps_none">No app with a known last-used time has been unused for 60+ days.</string>
+    <string name="smart_unused_apps_ready">App review is ready to run without slowing the file scan.</string>
+    <string name="smart_unused_apps_analyze">Analyze apps</string>
+    <string name="smart_unused_apps_view_all">Review apps</string>
+    <string name="smart_unused_apps_separate_note">App removal is separate from the Clean button total and always uses Android’s uninstall screen.</string>
+    <string name="smart_unused_apps_dialog_title">Unused app review</string>
+    <string name="smart_unused_apps_dialog_note">Only apps with a known last-used time of at least 60 days are shown. Nothing is removed automatically.</string>
+    <string name="smart_unused_apps_last_used">Last used %1$d days ago</string>
 </resources>

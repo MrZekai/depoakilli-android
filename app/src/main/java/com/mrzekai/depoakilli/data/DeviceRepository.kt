@@ -307,15 +307,20 @@ class DeviceRepository(
             scanLimitReached = indexed.size >= MAX_INDEXED_FILES,
             storageTypes = storageTypeStats(indexed),
             storagePreviews = storageTypePreviews(indexed),
+            smartMediaTypes = smartMediaTypeStats(indexed),
         )
     }
 
     suspend fun scanStorageReview(
         type: StorageFileType,
+        excludeWhatsAppMedia: Boolean = false,
         onProgress: (Int, Int) -> Unit = { _, _ -> },
     ): StorageReviewSummary = withContext(Dispatchers.IO) {
         if (!hasAllFilesAccess()) {
-            return@withContext StorageReviewSummary(type = type)
+            return@withContext StorageReviewSummary(
+                type = type,
+                excludeWhatsAppMedia = excludeWhatsAppMedia,
+            )
         }
         val indexed = indexSharedStorage { visitedDirectories, discoveredFiles ->
             onProgress(visitedDirectories, discoveredFiles)
@@ -323,12 +328,14 @@ class DeviceRepository(
         val typed = indexed
             .asSequence()
             .filter { storageFileType(it) == type }
+            .filter { !excludeWhatsAppMedia || !isWhatsAppSharedMedia(it) }
             .sortedByDescending(IndexedFile::sizeBytes)
             .take(MAX_STORAGE_REVIEW_ITEMS)
             .map { StorageReviewItem(file = it, selected = false) }
             .toList()
         StorageReviewSummary(
             type = type,
+            excludeWhatsAppMedia = excludeWhatsAppMedia,
             items = typed,
             scannedFileCount = indexed.size,
             scanLimitReached = indexed.size >= MAX_INDEXED_FILES || typed.size >= MAX_STORAGE_REVIEW_ITEMS,
@@ -706,6 +713,43 @@ class DeviceRepository(
         }
         buffer.flip()
         digest.update(buffer)
+    }
+
+    private fun smartMediaTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
+        var imageCount = 0
+        var imageBytes = 0L
+        var videoCount = 0
+        var videoBytes = 0L
+
+        files.forEach { file ->
+            when {
+                file.mimeType.startsWith("image/") -> {
+                    if (!isWhatsAppSharedMedia(file)) {
+                        imageCount++
+                        imageBytes += file.sizeBytes
+                    }
+                }
+                file.mimeType.startsWith("video/") -> {
+                    if (!isWhatsAppSharedMedia(file)) {
+                        videoCount++
+                        videoBytes += file.sizeBytes
+                    }
+                }
+            }
+        }
+
+        return buildList {
+            if (videoCount > 0) add(StorageTypeStat(StorageFileType.VIDEOS, videoCount, videoBytes))
+            if (imageCount > 0) add(StorageTypeStat(StorageFileType.IMAGES, imageCount, imageBytes))
+        }
+    }
+
+    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean {
+        val path = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
+        return path.contains("/android/media/com.whatsapp/") ||
+            path.contains("/android/media/com.whatsapp.w4b/") ||
+            path.startsWith("/whatsapp/") ||
+            path.startsWith("/whatsapp business/")
     }
 
     private fun storageTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
