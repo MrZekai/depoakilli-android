@@ -39,6 +39,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
@@ -136,8 +137,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 20",
-    'versionName = "0.5.13"',
+    "versionCode = 21",
+    'versionName = "0.5.14"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -231,11 +232,20 @@ for expected in (
     "smart_clean_primary",
     "DashboardToolTile",
     "DashboardHero",
-    "CleaningScoreRing",
+    "StorageStatusRing",
+    "dashboard_cleanup_opportunity",
+    "dashboardSnapshotAtMillis",
     "RamOptimizationStrip",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.11 dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.14 real dashboard invariant: {expected}")
+for forbidden in (
+    "CleaningScoreRing",
+    "cleaningScore(",
+    "dashboard_cleaning_score",
+):
+    if forbidden in dashboard:
+        errors.append(f"v0.5.14 dashboard must not expose an artificial cleaning score: {forbidden}")
 if "onOpenAppCache" in dashboard:
     errors.append("v0.5.11 home dashboard must not show the old paired deep-app-cleanup card")
 if "PRO" in dashboard or "Premium" in dashboard:
@@ -249,9 +259,15 @@ for expected in (
     "CleanupResult",
     "cleanupResult",
     "dismissCleanupResult",
+    "DashboardSnapshotStore",
+    "dashboardSnapshotAtMillis",
+    "restoreDashboardSnapshot",
+    "persistDashboardSnapshot",
+    "beforeAvailableBytes",
+    "afterAvailableBytes",
 ):
     if expected not in view_model:
-        errors.append(f"missing v0.5.11 RAM result invariant: {expected}")
+        errors.append(f"missing v0.5.14 measured-state invariant: {expected}")
 for forbidden in (
     "summary = it.summary.copy(items = emptyList())",
     "whatsAppSummary = it.whatsAppSummary.copy(items = emptyList())",
@@ -268,6 +284,26 @@ for expected in (
 ):
     if expected not in memory_result_ui:
         errors.append(f"missing v0.5.11 RAM result UI invariant: {expected}")
+
+dashboard_snapshot_store = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt").read_text(encoding="utf-8")
+for expected in (
+    "DashboardSnapshot",
+    "DashboardSnapshotStore",
+    "getSharedPreferences",
+    "KEY_ANALYZED_AT",
+    "CleanCategory.values()",
+):
+    if expected not in dashboard_snapshot_store:
+        errors.append(f"missing v0.5.14 dashboard snapshot invariant: {expected}")
+
+cleanup_result_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt").read_text(encoding="utf-8")
+for expected in (
+    "cleanup_result_storage_snapshot",
+    "beforeAvailableBytes",
+    "afterAvailableBytes",
+):
+    if expected not in cleanup_result_ui:
+        errors.append(f"missing v0.5.14 cleanup storage measurement UI invariant: {expected}")
 
 smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (
@@ -311,9 +347,13 @@ for expected in (
     "smartMediaPreviews",
     "UNUSED_APP_DAYS = 60L",
     "smart_clean_suggestions_subtitle_v0512",
+    "smart_total_opportunity",
+    "smart_safe_candidates",
+    "summary.totalSuggestedBytes",
+    "summary.safeSuggestedBytes",
 ):
     if expected not in smart_results:
-        errors.append(f"missing v0.5.12 Smart priority-review invariant: {expected}")
+        errors.append(f"missing v0.5.14 Smart priority/hero invariant: {expected}")
 if "orderedSmartCategories" in smart_results:
     errors.append("v0.5.12 Smart Clean must not restore the old generic category ordering")
 for strings_path in (
@@ -329,8 +369,15 @@ ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.
 view_model_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
 if "dashboardReviewBytes" not in view_model_source or "summary.safeSuggestedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
     errors.append("dashboard must separate safely selected cleanup bytes from review-only candidate bytes")
-if "dashboard_safe_cleanable" not in dashboard or "dashboard_review_ready" not in dashboard:
-    errors.append("dashboard must label safe cleanup and review candidates separately")
+for expected in (
+    "dashboard_cleanup_opportunity",
+    "dashboard_safe_amount",
+    "dashboard_review_amount",
+    "dashboard_free_space",
+    "dashboard_storage_used_percent",
+):
+    if expected not in dashboard:
+        errors.append(f"v0.5.14 dashboard real-metric copy missing: {expected}")
 ai_engine_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt").read_text(encoding="utf-8")
 if 'path.contains("/thumbnails/")' in ai_engine_source:
     errors.append("generic user Thumbnails folders must not be auto-classified as junk")
@@ -512,4 +559,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.9 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.14 project structure, permissions, resources, CI and safety guardrails are valid.")

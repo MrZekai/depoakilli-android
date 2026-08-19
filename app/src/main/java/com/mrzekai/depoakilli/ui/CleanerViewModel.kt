@@ -48,6 +48,8 @@ data class CleanupResult(
     val deletedCount: Int,
     val failedCount: Int,
     val cancelledCount: Int = 0,
+    val beforeAvailableBytes: Long = 0L,
+    val afterAvailableBytes: Long = 0L,
 )
 
 data class CleanerUiState(
@@ -60,6 +62,7 @@ data class CleanerUiState(
     val dashboardCleanableBytes: Long = 0L,
     val dashboardReviewBytes: Long = 0L,
     val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
+    val dashboardSnapshotAtMillis: Long = 0L,
     val smartCategoryReview: CleanCategory? = null,
     val smartCategoryReviewIds: Set<String>? = null,
     val storageReview: StorageReviewSummary = StorageReviewSummary(),
@@ -90,19 +93,47 @@ data class CleanerUiState(
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = DeviceRepository(application)
+    private val dashboardSnapshotStore = DashboardSnapshotStore(application)
     private val _state = MutableStateFlow(CleanerUiState())
     private var pendingConsentItems: List<CleanableItem> = emptyList()
     private var pendingCleanupDeletedBytes: Long = 0L
     private var pendingCleanupDeletedCount: Int = 0
     private var pendingCleanupFailedCount: Int = 0
+    private var pendingCleanupStorageBeforeBytes: Long = 0L
     private var appCacheRefreshJob: Job? = null
     private var lastAppCacheRefreshAt = 0L
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
 
     init {
+        restoreDashboardSnapshot()
         refreshDeviceState()
         refreshAppCaches()
+    }
+
+    private fun restoreDashboardSnapshot() {
+        val snapshot = dashboardSnapshotStore.load() ?: return
+        _state.update {
+            it.copy(
+                dashboardCleanableBytes = snapshot.cleanableBytes,
+                dashboardReviewBytes = snapshot.reviewBytes,
+                dashboardCategoryBytes = snapshot.categoryBytes,
+                dashboardSnapshotAtMillis = snapshot.analyzedAtMillis,
+            )
+        }
+    }
+
+    private fun persistDashboardSnapshot() {
+        val state = _state.value
+        if (state.dashboardSnapshotAtMillis <= 0L) return
+        dashboardSnapshotStore.save(
+            DashboardSnapshot(
+                cleanableBytes = state.dashboardCleanableBytes,
+                reviewBytes = state.dashboardReviewBytes,
+                categoryBytes = state.dashboardCategoryBytes,
+                analyzedAtMillis = state.dashboardSnapshotAtMillis,
+            ),
+        )
     }
 
     fun refreshDeviceState() {
@@ -210,8 +241,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
             }.onSuccess { summary ->
+                val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
+                val analyzedAtMillis = if (comprehensive) System.currentTimeMillis() else 0L
                 _state.update {
-                    val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
                     it.copy(
                         summary = summary,
                         dashboardCleanableBytes = if (comprehensive) {
@@ -229,6 +261,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         } else {
                             it.dashboardCategoryBytes
                         },
+                        dashboardSnapshotAtMillis = if (comprehensive) {
+                            analyzedAtMillis
+                        } else {
+                            it.dashboardSnapshotAtMillis
+                        },
                         scanning = false,
                         lastScanCompleted = true,
                         storage = repository.storageSnapshot(),
@@ -236,6 +273,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         hasAllFilesAccess = repository.hasAllFilesAccess(),
                         hasWhatsAppAccess = repository.hasWhatsAppAccess(),
                     )
+                }
+                if (comprehensive) {
+                    persistDashboardSnapshot()
                 }
                 if (focus == ScanFocus.SMART) {
                     if (repository.hasUsageAccess()) {
@@ -347,6 +387,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             onCompleted(false)
             return
         }
+        val storageBefore = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -357,21 +398,34 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             runCatching { repository.deleteWhatsAppItems(selected) }
                 .onSuccess { result ->
+                    val storageAfter = repository.storageSnapshot()
                     _state.update { state ->
+                        val trackedWhatsAppBytes = state.dashboardCategoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
+                        val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes)
                         state.copy(
                             whatsAppSummary = state.whatsAppSummary.copy(
                                 items = state.whatsAppSummary.items.filterNot { it.id in result.deletedIds },
                             ),
-                            storage = repository.storageSnapshot(),
+                            dashboardReviewBytes = (state.dashboardReviewBytes - trackedDeletedBytes).coerceAtLeast(0L),
+                            dashboardCategoryBytes = state.dashboardCategoryBytes.toMutableMap().apply {
+                                if (containsKey(CleanCategory.WHATSAPP_MEDIA)) {
+                                    this[CleanCategory.WHATSAPP_MEDIA] =
+                                        (trackedWhatsAppBytes - trackedDeletedBytes).coerceAtLeast(0L)
+                                }
+                            },
+                            storage = storageAfter,
                             cleanupInProgress = false,
                             cleanupResult = CleanupResult(
                                 deletedBytes = result.deletedBytes,
                                 deletedCount = result.deletedIds.size,
                                 failedCount = result.failedCount,
+                                beforeAvailableBytes = storageBefore,
+                                afterAvailableBytes = storageAfter.availableBytes,
                             ),
                             message = null,
                         )
                     }
+                    persistDashboardSnapshot()
                     onCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure {
@@ -563,6 +617,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             return
         }
         resetPendingCleanupResult()
+        pendingCleanupStorageBeforeBytes = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -612,6 +667,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
+        val storageBefore = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -627,6 +683,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         deletedIds = result.deletedIds,
                         deletedBytes = result.deletedBytes,
                         failedCount = result.failedCount,
+                        beforeAvailableBytes = storageBefore,
                     )
                     onCleanupCompleted()
                 }
@@ -651,6 +708,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     deletedCount = pendingCleanupDeletedCount,
                     failedCount = pendingCleanupFailedCount,
                     cancelledCount = pending.size,
+                    beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
+                    afterAvailableBytes = repository.storageSnapshot().availableBytes,
                 )
             } else {
                 null
@@ -676,6 +735,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             deletedBytes = pendingCleanupDeletedBytes + removedBytes,
             deletedCount = pendingCleanupDeletedCount + removedIds.size,
             failedCount = pendingCleanupFailedCount,
+            beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
+            afterAvailableBytes = repository.storageSnapshot().availableBytes,
         )
         finishCleanup(
             items = pending,
@@ -701,16 +762,20 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         deletedBytes: Long,
         failedCount: Int,
         clearPending: Boolean = true,
-        result: CleanupResult? = if (clearPending) {
-            CleanupResult(
+        result: CleanupResult? = null,
+    ) {
+        val storageAfter = repository.storageSnapshot()
+        val measuredResult = if (clearPending) {
+            result ?: CleanupResult(
                 deletedBytes = deletedBytes,
                 deletedCount = deletedIds.size,
                 failedCount = failedCount,
+                beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
+                afterAvailableBytes = storageAfter.availableBytes,
             )
         } else {
             null
-        },
-    ) {
+        }
         _state.update { state ->
             val deletedItems = items.filter { it.id in deletedIds }
             val deletedByCategory = deletedItems
@@ -731,15 +796,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
                     (bytes - (deletedByCategory[category] ?: 0L)).coerceAtLeast(0L)
                 },
-                storage = repository.storageSnapshot(),
+                storage = storageAfter,
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
                 cleanupInProgress = if (clearPending) false else state.cleanupInProgress,
-                cleanupResult = result ?: state.cleanupResult,
-                message = if (result == null) state.message else null,
+                cleanupResult = measuredResult ?: state.cleanupResult,
+                message = if (measuredResult == null) state.message else null,
             )
         }
-        if (clearPending) pendingConsentItems = emptyList()
+        persistDashboardSnapshot()
+        if (clearPending) {
+            pendingConsentItems = emptyList()
+            resetPendingCleanupResult()
+        }
     }
 
     fun dismissCleanupResult() {
@@ -750,6 +819,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         pendingCleanupDeletedBytes = 0L
         pendingCleanupDeletedCount = 0
         pendingCleanupFailedCount = 0
+        pendingCleanupStorageBeforeBytes = 0L
     }
 
     private fun finishStorageReviewCleanup(
@@ -757,7 +827,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         deletedIds: Set<String>,
         deletedBytes: Long,
         failedCount: Int,
+        beforeAvailableBytes: Long,
     ) {
+        val storageAfter = repository.storageSnapshot()
         _state.update { state ->
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
             val deletedUris = deletedFiles.mapTo(hashSetOf()) { it.uri }
@@ -815,17 +887,20 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     items = state.storageReview.items.filterNot { it.id in deletedIds },
                     loading = false,
                 ),
-                storage = repository.storageSnapshot(),
+                storage = storageAfter,
                 memory = repository.memorySnapshot(),
                 cleanupInProgress = false,
                 cleanupResult = CleanupResult(
                     deletedBytes = deletedBytes,
                     deletedCount = deletedIds.size,
                     failedCount = failedCount,
+                    beforeAvailableBytes = beforeAvailableBytes,
+                    afterAvailableBytes = storageAfter.availableBytes,
                 ),
                 message = null,
             )
         }
+        persistDashboardSnapshot()
     }
 
     fun onDeepCacheCleanupResult(approved: Boolean) {

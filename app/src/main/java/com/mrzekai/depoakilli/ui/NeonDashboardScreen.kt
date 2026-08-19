@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.ui.theme.Amber400
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
@@ -65,6 +66,7 @@ import com.mrzekai.depoakilli.ui.theme.Purple500
 import com.mrzekai.depoakilli.ui.theme.Rose500
 import com.mrzekai.depoakilli.ui.theme.Teal500
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
+import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 @Composable
@@ -96,7 +98,8 @@ internal fun NeonDashboardScreen(
     val whatsAppBytes = categoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
     val cleanableBytes = state.dashboardCleanableBytes
     val reviewBytes = state.dashboardReviewBytes
-    val score = cleaningScore(state)
+    val opportunityBytes = (cleanableBytes + reviewBytes).coerceAtLeast(0L)
+    val hasDashboardSnapshot = state.dashboardSnapshotAtMillis > 0L
 
     Box(
         modifier = modifier
@@ -125,14 +128,15 @@ internal fun NeonDashboardScreen(
                 DashboardHero(
                     cleanableBytes = cleanableBytes,
                     reviewBytes = reviewBytes,
-                    hasScanResult = state.lastScanCompleted,
-                    cleaningScore = score,
+                    snapshotAtMillis = state.dashboardSnapshotAtMillis,
+                    storage = state.storage,
                 )
             }
             item {
                 SmartCleanButton(
                     state = state,
-                    cleanableBytes = cleanableBytes,
+                    opportunityBytes = opportunityBytes,
+                    hasDashboardSnapshot = hasDashboardSnapshot,
                     onClick = onSmartClean,
                 )
             }
@@ -295,9 +299,12 @@ private fun DashboardHeader(onOpenProfile: () -> Unit) {
 private fun DashboardHero(
     cleanableBytes: Long,
     reviewBytes: Long,
-    hasScanResult: Boolean,
-    cleaningScore: Int,
+    snapshotAtMillis: Long,
+    storage: StorageSnapshot,
 ) {
+    val hasSnapshot = snapshotAtMillis > 0L
+    val opportunityBytes = (cleanableBytes + reviewBytes).coerceAtLeast(0L)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -327,12 +334,13 @@ private fun DashboardHero(
                     verticalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        stringResource(R.string.dashboard_safe_cleanable),
+                        stringResource(R.string.dashboard_cleanup_opportunity),
                         color = Color(0xFFC7D5FF),
                         fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        ByteFormatter.format(cleanableBytes),
+                        if (hasSnapshot) ByteFormatter.format(opportunityBytes) else "—",
                         color = Color.White,
                         fontSize = 39.sp,
                         lineHeight = 42.sp,
@@ -344,26 +352,49 @@ private fun DashboardHero(
                         shape = RoundedCornerShape(18.dp),
                     ) {
                         Column(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                            verticalArrangement = Arrangement.spacedBy(1.dp),
                         ) {
-                            Text(
-                                if (hasScanResult) {
-                                    stringResource(R.string.dashboard_safe_ready, ByteFormatter.format(cleanableBytes))
-                                } else {
-                                    stringResource(R.string.dashboard_cleanable_unknown)
-                                },
-                                color = Color(0xFFE6EBFF),
-                                style = MaterialTheme.typography.bodySmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            if (hasScanResult && reviewBytes > 0L) {
+                            if (hasSnapshot) {
                                 Text(
-                                    stringResource(R.string.dashboard_review_ready, ByteFormatter.format(reviewBytes)),
+                                    stringResource(
+                                        R.string.dashboard_safe_amount,
+                                        ByteFormatter.format(cleanableBytes),
+                                    ),
+                                    color = Color(0xFFDDF4EA),
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    stringResource(
+                                        R.string.dashboard_review_amount,
+                                        ByteFormatter.format(reviewBytes),
+                                    ),
                                     color = Color(0xFF9FE6FF),
                                     fontSize = 10.sp,
                                     maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    dashboardLastAnalysisLabel(snapshotAtMillis),
+                                    color = Color(0xFFC9D0F3),
+                                    fontSize = 9.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            } else {
+                                Text(
+                                    stringResource(R.string.dashboard_not_analyzed),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 11.sp,
+                                )
+                                Text(
+                                    stringResource(R.string.dashboard_not_analyzed_hint),
+                                    color = Color(0xFFC9D0F3),
+                                    fontSize = 9.sp,
+                                    maxLines = 2,
                                     overflow = TextOverflow.Ellipsis,
                                 )
                             }
@@ -372,18 +403,39 @@ private fun DashboardHero(
                 }
             }
         }
-        CleaningScoreRing(
-            score = cleaningScore,
+
+        StorageStatusRing(
+            storage = storage,
             modifier = Modifier.weight(.9f),
         )
     }
 }
 
 @Composable
-private fun CleaningScoreRing(
-    score: Int,
+private fun StorageStatusRing(
+    storage: StorageSnapshot,
     modifier: Modifier = Modifier,
 ) {
+    val hasStorage = storage.totalBytes > 0L
+    val freeFraction = if (hasStorage) {
+        (storage.availableBytes.toDouble() / storage.totalBytes.toDouble())
+            .coerceIn(0.0, 1.0)
+            .toFloat()
+    } else {
+        0f
+    }
+    val usedPercent = if (hasStorage) {
+        ((1f - freeFraction) * 100f).roundToInt().coerceIn(0, 100)
+    } else {
+        0
+    }
+    val accent = when {
+        !hasStorage -> ElectricBlue
+        freeFraction < 0.10f -> Rose500
+        freeFraction < 0.20f -> Amber400
+        else -> Lime400
+    }
+
     Box(
         modifier = modifier.height(184.dp),
         contentAlignment = Alignment.Center,
@@ -401,45 +453,80 @@ private fun CleaningScoreRing(
                 size = ringSize,
                 style = Stroke(stroke, cap = StrokeCap.Round),
             )
-            drawArc(
-                brush = Brush.sweepGradient(
-                    listOf(
-                        Color(0xFF16D9E3),
-                        Color(0xFF2BE878),
-                        Color(0xFF79F33A),
-                        Color(0xFF7B5CFF),
-                        Color(0xFF16D9E3),
+            if (hasStorage) {
+                drawArc(
+                    brush = Brush.sweepGradient(
+                        listOf(
+                            ElectricBlue,
+                            accent,
+                            Color(0xFF16D9E3),
+                            ElectricBlue,
+                        ),
                     ),
-                ),
-                startAngle = -130f,
-                sweepAngle = 260f * (score.coerceIn(0, 100) / 100f),
-                useCenter = false,
-                topLeft = topLeft,
-                size = ringSize,
-                style = Stroke(stroke, cap = StrokeCap.Round),
-            )
+                    startAngle = -130f,
+                    sweepAngle = 260f * freeFraction,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = ringSize,
+                    style = Stroke(stroke, cap = StrokeCap.Round),
+                )
+            }
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
             Text(
-                "$score%",
+                if (hasStorage) ByteFormatter.format(storage.availableBytes) else "—",
                 color = Color.White,
-                fontSize = 34.sp,
+                fontSize = 23.sp,
                 fontWeight = FontWeight.Black,
+                maxLines = 1,
             )
             Text(
-                stringResource(R.string.dashboard_cleaning_score),
-                color = Lime400,
+                stringResource(R.string.dashboard_free_space),
+                color = accent,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Black,
+            )
+            Text(
+                if (hasStorage) {
+                    stringResource(R.string.dashboard_storage_used_percent, usedPercent)
+                } else {
+                    stringResource(R.string.dashboard_storage_unknown)
+                },
+                color = Color(0xFFB8C6E2),
+                fontSize = 9.sp,
+                maxLines = 1,
             )
         }
     }
 }
 
 @Composable
+private fun dashboardLastAnalysisLabel(snapshotAtMillis: Long): String {
+    val ageMillis = (System.currentTimeMillis() - snapshotAtMillis).coerceAtLeast(0L)
+    val minutes = TimeUnit.MILLISECONDS.toMinutes(ageMillis)
+    return when {
+        minutes < 1L -> stringResource(R.string.dashboard_last_analysis_now)
+        minutes < 60L -> stringResource(R.string.dashboard_last_analysis_minutes, minutes)
+        minutes < 24L * 60L -> stringResource(
+            R.string.dashboard_last_analysis_hours,
+            TimeUnit.MILLISECONDS.toHours(ageMillis),
+        )
+        else -> stringResource(
+            R.string.dashboard_last_analysis_days,
+            TimeUnit.MILLISECONDS.toDays(ageMillis),
+        )
+    }
+}
+
+@Composable
 private fun SmartCleanButton(
     state: CleanerUiState,
-    cleanableBytes: Long,
+    opportunityBytes: Long,
+    hasDashboardSnapshot: Boolean,
     onClick: () -> Unit,
 ) {
     Box(
@@ -485,10 +572,19 @@ private fun SmartCleanButton(
                     fontStyle = FontStyle.Italic,
                 )
                 Text(
-                    if (cleanableBytes > 0L) {
-                        stringResource(R.string.dashboard_safe_ready, ByteFormatter.format(cleanableBytes))
-                    } else {
-                        stringResource(R.string.smart_clean_primary_subtitle)
+                    when {
+                        hasDashboardSnapshot && opportunityBytes > 0L -> {
+                            stringResource(
+                                R.string.dashboard_opportunity_ready,
+                                ByteFormatter.format(opportunityBytes),
+                            )
+                        }
+                        hasDashboardSnapshot -> {
+                            stringResource(R.string.dashboard_no_current_opportunity)
+                        }
+                        else -> {
+                            stringResource(R.string.smart_clean_primary_subtitle)
+                        }
                     },
                     color = Color.White.copy(alpha = .78f),
                     style = MaterialTheme.typography.bodySmall,
@@ -830,17 +926,4 @@ private fun DeepCleanPromo(onClick: () -> Unit) {
             }
         }
     }
-}
-
-private fun cleaningScore(state: CleanerUiState): Int {
-    val usedPenalty = state.storage.usedFraction.coerceIn(0f, 1f) * 38f
-    val reclaimFraction = if (state.storage.totalBytes > 0L) {
-        (state.dashboardCleanableBytes.toDouble() / state.storage.totalBytes.toDouble())
-            .coerceIn(0.0, 0.45)
-            .toFloat()
-    } else {
-        0f
-    }
-    val reclaimPenalty = reclaimFraction * 70f
-    return (100f - usedPenalty - reclaimPenalty).roundToInt().coerceIn(35, 99)
 }

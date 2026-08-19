@@ -578,4 +578,23 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="cleanup_result_zero">Ek alan açılamadı.</string>
     <string name="cleanup_result_note">Bu değerler, Akıllı Temizleyici’nin bu cihazda gerçekten sildiği dosyalardan hesaplanır.</string>
     <string name="cleanup_result_done">Tamam</string>
+
+    <string name="dashboard_cleanup_opportunity">Temizlik Fırsatı</string>
+    <string name="dashboard_safe_amount">%1$s güvenli temizlik</string>
+    <string name="dashboard_review_amount">%1$s inceleme</string>
+    <string name="dashboard_last_analysis_now">Son analiz: az önce</string>
+    <string name="dashboard_last_analysis_minutes">Son analiz: %1$d dk önce</string>
+    <string name="dashboard_last_analysis_hours">Son analiz: %1$d sa önce</string>
+    <string name="dashboard_last_analysis_days">Son analiz: %1$d gün önce</string>
+    <string name="dashboard_not_analyzed">Henüz analiz edilmedi</string>
+    <string name="dashboard_not_analyzed_hint">Gerçek temizlik fırsatını hesaplamak için Akıllı Temizlik’i çalıştır.</string>
+    <string name="dashboard_free_space">BOŞ ALAN</string>
+    <string name="dashboard_storage_used_percent">%1$d%% kullanılıyor</string>
+    <string name="dashboard_storage_unknown">Depolama bilgisi alınamadı</string>
+    <string name="dashboard_opportunity_ready">%1$s temizlik fırsatı</string>
+    <string name="dashboard_no_current_opportunity">Son analizde ek temizlik adayı yok</string>
+    <string name="smart_total_opportunity">Temizlik fırsatı</string>
+    <string name="smart_safe_candidates">Güvenli temizlik</string>
+    <string name="smart_clean_hero_subtitle_v0514">Bu analizde bulunan gerçek adaylar. Kişisel medya manuel incelemede kalır.</string>
+    <string name="cleanup_result_storage_snapshot">Boş alan ölçümü: %1$s → %2$s</string>
 </resources>

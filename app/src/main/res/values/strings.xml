@@ -578,4 +578,23 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="cleanup_result_zero">No additional space was reclaimed.</string>
     <string name="cleanup_result_note">These values are calculated from files Smart Cleaner actually removed on this device.</string>
     <string name="cleanup_result_done">Done</string>
+
+    <string name="dashboard_cleanup_opportunity">Cleanup opportunity</string>
+    <string name="dashboard_safe_amount">%1$s safe cleanup</string>
+    <string name="dashboard_review_amount">%1$s needs review</string>
+    <string name="dashboard_last_analysis_now">Last analysis: just now</string>
+    <string name="dashboard_last_analysis_minutes">Last analysis: %1$d min ago</string>
+    <string name="dashboard_last_analysis_hours">Last analysis: %1$d h ago</string>
+    <string name="dashboard_last_analysis_days">Last analysis: %1$d d ago</string>
+    <string name="dashboard_not_analyzed">Not analyzed yet</string>
+    <string name="dashboard_not_analyzed_hint">Run Smart Clean to calculate real cleanup opportunities.</string>
+    <string name="dashboard_free_space">FREE SPACE</string>
+    <string name="dashboard_storage_used_percent">%1$d%% used</string>
+    <string name="dashboard_storage_unknown">Storage unavailable</string>
+    <string name="dashboard_opportunity_ready">%1$s cleanup opportunity</string>
+    <string name="dashboard_no_current_opportunity">No current cleanup candidates from the last analysis</string>
+    <string name="smart_total_opportunity">Cleanup opportunity</string>
+    <string name="smart_safe_candidates">Safe cleanup</string>
+    <string name="smart_clean_hero_subtitle_v0514">Real candidates from this analysis. Personal media remains manual review.</string>
+    <string name="cleanup_result_storage_snapshot">Free-space snapshot: %1$s → %2$s</string>
 </resources>

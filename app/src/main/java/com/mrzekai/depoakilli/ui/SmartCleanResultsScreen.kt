@@ -1307,21 +1307,21 @@ private fun SmartCleanHero(summary: ScanSummary) {
                 Spacer(Modifier.width(18.dp))
                 Column(Modifier.weight(1f)) {
                     Text(
-                        ByteFormatter.format(summary.selectedBytes),
+                        ByteFormatter.format(summary.totalSuggestedBytes),
                         color = Color.White,
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Black,
                         maxLines = 1,
                     )
                     Text(
-                        stringResource(R.string.cleanable_space),
+                        stringResource(R.string.smart_total_opportunity),
                         color = SmartGreen,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Black,
                     )
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        stringResource(R.string.smart_clean_hero_subtitle),
+                        stringResource(R.string.smart_clean_hero_subtitle_v0514),
                         color = Color.White.copy(alpha = .88f),
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -1339,8 +1339,8 @@ private fun SmartCleanHero(summary: ScanSummary) {
                 ) {
                     HeroStat(
                         icon = Icons.Outlined.CheckCircle,
-                        value = summary.selectedItems.size.toString(),
-                        label = stringResource(R.string.smart_items_selected),
+                        value = ByteFormatter.format(summary.safeSuggestedBytes),
+                        label = stringResource(R.string.smart_safe_candidates),
                     )
                     HeroStat(
                         icon = Icons.Outlined.AutoAwesome,

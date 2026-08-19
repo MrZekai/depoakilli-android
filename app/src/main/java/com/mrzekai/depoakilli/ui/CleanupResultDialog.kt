@@ -33,6 +33,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
 
 @Composable
@@ -135,6 +136,16 @@ internal fun CleanupResultDialog(
                                 ),
                                 accent = Lime400,
                             )
+                            if (result.beforeAvailableBytes > 0L && result.afterAvailableBytes > 0L) {
+                                CleanupResultLine(
+                                    text = stringResource(
+                                        R.string.cleanup_result_storage_snapshot,
+                                        ByteFormatter.format(result.beforeAvailableBytes),
+                                        ByteFormatter.format(result.afterAvailableBytes),
+                                    ),
+                                    accent = ElectricBlue,
+                                )
+                            }
                             if (result.failedCount > 0) {
                                 CleanupResultLine(
                                     text = stringResource(
