@@ -563,4 +563,19 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_unused_apps_dialog_title">Kullanılmayan uygulamaları incele</string>
     <string name="smart_unused_apps_dialog_note">Yalnız son kullanım zamanı bilinen ve en az 60 gündür açılmamış uygulamalar gösterilir. Hiçbir şey otomatik kaldırılmaz.</string>
     <string name="smart_unused_apps_last_used">Son kullanım %1$d gün önce</string>
+
+    <string name="premium_cleanup_confirm_title">Seçilen dosyalar silinsin mi?</string>
+    <string name="premium_cleanup_confirm_body">%1$d öğe seçtin; toplam %2$s. Bu dosyaların silinmesini istiyorsan devam et.</string>
+    <string name="premium_cleanup_irreversible">Seçilen dosyalar kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
+    <string name="premium_cleanup_ad_notice">Uygunsa temizlikten önce bir geçiş reklamı gösterilebilir. Reklam hazır değilse temizlik normal şekilde devam eder.</string>
+    <string name="premium_cleanup_confirm_action">Evet, devam et</string>
+    <string name="cleanup_result_title">Temizlik tamamlandı</string>
+    <string name="cleanup_result_partial_title">Temizlik kısmen tamamlandı</string>
+    <string name="cleanup_result_space_reclaimed">Açılan alan</string>
+    <string name="cleanup_result_files_removed">%1$d dosya silindi</string>
+    <string name="cleanup_result_failed">%1$d dosya silinemedi</string>
+    <string name="cleanup_result_cancelled">Android onayı iptal edildiği için %1$d dosyaya dokunulmadı</string>
+    <string name="cleanup_result_zero">Ek alan açılamadı.</string>
+    <string name="cleanup_result_note">Bu değerler, Akıllı Temizleyici’nin bu cihazda gerçekten sildiği dosyalardan hesaplanır.</string>
+    <string name="cleanup_result_done">Tamam</string>
 </resources>

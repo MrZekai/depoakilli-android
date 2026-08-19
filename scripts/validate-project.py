@@ -44,6 +44,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
@@ -135,8 +136,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 19",
-    'versionName = "0.5.12"',
+    "versionCode = 20",
+    'versionName = "0.5.13"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -245,6 +246,9 @@ for expected in (
     "MemoryOptimizationResult",
     "memoryOptimizationResult",
     "dismissMemoryOptimizationResult",
+    "CleanupResult",
+    "cleanupResult",
+    "dismissCleanupResult",
 ):
     if expected not in view_model:
         errors.append(f"missing v0.5.11 RAM result invariant: {expected}")
@@ -412,6 +416,8 @@ if "whatsapp_cleanup_ad_notice" not in whatsapp_ui:
 premium_tools = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt").read_text(encoding="utf-8")
 for expected in (
     "PremiumCleanerToolScreen",
+    "PremiumCleanupConfirmationDialog",
+    "premium_cleanup_confirm_action",
     "PremiumToolHero",
     "PremiumToolSectionCard",
     "PremiumToolDetailPage",
@@ -438,6 +444,10 @@ for focus in (
         errors.append(f"premium tool routing missing for {focus}")
 if "PremiumCleanerToolScreen(" not in cleaner_app:
     errors.append("non-Smart cleaner tools must route through PremiumCleanerToolScreen")
+if "CleanupResultDialog(" not in cleaner_app:
+    errors.append("v0.5.13 cleanup completion must show the measured result dialog")
+if 'onClean = { onClean(null) }' in premium_tools:
+    errors.append("premium cleaner tools must never bypass the final confirmation dialog")
 if "setItemsSelected" not in view_model_source or "onSetItemsSelected" not in cleaner_app:
     errors.append("premium tool select-all must use one batched state update instead of per-file toggles")
 if "FileResultRow(item" in cleaner_app and "PremiumCleanerToolScreen(" not in cleaner_app:

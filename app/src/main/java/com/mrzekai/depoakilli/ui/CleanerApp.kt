@@ -404,6 +404,13 @@ fun CleanerApp(
             onDismiss = viewModel::dismissMemoryOptimizationResult,
         )
     }
+
+    state.cleanupResult?.let { result ->
+        CleanupResultDialog(
+            result = result,
+            onDismiss = viewModel::dismissCleanupResult,
+        )
+    }
 }
 
 @Composable

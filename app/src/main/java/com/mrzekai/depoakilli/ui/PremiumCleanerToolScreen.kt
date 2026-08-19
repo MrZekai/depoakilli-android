@@ -355,6 +355,7 @@ private fun PremiumToolResults(
     var sortName by rememberSaveable(focus.name) { mutableStateOf(ToolSortMode.LARGEST.name) }
     var detailKey by rememberSaveable(focus.name) { mutableStateOf<String?>(null) }
     var previewId by rememberSaveable(focus.name) { mutableStateOf<String?>(null) }
+    var showCleanupConfirmation by rememberSaveable(focus.name) { mutableStateOf(false) }
     val sortMode = ToolSortMode.valueOf(sortName)
 
     val sections = premiumSections(focus, summary)
@@ -367,6 +368,20 @@ private fun PremiumToolResults(
             accent = config.accent,
             onToggleSelection = { onToggleItem(previewItem.id) },
             onDismiss = { previewId = null },
+        )
+    }
+
+    if (showCleanupConfirmation) {
+        PremiumCleanupConfirmationDialog(
+            focus = focus,
+            selectedItems = summary.selectedItems,
+            accent = config.accent,
+            cleanupInProgress = cleanupInProgress,
+            onConfirm = {
+                showCleanupConfirmation = false
+                onClean(null)
+            },
+            onDismiss = { showCleanupConfirmation = false },
         )
     }
 
@@ -383,7 +398,7 @@ private fun PremiumToolResults(
             onPreview = { previewId = it.id },
             onToggleItem = onToggleItem,
             onToggleAll = { setSectionSelection(activeDetail.items, onSetItemsSelected) },
-            onClean = { onClean(null) },
+            onClean = { showCleanupConfirmation = true },
         )
         return
     }
@@ -444,8 +459,125 @@ private fun PremiumToolResults(
             accent = config.accent,
             accent2 = config.accent2,
             cleanupInProgress = cleanupInProgress,
-            onClean = { onClean(null) },
+            onClean = { showCleanupConfirmation = true },
         )
+    }
+}
+
+@Composable
+private fun PremiumCleanupConfirmationDialog(
+    focus: ScanFocus,
+    selectedItems: List<CleanableItem>,
+    accent: Color,
+    cleanupInProgress: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val selectedBytes = selectedItems.sumOf { it.sizeBytes }
+    val config = toolConfig(focus)
+
+    Dialog(
+        onDismissRequest = {
+            if (!cleanupInProgress) onDismiss()
+        },
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xB8000615))
+                .padding(horizontal = 20.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = ToolCard),
+                border = BorderStroke(1.dp, accent.copy(alpha = .45f)),
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(color = accent.copy(alpha = .16f), shape = CircleShape) {
+                            Icon(
+                                config.icon,
+                                contentDescription = null,
+                                tint = accent,
+                                modifier = Modifier.padding(13.dp).size(30.dp),
+                            )
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.premium_cleanup_confirm_title),
+                                color = Color.White,
+                                fontSize = 21.sp,
+                                fontWeight = FontWeight.Black,
+                            )
+                            Text(
+                                stringResource(config.titleRes),
+                                color = accent,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+
+                    Text(
+                        stringResource(
+                            R.string.premium_cleanup_confirm_body,
+                            selectedItems.size,
+                            ByteFormatter.format(selectedBytes),
+                        ),
+                        color = ToolTextSecondary,
+                    )
+
+                    Surface(
+                        color = ToolRed.copy(alpha = .10f),
+                        shape = RoundedCornerShape(15.dp),
+                        border = BorderStroke(1.dp, ToolRed.copy(alpha = .25f)),
+                    ) {
+                        Text(
+                            stringResource(R.string.premium_cleanup_irreversible),
+                            color = Color(0xFFFFA7AE),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(12.dp),
+                        )
+                    }
+
+                    Text(
+                        stringResource(R.string.premium_cleanup_ad_notice),
+                        color = Color(0xFF9EB7D0),
+                        fontSize = 10.sp,
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        TextButton(
+                            onClick = onDismiss,
+                            enabled = !cleanupInProgress,
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                        Button(
+                            onClick = onConfirm,
+                            enabled = selectedItems.isNotEmpty() && !cleanupInProgress,
+                            modifier = Modifier.weight(1.4f),
+                        ) {
+                            Text(
+                                stringResource(R.string.premium_cleanup_confirm_action),
+                                fontWeight = FontWeight.Black,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

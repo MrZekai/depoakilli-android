@@ -563,4 +563,19 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_unused_apps_dialog_title">Unused app review</string>
     <string name="smart_unused_apps_dialog_note">Only apps with a known last-used time of at least 60 days are shown. Nothing is removed automatically.</string>
     <string name="smart_unused_apps_last_used">Last used %1$d days ago</string>
+
+    <string name="premium_cleanup_confirm_title">Delete selected files?</string>
+    <string name="premium_cleanup_confirm_body">You selected %1$d items using %2$s. Continue only if you want these files removed.</string>
+    <string name="premium_cleanup_irreversible">Selected files will be permanently removed. This cannot be undone.</string>
+    <string name="premium_cleanup_ad_notice">An eligible interstitial ad may appear before cleanup. If no ad is available, cleanup continues normally.</string>
+    <string name="premium_cleanup_confirm_action">Yes, continue</string>
+    <string name="cleanup_result_title">Cleanup complete</string>
+    <string name="cleanup_result_partial_title">Cleanup partially completed</string>
+    <string name="cleanup_result_space_reclaimed">Space reclaimed</string>
+    <string name="cleanup_result_files_removed">%1$d files removed</string>
+    <string name="cleanup_result_failed">%1$d files could not be removed</string>
+    <string name="cleanup_result_cancelled">%1$d files were left untouched after Android confirmation was cancelled</string>
+    <string name="cleanup_result_zero">No additional space was reclaimed.</string>
+    <string name="cleanup_result_note">These values are calculated from files Smart Cleaner actually removed on this device.</string>
+    <string name="cleanup_result_done">Done</string>
 </resources>

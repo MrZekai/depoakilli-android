@@ -43,6 +43,13 @@ data class MemoryOptimizationResult(
         get() = (afterAvailableBytes - beforeAvailableBytes).coerceAtLeast(0L)
 }
 
+data class CleanupResult(
+    val deletedBytes: Long,
+    val deletedCount: Int,
+    val failedCount: Int,
+    val cancelledCount: Int = 0,
+)
+
 data class CleanerUiState(
     val storage: StorageSnapshot = StorageSnapshot(),
     val memory: MemorySnapshot = MemorySnapshot(),
@@ -66,6 +73,7 @@ data class CleanerUiState(
     val optimizingMemory: Boolean = false,
     val memoryOptimizationResult: MemoryOptimizationResult? = null,
     val cleanupInProgress: Boolean = false,
+    val cleanupResult: CleanupResult? = null,
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
     val pendingScanFocus: ScanFocus? = null,
@@ -84,6 +92,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private val repository = DeviceRepository(application)
     private val _state = MutableStateFlow(CleanerUiState())
     private var pendingConsentItems: List<CleanableItem> = emptyList()
+    private var pendingCleanupDeletedBytes: Long = 0L
+    private var pendingCleanupDeletedCount: Int = 0
+    private var pendingCleanupFailedCount: Int = 0
     private var appCacheRefreshJob: Job? = null
     private var lastAppCacheRefreshAt = 0L
 
@@ -336,7 +347,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             onCompleted(false)
             return
         }
-        _state.update { it.copy(cleanupInProgress = true) }
+        _state.update {
+            it.copy(
+                cleanupInProgress = true,
+                cleanupResult = null,
+                message = null,
+            )
+        }
         viewModelScope.launch {
             runCatching { repository.deleteWhatsAppItems(selected) }
                 .onSuccess { result ->
@@ -347,11 +364,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                             ),
                             storage = repository.storageSnapshot(),
                             cleanupInProgress = false,
-                            message = getApplication<Application>().getString(
-                                if (result.failedCount == 0) R.string.message_whatsapp_cleanup_complete else R.string.message_whatsapp_cleanup_partial,
-                                ByteFormatter.format(result.deletedBytes),
-                                result.failedCount,
+                            cleanupResult = CleanupResult(
+                                deletedBytes = result.deletedBytes,
+                                deletedCount = result.deletedIds.size,
+                                failedCount = result.failedCount,
                             ),
+                            message = null,
                         )
                     }
                     onCompleted(result.deletedIds.isNotEmpty())
@@ -544,7 +562,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
-        _state.update { it.copy(cleanupInProgress = true, message = null) }
+        resetPendingCleanupResult()
+        _state.update {
+            it.copy(
+                cleanupInProgress = true,
+                cleanupResult = null,
+                message = null,
+            )
+        }
         viewModelScope.launch {
             runCatching {
                 val direct = repository.deleteDirectItems(selected)
@@ -555,6 +580,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     onCleanupCompleted()
                 } else {
                     pendingConsentItems = remaining
+                    pendingCleanupDeletedBytes = direct.deletedBytes
+                    pendingCleanupDeletedCount = direct.deletedIds.size
+                    pendingCleanupFailedCount = direct.failedCount
                     finishCleanup(
                         items = selected.filter { it.id in direct.attemptedIds },
                         deletedIds = direct.deletedIds,
@@ -566,6 +594,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onFailure {
                 pendingConsentItems = emptyList()
+                resetPendingCleanupResult()
                 _state.update { state ->
                     state.copy(
                         cleanupInProgress = false,
@@ -583,7 +612,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
-        _state.update { it.copy(cleanupInProgress = true, message = null) }
+        _state.update {
+            it.copy(
+                cleanupInProgress = true,
+                cleanupResult = null,
+                message = null,
+            )
+        }
         viewModelScope.launch {
             runCatching { repository.deleteStorageReviewItems(selected) }
                 .onSuccess { result ->
@@ -610,17 +645,46 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         val pending = pendingConsentItems
         pendingConsentItems = emptyList()
         if (!approved) {
+            val partialResult = if (pendingCleanupDeletedCount > 0 || pendingCleanupFailedCount > 0) {
+                CleanupResult(
+                    deletedBytes = pendingCleanupDeletedBytes,
+                    deletedCount = pendingCleanupDeletedCount,
+                    failedCount = pendingCleanupFailedCount,
+                    cancelledCount = pending.size,
+                )
+            } else {
+                null
+            }
+            resetPendingCleanupResult()
             _state.update {
                 it.copy(
                     cleanupInProgress = false,
-                    message = getApplication<Application>().getString(R.string.message_cleanup_cancelled),
+                    cleanupResult = partialResult,
+                    message = if (partialResult == null) {
+                        getApplication<Application>().getString(R.string.message_cleanup_cancelled)
+                    } else {
+                        null
+                    },
                 )
             }
             return
         }
+
         val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
         val removedBytes = pending.sumOf(CleanableItem::sizeBytes)
-        finishCleanup(pending, removedIds, removedBytes, 0)
+        val combinedResult = CleanupResult(
+            deletedBytes = pendingCleanupDeletedBytes + removedBytes,
+            deletedCount = pendingCleanupDeletedCount + removedIds.size,
+            failedCount = pendingCleanupFailedCount,
+        )
+        finishCleanup(
+            items = pending,
+            deletedIds = removedIds,
+            deletedBytes = removedBytes,
+            failedCount = 0,
+            result = combinedResult,
+        )
+        resetPendingCleanupResult()
     }
 
     fun refreshAfterCleanup() {
@@ -637,6 +701,15 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         deletedBytes: Long,
         failedCount: Int,
         clearPending: Boolean = true,
+        result: CleanupResult? = if (clearPending) {
+            CleanupResult(
+                deletedBytes = deletedBytes,
+                deletedCount = deletedIds.size,
+                failedCount = failedCount,
+            )
+        } else {
+            null
+        },
     ) {
         _state.update { state ->
             val deletedItems = items.filter { it.id in deletedIds }
@@ -662,14 +735,21 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 memory = repository.memorySnapshot(),
                 ownCacheBytes = repository.ownCacheSize(),
                 cleanupInProgress = if (clearPending) false else state.cleanupInProgress,
-                message = getApplication<Application>().getString(
-                    if (failedCount == 0) R.string.message_cleanup_complete_detail else R.string.message_cleanup_partial_detail,
-                    ByteFormatter.format(deletedBytes),
-                    failedCount,
-                ),
+                cleanupResult = result ?: state.cleanupResult,
+                message = if (result == null) state.message else null,
             )
         }
         if (clearPending) pendingConsentItems = emptyList()
+    }
+
+    fun dismissCleanupResult() {
+        _state.update { it.copy(cleanupResult = null) }
+    }
+
+    private fun resetPendingCleanupResult() {
+        pendingCleanupDeletedBytes = 0L
+        pendingCleanupDeletedCount = 0
+        pendingCleanupFailedCount = 0
     }
 
     private fun finishStorageReviewCleanup(
@@ -738,11 +818,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 storage = repository.storageSnapshot(),
                 memory = repository.memorySnapshot(),
                 cleanupInProgress = false,
-                message = getApplication<Application>().getString(
-                    if (failedCount == 0) R.string.message_cleanup_complete_detail else R.string.message_cleanup_partial_detail,
-                    ByteFormatter.format(deletedBytes),
-                    failedCount,
+                cleanupResult = CleanupResult(
+                    deletedBytes = deletedBytes,
+                    deletedCount = deletedIds.size,
+                    failedCount = failedCount,
                 ),
+                message = null,
             )
         }
     }
