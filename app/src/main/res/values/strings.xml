@@ -603,4 +603,15 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="ram_result_rebuildable_released_title_v0515">Rebuildable memory released</string>
     <string name="ram_result_rebuildable_released_v0515">Detailed scan/review lists and preview caches were released from memory. Dashboard totals stay available; detailed results will be rescanned when opened again.</string>
     <string name="ram_result_measured_note_v0515">Measured from %1$d post-release samples. App memory uses real process PSS; available RAM is a system signal that can fluctuate. Android manages other apps and device-wide process reclamation.</string>
+
+    <!-- v0.5.16.1 hardening -->
+    <string name="dashboard_no_cleanup_found">Ready</string>
+    <string name="dashboard_no_risky_auto_selection">No risky automatic selection</string>
+    <string name="dashboard_scanned_summary">%1$d files • %2$s analyzed</string>
+    <string name="disclosure_all_files_title">Why full storage access?</string>
+    <string name="disclosure_all_files_body">Smart Cleaner uses Android’s All files access only for its core file-management features: scanning shared storage for junk candidates, exact duplicates, large files, downloads, APK installers and shared messaging media. Files stay on your device. You review what will be deleted. Android still protects other apps’ private data.</string>
+    <string name="disclosure_usage_title">Why Usage Access?</string>
+    <string name="disclosure_usage_body">Usage Access is optional. It lets Smart Cleaner read Android-reported app storage/cache totals and last-used times so you can review large or unused apps. It does not read the private content inside those apps and does not silently delete their protected data.</string>
+    <string name="disclosure_continue">Continue</string>
+    <string name="disclosure_not_now">Not now</string>
 </resources>

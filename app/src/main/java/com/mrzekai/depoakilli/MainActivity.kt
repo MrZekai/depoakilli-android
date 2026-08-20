@@ -88,10 +88,27 @@ class MainActivity : ComponentActivity() {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
             val app = application as DepoAkilliApplication
             val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
+            val cleanerState by cleanerViewModel.state.collectAsStateWithLifecycle()
 
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
                 app.setAppOpenAdsAllowed(canRequestAds)
+            }
+
+            LaunchedEffect(
+                cleanerState.scanning,
+                cleanerState.dashboardRefreshing,
+                cleanerState.whatsAppScanning,
+                cleanerState.cleanupInProgress,
+                cleanerState.optimizingMemory,
+            ) {
+                app.setCriticalTaskActive(
+                    cleanerState.scanning ||
+                        cleanerState.dashboardRefreshing ||
+                        cleanerState.whatsAppScanning ||
+                        cleanerState.cleanupInProgress ||
+                        cleanerState.optimizingMemory,
+                )
             }
 
             DepoAkilliTheme {
@@ -122,7 +139,12 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
-        if (::interstitialAds.isInitialized) interstitialAds.load()
+        if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
+    }
+
+    override fun onPause() {
+        if (::interstitialAds.isInitialized) interstitialAds.onHostPaused(this)
+        super.onPause()
     }
 
     override fun onTrimMemory(level: Int) {

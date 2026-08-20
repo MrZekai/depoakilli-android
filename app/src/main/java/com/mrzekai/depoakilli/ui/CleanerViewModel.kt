@@ -22,6 +22,7 @@ import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class MemoryOptimizationResult(
     val beforeAvailableBytes: Long,
@@ -66,7 +68,10 @@ data class CleanerUiState(
     val dashboardCleanableBytes: Long = 0L,
     val dashboardReviewBytes: Long = 0L,
     val dashboardCategoryBytes: Map<CleanCategory, Long> = emptyMap(),
+    val dashboardScannedFileCount: Int = 0,
+    val dashboardScannedBytes: Long = 0L,
     val dashboardSnapshotAtMillis: Long = 0L,
+    val dashboardRefreshing: Boolean = false,
     val smartCategoryReview: CleanCategory? = null,
     val smartCategoryReviewIds: Set<String>? = null,
     val storageReview: StorageReviewSummary = StorageReviewSummary(),
@@ -124,6 +129,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 dashboardCleanableBytes = snapshot.cleanableBytes,
                 dashboardReviewBytes = snapshot.reviewBytes,
                 dashboardCategoryBytes = snapshot.categoryBytes,
+                dashboardScannedFileCount = snapshot.scannedFileCount,
+                dashboardScannedBytes = snapshot.scannedBytes,
                 dashboardSnapshotAtMillis = snapshot.analyzedAtMillis,
             )
         }
@@ -137,22 +144,34 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 cleanableBytes = state.dashboardCleanableBytes,
                 reviewBytes = state.dashboardReviewBytes,
                 categoryBytes = state.dashboardCategoryBytes,
+                scannedFileCount = state.dashboardScannedFileCount,
+                scannedBytes = state.dashboardScannedBytes,
                 analyzedAtMillis = state.dashboardSnapshotAtMillis,
             ),
         )
     }
 
     fun refreshDeviceState() {
-        _state.update {
-            it.copy(
-                storage = repository.storageSnapshot(),
-                memory = repository.memorySnapshot(),
-                ownCacheBytes = repository.ownCacheSize(),
-                hasAllFilesAccess = repository.hasAllFilesAccess(),
-                hasUsageAccess = repository.hasUsageAccess(),
-                hasWhatsAppAccess = repository.hasWhatsAppAccess(),
-                deviceInfo = repository.deviceInfoSnapshot(),
-            )
+        viewModelScope.launch {
+            val storage = withContext(Dispatchers.Default) { repository.storageSnapshot() }
+            val memory = withContext(Dispatchers.Default) { repository.memorySnapshot() }
+            val ownCacheBytes = withContext(Dispatchers.IO) { repository.ownCacheSize() }
+            val hasAllFilesAccess = repository.hasAllFilesAccess()
+            val hasUsageAccess = repository.hasUsageAccess()
+            val hasWhatsAppAccess = repository.hasWhatsAppAccess()
+            val deviceInfo = repository.deviceInfoSnapshot()
+
+            _state.update {
+                it.copy(
+                    storage = storage,
+                    memory = memory,
+                    ownCacheBytes = ownCacheBytes,
+                    hasAllFilesAccess = hasAllFilesAccess,
+                    hasUsageAccess = hasUsageAccess,
+                    hasWhatsAppAccess = hasWhatsAppAccess,
+                    deviceInfo = deviceInfo,
+                )
+            }
         }
     }
 
@@ -203,6 +222,27 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun queueScanAfterPermission(focus: ScanFocus) {
         _state.update { it.copy(scanFocus = focus, pendingScanFocus = focus) }
+    }
+
+    fun refreshDashboard() {
+        val current = _state.value
+        if (
+            current.dashboardRefreshing ||
+            current.scanning ||
+            current.whatsAppScanning ||
+            current.cleanupInProgress ||
+            current.optimizingMemory
+        ) return
+
+        _state.update { it.copy(dashboardRefreshing = true, message = null) }
+        refreshDeviceState()
+        refreshAppCaches(force = true)
+
+        if (repository.hasAllFilesAccess()) {
+            scan(ScanFocus.SMART)
+        } else {
+            _state.update { it.copy(dashboardRefreshing = false) }
+        }
     }
 
     fun resumePendingScanAfterPermission() {
@@ -267,12 +307,23 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         } else {
                             it.dashboardCategoryBytes
                         },
+                        dashboardScannedFileCount = if (comprehensive) {
+                            summary.scannedFileCount
+                        } else {
+                            it.dashboardScannedFileCount
+                        },
+                        dashboardScannedBytes = if (comprehensive) {
+                            summary.scannedBytes
+                        } else {
+                            it.dashboardScannedBytes
+                        },
                         dashboardSnapshotAtMillis = if (comprehensive) {
                             analyzedAtMillis
                         } else {
                             it.dashboardSnapshotAtMillis
                         },
                         scanning = false,
+                        dashboardRefreshing = false,
                         lastScanCompleted = true,
                         storage = repository.storageSnapshot(),
                         memory = repository.memorySnapshot(),
@@ -294,6 +345,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 _state.update { current ->
                     current.copy(
                         scanning = false,
+                        dashboardRefreshing = false,
                         message = getApplication<Application>().getString(R.string.message_scan_failed),
                     )
                 }
@@ -970,12 +1022,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         val current = _state.value
         if (
             current.scanning ||
+            current.dashboardRefreshing ||
             current.whatsAppScanning ||
             current.cleanupInProgress ||
             current.optimizingMemory
         ) return
 
-        val before = repository.memorySnapshot()
         appCacheRefreshJob?.cancel()
         installedAppsRefreshJob?.cancel()
         appCacheRefreshJob = null
@@ -991,13 +1043,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
 
-        // Manual RAM optimization is intentionally aggressive, but only inside this app.
-        // Dashboard aggregate metrics are persisted separately; detailed scan/review lists,
-        // previews and other rebuildable state are dropped and will be rescanned on demand.
-        val rebuildableStateReleased = releaseRebuildableMemoryState()
-        runCatching(releaseHeavyResources)
-
         viewModelScope.launch {
+            val before = withContext(Dispatchers.Default) { repository.memorySnapshot() }
+            val rebuildableStateReleased = releaseRebuildableMemoryState()
+            runCatching(releaseHeavyResources)
+
             val after = measureStableMemorySnapshot()
             val result = MemoryOptimizationResult(
                 beforeAvailableBytes = before.availableBytes,
@@ -1062,7 +1112,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         delay(MEMORY_INITIAL_SETTLE_MILLIS)
         val samples = mutableListOf<MemorySnapshot>()
         repeat(MEMORY_MEASUREMENT_SAMPLES) { index ->
-            samples += repository.memorySnapshot()
+            samples += withContext(Dispatchers.Default) { repository.memorySnapshot() }
             if (index < MEMORY_MEASUREMENT_SAMPLES - 1) {
                 delay(MEMORY_SAMPLE_INTERVAL_MILLIS)
             }

@@ -43,6 +43,7 @@ import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -119,6 +120,11 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
     ABOUT(R.string.about_app),
 }
 
+private enum class AccessDisclosure {
+    ALL_FILES,
+    USAGE_ACCESS,
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CleanerApp(
@@ -144,6 +150,7 @@ fun CleanerApp(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
+    var accessDisclosure by rememberSaveable { mutableStateOf<AccessDisclosure?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.message) {
@@ -153,12 +160,20 @@ fun CleanerApp(
         }
     }
 
+    fun requestAllFilesWithDisclosure() {
+        accessDisclosure = AccessDisclosure.ALL_FILES
+    }
+
+    fun requestUsageWithDisclosure() {
+        accessDisclosure = AccessDisclosure.USAGE_ACCESS
+    }
+
     fun launchScan(focus: ScanFocus) {
         legalReturnScreen = null
         detailScreen = DetailScreen.CLEAN_RESULTS
         if (!state.hasAllFilesAccess) {
             viewModel.queueScanAfterPermission(focus)
-            onRequestAllFilesAccess()
+            requestAllFilesWithDisclosure()
         } else {
             viewModel.scan(focus)
         }
@@ -245,18 +260,33 @@ fun CleanerApp(
             }
         },
         bottomBar = {
+            val screenAllowsBanner = when (detailScreen) {
+                null -> when (AppTab.entries[selectedTabIndex]) {
+                    AppTab.HOME,
+                    AppTab.TOOLS,
+                    AppTab.SECURITY,
+                    AppTab.PROFILE -> true
+                }
+                DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
+                DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
+                DetailScreen.APP_CACHE,
+                DetailScreen.APP_MANAGER,
+                DetailScreen.SETTINGS -> true
+                DetailScreen.PRIVACY,
+                DetailScreen.TERMS,
+                DetailScreen.ABOUT -> false
+            }
+
             val bannerAllowed =
                 canRequestAds &&
+                    screenAllowsBanner &&
+                    accessDisclosure == null &&
                     !fullScreenAdActive &&
                     !state.scanning &&
+                    !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
                     !state.cleanupInProgress &&
-                    !state.optimizingMemory &&
-                    when (detailScreen) {
-                        DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
-                        DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
-                        else -> true
-                    }
+                    !state.optimizingMemory
 
             if (detailScreen == null) {
                 Column(
@@ -304,14 +334,14 @@ fun CleanerApp(
         when (detailScreen) {
             DetailScreen.CLEAN_RESULTS -> CleanScreen(
                 state = state,
-                onRequestAllFilesAccess = onRequestAllFilesAccess,
+                onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
                 onScan = { viewModel.scan(state.scanFocus) },
                 onToggleItem = viewModel::toggleItem,
                 onToggleCategory = viewModel::toggleCategory,
                 onSetItemsSelected = viewModel::setItemsSelected,
                 onOpenCategoryReview = viewModel::openSmartCategoryReview,
                 onOpenStorageReview = viewModel::openStorageReview,
-                onRequestUsageAccess = onRequestUsageAccess,
+                onRequestUsageAccess = ::requestUsageWithDisclosure,
                 onRefreshInstalledApps = viewModel::refreshInstalledApps,
                 onUninstallApp = onUninstallApp,
                 onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
@@ -324,7 +354,7 @@ fun CleanerApp(
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
                 state = state,
                 onBack = ::navigateBackInApp,
-                onRequestAccess = onRequestAllFilesAccess,
+                onRequestAccess = ::requestAllFilesWithDisclosure,
                 onScan = viewModel::scanWhatsAppLibrary,
                 onToggleItem = viewModel::toggleWhatsAppItem,
                 onToggleCategory = viewModel::toggleWhatsAppCategory,
@@ -341,7 +371,7 @@ fun CleanerApp(
 
             DetailScreen.APP_CACHE -> AppCacheManagerScreen(
                 state = state,
-                onRequestUsageAccess = onRequestUsageAccess,
+                onRequestUsageAccess = ::requestUsageWithDisclosure,
                 onRefresh = { viewModel.refreshAppCaches(force = true) },
                 onClearAllAppCaches = onClearAllAppCaches,
                 onClearOwnCache = viewModel::clearOwnAppCache,
@@ -350,7 +380,7 @@ fun CleanerApp(
 
             DetailScreen.APP_MANAGER -> AppManagerScreen(
                 state = state,
-                onRequestUsageAccess = onRequestUsageAccess,
+                onRequestUsageAccess = ::requestUsageWithDisclosure,
                 onRefresh = viewModel::refreshInstalledApps,
                 onUninstallApp = onUninstallApp,
                 modifier = Modifier.padding(padding),
@@ -393,6 +423,7 @@ fun CleanerApp(
                     onApks = { launchScan(ScanFocus.APKS) },
                     onMedia = { launchScan(ScanFocus.MEDIA) },
                     onDeepClean = { launchScan(ScanFocus.DEEP) },
+                    onRefresh = viewModel::refreshDashboard,
                     onRamOptimize = onOptimizeMemory,
                     modifier = Modifier.padding(padding),
                 )
@@ -400,7 +431,7 @@ fun CleanerApp(
                 AppTab.TOOLS -> DeviceCenterScreen(
                     state = state,
                     onScan = ::launchScan,
-                    onRequestAllFilesAccess = onRequestAllFilesAccess,
+                    onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
                     onOpenWhatsApp = {
                         detailScreen = DetailScreen.WHATSAPP
                         if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
@@ -417,8 +448,8 @@ fun CleanerApp(
 
                 AppTab.SECURITY -> SecurityCenterScreen(
                     state = state,
-                    onRequestAllFilesAccess = onRequestAllFilesAccess,
-                    onRequestUsageAccess = onRequestUsageAccess,
+                    onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+                    onRequestUsageAccess = ::requestUsageWithDisclosure,
                     onOpenPrivacy = { detailScreen = DetailScreen.PRIVACY },
                     modifier = Modifier.padding(padding),
                 )
@@ -435,6 +466,54 @@ fun CleanerApp(
                 )
             }
         }
+    }
+
+    accessDisclosure?.let { disclosure ->
+        AlertDialog(
+            onDismissRequest = { accessDisclosure = null },
+            title = {
+                Text(
+                    stringResource(
+                        if (disclosure == AccessDisclosure.ALL_FILES) {
+                            R.string.disclosure_all_files_title
+                        } else {
+                            R.string.disclosure_usage_title
+                        },
+                    ),
+                    fontWeight = FontWeight.Black,
+                )
+            },
+            text = {
+                Text(
+                    stringResource(
+                        if (disclosure == AccessDisclosure.ALL_FILES) {
+                            R.string.disclosure_all_files_body
+                        } else {
+                            R.string.disclosure_usage_body
+                        },
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        accessDisclosure = null
+                        if (disclosure == AccessDisclosure.ALL_FILES) {
+                            onRequestAllFilesAccess()
+                        } else {
+                            onRequestUsageAccess()
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.disclosure_continue))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { accessDisclosure = null }) {
+                    Text(stringResource(R.string.disclosure_not_now))
+                }
+            },
+        )
     }
 
     if (!fullScreenAdActive) {
@@ -819,14 +898,14 @@ private fun CleanScreen(
     if (state.scanFocus == ScanFocus.SMART) {
         SmartCleanResultsScreen(
             state = state,
-            onRequestAllFilesAccess = onRequestAllFilesAccess,
+            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
             onSetItemsSelected = onSetItemsSelected,
             onOpenCategoryReview = onOpenCategoryReview,
             onOpenStorageReview = onOpenStorageReview,
-            onRequestUsageAccess = onRequestUsageAccess,
+            onRequestUsageAccess = ::requestUsageWithDisclosure,
             onRefreshInstalledApps = onRefreshInstalledApps,
             onUninstallApp = onUninstallApp,
             onToggleStorageReviewItem = onToggleStorageReviewItem,
@@ -850,7 +929,7 @@ private fun CleanScreen(
     ) {
         PremiumCleanerToolScreen(
             state = state,
-            onRequestAllFilesAccess = onRequestAllFilesAccess,
+            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
             onScan = onScan,
             onToggleItem = onToggleItem,
             onSetItemsSelected = onSetItemsSelected,

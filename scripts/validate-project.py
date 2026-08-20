@@ -138,8 +138,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 23",
-    'versionName = "0.5.16"',
+    "versionCode = 24",
+    'versionName = "0.5.16.1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -231,6 +231,27 @@ for expected in (
 if "OpenDocumentTree" in main_activity:
     errors.append("WhatsApp must not use OpenDocumentTree in v0.5")
 
+for expected in (
+    "interstitialAds.onHostResumed(this)",
+    "interstitialAds.onHostPaused(this)",
+    "setCriticalTaskActive",
+    "dashboardRefreshing",
+):
+    if expected not in main_activity:
+        errors.append(f"missing v0.5.16.1 activity hardening invariant: {expected}")
+
+ad_components = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
+for expected in (
+    "setImmersiveMode(true)",
+    "HOST_STABLE_DELAY_MILLIS = 1_200L",
+    "INTERSTITIAL_TTL_MILLIS = 50L * 60L * 1000L",
+    "onHostResumed",
+    "onHostPaused",
+    "INTERSTITIAL/LOAD_REQUEST",
+):
+    if expected not in ad_components:
+        errors.append(f"missing v0.5.16.1 interstitial hardening invariant: {expected}")
+
 application_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt").read_text(encoding="utf-8")
 for expected in (
     "override fun onTrimMemory(level: Int)",
@@ -264,10 +285,10 @@ for expected in (
     "StorageStatusRing",
     "dashboard_cleanup_opportunity",
     "dashboardSnapshotAtMillis",
-    "RamOptimizationStrip",
+    "PullToRefreshBox",
     "lowMemoryThresholdBytes",
-    "dashboard_ram_optimizer_subtitle_v0515",
-    "dashboard_ram_pressure_warning_v0515",
+    "dashboard_no_risky_auto_selection",
+    "dashboardScannedFileCount",
 ):
     if expected not in dashboard:
         errors.append(f"missing v0.5.15 real dashboard/memory invariant: {expected}")
@@ -320,6 +341,16 @@ for expected in (
 ):
     if expected not in view_model:
         errors.append(f"missing v0.5.15 advanced memory invariant: {expected}")
+for expected in (
+    "refreshDashboard",
+    "dashboardRefreshing",
+    "dashboardScannedFileCount",
+    "dashboardScannedBytes",
+    "withContext(Dispatchers.Default)",
+):
+    if expected not in view_model:
+        errors.append(f"missing v0.5.16.1 dashboard/thread invariant: {expected}")
+
 for forbidden in (
     "Runtime.getRuntime().gc()",
     "System.gc()",

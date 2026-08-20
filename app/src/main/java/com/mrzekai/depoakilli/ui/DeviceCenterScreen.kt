@@ -190,9 +190,6 @@ internal fun DeviceCenterScreen(
             )
         }
         item {
-            RamOptimizerCard(state, onOptimizeMemory)
-        }
-        item {
             ToolActionCard(
                 title = stringResource(R.string.settings_title),
                 subtitle = stringResource(R.string.settings_subtitle),

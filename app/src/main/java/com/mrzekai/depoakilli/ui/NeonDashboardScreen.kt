@@ -34,11 +34,13 @@ import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,6 +71,7 @@ import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NeonDashboardScreen(
     state: CleanerUiState,
@@ -80,6 +83,7 @@ internal fun NeonDashboardScreen(
     onApks: () -> Unit,
     onMedia: () -> Unit,
     onDeepClean: () -> Unit,
+    onRefresh: () -> Unit,
     onRamOptimize: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -101,8 +105,13 @@ internal fun NeonDashboardScreen(
     val opportunityBytes = (cleanableBytes + reviewBytes).coerceAtLeast(0L)
     val hasDashboardSnapshot = state.dashboardSnapshotAtMillis > 0L
 
-    Box(
-        modifier = modifier
+    PullToRefreshBox(
+        isRefreshing = state.dashboardRefreshing,
+        onRefresh = onRefresh,
+        modifier = modifier.fillMaxSize(),
+    ) {
+        Box(
+        modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
@@ -129,6 +138,8 @@ internal fun NeonDashboardScreen(
                     cleanableBytes = cleanableBytes,
                     reviewBytes = reviewBytes,
                     snapshotAtMillis = state.dashboardSnapshotAtMillis,
+                    scannedFileCount = state.dashboardScannedFileCount,
+                    scannedBytes = state.dashboardScannedBytes,
                     storage = state.storage,
                 )
             }
@@ -233,15 +244,10 @@ internal fun NeonDashboardScreen(
                 }
             }
             item {
-                RamOptimizationStrip(
-                    state = state,
-                    onClick = onRamOptimize,
-                )
-            }
-            item {
                 DeepCleanPromo(onClick = onDeepClean)
             }
         }
+    }
     }
 }
 
@@ -300,6 +306,8 @@ private fun DashboardHero(
     cleanableBytes: Long,
     reviewBytes: Long,
     snapshotAtMillis: Long,
+    scannedFileCount: Int,
+    scannedBytes: Long,
     storage: StorageSnapshot,
 ) {
     val hasSnapshot = snapshotAtMillis > 0L
@@ -340,7 +348,13 @@ private fun DashboardHero(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        if (hasSnapshot) ByteFormatter.format(opportunityBytes) else "—",
+                        if (!hasSnapshot) {
+                            "—"
+                        } else if (opportunityBytes > 0L) {
+                            ByteFormatter.format(opportunityBytes)
+                        } else {
+                            stringResource(R.string.dashboard_no_cleanup_found)
+                        },
                         color = Color.White,
                         fontSize = 39.sp,
                         lineHeight = 42.sp,
@@ -357,10 +371,14 @@ private fun DashboardHero(
                         ) {
                             if (hasSnapshot) {
                                 Text(
-                                    stringResource(
-                                        R.string.dashboard_safe_amount,
-                                        ByteFormatter.format(cleanableBytes),
-                                    ),
+                                    if (cleanableBytes > 0L) {
+                                        stringResource(
+                                            R.string.dashboard_safe_amount,
+                                            ByteFormatter.format(cleanableBytes),
+                                        )
+                                    } else {
+                                        stringResource(R.string.dashboard_no_risky_auto_selection)
+                                    },
                                     color = Color(0xFFDDF4EA),
                                     fontSize = 10.sp,
                                     maxLines = 1,
@@ -373,6 +391,17 @@ private fun DashboardHero(
                                     ),
                                     color = Color(0xFF9FE6FF),
                                     fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    stringResource(
+                                        R.string.dashboard_scanned_summary,
+                                        scannedFileCount,
+                                        ByteFormatter.format(scannedBytes),
+                                    ),
+                                    color = Color(0xFFC9D0F3),
+                                    fontSize = 9.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )

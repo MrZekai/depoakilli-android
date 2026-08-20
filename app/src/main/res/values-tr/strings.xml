@@ -603,4 +603,15 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="ram_result_rebuildable_released_title_v0515">Yeniden oluşturulabilir bellek bırakıldı</string>
     <string name="ram_result_rebuildable_released_v0515">Detaylı tarama/inceleme listeleri ve önizleme önbellekleri RAM’den bırakıldı. Ana sayfadaki toplu değerler korunur; detaylar yeniden açıldığında tekrar taranır.</string>
     <string name="ram_result_measured_note_v0515">Serbest bırakma sonrası %1$d ölçüm örneğinden hesaplandı. Uygulama belleği gerçek proses PSS değeridir; kullanılabilir RAM anlık değişebilen bir sistem sinyalidir. Diğer uygulamaları ve cihaz genelindeki süreçleri Android yönetir.</string>
+
+    <!-- v0.5.16.1 hardening -->
+    <string name="dashboard_no_cleanup_found">Hazır</string>
+    <string name="dashboard_no_risky_auto_selection">Riskli otomatik seçim yok</string>
+    <string name="dashboard_scanned_summary">%1$d dosya • %2$s analiz edildi</string>
+    <string name="disclosure_all_files_title">Tam depolama erişimi neden gerekli?</string>
+    <string name="disclosure_all_files_body">Akıllı Temizleyici, Android Tüm dosyalara erişim iznini yalnız temel dosya yönetimi özellikleri için kullanır: paylaşılan depolamada çöp adayları, birebir kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve paylaşılan mesajlaşma medyasını taramak. Dosyalar cihazından çıkmaz. Nelerin silineceğini sen incelersin. Android diğer uygulamaların özel verilerini korumaya devam eder.</string>
+    <string name="disclosure_usage_title">Kullanım Erişimi neden gerekli?</string>
+    <string name="disclosure_usage_body">Kullanım Erişimi isteğe bağlıdır. Android’in bildirdiği uygulama depolama/önbellek toplamlarını ve son kullanım zamanlarını okuyarak büyük veya uzun süredir kullanılmayan uygulamaları incelemeni sağlar. Uygulamaların özel içeriğini okumaz ve korunan verilerini sessizce silmez.</string>
+    <string name="disclosure_continue">Devam et</string>
+    <string name="disclosure_not_now">Şimdi değil</string>
 </resources>

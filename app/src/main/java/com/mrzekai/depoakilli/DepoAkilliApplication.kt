@@ -7,6 +7,7 @@ import android.content.ComponentCallbacks2
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -25,6 +26,7 @@ class DepoAkilliApplication :
     private var currentActivity: MainActivity? = null
     private var externalLaunchPending = false
     private var suppressNextAppOpenAd = false
+    private var criticalTaskActive = false
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private val _fullScreenAdSurfaceActive = MutableStateFlow(false)
@@ -32,6 +34,12 @@ class DepoAkilliApplication :
 
     private val processObserver = object : DefaultLifecycleObserver {
         override fun onStart(owner: LifecycleOwner) {
+            if (criticalTaskActive) {
+                appOpenAds.load()
+                _fullScreenAdSurfaceActive.value = false
+                return
+            }
+
             if (suppressNextAppOpenAd) {
                 suppressNextAppOpenAd = false
                 appOpenAds.load()
@@ -105,6 +113,10 @@ class DepoAkilliApplication :
         }
     }
 
+    fun setCriticalTaskActive(active: Boolean) {
+        criticalTaskActive = active
+    }
+
     fun releaseAdMemory() {
         appOpenAds.releaseForMemoryOptimization()
     }
@@ -148,9 +160,34 @@ class DepoAkilliApplication :
         const val EXTERNAL_LAUNCH_ARM_MILLIS = 3_000L
     }
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
-    override fun onActivityResumed(activity: Activity) = Unit
-    override fun onActivityPaused(activity: Activity) = Unit
-    override fun onActivityStopped(activity: Activity) = Unit
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        logAdActivityLifecycle("CREATED", activity)
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        logAdActivityLifecycle("RESUMED", activity)
+    }
+
+    override fun onActivityPaused(activity: Activity) {
+        logAdActivityLifecycle("PAUSED", activity)
+    }
+
+    override fun onActivityStopped(activity: Activity) {
+        logAdActivityLifecycle("STOPPED", activity)
+    }
+
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
+
+    private fun logAdActivityLifecycle(event: String, activity: Activity) {
+        if (
+            BuildConfig.DEBUG &&
+            activity.javaClass.name.startsWith("com.google.android.gms.ads")
+        ) {
+            Log.i(
+                "AdDiag",
+                "AD_ACTIVITY/$event class=${activity.javaClass.name} " +
+                    "finishing=${activity.isFinishing} taskRoot=${activity.isTaskRoot}",
+            )
+        }
+    }
 }

@@ -7,6 +7,8 @@ internal data class DashboardSnapshot(
     val cleanableBytes: Long,
     val reviewBytes: Long,
     val categoryBytes: Map<CleanCategory, Long>,
+    val scannedFileCount: Int,
+    val scannedBytes: Long,
     val analyzedAtMillis: Long,
 )
 
@@ -30,6 +32,8 @@ internal class DashboardSnapshotStore(context: Context) {
             cleanableBytes = preferences.getLong(KEY_CLEANABLE_BYTES, 0L).coerceAtLeast(0L),
             reviewBytes = preferences.getLong(KEY_REVIEW_BYTES, 0L).coerceAtLeast(0L),
             categoryBytes = categoryBytes,
+            scannedFileCount = preferences.getInt(KEY_SCANNED_FILE_COUNT, 0).coerceAtLeast(0),
+            scannedBytes = preferences.getLong(KEY_SCANNED_BYTES, 0L).coerceAtLeast(0L),
             analyzedAtMillis = analyzedAtMillis,
         )
     }
@@ -38,6 +42,8 @@ internal class DashboardSnapshotStore(context: Context) {
         preferences.edit().apply {
             putLong(KEY_CLEANABLE_BYTES, snapshot.cleanableBytes.coerceAtLeast(0L))
             putLong(KEY_REVIEW_BYTES, snapshot.reviewBytes.coerceAtLeast(0L))
+            putInt(KEY_SCANNED_FILE_COUNT, snapshot.scannedFileCount.coerceAtLeast(0))
+            putLong(KEY_SCANNED_BYTES, snapshot.scannedBytes.coerceAtLeast(0L))
             putLong(KEY_ANALYZED_AT, snapshot.analyzedAtMillis.coerceAtLeast(0L))
             CleanCategory.values().forEach { category ->
                 putLong(
@@ -52,6 +58,8 @@ internal class DashboardSnapshotStore(context: Context) {
         const val PREFS_NAME = "dashboard_snapshot_v1"
         const val KEY_CLEANABLE_BYTES = "cleanable_bytes"
         const val KEY_REVIEW_BYTES = "review_bytes"
+        const val KEY_SCANNED_FILE_COUNT = "scanned_file_count"
+        const val KEY_SCANNED_BYTES = "scanned_bytes"
         const val KEY_ANALYZED_AT = "analyzed_at"
         const val KEY_CATEGORY_PREFIX = "category_"
     }
