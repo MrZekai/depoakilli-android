@@ -138,8 +138,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 24",
-    'versionName = "0.5.16.1"',
+    "versionCode = 25",
+    'versionName = "0.5.16.2"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -161,6 +161,17 @@ for expected in (
 
 if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
     errors.append("Compose BOM must remain enforced")
+
+for expected in (
+    'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
+    'liveBannerId = "ca-app-pub-1380972808968213/2118175647"',
+    'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
+    'liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"',
+    'manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId',
+    'manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId',
+):
+    if expected not in build_file:
+        errors.append(f"missing v0.5.16.2 AdMob build invariant: {expected}")
 
 repository = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt").read_text(encoding="utf-8")
 for expected in (

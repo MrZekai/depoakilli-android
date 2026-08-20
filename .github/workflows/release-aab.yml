@@ -30,10 +30,6 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
-          ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID }}
-          ADMOB_INTERSTITIAL_ID: ${{ secrets.ADMOB_INTERSTITIAL_ID }}
-          ADMOB_APP_OPEN_ID: ${{ secrets.ADMOB_APP_OPEN_ID }}
         run: bash ./scripts/validate-release-env.sh
 
       - name: Decode upload key
@@ -49,11 +45,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew --stacktrace bundleRelease \
-            -PADMOB_APP_ID='${{ secrets.ADMOB_APP_ID }}' \
-            -PADMOB_BANNER_ID='${{ secrets.ADMOB_BANNER_ID }}' \
-            -PADMOB_INTERSTITIAL_ID='${{ secrets.ADMOB_INTERSTITIAL_ID }}' \
-            -PADMOB_APP_OPEN_ID='${{ secrets.ADMOB_APP_OPEN_ID }}'
+          ./gradlew --stacktrace bundleRelease
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v6

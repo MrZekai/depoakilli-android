@@ -11,10 +11,13 @@ val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
 val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
 
-val admobAppId = providers.gradleProperty("ADMOB_APP_ID").orElse(sampleAdMobAppId)
-val admobBannerId = providers.gradleProperty("ADMOB_BANNER_ID").orElse(sampleBannerId)
-val admobInterstitialId = providers.gradleProperty("ADMOB_INTERSTITIAL_ID").orElse(sampleInterstitialId)
-val admobAppOpenId = providers.gradleProperty("ADMOB_APP_OPEN_ID").orElse(sampleAppOpenId)
+// AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
+// Keep QA/debug on Google's official sample IDs and bind production only
+// to Smart Cleaner's own live AdMob application/ad units.
+val liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"
+val liveBannerId = "ca-app-pub-1380972808968213/2118175647"
+val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
+val liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"
 val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -29,16 +32,17 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 24
-        versionName = "0.5.16.1"
+        versionCode = 25
+        versionName = "0.5.16.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId.get()
+        // Safe default for local/debug builds.
+        manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
 
-        buildConfigField("String", "ADMOB_BANNER_ID", "\"${admobBannerId.get()}\"")
-        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"${admobInterstitialId.get()}\"")
-        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"${admobAppOpenId.get()}\"")
+        buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
+        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
     }
 
     signingConfigs {
@@ -71,6 +75,12 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            // Production AAB always uses Smart Cleaner's own AdMob IDs.
+            manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$liveBannerId\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$liveInterstitialId\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
+
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -161,13 +171,16 @@ val validateReleaseAds by tasks.registering {
     description = "Fails release builds that still use Google sample AdMob IDs."
     doLast {
         val values = listOf(
-            admobAppId.get(),
-            admobBannerId.get(),
-            admobInterstitialId.get(),
-            admobAppOpenId.get(),
+            liveAdMobAppId,
+            liveBannerId,
+            liveInterstitialId,
+            liveAppOpenId,
         )
         check(values.none { it.contains("3940256099942544") }) {
-            "Release blocked: configure all four live AdMob IDs."
+            "Release blocked: Google sample AdMob IDs cannot be used in production."
+        }
+        check(values.all { it.startsWith("ca-app-pub-1380972808968213") }) {
+            "Release blocked: Smart Cleaner AdMob publisher IDs are inconsistent."
         }
         check(
             releaseKeystorePath.isPresent &&
