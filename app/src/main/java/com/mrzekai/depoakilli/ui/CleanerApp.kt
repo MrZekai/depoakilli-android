@@ -898,14 +898,14 @@ private fun CleanScreen(
     if (state.scanFocus == ScanFocus.SMART) {
         SmartCleanResultsScreen(
             state = state,
-            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+            onRequestAllFilesAccess = onRequestAllFilesAccess,
             onScan = onScan,
             onToggleItem = onToggleItem,
             onToggleCategory = onToggleCategory,
             onSetItemsSelected = onSetItemsSelected,
             onOpenCategoryReview = onOpenCategoryReview,
             onOpenStorageReview = onOpenStorageReview,
-            onRequestUsageAccess = ::requestUsageWithDisclosure,
+            onRequestUsageAccess = onRequestUsageAccess,
             onRefreshInstalledApps = onRefreshInstalledApps,
             onUninstallApp = onUninstallApp,
             onToggleStorageReviewItem = onToggleStorageReviewItem,
@@ -929,7 +929,7 @@ private fun CleanScreen(
     ) {
         PremiumCleanerToolScreen(
             state = state,
-            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+            onRequestAllFilesAccess = onRequestAllFilesAccess,
             onScan = onScan,
             onToggleItem = onToggleItem,
             onSetItemsSelected = onSetItemsSelected,
