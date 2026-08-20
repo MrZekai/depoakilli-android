@@ -44,7 +44,7 @@ internal fun MemoryOptimizationResultDialog(
 ) {
     val releasedAppMemory = result.appMemoryReleasedBytes
     val availableGain = result.availableRamGainBytes
-    val hasMeasuredGain = releasedAppMemory > 0L || availableGain > 0L
+    val hasMeasuredGain = releasedAppMemory > 0L || availableGain > 0L || result.rebuildableStateReleased
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -126,12 +126,35 @@ internal fun MemoryOptimizationResultDialog(
                         )
                     } else {
                         Text(
-                            stringResource(R.string.ram_result_stable),
+                            stringResource(
+                                if (result.rebuildableStateReleased) {
+                                    R.string.ram_result_rebuildable_released_title_v0515
+                                } else {
+                                    R.string.ram_result_stable
+                                },
+                            ),
                             color = Lime400,
                             fontSize = 21.sp,
                             fontWeight = FontWeight.Black,
                             textAlign = TextAlign.Center,
                         )
+                    }
+
+                    if (result.rebuildableStateReleased) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color(0xFF1976D2).copy(alpha = .13f),
+                            shape = RoundedCornerShape(18.dp),
+                        ) {
+                            Text(
+                                stringResource(R.string.ram_result_rebuildable_released_v0515),
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
+                                color = Color(0xFFB8E5FF),
+                                fontSize = 11.sp,
+                                lineHeight = 15.sp,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                     }
 
                     RamMeasuredRow(
@@ -146,7 +169,10 @@ internal fun MemoryOptimizationResultDialog(
                     )
 
                     Text(
-                        stringResource(R.string.ram_result_measured_note),
+                        stringResource(
+                            R.string.ram_result_measured_note_v0515,
+                            result.measurementSamples,
+                        ),
                         color = Color(0xFFAFC7C6),
                         fontSize = 11.sp,
                         lineHeight = 15.sp,

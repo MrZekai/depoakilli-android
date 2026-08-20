@@ -143,6 +143,7 @@ data class MemorySnapshot(
     val availableBytes: Long = 0,
     val appUsedBytes: Long = 0,
     val lowMemory: Boolean = false,
+    val lowMemoryThresholdBytes: Long = 0L,
 ) {
     val usedBytes: Long get() = (totalBytes - availableBytes).coerceAtLeast(0)
     val usedFraction: Float

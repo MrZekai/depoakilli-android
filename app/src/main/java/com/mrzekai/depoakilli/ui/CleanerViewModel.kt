@@ -35,6 +35,10 @@ data class MemoryOptimizationResult(
     val afterAvailableBytes: Long,
     val beforeAppUsedBytes: Long,
     val afterAppUsedBytes: Long,
+    val rebuildableStateReleased: Boolean,
+    val measurementSamples: Int,
+    val beforeLowMemory: Boolean,
+    val afterLowMemory: Boolean,
 ) {
     val appMemoryReleasedBytes: Long
         get() = (beforeAppUsedBytes - afterAppUsedBytes).coerceAtLeast(0L)
@@ -101,6 +105,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var pendingCleanupFailedCount: Int = 0
     private var pendingCleanupStorageBeforeBytes: Long = 0L
     private var appCacheRefreshJob: Job? = null
+    private var installedAppsRefreshJob: Job? = null
     private var lastAppCacheRefreshAt = 0L
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
@@ -178,7 +183,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun refreshInstalledApps() {
         if (_state.value.loadingApps) return
         _state.update { it.copy(loadingApps = true) }
-        viewModelScope.launch {
+        installedAppsRefreshJob = viewModelScope.launch {
             runCatching { repository.installedAppsSnapshot() }
                 .onSuccess { apps ->
                     _state.update {
@@ -916,29 +921,47 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun optimizeMemory(releaseHeavyResources: () -> Unit) {
-        if (_state.value.scanning || _state.value.optimizingMemory) return
+        val current = _state.value
+        if (
+            current.scanning ||
+            current.whatsAppScanning ||
+            current.cleanupInProgress ||
+            current.optimizingMemory
+        ) return
+
         val before = repository.memorySnapshot()
+        appCacheRefreshJob?.cancel()
+        installedAppsRefreshJob?.cancel()
+        appCacheRefreshJob = null
+        installedAppsRefreshJob = null
+
         _state.update {
             it.copy(
                 optimizingMemory = true,
                 memoryOptimizationResult = null,
+                scanningAppCaches = false,
+                loadingApps = false,
                 message = null,
             )
         }
 
-        // Release only Smart Cleaner's temporary/heavy in-memory resources.
-        // Scan selections and user-reviewed file state remain intact.
+        // Manual RAM optimization is intentionally aggressive, but only inside this app.
+        // Dashboard aggregate metrics are persisted separately; detailed scan/review lists,
+        // previews and other rebuildable state are dropped and will be rescanned on demand.
+        val rebuildableStateReleased = releaseRebuildableMemoryState()
         runCatching(releaseHeavyResources)
-        runCatching { Runtime.getRuntime().gc() }
 
         viewModelScope.launch {
-            delay(MEMORY_MEASUREMENT_DELAY_MILLIS)
-            val after = repository.memorySnapshot()
+            val after = measureStableMemorySnapshot()
             val result = MemoryOptimizationResult(
                 beforeAvailableBytes = before.availableBytes,
                 afterAvailableBytes = after.availableBytes,
                 beforeAppUsedBytes = before.appUsedBytes,
                 afterAppUsedBytes = after.appUsedBytes,
+                rebuildableStateReleased = rebuildableStateReleased,
+                measurementSamples = MEMORY_MEASUREMENT_SAMPLES,
+                beforeLowMemory = before.lowMemory,
+                afterLowMemory = after.lowMemory,
             )
             _state.update {
                 it.copy(
@@ -949,6 +972,63 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 )
             }
         }
+    }
+
+    private fun releaseRebuildableMemoryState(): Boolean {
+        val snapshot = _state.value
+        val released = snapshot.summary.items.isNotEmpty() ||
+            snapshot.summary.storagePreviews.values.any { it.isNotEmpty() } ||
+            snapshot.storageReview.items.isNotEmpty() ||
+            snapshot.whatsAppSummary.items.isNotEmpty() ||
+            snapshot.installedApps.isNotEmpty() ||
+            snapshot.appCache.entries.isNotEmpty()
+
+        _state.update { state ->
+            val compactCache = AppCacheSnapshot(
+                supported = state.appCache.supported,
+                accessGranted = state.appCache.accessGranted,
+                entries = emptyList(),
+                scannedAppCount = state.appCache.scannedAppCount,
+                reportedOtherAppsCacheBytes = state.appCache.totalCacheBytes,
+            )
+            state.copy(
+                appCache = compactCache,
+                installedApps = emptyList(),
+                summary = ScanSummary(),
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+                storageReview = StorageReviewSummary(),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+                scanProgressFiles = 0,
+                scanProgressDirectories = 0,
+                lastScanCompleted = false,
+                whatsAppSummary = WhatsAppLibrarySummary(),
+                whatsAppScanProgress = 0,
+                whatsAppLastScanCompleted = false,
+            )
+        }
+        return released
+    }
+
+    private suspend fun measureStableMemorySnapshot(): MemorySnapshot {
+        delay(MEMORY_INITIAL_SETTLE_MILLIS)
+        val samples = mutableListOf<MemorySnapshot>()
+        repeat(MEMORY_MEASUREMENT_SAMPLES) { index ->
+            samples += repository.memorySnapshot()
+            if (index < MEMORY_MEASUREMENT_SAMPLES - 1) {
+                delay(MEMORY_SAMPLE_INTERVAL_MILLIS)
+            }
+        }
+
+        fun median(values: List<Long>): Long = values.sorted()[values.size / 2]
+        return MemorySnapshot(
+            totalBytes = median(samples.map(MemorySnapshot::totalBytes)),
+            availableBytes = median(samples.map(MemorySnapshot::availableBytes)),
+            appUsedBytes = median(samples.map(MemorySnapshot::appUsedBytes)),
+            lowMemory = samples.count(MemorySnapshot::lowMemory) > samples.size / 2,
+            lowMemoryThresholdBytes = median(samples.map(MemorySnapshot::lowMemoryThresholdBytes)),
+        )
     }
 
     fun dismissMemoryOptimizationResult() {
@@ -980,7 +1060,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private companion object {
-        const val MEMORY_MEASUREMENT_DELAY_MILLIS = 700L
+        const val MEMORY_INITIAL_SETTLE_MILLIS = 450L
+        const val MEMORY_SAMPLE_INTERVAL_MILLIS = 300L
+        const val MEMORY_MEASUREMENT_SAMPLES = 3
         const val WHATSAPP_COMPLETION_DELAY_MILLIS = 250L
         const val APP_CACHE_REFRESH_INTERVAL_MILLIS = 60L * 1000L
     }

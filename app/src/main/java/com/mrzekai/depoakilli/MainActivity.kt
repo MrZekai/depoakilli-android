@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli
 
 import android.app.Activity
+import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -112,6 +113,17 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.load()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (
+            level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND &&
+            ::interstitialAds.isInitialized &&
+            (application as DepoAkilliApplication).isSystemUnderMemoryPressure()
+        ) {
+            interstitialAds.releaseForMemoryOptimization()
+        }
     }
 
     private fun showMemoryOptimizationInterstitialThenOptimize() {

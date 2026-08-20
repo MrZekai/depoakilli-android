@@ -131,7 +131,7 @@
     <string name="language_settings_subtitle">Use the phone’s supported app-language setting; unsupported locales fall back to English.</string>
     <string name="ad_privacy_preferences">Ad privacy preferences</string>
     <string name="ad_privacy_preferences_subtitle">Change consent and personalization choices</string>
-    <string name="honest_memory_note">App memory cleanup releases temporary full-screen ad resources without discarding your scan selections, then measures this app’s real PSS memory again. Android keeps device-wide process reclamation under system control.</string>
+    <string name="honest_memory_note">Advanced memory optimization releases this app’s rebuildable scan details, previews, thumbnail caches and temporary ad resources, then remeasures this app’s real PSS memory. Dashboard aggregate metrics remain available; detailed results are rescanned on demand. Android keeps other apps and device-wide process reclamation under system control.</string>
     <string name="sponsored">Sponsored</string>
     <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
     <string name="message_select_item">Select at least one item to clean.</string>
@@ -318,9 +318,9 @@ Usage Access is optional and is used to read app storage/cache statistics and la
 
 Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.</string>
     <string name="ram_optimize_action">Optimize Smart Cleaner memory</string>
-    <string name="ram_optimizer_policy_note">RAM Optimization releases Smart Cleaner’s temporary heavy resources and remeasures available RAM. Android does not allow us to claim that protected third-party processes were force-closed.</string>
+    <string name="ram_optimizer_policy_note">App RAM Optimization aggressively releases Smart Cleaner’s rebuildable scan details, previews, thumbnail caches and temporary ad resources, then remeasures real app PSS. Android keeps third-party process reclamation under system control.</string>
     <string name="ram_optimizer_subtitle_v050">%1$s RAM currently available</string>
-    <string name="ram_optimizer_title_v050">RAM Optimization</string>
+    <string name="ram_optimizer_title_v050">App RAM Optimization</string>
     <string name="reason_large_file">Large file • %1$d days old</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
@@ -597,4 +597,10 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_safe_candidates">Safe cleanup</string>
     <string name="smart_clean_hero_subtitle_v0514">Real candidates from this analysis. Personal media remains manual review.</string>
     <string name="cleanup_result_storage_snapshot">Free-space snapshot: %1$s → %2$s</string>
+
+    <string name="dashboard_ram_optimizer_subtitle_v0515">Release rebuildable scan, preview and ad memory; then remeasure this app</string>
+    <string name="dashboard_ram_pressure_warning_v0515">Android reports memory pressure — release rebuildable app memory</string>
+    <string name="ram_result_rebuildable_released_title_v0515">Rebuildable memory released</string>
+    <string name="ram_result_rebuildable_released_v0515">Detailed scan/review lists and preview caches were released from memory. Dashboard totals stay available; detailed results will be rescanned when opened again.</string>
+    <string name="ram_result_measured_note_v0515">Measured from %1$d post-release samples. App memory uses real process PSS; available RAM is a system signal that can fluctuate. Android manages other apps and device-wide process reclamation.</string>
 </resources>

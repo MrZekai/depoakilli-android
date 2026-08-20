@@ -28,6 +28,7 @@ required = [
     "gradle/wrapper/gradle-wrapper.properties",
     "app/build.gradle.kts",
     "app/src/main/AndroidManifest.xml",
+    "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
     "app/src/main/res/values/strings.xml",
     "app/src/main/res/values-tr/strings.xml",
     "app/src/main/res/xml/locales_config.xml",
@@ -137,8 +138,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 21",
-    'versionName = "0.5.14"',
+    "versionCode = 22",
+    'versionName = "0.5.15"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -196,6 +197,9 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing v0.5.12 no-extra-scan media summary invariant: {expected}")
 
+if "lowMemoryThresholdBytes = info.threshold" not in repository:
+    errors.append("v0.5.15 memory snapshot must expose Android MemoryInfo.threshold")
+
 for forbidden in (
     "MAX_HASH_BYTES",
     "MAX_DUPLICATE_GROUP",
@@ -216,11 +220,28 @@ for expected in (
     "showMemoryOptimizationInterstitialThenOptimize",
     "releaseWhatsAppThumbnailMemory",
     "releasePremiumToolThumbnailMemory",
+    "override fun onTrimMemory(level: Int)",
+    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
 ):
     if expected not in main_activity:
         errors.append(f"missing Android system flow: {expected}")
 if "OpenDocumentTree" in main_activity:
     errors.append("WhatsApp must not use OpenDocumentTree in v0.5")
+
+application_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt").read_text(encoding="utf-8")
+for expected in (
+    "override fun onTrimMemory(level: Int)",
+    "ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN",
+    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
+    "releaseWhatsAppThumbnailMemory",
+    "releasePremiumToolThumbnailMemory",
+    "releaseForMemoryOptimization",
+    "isSystemUnderMemoryPressure",
+    "info.lowMemory",
+    "info.threshold",
+):
+    if expected not in application_source:
+        errors.append(f"missing v0.5.15 automatic memory-trim invariant: {expected}")
 
 # Compile-guard invariants caught by the first real Android CI run.
 if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
@@ -236,9 +257,12 @@ for expected in (
     "dashboard_cleanup_opportunity",
     "dashboardSnapshotAtMillis",
     "RamOptimizationStrip",
+    "lowMemoryThresholdBytes",
+    "dashboard_ram_optimizer_subtitle_v0515",
+    "dashboard_ram_pressure_warning_v0515",
 ):
     if expected not in dashboard:
-        errors.append(f"missing v0.5.14 real dashboard invariant: {expected}")
+        errors.append(f"missing v0.5.15 real dashboard/memory invariant: {expected}")
 for forbidden in (
     "CleaningScoreRing",
     "cleaningScore(",
@@ -268,22 +292,44 @@ for expected in (
 ):
     if expected not in view_model:
         errors.append(f"missing v0.5.14 measured-state invariant: {expected}")
+for expected in (
+    "releaseRebuildableMemoryState",
+    "measureStableMemorySnapshot",
+    "MEMORY_MEASUREMENT_SAMPLES = 3",
+    "summary = ScanSummary()",
+    "whatsAppSummary = WhatsAppLibrarySummary()",
+    "storageReview = StorageReviewSummary()",
+    "installedAppsRefreshJob?.cancel()",
+    "reportedOtherAppsCacheBytes = state.appCache.totalCacheBytes",
+    "rebuildableStateReleased",
+    "beforeLowMemory",
+    "afterLowMemory",
+):
+    if expected not in view_model:
+        errors.append(f"missing v0.5.15 advanced memory invariant: {expected}")
 for forbidden in (
-    "summary = it.summary.copy(items = emptyList())",
-    "whatsAppSummary = it.whatsAppSummary.copy(items = emptyList())",
+    "Runtime.getRuntime().gc()",
+    "System.gc()",
+    "killBackgroundProcesses(",
+    "dashboardCleanableBytes = 0L",
+    "dashboardReviewBytes = 0L",
+    "dashboardSnapshotAtMillis = 0L",
 ):
     if forbidden in view_model:
-        errors.append(f"RAM optimization must preserve user scan selections: {forbidden}")
+        errors.append(f"forbidden v0.5.15 memory behavior present: {forbidden}")
 
 memory_result_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt").read_text(encoding="utf-8")
 for expected in (
     "MemoryOptimizationResultDialog",
-    "ram_result_measured_note",
+    "ram_result_measured_note_v0515",
+    "ram_result_rebuildable_released_v0515",
     "appMemoryReleasedBytes",
     "availableRamGainBytes",
+    "rebuildableStateReleased",
+    "measurementSamples",
 ):
     if expected not in memory_result_ui:
-        errors.append(f"missing v0.5.11 RAM result UI invariant: {expected}")
+        errors.append(f"missing v0.5.15 advanced RAM result UI invariant: {expected}")
 
 dashboard_snapshot_store = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt").read_text(encoding="utf-8")
 for expected in (
@@ -363,6 +409,16 @@ for strings_path in (
     visible_strings = strings_path.read_text(encoding="utf-8")
     if "Cleaner Engine" in visible_strings or "CLEANER ENGINE" in visible_strings:
         errors.append(f"user-visible Cleaner Engine branding remains in {strings_path}")
+    if "without discarding your scan selections" in visible_strings or "tarama seçimlerinizi silmeden" in visible_strings:
+        errors.append(f"v0.5.15 memory copy still claims detailed scan selections are preserved: {strings_path}")
+    for expected in (
+        "dashboard_ram_optimizer_subtitle_v0515",
+        "dashboard_ram_pressure_warning_v0515",
+        "ram_result_rebuildable_released_v0515",
+        "ram_result_measured_note_v0515",
+    ):
+        if expected not in visible_strings:
+            errors.append(f"missing v0.5.15 memory copy {expected} in {strings_path}")
 
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
 ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
@@ -559,4 +615,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.14 project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.15 advanced memory project structure, permissions, resources, CI and safety guardrails are valid.")

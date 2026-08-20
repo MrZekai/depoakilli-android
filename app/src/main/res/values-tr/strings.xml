@@ -131,7 +131,7 @@
     <string name="language_settings_subtitle">Telefonun desteklediği uygulama dili ayarını kullan; desteklenmeyen diller İngilizceye döner.</string>
     <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
     <string name="ad_privacy_preferences_subtitle">Onay ve kişiselleştirme seçimlerini değiştir</string>
-    <string name="honest_memory_note">Uygulama belleği temizliği tarama seçimlerinizi silmeden geçici tam ekran reklam kaynaklarını bırakır ve bu uygulamanın gerçek PSS bellek kullanımını yeniden ölçer. Cihaz genelindeki süreç yönetimi Android’dedir.</string>
+    <string name="honest_memory_note">Gelişmiş bellek optimizasyonu bu uygulamanın yeniden oluşturulabilir tarama detaylarını, önizlemelerini, küçük resim önbelleklerini ve geçici reklam kaynaklarını bırakır; ardından uygulamanın gerçek PSS belleğini yeniden ölçer. Ana sayfadaki toplu analiz değerleri korunur, detaylar gerektiğinde yeniden taranır. Diğer uygulamaların ve cihaz genelindeki süreçlerin yönetimi Android’dedir.</string>
     <string name="sponsored">Sponsorlu</string>
     <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
@@ -318,9 +318,9 @@ Kullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistik
 
 Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.</string>
     <string name="ram_optimize_action">Akıllı Temizleyici belleğini optimize et</string>
-    <string name="ram_optimizer_policy_note">RAM Optimizasyonu Akıllı Temizleyici’nin geçici ağır kaynaklarını bırakır ve kullanılabilir RAM’i yeniden ölçer. Android’in koruduğu üçüncü taraf süreçlerini zorla kapattığımızı iddia etmeyiz.</string>
+    <string name="ram_optimizer_policy_note">Uygulama RAM Optimizasyonu Akıllı Temizleyici’nin yeniden oluşturulabilir tarama detaylarını, önizlemelerini, küçük resim önbelleklerini ve geçici reklam kaynaklarını agresif biçimde bırakır; ardından gerçek uygulama PSS belleğini yeniden ölçer. Üçüncü taraf süreçlerinin yönetimi Android’dedir.</string>
     <string name="ram_optimizer_subtitle_v050">Şu anda %1$s RAM kullanılabilir</string>
-    <string name="ram_optimizer_title_v050">RAM Optimizasyonu</string>
+    <string name="ram_optimizer_title_v050">Uygulama RAM Optimizasyonu</string>
     <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
     <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
     <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
@@ -597,4 +597,10 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_safe_candidates">Güvenli temizlik</string>
     <string name="smart_clean_hero_subtitle_v0514">Bu analizde bulunan gerçek adaylar. Kişisel medya manuel incelemede kalır.</string>
     <string name="cleanup_result_storage_snapshot">Boş alan ölçümü: %1$s → %2$s</string>
+
+    <string name="dashboard_ram_optimizer_subtitle_v0515">Yeniden oluşturulabilir tarama, önizleme ve reklam belleğini bırak; uygulamayı yeniden ölç</string>
+    <string name="dashboard_ram_pressure_warning_v0515">Android bellek baskısı bildiriyor — yeniden oluşturulabilir uygulama belleğini bırak</string>
+    <string name="ram_result_rebuildable_released_title_v0515">Yeniden oluşturulabilir bellek bırakıldı</string>
+    <string name="ram_result_rebuildable_released_v0515">Detaylı tarama/inceleme listeleri ve önizleme önbellekleri RAM’den bırakıldı. Ana sayfadaki toplu değerler korunur; detaylar yeniden açıldığında tekrar taranır.</string>
+    <string name="ram_result_measured_note_v0515">Serbest bırakma sonrası %1$d ölçüm örneğinden hesaplandı. Uygulama belleği gerçek proses PSS değeridir; kullanılabilir RAM anlık değişebilen bir sistem sinyalidir. Diğer uygulamaları ve cihaz genelindeki süreçleri Android yönetir.</string>
 </resources>

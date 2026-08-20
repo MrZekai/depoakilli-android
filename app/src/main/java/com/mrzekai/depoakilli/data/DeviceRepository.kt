@@ -84,6 +84,7 @@ class DeviceRepository(
             availableBytes = info.availMem,
             appUsedBytes = processMemoryInfo.totalPss.toLong() * 1024L,
             lowMemory = info.lowMemory,
+            lowMemoryThresholdBytes = info.threshold,
         )
     }
 

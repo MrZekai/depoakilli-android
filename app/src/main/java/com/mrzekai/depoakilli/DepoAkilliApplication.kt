@@ -1,12 +1,16 @@
 package com.mrzekai.depoakilli
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.Application
+import android.content.ComponentCallbacks2
 import android.os.Bundle
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.mrzekai.depoakilli.ads.AppOpenAdController
+import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
+import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
 
 class DepoAkilliApplication :
     Application(),
@@ -31,6 +35,31 @@ class DepoAkilliApplication :
         appOpenAds = AppOpenAdController(this)
         registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(processObserver)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
+            releaseWhatsAppThumbnailMemory()
+            releasePremiumToolThumbnailMemory()
+        }
+        if (
+            level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND &&
+            ::appOpenAds.isInitialized &&
+            isSystemUnderMemoryPressure()
+        ) {
+            appOpenAds.releaseForMemoryOptimization()
+        }
+    }
+
+    fun isSystemUnderMemoryPressure(): Boolean {
+        val manager = getSystemService(ActivityManager::class.java)
+        val info = ActivityManager.MemoryInfo()
+        manager.getMemoryInfo(info)
+        return info.lowMemory || (
+            info.threshold > 0L &&
+                info.availMem <= info.threshold * 3L / 2L
+        )
     }
 
     fun setAppOpenAdsAllowed(allowed: Boolean) {

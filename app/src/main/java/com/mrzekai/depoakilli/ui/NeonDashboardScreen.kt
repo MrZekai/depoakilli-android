@@ -709,7 +709,14 @@ private fun RamOptimizationStrip(
     state: CleanerUiState,
     onClick: () -> Unit,
 ) {
-    val enabled = !state.optimizingMemory && !state.scanning
+    val enabled = !state.optimizingMemory &&
+        !state.scanning &&
+        !state.whatsAppScanning &&
+        !state.cleanupInProgress
+    val memoryPressure = state.memory.lowMemory || (
+        state.memory.lowMemoryThresholdBytes > 0L &&
+            state.memory.availableBytes <= state.memory.lowMemoryThresholdBytes * 3L / 2L
+    )
 
     Card(
         modifier = Modifier.fillMaxWidth().height(124.dp),
@@ -774,8 +781,11 @@ private fun RamOptimizationStrip(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    stringResource(R.string.dashboard_ram_optimizer_subtitle),
-                    color = Color(0xFFC5D7E2),
+                    stringResource(
+                        if (memoryPressure) R.string.dashboard_ram_pressure_warning_v0515
+                        else R.string.dashboard_ram_optimizer_subtitle_v0515,
+                    ),
+                    color = if (memoryPressure) Amber400 else Color(0xFFC5D7E2),
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
