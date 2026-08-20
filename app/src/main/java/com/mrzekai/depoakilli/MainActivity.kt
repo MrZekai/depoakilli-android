@@ -59,15 +59,22 @@ class MainActivity : ComponentActivity() {
     private val deepCacheLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
-        cleanerViewModel.onDeepCacheCleanupResult(result.resultCode == Activity.RESULT_OK)
+        val approved = result.resultCode == Activity.RESULT_OK
+        cleanerViewModel.onDeepCacheCleanupResult(approved)
+        if (approved) {
+            showPostTaskInterstitial()
+        }
     }
 
     private val deleteLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
         val approved = result.resultCode == Activity.RESULT_OK
-        cleanerViewModel.completeCleanup(approved)
+        val changed = cleanerViewModel.completeCleanup(approved)
         if (approved) cleanerViewModel.refreshAfterCleanup()
+        if (approved && changed) {
+            showPostTaskInterstitial()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,24 +86,27 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
+            val app = application as DepoAkilliApplication
+            val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
 
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
-                (application as DepoAkilliApplication).setAppOpenAdsAllowed(canRequestAds)
+                app.setAppOpenAdsAllowed(canRequestAds)
             }
 
             DepoAkilliTheme {
                 CleanerApp(
                     viewModel = cleanerViewModel,
-                    canRequestAds = canRequestAds,
+                    canRequestAds = canRequestAds && !fullScreenAdActive,
+                    fullScreenAdActive = fullScreenAdActive,
                     privacyOptionsRequired = consentManager.privacyOptionsRequired,
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
-                    onPrepareCleanup = ::showCleanupInterstitialThenDelete,
-                    onPrepareStorageCleanup = ::showStorageCleanupInterstitialThenDelete,
-                    onPrepareWhatsAppCleanup = ::showWhatsAppCleanupInterstitialThenDelete,
-                    onOptimizeMemory = ::showMemoryOptimizationInterstitialThenOptimize,
+                    onPrepareCleanup = ::cleanSelectedThenShowInterstitial,
+                    onPrepareStorageCleanup = ::cleanStorageThenShowInterstitial,
+                    onPrepareWhatsAppCleanup = ::cleanWhatsAppThenShowInterstitial,
+                    onOptimizeMemory = ::optimizeMemoryThenShowInterstitial,
                     onUninstallApp = ::uninstallApp,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
@@ -126,45 +136,66 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showMemoryOptimizationInterstitialThenOptimize() {
-        runCleanupAdGate {
-            cleanerViewModel.optimizeMemory {
+    private fun optimizeMemoryThenShowInterstitial() {
+        cleanerViewModel.optimizeMemory(
+            releaseHeavyResources = {
                 releaseWhatsAppThumbnailMemory()
                 releasePremiumToolThumbnailMemory()
-                interstitialAds.releaseForMemoryOptimization()
+                // Keep the already-loaded interstitial available for the natural break.
+                // App Open is separate and can be released as part of memory optimization.
                 (application as DepoAkilliApplication).releaseAdMemory()
+            },
+            onCompleted = {
+                showPostTaskInterstitial()
+            },
+        )
+    }
+
+    private fun cleanSelectedThenShowInterstitial(itemIds: Set<String>? = null) {
+        executeCleanupPlan(itemIds)
+    }
+
+    private fun cleanStorageThenShowInterstitial() {
+        cleanerViewModel.deleteSelectedStorageReview { changed ->
+            cleanerViewModel.refreshDeviceState()
+            if (changed) {
+                showPostTaskInterstitial()
             }
         }
     }
 
-    private fun showCleanupInterstitialThenDelete(itemIds: Set<String>? = null) {
-        runCleanupAdGate {
-            executeCleanupPlan(itemIds)
-        }
-    }
-
-    private fun showStorageCleanupInterstitialThenDelete() {
-        runCleanupAdGate {
-            cleanerViewModel.deleteSelectedStorageReview {
-                cleanerViewModel.refreshDeviceState()
+    private fun cleanWhatsAppThenShowInterstitial(onFinished: (Boolean) -> Unit) {
+        cleanerViewModel.deleteSelectedWhatsApp { changed ->
+            cleanerViewModel.refreshDeviceState()
+            if (changed) {
+                showPostTaskInterstitial {
+                    onFinished(true)
+                }
+            } else {
+                onFinished(false)
             }
         }
     }
 
-    private fun showWhatsAppCleanupInterstitialThenDelete(onFinished: (Boolean) -> Unit) {
-        runCleanupAdGate {
-            cleanerViewModel.deleteSelectedWhatsApp { changed ->
-                cleanerViewModel.refreshDeviceState()
-                onFinished(changed)
-            }
-        }
-    }
+    private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
+        val app = application as DepoAkilliApplication
 
-    private fun runCleanupAdGate(afterAd: () -> Unit) {
-        suppressNextAppOpenAd()
-        interstitialAds.showBeforeCleanup(this) {
-            afterAd()
-        }
+        // Short neutral settle surface prevents the cleanup-confirm tap from
+        // carrying into a suddenly appearing full-screen ad.
+        app.beginInterstitialSurface()
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
+            {
+                interstitialAds.showAtNaturalBreak(
+                    activity = this,
+                    onWillShow = {},
+                    onFinished = {
+                        app.endInterstitialSurface()
+                        onFinished()
+                    },
+                )
+            },
+            POST_TASK_AD_SETTLE_MILLIS,
+        )
     }
 
     private fun executeCleanupPlan(itemIds: Set<String>? = null) {
@@ -183,8 +214,11 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             },
-            onCleanupCompleted = {
+            onCleanupCompleted = { changed ->
                 cleanerViewModel.refreshAfterCleanup()
+                if (changed) {
+                    showPostTaskInterstitial()
+                }
             },
         )
     }
@@ -317,5 +351,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
+        const val POST_TASK_AD_SETTLE_MILLIS = 850L
     }
 }

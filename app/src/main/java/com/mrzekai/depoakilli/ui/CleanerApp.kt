@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli.ui
 
 import androidx.annotation.StringRes
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -123,6 +124,7 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
 fun CleanerApp(
     viewModel: CleanerViewModel,
     canRequestAds: Boolean,
+    fullScreenAdActive: Boolean,
     privacyOptionsRequired: Boolean,
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
@@ -141,6 +143,7 @@ fun CleanerApp(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
+    var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.message) {
@@ -151,6 +154,7 @@ fun CleanerApp(
     }
 
     fun launchScan(focus: ScanFocus) {
+        legalReturnScreen = null
         detailScreen = DetailScreen.CLEAN_RESULTS
         if (!state.hasAllFilesAccess) {
             viewModel.queueScanAfterPermission(focus)
@@ -160,7 +164,47 @@ fun CleanerApp(
         }
     }
 
-    Scaffold(
+    fun openLegalPage(page: LegalPage) {
+        legalReturnScreen = detailScreen
+        detailScreen = when (page) {
+            LegalPage.PRIVACY -> DetailScreen.PRIVACY
+            LegalPage.TERMS -> DetailScreen.TERMS
+            LegalPage.ABOUT -> DetailScreen.ABOUT
+        }
+    }
+
+    fun navigateBackInApp() {
+        when {
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
+                viewModel.closeStorageReview()
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null ->
+                viewModel.closeSmartCategoryReview()
+            detailScreen in setOf(DetailScreen.PRIVACY, DetailScreen.TERMS, DetailScreen.ABOUT) &&
+                legalReturnScreen != null -> {
+                detailScreen = legalReturnScreen
+                legalReturnScreen = null
+            }
+            detailScreen != null -> {
+                detailScreen = null
+                legalReturnScreen = null
+            }
+            selectedTabIndex != AppTab.HOME.ordinal ->
+                selectedTabIndex = AppTab.HOME.ordinal
+        }
+    }
+
+    val hasInAppBackTarget =
+        detailScreen != null ||
+            state.storageReview.type != null ||
+            state.smartCategoryReview != null ||
+            selectedTabIndex != AppTab.HOME.ordinal
+
+    BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive) {
+        navigateBackInApp()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -188,18 +232,11 @@ fun CleanerApp(
                     },
                     navigationIcon = {
                         if (detailScreen != null) {
-                            IconButton(
-                                onClick = {
-                                    when {
-                                        detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
-                                            viewModel.closeStorageReview()
-                                        detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null ->
-                                            viewModel.closeSmartCategoryReview()
-                                        else -> detailScreen = null
-                                    }
-                                },
-                            ) {
-                                Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
+                            IconButton(onClick = ::navigateBackInApp) {
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.ArrowBack,
+                                    contentDescription = stringResource(R.string.back),
+                                )
                             }
                         }
                     },
@@ -208,43 +245,57 @@ fun CleanerApp(
             }
         },
         bottomBar = {
-            when {
-                detailScreen == DetailScreen.CLEAN_RESULTS || detailScreen == DetailScreen.WHATSAPP -> {
-                    Column(
-                        modifier = Modifier
-                            .background(Color(0xFF06112A))
-                            .navigationBarsPadding(),
-                    ) {
-                        HorizontalDivider(color = Color.White.copy(alpha = .10f))
-                        BannerAd(canRequestAds = canRequestAds)
+            val bannerAllowed =
+                canRequestAds &&
+                    !fullScreenAdActive &&
+                    !state.scanning &&
+                    !state.whatsAppScanning &&
+                    !state.cleanupInProgress &&
+                    !state.optimizingMemory &&
+                    when (detailScreen) {
+                        DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
+                        DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
+                        else -> true
                     }
-                }
 
-                detailScreen == null -> {
-                    Column(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface)
-                            .navigationBarsPadding(),
-                    ) {
-                        BannerAd(canRequestAds = canRequestAds)
+            if (detailScreen == null) {
+                Column(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .navigationBarsPadding(),
+                ) {
+                    if (bannerAllowed) {
+                        BannerAd(canRequestAds = true)
                         Spacer(Modifier.height(8.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
-                        NavigationBar(containerColor = Color(0xFF07132C)) {
-                            AppTab.entries.forEachIndexed { index, tab ->
-                                val title = stringResource(tab.titleRes)
-                                NavigationBarItem(
-                                    selected = selectedTabIndex == index,
-                                    onClick = { selectedTabIndex = index },
-                                    icon = { Icon(tab.icon, contentDescription = title) },
-                                    label = { Text(title) },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = ElectricBlue,
-                                        selectedTextColor = ElectricBlue,
-                                        indicatorColor = Color(0xFF123A75),
-                                    ),
-                                )
-                            }
+                    }
+                    NavigationBar(containerColor = Color(0xFF07132C)) {
+                        AppTab.entries.forEachIndexed { index, tab ->
+                            val title = stringResource(tab.titleRes)
+                            NavigationBarItem(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index },
+                                icon = { Icon(tab.icon, contentDescription = title) },
+                                label = { Text(title) },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = ElectricBlue,
+                                    selectedTextColor = ElectricBlue,
+                                    indicatorColor = Color(0xFF123A75),
+                                ),
+                            )
                         }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .background(Color(0xFF06112A))
+                        .navigationBarsPadding(),
+                ) {
+                    if (bannerAllowed) {
+                        HorizontalDivider(color = Color.White.copy(alpha = .10f))
+                        Spacer(Modifier.height(6.dp))
+                        BannerAd(canRequestAds = true)
                     }
                 }
             }
@@ -272,7 +323,7 @@ fun CleanerApp(
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
                 state = state,
-                onBack = { detailScreen = null },
+                onBack = ::navigateBackInApp,
                 onRequestAccess = onRequestAllFilesAccess,
                 onScan = viewModel::scanWhatsAppLibrary,
                 onToggleItem = viewModel::toggleWhatsAppItem,
@@ -312,13 +363,7 @@ fun CleanerApp(
                 onSendFeedback = onSendFeedback,
                 onShareApp = onShareApp,
                 onShowPrivacyOptions = onShowPrivacyOptions,
-                onOpenLegalPage = { page ->
-                    detailScreen = when (page) {
-                        LegalPage.PRIVACY -> DetailScreen.PRIVACY
-                        LegalPage.TERMS -> DetailScreen.TERMS
-                        LegalPage.ABOUT -> DetailScreen.ABOUT
-                    }
-                },
+                onOpenLegalPage = ::openLegalPage,
                 modifier = Modifier.padding(padding),
             )
 
@@ -385,31 +430,49 @@ fun CleanerApp(
                     onSendFeedback = onSendFeedback,
                     onShareApp = onShareApp,
                     onShowPrivacyOptions = onShowPrivacyOptions,
-                    onOpenLegalPage = { page ->
-                        detailScreen = when (page) {
-                            LegalPage.PRIVACY -> DetailScreen.PRIVACY
-                            LegalPage.TERMS -> DetailScreen.TERMS
-                            LegalPage.ABOUT -> DetailScreen.ABOUT
-                        }
-                    },
+                    onOpenLegalPage = ::openLegalPage,
                     modifier = Modifier.padding(padding),
                 )
             }
         }
     }
 
-    state.memoryOptimizationResult?.let { result ->
-        MemoryOptimizationResultDialog(
-            result = result,
-            onDismiss = viewModel::dismissMemoryOptimizationResult,
-        )
+    if (!fullScreenAdActive) {
+        state.memoryOptimizationResult?.let { result ->
+            MemoryOptimizationResultDialog(
+                result = result,
+                onDismiss = viewModel::dismissMemoryOptimizationResult,
+            )
+        }
+
+        state.cleanupResult?.let { result ->
+            CleanupResultDialog(
+                result = result,
+                onDismiss = viewModel::dismissCleanupResult,
+            )
+        }
     }
 
-    state.cleanupResult?.let { result ->
-        CleanupResultDialog(
-            result = result,
-            onDismiss = viewModel::dismissCleanupResult,
-        )
+        if (fullScreenAdActive) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    CircularProgressIndicator(color = ElectricBlue)
+                    Text(
+                        stringResource(R.string.app_name),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+            }
+        }
     }
 }
 

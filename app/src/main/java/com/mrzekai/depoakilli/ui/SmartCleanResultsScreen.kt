@@ -534,9 +534,6 @@ private fun SmartResultsContent(
         // Keep heavy media rails collapsed on first paint.
         mutableStateOf(setOf(CleanCategory.JUNK))
     }
-    var expandedStorageTypes by remember {
-        mutableStateOf(emptySet<StorageFileType>())
-    }
     var showUnusedAppsReview by remember { mutableStateOf(false) }
 
     val unusedApps = remember(installedApps, hasUsageAccess) {
@@ -645,13 +642,6 @@ private fun SmartResultsContent(
                         count = videoStat.fileCount,
                         bytes = videoStat.totalBytes,
                         previews = smartMediaPreviews(summary, StorageFileType.VIDEOS),
-                        expanded = StorageFileType.VIDEOS in expandedStorageTypes,
-                        onExpandToggle = {
-                            expandedStorageTypes = toggleStorageExpansion(
-                                expandedStorageTypes,
-                                StorageFileType.VIDEOS,
-                            )
-                        },
                         onOpenAll = { onOpenStorageReview(StorageFileType.VIDEOS, true) },
                     )
                 }
@@ -665,13 +655,6 @@ private fun SmartResultsContent(
                         count = imageStat.fileCount,
                         bytes = imageStat.totalBytes,
                         previews = smartMediaPreviews(summary, StorageFileType.IMAGES),
-                        expanded = StorageFileType.IMAGES in expandedStorageTypes,
-                        onExpandToggle = {
-                            expandedStorageTypes = toggleStorageExpansion(
-                                expandedStorageTypes,
-                                StorageFileType.IMAGES,
-                            )
-                        },
                         onOpenAll = { onOpenStorageReview(StorageFileType.IMAGES, true) },
                     )
                 }
@@ -884,13 +867,6 @@ private fun isWhatsAppRelativePath(relativePath: String): Boolean {
         path.startsWith("/whatsapp business/")
 }
 
-private fun toggleStorageExpansion(
-    expanded: Set<StorageFileType>,
-    type: StorageFileType,
-): Set<StorageFileType> {
-    return if (type in expanded) expanded - type else expanded + type
-}
-
 private fun unusedAppsForSmartReview(
     apps: List<InstalledAppEntry>,
     hasUsageAccess: Boolean,
@@ -916,8 +892,6 @@ private fun SmartStorageSuggestionCard(
     count: Int,
     bytes: Long,
     previews: List<IndexedFile>,
-    expanded: Boolean,
-    onExpandToggle: () -> Unit,
     onOpenAll: () -> Unit,
 ) {
     val accent = storageAccent(type)
@@ -930,7 +904,7 @@ private fun SmartStorageSuggestionCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onExpandToggle)
+                    .clickable(onClick = onOpenAll)
                     .padding(horizontal = 12.dp, vertical = 11.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -973,32 +947,25 @@ private fun SmartStorageSuggestionCard(
                     )
                 }
                 Spacer(Modifier.width(8.dp))
-                Text(if (expanded) "⌃" else "⌄", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(20.dp),
+                )
             }
 
-            if (expanded) {
-                if (previews.isNotEmpty()) {
-                    LazyRow(
-                        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        items(previews, key = { it.uri }) { file ->
-                            SmartStoragePreviewTile(
-                                file = file,
-                                accent = accent,
-                                onClick = onOpenAll,
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.End,
+            if (previews.isNotEmpty()) {
+                LazyRow(
+                    contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    TextButton(onClick = onOpenAll) {
-                        Text(stringResource(R.string.smart_show_all_count, count), color = accent, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.width(4.dp))
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent, modifier = Modifier.size(17.dp))
+                    items(previews, key = { it.uri }) { file ->
+                        SmartStoragePreviewTile(
+                            file = file,
+                            accent = accent,
+                            onClick = onOpenAll,
+                        )
                     }
                 }
             }

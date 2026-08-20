@@ -5,28 +5,64 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.mrzekai.depoakilli.ads.AppOpenAdController
 import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
 import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class DepoAkilliApplication :
     Application(),
     Application.ActivityLifecycleCallbacks {
 
     private lateinit var appOpenAds: AppOpenAdController
-    private var currentActivity: Activity? = null
+    private var currentActivity: MainActivity? = null
+    private var externalLaunchPending = false
     private var suppressNextAppOpenAd = false
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val _fullScreenAdSurfaceActive = MutableStateFlow(false)
+    val fullScreenAdSurfaceActive: StateFlow<Boolean> = _fullScreenAdSurfaceActive.asStateFlow()
+
     private val processObserver = object : DefaultLifecycleObserver {
         override fun onStart(owner: LifecycleOwner) {
             if (suppressNextAppOpenAd) {
                 suppressNextAppOpenAd = false
                 appOpenAds.load()
+                _fullScreenAdSurfaceActive.value = false
                 return
             }
-            currentActivity?.let(appOpenAds::onAppForeground)
+
+            val activity = currentActivity
+            if (activity == null) {
+                appOpenAds.load()
+                _fullScreenAdSurfaceActive.value = false
+                return
+            }
+
+            // Banner was hidden when the app moved to background. Keep it hidden
+            // until App Open either finishes or decides not to show.
+            appOpenAds.onAppForeground(activity) {
+                _fullScreenAdSurfaceActive.value = false
+            }
+        }
+
+        override fun onStop(owner: LifecycleOwner) {
+            if (externalLaunchPending) {
+                // The app actually left foreground after an app-initiated external flow.
+                // Suppress exactly that return; ordinary Home/app-switch returns remain eligible.
+                suppressNextAppOpenAd = true
+                externalLaunchPending = false
+            }
+            appOpenAds.onAppBackgrounded()
+            // Ensures a returning App Open never overlays an already-visible banner.
+            _fullScreenAdSurfaceActive.value = true
         }
     }
 
@@ -64,6 +100,9 @@ class DepoAkilliApplication :
 
     fun setAppOpenAdsAllowed(allowed: Boolean) {
         appOpenAds.setAdsAllowed(allowed)
+        if (!allowed) {
+            _fullScreenAdSurfaceActive.value = false
+        }
     }
 
     fun releaseAdMemory() {
@@ -71,11 +110,30 @@ class DepoAkilliApplication :
     }
 
     fun suppressNextAppOpenAd() {
-        suppressNextAppOpenAd = true
+        // Arm suppression only for a real app-initiated external launch.
+        // If the app never leaves foreground (for example an in-app dialog),
+        // the arm expires instead of suppressing a later genuine return.
+        externalLaunchPending = true
+        mainHandler.postDelayed(
+            {
+                if (externalLaunchPending) {
+                    externalLaunchPending = false
+                }
+            },
+            EXTERNAL_LAUNCH_ARM_MILLIS,
+        )
+    }
+
+    fun beginInterstitialSurface() {
+        _fullScreenAdSurfaceActive.value = true
+    }
+
+    fun endInterstitialSurface() {
+        _fullScreenAdSurfaceActive.value = false
     }
 
     override fun onActivityStarted(activity: Activity) {
-        if (!appOpenAds.isShowingAd) {
+        if (activity is MainActivity && !appOpenAds.isShowingAd) {
             currentActivity = activity
         }
     }
@@ -84,6 +142,10 @@ class DepoAkilliApplication :
         if (currentActivity === activity) {
             currentActivity = null
         }
+    }
+
+    private companion object {
+        const val EXTERNAL_LAUNCH_ARM_MILLIS = 3_000L
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit

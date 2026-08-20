@@ -43,8 +43,7 @@ internal fun MemoryOptimizationResultDialog(
     onDismiss: () -> Unit,
 ) {
     val releasedAppMemory = result.appMemoryReleasedBytes
-    val availableGain = result.availableRamGainBytes
-    val hasMeasuredGain = releasedAppMemory > 0L || availableGain > 0L || result.rebuildableStateReleased
+    val hasMeasuredGain = releasedAppMemory > 0L || result.rebuildableStateReleased
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -107,19 +106,6 @@ internal fun MemoryOptimizationResultDialog(
                         )
                         Text(
                             stringResource(R.string.ram_result_app_released),
-                            color = Color(0xFFD2E8E1),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                        )
-                    } else if (availableGain > 0L) {
-                        Text(
-                            "+${ByteFormatter.format(availableGain)}",
-                            color = Lime400,
-                            fontSize = 42.sp,
-                            fontWeight = FontWeight.Black,
-                        )
-                        Text(
-                            stringResource(R.string.ram_result_available_gain),
                             color = Color(0xFFD2E8E1),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,

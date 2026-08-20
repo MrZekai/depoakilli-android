@@ -425,7 +425,7 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_cleanup_in_progress">Temizleniyor…</string>
     <string name="message_cleanup_failed">Temizlik tamamlanamadı. Başka bir değişiklik yapılmadı.</string>
 
-    <string name="smart_cleanup_ad_notice">Hazır bir geçiş reklamı varsa bu onaydan sonra gösterilir. Reklam kapandığında temizlik otomatik başlar.</string>
+    <string name="smart_cleanup_ad_notice">Önce temizlik tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
 
 
     <string name="smart_scan_live_title">Canlı tarama</string>
@@ -489,7 +489,7 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="whatsapp_selected_items_short">%1$d öğe</string>
     <string name="whatsapp_review_and_clean">İncele ve temizle</string>
     <string name="whatsapp_cleanup_in_progress">Temizleniyor…</string>
-    <string name="whatsapp_cleanup_ad_notice">Uygun ve hazır bir geçiş reklamı varsa bu onaydan sonra gösterilebilir. Reklam kapandığında temizlik otomatik başlar.</string>
+    <string name="whatsapp_cleanup_ad_notice">Önce WhatsApp temizliği tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
     <string name="whatsapp_cleanup_irreversible">Seçilen dosyalar paylaşılan depolamadan kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
     <string name="whatsapp_confirm_and_continue">Devam et</string>
     <string name="whatsapp_preview_title">Önizleme</string>
@@ -567,7 +567,7 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="premium_cleanup_confirm_title">Seçilen dosyalar silinsin mi?</string>
     <string name="premium_cleanup_confirm_body">%1$d öğe seçtin; toplam %2$s. Bu dosyaların silinmesini istiyorsan devam et.</string>
     <string name="premium_cleanup_irreversible">Seçilen dosyalar kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
-    <string name="premium_cleanup_ad_notice">Uygunsa temizlikten önce bir geçiş reklamı gösterilebilir. Reklam hazır değilse temizlik normal şekilde devam eder.</string>
+    <string name="premium_cleanup_ad_notice">Önce temizlik tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
     <string name="premium_cleanup_confirm_action">Evet, devam et</string>
     <string name="cleanup_result_title">Temizlik tamamlandı</string>
     <string name="cleanup_result_partial_title">Temizlik kısmen tamamlandı</string>

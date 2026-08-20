@@ -53,9 +53,10 @@ fun BannerAd(
 }
 
 class InterstitialAdController(private val context: Context) {
+    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     private var interstitial: InterstitialAd? = null
     private var loading = false
-    private var lastShownAt = 0L
+    private var lastShownAt = preferences.getLong(KEY_LAST_SHOWN_AT, 0L)
     private var lastReleasedAt = 0L
     private var adsAllowed = false
 
@@ -91,14 +92,21 @@ class InterstitialAdController(private val context: Context) {
         )
     }
 
-    fun showBeforeCleanup(
+    /**
+     * Shows an interstitial only at a completed-task / natural-break point.
+     * If the ad is unavailable, frequency-capped, or too close to App Open,
+     * the caller continues immediately and the app never blocks the task.
+     */
+    fun showAtNaturalBreak(
         activity: Activity,
+        onWillShow: () -> Unit = {},
         onFinished: () -> Unit = {},
     ) {
         if (!adsAllowed || activity.isFinishing || activity.isDestroyed) {
             onFinished()
             return
         }
+
         val now = System.currentTimeMillis()
         val ad = interstitial
         if (ad == null) {
@@ -116,8 +124,8 @@ class InterstitialAdController(private val context: Context) {
         }
 
         interstitial = null
-        lastShownAt = now
         var completed = false
+
         fun finishFlow() {
             if (completed) return
             completed = true
@@ -126,6 +134,11 @@ class InterstitialAdController(private val context: Context) {
         }
 
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdShowedFullScreenContent() {
+                lastShownAt = System.currentTimeMillis()
+                preferences.edit().putLong(KEY_LAST_SHOWN_AT, lastShownAt).apply()
+            }
+
             override fun onAdDismissedFullScreenContent() {
                 finishFlow()
             }
@@ -134,14 +147,11 @@ class InterstitialAdController(private val context: Context) {
                 finishFlow()
             }
         }
+
+        onWillShow()
         runCatching { ad.show(activity) }
             .onFailure { finishFlow() }
     }
-
-    fun showAfterCleanup(
-        activity: Activity,
-        onFinished: () -> Unit = {},
-    ) = showBeforeCleanup(activity, onFinished)
 
     fun releaseForMemoryOptimization() {
         interstitial = null
@@ -150,9 +160,20 @@ class InterstitialAdController(private val context: Context) {
     }
 
     companion object {
+        private const val PREFERENCES_NAME = "interstitial_ads"
+        private const val KEY_LAST_SHOWN_AT = "last_shown_at"
         private const val MIN_INTERVAL_MILLIS = 5L * 60L * 1000L
         private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L
-        private const val FULL_SCREEN_SEPARATION_MILLIS = 30L * 1000L
+        const val FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L
+
+        fun wasShownWithin(context: Context, intervalMillis: Long): Boolean {
+            val lastShownAt = context.getSharedPreferences(
+                PREFERENCES_NAME,
+                Context.MODE_PRIVATE,
+            ).getLong(KEY_LAST_SHOWN_AT, 0L)
+            return lastShownAt > 0L &&
+                System.currentTimeMillis() - lastShownAt < intervalMillis
+        }
     }
 }
 
@@ -162,6 +183,7 @@ class AppOpenAdController(private val context: Context) {
     private var loading = false
     private var loadTime = 0L
     private var lastReleasedAt = 0L
+    private var lastBackgroundedAt = 0L
     private var adsAllowed = false
 
     var isShowingAd: Boolean = false
@@ -177,21 +199,60 @@ class AppOpenAdController(private val context: Context) {
         }
     }
 
-    fun onAppForeground(activity: Activity) {
-        val foregroundCount = preferences.getInt(KEY_FOREGROUND_COUNT, 0) + 1
-        preferences.edit().putInt(KEY_FOREGROUND_COUNT, foregroundCount).apply()
+    fun onAppBackgrounded() {
+        lastBackgroundedAt = System.currentTimeMillis()
+    }
 
-        if (!adsAllowed || foregroundCount < MIN_FOREGROUNDS_BEFORE_FIRST_AD) {
+    /**
+     * App Open is reserved for genuine app returns, not cold launch and not
+     * Android permission/settings/delete-consent returns. The Application
+     * layer handles one-shot suppression for those internal flows.
+     */
+    fun onAppForeground(
+        activity: Activity,
+        onFinished: () -> Unit = {},
+    ) {
+        val now = System.currentTimeMillis()
+        val backgroundedAt = lastBackgroundedAt
+        lastBackgroundedAt = 0L
+
+        if (
+            !adsAllowed ||
+            backgroundedAt <= 0L ||
+            now - backgroundedAt < MIN_BACKGROUND_DURATION_MILLIS
+        ) {
             load()
+            onFinished()
+            return
+        }
+
+        val eligibleReturnCount = preferences.getInt(KEY_ELIGIBLE_RETURN_COUNT, 0) + 1
+        preferences.edit().putInt(KEY_ELIGIBLE_RETURN_COUNT, eligibleReturnCount).apply()
+        if (eligibleReturnCount < MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD) {
+            load()
+            onFinished()
             return
         }
 
         val lastShownAt = preferences.getLong(KEY_LAST_SHOWN_AT, 0L)
-        if (System.currentTimeMillis() - lastShownAt < MIN_SHOW_INTERVAL_MILLIS) {
+        if (lastShownAt > 0L && now - lastShownAt < MIN_SHOW_INTERVAL_MILLIS) {
             load()
+            onFinished()
             return
         }
-        showIfAvailable(activity)
+
+        if (
+            InterstitialAdController.wasShownWithin(
+                context,
+                InterstitialAdController.FULL_SCREEN_SEPARATION_MILLIS,
+            )
+        ) {
+            load()
+            onFinished()
+            return
+        }
+
+        showIfAvailable(activity, onFinished)
     }
 
     fun load() {
@@ -228,17 +289,35 @@ class AppOpenAdController(private val context: Context) {
         lastReleasedAt = System.currentTimeMillis()
     }
 
-    private fun showIfAvailable(activity: Activity) {
-        if (isShowingAd || activity.isFinishing || activity.isDestroyed) return
+    private fun showIfAvailable(
+        activity: Activity,
+        onFinished: () -> Unit,
+    ) {
+        if (isShowingAd || activity.isFinishing || activity.isDestroyed) {
+            onFinished()
+            return
+        }
+
         val ad = appOpenAd
         if (ad == null || !isAdAvailable()) {
             appOpenAd = null
             load()
+            onFinished()
             return
         }
 
         appOpenAd = null
         isShowingAd = true
+        var completed = false
+
+        fun finishShowing() {
+            if (completed) return
+            completed = true
+            isShowingAd = false
+            onFinished()
+            load()
+        }
+
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 finishShowing()
@@ -252,12 +331,9 @@ class AppOpenAdController(private val context: Context) {
                 preferences.edit().putLong(KEY_LAST_SHOWN_AT, System.currentTimeMillis()).apply()
             }
         }
-        ad.show(activity)
-    }
 
-    private fun finishShowing() {
-        isShowingAd = false
-        load()
+        runCatching { ad.show(activity) }
+            .onFailure { finishShowing() }
     }
 
     private fun isAdAvailable(): Boolean =
@@ -265,10 +341,13 @@ class AppOpenAdController(private val context: Context) {
 
     companion object {
         private const val PREFERENCES_NAME = "app_open_ads"
-        private const val KEY_FOREGROUND_COUNT = "foreground_count"
+        private const val KEY_ELIGIBLE_RETURN_COUNT = "eligible_return_count"
         private const val KEY_LAST_SHOWN_AT = "last_shown_at"
-        private const val MIN_FOREGROUNDS_BEFORE_FIRST_AD = 3
-        private const val MIN_SHOW_INTERVAL_MILLIS = 2L * 60L * 60L * 1000L
+
+        // Conservative monetization: only genuine returns after a meaningful absence.
+        private const val MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L
+        private const val MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 3
+        private const val MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L
         private const val APP_OPEN_EXPIRY_MILLIS = 4L * 60L * 60L * 1000L
         private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L
 
@@ -277,7 +356,8 @@ class AppOpenAdController(private val context: Context) {
                 PREFERENCES_NAME,
                 Context.MODE_PRIVATE,
             ).getLong(KEY_LAST_SHOWN_AT, 0L)
-            return System.currentTimeMillis() - lastShownAt < intervalMillis
+            return lastShownAt > 0L &&
+                System.currentTimeMillis() - lastShownAt < intervalMillis
         }
     }
 }

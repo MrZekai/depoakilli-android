@@ -385,7 +385,14 @@ class DeviceRepository(
             val deletedIds = hashSetOf<String>()
             items.forEach { item ->
                 coroutineContext.ensureActive()
-                if (deleteUriDirectly(item.uri)) {
+                if (
+                    fileSnapshotStillMatches(
+                        item.uri,
+                        item.sizeBytes,
+                        item.modifiedAtMillis,
+                    ) &&
+                    deleteUriDirectly(item.uri)
+                ) {
                     deletedIds += item.id
                     deletedBytes += item.sizeBytes
                 }
@@ -404,7 +411,14 @@ class DeviceRepository(
             var deletedBytes = 0L
             items.forEach { item ->
                 coroutineContext.ensureActive()
-                if (deleteUriDirectly(item.file.uri)) {
+                if (
+                    fileSnapshotStillMatches(
+                        item.file.uri,
+                        item.file.sizeBytes,
+                        item.file.modifiedAtMillis,
+                    ) &&
+                    deleteUriDirectly(item.file.uri)
+                ) {
                     deletedIds += item.id
                     deletedBytes += item.file.sizeBytes
                 }
@@ -422,7 +436,14 @@ class DeviceRepository(
         var deletedBytes = 0L
         directItems.forEach { item ->
             coroutineContext.ensureActive()
-            if (deleteUriDirectly(item.uri)) {
+            if (
+                fileSnapshotStillMatches(
+                    item.uri,
+                    item.sizeBytes,
+                    item.modifiedAtMillis,
+                ) &&
+                deleteUriDirectly(item.uri)
+            ) {
                 deletedIds += item.id
                 deletedBytes += item.sizeBytes
             }
@@ -806,6 +827,19 @@ class DeviceRepository(
             .filterNot { it.packageName == context.packageName }
             .distinctBy(ApplicationInfo::packageName)
     }
+
+    private fun fileSnapshotStillMatches(
+        uriString: String,
+        expectedSizeBytes: Long,
+        expectedModifiedAtMillis: Long,
+    ): Boolean = runCatching {
+        val uri = Uri.parse(uriString)
+        if (uri.scheme != "file") return@runCatching true
+        val file = File(requireNotNull(uri.path))
+        file.isFile &&
+            file.length() == expectedSizeBytes &&
+            (expectedModifiedAtMillis <= 0L || file.lastModified() == expectedModifiedAtMillis)
+    }.getOrDefault(false)
 
     private fun deleteUriDirectly(uriString: String): Boolean = runCatching {
         val uri = Uri.parse(uriString)

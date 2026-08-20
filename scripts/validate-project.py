@@ -138,8 +138,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 22",
-    'versionName = "0.5.15"',
+    "versionCode = 23",
+    'versionName = "0.5.16"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -216,8 +216,11 @@ for expected in (
     "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
     "StorageManager.ACTION_CLEAR_APP_CACHE",
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
-    "runCleanupAdGate",
-    "showMemoryOptimizationInterstitialThenOptimize",
+    "showPostTaskInterstitial",
+    "optimizeMemoryThenShowInterstitial",
+    "cleanSelectedThenShowInterstitial",
+    "cleanStorageThenShowInterstitial",
+    "cleanWhatsAppThenShowInterstitial",
     "releaseWhatsAppThumbnailMemory",
     "releasePremiumToolThumbnailMemory",
     "override fun onTrimMemory(level: Int)",
@@ -239,9 +242,14 @@ for expected in (
     "isSystemUnderMemoryPressure",
     "info.lowMemory",
     "info.threshold",
+    "fullScreenAdSurfaceActive",
+    "onAppBackgrounded",
+    "beginInterstitialSurface",
+    "endInterstitialSurface",
+    "suppressNextAppOpenAd",
 ):
     if expected not in application_source:
-        errors.append(f"missing v0.5.15 automatic memory-trim invariant: {expected}")
+        errors.append(f"missing v0.5.16 lifecycle/memory invariant: {expected}")
 
 # Compile-guard invariants caught by the first real Android CI run.
 if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
@@ -296,6 +304,11 @@ for expected in (
     "releaseRebuildableMemoryState",
     "measureStableMemorySnapshot",
     "MEMORY_MEASUREMENT_SAMPLES = 3",
+    "storageReviewJob",
+    "current.summary.storagePreviews[type]",
+    "StorageReviewItem(file = file, selected = false)",
+    "selectedIds",
+    "isWhatsAppIndexedPath",
     "summary = ScanSummary()",
     "whatsAppSummary = WhatsAppLibrarySummary()",
     "storageReview = StorageReviewSummary()",
@@ -324,7 +337,6 @@ for expected in (
     "ram_result_measured_note_v0515",
     "ram_result_rebuildable_released_v0515",
     "appMemoryReleasedBytes",
-    "availableRamGainBytes",
     "rebuildableStateReleased",
     "measurementSamples",
 ):
@@ -402,6 +414,12 @@ for expected in (
         errors.append(f"missing v0.5.14 Smart priority/hero invariant: {expected}")
 if "orderedSmartCategories" in smart_results:
     errors.append("v0.5.12 Smart Clean must not restore the old generic category ordering")
+for forbidden in (
+    "expandedStorageTypes",
+    "toggleStorageExpansion",
+):
+    if forbidden in smart_results:
+        errors.append(f"v0.5.16 Smart media cards must open content directly: {forbidden}")
 for strings_path in (
     ROOT / "app/src/main/res/values/strings.xml",
     ROOT / "app/src/main/res/values-tr/strings.xml",
@@ -416,11 +434,39 @@ for strings_path in (
         "dashboard_ram_pressure_warning_v0515",
         "ram_result_rebuildable_released_v0515",
         "ram_result_measured_note_v0515",
+        "smart_cleanup_ad_notice",
+        "whatsapp_cleanup_ad_notice",
+        "premium_cleanup_ad_notice",
     ):
         if expected not in visible_strings:
-            errors.append(f"missing v0.5.15 memory copy {expected} in {strings_path}")
+            errors.append(f"missing v0.5.16 memory/ad copy {expected} in {strings_path}")
+    for forbidden_copy in (
+        "Cleanup starts automatically when the ad closes",
+        "appear before cleanup",
+        "Reklam kapandığında temizlik otomatik başlar",
+        "temizlikten önce bir geçiş reklamı",
+    ):
+        if forbidden_copy in visible_strings:
+            errors.append(f"v0.5.16 stale pre-cleanup ad copy remains in {strings_path}: {forbidden_copy}")
 
 cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
+for expected in (
+    "import androidx.activity.compose.BackHandler",
+    "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
+    "CircularProgressIndicator(color = ElectricBlue)",
+    "navigateBackInApp",
+    "viewModel.closeStorageReview()",
+    "viewModel.closeSmartCategoryReview()",
+    "selectedTabIndex = AppTab.HOME.ordinal",
+    "legalReturnScreen",
+    "fullScreenAdActive",
+    "if (!fullScreenAdActive)",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing v0.5.16 in-app Back/full-screen UI invariant: {expected}")
+if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
+    errors.append("v0.5.16 must keep gated anchored banners on top-level and detail-page shells")
+
 ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
 view_model_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
 if "dashboardReviewBytes" not in view_model_source or "summary.safeSuggestedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
@@ -439,17 +485,34 @@ if 'path.contains("/thumbnails/")' in ai_engine_source:
     errors.append("generic user Thumbnails folders must not be auto-classified as junk")
 if 'val generatedThumbnail = path.contains("/.thumbnails/")' not in ai_engine_source:
     errors.append("hidden generated thumbnail cache rule is missing")
-if "detailScreen == DetailScreen.CLEAN_RESULTS" not in cleaner_app or "BannerAd(canRequestAds = canRequestAds)" not in cleaner_app:
-    errors.append("Smart Clean results must reserve an anchored banner slot")
+if "val bannerAllowed =" not in cleaner_app or cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
+    errors.append("v0.5.16 content screens must use the gated standard banner shell")
 if "AdSize.BANNER" not in ads_source:
     errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.8")
 if "getLargeAnchoredAdaptiveBannerAdSize" in ads_source:
     errors.append("v0.5.8 must not reserve the oversized large adaptive banner")
 main_activity_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
-if "showBeforeCleanup" not in ads_source or "onFinished: () -> Unit" not in ads_source:
-    errors.append("cleanup interstitial must run before deletion and expose a completion callback")
-if "showCleanupInterstitialThenDelete" not in main_activity_source or "executeCleanupPlan" not in main_activity_source:
-    errors.append("MainActivity must show the cleanup interstitial before starting the delete plan")
+for expected in (
+    "showAtNaturalBreak",
+    "onWillShow: () -> Unit",
+    "FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L",
+    "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
+    "MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L",
+    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 3",
+    "MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L",
+):
+    if expected not in ads_source:
+        errors.append(f"missing v0.5.16 policy-safe ad invariant: {expected}")
+for forbidden in (
+    "showBeforeCleanup",
+    "showCleanupInterstitialThenDelete",
+    "showStorageCleanupInterstitialThenDelete",
+    "showWhatsAppCleanupInterstitialThenDelete",
+):
+    if forbidden in ads_source or forbidden in main_activity_source:
+        errors.append(f"v0.5.16 must not restore pre-task full-screen ad flow: {forbidden}")
+if "executeCleanupPlan" not in main_activity_source or "showPostTaskInterstitial" not in main_activity_source:
+    errors.append("v0.5.16 cleanup must complete before the eligible natural-break interstitial")
 if "cleanupInProgress: Boolean = false" not in view_model_source or "if (_state.value.cleanupInProgress) return" not in view_model_source:
     errors.append("cleanup must guard against duplicate concurrent delete executions")
 if "refreshAfterCleanup" not in view_model_source:
@@ -474,8 +537,8 @@ if "toggleStorageReviewItem" not in view_model_source or "toggleAllStorageReview
     errors.append("Storage Analysis must support per-file and select-all selection")
 if "deleteSelectedStorageReview" not in view_model_source:
     errors.append("Storage Analysis must support real selected-file deletion")
-if "showStorageCleanupInterstitialThenDelete" not in main_activity_source:
-    errors.append("Storage Analysis deletion must reuse the disclosed interstitial-before-delete flow")
+if "cleanStorageThenShowInterstitial" not in main_activity_source:
+    errors.append("Storage Analysis deletion must use the post-task natural-break interstitial flow")
 if "storage_analyzer_action_hint" not in smart_results or "storage_review_manual_reason" not in smart_results:
     errors.append("Storage Analysis must explain manual review and non-automatic selection")
 if "TopAppBar(" in cleaner_app:
@@ -503,12 +566,12 @@ if "WhatsAppMediaRow" in whatsapp_ui:
     errors.append("v0.5.8 WhatsApp UI must not fall back to the legacy plain vertical media rows")
 if "VideoView" in whatsapp_ui:
     errors.append("v0.5.8 WhatsApp video preview must use Media3, not legacy VideoView")
-if "detailScreen == DetailScreen.CLEAN_RESULTS || detailScreen == DetailScreen.WHATSAPP" not in cleaner_app:
-    errors.append("WhatsApp Cleaner must reserve the single standard banner shell")
+if "DetailScreen.WHATSAPP -> state.hasWhatsAppAccess" not in cleaner_app:
+    errors.append("WhatsApp Cleaner must use the gated standard banner shell")
 if "onPrepareWhatsAppCleanup" not in cleaner_app:
     errors.append("WhatsApp cleanup must route through the pre-delete interstitial callback")
-if "showWhatsAppCleanupInterstitialThenDelete" not in main_activity_source:
-    errors.append("MainActivity must route WhatsApp cleanup through the interstitial-before-delete flow")
+if "cleanWhatsAppThenShowInterstitial" not in main_activity_source:
+    errors.append("MainActivity must route WhatsApp cleanup through the post-task natural-break interstitial flow")
 if "deleteSelectedWhatsApp(onCompleted: (Boolean) -> Unit = {})" not in view_model_source:
     errors.append("WhatsApp delete must expose completion state for post-cleanup navigation")
 if "whatsapp_cleanup_ad_notice" not in whatsapp_ui:
@@ -615,4 +678,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.15 advanced memory project structure, permissions, resources, CI and safety guardrails are valid.")
+print("Smart Cleaner 0.5.16 FINAL-R2 monetization, instant review, memory honesty and Back navigation are valid.")

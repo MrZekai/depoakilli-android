@@ -106,6 +106,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var pendingCleanupStorageBeforeBytes: Long = 0L
     private var appCacheRefreshJob: Job? = null
     private var installedAppsRefreshJob: Job? = null
+    private var storageReviewJob: Job? = null
     private var lastAppCacheRefreshAt = 0L
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
@@ -464,30 +465,45 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun openStorageReview(type: StorageFileType, excludeWhatsAppMedia: Boolean = false) {
-        if (
-            _state.value.storageReview.loading &&
-            _state.value.storageReview.type == type &&
-            _state.value.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
-        ) return
         if (!repository.hasAllFilesAccess()) {
             _state.update {
                 it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
             }
             return
         }
+
+        storageReviewJob?.cancel()
+
+        val current = _state.value
+        val immediateItems = current.summary.storagePreviews[type]
+            .orEmpty()
+            .asSequence()
+            .filter { file ->
+                !excludeWhatsAppMedia || !isWhatsAppIndexedPath(file.relativePath)
+            }
+            .map { file -> StorageReviewItem(file = file, selected = false) }
+            .toList()
+
+        // Open the actual selectable content immediately from Smart Scan previews.
+        // The full category is refreshed silently in the background; the user never
+        // waits on a second "preparing category" screen.
         _state.update {
             it.copy(
                 storageReview = StorageReviewSummary(
                     type = type,
                     excludeWhatsAppMedia = excludeWhatsAppMedia,
-                    loading = true,
+                    items = immediateItems,
+                    scannedFileCount = current.summary.scannedFileCount,
+                    scanLimitReached = current.summary.scanLimitReached,
+                    loading = false,
                 ),
-                storageReviewProgressFiles = 0,
+                storageReviewProgressFiles = current.summary.scannedFileCount,
                 storageReviewProgressDirectories = 0,
                 message = null,
             )
         }
-        viewModelScope.launch {
+
+        storageReviewJob = viewModelScope.launch {
             runCatching {
                 repository.scanStorageReview(type, excludeWhatsAppMedia) { directories, files ->
                     _state.update { state ->
@@ -510,8 +526,18 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         state.storageReview.type == type &&
                         state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
                     ) {
+                        val selectedIds = state.storageReview.items
+                            .asSequence()
+                            .filter(StorageReviewItem::selected)
+                            .mapTo(hashSetOf(), StorageReviewItem::id)
+
                         state.copy(
-                            storageReview = review,
+                            storageReview = review.copy(
+                                items = review.items.map { item ->
+                                    if (item.id in selectedIds) item.copy(selected = true) else item
+                                },
+                                loading = false,
+                            ),
                             storageReviewProgressFiles = review.scannedFileCount,
                         )
                     } else {
@@ -520,20 +546,34 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onFailure {
                 _state.update { state ->
-                    state.copy(
-                        storageReview = StorageReviewSummary(
-                            type = type,
-                            excludeWhatsAppMedia = excludeWhatsAppMedia,
-                            loading = false,
-                        ),
-                        message = getApplication<Application>().getString(R.string.message_scan_failed),
-                    )
+                    if (
+                        state.storageReview.type == type &&
+                        state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
+                    ) {
+                        // Keep the immediately visible Smart Scan items usable even if
+                        // the silent background expansion fails.
+                        state.copy(
+                            message = getApplication<Application>().getString(R.string.message_scan_failed),
+                        )
+                    } else {
+                        state
+                    }
                 }
             }
         }
     }
 
+    private fun isWhatsAppIndexedPath(relativePath: String): Boolean {
+        val path = "/${relativePath.replace('\\', '/').trim('/')}/".lowercase()
+        return path.contains("/android/media/com.whatsapp/") ||
+            path.contains("/android/media/com.whatsapp.w4b/") ||
+            path.startsWith("/whatsapp/") ||
+            path.startsWith("/whatsapp business/")
+    }
+
     fun closeStorageReview() {
+        storageReviewJob?.cancel()
+        storageReviewJob = null
         _state.update {
             it.copy(
                 storageReview = StorageReviewSummary(),
@@ -609,7 +649,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun prepareCleanup(
         itemIds: Set<String>? = null,
         onPlanReady: (DeviceRepository.DeletePlan) -> Unit,
-        onCleanupCompleted: () -> Unit,
+        onCleanupCompleted: (Boolean) -> Unit,
     ) {
         if (_state.value.cleanupInProgress) return
         val selected = if (itemIds == null) {
@@ -637,7 +677,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 val plan = repository.createDeleteRequest(remaining)
                 if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
                     finishCleanup(selected, direct.deletedIds, direct.deletedBytes, direct.failedCount)
-                    onCleanupCompleted()
+                    onCleanupCompleted(direct.deletedIds.isNotEmpty())
                 } else {
                     pendingConsentItems = remaining
                     pendingCleanupDeletedBytes = direct.deletedBytes
@@ -665,7 +705,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun deleteSelectedStorageReview(onCleanupCompleted: () -> Unit) {
+    fun deleteSelectedStorageReview(onCleanupCompleted: (Boolean) -> Unit) {
         if (_state.value.cleanupInProgress) return
         val selected = _state.value.storageReview.selectedItems
         if (selected.isEmpty()) {
@@ -690,7 +730,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         failedCount = result.failedCount,
                         beforeAvailableBytes = storageBefore,
                     )
-                    onCleanupCompleted()
+                    onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure {
                     _state.update { state ->
@@ -703,7 +743,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun completeCleanup(approved: Boolean) {
+    fun completeCleanup(approved: Boolean): Boolean {
         val pending = pendingConsentItems
         pendingConsentItems = emptyList()
         if (!approved) {
@@ -731,14 +771,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     },
                 )
             }
-            return
+            // A cancelled Android consent flow never triggers a monetization break.
+            return false
         }
 
+        val directDeletedCount = pendingCleanupDeletedCount
         val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
         val removedBytes = pending.sumOf(CleanableItem::sizeBytes)
         val combinedResult = CleanupResult(
             deletedBytes = pendingCleanupDeletedBytes + removedBytes,
-            deletedCount = pendingCleanupDeletedCount + removedIds.size,
+            deletedCount = directDeletedCount + removedIds.size,
             failedCount = pendingCleanupFailedCount,
             beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
             afterAvailableBytes = repository.storageSnapshot().availableBytes,
@@ -751,6 +793,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             result = combinedResult,
         )
         resetPendingCleanupResult()
+        return directDeletedCount + removedIds.size > 0
     }
 
     fun refreshAfterCleanup() {
@@ -920,7 +963,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun optimizeMemory(releaseHeavyResources: () -> Unit) {
+    fun optimizeMemory(
+        releaseHeavyResources: () -> Unit,
+        onCompleted: () -> Unit = {},
+    ) {
         val current = _state.value
         if (
             current.scanning ||
@@ -971,6 +1017,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     message = null,
                 )
             }
+            onCompleted()
         }
     }
 

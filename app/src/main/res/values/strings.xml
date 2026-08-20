@@ -425,7 +425,7 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_cleanup_in_progress">Cleaning…</string>
     <string name="message_cleanup_failed">Cleanup could not be completed. Nothing else was changed.</string>
 
-    <string name="smart_cleanup_ad_notice">If an interstitial is ready, it appears after this confirmation. Cleanup starts automatically when the ad closes.</string>
+    <string name="smart_cleanup_ad_notice">Cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
 
 
     <string name="smart_scan_live_title">Live scan</string>
@@ -489,7 +489,7 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="whatsapp_selected_items_short">%1$d items</string>
     <string name="whatsapp_review_and_clean">Review &amp; clean</string>
     <string name="whatsapp_cleanup_in_progress">Cleaning…</string>
-    <string name="whatsapp_cleanup_ad_notice">If an interstitial is ready and allowed, it may appear after this confirmation. Cleanup starts automatically when it closes.</string>
+    <string name="whatsapp_cleanup_ad_notice">WhatsApp cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
     <string name="whatsapp_cleanup_irreversible">Selected files are permanently deleted from shared storage. This cannot be undone.</string>
     <string name="whatsapp_confirm_and_continue">Continue</string>
     <string name="whatsapp_preview_title">Preview</string>
@@ -567,7 +567,7 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="premium_cleanup_confirm_title">Delete selected files?</string>
     <string name="premium_cleanup_confirm_body">You selected %1$d items using %2$s. Continue only if you want these files removed.</string>
     <string name="premium_cleanup_irreversible">Selected files will be permanently removed. This cannot be undone.</string>
-    <string name="premium_cleanup_ad_notice">An eligible interstitial ad may appear before cleanup. If no ad is available, cleanup continues normally.</string>
+    <string name="premium_cleanup_ad_notice">Cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
     <string name="premium_cleanup_confirm_action">Yes, continue</string>
     <string name="cleanup_result_title">Cleanup complete</string>
     <string name="cleanup_result_partial_title">Cleanup partially completed</string>
