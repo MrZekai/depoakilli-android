@@ -732,7 +732,6 @@ private fun DashboardToolTile(
 }
 
 @Composable
-@Composable
 private fun DashboardWideTool(
     title: String,
     amount: String,
