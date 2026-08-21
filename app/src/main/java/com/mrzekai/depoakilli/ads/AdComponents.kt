@@ -68,6 +68,7 @@ class InterstitialAdController(private val context: Context) {
     private var lastReleasedAt = 0L
     private var adsAllowed = false
     private var isShowing = false
+    private var shownThisProcess = false
 
     private var resumedActivity: Activity? = null
     private var hostResumedAtElapsed = 0L
@@ -75,9 +76,9 @@ class InterstitialAdController(private val context: Context) {
 
     fun setAdsAllowed(allowed: Boolean) {
         adsAllowed = allowed
-        if (allowed) {
+        if (allowed && !shownThisProcess) {
             scheduleStableLoad("ads-allowed")
-        } else {
+        } else if (!allowed) {
             interstitial = null
             loading = false
             loadedAtElapsed = 0L
@@ -88,7 +89,9 @@ class InterstitialAdController(private val context: Context) {
     fun onHostResumed(activity: Activity) {
         resumedActivity = activity
         hostResumedAtElapsed = SystemClock.elapsedRealtime()
-        scheduleStableLoad("host-resumed")
+        if (!shownThisProcess) {
+            scheduleStableLoad("host-resumed")
+        }
     }
 
     fun onHostPaused(activity: Activity) {
@@ -106,7 +109,7 @@ class InterstitialAdController(private val context: Context) {
         val generation = ++loadGeneration
         mainHandler.postDelayed(
             {
-                if (generation != loadGeneration || !adsAllowed || isShowing) return@postDelayed
+                if (generation != loadGeneration || !adsAllowed || isShowing || shownThisProcess) return@postDelayed
                 val host = resumedActivity
                 if (host == null || host.isFinishing || host.isDestroyed) return@postDelayed
 
@@ -122,7 +125,7 @@ class InterstitialAdController(private val context: Context) {
     }
 
     private fun loadNow(reason: String) {
-        if (!adsAllowed || loading || isShowing || isFresh()) return
+        if (!adsAllowed || loading || isShowing || shownThisProcess || isFresh()) return
         if (System.currentTimeMillis() - lastReleasedAt < MIN_RELOAD_AFTER_RELEASE_MILLIS) return
 
         interstitial = null
@@ -170,6 +173,12 @@ class InterstitialAdController(private val context: Context) {
         onWillShow: () -> Unit = {},
         onFinished: () -> Unit = {},
     ) {
+        if (shownThisProcess) {
+            Log.i(AD_DIAG_TAG, "INTERSTITIAL/SHOW_SKIP session-cap")
+            onFinished()
+            return
+        }
+
         val host = resumedActivity
         if (
             !adsAllowed ||
@@ -217,12 +226,16 @@ class InterstitialAdController(private val context: Context) {
             isShowing = false
             Log.i(AD_DIAG_TAG, "INTERSTITIAL/FLOW_FINISH via=$reason")
             onFinished()
-            scheduleStableLoad("after-$reason")
+            if (!shownThisProcess) {
+                scheduleStableLoad("after-$reason")
+            }
         }
 
         // Let Google AdActivity own its default system UI/insets.
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
+                shownThisProcess = true
+                loadGeneration++
                 lastShownAt = System.currentTimeMillis()
                 preferences.edit().putLong(KEY_LAST_SHOWN_AT, lastShownAt).apply()
                 logAd("SHOWED", ad)
@@ -302,15 +315,16 @@ class AppOpenAdController(private val context: Context) {
     private var lastReleasedAt = 0L
     private var lastBackgroundedAt = 0L
     private var adsAllowed = false
+    private var shownThisProcess = false
 
     var isShowingAd: Boolean = false
         private set
 
     fun setAdsAllowed(allowed: Boolean) {
         adsAllowed = allowed
-        if (allowed) {
+        if (allowed && !shownThisProcess) {
             load()
-        } else {
+        } else if (!allowed) {
             appOpenAd = null
             loading = false
         }
@@ -335,6 +349,7 @@ class AppOpenAdController(private val context: Context) {
 
         if (
             !adsAllowed ||
+            shownThisProcess ||
             backgroundedAt <= 0L ||
             now - backgroundedAt < MIN_BACKGROUND_DURATION_MILLIS
         ) {
@@ -373,7 +388,7 @@ class AppOpenAdController(private val context: Context) {
     }
 
     fun load() {
-        if (!adsAllowed || loading || isAdAvailable()) return
+        if (!adsAllowed || shownThisProcess || loading || isAdAvailable()) return
         if (System.currentTimeMillis() - lastReleasedAt < MIN_RELOAD_AFTER_RELEASE_MILLIS) return
         appOpenAd = null
         loading = true
@@ -445,7 +460,9 @@ class AppOpenAdController(private val context: Context) {
             }
 
             override fun onAdShowedFullScreenContent() {
+                shownThisProcess = true
                 preferences.edit().putLong(KEY_LAST_SHOWN_AT, System.currentTimeMillis()).apply()
+                Log.i("AdDiag", "APP_OPEN/SHOWED_SESSION_ONLY")
             }
         }
 
@@ -463,7 +480,7 @@ class AppOpenAdController(private val context: Context) {
 
         // Conservative monetization: only genuine returns after a meaningful absence.
         private const val MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L
-        private const val MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 3
+        private const val MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1
         private const val MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L
         private const val APP_OPEN_EXPIRY_MILLIS = 4L * 60L * 60L * 1000L
         private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L

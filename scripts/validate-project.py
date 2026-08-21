@@ -145,8 +145,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 26",
-    'versionName = "0.5.16.3"',
+    "versionCode = 27",
+    'versionName = "0.5.16.4"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -270,6 +270,16 @@ for expected in (
 ):
     if expected not in ad_components:
         errors.append(f"missing v0.5.16.1 interstitial hardening invariant: {expected}")
+
+for expected in (
+    "INTERSTITIAL/SHOW_SKIP session-cap",
+    "APP_OPEN/SHOWED_SESSION_ONLY",
+    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1",
+):
+    if expected not in ad_components:
+        errors.append(f"missing v0.5.16.4 session-ad invariant: {expected}")
+if ad_components.count("private var shownThisProcess = false") != 2:
+    errors.append("v0.5.16.4 requires one session cap in each fullscreen controller")
 
 application_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt").read_text(encoding="utf-8")
 for expected in (
@@ -548,7 +558,7 @@ for expected in (
     "FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L",
     "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
     "MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L",
-    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 3",
+    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1",
     "MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L",
 ):
     if expected not in ads_source:
