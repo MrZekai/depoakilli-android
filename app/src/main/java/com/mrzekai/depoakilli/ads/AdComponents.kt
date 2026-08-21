@@ -220,8 +220,7 @@ class InterstitialAdController(private val context: Context) {
             scheduleStableLoad("after-$reason")
         }
 
-        ad.setImmersiveMode(true)
-
+        // Let Google AdActivity own its default system UI/insets.
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
                 lastShownAt = System.currentTimeMillis()

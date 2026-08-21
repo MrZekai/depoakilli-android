@@ -132,14 +132,21 @@ for forbidden in (
     if forbidden in manifest:
         errors.append(f"forbidden permission/automation present: {forbidden}")
 
+# Android 13+ AdMob compatibility: Google AdActivity inherits application=false,
+# while our own MainActivity explicitly retains predictive back.
+if 'android:enableOnBackInvokedCallback="false"' not in manifest:
+    errors.append('missing application predictive-back opt-out for AdMob compatibility')
+if manifest.count('android:enableOnBackInvokedCallback="true"') != 1:
+    errors.append('MainActivity must be the only activity explicitly opting into predictive back')
+
 build_file = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
 for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 25",
-    'versionName = "0.5.16.2"',
+    "versionCode = 26",
+    'versionName = "0.5.16.3"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'storeFile = qaKeystore',
@@ -252,8 +259,9 @@ for expected in (
         errors.append(f"missing v0.5.16.1 activity hardening invariant: {expected}")
 
 ad_components = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
+if "setImmersiveMode(true)" in ad_components:
+    errors.append("v0.5.16.3 Interstitial must not force immersive mode")
 for expected in (
-    "setImmersiveMode(true)",
     "HOST_STABLE_DELAY_MILLIS = 1_200L",
     "INTERSTITIAL_TTL_MILLIS = 50L * 60L * 1000L",
     "onHostResumed",
