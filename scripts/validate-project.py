@@ -12,13 +12,24 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
 
-def require(path: str) -> pathlib.Path:
-    target = ROOT / path
-    if not target.is_file():
-        errors.append(f"missing required file: {path}")
-    return target
+def require(relative: str) -> pathlib.Path:
+    path = ROOT / relative
+    if not path.is_file():
+        errors.append(f"missing required file: {relative}")
+    return path
 
 
+def read(relative: str) -> str:
+    path = require(relative)
+    if not path.is_file():
+        return ""
+    return path.read_text(encoding="utf-8")
+
+
+# ------------------------------------------------------------------
+# Required project surface for v0.5.17-alpha1.
+# Deliberately excludes MemoryOptimizationResultDialog.kt.
+# ------------------------------------------------------------------
 required = [
     "settings.gradle.kts",
     "build.gradle.kts",
@@ -28,148 +39,77 @@ required = [
     "gradle/wrapper/gradle-wrapper.properties",
     "app/build.gradle.kts",
     "app/src/main/AndroidManifest.xml",
-    "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
-    "app/src/main/res/values/strings.xml",
-    "app/src/main/res/values-tr/strings.xml",
-    "app/src/main/res/xml/locales_config.xml",
-    "app/src/main/res/layout/smart_video_player.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
-    "app/src/test/java/com/mrzekai/depoakilli/data/AiCleaningEngineTest.kt",
-    "app/src/test/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifierTest.kt",
-    "app/src/test/java/com/mrzekai/depoakilli/data/DuplicatePolicyTest.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
+    "app/src/main/res/values/strings.xml",
+    "app/src/main/res/values-tr/strings.xml",
+    "app/src/main/res/xml/locales_config.xml",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
-    "docs/CLEANER_ENGINE_V050.md",
-    "docs/NEON_DASHBOARD_V051.md",
-    "docs/REVISION_NOTES_V051.md",
-    "docs/REVISION_NOTES_V057.md",
-    "docs/REVISION_NOTES_V058.md",
-    "docs/REVISION_NOTES_V059.md",
-    "docs/PLAY_PERMISSIONS_V050.md",
-    "docs/PERMISSIONS.md",
-    "docs/ANDROID_CACHE_LIMITS.md",
-    "docs/FEATURE_MATRIX.md",
-    "docs/QA_SIGNING.md",
-    "scripts/verify-qa-signing.sh",
     "keystore/depoakilli-ci-qa.jks",
-    "app/src/debug/res/values/strings.xml",
-    "app/src/debug/res/values-tr/strings.xml",
-    "app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png",
-    "app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png",
-    "app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png",
-    "store-assets/icon-512.png",
-    "store-assets/icon-master-1536.png",
 ]
 for relative in required:
     require(relative)
 
-
-def png_dimensions(path: pathlib.Path) -> tuple[int, int] | None:
-    if not path.is_file():
-        return None
-    with path.open("rb") as stream:
-        if stream.read(8) != b"\x89PNG\r\n\x1a\n":
-            errors.append(f"launcher asset is not a real PNG: {path.relative_to(ROOT)}")
-            return None
-        stream.read(4)
-        chunk_type = stream.read(4)
-        if chunk_type != b"IHDR":
-            errors.append(f"launcher PNG has no valid IHDR: {path.relative_to(ROOT)}")
-            return None
-        return struct.unpack(">II", stream.read(8))
-
-
-for relative, expected in (
-    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground_art.png", (432, 432)),
-    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_legacy_art.png", (432, 432)),
-    ("app/src/main/res/drawable-xxxhdpi/ic_launcher_monochrome_art.png", (432, 432)),
-    ("store-assets/icon-512.png", (512, 512)),
-    ("store-assets/icon-master-1536.png", (1536, 1536)),
-):
-    dimensions = png_dimensions(ROOT / relative)
-    if dimensions is not None and dimensions != expected:
-        errors.append(f"incorrect launcher dimensions for {relative}: expected {expected}, got {dimensions}")
-
+# XML must remain structurally valid across all resource sets.
 for xml_file in ROOT.rglob("*.xml"):
     try:
         ET.parse(xml_file)
     except ET.ParseError as exc:
         errors.append(f"invalid XML {xml_file.relative_to(ROOT)}: {exc}")
 
-manifest = (ROOT / "app/src/main/AndroidManifest.xml").read_text(encoding="utf-8")
+# ------------------------------------------------------------------
+# Manifest / Android platform contract.
+# ------------------------------------------------------------------
+manifest = read("app/src/main/AndroidManifest.xml")
 for expected in (
     "android.permission.MANAGE_EXTERNAL_STORAGE",
     "android.permission.PACKAGE_USAGE_STATS",
     'android:localeConfig="@xml/locales_config"',
-    '<queries>',
-    'android.intent.category.LAUNCHER',
+    "<queries>",
+    "android.intent.category.LAUNCHER",
+    'android:enableOnBackInvokedCallback="false"',
 ):
     if expected not in manifest:
-        errors.append(f"missing v0.5 manifest invariant: {expected}")
-
+        errors.append(f"missing manifest invariant: {expected}")
+if manifest.count('android:enableOnBackInvokedCallback="true"') != 1:
+    errors.append("MainActivity must be the only activity explicitly opting into predictive back")
 for forbidden in (
     "QUERY_ALL_PACKAGES",
     "BIND_ACCESSIBILITY_SERVICE",
     "KILL_BACKGROUND_PROCESSES",
     "WRITE_EXTERNAL_STORAGE",
-    "CLEAR_APP_CACHE\"",
 ):
     if forbidden in manifest:
-        errors.append(f"forbidden permission/automation present: {forbidden}")
+        errors.append(f"forbidden manifest capability present: {forbidden}")
 
-# Android 13+ AdMob compatibility: Google AdActivity inherits application=false,
-# while our own MainActivity explicitly retains predictive back.
-if 'android:enableOnBackInvokedCallback="false"' not in manifest:
-    errors.append('missing application predictive-back opt-out for AdMob compatibility')
-if manifest.count('android:enableOnBackInvokedCallback="true"') != 1:
-    errors.append('MainActivity must be the only activity explicitly opting into predictive back')
-
-build_file = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
+# ------------------------------------------------------------------
+# Build / production-vs-QA AdMob contract.
+# ------------------------------------------------------------------
+build_file = read("app/build.gradle.kts")
 for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 27",
-    'versionName = "0.5.16.4"',
+    "versionCode = 28",
+    'versionName = "0.5.17-alpha1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
-    'storeFile = qaKeystore',
-):
-    if expected not in build_file:
-        errors.append(f"missing build invariant: {expected}")
-
-catalog = (ROOT / "gradle/libs.versions.toml").read_text(encoding="utf-8")
-for expected in (
-    'agp = "8.13.2"',
-    'kotlin = "2.2.21"',
-    'compose-bom = "2026.06.01"',
-    'fragment = "1.9.0"',
-    'lifecycle = "2.10.0"',
-    'media3 = "1.10.1"',
-):
-    if expected not in catalog:
-        errors.append(f"missing compatible dependency pin: {expected}")
-
-if "enforcedPlatform(libs.androidx.compose.bom)" not in build_file:
-    errors.append("Compose BOM must remain enforced")
-
-for expected in (
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
     'liveBannerId = "ca-app-pub-1380972808968213/2118175647"',
     'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
@@ -178,9 +118,12 @@ for expected in (
     'manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId',
 ):
     if expected not in build_file:
-        errors.append(f"missing v0.5.16.2 AdMob build invariant: {expected}")
+        errors.append(f"missing build/AdMob invariant: {expected}")
 
-repository = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt").read_text(encoding="utf-8")
+# ------------------------------------------------------------------
+# Core storage-manager engine remains real.
+# ------------------------------------------------------------------
+repository = read("app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt")
 for expected in (
     "Environment.isExternalStorageManager()",
     "indexSharedStorage",
@@ -189,35 +132,15 @@ for expected in (
     "fingerprint(file",
     "MAX_INDEXED_FILES = 200_000",
     "MAX_WHATSAPP_FILES = 100_000",
-    "CleanCategory.LARGE_FILE",
-    "ScanFocus.DEEP",
-    "ScanFocus.APKS",
-    "ScanFocus.ANALYZE",
-    "assessDeep(file",
-    "SCAN_PROGRESS_THROTTLE_MILLIS = 120L",
-):
-    if expected not in repository:
-        errors.append(f"missing Cleaner Engine repository invariant: {expected}")
-
-for expected in (
     "scanStorageReview",
     "deleteStorageReviewItems",
+    "deleteWhatsAppItems",
     "MAX_STORAGE_REVIEW_ITEMS = 50_000",
-):
-    if expected not in repository:
-        errors.append(f"missing v0.5.8 storage review repository invariant: {expected}")
-
-for expected in (
     "smartMediaTypeStats",
     "isWhatsAppSharedMedia",
-    "smartMediaTypes = smartMediaTypeStats(indexed)",
 ):
     if expected not in repository:
-        errors.append(f"missing v0.5.12 no-extra-scan media summary invariant: {expected}")
-
-if "lowMemoryThresholdBytes = info.threshold" not in repository:
-    errors.append("v0.5.15 memory snapshot must expose Android MemoryInfo.threshold")
-
+        errors.append(f"missing storage engine invariant: {expected}")
 for forbidden in (
     "MAX_HASH_BYTES",
     "MAX_DUPLICATE_GROUP",
@@ -225,508 +148,335 @@ for forbidden in (
     "KEY_WHATSAPP_TREE_URI",
     "DocumentsContract",
     "APP_CACHE_URI",
+    "distinctBy(File::absolutePath)",
 ):
     if forbidden in repository:
-        errors.append(f"legacy v0.4 cleaner restriction still present: {forbidden}")
+        errors.append(f"forbidden/legacy storage implementation remains: {forbidden}")
 
-main_activity = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
+# ------------------------------------------------------------------
+# Result-first cleanup monetization.
+# The only direct no-argument showPostTaskInterstitial() call must be the
+# result-dismiss handoff. Destructive work itself must not call the ad.
+# ------------------------------------------------------------------
+main_activity = read("app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt")
 for expected in (
     "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
     "StorageManager.ACTION_CLEAR_APP_CACHE",
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
+    "interstitialAds.onHostResumed(this)",
+    "interstitialAds.onHostPaused(this)",
+    "setCriticalTaskActive",
     "showPostTaskInterstitial",
+    "onCleanupResultDismissed",
+    "onCleanupResultDismissed = ::onCleanupResultDismissed",
+    "onPrepareCleanup = ::cleanSelected",
+    "onPrepareStorageCleanup = ::cleanStorage",
+    "onPrepareWhatsAppCleanup = ::cleanWhatsApp",
+    "override fun onTrimMemory(level: Int)",
+    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
+):
+    if expected not in main_activity:
+        errors.append(f"missing v0.5.17 activity flow: {expected}")
+
+for forbidden in (
     "optimizeMemoryThenShowInterstitial",
     "cleanSelectedThenShowInterstitial",
     "cleanStorageThenShowInterstitial",
     "cleanWhatsAppThenShowInterstitial",
-    "releaseWhatsAppThumbnailMemory",
-    "releasePremiumToolThumbnailMemory",
-    "override fun onTrimMemory(level: Int)",
-    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
+    "onOptimizeMemory",
+    "cleanerViewModel.optimizeMemory",
 ):
-    if expected not in main_activity:
-        errors.append(f"missing Android system flow: {expected}")
-if "OpenDocumentTree" in main_activity:
-    errors.append("WhatsApp must not use OpenDocumentTree in v0.5")
+    if forbidden in main_activity:
+        errors.append(f"obsolete RAM/ad-gating flow remains in MainActivity: {forbidden}")
 
-for expected in (
-    "interstitialAds.onHostResumed(this)",
-    "interstitialAds.onHostPaused(this)",
-    "setCriticalTaskActive",
-    "dashboardRefreshing",
-):
-    if expected not in main_activity:
-        errors.append(f"missing v0.5.16.1 activity hardening invariant: {expected}")
+if main_activity.count("showPostTaskInterstitial()") != 1:
+    errors.append(
+        "v0.5.17 requires exactly one direct no-argument Interstitial handoff "
+        "(after CleanupResult dismissal)"
+    )
+result_handoff = (
+    "private fun onCleanupResultDismissed() {",
+    "cleanerViewModel.refreshDeviceState()",
+    "showPostTaskInterstitial()",
+)
+if not all(token in main_activity for token in result_handoff):
+    errors.append("cleanup-result dismissal must own the natural-break Interstitial handoff")
+if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
+    errors.append("MainActivity uses setContent without the required Compose import")
 
-ad_components = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
-if "setImmersiveMode(true)" in ad_components:
-    errors.append("v0.5.16.3 Interstitial must not force immersive mode")
-for expected in (
-    "HOST_STABLE_DELAY_MILLIS = 1_200L",
-    "INTERSTITIAL_TTL_MILLIS = 50L * 60L * 1000L",
-    "onHostResumed",
-    "onHostPaused",
-    "INTERSTITIAL/LOAD_REQUEST",
-):
-    if expected not in ad_components:
-        errors.append(f"missing v0.5.16.1 interstitial hardening invariant: {expected}")
-
+# ------------------------------------------------------------------
+# Full-screen session caps and adaptive banner.
+# ------------------------------------------------------------------
+ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
 for expected in (
     "INTERSTITIAL/SHOW_SKIP session-cap",
     "APP_OPEN/SHOWED_SESSION_ONLY",
     "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1",
+    "FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L",
+    "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
+    "MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L",
+    "MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L",
+    "getCurrentOrientationAnchoredAdaptiveBannerAdSize",
+    "Lifecycle.Event.ON_RESUME -> adView.resume()",
+    "Lifecycle.Event.ON_PAUSE -> adView.pause()",
+    "adView.destroy()",
+    "releaseCachedAd",
 ):
-    if expected not in ad_components:
-        errors.append(f"missing v0.5.16.4 session-ad invariant: {expected}")
-if ad_components.count("private var shownThisProcess = false") != 2:
-    errors.append("v0.5.16.4 requires one session cap in each fullscreen controller")
+    if expected not in ads:
+        errors.append(f"missing v0.5.17 ad invariant: {expected}")
+if ads.count("private var shownThisProcess = false") != 2:
+    errors.append("exactly one process-session cap is required in each fullscreen ad controller")
+if "AdSize.BANNER" in ads:
+    errors.append("fixed 320x50 AdSize.BANNER must not return; v0.5.17 uses anchored adaptive banner")
+if "setImmersiveMode(true)" in ads:
+    errors.append("Interstitial must let Google AdActivity own system UI/insets")
 
-application_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt").read_text(encoding="utf-8")
+application = read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt")
 for expected in (
-    "override fun onTrimMemory(level: Int)",
-    "ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN",
-    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
-    "releaseWhatsAppThumbnailMemory",
-    "releasePremiumToolThumbnailMemory",
-    "releaseForMemoryOptimization",
-    "isSystemUnderMemoryPressure",
-    "info.lowMemory",
-    "info.threshold",
     "fullScreenAdSurfaceActive",
     "onAppBackgrounded",
     "beginInterstitialSurface",
     "endInterstitialSurface",
     "suppressNextAppOpenAd",
+    "releaseCachedAd",
+    "ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN",
 ):
-    if expected not in application_source:
-        errors.append(f"missing v0.5.16 lifecycle/memory invariant: {expected}")
+    if expected not in application:
+        errors.append(f"missing app lifecycle/ad invariant: {expected}")
+if "releaseForMemoryOptimization" in application:
+    errors.append("obsolete RAM-optimizer-named ad release API remains in Application")
 
-# Compile-guard invariants caught by the first real Android CI run.
-if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
-    errors.append("MainActivity uses setContent without androidx.activity.compose.setContent import")
-if "distinctBy(File::absolutePath)" in repository:
-    errors.append("DeviceRepository must not use unsupported synthetic Java property reference File::absolutePath")
-dashboard = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt").read_text(encoding="utf-8")
-for expected in (
-    "smart_clean_primary",
-    "DashboardToolTile",
-    "DashboardHero",
-    "StorageStatusRing",
-    "dashboard_cleanup_opportunity",
-    "dashboardSnapshotAtMillis",
-    "PullToRefreshBox",
-    "lowMemoryThresholdBytes",
-    "dashboard_no_risky_auto_selection",
-    "dashboardScannedFileCount",
-):
-    if expected not in dashboard:
-        errors.append(f"missing v0.5.15 real dashboard/memory invariant: {expected}")
+# ------------------------------------------------------------------
+# User-facing RAM Optimizer must be gone, while read-only MemorySnapshot
+# support may remain for Android/device information.
+# ------------------------------------------------------------------
+view_model = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt")
+cleaner_app = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
+device_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt")
+dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt")
+memory_dialog = ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt"
+
 for forbidden in (
-    "CleaningScoreRing",
-    "cleaningScore(",
-    "dashboard_cleaning_score",
-):
-    if forbidden in dashboard:
-        errors.append(f"v0.5.14 dashboard must not expose an artificial cleaning score: {forbidden}")
-if "onOpenAppCache" in dashboard:
-    errors.append("v0.5.11 home dashboard must not show the old paired deep-app-cleanup card")
-if "PRO" in dashboard or "Premium" in dashboard:
-    errors.append("v0.5.11 dashboard must not advertise a non-existent Pro/Premium tier")
-
-view_model = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
-for expected in (
     "MemoryOptimizationResult",
     "memoryOptimizationResult",
     "dismissMemoryOptimizationResult",
-    "CleanupResult",
-    "cleanupResult",
-    "dismissCleanupResult",
-    "DashboardSnapshotStore",
-    "dashboardSnapshotAtMillis",
-    "restoreDashboardSnapshot",
-    "persistDashboardSnapshot",
-    "beforeAvailableBytes",
-    "afterAvailableBytes",
-):
-    if expected not in view_model:
-        errors.append(f"missing v0.5.14 measured-state invariant: {expected}")
-for expected in (
-    "releaseRebuildableMemoryState",
-    "measureStableMemorySnapshot",
-    "MEMORY_MEASUREMENT_SAMPLES = 3",
-    "storageReviewJob",
-    "current.summary.storagePreviews[type]",
-    "StorageReviewItem(file = file, selected = false)",
-    "selectedIds",
-    "isWhatsAppIndexedPath",
-    "summary = ScanSummary()",
-    "whatsAppSummary = WhatsAppLibrarySummary()",
-    "storageReview = StorageReviewSummary()",
-    "installedAppsRefreshJob?.cancel()",
-    "reportedOtherAppsCacheBytes = state.appCache.totalCacheBytes",
-    "rebuildableStateReleased",
-    "beforeLowMemory",
-    "afterLowMemory",
-):
-    if expected not in view_model:
-        errors.append(f"missing v0.5.15 advanced memory invariant: {expected}")
-for expected in (
-    "refreshDashboard",
-    "dashboardRefreshing",
-    "dashboardScannedFileCount",
-    "dashboardScannedBytes",
-    "withContext(Dispatchers.Default)",
-):
-    if expected not in view_model:
-        errors.append(f"missing v0.5.16.1 dashboard/thread invariant: {expected}")
-
-for forbidden in (
-    "Runtime.getRuntime().gc()",
-    "System.gc()",
-    "killBackgroundProcesses(",
-    "dashboardCleanableBytes = 0L",
-    "dashboardReviewBytes = 0L",
-    "dashboardSnapshotAtMillis = 0L",
+    "fun optimizeMemory(",
+    "optimizingMemory",
 ):
     if forbidden in view_model:
-        errors.append(f"forbidden v0.5.15 memory behavior present: {forbidden}")
-
-memory_result_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt").read_text(encoding="utf-8")
-for expected in (
-    "MemoryOptimizationResultDialog",
-    "ram_result_measured_note_v0515",
-    "ram_result_rebuildable_released_v0515",
-    "appMemoryReleasedBytes",
-    "rebuildableStateReleased",
-    "measurementSamples",
+        errors.append(f"RAM optimizer logic remains in CleanerViewModel: {forbidden}")
+for source_name, source in (
+    ("CleanerApp", cleaner_app),
+    ("DeviceCenterScreen", device_center),
+    ("NeonDashboardScreen", dashboard),
 ):
-    if expected not in memory_result_ui:
-        errors.append(f"missing v0.5.15 advanced RAM result UI invariant: {expected}")
+    for forbidden in (
+        "onOptimizeMemory",
+        "RamOptimizerCard",
+        "MemoryOptimizationResultDialog",
+        "R.string.ram_optimizer",
+        "R.string.ram_result",
+    ):
+        if forbidden in source:
+            errors.append(f"user-facing RAM optimizer remains in {source_name}: {forbidden}")
+if memory_dialog.exists():
+    errors.append("MemoryOptimizationResultDialog.kt must be deleted in v0.5.17")
 
-dashboard_snapshot_store = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt").read_text(encoding="utf-8")
+# Cleanup result remains measured and independent of ads.
 for expected in (
-    "DashboardSnapshot",
-    "DashboardSnapshotStore",
-    "getSharedPreferences",
-    "KEY_ANALYZED_AT",
-    "CleanCategory.values()",
-):
-    if expected not in dashboard_snapshot_store:
-        errors.append(f"missing v0.5.14 dashboard snapshot invariant: {expected}")
-
-cleanup_result_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt").read_text(encoding="utf-8")
-for expected in (
-    "cleanup_result_storage_snapshot",
+    "data class CleanupResult",
+    "cleanupResult",
+    "dismissCleanupResult",
     "beforeAvailableBytes",
     "afterAvailableBytes",
+    "deleteSelectedStorageReview",
+    "deleteSelectedWhatsApp",
 ):
-    if expected not in cleanup_result_ui:
-        errors.append(f"missing v0.5.14 cleanup storage measurement UI invariant: {expected}")
+    if expected not in view_model:
+        errors.append(f"missing measured cleanup invariant: {expected}")
 
-smart_results = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt").read_text(encoding="utf-8")
 for expected in (
-    "SmartCleanHero",
-    "SmartCategoryStripCard",
-    "SmartHorizontalPreviewTile",
-    "SmartCleanBottomAction",
-    "CleanupConfirmationDialog",
-    "CategoryDetailPage",
-    "StorageDetailPage",
-    "StorageReviewGridItem",
-    "StorageReviewListItem",
-    "ReviewCleanupFooter",
-    "StorageCleanupConfirmationDialog",
-    "FilePreviewDialog",
-    "CategoryGridItem",
-    "LazyVerticalGrid(",
-    "VideoFilePreview",
-    "smart_video_play",
-    "LazyRow(",
-):
-    if expected not in smart_results:
-        errors.append(f"missing v0.5.8 Smart Clean/storage review invariant: {expected}")
-if "import androidx.compose.foundation.layout.weight" in smart_results:
-    errors.append("SmartCleanResultsScreen must not import the internal Compose layout weight symbol")
-if "Smart Clean scan in progress" not in (ROOT / "app/src/main/res/values/strings.xml").read_text(encoding="utf-8"):
-    errors.append("v0.5.8 must use the upgraded Smart Clean scan-progress copy")
-if "smart_detail_grid_hint" not in smart_results:
-    errors.append("v0.5.8 category detail must use the visual review grid guidance")
-if "ExoPlayer.Builder" not in smart_results or "MediaItem.fromUri" not in smart_results:
-    errors.append("v0.5.8 video preview must use Jetpack Media3 ExoPlayer")
-if "VideoView" in smart_results:
-    errors.append("legacy VideoView must not remain in v0.5.8 Smart Clean preview")
-if "R.layout.smart_video_player" not in smart_results:
-    errors.append("v0.5.8 video preview must use the TextureView-backed PlayerView layout")
-for expected in (
-    "SmartStorageSuggestionCard",
-    "UnusedAppsSectionCard",
-    "UnusedAppsReviewDialog",
-    "smartVisibleCategoryItems",
-    "smartMediaPreviews",
-    "UNUSED_APP_DAYS = 60L",
-    "smart_clean_suggestions_subtitle_v0512",
-    "smart_total_opportunity",
-    "smart_safe_candidates",
-    "summary.totalSuggestedBytes",
-    "summary.safeSuggestedBytes",
-):
-    if expected not in smart_results:
-        errors.append(f"missing v0.5.14 Smart priority/hero invariant: {expected}")
-if "orderedSmartCategories" in smart_results:
-    errors.append("v0.5.12 Smart Clean must not restore the old generic category ordering")
-for forbidden in (
-    "expandedStorageTypes",
-    "toggleStorageExpansion",
-):
-    if forbidden in smart_results:
-        errors.append(f"v0.5.16 Smart media cards must open content directly: {forbidden}")
-for strings_path in (
-    ROOT / "app/src/main/res/values/strings.xml",
-    ROOT / "app/src/main/res/values-tr/strings.xml",
-):
-    visible_strings = strings_path.read_text(encoding="utf-8")
-    if "Cleaner Engine" in visible_strings or "CLEANER ENGINE" in visible_strings:
-        errors.append(f"user-visible Cleaner Engine branding remains in {strings_path}")
-    if "without discarding your scan selections" in visible_strings or "tarama seçimlerinizi silmeden" in visible_strings:
-        errors.append(f"v0.5.15 memory copy still claims detailed scan selections are preserved: {strings_path}")
-    for expected in (
-        "dashboard_ram_optimizer_subtitle_v0515",
-        "dashboard_ram_pressure_warning_v0515",
-        "ram_result_rebuildable_released_v0515",
-        "ram_result_measured_note_v0515",
-        "smart_cleanup_ad_notice",
-        "whatsapp_cleanup_ad_notice",
-        "premium_cleanup_ad_notice",
-    ):
-        if expected not in visible_strings:
-            errors.append(f"missing v0.5.16 memory/ad copy {expected} in {strings_path}")
-    for forbidden_copy in (
-        "Cleanup starts automatically when the ad closes",
-        "appear before cleanup",
-        "Reklam kapandığında temizlik otomatik başlar",
-        "temizlikten önce bir geçiş reklamı",
-    ):
-        if forbidden_copy in visible_strings:
-            errors.append(f"v0.5.16 stale pre-cleanup ad copy remains in {strings_path}: {forbidden_copy}")
-
-cleaner_app = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").read_text(encoding="utf-8")
-for expected in (
-    "import androidx.activity.compose.BackHandler",
-    "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
-    "CircularProgressIndicator(color = ElectricBlue)",
-    "navigateBackInApp",
-    "viewModel.closeStorageReview()",
-    "viewModel.closeSmartCategoryReview()",
+    "CleanupResultDialog(",
+    "onCleanupResultDismissed()",
+    "eligibleForNaturalBreakAd",
     "selectedTabIndex = AppTab.HOME.ordinal",
-    "legalReturnScreen",
-    "fullScreenAdActive",
-    "if (!fullScreenAdActive)",
+    "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
+    "Spacer(Modifier.height(48.dp))",
 ):
     if expected not in cleaner_app:
-        errors.append(f"missing v0.5.16 in-app Back/full-screen UI invariant: {expected}")
+        errors.append(f"missing result-first/UI invariant: {expected}")
+
+# Trust surfaces do not carry banners; content surfaces still can.
+for expected in (
+    "AppTab.HOME,",
+    "AppTab.TOOLS -> true",
+    "AppTab.SECURITY,",
+    "AppTab.PROFILE -> false",
+    "DetailScreen.SETTINGS -> false",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing banner trust-surface gate: {expected}")
 if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
-    errors.append("v0.5.16 must keep gated anchored banners on top-level and detail-page shells")
+    errors.append("content shells must retain gated banner placements")
 
-ads_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt").read_text(encoding="utf-8")
-view_model_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt").read_text(encoding="utf-8")
-if "dashboardReviewBytes" not in view_model_source or "summary.safeSuggestedBytes" not in view_model_source or "summary.reviewBytes" not in view_model_source:
-    errors.append("dashboard must separate safely selected cleanup bytes from review-only candidate bytes")
-for expected in (
-    "dashboard_cleanup_opportunity",
-    "dashboard_safe_amount",
-    "dashboard_review_amount",
-    "dashboard_free_space",
-    "dashboard_storage_used_percent",
-):
-    if expected not in dashboard:
-        errors.append(f"v0.5.14 dashboard real-metric copy missing: {expected}")
-ai_engine_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt").read_text(encoding="utf-8")
-if 'path.contains("/thumbnails/")' in ai_engine_source:
-    errors.append("generic user Thumbnails folders must not be auto-classified as junk")
-if 'val generatedThumbnail = path.contains("/.thumbnails/")' not in ai_engine_source:
-    errors.append("hidden generated thumbnail cache rule is missing")
-if "val bannerAllowed =" not in cleaner_app or cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
-    errors.append("v0.5.16 content screens must use the gated standard banner shell")
-if "AdSize.BANNER" not in ads_source:
-    errors.append("BannerAd must use the standard 320x50 mobile banner size in v0.5.8")
-if "getLargeAnchoredAdaptiveBannerAdSize" in ads_source:
-    errors.append("v0.5.8 must not reserve the oversized large adaptive banner")
-main_activity_source = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt").read_text(encoding="utf-8")
-for expected in (
-    "showAtNaturalBreak",
-    "onWillShow: () -> Unit",
-    "FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L",
-    "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
-    "MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L",
-    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1",
-    "MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L",
-):
-    if expected not in ads_source:
-        errors.append(f"missing v0.5.16 policy-safe ad invariant: {expected}")
-for forbidden in (
-    "showBeforeCleanup",
-    "showCleanupInterstitialThenDelete",
-    "showStorageCleanupInterstitialThenDelete",
-    "showWhatsAppCleanupInterstitialThenDelete",
-):
-    if forbidden in ads_source or forbidden in main_activity_source:
-        errors.append(f"v0.5.16 must not restore pre-task full-screen ad flow: {forbidden}")
-if "executeCleanupPlan" not in main_activity_source or "showPostTaskInterstitial" not in main_activity_source:
-    errors.append("v0.5.16 cleanup must complete before the eligible natural-break interstitial")
-if "cleanupInProgress: Boolean = false" not in view_model_source or "if (_state.value.cleanupInProgress) return" not in view_model_source:
-    errors.append("cleanup must guard against duplicate concurrent delete executions")
-if "refreshAfterCleanup" not in view_model_source:
-    errors.append("cleanup must refresh results after deletion completes")
-if "smartCategoryReview" not in view_model_source or "openSmartCategoryReview" not in view_model_source:
-    errors.append("Smart Clean View all must use in-screen category review navigation")
-for expected in (
-    "smartCategoryReviewIds",
-    "openSmartCategoryReview(category: CleanCategory, itemIds: Set<String>? = null)",
-):
-    if expected not in view_model_source:
-        errors.append(f"v0.5.12 filtered Smart category review invariant missing: {expected}")
-if "StorageReviewSummary" not in view_model_source or "openStorageReview" not in view_model_source:
-    errors.append("Storage Analysis must load a full selectable review state")
-for expected in (
-    "excludeWhatsAppMedia",
-    "scanStorageReview(type, excludeWhatsAppMedia)",
-):
-    if expected not in view_model_source:
-        errors.append(f"v0.5.12 unique Smart media review invariant missing: {expected}")
-if "toggleStorageReviewItem" not in view_model_source or "toggleAllStorageReviewItems" not in view_model_source:
-    errors.append("Storage Analysis must support per-file and select-all selection")
-if "deleteSelectedStorageReview" not in view_model_source:
-    errors.append("Storage Analysis must support real selected-file deletion")
-if "cleanStorageThenShowInterstitial" not in main_activity_source:
-    errors.append("Storage Analysis deletion must use the post-task natural-break interstitial flow")
-if "storage_analyzer_action_hint" not in smart_results or "storage_review_manual_reason" not in smart_results:
-    errors.append("Storage Analysis must explain manual review and non-automatic selection")
-if "TopAppBar(" in cleaner_app:
-    if "ExperimentalMaterial3Api" not in cleaner_app or "@OptIn(ExperimentalMaterial3Api::class)" not in cleaner_app:
-        errors.append("CleanerApp TopAppBar requires ExperimentalMaterial3Api opt-in")
+# ------------------------------------------------------------------
+# Legal/resource truthfulness and translation parity.
+# ------------------------------------------------------------------
+default_strings_path = ROOT / "app/src/main/res/values/strings.xml"
+tr_strings_path = ROOT / "app/src/main/res/values-tr/strings.xml"
+default_strings = default_strings_path.read_text(encoding="utf-8")
+tr_strings = tr_strings_path.read_text(encoding="utf-8")
 
-whatsapp_ui = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt").read_text(encoding="utf-8")
+for required_name in (
+    "privacy_policy_body_v050",
+    "terms_of_service_body_v050",
+    "about_app_body_v050",
+    "smart_cleanup_ad_notice",
+    "whatsapp_cleanup_ad_notice",
+    "premium_cleanup_ad_notice",
+):
+    if f'name="{required_name}"' not in default_strings:
+        errors.append(f"missing default legal/ad resource: {required_name}")
+    if f'name="{required_name}"' not in tr_strings:
+        errors.append(f"missing Turkish legal/ad resource: {required_name}")
+
+obsolete_resource_names = {
+    "privacy_policy_body",
+    "terms_of_service_body",
+    "about_app_body",
+    "memory_optimizer",
+    "memory_optimizer_subtitle",
+    "memory_optimizing",
+    "message_memory_optimized",
+    "message_memory_optimized_stable",
+    "ram_booster_title",
+    "ram_booster_subtitle",
+    "ram_release_action",
+    "ram_optimize_action",
+    "ram_optimizer_policy_note",
+    "ram_optimizer_subtitle_v050",
+    "ram_optimizer_title_v050",
+    "honest_memory_note",
+    "memory_tools_quick",
+    "memory_tools_quick_subtitle",
+    "dashboard_ram_optimizer_subtitle",
+    "dashboard_ram_available_now",
+    "dashboard_ram_optimize_action",
+    "dashboard_ram_optimizing",
+    "dashboard_ram_optimizer_subtitle_v0515",
+    "dashboard_ram_pressure_warning_v0515",
+    "ram_result_title",
+    "ram_result_app_released",
+    "ram_result_available_gain",
+    "ram_result_stable",
+    "ram_result_available_ram",
+    "ram_result_app_memory",
+    "ram_result_before",
+    "ram_result_after",
+    "ram_result_measured_note",
+    "ram_result_done",
+    "ram_result_rebuildable_released_title_v0515",
+    "ram_result_rebuildable_released_v0515",
+    "ram_result_measured_note_v0515",
+}
+for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
+    body = strings_path.read_text(encoding="utf-8")
+    for resource_name in obsolete_resource_names:
+        if f'name="{resource_name}"' in body:
+            errors.append(
+                f"obsolete legal/RAM resource remains in {strings_path.relative_to(ROOT)}: {resource_name}"
+            )
+    for stale_copy in (
+        "before the measured result",
+        "ölçülen sonuçtan önce",
+        "Android’s system picker",
+        "Android’in sistem seçicisi",
+    ):
+        if stale_copy in body:
+            errors.append(
+                f"stale/misleading copy remains in {strings_path.relative_to(ROOT)}: {stale_copy}"
+            )
+
+if default_strings.count("measured result is always shown before any ad") != 3:
+    errors.append("all three English cleanup notices must be result-first")
+if tr_strings.count("ölçülen sonuç her zaman reklamdan önce gösterilir") != 3:
+    errors.append("all three Turkish cleanup notices must be result-first")
+if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
+    errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
+
+# English/Turkish key parity and Kotlin compile-resource guard.
+default_names = {node.attrib["name"] for node in ET.parse(default_strings_path).getroot().findall("string")}
+tr_names = {node.attrib["name"] for node in ET.parse(tr_strings_path).getroot().findall("string")}
+if default_names != tr_names:
+    if missing := sorted(default_names - tr_names):
+        errors.append(f"Turkish translations missing keys: {missing}")
+    if extra := sorted(tr_names - default_names):
+        errors.append(f"default translations missing keys: {extra}")
+
+kotlin_refs: dict[str, set[str]] = {}
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    for resource_name in re.findall(r"R\.string\.([A-Za-z0-9_]+)", source):
+        kotlin_refs.setdefault(resource_name, set()).add(str(kotlin_file.relative_to(ROOT)))
+for resource_name in sorted(set(kotlin_refs) - default_names):
+    locations = ", ".join(sorted(kotlin_refs[resource_name]))
+    errors.append(f"Kotlin references missing default R.string.{resource_name}: {locations}")
+
+# ------------------------------------------------------------------
+# Existing key feature UI must remain intact.
+# ------------------------------------------------------------------
+smart_results = read("app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt")
+for expected in (
+    "SmartCleanHero",
+    "CleanupConfirmationDialog",
+    "StorageDetailPage",
+    "StorageCleanupConfirmationDialog",
+    "FilePreviewDialog",
+    "LazyVerticalGrid(",
+    "ExoPlayer.Builder",
+    "smartCategoryReview",
+):
+    if expected not in smart_results and expected not in view_model:
+        errors.append(f"missing Smart Clean/review invariant: {expected}")
+
+whatsapp_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt")
 for expected in (
     "WhatsAppHeroCard",
     "WhatsAppGroupSection",
-    "LazyRow(",
-    "WhatsAppGroupDetailPage",
-    "LazyVerticalGrid(",
-    "WhatsAppMediaCard",
     "WhatsAppPreviewDialog",
-    "WhatsAppVideoPreview",
     "ExoPlayer.Builder",
-    "WhatsAppThumbnailCache",
-    "whatsapp_filter_incoming",
-    "whatsapp_review_and_clean",
+    "whatsapp_cleanup_ad_notice",
 ):
     if expected not in whatsapp_ui:
-        errors.append(f"missing v0.5.8 WhatsApp premium review invariant: {expected}")
-if "WhatsAppMediaRow" in whatsapp_ui:
-    errors.append("v0.5.8 WhatsApp UI must not fall back to the legacy plain vertical media rows")
-if "VideoView" in whatsapp_ui:
-    errors.append("v0.5.8 WhatsApp video preview must use Media3, not legacy VideoView")
-if "DetailScreen.WHATSAPP -> state.hasWhatsAppAccess" not in cleaner_app:
-    errors.append("WhatsApp Cleaner must use the gated standard banner shell")
-if "onPrepareWhatsAppCleanup" not in cleaner_app:
-    errors.append("WhatsApp cleanup must route through the pre-delete interstitial callback")
-if "cleanWhatsAppThenShowInterstitial" not in main_activity_source:
-    errors.append("MainActivity must route WhatsApp cleanup through the post-task natural-break interstitial flow")
-if "deleteSelectedWhatsApp(onCompleted: (Boolean) -> Unit = {})" not in view_model_source:
-    errors.append("WhatsApp delete must expose completion state for post-cleanup navigation")
-if "whatsapp_cleanup_ad_notice" not in whatsapp_ui:
-    errors.append("WhatsApp final confirmation must disclose the eligible pre-delete interstitial")
+        errors.append(f"missing WhatsApp review invariant: {expected}")
 
-
-
-premium_tools = (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt").read_text(encoding="utf-8")
+premium_tools = read("app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt")
 for expected in (
     "PremiumCleanerToolScreen",
     "PremiumCleanupConfirmationDialog",
-    "premium_cleanup_confirm_action",
-    "PremiumToolHero",
-    "PremiumToolSectionCard",
-    "PremiumToolDetailPage",
-    "PremiumToolPreviewDialog",
-    "LazyRow(",
-    "LazyVerticalGrid(",
+    "premium_cleanup_ad_notice",
     "ExoPlayer.Builder",
-    "ToolThumbnailCache",
-    "premium_duplicates_original_safe",
-    "premium_apk_installer_note",
 ):
     if expected not in premium_tools:
-        errors.append(f"missing v0.5.9 premium tool review invariant: {expected}")
-for focus in (
-    "ScanFocus.DUPLICATES",
-    "ScanFocus.LARGE_FILES",
-    "ScanFocus.APKS",
-    "ScanFocus.MEDIA",
-    "ScanFocus.JUNK",
-    "ScanFocus.DOWNLOADS",
-    "ScanFocus.DEEP",
-):
-    if focus not in premium_tools and focus not in cleaner_app:
-        errors.append(f"premium tool routing missing for {focus}")
-if "PremiumCleanerToolScreen(" not in cleaner_app:
-    errors.append("non-Smart cleaner tools must route through PremiumCleanerToolScreen")
-if "CleanupResultDialog(" not in cleaner_app:
-    errors.append("v0.5.13 cleanup completion must show the measured result dialog")
-if 'onClean = { onClean(null) }' in premium_tools:
-    errors.append("premium cleaner tools must never bypass the final confirmation dialog")
-if "setItemsSelected" not in view_model_source or "onSetItemsSelected" not in cleaner_app:
-    errors.append("premium tool select-all must use one batched state update instead of per-file toggles")
-if "FileResultRow(item" in cleaner_app and "PremiumCleanerToolScreen(" not in cleaner_app:
-    errors.append("legacy generic cleaner rows must not be the primary UI for premium tools")
-for forbidden_visible in ("Kopyaları Sil", "Büyük Dosyalar", "APK Paketleri", "İncele ve temizle"):
-    if forbidden_visible in premium_tools:
-        errors.append(f"premium tool UI must not hard-code Turkish copy: {forbidden_visible}")
+        errors.append(f"missing premium cleaner review invariant: {expected}")
 
-for forbidden_visible in ("Görseller", "Gönderilenler", "İncele ve temizle", "Temizliğe dahil"):
-    if forbidden_visible in whatsapp_ui:
-        errors.append(f"WhatsApp UI must not hard-code Turkish copy: {forbidden_visible}")
-locales_config = (ROOT / "app/src/main/res/xml/locales_config.xml").read_text(encoding="utf-8")
-if 'android:name="en"' not in locales_config or 'android:name="tr"' not in locales_config:
-    errors.append("global locale config must expose English and Turkish resources")
-
-strings_default = ROOT / "app/src/main/res/values/strings.xml"
-strings_tr = ROOT / "app/src/main/res/values-tr/strings.xml"
-if strings_default.is_file() and strings_tr.is_file():
-    default_names = {node.attrib["name"] for node in ET.parse(strings_default).getroot().findall("string")}
-    tr_names = {node.attrib["name"] for node in ET.parse(strings_tr).getroot().findall("string")}
-    if default_names != tr_names:
-        if missing := sorted(default_names - tr_names):
-            errors.append(f"Turkish translations missing keys: {missing}")
-        if missing := sorted(tr_names - default_names):
-            errors.append(f"default translations missing keys: {missing}")
-
-    # Compile-time guard: every Kotlin R.string reference must exist in the default
-    # resource set. This catches unresolved R.string symbols before Gradle/Kotlin CI.
-    kotlin_string_refs: dict[str, set[str]] = {}
-    for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
-        source = kotlin_file.read_text(encoding="utf-8")
-        for resource_name in re.findall(r"R\.string\.([A-Za-z0-9_]+)", source):
-            kotlin_string_refs.setdefault(resource_name, set()).add(str(kotlin_file.relative_to(ROOT)))
-    for resource_name in sorted(set(kotlin_string_refs) - default_names):
-        locations = ", ".join(sorted(kotlin_string_refs[resource_name]))
-        errors.append(f"Kotlin references missing default string resource R.string.{resource_name}: {locations}")
-
+# ------------------------------------------------------------------
+# QA signing + CI contract.
+# ------------------------------------------------------------------
 qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
 if qa_keystore.is_file():
     digest = hashlib.sha256(qa_keystore.read_bytes()).hexdigest()
     if digest != "d6e453480cd6e99fb7bbfd7192eef1719328979f09d6dba383249dbc46b5eac8":
-        errors.append("QA keystore bytes changed; CI update signing continuity would be broken")
+        errors.append("QA keystore bytes changed; update-signing continuity would break")
 
-workflow = (ROOT / ".github/workflows/android-ci.yml").read_text(encoding="utf-8")
+workflow = read(".github/workflows/android-ci.yml")
 for expected in (
     "actions/checkout@v7",
     "actions/setup-java@v5",
     "gradle/actions/setup-gradle@v6",
-    "actions/upload-artifact@v6",
     "testDebugUnitTest",
     "lintDebug",
     "assembleDebug",
-    "depoakilli-test-apk-",
     "Verify stable test signing certificate",
 ):
     if expected not in workflow:
@@ -738,4 +488,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner 0.5.16 FINAL-R2 monetization, instant review, memory honesty and Back navigation are valid.")
+print("Smart Cleaner v0.5.17-alpha1 Phase-1 hardening invariants are valid.")

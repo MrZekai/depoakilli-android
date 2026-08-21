@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
@@ -75,7 +73,6 @@ internal fun DeviceCenterScreen(
     onOpenWhatsApp: () -> Unit,
     onOpenCache: () -> Unit,
     onOpenAppManager: () -> Unit,
-    onOptimizeMemory: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -283,34 +280,6 @@ private fun ToolActionCard(
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
             Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent)
-        }
-    }
-}
-
-@Composable
-private fun RamOptimizerCard(state: CleanerUiState, onOptimizeMemory: () -> Unit) {
-    Card(shape = RoundedCornerShape(21.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF0D2A25))) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(color = Color(0xFF0C9C70), shape = RoundedCornerShape(15.dp)) {
-                    Icon(Icons.Outlined.Memory, contentDescription = null, tint = Color.White, modifier = Modifier.padding(11.dp).size(28.dp))
-                }
-                Spacer(Modifier.width(13.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(stringResource(R.string.ram_optimizer_title_v050), fontWeight = FontWeight.Black)
-                    Text(
-                        stringResource(R.string.ram_optimizer_subtitle_v050, ByteFormatter.format(state.memory.availableBytes)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            Text(stringResource(R.string.ram_optimizer_policy_note), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Button(onClick = onOptimizeMemory, enabled = !state.optimizingMemory, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Outlined.Bolt, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text(if (state.optimizingMemory) stringResource(R.string.memory_optimizing) else stringResource(R.string.ram_optimize_action))
-            }
         }
     }
 }

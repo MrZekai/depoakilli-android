@@ -22,8 +22,6 @@ import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
-import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
-import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
 
 class MainActivity : ComponentActivity() {
@@ -61,20 +59,13 @@ class MainActivity : ComponentActivity() {
     ) { result ->
         val approved = result.resultCode == Activity.RESULT_OK
         cleanerViewModel.onDeepCacheCleanupResult(approved)
-        if (approved) {
-            showPostTaskInterstitial()
-        }
     }
 
     private val deleteLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
         val approved = result.resultCode == Activity.RESULT_OK
-        val changed = cleanerViewModel.completeCleanup(approved)
-        if (approved) cleanerViewModel.refreshAfterCleanup()
-        if (approved && changed) {
-            showPostTaskInterstitial()
-        }
+        cleanerViewModel.completeCleanup(approved)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,14 +91,12 @@ class MainActivity : ComponentActivity() {
                 cleanerState.dashboardRefreshing,
                 cleanerState.whatsAppScanning,
                 cleanerState.cleanupInProgress,
-                cleanerState.optimizingMemory,
             ) {
                 app.setCriticalTaskActive(
                     cleanerState.scanning ||
                         cleanerState.dashboardRefreshing ||
                         cleanerState.whatsAppScanning ||
-                        cleanerState.cleanupInProgress ||
-                        cleanerState.optimizingMemory,
+                        cleanerState.cleanupInProgress,
                 )
             }
 
@@ -120,10 +109,10 @@ class MainActivity : ComponentActivity() {
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
-                    onPrepareCleanup = ::cleanSelectedThenShowInterstitial,
-                    onPrepareStorageCleanup = ::cleanStorageThenShowInterstitial,
-                    onPrepareWhatsAppCleanup = ::cleanWhatsAppThenShowInterstitial,
-                    onOptimizeMemory = ::optimizeMemoryThenShowInterstitial,
+                    onPrepareCleanup = ::cleanSelected,
+                    onPrepareStorageCleanup = ::cleanStorage,
+                    onPrepareWhatsAppCleanup = ::cleanWhatsApp,
+                    onCleanupResultDismissed = ::onCleanupResultDismissed,
                     onUninstallApp = ::uninstallApp,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
@@ -154,49 +143,32 @@ class MainActivity : ComponentActivity() {
             ::interstitialAds.isInitialized &&
             (application as DepoAkilliApplication).isSystemUnderMemoryPressure()
         ) {
-            interstitialAds.releaseForMemoryOptimization()
+            interstitialAds.releaseCachedAd()
         }
     }
 
-    private fun optimizeMemoryThenShowInterstitial() {
-        cleanerViewModel.optimizeMemory(
-            releaseHeavyResources = {
-                releaseWhatsAppThumbnailMemory()
-                releasePremiumToolThumbnailMemory()
-                // Keep the already-loaded interstitial available for the natural break.
-                // App Open is separate and can be released as part of memory optimization.
-                (application as DepoAkilliApplication).releaseAdMemory()
-            },
-            onCompleted = {
-                showPostTaskInterstitial()
-            },
-        )
-    }
-
-    private fun cleanSelectedThenShowInterstitial(itemIds: Set<String>? = null) {
+    private fun cleanSelected(itemIds: Set<String>? = null) {
         executeCleanupPlan(itemIds)
     }
 
-    private fun cleanStorageThenShowInterstitial() {
-        cleanerViewModel.deleteSelectedStorageReview { changed ->
+    private fun cleanStorage() {
+        cleanerViewModel.deleteSelectedStorageReview {
             cleanerViewModel.refreshDeviceState()
-            if (changed) {
-                showPostTaskInterstitial()
-            }
         }
     }
 
-    private fun cleanWhatsAppThenShowInterstitial(onFinished: (Boolean) -> Unit) {
+    private fun cleanWhatsApp(onFinished: (Boolean) -> Unit) {
         cleanerViewModel.deleteSelectedWhatsApp { changed ->
             cleanerViewModel.refreshDeviceState()
-            if (changed) {
-                showPostTaskInterstitial {
-                    onFinished(true)
-                }
-            } else {
-                onFinished(false)
-            }
+            onFinished(changed)
         }
+    }
+
+    private fun onCleanupResultDismissed() {
+        // The destructive operation and measured result are already complete.
+        // Monetization happens only after the user closes the result.
+        cleanerViewModel.refreshDeviceState()
+        showPostTaskInterstitial()
     }
 
     private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
@@ -236,11 +208,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             },
-            onCleanupCompleted = { changed ->
-                cleanerViewModel.refreshAfterCleanup()
-                if (changed) {
-                    showPostTaskInterstitial()
-                }
+            onCleanupCompleted = {
+                // Result state is already produced by CleanerViewModel.
+                // Never gate that result on a Google Mobile Ads callback.
             },
         )
     }

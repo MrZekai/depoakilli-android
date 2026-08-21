@@ -29,7 +29,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
@@ -37,7 +36,6 @@ import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
@@ -138,7 +136,7 @@ fun CleanerApp(
     onPrepareCleanup: (Set<String>?) -> Unit,
     onPrepareStorageCleanup: () -> Unit,
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
-    onOptimizeMemory: () -> Unit,
+    onCleanupResultDismissed: () -> Unit,
     onUninstallApp: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
@@ -263,15 +261,15 @@ fun CleanerApp(
             val screenAllowsBanner = when (detailScreen) {
                 null -> when (AppTab.entries[selectedTabIndex]) {
                     AppTab.HOME,
-                    AppTab.TOOLS,
+                    AppTab.TOOLS -> true
                     AppTab.SECURITY,
-                    AppTab.PROFILE -> true
+                    AppTab.PROFILE -> false
                 }
                 DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
                 DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
                 DetailScreen.APP_CACHE,
-                DetailScreen.APP_MANAGER,
-                DetailScreen.SETTINGS -> true
+                DetailScreen.APP_MANAGER -> true
+                DetailScreen.SETTINGS -> false
                 DetailScreen.PRIVACY,
                 DetailScreen.TERMS,
                 DetailScreen.ABOUT -> false
@@ -285,8 +283,7 @@ fun CleanerApp(
                     !state.scanning &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
-                    !state.cleanupInProgress &&
-                    !state.optimizingMemory
+                    !state.cleanupInProgress
 
             if (detailScreen == null) {
                 Column(
@@ -296,7 +293,7 @@ fun CleanerApp(
                 ) {
                     if (bannerAllowed) {
                         BannerAd(canRequestAds = true)
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(48.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
                     }
                     NavigationBar(containerColor = Color(0xFF07132C)) {
@@ -424,7 +421,6 @@ fun CleanerApp(
                     onMedia = { launchScan(ScanFocus.MEDIA) },
                     onDeepClean = { launchScan(ScanFocus.DEEP) },
                     onRefresh = viewModel::refreshDashboard,
-                    onRamOptimize = onOptimizeMemory,
                     modifier = Modifier.padding(padding),
                 )
 
@@ -441,7 +437,6 @@ fun CleanerApp(
                         detailScreen = DetailScreen.APP_MANAGER
                         viewModel.refreshInstalledApps()
                     },
-                    onOptimizeMemory = onOptimizeMemory,
                     onOpenSettings = { selectedTabIndex = AppTab.PROFILE.ordinal },
                     modifier = Modifier.padding(padding),
                 )
@@ -517,17 +512,19 @@ fun CleanerApp(
     }
 
     if (!fullScreenAdActive) {
-        state.memoryOptimizationResult?.let { result ->
-            MemoryOptimizationResultDialog(
-                result = result,
-                onDismiss = viewModel::dismissMemoryOptimizationResult,
-            )
-        }
-
         state.cleanupResult?.let { result ->
             CleanupResultDialog(
                 result = result,
-                onDismiss = viewModel::dismissCleanupResult,
+                onDismiss = {
+                    val eligibleForNaturalBreakAd = result.deletedCount > 0
+                    viewModel.dismissCleanupResult()
+                    detailScreen = null
+                    legalReturnScreen = null
+                    selectedTabIndex = AppTab.HOME.ordinal
+                    if (eligibleForNaturalBreakAd) {
+                        onCleanupResultDismissed()
+                    }
+                },
             )
         }
     }
@@ -562,7 +559,6 @@ private fun HomeScreen(
     onRequestAllFilesAccess: () -> Unit,
     onOpenWhatsApp: () -> Unit,
     onOpenCache: () -> Unit,
-    onOptimizeMemory: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -653,15 +649,6 @@ private fun HomeScreen(
                 icon = Icons.Outlined.Download,
                 accent = Color(0xFF805313),
                 onClick = { onScan(ScanFocus.DOWNLOADS) },
-            )
-        }
-        item {
-            WideToolCard(
-                title = stringResource(R.string.ram_optimizer_title_v050),
-                subtitle = stringResource(R.string.ram_optimizer_subtitle_v050, ByteFormatter.format(state.memory.availableBytes)),
-                icon = Icons.Outlined.Memory,
-                accent = Color(0xFF08A875),
-                onClick = onOptimizeMemory,
             )
         }
     }

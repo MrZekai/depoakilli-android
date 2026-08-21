@@ -92,7 +92,7 @@ class DepoAkilliApplication :
             ::appOpenAds.isInitialized &&
             isSystemUnderMemoryPressure()
         ) {
-            appOpenAds.releaseForMemoryOptimization()
+            appOpenAds.releaseCachedAd()
         }
     }
 
@@ -118,7 +118,7 @@ class DepoAkilliApplication :
     }
 
     fun releaseAdMemory() {
-        appOpenAds.releaseForMemoryOptimization()
+        appOpenAds.releaseCachedAd()
     }
 
     fun suppressNextAppOpenAd() {

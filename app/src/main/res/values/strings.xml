@@ -17,8 +17,6 @@
     <string name="downloads_subtitle">Old files</string>
     <string name="app_cache_quick">App cache</string>
     <string name="app_cache_quick_subtitle">%1$s temporary files</string>
-    <string name="memory_tools_quick">App memory</string>
-    <string name="memory_tools_quick_subtitle">Release temporary app memory</string>
     <string name="smart_clean_ready">SMART CLEAN</string>
     <string name="smart_clean_title">Your Phone Is Ready</string>
     <string name="smart_clean_subtitle">Scan junk, duplicates and large files in one pass</string>
@@ -45,8 +43,6 @@
     <string name="cleaning_tools_subtitle">Each tool performs a separate, focused task</string>
     <string name="junk_cleaner_title">Junk Cleaner</string>
     <string name="junk_cleaner_subtitle">This app’s cache and accessible downloaded media</string>
-    <string name="ram_booster_title">Free app memory</string>
-    <string name="ram_booster_subtitle">Release temporary app memory and remeasure RAM</string>
     <string name="duplicates_tool_title">Delete Duplicates</string>
     <string name="duplicates_tool_subtitle">Find exact copies by content fingerprint</string>
     <string name="whatsapp_cleaner_title">WhatsApp Cleaner</string>
@@ -124,14 +120,10 @@
     <string name="storage_settings_subtitle">Manage device and application storage usage</string>
     <string name="memory_and_apps">Memory and apps</string>
     <string name="memory_and_apps_subtitle">%1$s available / %2$s total • review installed apps</string>
-    <string name="memory_optimizer">Optimize app memory</string>
-    <string name="memory_optimizer_subtitle">%1$s available • this app uses %2$s</string>
-    <string name="memory_optimizing">Optimizing memory…</string>
     <string name="language_settings">App language</string>
     <string name="language_settings_subtitle">Use the phone’s supported app-language setting; unsupported locales fall back to English.</string>
     <string name="ad_privacy_preferences">Ad privacy preferences</string>
     <string name="ad_privacy_preferences_subtitle">Change consent and personalization choices</string>
-    <string name="honest_memory_note">Advanced memory optimization releases this app’s rebuildable scan details, previews, thumbnail caches and temporary ad resources, then remeasures this app’s real PSS memory. Dashboard aggregate metrics remain available; detailed results are rescanned on demand. Android keeps other apps and device-wide process reclamation under system control.</string>
     <string name="sponsored">Sponsored</string>
     <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
     <string name="message_select_item">Select at least one item to clean.</string>
@@ -140,8 +132,6 @@
     <string name="message_cleanup_partial">Cleanup completed, but Android could not remove some selected files.</string>
     <string name="message_cache_cleared">%1$s of temporary app cache cleared.</string>
     <string name="message_cache_already_empty">The app cache is already empty.</string>
-    <string name="message_memory_optimized">%1$s of this app’s memory released • %2$s RAM available</string>
-    <string name="message_memory_optimized_stable">Temporary app memory released • %1$s RAM available</string>
     <string name="message_whatsapp_folder_invalid">Choose the WhatsApp or WhatsApp Business Media folder.</string>
     <string name="message_whatsapp_access_required">Connect the WhatsApp Media folder first.</string>
     <string name="message_whatsapp_scan_failed">WhatsApp scan couldn’t finish. Reconnect the Media folder and try again.</string>
@@ -219,7 +209,6 @@
     <string name="device_storage_detail">%1$s used of %2$s total</string>
     <string name="device_ram_title">Available RAM</string>
     <string name="device_ram_detail">%1$s total RAM • Smart Cleaner currently uses %2$s</string>
-    <string name="ram_release_action">Release temporary memory</string>
     <string name="device_battery_title">Battery</string>
     <string name="device_battery_detail">%1$s • %2$.1f °C</string>
     <string name="battery_charging">Charging</string>
@@ -248,9 +237,6 @@
     <string name="feedback_subject">Smart Cleaner feedback</string>
     <string name="feedback_template">Device: %1$s %2$s\nAndroid: %3$s\n\nFeedback:\n</string>
     <string name="share_app_message">Smart Cleaner analyzes storage safely on your device: %1$s</string>
-    <string name="privacy_policy_body">Smart Cleaner analyzes accessible files on your device. Media contents and fingerprints used for cleaning are not uploaded by the cleaning engine. Access to a WhatsApp Media folder is granted by you through Android’s system picker and remains limited to that selected folder.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics, and consent choices under Google’s policies. Smart Cleaner does not sell your personal files. You can change advertising privacy choices from Settings when the option is available.\n\nDeleting files is performed only after your selection and confirmation. Other apps’ private caches are protected by Android and are never presented as if Smart Cleaner silently deleted them.</string>
-    <string name="terms_of_service_body">Smart Cleaner provides on-device storage analysis and deletion tools. Scan results are suggestions, not backups. Review selected files before confirming deletion because deleted documents and WhatsApp media may not be recoverable.\n\nThe app does not promise to delete private data belonging to other apps, force-stop protected processes, cool the CPU, or create storage that Android does not actually release. Availability can vary by Android version, device maker, file provider, and permissions granted by you.\n\nBy using the deletion tools, you confirm that you are authorized to manage the selected files.</string>
-    <string name="about_app_body">Smart Cleaner %1$s\n\nA privacy-conscious Android cleaner focused on real storage measurements, exact duplicate detection, large-file review, WhatsApp Media management, safe cache cleanup for this app, and transparent device information.\n\nPackage identity: com.mrzekai.depoakilli</string>
     <string name="about_app_body_v050">Smart Cleaner %1$s
 
 Smart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.
@@ -317,10 +303,6 @@ All files access is requested because file management and maintenance are core f
 Usage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.
 
 Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.</string>
-    <string name="ram_optimize_action">Optimize Smart Cleaner memory</string>
-    <string name="ram_optimizer_policy_note">App RAM Optimization aggressively releases Smart Cleaner’s rebuildable scan details, previews, thumbnail caches and temporary ad resources, then remeasures real app PSS. Android keeps third-party process reclamation under system control.</string>
-    <string name="ram_optimizer_subtitle_v050">%1$s RAM currently available</string>
-    <string name="ram_optimizer_title_v050">App RAM Optimization</string>
     <string name="reason_large_file">Large file • %1$d days old</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
@@ -347,7 +329,7 @@ Google Mobile Ads and the consent platform may process advertising identifiers, 
 
 Smart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. Deep App Cache uses Android’s official system action and may display a required Android confirmation.
 
-RAM Optimization releases this app’s temporary resources and does not promise to kill protected third-party apps or create fictional performance gains. Availability can vary by Android version and device manufacturer.</string>
+Smart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.</string>
     <string name="tools_rebuilt_status">%1$s free • %2$s app cache reported</string>
     <string name="tools_rebuilt_title">Real cleaning tools, one engine</string>
     <string name="uninstall">Uninstall</string>
@@ -425,8 +407,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_cleanup_in_progress">Cleaning…</string>
     <string name="message_cleanup_failed">Cleanup could not be completed. Nothing else was changed.</string>
 
-    <string name="smart_cleanup_ad_notice">Cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
-
 
     <string name="smart_scan_live_title">Live scan</string>
     <string name="smart_scan_files_label">Files found</string>
@@ -489,7 +469,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="whatsapp_selected_items_short">%1$d items</string>
     <string name="whatsapp_review_and_clean">Review &amp; clean</string>
     <string name="whatsapp_cleanup_in_progress">Cleaning…</string>
-    <string name="whatsapp_cleanup_ad_notice">WhatsApp cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
     <string name="whatsapp_cleanup_irreversible">Selected files are permanently deleted from shared storage. This cannot be undone.</string>
     <string name="whatsapp_confirm_and_continue">Continue</string>
     <string name="whatsapp_preview_title">Preview</string>
@@ -532,21 +511,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
 
     <string name="premium_duplicate_more_groups">More duplicate groups</string>
 
-    <string name="dashboard_ram_optimizer_subtitle">Release temporary Smart Cleaner memory and verify the measured result</string>
-    <string name="dashboard_ram_available_now">%1$s available RAM</string>
-    <string name="dashboard_ram_optimize_action">Optimize RAM</string>
-    <string name="dashboard_ram_optimizing">Optimizing memory…</string>
-    <string name="ram_result_title">RAM optimization complete</string>
-    <string name="ram_result_app_released">App memory released</string>
-    <string name="ram_result_available_gain">Available RAM increased</string>
-    <string name="ram_result_stable">Memory is already in a good state</string>
-    <string name="ram_result_available_ram">Available RAM</string>
-    <string name="ram_result_app_memory">Smart Cleaner memory</string>
-    <string name="ram_result_before">Before</string>
-    <string name="ram_result_after">After</string>
-    <string name="ram_result_measured_note">Measured on this device. Smart Cleaner releases its own temporary resources; Android remains in control of other apps.</string>
-    <string name="ram_result_done">Done</string>
-
     <string name="smart_clean_suggestions_subtitle_v0512">Priority review: videos, images, WhatsApp, large files, unused apps and safe cleanup candidates. The same file is not repeated across these top sections.</string>
     <string name="smart_media_priority_summary">%1$d files • %2$s</string>
     <string name="smart_media_priority_note">Manual review • WhatsApp media is shown separately • nothing is preselected</string>
@@ -567,7 +531,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="premium_cleanup_confirm_title">Delete selected files?</string>
     <string name="premium_cleanup_confirm_body">You selected %1$d items using %2$s. Continue only if you want these files removed.</string>
     <string name="premium_cleanup_irreversible">Selected files will be permanently removed. This cannot be undone.</string>
-    <string name="premium_cleanup_ad_notice">Cleanup runs first. If an eligible interstitial is ready, it may appear after cleanup completes and before the measured result. If no ad is available, the result appears immediately.</string>
     <string name="premium_cleanup_confirm_action">Yes, continue</string>
     <string name="cleanup_result_title">Cleanup complete</string>
     <string name="cleanup_result_partial_title">Cleanup partially completed</string>
@@ -598,12 +561,6 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="smart_clean_hero_subtitle_v0514">Real candidates from this analysis. Personal media remains manual review.</string>
     <string name="cleanup_result_storage_snapshot">Free-space snapshot: %1$s → %2$s</string>
 
-    <string name="dashboard_ram_optimizer_subtitle_v0515">Release rebuildable scan, preview and ad memory; then remeasure this app</string>
-    <string name="dashboard_ram_pressure_warning_v0515">Android reports memory pressure — release rebuildable app memory</string>
-    <string name="ram_result_rebuildable_released_title_v0515">Rebuildable memory released</string>
-    <string name="ram_result_rebuildable_released_v0515">Detailed scan/review lists and preview caches were released from memory. Dashboard totals stay available; detailed results will be rescanned when opened again.</string>
-    <string name="ram_result_measured_note_v0515">Measured from %1$d post-release samples. App memory uses real process PSS; available RAM is a system signal that can fluctuate. Android manages other apps and device-wide process reclamation.</string>
-
     <!-- v0.5.16.1 hardening -->
     <string name="dashboard_no_cleanup_found">Ready</string>
     <string name="dashboard_no_risky_auto_selection">No risky automatic selection</string>
@@ -614,4 +571,7 @@ RAM Optimization releases this app’s temporary resources and does not promise 
     <string name="disclosure_usage_body">Usage Access is optional. It lets Smart Cleaner read Android-reported app storage/cache totals and last-used times so you can review large or unused apps. It does not read the private content inside those apps and does not silently delete their protected data.</string>
     <string name="disclosure_continue">Continue</string>
     <string name="disclosure_not_now">Not now</string>
+    <string name="smart_cleanup_ad_notice">Cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
+    <string name="whatsapp_cleanup_ad_notice">WhatsApp cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
+    <string name="premium_cleanup_ad_notice">Cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
 </resources>

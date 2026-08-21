@@ -27,7 +27,6 @@ import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.VideoFile
@@ -84,7 +83,6 @@ internal fun NeonDashboardScreen(
     onMedia: () -> Unit,
     onDeepClean: () -> Unit,
     onRefresh: () -> Unit,
-    onRamOptimize: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val categoryBytes = state.dashboardCategoryBytes
@@ -734,117 +732,6 @@ private fun DashboardToolTile(
 }
 
 @Composable
-private fun RamOptimizationStrip(
-    state: CleanerUiState,
-    onClick: () -> Unit,
-) {
-    val enabled = !state.optimizingMemory &&
-        !state.scanning &&
-        !state.whatsAppScanning &&
-        !state.cleanupInProgress
-    val memoryPressure = state.memory.lowMemory || (
-        state.memory.lowMemoryThresholdBytes > 0L &&
-            state.memory.availableBytes <= state.memory.lowMemoryThresholdBytes * 3L / 2L
-    )
-
-    Card(
-        modifier = Modifier.fillMaxWidth().height(124.dp),
-        shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFF0B3340),
-                            Color(0xFF0C4B3B),
-                            Color(0xFF0A653C),
-                        ),
-                    ),
-                )
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                color = Lime400.copy(alpha = .16f),
-                shape = RoundedCornerShape(20.dp),
-            ) {
-                Icon(
-                    Icons.Outlined.Memory,
-                    contentDescription = null,
-                    tint = Lime400,
-                    modifier = Modifier.padding(13.dp).size(38.dp),
-                )
-            }
-
-            Spacer(Modifier.size(13.dp))
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                Text(
-                    stringResource(R.string.ram_optimizer_title_v050),
-                    color = Color.White,
-                    fontSize = 21.sp,
-                    fontWeight = FontWeight.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    if (state.optimizingMemory) {
-                        stringResource(R.string.dashboard_ram_optimizing)
-                    } else {
-                        stringResource(
-                            R.string.dashboard_ram_available_now,
-                            ByteFormatter.format(state.memory.availableBytes),
-                        )
-                    },
-                    color = Lime400,
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    stringResource(
-                        if (memoryPressure) R.string.dashboard_ram_pressure_warning_v0515
-                        else R.string.dashboard_ram_optimizer_subtitle_v0515,
-                    ),
-                    color = if (memoryPressure) Amber400 else Color(0xFFC5D7E2),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-
-            Surface(
-                color = Lime400.copy(alpha = .18f),
-                shape = CircleShape,
-            ) {
-                if (state.optimizingMemory) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.padding(12.dp).size(27.dp),
-                        strokeWidth = 3.dp,
-                        color = Lime400,
-                        trackColor = Color.White.copy(alpha = .12f),
-                    )
-                } else {
-                    Icon(
-                        Icons.AutoMirrored.Outlined.ArrowForward,
-                        contentDescription = stringResource(R.string.dashboard_ram_optimize_action),
-                        tint = Lime400,
-                        modifier = Modifier.padding(13.dp).size(27.dp),
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
 private fun DashboardWideTool(
     title: String,

@@ -17,8 +17,6 @@
     <string name="downloads_subtitle">Eski dosyalar</string>
     <string name="app_cache_quick">Uygulama önbelleği</string>
     <string name="app_cache_quick_subtitle">%1$s geçici dosya</string>
-    <string name="memory_tools_quick">Uygulama belleği</string>
-    <string name="memory_tools_quick_subtitle">Geçici uygulama belleğini serbest bırak</string>
     <string name="smart_clean_ready">AKILLI TEMİZLİK</string>
     <string name="smart_clean_title">Telefonun Hazır</string>
     <string name="smart_clean_subtitle">Çöp, kopya ve büyük dosyaları tek taramada bul</string>
@@ -45,8 +43,6 @@
     <string name="cleaning_tools_subtitle">Her araç ayrı ve hedef odaklı bir işlem yapar</string>
     <string name="junk_cleaner_title">Çöp Temizliği</string>
     <string name="junk_cleaner_subtitle">Bu uygulamanın önbelleği ve erişilebilir indirilen medya</string>
-    <string name="ram_booster_title">Uygulama belleğini boşalt</string>
-    <string name="ram_booster_subtitle">Geçici uygulama belleğini bırak ve RAM’i yeniden ölç</string>
     <string name="duplicates_tool_title">Kopyaları Sil</string>
     <string name="duplicates_tool_subtitle">İçerik parmak iziyle birebir kopyaları bul</string>
     <string name="whatsapp_cleaner_title">WhatsApp Temizleyici</string>
@@ -124,14 +120,10 @@
     <string name="storage_settings_subtitle">Cihaz ve uygulama alan kullanımını yönet</string>
     <string name="memory_and_apps">Bellek ve uygulamalar</string>
     <string name="memory_and_apps_subtitle">%1$s kullanılabilir / %2$s toplam • yüklü uygulamaları incele</string>
-    <string name="memory_optimizer">Uygulama belleğini optimize et</string>
-    <string name="memory_optimizer_subtitle">%1$s kullanılabilir • bu uygulama %2$s kullanıyor</string>
-    <string name="memory_optimizing">Bellek optimize ediliyor…</string>
     <string name="language_settings">Uygulama dili</string>
     <string name="language_settings_subtitle">Telefonun desteklediği uygulama dili ayarını kullan; desteklenmeyen diller İngilizceye döner.</string>
     <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
     <string name="ad_privacy_preferences_subtitle">Onay ve kişiselleştirme seçimlerini değiştir</string>
-    <string name="honest_memory_note">Gelişmiş bellek optimizasyonu bu uygulamanın yeniden oluşturulabilir tarama detaylarını, önizlemelerini, küçük resim önbelleklerini ve geçici reklam kaynaklarını bırakır; ardından uygulamanın gerçek PSS belleğini yeniden ölçer. Ana sayfadaki toplu analiz değerleri korunur, detaylar gerektiğinde yeniden taranır. Diğer uygulamaların ve cihaz genelindeki süreçlerin yönetimi Android’dedir.</string>
     <string name="sponsored">Sponsorlu</string>
     <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
@@ -140,8 +132,6 @@
     <string name="message_cleanup_partial">Temizlik tamamlandı; ancak Android seçilen bazı dosyaları silemedi.</string>
     <string name="message_cache_cleared">%1$s geçici uygulama önbelleği temizlendi.</string>
     <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
-    <string name="message_memory_optimized">Bu uygulamanın %1$s belleği serbest bırakıldı • %2$s RAM kullanılabilir</string>
-    <string name="message_memory_optimized_stable">Geçici uygulama belleği serbest bırakıldı • %1$s RAM kullanılabilir</string>
     <string name="message_whatsapp_folder_invalid">WhatsApp veya WhatsApp Business Medya klasörünü seçin.</string>
     <string name="message_whatsapp_access_required">Önce WhatsApp Medya klasörünü bağlayın.</string>
     <string name="message_whatsapp_scan_failed">WhatsApp taraması tamamlanamadı. Medya klasörünü yeniden bağlayıp tekrar deneyin.</string>
@@ -219,7 +209,6 @@
     <string name="device_storage_detail">Toplam %2$s alanın %1$s bölümü kullanılıyor</string>
     <string name="device_ram_title">Kullanılabilir RAM</string>
     <string name="device_ram_detail">Toplam %1$s RAM • Akıllı Temizleyici şu anda %2$s kullanıyor</string>
-    <string name="ram_release_action">Geçici belleği serbest bırak</string>
     <string name="device_battery_title">Pil</string>
     <string name="device_battery_detail">%1$s • %2$.1f °C</string>
     <string name="battery_charging">Şarj oluyor</string>
@@ -248,9 +237,6 @@
     <string name="feedback_subject">Akıllı Temizleyici geri bildirimi</string>
     <string name="feedback_template">Cihaz: %1$s %2$s\nAndroid: %3$s\n\nGeri bildirim:\n</string>
     <string name="share_app_message">Akıllı Temizleyici depolamayı cihazında güvenle analiz eder: %1$s</string>
-    <string name="privacy_policy_body">Akıllı Temizleyici erişilebilir dosyaları cihazında analiz eder. Temizlik motorunun kullandığı medya içerikleri ve parmak izleri yüklenmez. WhatsApp Medya klasörüne erişim Android’in sistem seçicisi üzerinden senin tarafından verilir ve yalnız seçtiğin klasörle sınırlı kalır.\n\nGoogle Mobile Ads ve onay platformu, Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Akıllı Temizleyici kişisel dosyalarını satmaz. Seçenek sunulduğunda reklam gizliliği tercihlerini Ayarlar’dan değiştirebilirsin.\n\nDosyalar yalnız senin seçimin ve onayın sonrasında silinir. Diğer uygulamaların özel önbellekleri Android tarafından korunur ve Akıllı Temizleyici bunları sessizce silmiş gibi göstermez.</string>
-    <string name="terms_of_service_body">Akıllı Temizleyici cihaz içi depolama analizi ve silme araçları sunar. Tarama sonuçları öneridir, yedek değildir. Silinen belgeler ve WhatsApp medyaları kurtarılamayabileceğinden onaylamadan önce seçili dosyaları incele.\n\nUygulama başka uygulamalara ait özel verileri silmeyi, korunan süreçleri zorla kapatmayı, işlemciyi soğutmayı veya Android’in gerçekten serbest bırakmadığı alanı oluşturmayı vaat etmez. Kullanılabilirlik Android sürümüne, cihaz üreticisine, dosya sağlayıcısına ve verdiğin izinlere göre değişebilir.\n\nSilme araçlarını kullanarak seçili dosyaları yönetme yetkisine sahip olduğunu kabul edersin.</string>
-    <string name="about_app_body">Akıllı Temizleyici %1$s\n\nGerçek depolama ölçümlerine, birebir kopya tespitine, büyük dosya incelemesine, WhatsApp Medya yönetimine, bu uygulama için güvenli önbellek temizliğine ve şeffaf cihaz bilgilerine odaklanan gizlilik dostu Android temizleyicisi.\n\nPaket kimliği: com.mrzekai.depoakilli</string>
     <string name="about_app_body_v050">Akıllı Temizleyici %1$s
 
 Akıllı Temizleyici bir depolama yönetimi ve bakım uygulamasıdır. Paylaşılan depolamayı cihaz içinde çöp, birebir kopyalar, büyük dosyalar, eski indirilenler, APK kurulumları, medya inceleme öğeleri ve WhatsApp medyası için tarar. Derin Uygulama Önbelleği Android’in resmî sistem temizleme akışını kullanır; Android sistem onayı isteyebilir.
@@ -317,10 +303,6 @@ Tüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği 
 Kullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Derin Uygulama Önbelleği Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.
 
 Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.</string>
-    <string name="ram_optimize_action">Akıllı Temizleyici belleğini optimize et</string>
-    <string name="ram_optimizer_policy_note">Uygulama RAM Optimizasyonu Akıllı Temizleyici’nin yeniden oluşturulabilir tarama detaylarını, önizlemelerini, küçük resim önbelleklerini ve geçici reklam kaynaklarını agresif biçimde bırakır; ardından gerçek uygulama PSS belleğini yeniden ölçer. Üçüncü taraf süreçlerinin yönetimi Android’dedir.</string>
-    <string name="ram_optimizer_subtitle_v050">Şu anda %1$s RAM kullanılabilir</string>
-    <string name="ram_optimizer_title_v050">Uygulama RAM Optimizasyonu</string>
     <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
     <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
     <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
@@ -345,9 +327,9 @@ Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tan�
     <string name="storage_type_videos">Videolar</string>
     <string name="terms_of_service_body_v050">Akıllı Temizleyici cihaz içi depolama analizi ve dosya yönetimi araçları sunar. Tarama sonuçları öneridir, yedek değildir. Kullanıcı dosyalarını silmeden önce seçimi incele.
 
-Akıllı Temizleyici Android Tüm dosyalara erişim iznini verdikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Derin Uygulama Önbelleği Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.
+Akıllı Temizleyici, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Derin Uygulama Önbelleği Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.
 
-RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üçüncü taraf uygulamaları öldürdüğünü veya hayalî performans kazancı oluşturduğunu vaat etmez. Kullanılabilirlik Android sürümü ve cihaz üreticisine göre değişebilir.</string>
+Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.</string>
     <string name="tools_rebuilt_status">%1$s boş • %2$s uygulama önbelleği raporlandı</string>
     <string name="tools_rebuilt_title">Tek motorda gerçek temizlik araçları</string>
     <string name="uninstall">Kaldır</string>
@@ -425,8 +407,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_cleanup_in_progress">Temizleniyor…</string>
     <string name="message_cleanup_failed">Temizlik tamamlanamadı. Başka bir değişiklik yapılmadı.</string>
 
-    <string name="smart_cleanup_ad_notice">Önce temizlik tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
-
 
     <string name="smart_scan_live_title">Canlı tarama</string>
     <string name="smart_scan_files_label">Bulunan dosya</string>
@@ -489,7 +469,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="whatsapp_selected_items_short">%1$d öğe</string>
     <string name="whatsapp_review_and_clean">İncele ve temizle</string>
     <string name="whatsapp_cleanup_in_progress">Temizleniyor…</string>
-    <string name="whatsapp_cleanup_ad_notice">Önce WhatsApp temizliği tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
     <string name="whatsapp_cleanup_irreversible">Seçilen dosyalar paylaşılan depolamadan kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
     <string name="whatsapp_confirm_and_continue">Devam et</string>
     <string name="whatsapp_preview_title">Önizleme</string>
@@ -532,21 +511,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
 
     <string name="premium_duplicate_more_groups">Diğer kopya grupları</string>
 
-    <string name="dashboard_ram_optimizer_subtitle">Akıllı Temizleyici’nin geçici belleğini bırak ve gerçek sonucu yeniden ölç</string>
-    <string name="dashboard_ram_available_now">%1$s kullanılabilir RAM</string>
-    <string name="dashboard_ram_optimize_action">RAM’i optimize et</string>
-    <string name="dashboard_ram_optimizing">Bellek optimize ediliyor…</string>
-    <string name="ram_result_title">RAM optimizasyonu tamamlandı</string>
-    <string name="ram_result_app_released">Uygulama belleği serbest bırakıldı</string>
-    <string name="ram_result_available_gain">Kullanılabilir RAM arttı</string>
-    <string name="ram_result_stable">Bellek zaten iyi durumda</string>
-    <string name="ram_result_available_ram">Kullanılabilir RAM</string>
-    <string name="ram_result_app_memory">Akıllı Temizleyici belleği</string>
-    <string name="ram_result_before">Önce</string>
-    <string name="ram_result_after">Sonra</string>
-    <string name="ram_result_measured_note">Bu cihazda ölçüldü. Akıllı Temizleyici yalnız kendi geçici kaynaklarını bırakır; diğer uygulamaların yönetimi Android’de kalır.</string>
-    <string name="ram_result_done">Tamam</string>
-
     <string name="smart_clean_suggestions_subtitle_v0512">Öncelikli inceleme: videolar, görseller, WhatsApp, büyük dosyalar, kullanılmayan uygulamalar ve güvenli temizlik adayları. Aynı dosya bu üst bölümlerde tekrar gösterilmez.</string>
     <string name="smart_media_priority_summary">%1$d dosya • %2$s</string>
     <string name="smart_media_priority_note">Manuel inceleme • WhatsApp medyası ayrı gösterilir • hiçbir şey önceden seçilmez</string>
@@ -567,7 +531,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="premium_cleanup_confirm_title">Seçilen dosyalar silinsin mi?</string>
     <string name="premium_cleanup_confirm_body">%1$d öğe seçtin; toplam %2$s. Bu dosyaların silinmesini istiyorsan devam et.</string>
     <string name="premium_cleanup_irreversible">Seçilen dosyalar kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
-    <string name="premium_cleanup_ad_notice">Önce temizlik tamamlanır. Uygun ve hazır bir geçiş reklamı varsa temizlik bittikten sonra, ölçülen sonuçtan önce gösterilebilir. Reklam yoksa sonuç hemen açılır.</string>
     <string name="premium_cleanup_confirm_action">Evet, devam et</string>
     <string name="cleanup_result_title">Temizlik tamamlandı</string>
     <string name="cleanup_result_partial_title">Temizlik kısmen tamamlandı</string>
@@ -598,12 +561,6 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="smart_clean_hero_subtitle_v0514">Bu analizde bulunan gerçek adaylar. Kişisel medya manuel incelemede kalır.</string>
     <string name="cleanup_result_storage_snapshot">Boş alan ölçümü: %1$s → %2$s</string>
 
-    <string name="dashboard_ram_optimizer_subtitle_v0515">Yeniden oluşturulabilir tarama, önizleme ve reklam belleğini bırak; uygulamayı yeniden ölç</string>
-    <string name="dashboard_ram_pressure_warning_v0515">Android bellek baskısı bildiriyor — yeniden oluşturulabilir uygulama belleğini bırak</string>
-    <string name="ram_result_rebuildable_released_title_v0515">Yeniden oluşturulabilir bellek bırakıldı</string>
-    <string name="ram_result_rebuildable_released_v0515">Detaylı tarama/inceleme listeleri ve önizleme önbellekleri RAM’den bırakıldı. Ana sayfadaki toplu değerler korunur; detaylar yeniden açıldığında tekrar taranır.</string>
-    <string name="ram_result_measured_note_v0515">Serbest bırakma sonrası %1$d ölçüm örneğinden hesaplandı. Uygulama belleği gerçek proses PSS değeridir; kullanılabilir RAM anlık değişebilen bir sistem sinyalidir. Diğer uygulamaları ve cihaz genelindeki süreçleri Android yönetir.</string>
-
     <!-- v0.5.16.1 hardening -->
     <string name="dashboard_no_cleanup_found">Hazır</string>
     <string name="dashboard_no_risky_auto_selection">Riskli otomatik seçim yok</string>
@@ -614,4 +571,7 @@ RAM Optimizasyonu bu uygulamanın geçici kaynaklarını bırakır; korunan üç
     <string name="disclosure_usage_body">Kullanım Erişimi isteğe bağlıdır. Android’in bildirdiği uygulama depolama/önbellek toplamlarını ve son kullanım zamanlarını okuyarak büyük veya uzun süredir kullanılmayan uygulamaları incelemeni sağlar. Uygulamaların özel içeriğini okumaz ve korunan verilerini sessizce silmez.</string>
     <string name="disclosure_continue">Devam et</string>
     <string name="disclosure_not_now">Şimdi değil</string>
+    <string name="smart_cleanup_ad_notice">Önce temizlik tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
+    <string name="whatsapp_cleanup_ad_notice">Önce WhatsApp temizliği tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
+    <string name="premium_cleanup_ad_notice">Önce temizlik tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
 </resources>

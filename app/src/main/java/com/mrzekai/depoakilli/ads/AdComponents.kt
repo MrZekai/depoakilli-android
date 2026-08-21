@@ -13,9 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
@@ -35,24 +39,47 @@ fun BannerAd(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val adSize = AdSize.BANNER
+    val configuration = LocalConfiguration.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val widthDp = configuration.screenWidthDp.coerceAtLeast(320)
+    val adSize = remember(context, widthDp) {
+        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, widthDp)
+    }
 
     Box(
-        modifier = modifier.fillMaxWidth().height(50.dp),
+        modifier = modifier.fillMaxWidth().height(adSize.height.dp),
         contentAlignment = Alignment.Center,
     ) {
         if (canRequestAds) {
-            val adView = remember(context, BuildConfig.ADMOB_BANNER_ID) {
+            val adView = remember(context, BuildConfig.ADMOB_BANNER_ID, widthDp) {
                 AdView(context).apply {
                     adUnitId = BuildConfig.ADMOB_BANNER_ID
                     setAdSize(adSize)
                     loadAd(AdRequest.Builder().build())
                 }
             }
-            DisposableEffect(adView) {
-                onDispose { adView.destroy() }
+            DisposableEffect(adView, lifecycleOwner) {
+                val observer = LifecycleEventObserver { _, event ->
+                    when (event) {
+                        Lifecycle.Event.ON_RESUME -> adView.resume()
+                        Lifecycle.Event.ON_PAUSE -> adView.pause()
+                        Lifecycle.Event.ON_DESTROY -> adView.destroy()
+                        else -> Unit
+                    }
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                if (lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    adView.resume()
+                }
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(observer)
+                    adView.destroy()
+                }
             }
-            AndroidView(factory = { adView })
+            AndroidView(
+                factory = { adView },
+                modifier = Modifier.fillMaxWidth(),
+            )
         }
     }
 }
@@ -278,7 +305,7 @@ class InterstitialAdController(private val context: Context) {
         )
     }
 
-    fun releaseForMemoryOptimization() {
+    fun releaseCachedAd() {
         interstitial = null
         loading = false
         loadedAtElapsed = 0L
@@ -413,7 +440,7 @@ class AppOpenAdController(private val context: Context) {
         )
     }
 
-    fun releaseForMemoryOptimization() {
+    fun releaseCachedAd() {
         if (!isShowingAd) {
             appOpenAd = null
         }
