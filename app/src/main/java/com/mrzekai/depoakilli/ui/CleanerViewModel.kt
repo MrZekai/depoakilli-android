@@ -67,6 +67,7 @@ data class CleanerUiState(
     val loadingApps: Boolean = false,
     val cleanupInProgress: Boolean = false,
     val cleanupResult: CleanupResult? = null,
+    val cleanupHistory: CleanupHistorySnapshot = CleanupHistorySnapshot(),
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
     val pendingScanFocus: ScanFocus? = null,
@@ -84,6 +85,7 @@ data class CleanerUiState(
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = DeviceRepository(application)
     private val dashboardSnapshotStore = DashboardSnapshotStore(application)
+    private val cleanupHistoryStore = CleanupHistoryStore(application)
     private val _state = MutableStateFlow(CleanerUiState())
     private var pendingConsentItems: List<CleanableItem> = emptyList()
     private var pendingCleanupDeletedBytes: Long = 0L
@@ -99,6 +101,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     init {
         restoreDashboardSnapshot()
+        restoreCleanupHistory()
         refreshDeviceState()
         refreshAppCaches()
     }
@@ -130,6 +133,23 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 analyzedAtMillis = state.dashboardSnapshotAtMillis,
             ),
         )
+    }
+
+    private fun restoreCleanupHistory() {
+        _state.update {
+            it.copy(cleanupHistory = cleanupHistoryStore.load())
+        }
+    }
+
+    private fun recordCleanupHistory(result: CleanupResult) {
+        if (result.deletedCount <= 0) return
+        val updated = cleanupHistoryStore.record(
+            deletedBytes = result.deletedBytes,
+            deletedCount = result.deletedCount,
+        )
+        _state.update {
+            it.copy(cleanupHistory = updated)
+        }
     }
 
     fun refreshDeviceState() {
@@ -437,6 +457,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             runCatching { repository.deleteWhatsAppItems(selected) }
                 .onSuccess { result ->
                     val storageAfter = repository.storageSnapshot()
+                    val measuredResult = CleanupResult(
+                        deletedBytes = result.deletedBytes,
+                        deletedCount = result.deletedIds.size,
+                        failedCount = result.failedCount,
+                        beforeAvailableBytes = storageBefore,
+                        afterAvailableBytes = storageAfter.availableBytes,
+                    )
                     _state.update { state ->
                         val trackedWhatsAppBytes = state.dashboardCategoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
                         val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes)
@@ -453,17 +480,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                             },
                             storage = storageAfter,
                             cleanupInProgress = false,
-                            cleanupResult = CleanupResult(
-                                deletedBytes = result.deletedBytes,
-                                deletedCount = result.deletedIds.size,
-                                failedCount = result.failedCount,
-                                beforeAvailableBytes = storageBefore,
-                                afterAvailableBytes = storageAfter.availableBytes,
-                            ),
+                            cleanupResult = measuredResult,
                             message = null,
                         )
                     }
                     persistDashboardSnapshot()
+                    recordCleanupHistory(measuredResult)
                     onCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure {
@@ -803,6 +825,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     },
                 )
             }
+            partialResult?.let(::recordCleanupHistory)
             // A cancelled Android consent flow never triggers a monetization break.
             return false
         }
@@ -885,6 +908,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         persistDashboardSnapshot()
+        measuredResult?.let(::recordCleanupHistory)
         if (clearPending) {
             pendingConsentItems = emptyList()
             resetPendingCleanupResult()
@@ -910,6 +934,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         beforeAvailableBytes: Long,
     ) {
         val storageAfter = repository.storageSnapshot()
+        val measuredResult = CleanupResult(
+            deletedBytes = deletedBytes,
+            deletedCount = deletedIds.size,
+            failedCount = failedCount,
+            beforeAvailableBytes = beforeAvailableBytes,
+            afterAvailableBytes = storageAfter.availableBytes,
+        )
         _state.update { state ->
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
             val deletedUris = deletedFiles.mapTo(hashSetOf()) { it.uri }
@@ -970,17 +1001,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 storage = storageAfter,
                 memory = repository.memorySnapshot(),
                 cleanupInProgress = false,
-                cleanupResult = CleanupResult(
-                    deletedBytes = deletedBytes,
-                    deletedCount = deletedIds.size,
-                    failedCount = failedCount,
-                    beforeAvailableBytes = beforeAvailableBytes,
-                    afterAvailableBytes = storageAfter.availableBytes,
-                ),
+                cleanupResult = measuredResult,
                 message = null,
             )
         }
         persistDashboardSnapshot()
+        recordCleanupHistory(measuredResult)
     }
 
     fun onDeepCacheCleanupResult(approved: Boolean) {

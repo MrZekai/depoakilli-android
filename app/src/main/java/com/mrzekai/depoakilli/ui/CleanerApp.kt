@@ -426,13 +426,15 @@ fun CleanerApp(
                         detailScreen = DetailScreen.WHATSAPP
                         if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
                     },
-                    onDuplicates = { launchScan(ScanFocus.DUPLICATES) },
                     onLargeFiles = { launchScan(ScanFocus.LARGE_FILES) },
                     onApks = { launchScan(ScanFocus.APKS) },
-                    onMedia = { launchScan(ScanFocus.MEDIA) },
+                    onOpenAppCache = {
+                        detailScreen = DetailScreen.APP_CACHE
+                        viewModel.refreshAppCaches(force = true)
+                    },
+                    onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                     onDownloads = { launchScan(ScanFocus.DOWNLOADS) },
-                    onJunk = { launchScan(ScanFocus.JUNK) },
-                    onDeepClean = { launchScan(ScanFocus.DEEP) },
+                    onOpenTools = { selectedTabIndex = AppTab.TOOLS.ordinal },
                     onRefresh = viewModel::refreshDashboard,
                     modifier = Modifier.padding(padding),
                 )

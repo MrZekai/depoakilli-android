@@ -574,4 +574,30 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="smart_cleanup_ad_notice">Önce temizlik tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
     <string name="whatsapp_cleanup_ad_notice">Önce WhatsApp temizliği tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
     <string name="premium_cleanup_ad_notice">Önce temizlik tamamlanır ve ölçülen sonuç her zaman reklamdan önce gösterilir. Sonucu kapattıktan sonra, uygunsa bu doğal geçiş noktasında bir geçiş reklamı gösterilebilir.</string>
+
+    <string name="home_smart_clean_subtitle">Gerçek temizlik adaylarını incele</string>
+    <string name="home_last_cleanup_title">Son temizlik</string>
+    <string name="home_last_cleanup_empty">Henüz temizlik kaydı yok</string>
+    <string name="home_last_cleanup_empty_subtitle">İlk temizliğinden sonra doğrulanmış kazanılan alan burada görünecek.</string>
+    <string name="home_last_cleanup_summary">%1$s • %2$s temizlendi • %3$d dosya kaldırıldı</string>
+    <string name="home_last_cleanup_total">Toplam %1$s geri kazanıldı</string>
+    <string name="home_last_cleanup_now">Az önce</string>
+    <string name="home_last_cleanup_minutes">%1$d dk önce</string>
+    <string name="home_last_cleanup_hours">%1$d sa önce</string>
+    <string name="home_last_cleanup_days">%1$d gün önce</string>
+    <string name="home_smart_suggestions_title">Akıllı öneriler</string>
+    <string name="home_different_tools_title">Farklı araçlar</string>
+    <string name="home_suggestion_empty">Şu anda öncelikli öneri yok</string>
+    <string name="home_suggestion_empty_subtitle">Cihaz içi analizi yenilemek için Akıllı Temizlik çalıştır.</string>
+    <string name="home_cache_title">Uygulama Önbelleği</string>
+    <string name="home_cache_subtitle">Ölçülen uygulama önbelleğini incele</string>
+    <string name="home_cache_measured">%1$s ölçüldü</string>
+    <string name="home_privacy_title">Gizlilik Merkezi</string>
+    <string name="home_privacy_ready">Erişimler hazır</string>
+    <string name="home_privacy_review">İzinleri gözden geçir</string>
+    <string name="home_downloads_title">İndirilenler</string>
+    <string name="home_downloads_subtitle">İndirilen dosyaları yönet</string>
+    <string name="home_discover_title">Daha Fazlasını Keşfet</string>
+    <string name="home_discover_subtitle">Tüm temizlik ve depolama araçlarını görüntüle</string>
+    <string name="home_discover_action">Keşfet</string>
 </resources>

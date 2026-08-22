@@ -574,4 +574,30 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="smart_cleanup_ad_notice">Cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
     <string name="whatsapp_cleanup_ad_notice">WhatsApp cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
     <string name="premium_cleanup_ad_notice">Cleanup completes first and the measured result is always shown before any ad. After you close the result, one eligible interstitial may appear at that natural break.</string>
+
+    <string name="home_smart_clean_subtitle">Review real cleanup candidates</string>
+    <string name="home_last_cleanup_title">Last cleanup</string>
+    <string name="home_last_cleanup_empty">No cleanup recorded yet</string>
+    <string name="home_last_cleanup_empty_subtitle">Verified reclaimed space will appear here after your first cleanup.</string>
+    <string name="home_last_cleanup_summary">%1$s • %2$s reclaimed • %3$d files removed</string>
+    <string name="home_last_cleanup_total">%1$s reclaimed in total</string>
+    <string name="home_last_cleanup_now">Just now</string>
+    <string name="home_last_cleanup_minutes">%1$d min ago</string>
+    <string name="home_last_cleanup_hours">%1$d h ago</string>
+    <string name="home_last_cleanup_days">%1$d d ago</string>
+    <string name="home_smart_suggestions_title">Smart suggestions</string>
+    <string name="home_different_tools_title">Different tools</string>
+    <string name="home_suggestion_empty">No priority suggestion right now</string>
+    <string name="home_suggestion_empty_subtitle">Run Smart Clean to refresh your on-device analysis.</string>
+    <string name="home_cache_title">App cache</string>
+    <string name="home_cache_subtitle">Review measured app cache</string>
+    <string name="home_cache_measured">%1$s measured</string>
+    <string name="home_privacy_title">Privacy Center</string>
+    <string name="home_privacy_ready">Access is ready</string>
+    <string name="home_privacy_review">Review permissions</string>
+    <string name="home_downloads_title">Downloads</string>
+    <string name="home_downloads_subtitle">Manage downloaded files</string>
+    <string name="home_discover_title">Discover more</string>
+    <string name="home_discover_subtitle">View all cleanup and storage tools</string>
+    <string name="home_discover_action">Explore</string>
 </resources>

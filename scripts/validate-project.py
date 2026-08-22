@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha2.
+# Required project surface for v0.5.17-alpha3.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -50,6 +50,9 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
@@ -106,8 +109,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 29",
-    'versionName = "0.5.17-alpha2"',
+    "versionCode = 30",
+    'versionName = "0.5.17-alpha3"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -254,6 +257,9 @@ view_model = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.
 cleaner_app = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
 device_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt")
 dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt")
+home_components = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt")
+home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt")
+cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
 memory_dialog = ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt"
 
 for forbidden in (
@@ -335,24 +341,83 @@ for expected in (
         errors.append(f"missing Phase-2 navigation invariant: {expected}")
 
 for expected in (
-    "private data class DashboardFinding(",
-    "state.dashboardCategoryBytes",
-    ".filter { it.bytes > 0L }",
-    ".sortedByDescending(DashboardFinding::bytes)",
-    "DashboardDeepCleanRow",
-    "onDownloads: () -> Unit",
-    "onJunk: () -> Unit",
+    "HomeOpportunityCard(",
+    "HomeSmartCleanCard(",
+    "HomeCleanupProofCard(",
+    "HomeSuggestionCard(",
+    "HomeToolShortcut(",
+    "HomeExploreCard(",
+    "onOpenAppCache: () -> Unit",
+    "onOpenPrivacyAccess: () -> Unit",
+    "onOpenTools: () -> Unit",
 ):
     if expected not in dashboard:
-        errors.append(f"missing Phase-2 dynamic Home invariant: {expected}")
+        errors.append(f"missing alpha3 premium Home invariant: {expected}")
+
+for expected in (
+    "HomeBrandHeader",
+    "HomeOpportunityCard",
+    "HomeSmartCleanCard",
+    "HomeCleanupProofCard",
+    "HomeSuggestionCard",
+    "HomeToolShortcut",
+    "HomeExploreCard",
+):
+    if expected not in home_components:
+        errors.append(f"missing alpha3 Home component: {expected}")
+
+for expected in (
+    "HeroGradient",
+    "PrimaryGradient",
+    "ExploreGradient",
+    "PageGradient",
+):
+    if expected not in home_tokens:
+        errors.append(f"missing Home visual token: {expected}")
+
+for expected in (
+    "data class CleanupHistorySnapshot",
+    "totalDeletedBytes",
+    "lastDeletedBytes",
+    'PREFS_NAME = "cleanup_history_v1"',
+):
+    if expected not in cleanup_history_store:
+        errors.append(f"missing verified cleanup-history invariant: {expected}")
+
+for expected in (
+    "cleanupHistoryStore",
+    "recordCleanupHistory",
+):
+    if expected not in view_model:
+        errors.append(f"missing cleanup proof-layer ViewModel invariant: {expected}")
+
+if not re.search(
+    r"val\s+cleanupHistory\s*:\s*CleanupHistorySnapshot\s*=\s*CleanupHistorySnapshot\(\)",
+    view_model,
+):
+    errors.append(
+        "missing typed cleanupHistory: CleanupHistorySnapshot ViewModel state invariant"
+    )
 
 for forbidden in (
     "DashboardToolTile(",
     "DeepCleanPromo(",
+    "DashboardDeepCleanRow(",
     "onOpenProfile:",
+    "onDeepClean:",
+    "onJunk:",
+    "onMedia:",
 ):
     if forbidden in dashboard:
-        errors.append(f"duplicated/static Home UI remains: {forbidden}")
+        errors.append(f"duplicated/obsolete Home UI remains: {forbidden}")
+
+for forbidden in (
+    "R.string.sponsored",
+    "premium",
+    "Premium",
+):
+    if forbidden in dashboard or forbidden in home_components:
+        errors.append(f"Home must not fake a premium/sponsored product surface: {forbidden}")
 if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
     errors.append("content shells must retain gated banner placements")
 
@@ -371,6 +436,11 @@ for required_name in (
     "smart_cleanup_ad_notice",
     "whatsapp_cleanup_ad_notice",
     "premium_cleanup_ad_notice",
+    "home_last_cleanup_title",
+    "home_last_cleanup_summary",
+    "home_smart_suggestions_title",
+    "home_different_tools_title",
+    "home_discover_title",
 ):
     if f'name="{required_name}"' not in default_strings:
         errors.append(f"missing default legal/ad resource: {required_name}")
@@ -525,4 +595,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha2 Phase-2 home/navigation invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha3 premium Home/proof-layer invariants are valid.")
