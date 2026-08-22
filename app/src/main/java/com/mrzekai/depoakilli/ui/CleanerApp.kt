@@ -535,11 +535,12 @@ fun CleanerApp(
                         result.operationSucceeded &&
                             (
                                 result.deletedCount > 0 ||
+                                    result.deletedBytes > 0L ||
                                     result.kind == CleanupResultKind.SYSTEM_CACHE
                                 )
 
                     val returnToCacheManager =
-                        result.kind == CleanupResultKind.SYSTEM_CACHE
+                        result.kind != CleanupResultKind.FILES
 
                     viewModel.dismissCleanupResult()
                     legalReturnScreen = null

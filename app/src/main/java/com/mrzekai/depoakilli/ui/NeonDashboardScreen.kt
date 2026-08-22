@@ -178,8 +178,8 @@ internal fun NeonDashboardScreen(
             }
 
             item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     HomeToolShortcut(
                         title = stringResource(R.string.home_cache_title),
@@ -195,7 +195,6 @@ internal fun NeonDashboardScreen(
                             null
                         },
                         onClick = onOpenAppCache,
-                        modifier = Modifier.weight(1f),
                     )
 
                     HomeToolShortcut(
@@ -210,7 +209,6 @@ internal fun NeonDashboardScreen(
                         icon = Icons.Outlined.Security,
                         accent = HomeVisualTokens.Teal,
                         onClick = onOpenPrivacyAccess,
-                        modifier = Modifier.weight(1f),
                     )
 
                     HomeToolShortcut(
@@ -224,7 +222,6 @@ internal fun NeonDashboardScreen(
                             null
                         },
                         onClick = onDownloads,
-                        modifier = Modifier.weight(1f),
                     )
                 }
             }

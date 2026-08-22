@@ -625,4 +625,8 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="cleanup_result_system_cache_reduced">ölçülen önbellek azalması</string>
     <string name="cleanup_result_system_cache_unmeasured">Android önbellek temizliğini tamamladı. Bu cihazda güvenilir bir byte azalması ölçülemedi.</string>
     <string name="cleanup_result_system_cache_note">Önbellek azalması Android depolama istatistiklerinden işlem öncesi ve sonrası ölçülür. Android güvenilir bir fark sunmazsa geri kazanılan alan için rakam uydurulmaz.</string>
+
+    <string name="cleanup_result_app_cache_title">%1$s önbelleği temizlendi</string>
+    <string name="cleanup_result_app_cache_note">Gösterilen azalma, gerçekten temizlenen veya Android önbellek işlemi öncesi ve sonrası ölçülen önbelleğe dayanır.</string>
+    <string name="message_individual_cache_no_change">Android ayarlarından döndükten sonra ölçülebilir bir önbellek azalması algılanmadı.</string>
 </resources>

@@ -55,6 +55,17 @@ internal fun CleanupResultDialog(
     val configuration = LocalConfiguration.current
     val partial = result.failedCount > 0 || result.cancelledCount > 0
     val accent = if (partial) Color(0xFFFFB74D) else Lime400
+    val resultTitle = when {
+        result.kind == CleanupResultKind.APP_CACHE ->
+            stringResource(
+                R.string.cleanup_result_app_cache_title,
+                result.subjectLabel ?: stringResource(R.string.app_name),
+            )
+        result.kind == CleanupResultKind.SYSTEM_CACHE ->
+            stringResource(R.string.cleanup_result_system_cache_title)
+        partial -> stringResource(R.string.cleanup_result_partial_title)
+        else -> stringResource(R.string.cleanup_result_title)
+    }
 
     Dialog(
         onDismissRequest = { onDismiss(resultAdPresented) },
@@ -104,14 +115,7 @@ internal fun CleanupResultDialog(
                     }
 
                     Text(
-                        stringResource(
-                            when {
-                                result.kind == CleanupResultKind.SYSTEM_CACHE ->
-                                    R.string.cleanup_result_system_cache_title
-                                partial -> R.string.cleanup_result_partial_title
-                                else -> R.string.cleanup_result_title
-                            },
-                        ),
+                        text = resultTitle,
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Black,
@@ -127,7 +131,7 @@ internal fun CleanupResultDialog(
                         )
                         Text(
                             stringResource(
-                                if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
+                                if (result.kind != CleanupResultKind.FILES) {
                                     R.string.cleanup_result_system_cache_reduced
                                 } else {
                                     R.string.cleanup_result_space_reclaimed
@@ -139,7 +143,7 @@ internal fun CleanupResultDialog(
                     } else {
                         Text(
                             stringResource(
-                                if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
+                                if (result.kind != CleanupResultKind.FILES) {
                                     R.string.cleanup_result_system_cache_unmeasured
                                 } else {
                                     R.string.cleanup_result_zero
@@ -202,10 +206,13 @@ internal fun CleanupResultDialog(
 
                     Text(
                         stringResource(
-                            if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
-                                R.string.cleanup_result_system_cache_note
-                            } else {
-                                R.string.cleanup_result_note
+                            when (result.kind) {
+                                CleanupResultKind.SYSTEM_CACHE ->
+                                    R.string.cleanup_result_system_cache_note
+                                CleanupResultKind.APP_CACHE ->
+                                    R.string.cleanup_result_app_cache_note
+                                CleanupResultKind.FILES ->
+                                    R.string.cleanup_result_note
                             },
                         ),
                         color = Color(0xFF9FB8C2),

@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha5.
+# Required project surface for v0.5.17-alpha6.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -111,8 +111,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 32",
-    'versionName = "0.5.17-alpha5"',
+    "versionCode = 33",
+    'versionName = "0.5.17-alpha6"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -313,6 +313,65 @@ if "state.cleanupResult == null" not in cleaner_app:
 
 if "eligibleForNaturalBreakAd && !resultAdPresented" not in cleaner_app:
     errors.append("Interstitial must be fallback-only when result ad was not presented")
+
+# ------------------------------------------------------------------
+# Alpha6 measurable cache results + readable Home tool cards.
+# ------------------------------------------------------------------
+for expected in (
+    "CleanupResultKind.APP_CACHE",
+    "subjectLabel",
+    "beginIndividualAppCacheMeasurement",
+    "onIndividualAppCacheSettingsReturned",
+    "cancelIndividualAppCacheMeasurement",
+    "measuredReduction",
+):
+    if expected not in view_model:
+        errors.append(f"missing alpha6 app-cache result invariant: {expected}")
+
+for expected in (
+    "beginIndividualAppCacheMeasurement(packageName)",
+    "onIndividualAppCacheSettingsReturned()",
+    "cancelIndividualAppCacheMeasurement()",
+):
+    if expected not in main_activity:
+        errors.append(f"missing alpha6 individual-cache activity invariant: {expected}")
+
+for expected in (
+    "result.deletedBytes > 0L",
+    "result.kind != CleanupResultKind.FILES",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing alpha6 result coverage invariant: {expected}")
+
+for expected in (
+    "CleanupResultKind.APP_CACHE",
+    "cleanup_result_app_cache_title",
+    "cleanup_result_app_cache_note",
+):
+    if expected not in cleanup_dialog:
+        errors.append(f"missing alpha6 app-cache dialog invariant: {expected}")
+
+different_tools_start = dashboard.find("R.string.home_different_tools_title")
+if different_tools_start < 0:
+    errors.append("Home different-tools section is missing")
+else:
+    different_tools_section = dashboard[different_tools_start:]
+    if "modifier = Modifier.weight(1f)" in different_tools_section:
+        errors.append("Home different-tools cards must not remain in the cramped 3-column layout")
+
+shortcut_start = home_components.find("internal fun HomeToolShortcut(")
+shortcut_end = home_components.find("internal fun HomeExploreCard(", shortcut_start)
+if shortcut_start < 0 or shortcut_end <= shortcut_start:
+    errors.append("unable to inspect HomeToolShortcut")
+else:
+    shortcut_section = home_components[shortcut_start:shortcut_end]
+    for expected in (
+        ".fillMaxWidth()",
+        "fontSize = 16.sp",
+        "text = subtitle",
+    ):
+        if expected not in shortcut_section:
+            errors.append(f"missing alpha6 HomeToolShortcut invariant: {expected}")
 
 
 for forbidden in (
@@ -565,6 +624,9 @@ for required_name in (
     "cleanup_result_system_cache_reduced",
     "cleanup_result_system_cache_unmeasured",
     "cleanup_result_system_cache_note",
+    "cleanup_result_app_cache_title",
+    "cleanup_result_app_cache_note",
+    "message_individual_cache_no_change",
 ):
     if f'name="{required_name}"' not in default_strings:
         errors.append(f"missing default legal/ad resource: {required_name}")
@@ -719,4 +781,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha5 result-native monetization invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha6 result coverage/home-tool invariants are valid.")

@@ -625,4 +625,8 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="cleanup_result_system_cache_reduced">measured cache reduction</string>
     <string name="cleanup_result_system_cache_unmeasured">Android completed the cache cleanup. A reliable byte reduction was not available on this device.</string>
     <string name="cleanup_result_system_cache_note">Cache reduction is measured from Android storage statistics before and after the system cleanup. If Android does not expose a reliable delta, no reclaimed-space number is invented.</string>
+
+    <string name="cleanup_result_app_cache_title">%1$s cache cleaned</string>
+    <string name="cleanup_result_app_cache_note">The displayed reduction is based on cache actually cleared or measured before and after the Android cache action.</string>
+    <string name="message_individual_cache_no_change">No measurable cache reduction was detected after returning from Android settings.</string>
 </resources>

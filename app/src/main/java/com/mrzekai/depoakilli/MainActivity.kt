@@ -57,8 +57,7 @@ class MainActivity : ComponentActivity() {
     private val appDetailsLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        cleanerViewModel.refreshDeviceState(force = true)
-        cleanerViewModel.refreshAppCaches(force = true)
+        cleanerViewModel.onIndividualAppCacheSettingsReturned()
     }
 
     private val deepCacheLauncher = registerForActivityResult(
@@ -267,13 +266,17 @@ class MainActivity : ComponentActivity() {
 
     private fun openAppCacheSettings(packageName: String) {
         suppressNextAppOpenAd()
+        cleanerViewModel.beginIndividualAppCacheMeasurement(packageName)
+
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.parse("package:$packageName"),
         )
+
         runCatching {
             appDetailsLauncher.launch(intent)
         }.onFailure {
+            cleanerViewModel.cancelIndividualAppCacheMeasurement()
             cleanerViewModel.showMessage(R.string.message_screen_unavailable)
         }
     }

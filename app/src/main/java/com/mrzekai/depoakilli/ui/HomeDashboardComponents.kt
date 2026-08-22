@@ -547,63 +547,84 @@ internal fun HomeToolShortcut(
 ) {
     Surface(
         modifier = modifier
-            .height(118.dp)
+            .fillMaxWidth()
             .clickable(onClick = onClick),
         color = HomeVisualTokens.SurfaceMuted,
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(19.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(
-                    modifier = Modifier.size(38.dp),
-                    color = accent.copy(alpha = .15f),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            icon,
-                            contentDescription = null,
-                            tint = accent,
-                            modifier = Modifier.size(23.dp),
-                        )
-                    }
+            Surface(
+                modifier = Modifier.size(48.dp),
+                color = accent.copy(alpha = .16f),
+                shape = RoundedCornerShape(15.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(27.dp),
+                    )
                 }
+            }
 
-                Spacer(Modifier.size(8.dp))
+            Spacer(Modifier.size(12.dp))
 
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
                 Text(
                     text = title,
-                    modifier = Modifier.weight(1f),
                     color = HomeVisualTokens.TextPrimary,
-                    fontSize = 12.sp,
-                    lineHeight = 15.sp,
+                    fontSize = 16.sp,
+                    lineHeight = 20.sp,
                     fontWeight = FontWeight.Black,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
+
+                Text(
+                    text = subtitle,
+                    color = HomeVisualTokens.TextSecondary,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                trailingValue?.let { value ->
+                    Text(
+                        text = value,
+                        color = accent,
+                        fontSize = 13.sp,
+                        lineHeight = 17.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
 
-            Text(
-                text = trailingValue ?: subtitle,
-                color = if (trailingValue != null) accent else HomeVisualTokens.TextMuted,
-                fontSize = 11.sp,
-                lineHeight = 14.sp,
-                fontWeight = if (trailingValue != null) FontWeight.Bold else FontWeight.Normal,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Spacer(Modifier.size(8.dp))
 
-            Icon(
-                Icons.AutoMirrored.Outlined.ArrowForward,
-                contentDescription = null,
-                tint = HomeVisualTokens.TextMuted,
-                modifier = Modifier
-                    .size(18.dp)
-                    .align(Alignment.End),
-            )
+            Surface(
+                modifier = Modifier.size(38.dp),
+                color = accent.copy(alpha = .12f),
+                shape = CircleShape,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = null,
+                        tint = accent,
+                        modifier = Modifier.size(21.dp),
+                    )
+                }
+            }
         }
     }
 }

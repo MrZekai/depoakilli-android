@@ -37,6 +37,7 @@ import kotlinx.coroutines.withContext
 enum class CleanupResultKind {
     FILES,
     SYSTEM_CACHE,
+    APP_CACHE,
 }
 
 data class CleanupResult(
@@ -48,6 +49,7 @@ data class CleanupResult(
     val afterAvailableBytes: Long = 0L,
     val kind: CleanupResultKind = CleanupResultKind.FILES,
     val operationSucceeded: Boolean = true,
+    val subjectLabel: String? = null,
 )
 
 private data class DeviceRefreshSnapshot(
@@ -113,6 +115,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var pendingCleanupStorageBeforeBytes: Long = 0L
     private var pendingDeepCacheBeforeBytes: Long = 0L
     private var pendingDeepCacheStorageBeforeBytes: Long = 0L
+    private var pendingIndividualCachePackage: String? = null
+    private var pendingIndividualCacheLabel: String? = null
+    private var pendingIndividualCacheBeforeBytes: Long = 0L
+    private var pendingIndividualCacheStorageBeforeBytes: Long = 0L
     private var deviceRefreshJob: Job? = null
     private var appCacheRefreshJob: Job? = null
     private var installedAppsRefreshJob: Job? = null
@@ -1111,18 +1117,133 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun beginIndividualAppCacheMeasurement(packageName: String) {
+        val current = _state.value
+        val app = current.appCache.entries.firstOrNull { it.packageName == packageName }
+
+        pendingIndividualCachePackage = packageName
+        pendingIndividualCacheLabel = app?.label ?: packageName
+        pendingIndividualCacheBeforeBytes = app?.cacheBytes?.coerceAtLeast(0L) ?: 0L
+        pendingIndividualCacheStorageBeforeBytes = current.storage.availableBytes.coerceAtLeast(0L)
+
+        _state.update { it.copy(cleanupResult = null, message = null) }
+    }
+
+    fun cancelIndividualAppCacheMeasurement() {
+        pendingIndividualCachePackage = null
+        pendingIndividualCacheLabel = null
+        pendingIndividualCacheBeforeBytes = 0L
+        pendingIndividualCacheStorageBeforeBytes = 0L
+    }
+
+    fun onIndividualAppCacheSettingsReturned() {
+        val packageName = pendingIndividualCachePackage
+        val appLabel = pendingIndividualCacheLabel
+        val beforeCacheBytes = pendingIndividualCacheBeforeBytes
+        val beforeAvailableBytes = pendingIndividualCacheStorageBeforeBytes
+
+        cancelIndividualAppCacheMeasurement()
+
+        if (packageName.isNullOrBlank()) {
+            refreshAppCaches(force = true)
+            return
+        }
+
+        appCacheRefreshJob?.cancel()
+        _state.update { it.copy(scanningAppCaches = true) }
+
+        viewModelScope.launch {
+            val afterCache = runCatching {
+                repository.appCacheSnapshot()
+            }.getOrNull()
+
+            val storageAfter = runCatching {
+                repository.storageSnapshot()
+            }.getOrElse {
+                _state.value.storage
+            }
+
+            val afterCacheBytes = afterCache
+                ?.entries
+                ?.firstOrNull { it.packageName == packageName }
+                ?.cacheBytes
+                ?.coerceAtLeast(0L)
+                ?: 0L
+
+            val measuredReduction =
+                if (beforeCacheBytes > 0L && afterCache != null) {
+                    (beforeCacheBytes - afterCacheBytes).coerceAtLeast(0L)
+                } else {
+                    0L
+                }
+
+            if (afterCache != null) {
+                lastAppCacheRefreshAt = SystemClock.elapsedRealtime()
+            }
+
+            _state.update { current ->
+                current.copy(
+                    appCache = afterCache ?: current.appCache,
+                    storage = storageAfter,
+                    scanningAppCaches = false,
+                    cleanupResult = if (measuredReduction > 0L) {
+                        CleanupResult(
+                            deletedBytes = measuredReduction,
+                            deletedCount = 0,
+                            failedCount = 0,
+                            beforeAvailableBytes = beforeAvailableBytes,
+                            afterAvailableBytes = storageAfter.availableBytes,
+                            kind = CleanupResultKind.APP_CACHE,
+                            subjectLabel = appLabel,
+                        )
+                    } else {
+                        null
+                    },
+                    message = if (measuredReduction > 0L) {
+                        null
+                    } else {
+                        getApplication<Application>().getString(
+                            R.string.message_individual_cache_no_change,
+                        )
+                    },
+                )
+            }
+        }
+    }
+
     fun clearOwnAppCache() {
         viewModelScope.launch {
+            val beforeAvailableBytes = repository.storageSnapshot().availableBytes
             val clearedBytes = repository.clearOwnCache().coerceAtLeast(0L)
-            _state.update {
-                it.copy(
-                    ownCacheBytes = repository.ownCacheSize(),
-                    storage = repository.storageSnapshot(),
-                    message = getApplication<Application>().getString(
-                        if (clearedBytes > 0L) R.string.message_own_cache_cleared else R.string.message_cache_already_empty,
-                        ByteFormatter.format(clearedBytes),
-                    ),
-                )
+            val storageAfter = repository.storageSnapshot()
+
+            _state.update { current ->
+                if (clearedBytes > 0L) {
+                    current.copy(
+                        ownCacheBytes = repository.ownCacheSize(),
+                        storage = storageAfter,
+                        cleanupResult = CleanupResult(
+                            deletedBytes = clearedBytes,
+                            deletedCount = 0,
+                            failedCount = 0,
+                            beforeAvailableBytes = beforeAvailableBytes,
+                            afterAvailableBytes = storageAfter.availableBytes,
+                            kind = CleanupResultKind.APP_CACHE,
+                            subjectLabel = getApplication<Application>().getString(R.string.app_name),
+                        ),
+                        message = null,
+                    )
+                } else {
+                    current.copy(
+                        ownCacheBytes = repository.ownCacheSize(),
+                        storage = storageAfter,
+                        cleanupResult = null,
+                        message = getApplication<Application>().getString(
+                            R.string.message_cache_already_empty,
+                            ByteFormatter.format(0L),
+                        ),
+                    )
+                }
             }
         }
     }
