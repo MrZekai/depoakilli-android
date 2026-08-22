@@ -159,7 +159,6 @@ private fun ResultMrecAd(
         }
 
         onDispose {
-            adView.adListener = null
             adView.destroy()
         }
     }
