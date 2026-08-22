@@ -10,6 +10,7 @@ val sampleAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
 val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
 val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
+val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
 
 // AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
 // Keep QA/debug on Google's official sample IDs and bind production only
@@ -18,6 +19,11 @@ val liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"
 val liveBannerId = "ca-app-pub-1380972808968213/2118175647"
 val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
 val liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"
+// Optional production Native unit. Empty means use live MREC fallback.
+val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
+    .orNull
+    ?.trim()
+    .orEmpty()
 val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -32,8 +38,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 31
-        versionName = "0.5.17-alpha4"
+        versionCode = 32
+        versionName = "0.5.17-alpha5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -43,6 +49,7 @@ android {
         buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
         buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+        buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
     }
 
     signingConfigs {
@@ -80,6 +87,7 @@ android {
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$liveBannerId\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$liveInterstitialId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -181,6 +189,14 @@ val validateReleaseAds by tasks.registering {
         }
         check(values.all { it.startsWith("ca-app-pub-1380972808968213") }) {
             "Release blocked: Smart Cleaner AdMob publisher IDs are inconsistent."
+        }
+        if (liveResultNativeId.isNotBlank()) {
+            check(!liveResultNativeId.contains("3940256099942544")) {
+                "Release blocked: Google sample Native ad ID cannot be used in production."
+            }
+            check(liveResultNativeId.startsWith("ca-app-pub-1380972808968213/")) {
+                "Release blocked: Result Native ad unit must belong to Smart Cleaner."
+            }
         }
         check(
             releaseKeystorePath.isPresent &&

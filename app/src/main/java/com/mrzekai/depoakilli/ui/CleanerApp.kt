@@ -284,7 +284,8 @@ fun CleanerApp(
                     !state.scanning &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
-                    !state.cleanupInProgress
+                    !state.cleanupInProgress &&
+                    state.cleanupResult == null
 
             if (detailScreen == null) {
                 Column(
@@ -528,13 +529,29 @@ fun CleanerApp(
         state.cleanupResult?.let { result ->
             CleanupResultDialog(
                 result = result,
-                onDismiss = {
-                    val eligibleForNaturalBreakAd = result.deletedCount > 0
+                canRequestAds = canRequestAds,
+                onDismiss = { resultAdPresented ->
+                    val eligibleForNaturalBreakAd =
+                        result.operationSucceeded &&
+                            (
+                                result.deletedCount > 0 ||
+                                    result.kind == CleanupResultKind.SYSTEM_CACHE
+                                )
+
+                    val returnToCacheManager =
+                        result.kind == CleanupResultKind.SYSTEM_CACHE
+
                     viewModel.dismissCleanupResult()
-                    detailScreen = null
                     legalReturnScreen = null
-                    selectedTabIndex = AppTab.HOME.ordinal
-                    if (eligibleForNaturalBreakAd) {
+
+                    if (returnToCacheManager) {
+                        detailScreen = DetailScreen.APP_CACHE
+                    } else {
+                        detailScreen = null
+                        selectedTabIndex = AppTab.HOME.ordinal
+                    }
+
+                    if (eligibleForNaturalBreakAd && !resultAdPresented) {
                         onCleanupResultDismissed()
                     }
                 },

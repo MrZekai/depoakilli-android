@@ -256,9 +256,11 @@ class MainActivity : ComponentActivity() {
             return
         }
         suppressNextAppOpenAd()
+        cleanerViewModel.beginDeepCacheCleanupMeasurement()
         runCatching {
             deepCacheLauncher.launch(Intent(StorageManager.ACTION_CLEAR_APP_CACHE))
         }.onFailure {
+            cleanerViewModel.onDeepCacheCleanupResult(false)
             cleanerViewModel.showMessage(R.string.message_screen_unavailable)
         }
     }

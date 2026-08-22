@@ -620,4 +620,9 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="cache_modern_open_android">Android uygulama ayarını aç</string>
     <string name="cache_modern_clean_now">Şimdi temizle</string>
     <string name="cache_modern_safety_note">Akıllı Temizleyici Android’in bildirdiği önbelleği ölçer. Başka uygulamaların özel dosyalarını sessizce silmez; tek tek temizlik Android’in resmî uygulama ekranından tamamlanır.</string>
+
+    <string name="cleanup_result_system_cache_title">Android önbellek temizliği tamamlandı</string>
+    <string name="cleanup_result_system_cache_reduced">ölçülen önbellek azalması</string>
+    <string name="cleanup_result_system_cache_unmeasured">Android önbellek temizliğini tamamladı. Bu cihazda güvenilir bir byte azalması ölçülemedi.</string>
+    <string name="cleanup_result_system_cache_note">Önbellek azalması Android depolama istatistiklerinden işlem öncesi ve sonrası ölçülür. Android güvenilir bir fark sunmazsa geri kazanılan alan için rakam uydurulmaz.</string>
 </resources>

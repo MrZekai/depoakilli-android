@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha4.
+# Required project surface for v0.5.17-alpha5.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -42,6 +42,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
@@ -110,14 +111,17 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 31",
-    'versionName = "0.5.17-alpha4"',
+    "versionCode = 32",
+    'versionName = "0.5.17-alpha5"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
     'liveBannerId = "ca-app-pub-1380972808968213/2118175647"',
     'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
     'liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"',
+    'sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"',
+    'providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")',
+    '"ADMOB_RESULT_NATIVE_ID"',
     'manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId',
     'manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId',
 ):
@@ -212,6 +216,7 @@ if "setContent {" in main_activity and "import androidx.activity.compose.setCont
 # Full-screen session caps and adaptive banner.
 # ------------------------------------------------------------------
 ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
+result_ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt")
 for expected in (
     "INTERSTITIAL/SHOW_SKIP session-cap",
     "APP_OPEN/SHOWED_SESSION_ONLY",
@@ -264,6 +269,52 @@ home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens
 cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
 memory_dialog = ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt"
 
+# ------------------------------------------------------------------
+# Alpha5 result Native/MREC monetization and Android cache result.
+# ------------------------------------------------------------------
+for expected in (
+    "AdLoader.Builder",
+    "MediaView",
+    "NativeAdView",
+    "AdSize.MEDIUM_RECTANGLE",
+    "CleanupResultAdSurface",
+    "ADMOB_RESULT_NATIVE_ID",
+):
+    if expected not in result_ads:
+        errors.append(f"missing alpha5 result-ad invariant: {expected}")
+
+for forbidden in ("VAST", "ExoPlayer", "Media3"):
+    if forbidden in result_ads:
+        errors.append(f"custom/VAST ad playback must not be implemented: {forbidden}")
+
+cleanup_dialog = read(
+    "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt"
+)
+for expected in (
+    "CleanupResultAdSurface(",
+    "onAdPresented = { resultAdPresented = true }",
+    "onDismiss: (resultAdPresented: Boolean) -> Unit",
+    "CleanupResultKind.SYSTEM_CACHE",
+    "verticalScroll(rememberScrollState())",
+):
+    if expected not in cleanup_dialog:
+        errors.append(f"missing alpha5 result-dialog invariant: {expected}")
+
+for expected in (
+    "beginDeepCacheCleanupMeasurement()",
+    "kind = CleanupResultKind.SYSTEM_CACHE",
+    "measuredCacheReduction",
+):
+    if expected not in view_model:
+        errors.append(f"missing truthful Android-cache result invariant: {expected}")
+
+if "state.cleanupResult == null" not in cleaner_app:
+    errors.append("normal bottom banner must be disabled while cleanup result is visible")
+
+if "eligibleForNaturalBreakAd && !resultAdPresented" not in cleaner_app:
+    errors.append("Interstitial must be fallback-only when result ad was not presented")
+
+
 for forbidden in (
     "MemoryOptimizationResult",
     "memoryOptimizationResult",
@@ -307,6 +358,10 @@ for expected in (
     "CleanupResultDialog(",
     "onCleanupResultDismissed()",
     "eligibleForNaturalBreakAd",
+    "resultAdPresented",
+    "!resultAdPresented",
+    "state.cleanupResult == null",
+    "CleanupResultKind.SYSTEM_CACHE",
     "selectedTabIndex = AppTab.HOME.ordinal",
     "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
     "Spacer(Modifier.height(10.dp))",
@@ -506,6 +561,10 @@ for required_name in (
     "cache_modern_total_label",
     "cache_modern_individual_steps",
     "cache_modern_safety_note",
+    "cleanup_result_system_cache_title",
+    "cleanup_result_system_cache_reduced",
+    "cleanup_result_system_cache_unmeasured",
+    "cleanup_result_system_cache_note",
 ):
     if f'name="{required_name}"' not in default_strings:
         errors.append(f"missing default legal/ad resource: {required_name}")
@@ -660,4 +719,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha4 cache UX/speed invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha5 result-native monetization invariants are valid.")

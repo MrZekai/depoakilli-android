@@ -34,6 +34,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+enum class CleanupResultKind {
+    FILES,
+    SYSTEM_CACHE,
+}
+
 data class CleanupResult(
     val deletedBytes: Long,
     val deletedCount: Int,
@@ -41,6 +46,8 @@ data class CleanupResult(
     val cancelledCount: Int = 0,
     val beforeAvailableBytes: Long = 0L,
     val afterAvailableBytes: Long = 0L,
+    val kind: CleanupResultKind = CleanupResultKind.FILES,
+    val operationSucceeded: Boolean = true,
 )
 
 private data class DeviceRefreshSnapshot(
@@ -104,6 +111,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var pendingCleanupDeletedCount: Int = 0
     private var pendingCleanupFailedCount: Int = 0
     private var pendingCleanupStorageBeforeBytes: Long = 0L
+    private var pendingDeepCacheBeforeBytes: Long = 0L
+    private var pendingDeepCacheStorageBeforeBytes: Long = 0L
     private var deviceRefreshJob: Job? = null
     private var appCacheRefreshJob: Job? = null
     private var installedAppsRefreshJob: Job? = null
@@ -1045,15 +1054,60 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         recordCleanupHistory(measuredResult)
     }
 
+    fun beginDeepCacheCleanupMeasurement() {
+        val current = _state.value
+        pendingDeepCacheBeforeBytes = current.appCache.totalCacheBytes.coerceAtLeast(0L)
+        pendingDeepCacheStorageBeforeBytes = current.storage.availableBytes.coerceAtLeast(0L)
+    }
+
     fun onDeepCacheCleanupResult(approved: Boolean) {
-        refreshDeviceState(force = true)
-        refreshAppCaches(force = true)
-        _state.update {
-            it.copy(
-                message = getApplication<Application>().getString(
-                    if (approved) R.string.message_deep_cache_complete else R.string.message_cache_cleanup_cancelled,
-                ),
-            )
+        val beforeCacheBytes = pendingDeepCacheBeforeBytes
+        val beforeAvailableBytes = pendingDeepCacheStorageBeforeBytes
+        pendingDeepCacheBeforeBytes = 0L
+        pendingDeepCacheStorageBeforeBytes = 0L
+
+        if (!approved) {
+            refreshDeviceState(force = true)
+            refreshAppCaches(force = true)
+            return
+        }
+
+        appCacheRefreshJob?.cancel()
+        _state.update { it.copy(scanningAppCaches = true, message = null) }
+
+        viewModelScope.launch {
+            val afterCache = runCatching { repository.appCacheSnapshot() }.getOrNull()
+            val storageAfter = runCatching { repository.storageSnapshot() }
+                .getOrElse { _state.value.storage }
+
+            val measuredCacheReduction =
+                if (beforeCacheBytes > 0L && afterCache != null) {
+                    (beforeCacheBytes - afterCache.totalCacheBytes).coerceAtLeast(0L)
+                } else {
+                    0L
+                }
+
+            if (afterCache != null) {
+                lastAppCacheRefreshAt = SystemClock.elapsedRealtime()
+            }
+
+            _state.update { current ->
+                current.copy(
+                    appCache = afterCache ?: current.appCache,
+                    storage = storageAfter,
+                    scanningAppCaches = false,
+                    cleanupResult = CleanupResult(
+                        deletedBytes = measuredCacheReduction,
+                        deletedCount = 0,
+                        failedCount = 0,
+                        beforeAvailableBytes = beforeAvailableBytes,
+                        afterAvailableBytes = storageAfter.availableBytes,
+                        kind = CleanupResultKind.SYSTEM_CACHE,
+                        operationSucceeded = true,
+                    ),
+                    message = null,
+                )
+            }
         }
     }
 

@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -32,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.CleanupResultAdSurface
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
@@ -39,13 +48,16 @@ import com.mrzekai.depoakilli.ui.theme.Lime400
 @Composable
 internal fun CleanupResultDialog(
     result: CleanupResult,
-    onDismiss: () -> Unit,
+    canRequestAds: Boolean,
+    onDismiss: (resultAdPresented: Boolean) -> Unit,
 ) {
+    var resultAdPresented by remember(result) { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
     val partial = result.failedCount > 0 || result.cancelledCount > 0
     val accent = if (partial) Color(0xFFFFB74D) else Lime400
 
     Dialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(resultAdPresented) },
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
@@ -56,7 +68,9 @@ internal fun CleanupResultDialog(
             contentAlignment = Alignment.Center,
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = (configuration.screenHeightDp * 0.94f).dp),
                 shape = RoundedCornerShape(30.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
             ) {
@@ -72,6 +86,7 @@ internal fun CleanupResultDialog(
                                 ),
                             ),
                         )
+                        .verticalScroll(rememberScrollState())
                         .padding(22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(15.dp),
@@ -90,8 +105,12 @@ internal fun CleanupResultDialog(
 
                     Text(
                         stringResource(
-                            if (partial) R.string.cleanup_result_partial_title
-                            else R.string.cleanup_result_title,
+                            when {
+                                result.kind == CleanupResultKind.SYSTEM_CACHE ->
+                                    R.string.cleanup_result_system_cache_title
+                                partial -> R.string.cleanup_result_partial_title
+                                else -> R.string.cleanup_result_title
+                            },
                         ),
                         color = Color.White,
                         fontSize = 24.sp,
@@ -107,13 +126,25 @@ internal fun CleanupResultDialog(
                             fontWeight = FontWeight.Black,
                         )
                         Text(
-                            stringResource(R.string.cleanup_result_space_reclaimed),
+                            stringResource(
+                                if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
+                                    R.string.cleanup_result_system_cache_reduced
+                                } else {
+                                    R.string.cleanup_result_space_reclaimed
+                                },
+                            ),
                             color = Color(0xFFD4E9E3),
                             fontWeight = FontWeight.Bold,
                         )
                     } else {
                         Text(
-                            stringResource(R.string.cleanup_result_zero),
+                            stringResource(
+                                if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
+                                    R.string.cleanup_result_system_cache_unmeasured
+                                } else {
+                                    R.string.cleanup_result_zero
+                                },
+                            ),
                             color = Color(0xFFD4E9E3),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
@@ -129,13 +160,15 @@ internal fun CleanupResultDialog(
                             modifier = Modifier.fillMaxWidth().padding(14.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            CleanupResultLine(
-                                text = stringResource(
-                                    R.string.cleanup_result_files_removed,
-                                    result.deletedCount,
-                                ),
-                                accent = Lime400,
-                            )
+                            if (result.kind == CleanupResultKind.FILES) {
+                                CleanupResultLine(
+                                    text = stringResource(
+                                        R.string.cleanup_result_files_removed,
+                                        result.deletedCount,
+                                    ),
+                                    accent = Lime400,
+                                )
+                            }
                             if (result.beforeAvailableBytes > 0L && result.afterAvailableBytes > 0L) {
                                 CleanupResultLine(
                                     text = stringResource(
@@ -168,15 +201,27 @@ internal fun CleanupResultDialog(
                     }
 
                     Text(
-                        stringResource(R.string.cleanup_result_note),
+                        stringResource(
+                            if (result.kind == CleanupResultKind.SYSTEM_CACHE) {
+                                R.string.cleanup_result_system_cache_note
+                            } else {
+                                R.string.cleanup_result_note
+                            },
+                        ),
                         color = Color(0xFF9FB8C2),
                         fontSize = 11.sp,
                         lineHeight = 15.sp,
                         textAlign = TextAlign.Center,
                     )
 
+                    CleanupResultAdSurface(
+                        canRequestAds = canRequestAds,
+                        onAdPresented = { resultAdPresented = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+
                     Button(
-                        onClick = onDismiss,
+                        onClick = { onDismiss(resultAdPresented) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(

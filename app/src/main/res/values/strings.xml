@@ -620,4 +620,9 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="cache_modern_open_android">Open Android app settings</string>
     <string name="cache_modern_clean_now">Clean now</string>
     <string name="cache_modern_safety_note">Smart Cleaner measures cache reported by Android. It does not silently delete another app’s private files; individual cleanup is completed from Android’s official app screen.</string>
+
+    <string name="cleanup_result_system_cache_title">Android cache cleanup completed</string>
+    <string name="cleanup_result_system_cache_reduced">measured cache reduction</string>
+    <string name="cleanup_result_system_cache_unmeasured">Android completed the cache cleanup. A reliable byte reduction was not available on this device.</string>
+    <string name="cleanup_result_system_cache_note">Cache reduction is measured from Android storage statistics before and after the system cleanup. If Android does not expose a reliable delta, no reclaimed-space number is invented.</string>
 </resources>
