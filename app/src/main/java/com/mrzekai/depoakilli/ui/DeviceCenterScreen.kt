@@ -443,6 +443,7 @@ internal fun SettingsDetailScreen(
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
+    onOpenPrivacyAccess: () -> Unit,
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -452,8 +453,12 @@ internal fun SettingsDetailScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item {
-            Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-            Text(stringResource(R.string.settings_subtitle_v050), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            SettingsActionRow(
+                title = stringResource(R.string.security_center_title),
+                subtitle = stringResource(R.string.security_center_subtitle),
+                icon = Icons.Outlined.Security,
+                onClick = onOpenPrivacyAccess,
+            )
         }
         item {
             SettingsActionRow(

@@ -103,8 +103,7 @@ import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
     HOME(R.string.tab_home, Icons.Outlined.Home),
     TOOLS(R.string.tab_tools, Icons.Outlined.CleaningServices),
-    SECURITY(R.string.tab_security, Icons.Outlined.Security),
-    PROFILE(R.string.tab_profile, Icons.Outlined.Android),
+    ME(R.string.tab_profile, Icons.Outlined.Android),
 }
 
 private enum class DetailScreen(@StringRes val titleRes: Int) {
@@ -113,6 +112,7 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
     APP_CACHE(R.string.cache_manager_title),
     APP_MANAGER(R.string.app_manager_title),
     SETTINGS(R.string.settings_title),
+    ACCESS(R.string.security_center_title),
     PRIVACY(R.string.privacy_policy),
     TERMS(R.string.terms_of_service),
     ABOUT(R.string.about_app),
@@ -262,14 +262,14 @@ fun CleanerApp(
                 null -> when (AppTab.entries[selectedTabIndex]) {
                     AppTab.HOME,
                     AppTab.TOOLS -> true
-                    AppTab.SECURITY,
-                    AppTab.PROFILE -> false
+                    AppTab.ME -> false
                 }
                 DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
                 DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
                 DetailScreen.APP_CACHE,
                 DetailScreen.APP_MANAGER -> true
-                DetailScreen.SETTINGS -> false
+                DetailScreen.SETTINGS,
+                DetailScreen.ACCESS,
                 DetailScreen.PRIVACY,
                 DetailScreen.TERMS,
                 DetailScreen.ABOUT -> false
@@ -293,7 +293,7 @@ fun CleanerApp(
                 ) {
                     if (bannerAllowed) {
                         BannerAd(canRequestAds = true)
-                        Spacer(Modifier.height(48.dp))
+                        Spacer(Modifier.height(10.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
                     }
                     NavigationBar(containerColor = Color(0xFF07132C)) {
@@ -390,7 +390,19 @@ fun CleanerApp(
                 onSendFeedback = onSendFeedback,
                 onShareApp = onShareApp,
                 onShowPrivacyOptions = onShowPrivacyOptions,
+                onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                 onOpenLegalPage = ::openLegalPage,
+                modifier = Modifier.padding(padding),
+            )
+
+            DetailScreen.ACCESS -> SecurityCenterScreen(
+                state = state,
+                onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+                onRequestUsageAccess = ::requestUsageWithDisclosure,
+                onOpenPrivacy = {
+                    legalReturnScreen = DetailScreen.ACCESS
+                    detailScreen = DetailScreen.PRIVACY
+                },
                 modifier = Modifier.padding(padding),
             )
 
@@ -409,7 +421,6 @@ fun CleanerApp(
             null -> when (AppTab.entries[selectedTabIndex]) {
                 AppTab.HOME -> NeonDashboardScreen(
                     state = state,
-                    onOpenProfile = { selectedTabIndex = AppTab.PROFILE.ordinal },
                     onSmartClean = { launchScan(ScanFocus.SMART) },
                     onOpenWhatsApp = {
                         detailScreen = DetailScreen.WHATSAPP
@@ -419,6 +430,8 @@ fun CleanerApp(
                     onLargeFiles = { launchScan(ScanFocus.LARGE_FILES) },
                     onApks = { launchScan(ScanFocus.APKS) },
                     onMedia = { launchScan(ScanFocus.MEDIA) },
+                    onDownloads = { launchScan(ScanFocus.DOWNLOADS) },
+                    onJunk = { launchScan(ScanFocus.JUNK) },
                     onDeepClean = { launchScan(ScanFocus.DEEP) },
                     onRefresh = viewModel::refreshDashboard,
                     modifier = Modifier.padding(padding),
@@ -437,25 +450,18 @@ fun CleanerApp(
                         detailScreen = DetailScreen.APP_MANAGER
                         viewModel.refreshInstalledApps()
                     },
-                    onOpenSettings = { selectedTabIndex = AppTab.PROFILE.ordinal },
+                    onOpenSettings = { selectedTabIndex = AppTab.ME.ordinal },
                     modifier = Modifier.padding(padding),
                 )
 
-                AppTab.SECURITY -> SecurityCenterScreen(
-                    state = state,
-                    onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
-                    onRequestUsageAccess = ::requestUsageWithDisclosure,
-                    onOpenPrivacy = { detailScreen = DetailScreen.PRIVACY },
-                    modifier = Modifier.padding(padding),
-                )
-
-                AppTab.PROFILE -> SettingsDetailScreen(
+                AppTab.ME -> SettingsDetailScreen(
                     privacyOptionsRequired = privacyOptionsRequired,
                     onOpenLanguageSettings = onOpenLanguageSettings,
                     onRateApp = onRateApp,
                     onSendFeedback = onSendFeedback,
                     onShareApp = onShareApp,
                     onShowPrivacyOptions = onShowPrivacyOptions,
+                    onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                     onOpenLegalPage = ::openLegalPage,
                     modifier = Modifier.padding(padding),
                 )
@@ -549,317 +555,6 @@ fun CleanerApp(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun HomeScreen(
-    state: CleanerUiState,
-    onScan: (ScanFocus) -> Unit,
-    onRequestAllFilesAccess: () -> Unit,
-    onOpenWhatsApp: () -> Unit,
-    onOpenCache: () -> Unit,
-    onOpenSettings: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(18.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item {
-            SmartCleanerHero(
-                state = state,
-                onScan = { onScan(ScanFocus.SMART) },
-                onOpenSettings = onOpenSettings,
-            )
-        }
-        if (!state.hasAllFilesAccess) {
-            item { AllFilesAccessCard(onRequestAllFilesAccess) }
-        }
-        item {
-            Text(
-                stringResource(R.string.cleaning_tools_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Black,
-            )
-            Text(
-                stringResource(R.string.cleaning_tools_subtitle_v050),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        item {
-            ToolGridRow(
-                left = ToolSpec(
-                    R.string.junk_cleaner_title,
-                    R.string.junk_cleaner_subtitle_v050,
-                    Icons.Outlined.DeleteSweep,
-                    Color(0xFFEA6A22),
-                ) { onScan(ScanFocus.JUNK) },
-                right = ToolSpec(
-                    R.string.duplicates_tool_title,
-                    R.string.duplicates_tool_subtitle_v050,
-                    Icons.Outlined.ContentCopy,
-                    Color(0xFF7047E8),
-                ) { onScan(ScanFocus.DUPLICATES) },
-            )
-        }
-        item {
-            ToolGridRow(
-                left = ToolSpec(
-                    R.string.large_files_tool_title,
-                    R.string.large_files_tool_subtitle_v050,
-                    Icons.Outlined.VideoFile,
-                    Color(0xFFEA3E5C),
-                ) { onScan(ScanFocus.LARGE_FILES) },
-                right = ToolSpec(
-                    R.string.media_cleaner_title,
-                    R.string.media_cleaner_subtitle,
-                    Icons.Outlined.PhotoLibrary,
-                    Color(0xFF0B8DD8),
-                ) { onScan(ScanFocus.MEDIA) },
-            )
-        }
-        item {
-            WideToolCard(
-                title = stringResource(R.string.whatsapp_cleaner_title),
-                subtitle = stringResource(R.string.whatsapp_cleaner_subtitle_v050),
-                icon = Icons.Outlined.Chat,
-                accent = WhatsAppGreen,
-                onClick = onOpenWhatsApp,
-            )
-        }
-        item {
-            WideToolCard(
-                title = stringResource(R.string.deep_cache_title),
-                subtitle = if (state.appCache.totalCacheBytes > 0L) {
-                    stringResource(R.string.deep_cache_measured, ByteFormatter.format(state.appCache.totalCacheBytes))
-                } else {
-                    stringResource(R.string.deep_cache_subtitle)
-                },
-                icon = Icons.Outlined.CleaningServices,
-                accent = Color(0xFF1253D8),
-                onClick = onOpenCache,
-            )
-        }
-        item {
-            WideToolCard(
-                title = stringResource(R.string.downloads_apk_title),
-                subtitle = stringResource(R.string.downloads_apk_subtitle),
-                icon = Icons.Outlined.Download,
-                accent = Color(0xFF805313),
-                onClick = { onScan(ScanFocus.DOWNLOADS) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun SmartCleanerHero(
-    state: CleanerUiState,
-    onScan: () -> Unit,
-    onOpenSettings: () -> Unit,
-) {
-    Card(shape = RoundedCornerShape(30.dp)) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        listOf(Color(0xFF07143B), Color(0xFF0A4ED7), Color(0xFF13B78D)),
-                    ),
-                )
-                .padding(20.dp),
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(color = Color.White.copy(alpha = .14f), shape = CircleShape) {
-                        Icon(
-                            Icons.Outlined.Security,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.padding(11.dp).size(28.dp),
-                        )
-                    }
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.app_name), color = Color.White.copy(alpha = .82f), fontWeight = FontWeight.Bold)
-                        Text(
-                            stringResource(R.string.hero_performance_v050),
-                            color = Color.White,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Black,
-                        )
-                    }
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Outlined.Settings, contentDescription = null, tint = Color.White)
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    StorageRing(state.storage)
-                    Column(
-                        modifier = Modifier.weight(1f).padding(start = 18.dp),
-                        verticalArrangement = Arrangement.spacedBy(7.dp),
-                    ) {
-                        Text(
-                            stringResource(R.string.storage_free, ByteFormatter.format(state.storage.availableBytes)),
-                            color = Color.White,
-                            fontWeight = FontWeight.Black,
-                        )
-                        Text(
-                            stringResource(R.string.deep_cache_home_metric, ByteFormatter.format(state.appCache.totalCacheBytes)),
-                            color = Color.White.copy(alpha = .82f),
-                        )
-                        Text(
-                            if (state.hasAllFilesAccess) stringResource(R.string.full_storage_access_ready) else stringResource(R.string.full_storage_access_needed),
-                            color = if (state.hasAllFilesAccess) Color(0xFF8FF7C2) else Color(0xFFFFD37A),
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-                Button(
-                    onClick = onScan,
-                    enabled = !state.scanning,
-                    modifier = Modifier.fillMaxWidth().height(54.dp),
-                ) {
-                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        if (state.scanning) stringResource(R.string.smart_clean_scanning) else stringResource(R.string.smart_clean_action_v050),
-                        fontWeight = FontWeight.Black,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun StorageRing(storage: StorageSnapshot) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.size(112.dp)) {
-        Canvas(Modifier.fillMaxSize()) {
-            val stroke = 11.dp.toPx()
-            drawArc(
-                Color.White.copy(alpha = .18f), -90f, 360f, false,
-                topLeft = Offset(stroke / 2, stroke / 2),
-                size = Size(size.width - stroke, size.height - stroke),
-                style = Stroke(stroke, cap = StrokeCap.Round),
-            )
-            drawArc(
-                Lime400, -90f, 360f * storage.usedFraction.coerceIn(0f, 1f), false,
-                topLeft = Offset(stroke / 2, stroke / 2),
-                size = Size(size.width - stroke, size.height - stroke),
-                style = Stroke(stroke, cap = StrokeCap.Round),
-            )
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("${(storage.usedFraction * 100).toInt()}%", color = Color.White, fontSize = 25.sp, fontWeight = FontWeight.Black)
-            Text(stringResource(R.string.home_storage_label), color = Color.White.copy(alpha = .75f), style = MaterialTheme.typography.labelSmall)
-        }
-    }
-}
-
-@Composable
-private fun AllFilesAccessCard(onRequest: () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2414)),
-        shape = RoundedCornerShape(22.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(Icons.Outlined.Security, contentDescription = null, tint = Color(0xFF9A6500))
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.all_files_access_title), fontWeight = FontWeight.Black)
-                Text(
-                    stringResource(R.string.all_files_access_description),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            TextButton(onClick = onRequest) { Text(stringResource(R.string.grant_access)) }
-        }
-    }
-}
-
-private data class ToolSpec(
-    @StringRes val titleRes: Int,
-    @StringRes val subtitleRes: Int,
-    val icon: ImageVector,
-    val accent: Color,
-    val action: () -> Unit,
-)
-
-@Composable
-private fun ToolGridRow(left: ToolSpec, right: ToolSpec) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        SmallToolCard(left, Modifier.weight(1f))
-        SmallToolCard(right, Modifier.weight(1f))
-    }
-}
-
-@Composable
-private fun SmallToolCard(spec: ToolSpec, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier.height(170.dp),
-        onClick = spec.action,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = spec.accent.copy(alpha = .10f)),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(15.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Surface(color = spec.accent, shape = RoundedCornerShape(16.dp)) {
-                Icon(spec.icon, contentDescription = null, tint = Color.White, modifier = Modifier.padding(10.dp).size(28.dp))
-            }
-            Column {
-                Text(stringResource(spec.titleRes), fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(
-                    stringResource(spec.subtitleRes),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun WideToolCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    accent: Color,
-    onClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(22.dp))
-            .background(Color.White)
-            .border(1.dp, accent.copy(alpha = .12f), RoundedCornerShape(22.dp))
-            .clickable(onClick = onClick)
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Surface(color = accent, shape = RoundedCornerShape(16.dp)) {
-            Icon(icon, contentDescription = null, tint = Color.White, modifier = Modifier.padding(11.dp).size(27.dp))
-        }
-        Spacer(Modifier.width(13.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, fontWeight = FontWeight.Black)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent)
     }
 }
 

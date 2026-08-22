@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha1.
+# Required project surface for v0.5.17-alpha2.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -106,8 +106,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 28",
-    'versionName = "0.5.17-alpha1"',
+    "versionCode = 29",
+    'versionName = "0.5.17-alpha2"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -301,7 +301,7 @@ for expected in (
     "eligibleForNaturalBreakAd",
     "selectedTabIndex = AppTab.HOME.ordinal",
     "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
-    "Spacer(Modifier.height(48.dp))",
+    "Spacer(Modifier.height(10.dp))",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing result-first/UI invariant: {expected}")
@@ -310,12 +310,49 @@ for expected in (
 for expected in (
     "AppTab.HOME,",
     "AppTab.TOOLS -> true",
-    "AppTab.SECURITY,",
-    "AppTab.PROFILE -> false",
-    "DetailScreen.SETTINGS -> false",
+    "AppTab.ME -> false",
+    "DetailScreen.ACCESS,",
+    "DetailScreen.SETTINGS,",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing banner trust-surface gate: {expected}")
+
+for forbidden in (
+    "AppTab.SECURITY",
+    "AppTab.PROFILE",
+    "onOpenProfile =",
+    "private fun HomeScreen(",
+):
+    if forbidden in cleaner_app:
+        errors.append(f"obsolete four-tab/dead-home architecture remains: {forbidden}")
+
+for expected in (
+    "AppTab.ME -> SettingsDetailScreen(",
+    "DetailScreen.ACCESS -> SecurityCenterScreen(",
+    "onOpenPrivacyAccess",
+):
+    if expected not in cleaner_app and expected not in device_center:
+        errors.append(f"missing Phase-2 navigation invariant: {expected}")
+
+for expected in (
+    "private data class DashboardFinding(",
+    "state.dashboardCategoryBytes",
+    ".filter { it.bytes > 0L }",
+    ".sortedByDescending(DashboardFinding::bytes)",
+    "DashboardDeepCleanRow",
+    "onDownloads: () -> Unit",
+    "onJunk: () -> Unit",
+):
+    if expected not in dashboard:
+        errors.append(f"missing Phase-2 dynamic Home invariant: {expected}")
+
+for forbidden in (
+    "DashboardToolTile(",
+    "DeepCleanPromo(",
+    "onOpenProfile:",
+):
+    if forbidden in dashboard:
+        errors.append(f"duplicated/static Home UI remains: {forbidden}")
 if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
     errors.append("content shells must retain gated banner placements")
 
@@ -488,4 +525,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha1 Phase-1 hardening invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha2 Phase-2 home/navigation invariants are valid.")

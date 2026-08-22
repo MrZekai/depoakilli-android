@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,20 +22,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.DeleteSweep
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,7 +48,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -59,49 +55,114 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.ui.theme.Amber400
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import com.mrzekai.depoakilli.ui.theme.Purple500
 import com.mrzekai.depoakilli.ui.theme.Rose500
-import com.mrzekai.depoakilli.ui.theme.Teal500
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
+
+private data class DashboardFinding(
+    val title: String,
+    val bytes: Long,
+    val count: Int,
+    val icon: ImageVector,
+    val accent: Color,
+    val onClick: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NeonDashboardScreen(
     state: CleanerUiState,
-    onOpenProfile: () -> Unit,
     onSmartClean: () -> Unit,
     onOpenWhatsApp: () -> Unit,
     onDuplicates: () -> Unit,
     onLargeFiles: () -> Unit,
     onApks: () -> Unit,
     onMedia: () -> Unit,
+    onDownloads: () -> Unit,
+    onJunk: () -> Unit,
     onDeepClean: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val categoryBytes = state.dashboardCategoryBytes
-    val duplicateBytes = categoryBytes[CleanCategory.DUPLICATE] ?: 0L
-    val largeBytes = categoryBytes[CleanCategory.LARGE_FILE] ?: 0L
-    val apkBytes = categoryBytes[CleanCategory.APK_PACKAGE] ?: 0L
-    val mediaBytes = (categoryBytes[CleanCategory.SCREENSHOT] ?: 0L) +
-        state.summary.items
-            .asSequence()
-            .filter { item ->
-                item.assessment.category == CleanCategory.LARGE_FILE &&
-                    (item.mimeType.startsWith("image/") || item.mimeType.startsWith("video/"))
-            }
-            .sumOf { it.sizeBytes }
-    val whatsAppBytes = categoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
-    val cleanableBytes = state.dashboardCleanableBytes
-    val reviewBytes = state.dashboardReviewBytes
-    val opportunityBytes = (cleanableBytes + reviewBytes).coerceAtLeast(0L)
-    val hasDashboardSnapshot = state.dashboardSnapshotAtMillis > 0L
+    val opportunityBytes = (state.dashboardCleanableBytes + state.dashboardReviewBytes).coerceAtLeast(0L)
+    val hasSnapshot = state.dashboardSnapshotAtMillis > 0L
+    val liveComprehensiveCounts =
+        if (
+            state.lastScanCompleted &&
+            state.scanFocus in setOf(ScanFocus.SMART, ScanFocus.DEEP)
+        ) {
+            state.summary.byCategory.mapValues { (_, items) -> items.size }
+        } else {
+            emptyMap()
+        }
+
+    val findings = listOf(
+        DashboardFinding(
+            title = stringResource(R.string.category_large_files),
+            bytes = state.dashboardCategoryBytes[CleanCategory.LARGE_FILE] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.LARGE_FILE] ?: 0,
+            icon = Icons.Outlined.VideoFile,
+            accent = Amber400,
+            onClick = onLargeFiles,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_apk_packages),
+            bytes = state.dashboardCategoryBytes[CleanCategory.APK_PACKAGE] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.APK_PACKAGE] ?: 0,
+            icon = Icons.Outlined.Android,
+            accent = Lime400,
+            onClick = onApks,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_whatsapp),
+            bytes = state.dashboardCategoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.WHATSAPP_MEDIA] ?: 0,
+            icon = Icons.Outlined.Chat,
+            accent = WhatsAppGreen,
+            onClick = onOpenWhatsApp,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_duplicates),
+            bytes = state.dashboardCategoryBytes[CleanCategory.DUPLICATE] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.DUPLICATE] ?: 0,
+            icon = Icons.Outlined.ContentCopy,
+            accent = Purple500,
+            onClick = onDuplicates,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_old_downloads),
+            bytes = state.dashboardCategoryBytes[CleanCategory.OLD_DOWNLOAD] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.OLD_DOWNLOAD] ?: 0,
+            icon = Icons.Outlined.Download,
+            accent = Color(0xFFD59635),
+            onClick = onDownloads,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_screenshots),
+            bytes = state.dashboardCategoryBytes[CleanCategory.SCREENSHOT] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.SCREENSHOT] ?: 0,
+            icon = Icons.Outlined.PhotoLibrary,
+            accent = ElectricBlue,
+            onClick = onMedia,
+        ),
+        DashboardFinding(
+            title = stringResource(R.string.category_junk),
+            bytes = state.dashboardCategoryBytes[CleanCategory.JUNK] ?: 0L,
+            count = liveComprehensiveCounts[CleanCategory.JUNK] ?: 0,
+            icon = Icons.Outlined.DeleteSweep,
+            accent = Rose500,
+            onClick = onJunk,
+        ),
+    )
+        .filter { it.bytes > 0L }
+        .sortedByDescending(DashboardFinding::bytes)
 
     PullToRefreshBox(
         isRefreshing = state.dashboardRefreshing,
@@ -109,370 +170,255 @@ internal fun NeonDashboardScreen(
         modifier = modifier.fillMaxSize(),
     ) {
         Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF071A5C),
-                        Color(0xFF06143A),
-                        Color(0xFF030A1B),
-                    ),
-                ),
-            ),
-    ) {
-        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 22.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color(0xFF071A5C),
+                            Color(0xFF06143A),
+                            Color(0xFF030A1B),
+                        ),
+                    ),
+                ),
         ) {
-            item {
-                DashboardHeader(onOpenProfile = onOpenProfile)
-            }
-            item {
-                DashboardHero(
-                    cleanableBytes = cleanableBytes,
-                    reviewBytes = reviewBytes,
-                    snapshotAtMillis = state.dashboardSnapshotAtMillis,
-                    scannedFileCount = state.dashboardScannedFileCount,
-                    scannedBytes = state.dashboardScannedBytes,
-                    storage = state.storage,
-                )
-            }
-            item {
-                SmartCleanButton(
-                    state = state,
-                    opportunityBytes = opportunityBytes,
-                    hasDashboardSnapshot = hasDashboardSnapshot,
-                    onClick = onSmartClean,
-                )
-            }
-            if (!state.hasAllFilesAccess) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding(),
+                contentPadding = PaddingValues(
+                    start = 18.dp,
+                    end = 18.dp,
+                    top = 14.dp,
+                    bottom = 24.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                item { DashboardBrandHeader() }
                 item {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onSmartClean),
-                        color = Color(0xFF11245A).copy(alpha = .95f),
-                        shape = RoundedCornerShape(18.dp),
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 11.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                    DashboardStatusCard(
+                        storage = state.storage,
+                        opportunityBytes = opportunityBytes,
+                        safeBytes = state.dashboardCleanableBytes,
+                        reviewBytes = state.dashboardReviewBytes,
+                        snapshotAtMillis = state.dashboardSnapshotAtMillis,
+                        hasSnapshot = hasSnapshot,
+                    )
+                }
+                if (!state.hasAllFilesAccess) {
+                    item { DashboardAccessStrip(onClick = onSmartClean) }
+                }
+                item {
+                    DashboardPrimaryAction(
+                        hasSnapshot = hasSnapshot,
+                        scanning = state.scanning || state.dashboardRefreshing,
+                        onClick = onSmartClean,
+                    )
+                }
+                item {
+                    Text(
+                        text = stringResource(R.string.smart_clean_suggestions_title),
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Black,
+                    )
+                }
+                if (findings.isEmpty()) {
+                    item {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.White.copy(alpha = .06f),
+                            shape = RoundedCornerShape(20.dp),
                         ) {
-                            Icon(Icons.Outlined.Security, contentDescription = null, tint = Amber400)
-                            Spacer(Modifier.size(9.dp))
-                            Text(
-                                stringResource(R.string.dashboard_access_hint),
-                                color = Color(0xFFD8E2FF),
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+                            Column(
+                                modifier = Modifier.padding(17.dp),
+                                verticalArrangement = Arrangement.spacedBy(5.dp),
+                            ) {
+                                Text(
+                                    if (hasSnapshot) {
+                                        stringResource(R.string.dashboard_no_current_opportunity)
+                                    } else {
+                                        stringResource(R.string.dashboard_not_analyzed)
+                                    },
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                                Text(
+                                    if (hasSnapshot) {
+                                        stringResource(R.string.dashboard_no_risky_auto_selection)
+                                    } else {
+                                        stringResource(R.string.dashboard_not_analyzed_hint)
+                                    },
+                                    color = Color(0xFFB8C3DD),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    findings.forEach { finding ->
+                        item(key = finding.title) {
+                            DashboardFindingRow(finding)
                         }
                     }
                 }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.whatsapp_cleaner_title),
-                        amount = ByteFormatter.format(whatsAppBytes),
-                        icon = Icons.Outlined.Chat,
-                        accent = WhatsAppGreen,
-                        badge = whatsAppBytes > 0L,
-                        onClick = onOpenWhatsApp,
-                    )
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.duplicates_tool_title),
-                        amount = ByteFormatter.format(duplicateBytes),
-                        icon = Icons.Outlined.ContentCopy,
-                        accent = Purple500,
-                        badge = duplicateBytes > 0L,
-                        onClick = onDuplicates,
-                    )
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.large_files_tool_title),
-                        amount = ByteFormatter.format(largeBytes),
-                        icon = Icons.Outlined.VideoFile,
-                        accent = Amber400,
-                        badge = largeBytes > 0L,
-                        onClick = onLargeFiles,
-                    )
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.apk_packages),
-                        amount = ByteFormatter.format(apkBytes),
-                        icon = Icons.Outlined.Android,
-                        accent = Lime400,
-                        badge = apkBytes > 0L,
-                        onClick = onApks,
-                    )
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.media_cleaner_title),
-                        amount = ByteFormatter.format(mediaBytes),
-                        icon = Icons.Outlined.PhotoLibrary,
-                        accent = ElectricBlue,
-                        badge = mediaBytes > 0L,
-                        onClick = onMedia,
-                    )
-                    DashboardToolTile(
-                        modifier = Modifier.weight(1f),
-                        title = stringResource(R.string.deep_cleaner_title),
-                        amount = stringResource(R.string.dashboard_deep_detail),
-                        icon = Icons.Outlined.AutoAwesome,
-                        accent = Purple500,
-                        badge = false,
-                        onClick = onDeepClean,
-                    )
-                }
-            }
-            item {
-                DeepCleanPromo(onClick = onDeepClean)
+                item { DashboardDeepCleanRow(onClick = onDeepClean) }
             }
         }
-    }
     }
 }
 
 @Composable
-private fun DashboardHeader(onOpenProfile: () -> Unit) {
+private fun DashboardBrandHeader() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(onClick = onOpenProfile) {
-            Icon(
-                Icons.Outlined.Menu,
-                contentDescription = stringResource(R.string.tab_profile),
-                tint = Color.White,
-                modifier = Modifier.size(30.dp),
-            )
-        }
-        Spacer(Modifier.weight(1f))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
             Text(
-                text = stringResource(R.string.app_name).substringBeforeLast(" "),
+                text = stringResource(R.string.app_name),
                 color = Color.White,
-                fontSize = 25.sp,
+                fontSize = 27.sp,
                 fontWeight = FontWeight.Black,
             )
             Text(
-                text = " " + stringResource(R.string.app_name).substringAfterLast(" "),
-                color = Color(0xFF40E3CF),
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Black,
-            )
-            Text(
-                text = " ✦",
-                color = Color(0xFF45EBC9),
-                fontSize = 21.sp,
-                fontWeight = FontWeight.Black,
+                text = stringResource(R.string.app_tagline),
+                color = Color(0xFF8EE8D0),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
             )
         }
-        Spacer(Modifier.weight(1f))
         Surface(
-            color = Color.White.copy(alpha = .08f),
+            color = Color(0xFF0A765E).copy(alpha = .28f),
             shape = CircleShape,
         ) {
             Icon(
                 Icons.Outlined.Security,
                 contentDescription = null,
-                tint = Color(0xFF60F0BD),
-                modifier = Modifier.padding(10.dp).size(22.dp),
+                tint = Color(0xFF66F0C1),
+                modifier = Modifier.padding(11.dp).size(25.dp),
             )
         }
     }
 }
 
 @Composable
-private fun DashboardHero(
-    cleanableBytes: Long,
+private fun DashboardStatusCard(
+    storage: StorageSnapshot,
+    opportunityBytes: Long,
+    safeBytes: Long,
     reviewBytes: Long,
     snapshotAtMillis: Long,
-    scannedFileCount: Int,
-    scannedBytes: Long,
-    storage: StorageSnapshot,
+    hasSnapshot: Boolean,
 ) {
-    val hasSnapshot = snapshotAtMillis > 0L
-    val opportunityBytes = (cleanableBytes + reviewBytes).coerceAtLeast(0L)
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
+    Card(
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
-        Card(
-            modifier = Modifier.weight(1.45f).height(184.dp),
-            shape = RoundedCornerShape(26.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(0xFF1649D8),
-                                Color(0xFF242072),
-                                Color(0xFF371963),
-                            ),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0xFF153FBE),
+                            Color(0xFF252071),
+                            Color(0xFF144C51),
                         ),
-                    )
-                    .padding(18.dp),
+                    ),
+                )
+                .padding(18.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                ) {
+                Text(
+                    stringResource(R.string.dashboard_cleanup_opportunity),
+                    color = Color(0xFFD2DCFF),
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    if (!hasSnapshot) {
+                        "—"
+                    } else if (opportunityBytes > 0L) {
+                        ByteFormatter.format(opportunityBytes)
+                    } else {
+                        stringResource(R.string.dashboard_no_cleanup_found)
+                    },
+                    color = Color.White,
+                    fontSize = 39.sp,
+                    lineHeight = 41.sp,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
+                )
+                Text(
+                    if (hasSnapshot) {
+                        stringResource(
+                            R.string.dashboard_safe_amount,
+                            ByteFormatter.format(safeBytes),
+                        )
+                    } else {
+                        stringResource(R.string.dashboard_not_analyzed_hint)
+                    },
+                    color = Color(0xFF9DF1C4),
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (hasSnapshot) {
                     Text(
-                        stringResource(R.string.dashboard_cleanup_opportunity),
-                        color = Color(0xFFC7D5FF),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
+                        stringResource(
+                            R.string.dashboard_review_amount,
+                            ByteFormatter.format(reviewBytes),
+                        ),
+                        color = Color(0xFFA5D9FF),
+                        style = MaterialTheme.typography.bodySmall,
                     )
                     Text(
-                        if (!hasSnapshot) {
-                            "—"
-                        } else if (opportunityBytes > 0L) {
-                            ByteFormatter.format(opportunityBytes)
-                        } else {
-                            stringResource(R.string.dashboard_no_cleanup_found)
-                        },
-                        color = Color.White,
-                        fontSize = 39.sp,
-                        lineHeight = 42.sp,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 1,
+                        dashboardLastAnalysisLabel(snapshotAtMillis),
+                        color = Color(0xFFB8C3DD),
+                        style = MaterialTheme.typography.labelSmall,
                     )
-                    Surface(
-                        color = Color(0xFF6C49C9).copy(alpha = .45f),
-                        shape = RoundedCornerShape(18.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp),
-                        ) {
-                            if (hasSnapshot) {
-                                Text(
-                                    if (cleanableBytes > 0L) {
-                                        stringResource(
-                                            R.string.dashboard_safe_amount,
-                                            ByteFormatter.format(cleanableBytes),
-                                        )
-                                    } else {
-                                        stringResource(R.string.dashboard_no_risky_auto_selection)
-                                    },
-                                    color = Color(0xFFDDF4EA),
-                                    fontSize = 10.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    stringResource(
-                                        R.string.dashboard_review_amount,
-                                        ByteFormatter.format(reviewBytes),
-                                    ),
-                                    color = Color(0xFF9FE6FF),
-                                    fontSize = 10.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    stringResource(
-                                        R.string.dashboard_scanned_summary,
-                                        scannedFileCount,
-                                        ByteFormatter.format(scannedBytes),
-                                    ),
-                                    color = Color(0xFFC9D0F3),
-                                    fontSize = 9.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    dashboardLastAnalysisLabel(snapshotAtMillis),
-                                    color = Color(0xFFC9D0F3),
-                                    fontSize = 9.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            } else {
-                                Text(
-                                    stringResource(R.string.dashboard_not_analyzed),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp,
-                                )
-                                Text(
-                                    stringResource(R.string.dashboard_not_analyzed_hint),
-                                    color = Color(0xFFC9D0F3),
-                                    fontSize = 9.sp,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                        }
-                    }
                 }
             }
+            DashboardStorageGauge(storage)
         }
-
-        StorageStatusRing(
-            storage = storage,
-            modifier = Modifier.weight(.9f),
-        )
     }
 }
 
 @Composable
-private fun StorageStatusRing(
-    storage: StorageSnapshot,
-    modifier: Modifier = Modifier,
-) {
+private fun DashboardStorageGauge(storage: StorageSnapshot) {
     val hasStorage = storage.totalBytes > 0L
-    val freeFraction = if (hasStorage) {
-        (storage.availableBytes.toDouble() / storage.totalBytes.toDouble())
-            .coerceIn(0.0, 1.0)
-            .toFloat()
-    } else {
-        0f
-    }
-    val usedPercent = if (hasStorage) {
-        ((1f - freeFraction) * 100f).roundToInt().coerceIn(0, 100)
-    } else {
-        0
-    }
+    val freeFraction =
+        if (hasStorage) {
+            (storage.availableBytes.toDouble() / storage.totalBytes.toDouble())
+                .coerceIn(0.0, 1.0)
+                .toFloat()
+        } else {
+            0f
+        }
+    val usedFraction = if (hasStorage) 1f - freeFraction else 0f
+    val usedPercent = (usedFraction * 100f).roundToInt().coerceIn(0, 100)
     val accent = when {
         !hasStorage -> ElectricBlue
         freeFraction < 0.10f -> Rose500
         freeFraction < 0.20f -> Amber400
-        else -> Lime400
+        else -> Color(0xFF2FE6C3)
     }
 
     Box(
-        modifier = modifier.height(184.dp),
+        modifier = Modifier.size(126.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Canvas(Modifier.size(150.dp)) {
-            val stroke = 13.dp.toPx()
+        Canvas(Modifier.fillMaxSize()) {
+            val stroke = 12.dp.toPx()
             val ringSize = Size(size.width - stroke, size.height - stroke)
             val topLeft = Offset(stroke / 2f, stroke / 2f)
             drawArc(
-                color = Color.White.copy(alpha = .10f),
+                color = Color.White.copy(alpha = .12f),
                 startAngle = -130f,
                 sweepAngle = 260f,
                 useCenter = false,
@@ -480,60 +426,234 @@ private fun StorageStatusRing(
                 size = ringSize,
                 style = Stroke(stroke, cap = StrokeCap.Round),
             )
-            if (hasStorage) {
-                drawArc(
-                    brush = Brush.sweepGradient(
-                        listOf(
-                            ElectricBlue,
-                            accent,
-                            Color(0xFF16D9E3),
-                            ElectricBlue,
-                        ),
-                    ),
-                    startAngle = -130f,
-                    sweepAngle = 260f * freeFraction,
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = ringSize,
-                    style = Stroke(stroke, cap = StrokeCap.Round),
-                )
-            }
+            drawArc(
+                color = accent,
+                startAngle = -130f,
+                sweepAngle = 260f * usedFraction.coerceIn(0f, 1f),
+                useCenter = false,
+                topLeft = topLeft,
+                size = ringSize,
+                style = Stroke(stroke, cap = StrokeCap.Round),
+            )
         }
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 if (hasStorage) ByteFormatter.format(storage.availableBytes) else "—",
                 color = Color.White,
-                fontSize = 23.sp,
+                fontSize = 19.sp,
                 fontWeight = FontWeight.Black,
                 maxLines = 1,
             )
             Text(
                 stringResource(R.string.dashboard_free_space),
                 color = accent,
-                fontSize = 10.sp,
+                fontSize = 9.sp,
                 fontWeight = FontWeight.Black,
             )
+            if (hasStorage) {
+                Text(
+                    stringResource(R.string.dashboard_storage_used_percent, usedPercent),
+                    color = Color(0xFFC4CBE0),
+                    fontSize = 10.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DashboardAccessStrip(onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        color = Color(0xFF493515).copy(alpha = .88f),
+        shape = RoundedCornerShape(18.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Outlined.Security, contentDescription = null, tint = Amber400)
+            Spacer(Modifier.size(10.dp))
             Text(
-                if (hasStorage) {
-                    stringResource(R.string.dashboard_storage_used_percent, usedPercent)
-                } else {
-                    stringResource(R.string.dashboard_storage_unknown)
-                },
-                color = Color(0xFFB8C6E2),
-                fontSize = 9.sp,
-                maxLines = 1,
+                stringResource(R.string.dashboard_access_hint),
+                modifier = Modifier.weight(1f),
+                color = Color(0xFFFFD993),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Amber400)
+        }
+    }
+}
+
+@Composable
+private fun DashboardPrimaryAction(
+    hasSnapshot: Boolean,
+    scanning: Boolean,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        enabled = !scanning,
+        shape = RoundedCornerShape(26.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(
+                            Color(0xFF1268F4),
+                            Color(0xFF10BFD2),
+                            Color(0xFF27D772),
+                        ),
+                    ),
+                )
+                .padding(horizontal = 18.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(color = Color.White.copy(alpha = .13f), shape = CircleShape) {
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.padding(11.dp).size(28.dp),
+                )
+            }
+            Spacer(Modifier.size(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    if (scanning) stringResource(R.string.dashboard_scanning)
+                    else stringResource(R.string.smart_clean_primary),
+                    color = Color.White,
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    if (hasSnapshot) {
+                        stringResource(R.string.smart_clean_hero_subtitle_v0514)
+                    } else {
+                        stringResource(R.string.smart_clean_primary_subtitle)
+                    },
+                    color = Color.White.copy(alpha = .82f),
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(30.dp),
             )
         }
     }
 }
 
 @Composable
-private fun dashboardLastAnalysisLabel(snapshotAtMillis: Long): String {
-    val ageMillis = (System.currentTimeMillis() - snapshotAtMillis).coerceAtLeast(0L)
+private fun DashboardFindingRow(finding: DashboardFinding) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = finding.onClick),
+        color = Color(0xFF0C1834),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = finding.accent.copy(alpha = .14f),
+                shape = RoundedCornerShape(15.dp),
+            ) {
+                Icon(
+                    finding.icon,
+                    contentDescription = null,
+                    tint = finding.accent,
+                    modifier = Modifier.padding(10.dp).size(27.dp),
+                )
+            }
+            Spacer(Modifier.size(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(finding.title, color = Color.White, fontWeight = FontWeight.Black)
+                if (finding.count > 0) {
+                    Text(
+                        "${finding.count} ${stringResource(R.string.premium_tool_candidates)}",
+                        color = Color(0xFFB8C3DD),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
+            Text(
+                ByteFormatter.format(finding.bytes),
+                color = finding.accent,
+                fontWeight = FontWeight.Black,
+            )
+            Spacer(Modifier.size(8.dp))
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = finding.accent,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DashboardDeepCleanRow(onClick: () -> Unit) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        color = Color(0xFF211646),
+        shape = RoundedCornerShape(20.dp),
+    ) {
+        Row(
+            modifier = Modifier.padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = Purple500.copy(alpha = .18f),
+                shape = RoundedCornerShape(15.dp),
+            ) {
+                Icon(
+                    Icons.Outlined.AutoAwesome,
+                    contentDescription = null,
+                    tint = Color(0xFFA98AF8),
+                    modifier = Modifier.padding(10.dp).size(28.dp),
+                )
+            }
+            Spacer(Modifier.size(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.deep_cleaner_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    stringResource(R.string.premium_deep_subtitle),
+                    color = Color(0xFFC6B8E8),
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = Color(0xFFA98AF8),
+            )
+        }
+    }
+}
+
+@Composable
+private fun dashboardLastAnalysisLabel(timestampMillis: Long): String {
+    if (timestampMillis <= 0L) return stringResource(R.string.dashboard_not_analyzed)
+    val ageMillis = (System.currentTimeMillis() - timestampMillis).coerceAtLeast(0L)
     val minutes = TimeUnit.MILLISECONDS.toMinutes(ageMillis)
     return when {
         minutes < 1L -> stringResource(R.string.dashboard_last_analysis_now)
@@ -546,309 +666,5 @@ private fun dashboardLastAnalysisLabel(snapshotAtMillis: Long): String {
             R.string.dashboard_last_analysis_days,
             TimeUnit.MILLISECONDS.toDays(ageMillis),
         )
-    }
-}
-
-@Composable
-private fun SmartCleanButton(
-    state: CleanerUiState,
-    opportunityBytes: Long,
-    hasDashboardSnapshot: Boolean,
-    onClick: () -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(92.dp)
-            .background(
-                brush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFF0B66FF),
-                        Color(0xFF12A8F0),
-                        Color(0xFF25DD59),
-                    ),
-                ),
-                shape = RoundedCornerShape(46.dp),
-            )
-            .clickable(enabled = !state.scanning, onClick = onClick)
-            .padding(horizontal = 20.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                color = Color(0xFF0A5CFF).copy(alpha = .7f),
-                shape = CircleShape,
-            ) {
-                Icon(
-                    Icons.Outlined.CleaningServices,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.padding(15.dp).size(34.dp),
-                )
-            }
-            Spacer(Modifier.size(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    if (state.scanning) stringResource(R.string.dashboard_scanning) else stringResource(R.string.smart_clean_primary),
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Black,
-                    fontStyle = FontStyle.Italic,
-                )
-                Text(
-                    when {
-                        hasDashboardSnapshot && opportunityBytes > 0L -> {
-                            stringResource(
-                                R.string.dashboard_opportunity_ready,
-                                ByteFormatter.format(opportunityBytes),
-                            )
-                        }
-                        hasDashboardSnapshot -> {
-                            stringResource(R.string.dashboard_no_current_opportunity)
-                        }
-                        else -> {
-                            stringResource(R.string.smart_clean_primary_subtitle)
-                        }
-                    },
-                    color = Color.White.copy(alpha = .78f),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Icon(
-                Icons.AutoMirrored.Outlined.ArrowForward,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(30.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun DashboardToolTile(
-    title: String,
-    amount: String,
-    icon: ImageVector,
-    accent: Color,
-    badge: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier.height(156.dp),
-        onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        listOf(
-                            accent.copy(alpha = .18f),
-                            Color(0xFF11193B),
-                            Color(0xFF10152F),
-                        ),
-                    ),
-                )
-                .padding(12.dp),
-        ) {
-            if (badge) {
-                Surface(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    color = Color(0xFFE63E44),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Text(
-                        amount,
-                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Surface(
-                    color = accent.copy(alpha = .18f),
-                    shape = RoundedCornerShape(18.dp),
-                ) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = accent,
-                        modifier = Modifier.padding(10.dp).size(34.dp),
-                    )
-                }
-                Column {
-                    Text(
-                        title,
-                        color = Color.White,
-                        fontWeight = FontWeight.Black,
-                        maxLines = 2,
-                        minLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        lineHeight = 18.sp,
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            amount,
-                            modifier = Modifier.weight(1f),
-                            color = accent,
-                            fontWeight = FontWeight.Bold,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Surface(
-                            color = accent.copy(alpha = .35f),
-                            shape = CircleShape,
-                        ) {
-                            Icon(
-                                Icons.AutoMirrored.Outlined.ArrowForward,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.padding(5.dp).size(16.dp),
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DashboardWideTool(
-    title: String,
-    amount: String,
-    icon: ImageVector,
-    accent: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier.height(116.dp),
-        onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(accent.copy(alpha = .14f), Color.Transparent),
-                    ),
-                )
-                .padding(13.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                color = accent.copy(alpha = .17f),
-                shape = RoundedCornerShape(18.dp),
-            ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.padding(11.dp).size(34.dp),
-                )
-            }
-            Spacer(Modifier.size(10.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    title,
-                    color = Color.White,
-                    fontWeight = FontWeight.Black,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    amount,
-                    color = Color(0xFFB9C7E8),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Icon(
-                Icons.AutoMirrored.Outlined.ArrowForward,
-                contentDescription = null,
-                tint = accent,
-            )
-        }
-    }
-}
-
-@Composable
-private fun DeepCleanPromo(onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(
-                            Color(0xFF171B6D),
-                            Color(0xFF251771),
-                            Color(0xFF452080),
-                        ),
-                    ),
-                )
-                .padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(4.dp, 62.dp)
-                    .background(Color(0xFF496EFF), RoundedCornerShape(4.dp)),
-            )
-            Spacer(Modifier.size(13.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    stringResource(R.string.dashboard_more_space_title),
-                    color = Color.White,
-                    fontWeight = FontWeight.Black,
-                )
-                Text(
-                    stringResource(R.string.dashboard_more_space_subtitle),
-                    color = Color(0xFFC0C9E9),
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            Surface(
-                color = Rose500.copy(alpha = .18f),
-                shape = CircleShape,
-            ) {
-                Icon(
-                    Icons.Outlined.Bolt,
-                    contentDescription = null,
-                    tint = Color(0xFFFFD04D),
-                    modifier = Modifier.padding(14.dp).size(34.dp),
-                )
-            }
-        }
     }
 }
