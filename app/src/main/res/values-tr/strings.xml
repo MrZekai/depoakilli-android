@@ -600,4 +600,24 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="home_discover_title">Daha Fazlasını Keşfet</string>
     <string name="home_discover_subtitle">Tüm temizlik ve depolama araçlarını görüntüle</string>
     <string name="home_discover_action">Keşfet</string>
+
+    <string name="cache_modern_total_label">Toplam uygulama önbelleği</string>
+    <string name="cache_modern_measured_apps">%1$d uygulama ölçüldü</string>
+    <string name="cache_modern_hero_helper">Android depolama istatistiklerinden ölçülür</string>
+    <string name="cache_modern_system_action">Android ile önbelleği temizle</string>
+    <string name="cache_modern_system_action_subtitle">Android’in resmî önbellek temizleme akışını aç</string>
+    <string name="cache_modern_list_title">En çok önbellek kullananlar</string>
+    <string name="cache_modern_search_hint">Uygulama ara</string>
+    <string name="cache_modern_sort_largest">En çok önbellek</string>
+    <string name="cache_modern_sort_az">A–Z</string>
+    <string name="cache_modern_no_result">Eşleşen uygulama yok</string>
+    <string name="cache_modern_no_result_subtitle">Başka bir uygulama adı dene veya ölçülen önbellek listesini yenile.</string>
+    <string name="cache_modern_open_actions">Önbellek işlemlerini aç</string>
+    <string name="cache_modern_measured_for_app">%1$s ölçülen önbellek</string>
+    <string name="cache_modern_individual_title">Bu uygulamayı tek tek temizle</string>
+    <string name="cache_modern_individual_steps">Android Uygulama bilgisi ekranını aç, ardından Depolama ve önbellek › Önbelleği temizle seç. Son işlem Android ve senin kontrolündedir.</string>
+    <string name="cache_modern_individual_warning">Önbelleği temizle ile Depolamayı temizle / Verileri sil aynı işlem değildir. Uygulamayı sıfırlamak istemiyorsan verileri silme.</string>
+    <string name="cache_modern_open_android">Android uygulama ayarını aç</string>
+    <string name="cache_modern_clean_now">Şimdi temizle</string>
+    <string name="cache_modern_safety_note">Akıllı Temizleyici Android’in bildirdiği önbelleği ölçer. Başka uygulamaların özel dosyalarını sessizce silmez; tek tek temizlik Android’in resmî uygulama ekranından tamamlanır.</string>
 </resources>

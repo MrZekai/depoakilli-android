@@ -600,4 +600,24 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="home_discover_title">Discover more</string>
     <string name="home_discover_subtitle">View all cleanup and storage tools</string>
     <string name="home_discover_action">Explore</string>
+
+    <string name="cache_modern_total_label">Total app cache</string>
+    <string name="cache_modern_measured_apps">%1$d apps measured</string>
+    <string name="cache_modern_hero_helper">Measured from Android storage statistics</string>
+    <string name="cache_modern_system_action">Clean cache with Android</string>
+    <string name="cache_modern_system_action_subtitle">Open Android’s official cache cleanup flow</string>
+    <string name="cache_modern_list_title">Apps using the most cache</string>
+    <string name="cache_modern_search_hint">Search apps</string>
+    <string name="cache_modern_sort_largest">Largest cache</string>
+    <string name="cache_modern_sort_az">A–Z</string>
+    <string name="cache_modern_no_result">No matching app</string>
+    <string name="cache_modern_no_result_subtitle">Try another app name or refresh the measured cache list.</string>
+    <string name="cache_modern_open_actions">Open cache actions</string>
+    <string name="cache_modern_measured_for_app">%1$s measured cache</string>
+    <string name="cache_modern_individual_title">Clean this app individually</string>
+    <string name="cache_modern_individual_steps">Open Android App info, then choose Storage &amp; cache › Clear cache. Android keeps the final action under your control.</string>
+    <string name="cache_modern_individual_warning">Clear cache is different from Clear storage / Clear data. Do not clear app data unless you intend to reset that app.</string>
+    <string name="cache_modern_open_android">Open Android app settings</string>
+    <string name="cache_modern_clean_now">Clean now</string>
+    <string name="cache_modern_safety_note">Smart Cleaner measures cache reported by Android. It does not silently delete another app’s private files; individual cleanup is completed from Android’s official app screen.</string>
 </resources>

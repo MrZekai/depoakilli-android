@@ -24,6 +24,8 @@ import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,6 +41,16 @@ data class CleanupResult(
     val cancelledCount: Int = 0,
     val beforeAvailableBytes: Long = 0L,
     val afterAvailableBytes: Long = 0L,
+)
+
+private data class DeviceRefreshSnapshot(
+    val storage: StorageSnapshot,
+    val memory: MemorySnapshot,
+    val ownCacheBytes: Long,
+    val hasAllFilesAccess: Boolean,
+    val hasUsageAccess: Boolean,
+    val hasWhatsAppAccess: Boolean,
+    val deviceInfo: DeviceInfoSnapshot,
 )
 
 data class CleanerUiState(
@@ -92,9 +104,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var pendingCleanupDeletedCount: Int = 0
     private var pendingCleanupFailedCount: Int = 0
     private var pendingCleanupStorageBeforeBytes: Long = 0L
+    private var deviceRefreshJob: Job? = null
     private var appCacheRefreshJob: Job? = null
     private var installedAppsRefreshJob: Job? = null
     private var storageReviewJob: Job? = null
+    private var lastDeviceRefreshAt = 0L
     private var lastAppCacheRefreshAt = 0L
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
@@ -152,26 +166,53 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun refreshDeviceState() {
-        viewModelScope.launch {
-            val storage = withContext(Dispatchers.Default) { repository.storageSnapshot() }
-            val memory = withContext(Dispatchers.Default) { repository.memorySnapshot() }
-            val ownCacheBytes = withContext(Dispatchers.IO) { repository.ownCacheSize() }
-            val hasAllFilesAccess = repository.hasAllFilesAccess()
-            val hasUsageAccess = repository.hasUsageAccess()
-            val hasWhatsAppAccess = repository.hasWhatsAppAccess()
-            val deviceInfo = repository.deviceInfoSnapshot()
+    fun refreshDeviceState(force: Boolean = false) {
+        val now = SystemClock.elapsedRealtime()
+        if (!force && deviceRefreshJob?.isActive == true) return
+        if (
+            !force &&
+            lastDeviceRefreshAt != 0L &&
+            now - lastDeviceRefreshAt < DEVICE_REFRESH_INTERVAL_MILLIS
+        ) {
+            return
+        }
 
-            _state.update {
-                it.copy(
-                    storage = storage,
-                    memory = memory,
-                    ownCacheBytes = ownCacheBytes,
-                    hasAllFilesAccess = hasAllFilesAccess,
-                    hasUsageAccess = hasUsageAccess,
-                    hasWhatsAppAccess = hasWhatsAppAccess,
-                    deviceInfo = deviceInfo,
-                )
+        if (force) deviceRefreshJob?.cancel()
+
+        deviceRefreshJob = viewModelScope.launch {
+            runCatching {
+                coroutineScope {
+                    val storage = async(Dispatchers.Default) { repository.storageSnapshot() }
+                    val memory = async(Dispatchers.Default) { repository.memorySnapshot() }
+                    val ownCache = async(Dispatchers.IO) { repository.ownCacheSize() }
+                    val allFiles = async(Dispatchers.Default) { repository.hasAllFilesAccess() }
+                    val usage = async(Dispatchers.Default) { repository.hasUsageAccess() }
+                    val whatsApp = async(Dispatchers.Default) { repository.hasWhatsAppAccess() }
+                    val deviceInfo = async(Dispatchers.Default) { repository.deviceInfoSnapshot() }
+
+                    DeviceRefreshSnapshot(
+                        storage = storage.await(),
+                        memory = memory.await(),
+                        ownCacheBytes = ownCache.await(),
+                        hasAllFilesAccess = allFiles.await(),
+                        hasUsageAccess = usage.await(),
+                        hasWhatsAppAccess = whatsApp.await(),
+                        deviceInfo = deviceInfo.await(),
+                    )
+                }
+            }.onSuccess { snapshot ->
+                lastDeviceRefreshAt = SystemClock.elapsedRealtime()
+                _state.update {
+                    it.copy(
+                        storage = snapshot.storage,
+                        memory = snapshot.memory,
+                        ownCacheBytes = snapshot.ownCacheBytes,
+                        hasAllFilesAccess = snapshot.hasAllFilesAccess,
+                        hasUsageAccess = snapshot.hasUsageAccess,
+                        hasWhatsAppAccess = snapshot.hasWhatsAppAccess,
+                        deviceInfo = snapshot.deviceInfo,
+                    )
+                }
             }
         }
     }
@@ -236,7 +277,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
         _state.update { it.copy(dashboardRefreshing = true, message = null) }
         refreshDeviceState()
-        refreshAppCaches(force = true)
 
         if (repository.hasAllFilesAccess()) {
             scan(ScanFocus.SMART)
@@ -254,7 +294,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
-        refreshDeviceState()
         if (!repository.hasAllFilesAccess()) {
             _state.update {
                 it.copy(
@@ -334,11 +373,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 if (comprehensive) {
                     persistDashboardSnapshot()
                 }
-                if (focus == ScanFocus.SMART) {
-                    if (repository.hasUsageAccess()) {
-                        refreshInstalledApps()
-                    }
-                } else {
+                if (focus == ScanFocus.SMART && repository.hasUsageAccess()) {
+                    // Keep Home cache totals fresh without eagerly loading the
+                    // much heavier full App Manager list after every Smart Scan.
                     refreshAppCaches()
                 }
             }.onFailure {
@@ -355,7 +392,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun scanWhatsAppLibrary() {
         if (_state.value.whatsAppScanning) return
-        refreshDeviceState()
         if (!repository.hasAllFilesAccess()) {
             _state.update {
                 it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
@@ -1010,7 +1046,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun onDeepCacheCleanupResult(approved: Boolean) {
-        refreshDeviceState()
+        refreshDeviceState(force = true)
         refreshAppCaches(force = true)
         _state.update {
             it.copy(
@@ -1046,7 +1082,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private companion object {
-        const val WHATSAPP_COMPLETION_DELAY_MILLIS = 250L
+        const val WHATSAPP_COMPLETION_DELAY_MILLIS = 80L
+        const val DEVICE_REFRESH_INTERVAL_MILLIS = 1_500L
         const val APP_CACHE_REFRESH_INTERVAL_MILLIS = 60L * 1000L
     }
 }

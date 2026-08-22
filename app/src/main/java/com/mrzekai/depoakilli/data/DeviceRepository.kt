@@ -194,7 +194,8 @@ class DeviceRepository(
     suspend fun installedAppsSnapshot(): List<InstalledAppEntry> = withContext(Dispatchers.IO) {
         val packageManager = context.packageManager
         val applications = launcherApplications(packageManager)
-        val usageMap = if (hasUsageAccess()) {
+        val usageAccessGranted = hasUsageAccess()
+        val usageMap = if (usageAccessGranted) {
             val now = System.currentTimeMillis()
             val manager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
             manager.queryUsageStats(
@@ -209,7 +210,7 @@ class DeviceRepository(
         val user = Process.myUserHandle()
         applications.map { application ->
             coroutineContext.ensureActive()
-            val stats = if (hasUsageAccess()) {
+            val stats = if (usageAccessGranted) {
                 runCatching {
                     storageStats.queryStatsForPackage(
                         application.storageUuid ?: StorageManager.UUID_DEFAULT,

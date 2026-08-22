@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        cleanerViewModel.refreshDeviceState()
+        cleanerViewModel.refreshDeviceState(force = true)
         if (Environment.isExternalStorageManager()) {
             cleanerViewModel.showMessage(R.string.message_all_files_granted)
             cleanerViewModel.resumePendingScanAfterPermission()
@@ -49,9 +49,16 @@ class MainActivity : ComponentActivity() {
     private val usageAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        cleanerViewModel.refreshDeviceState()
+        cleanerViewModel.refreshDeviceState(force = true)
         cleanerViewModel.refreshAppCaches(force = true)
         cleanerViewModel.refreshInstalledApps()
+    }
+
+    private val appDetailsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        cleanerViewModel.refreshDeviceState(force = true)
+        cleanerViewModel.refreshAppCaches(force = true)
     }
 
     private val deepCacheLauncher = registerForActivityResult(
@@ -109,6 +116,7 @@ class MainActivity : ComponentActivity() {
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
+                    onOpenAppDetails = ::openAppCacheSettings,
                     onPrepareCleanup = ::cleanSelected,
                     onPrepareStorageCleanup = ::cleanStorage,
                     onPrepareWhatsAppCleanup = ::cleanWhatsApp,
@@ -153,13 +161,13 @@ class MainActivity : ComponentActivity() {
 
     private fun cleanStorage() {
         cleanerViewModel.deleteSelectedStorageReview {
-            cleanerViewModel.refreshDeviceState()
+            cleanerViewModel.refreshDeviceState(force = true)
         }
     }
 
     private fun cleanWhatsApp(onFinished: (Boolean) -> Unit) {
         cleanerViewModel.deleteSelectedWhatsApp { changed ->
-            cleanerViewModel.refreshDeviceState()
+            cleanerViewModel.refreshDeviceState(force = true)
             onFinished(changed)
         }
     }
@@ -167,7 +175,7 @@ class MainActivity : ComponentActivity() {
     private fun onCleanupResultDismissed() {
         // The destructive operation and measured result are already complete.
         // Monetization happens only after the user closes the result.
-        cleanerViewModel.refreshDeviceState()
+        cleanerViewModel.refreshDeviceState(force = true)
         showPostTaskInterstitial()
     }
 
@@ -250,6 +258,19 @@ class MainActivity : ComponentActivity() {
         suppressNextAppOpenAd()
         runCatching {
             deepCacheLauncher.launch(Intent(StorageManager.ACTION_CLEAR_APP_CACHE))
+        }.onFailure {
+            cleanerViewModel.showMessage(R.string.message_screen_unavailable)
+        }
+    }
+
+    private fun openAppCacheSettings(packageName: String) {
+        suppressNextAppOpenAd()
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:$packageName"),
+        )
+        runCatching {
+            appDetailsLauncher.launch(intent)
         }.onFailure {
             cleanerViewModel.showMessage(R.string.message_screen_unavailable)
         }
@@ -343,6 +364,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
-        const val POST_TASK_AD_SETTLE_MILLIS = 850L
+        const val POST_TASK_AD_SETTLE_MILLIS = 350L
     }
 }

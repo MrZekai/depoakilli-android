@@ -133,6 +133,7 @@ fun CleanerApp(
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onClearAllAppCaches: () -> Unit,
+    onOpenAppDetails: (String) -> Unit,
     onPrepareCleanup: (Set<String>?) -> Unit,
     onPrepareStorageCleanup: () -> Unit,
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
@@ -372,6 +373,7 @@ fun CleanerApp(
                 onRefresh = { viewModel.refreshAppCaches(force = true) },
                 onClearAllAppCaches = onClearAllAppCaches,
                 onClearOwnCache = viewModel::clearOwnAppCache,
+                onOpenAppDetails = onOpenAppDetails,
                 modifier = Modifier.padding(padding),
             )
 
@@ -430,7 +432,7 @@ fun CleanerApp(
                     onApks = { launchScan(ScanFocus.APKS) },
                     onOpenAppCache = {
                         detailScreen = DetailScreen.APP_CACHE
-                        viewModel.refreshAppCaches(force = true)
+                        viewModel.refreshAppCaches()
                     },
                     onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                     onDownloads = { launchScan(ScanFocus.DOWNLOADS) },
@@ -447,7 +449,10 @@ fun CleanerApp(
                         detailScreen = DetailScreen.WHATSAPP
                         if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
                     },
-                    onOpenCache = { detailScreen = DetailScreen.APP_CACHE },
+                    onOpenCache = {
+                        detailScreen = DetailScreen.APP_CACHE
+                        viewModel.refreshAppCaches()
+                    },
                     onOpenAppManager = {
                         detailScreen = DetailScreen.APP_MANAGER
                         viewModel.refreshInstalledApps()

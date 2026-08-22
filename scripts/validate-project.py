@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha3.
+# Required project surface for v0.5.17-alpha4.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -54,6 +54,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
@@ -109,8 +110,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 30",
-    'versionName = "0.5.17-alpha3"',
+    "versionCode = 31",
+    'versionName = "0.5.17-alpha4"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -256,6 +257,7 @@ if "releaseForMemoryOptimization" in application:
 view_model = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.kt")
 cleaner_app = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
 device_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt")
+app_cache_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt")
 dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt")
 home_components = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt")
 home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt")
@@ -421,6 +423,66 @@ for forbidden in (
 if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
     errors.append("content shells must retain gated banner placements")
 
+
+# ------------------------------------------------------------------
+# Alpha4 cache UX + runtime-speed invariants.
+# ------------------------------------------------------------------
+for expected in (
+    "CacheManagerHero(",
+    "CacheSystemActionCard(",
+    "CacheAppRow(",
+    "AppCacheActionSheet(",
+    "AsyncAppIcon(",
+    "cache_modern_individual_steps",
+):
+    if expected not in app_cache_ui:
+        errors.append(f"missing alpha4 cache-manager UI invariant: {expected}")
+
+if "internal fun AppCacheManagerScreen(" in device_center:
+    errors.append("legacy AppCacheManagerScreen must not remain inside DeviceCenterScreen")
+
+for expected in (
+    "onOpenAppDetails: (String) -> Unit",
+    "onOpenAppDetails = onOpenAppDetails",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing per-app cache settings routing: {expected}")
+
+for expected in (
+    "Settings.ACTION_APPLICATION_DETAILS_SETTINGS",
+    "appDetailsLauncher",
+    "onOpenAppDetails = ::openAppCacheSettings",
+    "POST_TASK_AD_SETTLE_MILLIS = 350L",
+):
+    if expected not in main_activity:
+        errors.append(f"missing alpha4 app-details/speed activity invariant: {expected}")
+
+for expected in (
+    "DeviceRefreshSnapshot",
+    "deviceRefreshJob",
+    "lastDeviceRefreshAt",
+    "DEVICE_REFRESH_INTERVAL_MILLIS = 1_500L",
+    "coroutineScope",
+    "async(Dispatchers.Default)",
+    "WHATSAPP_COMPLETION_DELAY_MILLIS = 80L",
+):
+    if expected not in view_model:
+        errors.append(f"missing alpha4 ViewModel speed invariant: {expected}")
+
+scan_start = view_model.find("    fun scan(focus: ScanFocus = ScanFocus.SMART) {")
+scan_end = view_model.find("    fun scanWhatsAppLibrary() {", scan_start)
+if scan_start >= 0 and scan_end > scan_start:
+    scan_section = view_model[scan_start:scan_end]
+    if "refreshDeviceState()" in scan_section:
+        errors.append("scan() must not repeat a device refresh before storage traversal")
+    if "refreshInstalledApps()" in scan_section:
+        errors.append("Smart Scan must not eagerly load the full App Manager list")
+else:
+    errors.append("unable to inspect scan() speed invariant section")
+
+if "val usageAccessGranted = hasUsageAccess()" not in repository:
+    errors.append("installedAppsSnapshot must cache Usage Access state once per refresh")
+
 # ------------------------------------------------------------------
 # Legal/resource truthfulness and translation parity.
 # ------------------------------------------------------------------
@@ -441,6 +503,9 @@ for required_name in (
     "home_smart_suggestions_title",
     "home_different_tools_title",
     "home_discover_title",
+    "cache_modern_total_label",
+    "cache_modern_individual_steps",
+    "cache_modern_safety_note",
 ):
     if f'name="{required_name}"' not in default_strings:
         errors.append(f"missing default legal/ad resource: {required_name}")
@@ -595,4 +660,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha3 premium Home/proof-layer invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha4 cache UX/speed invariants are valid.")
