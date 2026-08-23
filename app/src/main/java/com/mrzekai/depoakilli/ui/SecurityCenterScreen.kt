@@ -1,8 +1,8 @@
 package com.mrzekai.depoakilli.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,9 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Android
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
-import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -40,8 +42,8 @@ import com.mrzekai.depoakilli.ui.theme.Lime400
 @Composable
 internal fun SecurityCenterScreen(
     state: CleanerUiState,
-    onRequestAllFilesAccess: () -> Unit,
-    onRequestUsageAccess: () -> Unit,
+    onManageAllFilesAccess: () -> Unit,
+    onManageUsageAccess: () -> Unit,
     onOpenPrivacy: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,7 +52,10 @@ internal fun SecurityCenterScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(0xFF07183E), Color(0xFF040A1C)),
+                    listOf(
+                        Color(0xFF07183E),
+                        Color(0xFF040A1C),
+                    ),
                 ),
             ),
         contentPadding = PaddingValues(18.dp),
@@ -59,71 +64,199 @@ internal fun SecurityCenterScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    stringResource(R.string.security_center_title),
+                    text = stringResource(R.string.security_center_title),
                     style = MaterialTheme.typography.headlineSmall,
                     color = Color.White,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
-                    stringResource(R.string.security_center_subtitle),
+                    text = stringResource(R.string.security_center_subtitle),
                     color = Color(0xFFAAB7D3),
                 )
             }
         }
+
         item {
-            SecurityStatusCard(
+            PermissionManageCard(
                 title = stringResource(R.string.security_storage_access),
                 subtitle = stringResource(R.string.security_storage_access_desc),
                 icon = Icons.Outlined.Storage,
                 ready = state.hasAllFilesAccess,
-                onClick = if (state.hasAllFilesAccess) null else onRequestAllFilesAccess,
+                onClick = onManageAllFilesAccess,
             )
         }
+
         item {
-            SecurityStatusCard(
+            PermissionManageCard(
                 title = stringResource(R.string.security_usage_access),
                 subtitle = stringResource(R.string.security_usage_access_desc),
                 icon = Icons.Outlined.Android,
                 ready = state.hasUsageAccess,
-                onClick = if (state.hasUsageAccess) null else onRequestUsageAccess,
+                onClick = onManageUsageAccess,
             )
         }
+
         item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = onOpenPrivacy),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+            SecurityInfoCard(
+                title = stringResource(R.string.security_local_processing),
+                subtitle = stringResource(R.string.security_local_processing_desc),
+                icon = Icons.Outlined.Security,
+            )
+        }
+
+        item {
+            PrivacyPolicyCard(onClick = onOpenPrivacy)
+        }
+    }
+}
+
+@Composable
+private fun PermissionManageCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    ready: Boolean,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = if (ready) {
+                    Lime400.copy(alpha = .16f)
+                } else {
+                    ElectricBlue.copy(alpha = .16f)
+                },
+                shape = CircleShape,
             ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (ready) Lime400 else ElectricBlue,
+                    modifier = Modifier.padding(11.dp).size(28.dp),
+                )
+            }
+
+            Spacer(Modifier.size(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    text = subtitle,
+                    color = Color(0xFFAAB7D3),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+
                 Row(
-                    modifier = Modifier.padding(17.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Surface(
-                        color = Lime400.copy(alpha = .16f),
-                        shape = CircleShape,
+                        color = if (ready) {
+                            Lime400.copy(alpha = .16f)
+                        } else {
+                            Color(0xFFFFB21A).copy(alpha = .16f)
+                        },
+                        shape = RoundedCornerShape(10.dp),
                     ) {
-                        Icon(
-                            Icons.Outlined.Security,
-                            contentDescription = null,
-                            tint = Lime400,
-                            modifier = Modifier.padding(11.dp).size(28.dp),
+                        Text(
+                            text = stringResource(
+                                if (ready) R.string.status_ready
+                                else R.string.permissions_review_status,
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            color = if (ready) Lime400 else Color(0xFFFFC24B),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
                         )
                     }
-                    Spacer(Modifier.size(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            stringResource(R.string.security_local_processing),
-                            color = Color.White,
-                            fontWeight = FontWeight.Black,
-                        )
-                        Text(
-                            stringResource(R.string.security_local_processing_desc),
-                            color = Color(0xFFAAB7D3),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
+
+                    Text(
+                        text = stringResource(R.string.permissions_manage_android),
+                        color = Color(0xFF78B9FF),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = Color(0xFF78B9FF),
+            )
+        }
+    }
+}
+
+@Composable
+private fun SecurityInfoCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                color = Color(0xFF24D9A7).copy(alpha = .14f),
+                shape = CircleShape,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color(0xFF54E2B5),
+                    modifier = Modifier.padding(11.dp).size(28.dp),
+                )
+            }
+
+            Spacer(Modifier.size(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    text = subtitle,
+                    color = Color(0xFFAAB7D3),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Surface(
+                    color = Color(0xFF24D9A7).copy(alpha = .14f),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.permissions_on_device_badge),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        color = Color(0xFF54E2B5),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
             }
         }
@@ -131,56 +264,53 @@ internal fun SecurityCenterScreen(
 }
 
 @Composable
-private fun SecurityStatusCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    ready: Boolean,
-    onClick: (() -> Unit)?,
+private fun PrivacyPolicyCard(
+    onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
-        shape = RoundedCornerShape(24.dp),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
     ) {
         Row(
-            modifier = Modifier.padding(17.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                color = if (ready) Lime400.copy(alpha = .16f) else ElectricBlue.copy(alpha = .16f),
+                color = Color(0xFF8B5CF6).copy(alpha = .15f),
                 shape = CircleShape,
             ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = if (ready) Lime400 else ElectricBlue,
-                    modifier = Modifier.padding(11.dp).size(28.dp),
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Outlined.PrivacyTip,
+                        contentDescription = null,
+                        tint = Color(0xFFBA9BFF),
+                        modifier = Modifier.padding(11.dp).size(28.dp),
+                    )
+                }
             }
+
             Spacer(Modifier.size(12.dp))
+
             Column(Modifier.weight(1f)) {
-                Text(title, color = Color.White, fontWeight = FontWeight.Black)
                 Text(
-                    subtitle,
+                    text = stringResource(R.string.permissions_privacy_policy_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    text = stringResource(R.string.permissions_privacy_policy_subtitle),
                     color = Color(0xFFAAB7D3),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            Surface(
-                color = if (ready) Lime400.copy(alpha = .16f) else Color(0xFFFFB21A).copy(alpha = .16f),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text(
-                    if (ready) stringResource(R.string.status_ready) else stringResource(R.string.status_needed),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                    color = if (ready) Lime400 else Color(0xFFFFC24B),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
+
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                contentDescription = null,
+                tint = Color(0xFFBA9BFF),
+            )
         }
     }
 }

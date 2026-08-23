@@ -89,6 +89,7 @@ data class CleanerUiState(
     val cleanupInProgress: Boolean = false,
     val cleanupResult: CleanupResult? = null,
     val cleanupHistory: CleanupHistorySnapshot = CleanupHistorySnapshot(),
+    val storageChange: StorageChangeReport = StorageChangeReport(),
     val lastScanCompleted: Boolean = false,
     val scanFocus: ScanFocus = ScanFocus.SMART,
     val pendingScanFocus: ScanFocus? = null,
@@ -107,6 +108,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private val repository = DeviceRepository(application)
     private val dashboardSnapshotStore = DashboardSnapshotStore(application)
     private val cleanupHistoryStore = CleanupHistoryStore(application)
+    private val storageChangeStore = StorageChangeStore(application)
     private val _state = MutableStateFlow(CleanerUiState())
     private var pendingConsentItems: List<CleanableItem> = emptyList()
     private var pendingCleanupDeletedBytes: Long = 0L
@@ -125,12 +127,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var storageReviewJob: Job? = null
     private var lastDeviceRefreshAt = 0L
     private var lastAppCacheRefreshAt = 0L
+    private var captureAppCacheForStorageChange = false
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
 
     init {
         restoreDashboardSnapshot()
         restoreCleanupHistory()
+        restoreStorageChange()
         refreshDeviceState()
         refreshAppCaches()
     }
@@ -167,6 +171,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private fun restoreCleanupHistory() {
         _state.update {
             it.copy(cleanupHistory = cleanupHistoryStore.load())
+        }
+    }
+
+    private fun restoreStorageChange() {
+        _state.update {
+            it.copy(storageChange = storageChangeStore.load())
         }
     }
 
@@ -243,15 +253,26 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             runCatching { repository.appCacheSnapshot() }
                 .onSuccess { snapshot ->
                     lastAppCacheRefreshAt = SystemClock.elapsedRealtime()
-                    _state.update {
-                        it.copy(
+
+                    val storageChangeReport =
+                        if (captureAppCacheForStorageChange) {
+                            captureAppCacheForStorageChange = false
+                            storageChangeStore.updateCurrentAppCaches(snapshot)
+                        } else {
+                            null
+                        }
+
+                    _state.update { current ->
+                        current.copy(
                             appCache = snapshot,
                             scanningAppCaches = false,
                             hasUsageAccess = repository.hasUsageAccess(),
+                            storageChange = storageChangeReport ?: current.storageChange,
                         )
                     }
                 }
                 .onFailure {
+                    captureAppCacheForStorageChange = false
                     _state.update { it.copy(scanningAppCaches = false) }
                 }
         }
@@ -343,6 +364,20 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }.onSuccess { summary ->
                 val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
                 val analyzedAtMillis = if (comprehensive) System.currentTimeMillis() else 0L
+                val storageSnapshot = repository.storageSnapshot()
+                val memorySnapshot = repository.memorySnapshot()
+                val hasAllFilesAccess = repository.hasAllFilesAccess()
+                val hasWhatsAppAccess = repository.hasWhatsAppAccess()
+                val storageChangeReport = if (comprehensive) {
+                    storageChangeStore.recordFileSnapshot(
+                        storage = storageSnapshot,
+                        storageTypes = summary.storageTypes,
+                        analyzedAtMillis = analyzedAtMillis,
+                    )
+                } else {
+                    _state.value.storageChange
+                }
+
                 _state.update {
                     it.copy(
                         summary = summary,
@@ -376,22 +411,29 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         } else {
                             it.dashboardSnapshotAtMillis
                         },
+                        storageChange = if (comprehensive) {
+                            storageChangeReport
+                        } else {
+                            it.storageChange
+                        },
                         scanning = false,
                         dashboardRefreshing = false,
                         lastScanCompleted = true,
-                        storage = repository.storageSnapshot(),
-                        memory = repository.memorySnapshot(),
-                        hasAllFilesAccess = repository.hasAllFilesAccess(),
-                        hasWhatsAppAccess = repository.hasWhatsAppAccess(),
+                        storage = storageSnapshot,
+                        memory = memorySnapshot,
+                        hasAllFilesAccess = hasAllFilesAccess,
+                        hasWhatsAppAccess = hasWhatsAppAccess,
                     )
                 }
                 if (comprehensive) {
                     persistDashboardSnapshot()
-                }
-                if (focus == ScanFocus.SMART && repository.hasUsageAccess()) {
-                    // Keep Home cache totals fresh without eagerly loading the
-                    // much heavier full App Manager list after every Smart Scan.
-                    refreshAppCaches()
+
+                    if (repository.hasUsageAccess()) {
+                        // Enrich the new storage baseline asynchronously with
+                        // Android-reported per-app cache values.
+                        captureAppCacheForStorageChange = true
+                        refreshAppCaches(force = true)
+                    }
                 }
             }.onFailure {
                 _state.update { current ->

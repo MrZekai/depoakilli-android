@@ -609,7 +609,7 @@ private fun CacheAppRow(
 }
 
 @Composable
-private fun AsyncAppIcon(
+internal fun AsyncAppIcon(
     packageName: String,
     modifier: Modifier = Modifier,
 ) {

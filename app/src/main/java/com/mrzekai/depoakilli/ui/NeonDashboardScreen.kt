@@ -13,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,7 +48,7 @@ internal fun NeonDashboardScreen(
     onLargeFiles: () -> Unit,
     onApks: () -> Unit,
     onOpenAppCache: () -> Unit,
-    onOpenPrivacyAccess: () -> Unit,
+    onOpenStorageChange: () -> Unit,
     onDownloads: () -> Unit,
     onOpenTools: () -> Unit,
     onRefresh: () -> Unit,
@@ -88,6 +88,29 @@ internal fun NeonDashboardScreen(
     val downloadsBytes =
         (state.dashboardCategoryBytes[CleanCategory.OLD_DOWNLOAD] ?: 0L).coerceAtLeast(0L)
 
+    val storageChange = state.storageChange
+    val storageDelta = storageChange.usedDeltaBytes
+    val storageChangeSubtitle = when {
+        !storageChange.hasBaseline ->
+            stringResource(R.string.home_storage_change_no_baseline)
+        !storageChange.hasComparison ->
+            stringResource(R.string.home_storage_change_baseline_ready)
+        storageDelta > 0L ->
+            stringResource(
+                R.string.home_storage_change_more_used,
+                ByteFormatter.format(storageDelta),
+            )
+        storageDelta < 0L ->
+            stringResource(
+                R.string.home_storage_change_less_used,
+                ByteFormatter.format(dashboardAbs(storageDelta)),
+            )
+        else ->
+            stringResource(R.string.home_storage_change_no_change)
+    }
+    val storageChangeValue =
+        if (storageChange.hasComparison) dashboardSignedBytes(storageDelta) else null
+
     PullToRefreshBox(
         isRefreshing = state.dashboardRefreshing,
         onRefresh = onRefresh,
@@ -107,9 +130,7 @@ internal fun NeonDashboardScreen(
             verticalArrangement = Arrangement.spacedBy(HomeVisualTokens.SectionSpacing),
         ) {
             item {
-                HomeBrandHeader(
-                    onPrivacyAccess = onOpenPrivacyAccess,
-                )
+                HomeBrandHeader()
             }
 
             item {
@@ -198,17 +219,12 @@ internal fun NeonDashboardScreen(
                     )
 
                     HomeToolShortcut(
-                        title = stringResource(R.string.home_privacy_title),
-                        subtitle = stringResource(
-                            if (state.hasAllFilesAccess && state.hasUsageAccess) {
-                                R.string.home_privacy_ready
-                            } else {
-                                R.string.home_privacy_review
-                            },
-                        ),
-                        icon = Icons.Outlined.Security,
-                        accent = HomeVisualTokens.Teal,
-                        onClick = onOpenPrivacyAccess,
+                        title = stringResource(R.string.storage_change_title),
+                        subtitle = storageChangeSubtitle,
+                        icon = Icons.Outlined.Timeline,
+                        accent = HomeVisualTokens.Purple,
+                        trailingValue = storageChangeValue,
+                        onClick = onOpenStorageChange,
                     )
 
                     HomeToolShortcut(
@@ -232,3 +248,13 @@ internal fun NeonDashboardScreen(
         }
     }
 }
+
+
+private fun dashboardSignedBytes(delta: Long): String = when {
+    delta > 0L -> "+${ByteFormatter.format(delta)}"
+    delta < 0L -> "−${ByteFormatter.format(dashboardAbs(delta))}"
+    else -> ByteFormatter.format(0L)
+}
+
+private fun dashboardAbs(value: Long): Long =
+    if (value == Long.MIN_VALUE) Long.MAX_VALUE else kotlin.math.abs(value)

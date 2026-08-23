@@ -111,6 +111,7 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
     WHATSAPP(R.string.whatsapp_cleaner_title),
     APP_CACHE(R.string.cache_manager_title),
     APP_MANAGER(R.string.app_manager_title),
+    STORAGE_CHANGE(R.string.storage_change_title),
     SETTINGS(R.string.settings_title),
     ACCESS(R.string.security_center_title),
     PRIVACY(R.string.privacy_policy),
@@ -268,7 +269,8 @@ fun CleanerApp(
                 DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
                 DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
                 DetailScreen.APP_CACHE,
-                DetailScreen.APP_MANAGER -> true
+                DetailScreen.APP_MANAGER,
+                DetailScreen.STORAGE_CHANGE -> true
                 DetailScreen.SETTINGS,
                 DetailScreen.ACCESS,
                 DetailScreen.PRIVACY,
@@ -386,6 +388,13 @@ fun CleanerApp(
                 modifier = Modifier.padding(padding),
             )
 
+            DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
+                report = state.storageChange,
+                refreshing = state.dashboardRefreshing || state.scanning,
+                onRefresh = viewModel::refreshDashboard,
+                modifier = Modifier.padding(padding),
+            )
+
             DetailScreen.SETTINGS -> SettingsDetailScreen(
                 privacyOptionsRequired = privacyOptionsRequired,
                 onOpenLanguageSettings = onOpenLanguageSettings,
@@ -400,8 +409,20 @@ fun CleanerApp(
 
             DetailScreen.ACCESS -> SecurityCenterScreen(
                 state = state,
-                onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
-                onRequestUsageAccess = ::requestUsageWithDisclosure,
+                onManageAllFilesAccess = {
+                    if (state.hasAllFilesAccess) {
+                        onRequestAllFilesAccess()
+                    } else {
+                        requestAllFilesWithDisclosure()
+                    }
+                },
+                onManageUsageAccess = {
+                    if (state.hasUsageAccess) {
+                        onRequestUsageAccess()
+                    } else {
+                        requestUsageWithDisclosure()
+                    }
+                },
                 onOpenPrivacy = {
                     legalReturnScreen = DetailScreen.ACCESS
                     detailScreen = DetailScreen.PRIVACY
@@ -435,7 +456,7 @@ fun CleanerApp(
                         detailScreen = DetailScreen.APP_CACHE
                         viewModel.refreshAppCaches()
                     },
-                    onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
+                    onOpenStorageChange = { detailScreen = DetailScreen.STORAGE_CHANGE },
                     onDownloads = { launchScan(ScanFocus.DOWNLOADS) },
                     onOpenTools = { selectedTabIndex = AppTab.TOOLS.ordinal },
                     onRefresh = viewModel::refreshDashboard,

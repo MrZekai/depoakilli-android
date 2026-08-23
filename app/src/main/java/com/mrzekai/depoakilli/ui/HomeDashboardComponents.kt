@@ -48,7 +48,6 @@ import kotlin.math.roundToInt
 
 @Composable
 internal fun HomeBrandHeader(
-    onPrivacyAccess: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -78,16 +77,14 @@ internal fun HomeBrandHeader(
         }
 
         Surface(
-            modifier = Modifier
-                .size(52.dp)
-                .clickable(onClick = onPrivacyAccess),
+            modifier = Modifier.size(52.dp),
             color = Color(0xFF0B685B).copy(alpha = .38f),
             shape = CircleShape,
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Outlined.Security,
-                    contentDescription = stringResource(R.string.home_privacy_title),
+                    contentDescription = null,
                     tint = Color(0xFF64F0C5),
                     modifier = Modifier.size(28.dp),
                 )
@@ -151,7 +148,7 @@ internal fun HomeOpportunityCard(
 
             if (hasSnapshot) {
                 HomeMetricLine(
-                    icon = Icons.Outlined.Security,
+                    icon = Icons.Outlined.CleaningServices,
                     text = stringResource(
                         R.string.dashboard_safe_amount,
                         ByteFormatter.format(safeBytes),

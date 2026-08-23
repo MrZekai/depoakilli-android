@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha6.
+# Required project surface for v0.5.17-alpha7.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -52,6 +52,9 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DashboardSnapshotStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
@@ -111,8 +114,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 33",
-    'versionName = "0.5.17-alpha6"',
+    "versionCode = 34",
+    'versionName = "0.5.17-alpha7"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -267,7 +270,84 @@ dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScree
 home_components = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt")
 home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt")
 cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
+storage_change_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt")
+storage_change_screen = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeScreen.kt")
+security_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt")
 memory_dialog = ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt"
+
+# ------------------------------------------------------------------
+# Alpha7 storage-change differentiation + permissions/privacy.
+# ------------------------------------------------------------------
+for expected in (
+    "StorageChangeReport",
+    "storageChangeStore",
+    "restoreStorageChange",
+    "recordFileSnapshot",
+    "captureAppCacheForStorageChange",
+    "updateCurrentAppCaches",
+):
+    if expected not in view_model:
+        errors.append(f"missing alpha7 storage-change ViewModel invariant: {expected}")
+
+for expected in (
+    "PREVIOUS_PREFIX",
+    "CURRENT_PREFIX",
+    "StorageFileType.entries",
+    "MAX_TRACKED_APP_CACHES = 50",
+    "appCacheChanges",
+    "storageTypeChanges",
+):
+    if expected not in storage_change_store:
+        errors.append(f"missing alpha7 StorageChangeStore invariant: {expected}")
+
+for expected in (
+    "StorageChangeHero",
+    "StorageTypeChangeRow",
+    "AppCacheChangeRow",
+    "storage_change_truth_note",
+    "AsyncAppIcon",
+):
+    if expected not in storage_change_screen:
+        errors.append(f"missing alpha7 StorageChangeScreen invariant: {expected}")
+
+for expected in (
+    "STORAGE_CHANGE(R.string.storage_change_title)",
+    "StorageChangeScreen(",
+    "onOpenStorageChange",
+    "DetailScreen.STORAGE_CHANGE -> true",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing alpha7 storage-change navigation invariant: {expected}")
+
+different_tools_start = dashboard.find("R.string.home_different_tools_title")
+if different_tools_start >= 0:
+    different_tools = dashboard[different_tools_start:]
+    if "R.string.home_privacy_title" in different_tools:
+        errors.append("Privacy Center must not remain as a Home different-tools card")
+    if "R.string.storage_change_title" not in different_tools:
+        errors.append("Storage Change must replace Privacy Center on Home")
+
+if "onPrivacyAccess: () -> Unit" in home_components:
+    errors.append("Home header privacy action must be removed")
+if "icon = Icons.Outlined.CleaningServices" not in home_components:
+    errors.append("Home cleanup-ready metric must use cleaning semantics")
+
+for forbidden in (
+    "onClick = if (state.hasAllFilesAccess) null else",
+    "onClick = if (state.hasUsageAccess) null else",
+):
+    if forbidden in security_center:
+        errors.append(f"permission card must remain manageable when ready: {forbidden}")
+
+for expected in (
+    "onManageAllFilesAccess",
+    "onManageUsageAccess",
+    "permissions_manage_android",
+    "permissions_privacy_policy_title",
+):
+    if expected not in security_center:
+        errors.append(f"missing useful permissions/privacy invariant: {expected}")
+
 
 # ------------------------------------------------------------------
 # Alpha5 result Native/MREC monetization and Android cache result.
@@ -451,7 +531,6 @@ for forbidden in (
 for expected in (
     "AppTab.ME -> SettingsDetailScreen(",
     "DetailScreen.ACCESS -> SecurityCenterScreen(",
-    "onOpenPrivacyAccess",
 ):
     if expected not in cleaner_app and expected not in device_center:
         errors.append(f"missing Phase-2 navigation invariant: {expected}")
@@ -464,7 +543,7 @@ for expected in (
     "HomeToolShortcut(",
     "HomeExploreCard(",
     "onOpenAppCache: () -> Unit",
-    "onOpenPrivacyAccess: () -> Unit",
+    "onOpenStorageChange: () -> Unit",
     "onOpenTools: () -> Unit",
 ):
     if expected not in dashboard:
@@ -781,4 +860,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha6 result coverage/home-tool invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha7 storage-change/privacy invariants are valid.")
