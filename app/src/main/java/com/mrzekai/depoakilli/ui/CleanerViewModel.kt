@@ -1240,7 +1240,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         cleanupResult = null,
                         message = getApplication<Application>().getString(
                             R.string.message_cache_already_empty,
-                            ByteFormatter.format(0L),
                         ),
                     )
                 }
