@@ -509,8 +509,7 @@ class DeviceRepository(
                     null
                 } else {
                     aiEngine.assessDeep(file)?.takeIf {
-                        it.category == CleanCategory.APK_PACKAGE ||
-                            it.category == CleanCategory.OLD_DOWNLOAD ||
+                        it.category == CleanCategory.OLD_DOWNLOAD ||
                             it.category == CleanCategory.JUNK
                     }
                 }
@@ -934,7 +933,6 @@ class DeviceRepository(
         private val DOWNLOAD_CATEGORIES = setOf(
             CleanCategory.JUNK,
             CleanCategory.OLD_DOWNLOAD,
-            CleanCategory.APK_PACKAGE,
         )
         private val ARCHIVE_EXTENSIONS = setOf("zip", "rar", "7z", "tar", "gz", "bz2", "xz")
         private val DOCUMENT_EXTENSIONS = setOf(

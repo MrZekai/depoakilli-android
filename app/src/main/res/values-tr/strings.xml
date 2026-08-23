@@ -251,7 +251,7 @@ Paket: com.mrzekai.depoakilli</string>
     <string name="all_files_access_title">Tam depolama yönetimi erişimi</string>
     <string name="app_manager_intro">Açılabilir uygulamaları, depolama kullanımını ve önbelleği Akıllı Temizleyici içinde incele. Uygulama kaldırma her zaman Android’in resmî kaldırma onayını kullanır.</string>
     <string name="app_manager_size_detail">Toplam %1$s • önbellek %2$s</string>
-    <string name="app_manager_subtitle">Kurulu uygulamaları, boyutu, önbelleği ve kullanılmayan adayları incele</string>
+    <string name="app_manager_subtitle">Açılabilir uygulamaları, boyutlarını, önbelleklerini ve Android kaldırma seçeneklerini incele</string>
     <string name="app_manager_title">Uygulama Yöneticisi</string>
     <string name="app_manager_usage_description">Kullanım Erişimi uygulama depolama toplamlarını ve son kullanım bilgisini göstermemizi sağlar. Kişisel uygulama içeriği okunmaz.</string>
     <string name="app_manager_usage_title">Uygulama kullanım istatistiklerini etkinleştir</string>
@@ -282,10 +282,10 @@ Paket: com.mrzekai.depoakilli</string>
     <string name="full_storage_access_needed">Tam depolama taraması etkin değil</string>
     <string name="full_storage_access_ready">Tam paylaşılan depolama motoru hazır</string>
     <string name="hero_performance_v050">Maksimum temizlik, dürüst Android sınırları.</string>
-    <string name="junk_cleaner_subtitle_v050">Geçici dosyalar, küçük resimler, eski kurulumlar ve eski indirme adayları</string>
+    <string name="junk_cleaner_subtitle_v050">Geçici dosyaları, küçük resimleri, yarım indirmeleri ve açıkça silinebilir kalıntıları incele</string>
     <string name="language_settings_subtitle_v050">Android uygulama dili ayarını kullan. Desteklenmeyen diller güvenli biçimde İngilizceye döner.</string>
     <string name="large_files_tool_subtitle_v050">100 MB üzerindeki video, arşiv, APK, ses, belge ve diğer dosyaları bul</string>
-    <string name="media_cleaner_subtitle">Eski ekran görüntülerini ve çok yer kaplayan fotoğraf/videoları incele</string>
+    <string name="media_cleaner_subtitle">Birebir medya kopyalarını, eski ekran görüntülerini ve büyük fotoğraf/videoları incele</string>
     <string name="media_cleaner_title">Medya Temizleyici</string>
     <string name="message_all_files_granted">Tam depolama yönetimi erişimi hazır.</string>
     <string name="message_all_files_required">Akıllı Temizleyici’nin kapsamlı cihaz depolama taraması yapabilmesi için Tüm dosyalara erişimi etkinleştir.</string>
@@ -316,7 +316,7 @@ Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tan�
     <string name="scan_stats_v050">%1$d dosya • %2$s indekslendi • %3$d seçildi</string>
     <string name="settings_subtitle_v050">Dil, gizlilik, destek ve ürün bilgileri.</string>
     <string name="smart_clean_action_v050">DERİN AKILLI TARAMAYI BAŞLAT</string>
-    <string name="storage_analyzer_subtitle">Temizleme motoru cihazı tararken depolamayı dosya türüne göre gör</string>
+    <string name="storage_analyzer_subtitle">Hiçbir şeyi silmek için seçmeden erişilebilir paylaşılan dosyaları türlerine göre analiz et</string>
     <string name="storage_analyzer_title">Depolama Analizi</string>
     <string name="storage_type_apk">APK kurulumları</string>
     <string name="storage_type_archives">Arşivler</string>
@@ -331,7 +331,7 @@ Akıllı Temizleyici, Android Tüm dosyalara erişim izni verildikten sonra eri�
 
 Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.</string>
     <string name="tools_rebuilt_status">%1$s boş • %2$s uygulama önbelleği raporlandı</string>
-    <string name="tools_rebuilt_title">Tek motorda gerçek temizlik araçları</string>
+    <string name="tools_rebuilt_title">Temizlik ve depolama araçları</string>
     <string name="uninstall">Kaldır</string>
     <string name="whatsapp_category_statuses">Durumlar</string>
     <string name="whatsapp_category_statuses_description">Paylaşılan depolamadaki geçici WhatsApp durum medyaları</string>
@@ -668,4 +668,22 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="storage_change_time_minutes">%1$d dk önce</string>
     <string name="storage_change_time_hours">%1$d sa önce</string>
     <string name="storage_change_time_days">%1$d gün önce</string>
+    <string name="tools_cleaning_section_title">Temizlik</string>
+    <string name="tools_cleaning_section_subtitle">Silme adımından önce dosyaları analiz eden hedef odaklı araçlar</string>
+    <string name="tools_storage_section_title">Depolama ve analiz</string>
+    <string name="tools_storage_section_subtitle">İndirilenleri, APK kurulumlarını, önbelleği ve depolama değişimini ayrı incele</string>
+    <string name="tools_apps_section_title">Uygulamalar</string>
+    <string name="tools_apps_section_subtitle">Android uygulama depolamasını ve yönetim seçeneklerini incele</string>
+    <string name="tools_downloads_subtitle">Eski indirilenleri ve yarım kalmış indirme kalıntılarını incele</string>
+    <string name="tools_apk_subtitle">Erişilebilir paylaşılan depolamadaki APK kurulum paketlerini ayrı incele</string>
+    <string name="tools_storage_change_subtitle">İki gerçek analiz arasındaki ölçülen depolama artış ve azalışlarını gör</string>
+    <string name="storage_analyzer_scanning_subtitle">Erişilebilir paylaşılan dosyalar türlerine ayrılıyor…</string>
+    <string name="storage_analyzer_empty_subtitle">Görsel, video, ses, belge, arşiv, APK ve diğer erişilebilir dosyaların alan kullanımını gör.</string>
+    <string name="storage_analyzer_indexed_label">İNDEKSLENEN PAYLAŞILAN DOSYALAR</string>
+    <string name="storage_analyzer_indexed_summary">%1$d dosya indekslendi • cihazda %2$s boş</string>
+    <string name="storage_analyzer_types_title">Dosya türleri</string>
+    <string name="storage_analyzer_type_summary">%1$d dosya • %2$s • indekslenen verinin %%%3$d kadarı</string>
+    <string name="storage_analyzer_largest_examples">En büyük örnekler</string>
+    <string name="storage_analyzer_no_files">Bu analiz için erişilebilir dosya bulunamadı.</string>
+    <string name="storage_analyzer_truth_note">Bu ekran yalnız bilgi amaçlıdır. Burada hiçbir dosya önceden seçilmez veya silinmez. Android/data ve Android/obb gibi korunan özel alanlar taranmaz.</string>
 </resources>

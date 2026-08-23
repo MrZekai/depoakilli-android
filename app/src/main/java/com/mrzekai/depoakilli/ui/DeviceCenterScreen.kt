@@ -31,7 +31,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Button
@@ -74,7 +74,7 @@ internal fun DeviceCenterScreen(
     onOpenWhatsApp: () -> Unit,
     onOpenCache: () -> Unit,
     onOpenAppManager: () -> Unit,
-    onOpenSettings: () -> Unit,
+    onOpenStorageChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -83,6 +83,7 @@ internal fun DeviceCenterScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item { ToolsHero(state) }
+
         if (!state.hasAllFilesAccess) {
             item {
                 PermissionToolCard(
@@ -93,10 +94,14 @@ internal fun DeviceCenterScreen(
                 )
             }
         }
+
         item {
-            Text(stringResource(R.string.cleaner_engine_tools), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
-            Text(stringResource(R.string.cleaner_engine_tools_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            ToolsSectionHeader(
+                title = stringResource(R.string.tools_cleaning_section_title),
+                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
+            )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.deep_cleaner_title),
@@ -151,10 +156,18 @@ internal fun DeviceCenterScreen(
                 onClick = onOpenWhatsApp,
             )
         }
+
+        item {
+            ToolsSectionHeader(
+                title = stringResource(R.string.tools_storage_section_title),
+                subtitle = stringResource(R.string.tools_storage_section_subtitle),
+            )
+        }
+
         item {
             ToolActionCard(
-                title = stringResource(R.string.downloads_apk_title),
-                subtitle = stringResource(R.string.downloads_apk_subtitle),
+                title = stringResource(R.string.scan_focus_downloads),
+                subtitle = stringResource(R.string.tools_downloads_subtitle),
                 icon = Icons.Outlined.Download,
                 accent = Color(0xFF8A5B17),
                 onClick = { onScan(ScanFocus.DOWNLOADS) },
@@ -162,20 +175,20 @@ internal fun DeviceCenterScreen(
         }
         item {
             ToolActionCard(
-                title = stringResource(R.string.deep_cache_title),
-                subtitle = stringResource(R.string.deep_cache_subtitle),
-                icon = Icons.Outlined.CleaningServices,
-                accent = Color(0xFF1852D5),
-                onClick = onOpenCache,
+                title = stringResource(R.string.scan_focus_apks),
+                subtitle = stringResource(R.string.tools_apk_subtitle),
+                icon = Icons.Outlined.Android,
+                accent = Color(0xFF3A9B55),
+                onClick = { onScan(ScanFocus.APKS) },
             )
         }
         item {
             ToolActionCard(
-                title = stringResource(R.string.app_manager_title),
-                subtitle = stringResource(R.string.app_manager_subtitle),
-                icon = Icons.Outlined.Android,
-                accent = Color(0xFF1F8A68),
-                onClick = onOpenAppManager,
+                title = stringResource(R.string.cache_manager_title),
+                subtitle = stringResource(R.string.deep_cache_subtitle),
+                icon = Icons.Outlined.CleaningServices,
+                accent = Color(0xFF1852D5),
+                onClick = onOpenCache,
             )
         }
         item {
@@ -189,11 +202,28 @@ internal fun DeviceCenterScreen(
         }
         item {
             ToolActionCard(
-                title = stringResource(R.string.settings_title),
-                subtitle = stringResource(R.string.settings_subtitle),
-                icon = Icons.Outlined.Settings,
-                accent = Color(0xFF526079),
-                onClick = onOpenSettings,
+                title = stringResource(R.string.storage_change_title),
+                subtitle = stringResource(R.string.tools_storage_change_subtitle),
+                icon = Icons.Outlined.Timeline,
+                accent = Color(0xFF0E9A8A),
+                onClick = onOpenStorageChange,
+            )
+        }
+
+        item {
+            ToolsSectionHeader(
+                title = stringResource(R.string.tools_apps_section_title),
+                subtitle = stringResource(R.string.tools_apps_section_subtitle),
+            )
+        }
+
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.app_manager_title),
+                subtitle = stringResource(R.string.app_manager_subtitle),
+                icon = Icons.Outlined.Android,
+                accent = Color(0xFF1F8A68),
+                onClick = onOpenAppManager,
             )
         }
     }
@@ -219,14 +249,27 @@ private fun ToolsHero(state: CleanerUiState) {
                 ),
                 color = Color.White.copy(alpha = .86f),
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 StatusPill(
-                    if (state.hasAllFilesAccess) stringResource(R.string.access_files_ready) else stringResource(R.string.access_files_missing),
-                    state.hasAllFilesAccess,
+                    text = if (state.hasAllFilesAccess) {
+                        stringResource(R.string.access_files_ready)
+                    } else {
+                        stringResource(R.string.access_files_missing)
+                    },
+                    active = state.hasAllFilesAccess,
+                    modifier = Modifier.weight(1f),
                 )
                 StatusPill(
-                    if (state.hasUsageAccess) stringResource(R.string.access_usage_ready) else stringResource(R.string.access_usage_optional),
-                    state.hasUsageAccess,
+                    text = if (state.hasUsageAccess) {
+                        stringResource(R.string.access_usage_ready)
+                    } else {
+                        stringResource(R.string.access_usage_optional)
+                    },
+                    active = state.hasUsageAccess,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }
@@ -234,12 +277,28 @@ private fun ToolsHero(state: CleanerUiState) {
 }
 
 @Composable
-private fun StatusPill(text: String, active: Boolean) {
+private fun StatusPill(
+    text: String,
+    active: Boolean,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        color = if (active) Color(0xFF9CF2C5).copy(alpha = .22f) else Color(0xFFFFD580).copy(alpha = .20f),
+        modifier = modifier,
+        color = if (active) {
+            Color(0xFF9CF2C5).copy(alpha = .22f)
+        } else {
+            Color(0xFFFFD580).copy(alpha = .20f)
+        },
         shape = CircleShape,
     ) {
-        Text(text, color = Color.White, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+        Text(
+            text = text,
+            color = Color.White,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -255,6 +314,31 @@ private fun PermissionToolCard(title: String, subtitle: String, action: String, 
             }
             TextButton(onClick = onClick) { Text(action) }
         }
+    }
+}
+
+@Composable
+private fun ToolsSectionHeader(
+    title: String,
+    subtitle: String,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp, bottom = 2.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Black,
+        )
+        Text(
+            text = subtitle,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 

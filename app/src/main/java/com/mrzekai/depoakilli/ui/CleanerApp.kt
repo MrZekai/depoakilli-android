@@ -479,7 +479,9 @@ fun CleanerApp(
                         detailScreen = DetailScreen.APP_MANAGER
                         viewModel.refreshInstalledApps()
                     },
-                    onOpenSettings = { selectedTabIndex = AppTab.ME.ordinal },
+                    onOpenStorageChange = {
+                        detailScreen = DetailScreen.STORAGE_CHANGE
+                    },
                     modifier = Modifier.padding(padding),
                 )
 
@@ -640,6 +642,16 @@ private fun CleanScreen(
             onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
             onClean = onClean,
             onCleanStorage = onCleanStorage,
+            modifier = modifier,
+        )
+        return
+    }
+
+    if (state.scanFocus == ScanFocus.ANALYZE) {
+        StorageAnalyzerScreen(
+            state = state,
+            onRequestAllFilesAccess = onRequestAllFilesAccess,
+            onScan = onScan,
             modifier = modifier,
         )
         return

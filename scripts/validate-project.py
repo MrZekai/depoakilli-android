@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha7.
+# Required project surface for v0.5.17-alpha8.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -54,6 +54,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/StorageAnalyzerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
@@ -114,8 +115,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 34",
-    'versionName = "0.5.17-alpha7"',
+    "versionCode = 35",
+    'versionName = "0.5.17-alpha8"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -272,6 +273,7 @@ home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens
 cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
 storage_change_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt")
 storage_change_screen = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeScreen.kt")
+storage_analyzer = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageAnalyzerScreen.kt")
 security_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt")
 memory_dialog = ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/MemoryOptimizationResultDialog.kt"
 
@@ -348,6 +350,59 @@ for expected in (
     if expected not in security_center:
         errors.append(f"missing useful permissions/privacy invariant: {expected}")
 
+
+# ------------------------------------------------------------------
+# Alpha8 Tools audit: distinct tools, truthful copy, read-only analyzer.
+# ------------------------------------------------------------------
+for expected in (
+    "onOpenStorageChange",
+    "ScanFocus.APKS",
+    "R.string.cache_manager_title",
+    "R.string.tools_cleaning_section_title",
+    "R.string.tools_storage_section_title",
+    "R.string.tools_apps_section_title",
+):
+    if expected not in device_center:
+        errors.append(f"missing alpha8 Tools invariant: {expected}")
+
+for forbidden in (
+    "R.string.downloads_apk_title",
+    "onOpenSettings: () -> Unit",
+    "R.string.deep_cache_title",
+):
+    if forbidden in device_center:
+        errors.append(f"obsolete/misleading Tools surface remains: {forbidden}")
+
+for expected in (
+    "state.scanFocus == ScanFocus.ANALYZE",
+    "StorageAnalyzerScreen(",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing alpha8 analyzer routing invariant: {expected}")
+
+for expected in (
+    "summary.storageTypes",
+    "summary.storagePreviews",
+    "storage_analyzer_truth_note",
+    "AnalyzerTypeCard",
+):
+    if expected not in storage_analyzer:
+        errors.append(f"missing alpha8 read-only analyzer invariant: {expected}")
+
+for forbidden in (
+    "onClean:",
+    "cleanupInProgress",
+):
+    if forbidden in storage_analyzer:
+        errors.append(f"Storage Analyzer must remain read-only: {forbidden}")
+
+download_block_start = repository.find("private val DOWNLOAD_CATEGORIES")
+if download_block_start < 0:
+    errors.append("DOWNLOAD_CATEGORIES missing")
+else:
+    download_block = repository[download_block_start:download_block_start + 220]
+    if "CleanCategory.APK_PACKAGE" in download_block:
+        errors.append("Downloads tool must not overlap the dedicated APK tool")
 
 # ------------------------------------------------------------------
 # Alpha5 result Native/MREC monetization and Android cache result.
@@ -860,4 +915,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha7 storage-change/privacy invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha8 tools/analyzer invariants are valid.")
