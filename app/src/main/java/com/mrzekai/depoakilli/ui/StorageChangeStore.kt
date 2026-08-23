@@ -9,13 +9,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import kotlin.math.abs
 
-internal data class StorageChangeAppCache(
+data class StorageChangeAppCache(
     val packageName: String,
     val label: String,
     val bytes: Long,
 )
 
-internal data class StorageChangePoint(
+data class StorageChangePoint(
     val analyzedAtMillis: Long = 0L,
     val usedBytes: Long = 0L,
     val availableBytes: Long = 0L,
@@ -24,20 +24,20 @@ internal data class StorageChangePoint(
     val appCacheMeasuredAtMillis: Long = 0L,
 )
 
-internal data class StorageTypeChange(
+data class StorageTypeChange(
     val type: StorageFileType,
     val currentBytes: Long,
     val deltaBytes: Long,
 )
 
-internal data class AppCacheChange(
+data class AppCacheChange(
     val packageName: String,
     val label: String,
     val currentBytes: Long,
     val deltaBytes: Long,
 )
 
-internal data class StorageChangeReport(
+data class StorageChangeReport(
     val previous: StorageChangePoint? = null,
     val current: StorageChangePoint? = null,
 ) {
