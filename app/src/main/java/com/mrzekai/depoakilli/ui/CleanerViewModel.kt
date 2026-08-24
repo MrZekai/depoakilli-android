@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.data.StoragePathRules
+import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
@@ -183,6 +184,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun recordCleanupHistory(result: CleanupResult) {
+        AppDiagnostics.breadcrumb(
+            "cleanup_result",
+            mapOf(
+                "ok" to result.operationSucceeded,
+                "deleted" to result.deletedCount,
+                "failed" to result.failedCount,
+                "bytes" to result.deletedBytes,
+                "kind" to result.kind.name,
+            ),
+        )
         if (result.deletedCount <= 0) return
         val updated = cleanupHistoryStore.record(
             deletedBytes = result.deletedBytes,
@@ -342,6 +353,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             return
         }
         appCacheRefreshJob?.cancel()
+        val scanStartedAtElapsed = SystemClock.elapsedRealtime()
+        AppDiagnostics.breadcrumb("scan_started", mapOf("focus" to focus.name))
         _state.update {
             it.copy(
                 scanning = true,
@@ -364,6 +377,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
             }.onSuccess { summary ->
+                AppDiagnostics.breadcrumb(
+                    "scan_completed",
+                    mapOf(
+                        "focus" to focus.name,
+                        "files" to summary.scannedFileCount,
+                        "bytes" to summary.scannedBytes,
+                        "ms" to (SystemClock.elapsedRealtime() - scanStartedAtElapsed),
+                        "limit_reached" to summary.scanLimitReached,
+                    ),
+                )
                 val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
                 val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE
                 val analyzedAtMillis = if (recordsStorageChange) System.currentTimeMillis() else 0L
@@ -450,7 +473,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     captureAppCacheForStorageChange = true
                     refreshAppCaches(force = true)
                 }
-            }.onFailure {
+            }.onFailure { error ->
+                AppDiagnostics.captureException(
+                    error,
+                    "scan_failed",
+                    mapOf("focus" to focus.name),
+                )
                 _state.update { current ->
                     current.copy(
                         scanning = false,
@@ -828,6 +856,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
+        AppDiagnostics.breadcrumb(
+            "cleanup_confirmed",
+            mapOf(
+                "items" to selected.size,
+                "bytes" to selected.sumOf(CleanableItem::sizeBytes),
+            ),
+        )
         resetPendingCleanupResult()
         pendingCleanupStorageBeforeBytes = repository.storageSnapshot().availableBytes
         _state.update {
@@ -948,6 +983,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             return false
         }
 
+        repository.invalidateStorageIndex()
         val directDeletedCount = pendingCleanupDeletedCount
         val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
         val removedBytes = pending.sumOf(CleanableItem::sizeBytes)

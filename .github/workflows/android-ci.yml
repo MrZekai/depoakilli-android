@@ -62,25 +62,35 @@ jobs:
             find app/build -type f -name "lint-results-*.txt" -print -exec cat {} \; 2>/dev/null || true
           fi
 
-      - name: Build debug APK
+      - name: Build slim QA APK
         id: assemble
         if: always()
         continue-on-error: true
-        run: ./gradlew --stacktrace assembleDebug
+        run: ./gradlew --stacktrace assembleQa
 
       - name: Verify stable test signing certificate
         id: signing
         if: steps.assemble.outcome == 'success'
         continue-on-error: true
         shell: bash
-        run: bash scripts/verify-qa-signing.sh app/build/outputs/apk/debug/app-debug.apk
+        run: bash scripts/verify-qa-signing.sh app/build/outputs/apk/qa/app-qa.apk
 
-      - name: Upload debug APK
+      - name: Verify packaged slim QA APK
+        id: qa_binary
+        if: steps.assemble.outcome == 'success'
+        continue-on-error: true
+        shell: bash
+        run: bash scripts/verify-qa-apk.sh app/build/outputs/apk/qa/app-qa.apk
+
+      - name: Upload slim QA APK
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: depoakilli-test-apk-${{ github.run_number }}
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: depoakilli-slim-qa-apk-${{ github.run_number }}
+          path: |
+            app/build/outputs/apk/qa/app-qa.apk
+            app/build/outputs/mapping/qa/mapping.txt
+            app/build/reports/qa-apk-audit/
           if-no-files-found: warn
           retention-days: 14
 
@@ -114,6 +124,7 @@ jobs:
           LINT_OUTCOME: ${{ steps.lint.outcome }}
           ASSEMBLE_OUTCOME: ${{ steps.assemble.outcome }}
           SIGNING_OUTCOME: ${{ steps.signing.outcome }}
+          QA_BINARY_OUTCOME: ${{ steps.qa_binary.outcome }}
         run: |
           failed=0
           if [[ "$LINT_OUTCOME" != "success" ]]; then
@@ -121,15 +132,19 @@ jobs:
             failed=1
           fi
           if [[ "$ASSEMBLE_OUTCOME" != "success" ]]; then
-            echo "Debug APK build outcome: $ASSEMBLE_OUTCOME"
+            echo "Slim QA APK build outcome: $ASSEMBLE_OUTCOME"
             failed=1
           fi
           if [[ "$SIGNING_OUTCOME" != "success" && "$SIGNING_OUTCOME" != "skipped" ]]; then
             echo "QA signing verification outcome: $SIGNING_OUTCOME"
             failed=1
           fi
+          if [[ "$QA_BINARY_OUTCOME" != "success" && "$QA_BINARY_OUTCOME" != "skipped" ]]; then
+            echo "QA packaged-binary verification outcome: $QA_BINARY_OUTCOME"
+            failed=1
+          fi
           if [[ "$failed" -ne 0 ]]; then
             echo "CI failed after collecting lint, APK build and signing results."
             exit 1
           fi
-          echo "Android lint, debug APK build and QA signing checks passed."
+          echo "Android lint, slim QA APK, signing and packaged-binary checks passed."

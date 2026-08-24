@@ -44,6 +44,7 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import java.io.File
 import java.io.FileInputStream
+import java.lang.ref.SoftReference
 import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
@@ -64,12 +65,31 @@ class DeviceRepository(
     private val aiEngine: AiCleaningEngine = AiCleaningEngine(),
 ) {
     private val resolver = context.contentResolver
+    private var sharedIndexCache: SoftReference<List<IndexedFile>>? = null
+    private var sharedIndexCachedAtElapsed = 0L
 
     fun storageSnapshot(): StorageSnapshot {
-        val stats = StatFs(Environment.getDataDirectory().absolutePath)
+        val snapshots = sharedStorageRoots().mapNotNull { root ->
+            runCatching {
+                val stats = StatFs(root.absolutePath)
+                StorageSnapshot(
+                    totalBytes = stats.totalBytes,
+                    availableBytes = stats.availableBytes,
+                )
+            }.getOrNull()
+        }
+
+        if (snapshots.isNotEmpty()) {
+            return StorageSnapshot(
+                totalBytes = snapshots.sumOf(StorageSnapshot::totalBytes),
+                availableBytes = snapshots.sumOf(StorageSnapshot::availableBytes),
+            )
+        }
+
+        val fallback = StatFs(Environment.getDataDirectory().absolutePath)
         return StorageSnapshot(
-            totalBytes = stats.totalBytes,
-            availableBytes = stats.availableBytes,
+            totalBytes = fallback.totalBytes,
+            availableBytes = fallback.availableBytes,
         )
     }
 
@@ -252,7 +272,7 @@ class DeviceRepository(
         } else {
             indexSharedStorage { visitedDirectories, discoveredFiles ->
                 onProgress(visitedDirectories, discoveredFiles)
-            }
+            }.also(::cacheSharedIndex)
         }
         val assessments = ArrayList<CleanableItem>()
 
@@ -328,9 +348,13 @@ class DeviceRepository(
                 excludeWhatsAppMedia = excludeWhatsAppMedia,
             )
         }
-        val indexed = indexSharedStorage { visitedDirectories, discoveredFiles ->
+
+        val indexed = cachedSharedIndex()?.also { cached ->
+            onProgress(0, cached.size)
+        } ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
             onProgress(visitedDirectories, discoveredFiles)
-        }
+        }.also(::cacheSharedIndex)
+
         val typedFiles = indexed
             .asSequence()
             .filter { storageFileType(it) == type }
@@ -342,6 +366,7 @@ class DeviceRepository(
             .take(MAX_STORAGE_REVIEW_ITEMS)
             .map { StorageReviewItem(file = it, selected = false) }
             .toList()
+
         StorageReviewSummary(
             type = type,
             excludeWhatsAppMedia = excludeWhatsAppMedia,
@@ -543,11 +568,12 @@ class DeviceRepository(
     private suspend fun indexSharedStorage(
         onTraversalProgress: (visitedDirectories: Int, discoveredFiles: Int) -> Unit,
     ): List<IndexedFile> {
-        val root = Environment.getExternalStorageDirectory()
-        if (!root.isDirectory) return emptyList()
+        val roots = sharedStorageRoots()
+        if (roots.isEmpty()) return emptyList()
+
         val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<File>()
-        pending.add(root)
+        val pending = ArrayDeque<Pair<File, File>>()
+        roots.forEach { root -> pending.addLast(root to root) }
         var visitedDirectories = 0
         var lastProgressDirectories = 0
         var lastProgressFiles = 0
@@ -555,13 +581,16 @@ class DeviceRepository(
 
         while (pending.isNotEmpty() && output.size < MAX_INDEXED_FILES) {
             coroutineContext.ensureActive()
-            val directory = pending.removeFirst()
+            val (root, directory) = pending.removeFirst()
             visitedDirectories++
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
+
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    if (!shouldSkipDirectory(root, child)) pending.addLast(child)
+                    if (!shouldSkipDirectory(root, child)) {
+                        pending.addLast(root to child)
+                    }
                 } else if (child.isFile) {
                     val size = child.length().coerceAtLeast(0L)
                     if (size <= 0L) continue
@@ -591,24 +620,25 @@ class DeviceRepository(
     private suspend fun indexWhatsAppFiles(
         onDiscovered: (Int) -> Unit,
     ): List<IndexedFile> {
-        val roots = whatsappRoots().filter(File::isDirectory)
-        if (roots.isEmpty()) return emptyList()
-        val storageRoot = Environment.getExternalStorageDirectory()
+        val rootPairs = whatsappRootPairs()
+        if (rootPairs.isEmpty()) return emptyList()
+
         val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<File>()
-        roots.forEach(pending::addLast)
+        val pending = ArrayDeque<Pair<File, File>>()
+        rootPairs.forEach(pending::addLast)
         val visited = hashSetOf<String>()
 
         while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
             coroutineContext.ensureActive()
-            val directory = pending.removeFirst()
+            val (storageRoot, directory) = pending.removeFirst()
             val canonical = runCatching { directory.canonicalPath }.getOrDefault(directory.absolutePath)
             if (!visited.add(canonical)) continue
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
+
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    pending.addLast(child)
+                    pending.addLast(storageRoot to child)
                 } else if (child.isFile && child.length() > 0L) {
                     output += indexedFile(storageRoot, child)
                     if (output.size % 50 == 0) onDiscovered(output.size)
@@ -632,6 +662,53 @@ class DeviceRepository(
         )
     }
 
+
+    fun invalidateStorageIndex() {
+        sharedIndexCache = null
+        sharedIndexCachedAtElapsed = 0L
+    }
+
+    private fun cacheSharedIndex(indexed: List<IndexedFile>) {
+        sharedIndexCache = SoftReference(indexed)
+        sharedIndexCachedAtElapsed = SystemClock.elapsedRealtime()
+    }
+
+    private fun cachedSharedIndex(): List<IndexedFile>? {
+        val cached = sharedIndexCache?.get() ?: return null
+        if (
+            sharedIndexCachedAtElapsed <= 0L ||
+            SystemClock.elapsedRealtime() - sharedIndexCachedAtElapsed > SHARED_INDEX_CACHE_TTL_MILLIS
+        ) {
+            invalidateStorageIndex()
+            return null
+        }
+        return cached
+    }
+
+    private fun sharedStorageRoots(): List<File> {
+        val storageManager = context.getSystemService(StorageManager::class.java)
+        return buildList {
+            add(Environment.getExternalStorageDirectory())
+            storageManager.storageVolumes
+                .mapNotNullTo(this) { volume -> volume.directory }
+        }
+            .filter(File::isDirectory)
+            .distinctBy { root ->
+                runCatching { root.canonicalPath }.getOrDefault(root.absolutePath)
+            }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun removeDeletedPathFromMediaStore(absolutePath: String) {
+        runCatching {
+            resolver.delete(
+                MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
+                "${MediaStore.MediaColumns.DATA}=?",
+                arrayOf(absolutePath),
+            )
+        }
+    }
+
     private fun shouldSkipDirectory(root: File, directory: File): Boolean {
         val relative = StoragePathRules.normalizePath(
             runCatching { directory.relativeTo(root).invariantSeparatorsPath }
@@ -642,16 +719,22 @@ class DeviceRepository(
         return false
     }
 
-    private fun whatsappRoots(): List<File> {
-        val root = Environment.getExternalStorageDirectory()
-        return listOf(
-            File(root, "Android/media/com.whatsapp/WhatsApp/Media"),
-            File(root, "Android/media/com.whatsapp.w4b/WhatsApp Business/Media"),
-            File(root, "Android/media/com.whatsapp.w4b/WhatsApp/Media"),
-            File(root, "WhatsApp/Media"),
-            File(root, "WhatsApp Business/Media"),
-        ).distinctBy { it.absolutePath }
+    private fun whatsappRootPairs(): List<Pair<File, File>> = buildList {
+        sharedStorageRoots().forEach { root ->
+            add(root to File(root, "Android/media/com.whatsapp/WhatsApp/Media"))
+            add(root to File(root, "Android/media/com.whatsapp.w4b/WhatsApp Business/Media"))
+            add(root to File(root, "Android/media/com.whatsapp.w4b/WhatsApp/Media"))
+            add(root to File(root, "WhatsApp/Media"))
+            add(root to File(root, "WhatsApp Business/Media"))
+        }
     }
+        .filter { (_, mediaRoot) -> mediaRoot.isDirectory }
+        .distinctBy { (_, mediaRoot) ->
+            runCatching { mediaRoot.canonicalPath }.getOrDefault(mediaRoot.absolutePath)
+        }
+
+    private fun whatsappRoots(): List<File> =
+        whatsappRootPairs().map { (_, mediaRoot) -> mediaRoot }
 
     private suspend fun findDuplicates(files: List<IndexedFile>): List<CleanableItem> {
         val duplicates = ArrayList<CleanableItem>()
@@ -860,11 +943,25 @@ class DeviceRepository(
 
     private fun deleteUriDirectly(uriString: String): Boolean = runCatching {
         val uri = Uri.parse(uriString)
-        when (uri.scheme) {
-            "file" -> File(requireNotNull(uri.path)).delete()
+        val deleted = when (uri.scheme) {
+            "file" -> {
+                val path = uri.path ?: return@runCatching false
+                val file = File(path)
+                val removed = file.delete()
+                if (removed) {
+                    removeDeletedPathFromMediaStore(file.absolutePath)
+                }
+                removed
+            }
+
             "content" -> resolver.delete(uri, null, null) > 0
             else -> false
         }
+
+        if (deleted) {
+            invalidateStorageIndex()
+        }
+        deleted
     }.getOrDefault(false)
 
     private fun IndexedFile.toCleanable(assessment: AiAssessment) = CleanableItem(
@@ -928,6 +1025,7 @@ class DeviceRepository(
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val MAX_INDEXED_FILES = 200_000
+        private const val SHARED_INDEX_CACHE_TTL_MILLIS = 90L * 1000L
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000

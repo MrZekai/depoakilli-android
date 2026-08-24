@@ -38,6 +38,7 @@ import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.mrzekai.depoakilli.BuildConfig
+import com.mrzekai.depoakilli.R
 
 @Composable
 fun CleanupResultAdSurface(
@@ -197,7 +198,7 @@ private fun createNativeAdView(context: android.content.Context): NativeAdView {
     }
 
     val adBadge = TextView(context).apply {
-        text = "Ad"
+        text = context.getString(R.string.sponsored)
         textSize = 10f
         setTextColor(AndroidColor.WHITE)
         setTypeface(typeface, Typeface.BOLD)

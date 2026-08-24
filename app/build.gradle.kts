@@ -24,6 +24,14 @@ val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     .orNull
     ?.trim()
     .orEmpty()
+val sentryDsn = providers.environmentVariable("SENTRY_DSN")
+    .orNull
+    ?.trim()
+    .orEmpty()
+
+private fun quotedBuildConfig(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
 val releaseKeystorePath = providers.environmentVariable("ANDROID_KEYSTORE_PATH")
 val releaseKeystorePassword = providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")
 val releaseKeyAlias = providers.environmentVariable("ANDROID_KEY_ALIAS")
@@ -38,8 +46,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 37
-        versionName = "0.5.17-alpha10"
+        versionCode = 38
+        versionName = "0.5.17-alpha11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -50,6 +58,7 @@ android {
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
         buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+        buildConfigField("String", "SENTRY_DSN", quotedBuildConfig(sentryDsn))
     }
 
     signingConfigs {
@@ -80,6 +89,26 @@ android {
             versionNameSuffix = "-qa"
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
+        }
+        create("qa") {
+            // External-test APK: release-like binary, Google sample ads, stable QA signing.
+            initWith(getByName("release"))
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
         }
         release {
             // Production AAB always uses Smart Cleaner's own AdMob IDs.
@@ -153,11 +182,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Crash-only diagnostics. Use Android core to avoid Session Replay/NDK
+    // modules that Smart Cleaner does not use.
+    implementation("io.sentry:sentry-android-core:8.53.0")
 
     implementation(libs.google.play.services.ads)
     implementation(libs.google.ump)
@@ -197,6 +229,9 @@ val validateReleaseAds by tasks.registering {
             check(liveResultNativeId.startsWith("ca-app-pub-1380972808968213/")) {
                 "Release blocked: Result Native ad unit must belong to Smart Cleaner."
             }
+        }
+        check(sentryDsn.isNotBlank()) {
+            "Release blocked: configure SENTRY_DSN so closed-test/production crashes are observable."
         }
         check(
             releaseKeystorePath.isPresent &&

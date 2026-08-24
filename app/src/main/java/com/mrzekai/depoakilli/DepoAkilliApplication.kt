@@ -12,6 +12,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.mrzekai.depoakilli.ads.AppOpenAdController
+import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
 import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,6 +77,7 @@ class DepoAkilliApplication :
 
     override fun onCreate() {
         super.onCreate()
+        AppDiagnostics.initialize(this)
         appOpenAds = AppOpenAdController(this)
         registerActivityLifecycleCallbacks(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(processObserver)

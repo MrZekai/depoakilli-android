@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha10.
+# Required project surface for v0.5.17-alpha11.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -41,11 +41,13 @@ required = [
     "app/src/main/AndroidManifest.xml",
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/diagnostics/AppDiagnostics.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt",
@@ -70,6 +72,12 @@ required = [
     "app/src/main/res/xml/locales_config.xml",
     ".github/workflows/android-ci.yml",
     ".github/workflows/release-aab.yml",
+    "scripts/verify-release-aab.sh",
+    "scripts/verify-qa-apk.sh",
+    "scripts/verify-qa-signing.sh",
+    "PLAY_RELEASE_CHECKLIST.md",
+    "PRIVACY_POLICY_EN.md",
+    "PRIVACY_POLICY_TR.md",
     "keystore/depoakilli-ci-qa.jks",
 ]
 for relative in required:
@@ -119,8 +127,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 37",
-    'versionName = "0.5.17-alpha10"',
+    "versionCode = 38",
+    'versionName = "0.5.17-alpha11"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -435,7 +443,7 @@ for expected in (
     "onSystemDismiss: () -> Unit",
     "onDone: (resultAdPresented: Boolean) -> Unit",
     "dismissOnClickOutside = false",
-    "Spacer(Modifier.height(18.dp))",
+    "Spacer(Modifier.height(33.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
     "verticalScroll(rememberScrollState())",
 ):
@@ -1086,7 +1094,7 @@ for expected in (
     "onDismissRequest = onSystemDismiss",
     "dismissOnClickOutside = false",
     "if (resultAdPresented)",
-    "Spacer(Modifier.height(18.dp))",
+    "Spacer(Modifier.height(33.dp))",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
@@ -1118,6 +1126,30 @@ if "screenshots at least 30 days old" not in default_strings:
     errors.append("English Screenshots copy must disclose the 30-day focused threshold")
 
 # ------------------------------------------------------------------
+# Alpha11 release-readiness / slim-QA contract.
+workflow_alpha11 = read(".github/workflows/android-ci.yml")
+# ------------------------------------------------------------------
+for expected in (
+    'create("qa") {',
+    'isDebuggable = false',
+    'isMinifyEnabled = true',
+    'isShrinkResources = true',
+    'getDefaultProguardFile("proguard-android-optimize.txt")',
+    'implementation("io.sentry:sentry-android-core:8.53.0")',
+):
+    if expected not in build_file:
+        errors.append(f"missing alpha11 slim-QA/build invariant: {expected}")
+if "implementation(libs.androidx.compose.ui.tooling.preview)" in build_file:
+    errors.append("unused Compose tooling-preview dependency must not be packaged")
+for expected in (
+    "assembleQa",
+    "scripts/verify-qa-apk.sh",
+    "app/build/outputs/apk/qa/app-qa.apk",
+):
+    if expected not in workflow_alpha11:
+        errors.append(f"missing alpha11 slim-QA CI invariant: {expected}")
+
+# ------------------------------------------------------------------
 # QA signing + CI contract.
 # ------------------------------------------------------------------
 qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
@@ -1133,7 +1165,7 @@ for expected in (
     "gradle/actions/setup-gradle@v6",
     "testDebugUnitTest",
     "lintDebug",
-    "assembleDebug",
+    "assembleQa",
     "Verify stable test signing certificate",
 ):
     if expected not in workflow:
@@ -1145,4 +1177,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha10 release-safety invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha11 release-readiness + slim-QA invariants are valid.")

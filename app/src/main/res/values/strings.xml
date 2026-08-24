@@ -124,7 +124,7 @@
     <string name="language_settings_subtitle">Use the phone’s supported app-language setting; unsupported locales fall back to English.</string>
     <string name="ad_privacy_preferences">Ad privacy preferences</string>
     <string name="ad_privacy_preferences_subtitle">Change consent and personalization choices</string>
-    <string name="sponsored">Sponsored</string>
+    <string name="sponsored">Ad</string>
     <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
     <string name="message_select_item">Select at least one item to clean.</string>
     <string name="message_cleanup_cancelled">Cleanup was cancelled.</string>
@@ -302,7 +302,7 @@ All files access is requested because file management and maintenance are core f
 
 Usage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.
 
-Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.</string>
+Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nCrash diagnostics may be sent to Sentry when diagnostics are configured. They can include stack traces, device/Android/app version and aggregate operation counters. File names, paths, file contents and duplicate fingerprints are never sent to crash reporting.</string>
     <string name="reason_large_file">Large file • %1$d days old</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
@@ -692,4 +692,5 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="storage_analyzer_review_action">Review this file type →</string>
     <string name="storage_change_create_baseline">Create first measurement</string>
     <string name="storage_change_analysis_scope">Runs a real shared-storage analysis and saves a new snapshot for Storage Change. No cleanup is performed by this action.</string>
+    <string name="storage_change_progress">%1$d files • %2$d folders scanned</string>
 </resources>

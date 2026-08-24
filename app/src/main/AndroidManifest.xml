@@ -4,6 +4,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Google Mobile Ads pulls WorkManager transitively. Smart Cleaner never
+         runs a long-running Worker/foreground service, so remove that generic
+         foreground-service surface from the merged manifest. -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -30,6 +37,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DepoAkilli">
+
+        <!-- Sentry is initialized manually only when a DSN is configured. -->
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false" />
+
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            tools:node="remove" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

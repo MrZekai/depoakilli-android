@@ -389,6 +389,8 @@ fun CleanerApp(
             DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
                 report = state.storageChange,
                 refreshing = state.scanning && state.scanFocus == ScanFocus.ANALYZE,
+                progressFiles = state.scanProgressFiles,
+                progressDirectories = state.scanProgressDirectories,
                 onAnalyze = {
                     if (!state.hasAllFilesAccess) {
                         viewModel.queueScanAfterPermission(ScanFocus.ANALYZE)

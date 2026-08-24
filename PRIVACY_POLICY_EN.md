@@ -9,3 +9,7 @@ Usage Access is optional and is used for app storage/cache statistics and last-u
 Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google's policies.
 
 Files are removed only after user selection or an Android-controlled confirmation where Android requires one.
+
+## Crash diagnostics
+
+When a build is configured with Sentry, Smart Cleaner may send crash diagnostics such as stack traces, device/Android/app version, and aggregate operation counters needed to diagnose scan or cleanup failures. File names, file paths, file contents, duplicate fingerprints, installed-app lists, and user-entered text are not sent to Sentry by Smart Cleaner.

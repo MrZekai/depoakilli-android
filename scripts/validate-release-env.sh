@@ -6,6 +6,7 @@ required=(
   KEYSTORE_PASSWORD
   KEY_ALIAS
   KEY_PASSWORD
+  SENTRY_DSN
 )
 
 missing=()
@@ -20,4 +21,4 @@ if (( ${#missing[@]} > 0 )); then
   exit 1
 fi
 
-echo "Release signing environment is complete; AdMob IDs are release-pinned in Gradle."
+echo "Release signing + crash-diagnostics environment is complete; AdMob IDs are release-pinned in Gradle."

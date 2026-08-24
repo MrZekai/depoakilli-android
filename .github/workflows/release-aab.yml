@@ -30,6 +30,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: bash ./scripts/validate-release-env.sh
 
       - name: Decode upload key
@@ -43,14 +44,21 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           chmod +x gradlew
           ./gradlew --stacktrace bundleRelease
+
+      - name: Verify actual release bundle and universal APK
+        run: bash ./scripts/verify-release-aab.sh
 
       - name: Upload signed AAB
         uses: actions/upload-artifact@v6
         with:
           name: depoakilli-release-aab-${{ github.run_number }}
-          path: app/build/outputs/bundle/release/app-release.aab
+          path: |
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/mapping/release/mapping.txt
+            release-verification/
           if-no-files-found: error
           retention-days: 30

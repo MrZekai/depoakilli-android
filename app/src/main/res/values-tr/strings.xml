@@ -124,7 +124,7 @@
     <string name="language_settings_subtitle">Telefonun desteklediği uygulama dili ayarını kullan; desteklenmeyen diller İngilizceye döner.</string>
     <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
     <string name="ad_privacy_preferences_subtitle">Onay ve kişiselleştirme seçimlerini değiştir</string>
-    <string name="sponsored">Sponsorlu</string>
+    <string name="sponsored">Reklam</string>
     <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
     <string name="message_cleanup_cancelled">Temizlik işlemi iptal edildi.</string>
@@ -302,7 +302,7 @@ Tüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği 
 
 Kullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Derin Uygulama Önbelleği Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.
 
-Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.</string>
+Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nTanılama yapılandırıldığında çökme tanılamaları Sentry’ye gönderilebilir. Bunlar stack trace, cihaz/Android/uygulama sürümü ve toplu işlem sayaçlarını içerebilir. Dosya adları, yolları, dosya içerikleri ve kopya parmak izleri çökme raporlamasına asla gönderilmez.</string>
     <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
     <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
     <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
@@ -692,4 +692,5 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="storage_analyzer_review_action">Bu dosya türünü incele →</string>
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>
+    <string name="storage_change_progress">%1$d dosya • %2$d klasör tarandı</string>
 </resources>

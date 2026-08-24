@@ -9,3 +9,7 @@ Kullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistik
 Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir.
 
 Dosyalar yalnız kullanıcı seçimi veya Android'in zorunlu tuttuğu sistem onayı sonrasında kaldırılır.
+
+## Çökme tanılamaları
+
+Bir derlemede Sentry yapılandırıldığında Akıllı Temizleyici; tarama veya temizlik hatalarını tanılamak için stack trace, cihaz/Android/uygulama sürümü ve toplu işlem sayaçları gibi çökme tanılamalarını gönderebilir. Dosya adları, dosya yolları, dosya içerikleri, kopya parmak izleri, kurulu uygulama listeleri ve kullanıcı tarafından girilen metinler Akıllı Temizleyici tarafından Sentry’ye gönderilmez.

@@ -31,6 +31,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.mrzekai.depoakilli.BuildConfig
+import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Composable
@@ -252,6 +253,7 @@ class InterstitialAdController(private val context: Context) {
             if (!completed.compareAndSet(false, true)) return
             isShowing = false
             Log.i(AD_DIAG_TAG, "INTERSTITIAL/FLOW_FINISH via=$reason")
+            AppDiagnostics.breadcrumb("interstitial_finish", mapOf("via" to reason))
             onFinished()
             if (!shownThisProcess) {
                 scheduleStableLoad("after-$reason")
@@ -266,6 +268,7 @@ class InterstitialAdController(private val context: Context) {
                 lastShownAt = System.currentTimeMillis()
                 preferences.edit().putLong(KEY_LAST_SHOWN_AT, lastShownAt).apply()
                 logAd("SHOWED", ad)
+                AppDiagnostics.breadcrumb("interstitial_show")
             }
 
             override fun onAdImpression() {
@@ -291,6 +294,7 @@ class InterstitialAdController(private val context: Context) {
         runCatching { ad.show(host) }
             .onFailure {
                 Log.e(AD_DIAG_TAG, "INTERSTITIAL/SHOW_EXCEPTION", it)
+                AppDiagnostics.captureException(it, "interstitial_show_exception")
                 finishFlow("show-exception")
             }
     }

@@ -235,7 +235,7 @@ internal fun CleanupResultDialog(
                     )
 
                     if (resultAdPresented) {
-                        Spacer(Modifier.height(18.dp))
+                        Spacer(Modifier.height(33.dp))
                     }
 
                     Button(

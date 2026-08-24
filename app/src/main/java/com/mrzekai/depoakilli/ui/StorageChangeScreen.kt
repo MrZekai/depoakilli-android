@@ -46,6 +46,8 @@ import kotlin.math.abs
 internal fun StorageChangeScreen(
     report: StorageChangeReport,
     refreshing: Boolean,
+    progressFiles: Int,
+    progressDirectories: Int,
     onAnalyze: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -78,11 +80,25 @@ internal fun StorageChangeScreen(
 
         if (refreshing) {
             item {
-                LinearProgressIndicator(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    color = HomeVisualTokens.Teal,
-                    trackColor = Color.White.copy(alpha = .08f),
-                )
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = HomeVisualTokens.Teal,
+                        trackColor = Color.White.copy(alpha = .08f),
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.storage_change_progress,
+                            progressFiles,
+                            progressDirectories,
+                        ),
+                        color = Color(0xFF93A5C8),
+                        fontSize = 10.sp,
+                    )
+                }
             }
         }
 

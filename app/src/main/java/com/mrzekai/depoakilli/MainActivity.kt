@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.data.DeviceRepository
+import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
     ) {
         cleanerViewModel.refreshDeviceState(force = true)
         if (Environment.isExternalStorageManager()) {
+            AppDiagnostics.breadcrumb("permission_granted", mapOf("type" to "all_files"))
             cleanerViewModel.showMessage(R.string.message_all_files_granted)
             cleanerViewModel.resumePendingScanAfterPermission()
             if (pendingDeepCacheAfterStorageAccess) {
@@ -49,6 +51,9 @@ class MainActivity : ComponentActivity() {
     private val usageAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
+        if (DeviceRepository(applicationContext).hasUsageAccess()) {
+            AppDiagnostics.breadcrumb("permission_granted", mapOf("type" to "usage_access"))
+        }
         cleanerViewModel.refreshDeviceState(force = true)
         cleanerViewModel.refreshAppCaches(force = true)
         cleanerViewModel.refreshInstalledApps()
