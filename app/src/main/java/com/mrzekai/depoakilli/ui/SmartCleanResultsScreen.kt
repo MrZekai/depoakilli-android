@@ -743,7 +743,7 @@ private fun SmartResultsContent(
                         fontWeight = FontWeight.Black,
                     )
                     Text(
-                        stringResource(R.string.storage_analyzer_action_hint),
+                        stringResource(R.string.storage_review_action_hint),
                         color = SmartTextSecondary,
                         style = MaterialTheme.typography.bodySmall,
                     )

@@ -14,6 +14,7 @@ import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -24,6 +25,20 @@ class ModelsTest {
         assertEquals("1.0 KB", ByteFormatter.format(1_000))
         assertEquals("1.5 MB", ByteFormatter.format(1_500_000))
         assertEquals("2.0 GB", ByteFormatter.format(2_000_000_000))
+    }
+
+    @Test
+    fun `byte formatter is stable under Turkish format locale`() {
+        val previous = Locale.getDefault(Locale.Category.FORMAT)
+        try {
+            Locale.setDefault(Locale.Category.FORMAT, Locale.forLanguageTag("tr-TR"))
+
+            assertEquals("1.0 KB", ByteFormatter.format(1_000))
+            assertEquals("1.5 MB", ByteFormatter.format(1_500_000))
+            assertEquals("2.0 GB", ByteFormatter.format(2_000_000_000))
+        } finally {
+            Locale.setDefault(Locale.Category.FORMAT, previous)
+        }
     }
 
     @Test

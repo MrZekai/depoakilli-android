@@ -2,6 +2,7 @@ package com.mrzekai.depoakilli.model
 
 import androidx.annotation.StringRes
 import com.mrzekai.depoakilli.R
+import java.util.Locale
 
 enum class CleanCategory(
     @StringRes val titleRes: Int,
@@ -25,6 +26,7 @@ enum class ScanFocus {
     LARGE_FILES,
     WHATSAPP,
     MEDIA,
+    SCREENSHOTS,
     DOWNLOADS,
     APKS,
     ANALYZE,
@@ -248,9 +250,9 @@ object ByteFormatter {
             unitIndex++
         }
         return if (value >= 100 || unitIndex == 0) {
-            "%.0f %s".format(value, units[unitIndex])
+            String.format(Locale.ROOT, "%.0f %s", value, units[unitIndex])
         } else {
-            "%.1f %s".format(value, units[unitIndex])
+            String.format(Locale.ROOT, "%.1f %s", value, units[unitIndex])
         }
     }
 }

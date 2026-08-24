@@ -363,12 +363,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onSuccess { summary ->
                 val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
-                val analyzedAtMillis = if (comprehensive) System.currentTimeMillis() else 0L
+                val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE
+                val analyzedAtMillis = if (recordsStorageChange) System.currentTimeMillis() else 0L
                 val storageSnapshot = repository.storageSnapshot()
                 val memorySnapshot = repository.memorySnapshot()
                 val hasAllFilesAccess = repository.hasAllFilesAccess()
                 val hasWhatsAppAccess = repository.hasWhatsAppAccess()
-                val storageChangeReport = if (comprehensive) {
+                val storageChangeReport = if (recordsStorageChange) {
                     storageChangeStore.recordFileSnapshot(
                         storage = storageSnapshot,
                         storageTypes = summary.storageTypes,
@@ -411,7 +412,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         } else {
                             it.dashboardSnapshotAtMillis
                         },
-                        storageChange = if (comprehensive) {
+                        storageChange = if (recordsStorageChange) {
                             storageChangeReport
                         } else {
                             it.storageChange
@@ -427,13 +428,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
                 if (comprehensive) {
                     persistDashboardSnapshot()
+                }
 
-                    if (repository.hasUsageAccess()) {
-                        // Enrich the new storage baseline asynchronously with
-                        // Android-reported per-app cache values.
-                        captureAppCacheForStorageChange = true
-                        refreshAppCaches(force = true)
-                    }
+                if (recordsStorageChange && repository.hasUsageAccess()) {
+                    // Enrich the real storage snapshot asynchronously with
+                    // Android-reported per-app cache values.
+                    captureAppCacheForStorageChange = true
+                    refreshAppCaches(force = true)
                 }
             }.onFailure {
                 _state.update { current ->

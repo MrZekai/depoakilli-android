@@ -288,6 +288,7 @@ class DeviceRepository(
                     ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
                     ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
                     ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
+                    ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
                     ScanFocus.DOWNLOADS -> item.assessment.category in DOWNLOAD_CATEGORIES
                     ScanFocus.APKS -> item.assessment.category == CleanCategory.APK_PACKAGE
                     ScanFocus.ANALYZE -> false
@@ -470,8 +471,19 @@ class DeviceRepository(
             ScanFocus.SMART -> aiEngine.assess(file)
             ScanFocus.DEEP -> aiEngine.assessDeep(file)
 
-            ScanFocus.JUNK -> aiEngine.assess(file)?.takeIf {
-                it.category == CleanCategory.JUNK
+            ScanFocus.JUNK -> {
+                val normalized = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
+                if (
+                    normalized.contains("/download/") ||
+                    normalized.contains("/downloads/") ||
+                    normalized.contains("/indirilen")
+                ) {
+                    null
+                } else {
+                    aiEngine.assess(file)?.takeIf {
+                        it.category == CleanCategory.JUNK
+                    }
+                }
             }
 
             ScanFocus.DUPLICATES,
@@ -501,6 +513,10 @@ class DeviceRepository(
                         it.category == CleanCategory.SCREENSHOT || it.category == CleanCategory.LARGE_FILE
                     }
                 }
+            }
+
+            ScanFocus.SCREENSHOTS -> aiEngine.assessDeep(file)?.takeIf {
+                it.category == CleanCategory.SCREENSHOT
             }
 
             ScanFocus.DOWNLOADS -> {

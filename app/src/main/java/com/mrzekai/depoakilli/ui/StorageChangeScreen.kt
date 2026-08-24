@@ -46,7 +46,7 @@ import kotlin.math.abs
 internal fun StorageChangeScreen(
     report: StorageChangeReport,
     refreshing: Boolean,
-    onRefresh: () -> Unit,
+    onAnalyze: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val typeChanges = report.storageTypeChanges.take(MAX_VISIBLE_TYPE_CHANGES)
@@ -147,21 +147,32 @@ internal fun StorageChangeScreen(
         }
 
         item {
-            Button(
-                onClick = onRefresh,
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                enabled = !refreshing,
+                verticalArrangement = Arrangement.spacedBy(7.dp),
             ) {
-                Icon(Icons.Outlined.Refresh, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
+                Button(
+                    onClick = onAnalyze,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !refreshing,
+                ) {
+                    Icon(Icons.Outlined.Refresh, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        stringResource(
+                            when {
+                                refreshing -> R.string.storage_change_refreshing
+                                !report.hasBaseline -> R.string.storage_change_create_baseline
+                                else -> R.string.storage_change_refresh
+                            },
+                        ),
+                    )
+                }
                 Text(
-                    stringResource(
-                        if (refreshing) {
-                            R.string.storage_change_refreshing
-                        } else {
-                            R.string.storage_change_refresh
-                        },
-                    ),
+                    text = stringResource(R.string.storage_change_analysis_scope),
+                    color = Color(0xFF93A5C8),
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp,
                 )
             }
         }

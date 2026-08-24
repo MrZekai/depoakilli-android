@@ -69,6 +69,7 @@ internal fun StorageAnalyzerScreen(
     state: CleanerUiState,
     onRequestAllFilesAccess: () -> Unit,
     onScan: () -> Unit,
+    onReviewType: (StorageFileType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -89,6 +90,7 @@ internal fun StorageAnalyzerScreen(
             else -> AnalyzerResults(
                 state = state,
                 onScan = onScan,
+                onReviewType = onReviewType,
             )
         }
     }
@@ -305,6 +307,7 @@ private fun AnalyzerEmpty(
 private fun AnalyzerResults(
     state: CleanerUiState,
     onScan: () -> Unit,
+    onReviewType: (StorageFileType) -> Unit,
 ) {
     val summary = state.summary
     val totalIndexedBytes = summary.scannedBytes.coerceAtLeast(0L)
@@ -361,6 +364,7 @@ private fun AnalyzerResults(
                     stat = stat,
                     totalIndexedBytes = totalIndexedBytes,
                     previews = summary.storagePreviews[stat.type].orEmpty().take(3),
+                    onReview = { onReviewType(stat.type) },
                 )
             }
         }
@@ -528,6 +532,7 @@ private fun AnalyzerTypeCard(
     stat: StorageTypeStat,
     totalIndexedBytes: Long,
     previews: List<IndexedFile>,
+    onReview: () -> Unit,
 ) {
     val accent = analyzerAccent(stat.type)
     val percent = if (totalIndexedBytes > 0L) {
@@ -637,6 +642,17 @@ private fun AnalyzerTypeCard(
                         }
                     }
                 }
+            }
+
+            TextButton(
+                onClick = onReview,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = stringResource(R.string.storage_analyzer_review_action),
+                    color = accent,
+                    fontWeight = FontWeight.Black,
+                )
             }
         }
     }

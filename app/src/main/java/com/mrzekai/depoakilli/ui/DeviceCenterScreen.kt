@@ -97,8 +97,8 @@ internal fun DeviceCenterScreen(
 
         item {
             ToolsSectionHeader(
-                title = stringResource(R.string.tools_cleaning_section_title),
-                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
+                title = stringResource(R.string.tools_broad_scan_section_title),
+                subtitle = stringResource(R.string.tools_broad_scan_section_subtitle),
             )
         }
 
@@ -111,6 +111,14 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.DEEP) },
             )
         }
+
+        item {
+            ToolsSectionHeader(
+                title = stringResource(R.string.tools_cleaning_section_title),
+                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
+            )
+        }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.junk_cleaner_title),
@@ -136,6 +144,15 @@ internal fun DeviceCenterScreen(
                 icon = Icons.Outlined.VideoFile,
                 accent = Color(0xFFEA3E5C),
                 onClick = { onScan(ScanFocus.LARGE_FILES) },
+            )
+        }
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.category_screenshots),
+                subtitle = stringResource(R.string.screenshots_tool_subtitle),
+                icon = Icons.Outlined.PhotoLibrary,
+                accent = Color(0xFFDA57FF),
+                onClick = { onScan(ScanFocus.SCREENSHOTS) },
             )
         }
         item {
@@ -185,7 +202,7 @@ internal fun DeviceCenterScreen(
         item {
             ToolActionCard(
                 title = stringResource(R.string.cache_manager_title),
-                subtitle = stringResource(R.string.deep_cache_subtitle),
+                subtitle = stringResource(R.string.cache_manager_subtitle),
                 icon = Icons.Outlined.CleaningServices,
                 accent = Color(0xFF1852D5),
                 onClick = onOpenCache,

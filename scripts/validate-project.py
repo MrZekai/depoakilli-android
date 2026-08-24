@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha8.
+# Required project surface for v0.5.17-alpha9.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -74,8 +74,11 @@ required = [
 for relative in required:
     require(relative)
 
-# XML must remain structurally valid across all resource sets.
-for xml_file in ROOT.rglob("*.xml"):
+# XML must remain structurally valid across checked-in Android source/resource
+# sets. Never parse generated build/intermediate XML: lint/AGP outputs are not
+# project source and may use internal encodings/schema content not intended for
+# ElementTree validation.
+for xml_file in (ROOT / "app/src").rglob("*.xml"):
     try:
         ET.parse(xml_file)
     except ET.ParseError as exc:
@@ -115,8 +118,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 35",
-    'versionName = "0.5.17-alpha8"',
+    "versionCode = 36",
+    'versionName = "0.5.17-alpha9"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -824,10 +827,14 @@ for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
                 f"stale/misleading copy remains in {strings_path.relative_to(ROOT)}: {stale_copy}"
             )
 
-if default_strings.count("measured result is always shown before any ad") != 3:
-    errors.append("all three English cleanup notices must be result-first")
-if tr_strings.count("ölçülen sonuç her zaman reklamdan önce gösterilir") != 3:
-    errors.append("all three Turkish cleanup notices must be result-first")
+if default_strings.count("sponsored ad panel") != 3:
+    errors.append("all three English cleanup notices must disclose the result-screen sponsored panel")
+if tr_strings.count("sponsorlu reklam paneli") != 3:
+    errors.append("all three Turkish cleanup notices must disclose the result-screen sponsored panel")
+if default_strings.count("no full-screen ad follows for the same cleanup") != 3:
+    errors.append("English cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
+if tr_strings.count("aynı temizlik için tam ekran reklam gösterilmez") != 3:
+    errors.append("Turkish cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
 if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
     errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
 
@@ -887,6 +894,126 @@ for expected in (
     if expected not in premium_tools:
         errors.append(f"missing premium cleaner review invariant: {expected}")
 
+
+# ------------------------------------------------------------------
+# Alpha9 Core UX: return context, truthful ads, targeted tools,
+# screenshots, analyzer drill-down, and real ANALYZE snapshots.
+# ------------------------------------------------------------------
+clean_models_alpha9 = read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt")
+
+for expected in (
+    "SCREENSHOTS,",
+    "ScanFocus.SCREENSHOTS",
+):
+    if expected not in clean_models_alpha9 and expected not in repository:
+        errors.append(f"missing alpha9 Screenshots invariant: {expected}")
+
+for expected in (
+    "R.string.tools_broad_scan_section_title",
+    "R.string.tools_cleaning_section_title",
+    "ScanFocus.SCREENSHOTS",
+    "R.string.cache_manager_subtitle",
+):
+    if expected not in device_center:
+        errors.append(f"missing alpha9 Tools UX invariant: {expected}")
+
+junk_start = repository.find("ScanFocus.JUNK -> {")
+junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
+if junk_start < 0 or junk_end <= junk_start:
+    errors.append("unable to inspect alpha9 Junk/Downloads partition")
+else:
+    junk_section = repository[junk_start:junk_end]
+    for expected in ('normalized.contains("/download/")', 'normalized.contains("/downloads/")'):
+        if expected not in junk_section:
+            errors.append(f"Junk must exclude Downloads candidates: {expected}")
+
+for expected in (
+    "ScanFocus.SCREENSHOTS -> aiEngine.assessDeep(file)",
+    "it.category == CleanCategory.SCREENSHOT",
+):
+    if expected not in repository:
+        errors.append(f"missing dedicated Screenshots engine invariant: {expected}")
+
+for expected in (
+    "val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE",
+    "if (recordsStorageChange)",
+    "recordsStorageChange && repository.hasUsageAccess()",
+):
+    if expected not in view_model:
+        errors.append(f"ANALYZE must create a real Storage Change snapshot: {expected}")
+
+for expected in (
+    "onAnalyze: () -> Unit",
+    "storage_change_create_baseline",
+    "storage_change_analysis_scope",
+):
+    if expected not in storage_change_screen:
+        errors.append(f"missing in-place Storage Change analysis invariant: {expected}")
+
+for expected in (
+    "onReviewType: (StorageFileType) -> Unit",
+    "storage_analyzer_review_action",
+):
+    if expected not in storage_analyzer:
+        errors.append(f"missing Analyzer drill-down invariant: {expected}")
+
+for forbidden in (
+    "onClean:",
+    "cleanupInProgress",
+):
+    if forbidden in storage_analyzer:
+        errors.append(f"Analyzer must remain read-only in alpha9: {forbidden}")
+
+for expected in (
+    "val returnScreen = detailScreen",
+    "val returnTabIndex = selectedTabIndex",
+    "returnScreen == DetailScreen.WHATSAPP",
+    "returnTabIndex == AppTab.TOOLS.ordinal",
+    "detailScreen = DetailScreen.CLEAN_RESULTS",
+):
+    if expected not in cleaner_app:
+        errors.append(f"cleanup result must return to its real source surface: {expected}")
+
+if "onPrepareWhatsAppCleanup { changed ->" in cleaner_app:
+    errors.append("WhatsApp cleanup must not navigate Home before the measured result")
+
+for expected in (
+    "state.scanFocus == ScanFocus.ANALYZE && state.storageReview.type != null",
+    "onReviewType = { type -> onOpenStorageReview(type, false) }",
+    "ScanFocus.SCREENSHOTS,",
+):
+    if expected not in cleaner_app:
+        errors.append(f"missing alpha9 CleanerApp routing invariant: {expected}")
+
+for expected in (
+    "ScanFocus.SCREENSHOTS -> ToolVisualConfig",
+    "R.string.screenshots_tool_subtitle",
+):
+    if expected not in premium_tools:
+        errors.append(f"missing Screenshots premium-tool UX invariant: {expected}")
+
+if "R.string.storage_analyzer_action_hint" in smart_results:
+    errors.append("destructive storage review must not use the read-only Analyzer resource prefix")
+if "R.string.storage_review_action_hint" not in smart_results:
+    errors.append("manual storage review must use storage_review_action_hint")
+
+for required_copy in (
+    "sponsored ad panel",
+    "no full-screen ad follows for the same cleanup",
+    "Find exact duplicates verified by content; one original is always kept",
+    "Measure real Android-reported cache per app and verify the actual reduction after cleanup",
+):
+    if required_copy not in default_strings:
+        errors.append(f"missing alpha9 English product-truth copy: {required_copy}")
+
+for required_copy in (
+    "sponsorlu reklam paneli",
+    "aynı temizlik için tam ekran reklam gösterilmez",
+    "İçeriği doğrulanmış birebir kopyaları bul; her grupta bir orijinal her zaman korunur",
+):
+    if required_copy not in tr_strings:
+        errors.append(f"missing alpha9 Turkish product-truth copy: {required_copy}")
+
 # ------------------------------------------------------------------
 # QA signing + CI contract.
 # ------------------------------------------------------------------
@@ -915,4 +1042,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha8 tools/analyzer invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha9 core UX invariants are valid.")

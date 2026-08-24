@@ -1231,6 +1231,7 @@ private fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {
     ScanFocus.LARGE_FILES -> ToolVisualConfig(R.string.scan_focus_large, R.string.premium_large_subtitle, Icons.Outlined.VideoFile, ToolAmber, ToolCyan)
     ScanFocus.APKS -> ToolVisualConfig(R.string.scan_focus_apks, R.string.premium_apk_subtitle, Icons.Outlined.Android, ToolGreen, ToolCyan)
     ScanFocus.MEDIA -> ToolVisualConfig(R.string.scan_focus_media, R.string.premium_media_subtitle, Icons.Outlined.PhotoLibrary, ToolCyan, ToolPurple)
+    ScanFocus.SCREENSHOTS -> ToolVisualConfig(R.string.category_screenshots, R.string.screenshots_tool_subtitle, Icons.Outlined.PhotoLibrary, Color(0xFFDA57FF), ToolCyan)
     ScanFocus.JUNK -> ToolVisualConfig(R.string.scan_focus_junk, R.string.premium_junk_subtitle, Icons.Outlined.DeleteSweep, ToolCyan, ToolGreen)
     ScanFocus.DOWNLOADS -> ToolVisualConfig(R.string.scan_focus_downloads, R.string.premium_downloads_subtitle, Icons.Outlined.Download, ToolAmber, ToolCyan)
     ScanFocus.DEEP -> ToolVisualConfig(R.string.scan_focus_deep, R.string.premium_deep_subtitle, Icons.Outlined.AutoAwesome, ToolGreen, ToolPurple)

@@ -360,11 +360,9 @@ fun CleanerApp(
                 onToggleItem = viewModel::toggleWhatsAppItem,
                 onToggleCategory = viewModel::toggleWhatsAppCategory,
                 onDeleteSelected = {
-                    onPrepareWhatsAppCleanup { changed ->
-                        if (changed) {
-                            detailScreen = null
-                            selectedTabIndex = AppTab.HOME.ordinal
-                        }
+                    onPrepareWhatsAppCleanup { _ ->
+                        // Keep the WhatsApp tool as the return surface.
+                        // The measured result dialog owns the navigation break.
                     }
                 },
                 modifier = Modifier.padding(padding),
@@ -390,8 +388,15 @@ fun CleanerApp(
 
             DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
                 report = state.storageChange,
-                refreshing = state.dashboardRefreshing || state.scanning,
-                onRefresh = viewModel::refreshDashboard,
+                refreshing = state.scanning && state.scanFocus == ScanFocus.ANALYZE,
+                onAnalyze = {
+                    if (!state.hasAllFilesAccess) {
+                        viewModel.queueScanAfterPermission(ScanFocus.ANALYZE)
+                        requestAllFilesWithDisclosure()
+                    } else {
+                        viewModel.scan(ScanFocus.ANALYZE)
+                    }
+                },
                 modifier = Modifier.padding(padding),
             )
 
@@ -562,17 +567,28 @@ fun CleanerApp(
                                     result.kind == CleanupResultKind.SYSTEM_CACHE
                                 )
 
-                    val returnToCacheManager =
-                        result.kind != CleanupResultKind.FILES
+                    val returnScreen = detailScreen
+                    val returnTabIndex = selectedTabIndex
 
                     viewModel.dismissCleanupResult()
                     legalReturnScreen = null
 
-                    if (returnToCacheManager) {
-                        detailScreen = DetailScreen.APP_CACHE
-                    } else {
-                        detailScreen = null
-                        selectedTabIndex = AppTab.HOME.ordinal
+                    when {
+                        result.kind != CleanupResultKind.FILES -> {
+                            detailScreen = DetailScreen.APP_CACHE
+                        }
+                        returnScreen == DetailScreen.WHATSAPP -> {
+                            detailScreen = DetailScreen.WHATSAPP
+                        }
+                        returnScreen == DetailScreen.CLEAN_RESULTS &&
+                            returnTabIndex == AppTab.TOOLS.ordinal -> {
+                            detailScreen = DetailScreen.CLEAN_RESULTS
+                            selectedTabIndex = AppTab.TOOLS.ordinal
+                        }
+                        else -> {
+                            detailScreen = null
+                            selectedTabIndex = AppTab.HOME.ordinal
+                        }
                     }
 
                     if (eligibleForNaturalBreakAd && !resultAdPresented) {
@@ -625,7 +641,10 @@ private fun CleanScreen(
     onCleanStorage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state.scanFocus == ScanFocus.SMART) {
+    if (
+        state.scanFocus == ScanFocus.SMART ||
+        (state.scanFocus == ScanFocus.ANALYZE && state.storageReview.type != null)
+    ) {
         SmartCleanResultsScreen(
             state = state,
             onRequestAllFilesAccess = onRequestAllFilesAccess,
@@ -652,6 +671,7 @@ private fun CleanScreen(
             state = state,
             onRequestAllFilesAccess = onRequestAllFilesAccess,
             onScan = onScan,
+            onReviewType = { type -> onOpenStorageReview(type, false) },
             modifier = modifier,
         )
         return
@@ -663,6 +683,7 @@ private fun CleanScreen(
             ScanFocus.DUPLICATES,
             ScanFocus.LARGE_FILES,
             ScanFocus.MEDIA,
+            ScanFocus.SCREENSHOTS,
             ScanFocus.DOWNLOADS,
             ScanFocus.APKS,
         )
@@ -900,6 +921,7 @@ private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
     ScanFocus.LARGE_FILES -> R.string.scan_focus_large
     ScanFocus.WHATSAPP -> R.string.scan_focus_whatsapp
     ScanFocus.MEDIA -> R.string.scan_focus_media
+    ScanFocus.SCREENSHOTS -> R.string.category_screenshots
     ScanFocus.DOWNLOADS -> R.string.scan_focus_downloads
     ScanFocus.APKS -> R.string.scan_focus_apks
     ScanFocus.ANALYZE -> R.string.scan_focus_analyze
@@ -913,6 +935,7 @@ private fun categoryFocusIcon(focus: ScanFocus): ImageVector = when (focus) {
     ScanFocus.LARGE_FILES -> Icons.Outlined.VideoFile
     ScanFocus.WHATSAPP -> Icons.Outlined.Chat
     ScanFocus.MEDIA -> Icons.Outlined.PhotoLibrary
+    ScanFocus.SCREENSHOTS -> Icons.Outlined.PhotoLibrary
     ScanFocus.DOWNLOADS -> Icons.Outlined.Download
     ScanFocus.APKS -> Icons.Outlined.Android
     ScanFocus.ANALYZE -> Icons.Outlined.Storage
