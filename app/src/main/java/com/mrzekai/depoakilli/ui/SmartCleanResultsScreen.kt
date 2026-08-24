@@ -96,6 +96,7 @@ import androidx.media3.common.Tracks
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -860,7 +861,7 @@ private fun smartMediaPreviews(
 }
 
 private fun isWhatsAppRelativePath(relativePath: String): Boolean {
-    val path = "/${relativePath.replace('\\', '/').trim('/')}/".lowercase()
+    val path = StoragePathRules.normalizePath(relativePath)
     return path.contains("/android/media/com.whatsapp/") ||
         path.contains("/android/media/com.whatsapp.w4b/") ||
         path.startsWith("/whatsapp/") ||
@@ -2198,7 +2199,7 @@ private fun StorageDetailPage(
         }
 
         when {
-            review.loading -> {
+            review.loading && review.items.isEmpty() -> {
                 Box(
                     Modifier.weight(1f).fillMaxWidth(),
                     contentAlignment = Alignment.Center,

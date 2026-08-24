@@ -22,7 +22,7 @@ internal object DuplicatePolicy {
     }
 
     private fun isCameraOriginal(file: IndexedFile): Boolean {
-        val path = file.relativePath.lowercase()
+        val path = StoragePathRules.normalizePath(file.relativePath)
         return path.contains("dcim/") || path.contains("/dcim") ||
             path.contains("camera/") || path.contains("/camera")
     }

@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -49,7 +51,8 @@ import com.mrzekai.depoakilli.ui.theme.Lime400
 internal fun CleanupResultDialog(
     result: CleanupResult,
     canRequestAds: Boolean,
-    onDismiss: (resultAdPresented: Boolean) -> Unit,
+    onSystemDismiss: () -> Unit,
+    onDone: (resultAdPresented: Boolean) -> Unit,
 ) {
     var resultAdPresented by remember(result) { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
@@ -68,8 +71,12 @@ internal fun CleanupResultDialog(
     }
 
     Dialog(
-        onDismissRequest = { onDismiss(resultAdPresented) },
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = onSystemDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false,
+        ),
     ) {
         Box(
             modifier = Modifier
@@ -227,8 +234,12 @@ internal fun CleanupResultDialog(
                         modifier = Modifier.fillMaxWidth(),
                     )
 
+                    if (resultAdPresented) {
+                        Spacer(Modifier.height(18.dp))
+                    }
+
                     Button(
-                        onClick = { onDismiss(resultAdPresented) },
+                        onClick = { onDone(resultAdPresented) },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(

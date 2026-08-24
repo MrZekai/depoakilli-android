@@ -8,9 +8,9 @@ object WhatsAppMediaClassifier {
         mimeType: String,
         relativePath: String,
     ): WhatsAppMediaCategory {
-        val mime = mimeType.lowercase()
-        val lowercaseName = name.lowercase()
-        val path = relativePath.lowercase()
+        val mime = StoragePathRules.normalizeText(mimeType)
+        val lowercaseName = StoragePathRules.normalizeText(name)
+        val path = StoragePathRules.normalizePath(relativePath)
         return when {
             "voice notes" in path || "ptt-" in lowercaseName ->
                 WhatsAppMediaCategory.VOICE_NOTES

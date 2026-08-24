@@ -688,7 +688,7 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="storage_analyzer_truth_note">This screen is informational. Nothing is preselected or deleted here. Protected private areas such as Android/data and Android/obb are not scanned.</string>
     <string name="tools_broad_scan_section_title">Broad scan</string>
     <string name="tools_broad_scan_section_subtitle">Use one wider pass when you want several storage categories reviewed together</string>
-    <string name="screenshots_tool_subtitle">Review older screenshots in one focused, previewable list</string>
+    <string name="screenshots_tool_subtitle">Review screenshots at least 30 days old in one focused, previewable list</string>
     <string name="storage_analyzer_review_action">Review this file type →</string>
     <string name="storage_change_create_baseline">Create first measurement</string>
     <string name="storage_change_analysis_scope">Runs a real shared-storage analysis and saves a new snapshot for Storage Change. No cleanup is performed by this action.</string>

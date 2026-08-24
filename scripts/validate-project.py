@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha9.
+# Required project surface for v0.5.17-alpha10.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -44,6 +44,7 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt",
@@ -118,8 +119,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 36",
-    'versionName = "0.5.17-alpha9"',
+    "versionCode = 37",
+    'versionName = "0.5.17-alpha10"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -431,7 +432,10 @@ cleanup_dialog = read(
 for expected in (
     "CleanupResultAdSurface(",
     "onAdPresented = { resultAdPresented = true }",
-    "onDismiss: (resultAdPresented: Boolean) -> Unit",
+    "onSystemDismiss: () -> Unit",
+    "onDone: (resultAdPresented: Boolean) -> Unit",
+    "dismissOnClickOutside = false",
+    "Spacer(Modifier.height(18.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
     "verticalScroll(rememberScrollState())",
 ):
@@ -919,20 +923,20 @@ for expected in (
 
 junk_start = repository.find("ScanFocus.JUNK -> {")
 junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
-if junk_start < 0 or junk_end <= junk_start:
-    errors.append("unable to inspect alpha9 Junk/Downloads partition")
+downloads_start = repository.find("ScanFocus.DOWNLOADS -> {")
+downloads_end = repository.find("ScanFocus.WHATSAPP", downloads_start)
+if junk_start < 0 or junk_end <= junk_start or downloads_start < 0 or downloads_end <= downloads_start:
+    errors.append("unable to inspect alpha10 Junk/Downloads partition")
 else:
     junk_section = repository[junk_start:junk_end]
-    for expected in ('normalized.contains("/download/")', 'normalized.contains("/downloads/")'):
-        if expected not in junk_section:
-            errors.append(f"Junk must exclude Downloads candidates: {expected}")
+    downloads_section = repository[downloads_start:downloads_end]
+    if "StoragePathRules.isDownloadPath(file.relativePath)" not in junk_section:
+        errors.append("Junk must exclude the shared Download-path matcher")
+    if "StoragePathRules.isDownloadPath(file.relativePath)" not in downloads_section:
+        errors.append("Downloads must include the same shared Download-path matcher")
 
-for expected in (
-    "ScanFocus.SCREENSHOTS -> aiEngine.assessDeep(file)",
-    "it.category == CleanCategory.SCREENSHOT",
-):
-    if expected not in repository:
-        errors.append(f"missing dedicated Screenshots engine invariant: {expected}")
+if "ScanFocus.SCREENSHOTS -> aiEngine.assessFocusedScreenshot(file)" not in repository:
+    errors.append("dedicated Screenshots tool must use the conservative focused policy")
 
 for expected in (
     "val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE",
@@ -1014,6 +1018,105 @@ for required_copy in (
     if required_copy not in tr_strings:
         errors.append(f"missing alpha9 Turkish product-truth copy: {required_copy}")
 
+
+# ------------------------------------------------------------------
+# Alpha10 release-safety
+# ------------------------------------------------------------------
+storage_path_rules = read("app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt")
+ai_engine = read("app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt")
+duplicate_policy = read("app/src/main/java/com/mrzekai/depoakilli/data/DuplicatePolicy.kt")
+whatsapp_classifier = read("app/src/main/java/com/mrzekai/depoakilli/data/WhatsAppMediaClassifier.kt")
+
+for expected in (
+    "Normalizer.Form.NFD",
+    "lowercase(Locale.ROOT)",
+    "combiningMarks",
+    ".replace('ı', 'i')",
+    '"/download/"',
+    '"/downloads/"',
+    '"/indirilen/"',
+    '"/indirilenler/"',
+    "fun isDownloadPath(path: String)",
+):
+    if expected not in storage_path_rules:
+        errors.append(f"missing alpha10 locale-stable path invariant: {expected}")
+
+for expected in (
+    "StoragePathRules.isDownloadPath(file.relativePath)",
+    "StoragePathRules.normalizePath(file.relativePath)",
+    "StoragePathRules.normalizeText(file.mimeType)",
+    "typedFiles.size",
+):
+    if expected not in repository:
+        errors.append(f"missing alpha10 repository path/review invariant: {expected}")
+
+for expected in (
+    "StoragePathRules.normalizePath(file.relativePath)",
+    "StoragePathRules.normalizeText(file.name)",
+    "StoragePathRules.isDownloadPath(file.relativePath)",
+    "fun assessFocusedScreenshot(file: IndexedFile)",
+    "FOCUSED_SCREENSHOT_DAYS = 30L",
+):
+    if expected not in ai_engine:
+        errors.append(f"missing alpha10 AI matching invariant: {expected}")
+if ".lowercase()" in ai_engine:
+    errors.append("AiCleaningEngine must not use locale-sensitive lowercase()")
+
+for expected in (
+    "StoragePathRules.normalizePath(relativePath)",
+    "storageReviewGeneration",
+    "val reviewGeneration = ++storageReviewGeneration",
+    "reviewGeneration == storageReviewGeneration",
+    "loading = true",
+    "scannedFileCount = immediateItems.size",
+    "storageReviewJob?.cancel()",
+    "summary = if (focus == ScanFocus.ANALYZE)",
+):
+    if expected not in view_model:
+        errors.append(f"missing alpha10 ViewModel safety invariant: {expected}")
+
+if "review.loading && review.items.isEmpty()" not in smart_results:
+    errors.append("Storage Review previews must remain visible while background expansion loads")
+if "StoragePathRules.normalizePath(relativePath)" not in smart_results:
+    errors.append("Smart review WhatsApp path matching must be locale-stable")
+
+for expected in (
+    "onSystemDismiss: () -> Unit",
+    "onDone: (resultAdPresented: Boolean) -> Unit",
+    "onDismissRequest = onSystemDismiss",
+    "dismissOnClickOutside = false",
+    "if (resultAdPresented)",
+    "Spacer(Modifier.height(18.dp))",
+):
+    if expected not in cleanup_dialog:
+        errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
+
+system_start = cleaner_app.find("onSystemDismiss = {")
+done_start = cleaner_app.find("onDone = { resultAdPresented ->", system_start)
+if system_start < 0 or done_start <= system_start:
+    errors.append("Cleanup result must expose separate system-dismiss and Done handlers")
+else:
+    if "onCleanupResultDismissed()" in cleaner_app[system_start:done_start]:
+        errors.append("Back/system dismissal must never request an Interstitial")
+    if "onCleanupResultDismissed()" not in cleaner_app[done_start:done_start + 1300]:
+        errors.append("Only explicit Done may own the cleanup Interstitial fallback")
+
+for expected in (
+    "StoragePathRules.normalizeText(mimeType)",
+    "StoragePathRules.normalizeText(name)",
+    "StoragePathRules.normalizePath(relativePath)",
+):
+    if expected not in whatsapp_classifier:
+        errors.append(f"WhatsApp classifier must use stable matching: {expected}")
+
+if "StoragePathRules.normalizePath(file.relativePath)" not in duplicate_policy:
+    errors.append("Duplicate original-path policy must use stable path normalization")
+
+if "En az 30 günlük ekran görüntülerini" not in tr_strings:
+    errors.append("Turkish Screenshots copy must disclose the 30-day focused threshold")
+if "screenshots at least 30 days old" not in default_strings:
+    errors.append("English Screenshots copy must disclose the 30-day focused threshold")
+
 # ------------------------------------------------------------------
 # QA signing + CI contract.
 # ------------------------------------------------------------------
@@ -1042,4 +1145,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha9 core UX invariants are valid.")
+print("Smart Cleaner v0.5.17-alpha10 release-safety invariants are valid.")

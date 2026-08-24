@@ -555,10 +555,39 @@ fun CleanerApp(
 
     if (!fullScreenAdActive) {
         state.cleanupResult?.let { result ->
+            val dismissResultAndReturn: () -> Unit = {
+                val returnScreen = detailScreen
+                val returnTabIndex = selectedTabIndex
+
+                viewModel.dismissCleanupResult()
+                legalReturnScreen = null
+
+                when {
+                    result.kind != CleanupResultKind.FILES -> {
+                        detailScreen = DetailScreen.APP_CACHE
+                    }
+                    returnScreen == DetailScreen.WHATSAPP -> {
+                        detailScreen = DetailScreen.WHATSAPP
+                    }
+                    returnScreen == DetailScreen.CLEAN_RESULTS &&
+                        returnTabIndex == AppTab.TOOLS.ordinal -> {
+                        detailScreen = DetailScreen.CLEAN_RESULTS
+                        selectedTabIndex = AppTab.TOOLS.ordinal
+                    }
+                    else -> {
+                        detailScreen = null
+                        selectedTabIndex = AppTab.HOME.ordinal
+                    }
+                }
+            }
+
             CleanupResultDialog(
                 result = result,
                 canRequestAds = canRequestAds,
-                onDismiss = { resultAdPresented ->
+                onSystemDismiss = {
+                    dismissResultAndReturn()
+                },
+                onDone = { resultAdPresented ->
                     val eligibleForNaturalBreakAd =
                         result.operationSucceeded &&
                             (
@@ -567,29 +596,7 @@ fun CleanerApp(
                                     result.kind == CleanupResultKind.SYSTEM_CACHE
                                 )
 
-                    val returnScreen = detailScreen
-                    val returnTabIndex = selectedTabIndex
-
-                    viewModel.dismissCleanupResult()
-                    legalReturnScreen = null
-
-                    when {
-                        result.kind != CleanupResultKind.FILES -> {
-                            detailScreen = DetailScreen.APP_CACHE
-                        }
-                        returnScreen == DetailScreen.WHATSAPP -> {
-                            detailScreen = DetailScreen.WHATSAPP
-                        }
-                        returnScreen == DetailScreen.CLEAN_RESULTS &&
-                            returnTabIndex == AppTab.TOOLS.ordinal -> {
-                            detailScreen = DetailScreen.CLEAN_RESULTS
-                            selectedTabIndex = AppTab.TOOLS.ordinal
-                        }
-                        else -> {
-                            detailScreen = null
-                            selectedTabIndex = AppTab.HOME.ordinal
-                        }
-                    }
+                    dismissResultAndReturn()
 
                     if (eligibleForNaturalBreakAd && !resultAdPresented) {
                         onCleanupResultDismissed()

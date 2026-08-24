@@ -2,6 +2,7 @@ package com.mrzekai.depoakilli.data
 
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.IndexedFile
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -121,6 +122,56 @@ class AiCleaningEngineTest {
         val deep = engine.assessDeep(candidate)
         assertEquals(CleanCategory.SCREENSHOT, deep?.category)
         assertFalse(requireNotNull(deep).recommended)
+    }
+
+
+    @Test
+    fun `download path matching is stable across Turkish I variants and locales`() {
+        val previous = Locale.getDefault()
+        try {
+            for (locale in listOf(Locale.forLanguageTag("tr-TR"), Locale.ENGLISH)) {
+                Locale.setDefault(locale)
+
+                assertTrue(StoragePathRules.isDownloadPath("İndirilenler/"))
+                assertTrue(StoragePathRules.isDownloadPath("INDIRILENLER/"))
+                assertTrue(StoragePathRules.isDownloadPath("Download/"))
+                assertTrue(StoragePathRules.isDownloadPath("Downloads/"))
+                assertFalse(StoragePathRules.isDownloadPath("Pictures/"))
+
+                val result = engine.assess(
+                    file(
+                        "old.zip",
+                        "application/zip",
+                        120,
+                        "İndirilenler/",
+                    ),
+                )
+                assertEquals(CleanCategory.OLD_DOWNLOAD, result?.category)
+            }
+        } finally {
+            Locale.setDefault(previous)
+        }
+    }
+
+    @Test
+    fun `focused screenshots wait thirty days and remain review only`() {
+        val twentyNineDays = file(
+            "Screenshot_29.png",
+            "image/png",
+            29,
+            "Pictures/Screenshots/",
+        )
+        val thirtyOneDays = file(
+            "Screenshot_31.png",
+            "image/png",
+            31,
+            "Pictures/Screenshots/",
+        )
+
+        assertNull(engine.assessFocusedScreenshot(twentyNineDays))
+        val result = engine.assessFocusedScreenshot(thirtyOneDays)
+        assertEquals(CleanCategory.SCREENSHOT, result?.category)
+        assertFalse(requireNotNull(result).recommended)
     }
 
     @Test

@@ -19,9 +19,9 @@ class AiCleaningEngine(
 ) {
     fun assess(file: IndexedFile): AiAssessment? {
         val ageDays = ageDays(file.modifiedAtMillis)
-        val path = normalize(file.relativePath)
-        val name = file.name.lowercase()
-        val mime = file.mimeType.lowercase()
+        val path = StoragePathRules.normalizePath(file.relativePath)
+        val name = StoragePathRules.normalizeText(file.name)
+        val mime = StoragePathRules.normalizeText(file.mimeType)
 
         val isWhatsApp = path.contains("whatsapp")
         val isWhatsAppStatus = isWhatsApp && path.contains("/.statuses/")
@@ -61,10 +61,7 @@ class AiCleaningEngine(
             )
         }
 
-        val isScreenshot = path.contains("/screenshots/") ||
-            name.startsWith("screenshot") ||
-            name.startsWith("ekran_görüntüsü") ||
-            name.startsWith("ekran görüntüsü")
+        val isScreenshot = isScreenshot(path, name)
         if (isScreenshot && ageDays >= 14) {
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
@@ -75,7 +72,7 @@ class AiCleaningEngine(
             )
         }
 
-        val isDownload = path.contains("/download/") || path.contains("/downloads/") || path.contains("/indirilen")
+        val isDownload = StoragePathRules.isDownloadPath(file.relativePath)
         if (isDownload && ageDays >= 90) {
             return AiAssessment(
                 category = CleanCategory.OLD_DOWNLOAD,
@@ -109,8 +106,8 @@ class AiCleaningEngine(
         assess(file)?.let { return it }
 
         val ageDays = ageDays(file.modifiedAtMillis)
-        val path = normalize(file.relativePath)
-        val name = file.name.lowercase()
+        val path = StoragePathRules.normalizePath(file.relativePath)
+        val name = StoragePathRules.normalizeText(file.name)
 
         val isWhatsAppSent = path.contains("whatsapp") &&
             (path.contains("/sent/") || path.endsWith("/sent"))
@@ -124,10 +121,7 @@ class AiCleaningEngine(
             )
         }
 
-        val isScreenshot = path.contains("/screenshots/") ||
-            name.startsWith("screenshot") ||
-            name.startsWith("ekran_görüntüsü") ||
-            name.startsWith("ekran görüntüsü")
+        val isScreenshot = isScreenshot(path, name)
         if (isScreenshot && ageDays >= DEEP_SCREENSHOT_DAYS) {
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
@@ -138,9 +132,7 @@ class AiCleaningEngine(
             )
         }
 
-        val isDownload = path.contains("/download/") ||
-            path.contains("/downloads/") ||
-            path.contains("/indirilen")
+        val isDownload = StoragePathRules.isDownloadPath(file.relativePath)
         if (isDownload && ageDays >= DEEP_DOWNLOAD_DAYS) {
             return AiAssessment(
                 category = CleanCategory.OLD_DOWNLOAD,
@@ -164,12 +156,42 @@ class AiCleaningEngine(
         return null
     }
 
+
+    /**
+     * Dedicated Screenshots tool policy.
+     *
+     * This surface is intentionally more conservative than Deep Clean:
+     * screenshots are user-created content and are never preselected.
+     */
+    fun assessFocusedScreenshot(file: IndexedFile): AiAssessment? {
+        val ageDays = ageDays(file.modifiedAtMillis)
+        val path = StoragePathRules.normalizePath(file.relativePath)
+        val name = StoragePathRules.normalizeText(file.name)
+        if (!isScreenshot(path, name) || ageDays < FOCUSED_SCREENSHOT_DAYS) return null
+
+        return AiAssessment(
+            category = CleanCategory.SCREENSHOT,
+            safetyScore = if (ageDays >= 90) 88 else 74,
+            reasonRes = R.string.reason_old_screenshot,
+            reasonArgs = listOf(ageDays),
+            recommended = false,
+        )
+    }
+
     fun duplicateAssessment(automaticSelectionIsSafe: Boolean): AiAssessment = AiAssessment(
         category = CleanCategory.DUPLICATE,
         safetyScore = if (automaticSelectionIsSafe) 99 else 86,
         reasonRes = R.string.reason_exact_duplicate,
         recommended = automaticSelectionIsSafe,
     )
+
+
+    private fun isScreenshot(path: String, name: String): Boolean {
+        return path.contains("/screenshots/") ||
+            name.startsWith("screenshot") ||
+            name.startsWith("ekran_goruntusu") ||
+            name.startsWith("ekran goruntusu")
+    }
 
     private fun isTemporary(
         file: IndexedFile,
@@ -180,7 +202,8 @@ class AiCleaningEngine(
         if (ageDays < TEMP_MIN_AGE_DAYS) return false
         val tempExtension = TEMP_EXTENSIONS.any(name::endsWith)
         val generatedThumbnail = path.contains("/.thumbnails/")
-        val mediaFile = file.mimeType.startsWith("image/") || file.mimeType.startsWith("video/")
+        val mediaMime = StoragePathRules.normalizeText(file.mimeType)
+        val mediaFile = mediaMime.startsWith("image/") || mediaMime.startsWith("video/")
         val tempFolder = !mediaFile &&
             (path.contains("/temp/") || path.contains("/tmp/") || path.contains("/temporary/"))
         val knownTinyArtifact = file.sizeBytes <= 10L * 1024L * 1024L &&
@@ -193,13 +216,12 @@ class AiCleaningEngine(
         return TimeUnit.MILLISECONDS.toDays((nowMillis() - modifiedAtMillis).coerceAtLeast(0))
     }
 
-    private fun normalize(path: String): String = "/${path.replace('\\', '/').trim('/')}/".lowercase()
-
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private const val DEEP_LARGE_FILE_BYTES = 50L * 1024L * 1024L
         private const val DEEP_SCREENSHOT_DAYS = 7L
+        private const val FOCUSED_SCREENSHOT_DAYS = 30L
         private const val DEEP_DOWNLOAD_DAYS = 30L
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L
         private const val TEMP_MIN_AGE_DAYS = 3L

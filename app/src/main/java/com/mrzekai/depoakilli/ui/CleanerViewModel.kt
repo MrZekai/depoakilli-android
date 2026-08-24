@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
+import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
@@ -125,6 +126,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var appCacheRefreshJob: Job? = null
     private var installedAppsRefreshJob: Job? = null
     private var storageReviewJob: Job? = null
+    private var storageReviewGeneration = 0L
     private var lastDeviceRefreshAt = 0L
     private var lastAppCacheRefreshAt = 0L
     private var captureAppCacheForStorageChange = false
@@ -381,7 +383,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
                 _state.update {
                     it.copy(
-                        summary = summary,
+                        summary = if (focus == ScanFocus.ANALYZE) {
+                            it.summary.copy(
+                                scannedFileCount = summary.scannedFileCount,
+                                scannedBytes = summary.scannedBytes,
+                                limitedAccess = summary.limitedAccess,
+                                scanLimitReached = summary.scanLimitReached,
+                                storageTypes = summary.storageTypes,
+                                storagePreviews = summary.storagePreviews,
+                                smartMediaTypes = summary.smartMediaTypes,
+                            )
+                        } else {
+                            summary
+                        },
                         dashboardCleanableBytes = if (comprehensive) {
                             summary.safeSuggestedBytes
                         } else {
@@ -621,6 +635,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
 
         storageReviewJob?.cancel()
+        val reviewGeneration = ++storageReviewGeneration
 
         val current = _state.value
         val immediateItems = current.summary.storagePreviews[type]
@@ -641,11 +656,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     type = type,
                     excludeWhatsAppMedia = excludeWhatsAppMedia,
                     items = immediateItems,
-                    scannedFileCount = current.summary.scannedFileCount,
+                    scannedFileCount = immediateItems.size,
                     scanLimitReached = current.summary.scanLimitReached,
-                    loading = false,
+                    loading = true,
                 ),
-                storageReviewProgressFiles = current.summary.scannedFileCount,
+                storageReviewProgressFiles = 0,
                 storageReviewProgressDirectories = 0,
                 message = null,
             )
@@ -656,6 +671,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 repository.scanStorageReview(type, excludeWhatsAppMedia) { directories, files ->
                     _state.update { state ->
                         if (
+                            reviewGeneration == storageReviewGeneration &&
                             state.storageReview.type == type &&
                             state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
                         ) {
@@ -671,6 +687,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }.onSuccess { review ->
                 _state.update { state ->
                     if (
+                        reviewGeneration == storageReviewGeneration &&
                         state.storageReview.type == type &&
                         state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
                     ) {
@@ -695,6 +712,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }.onFailure {
                 _state.update { state ->
                     if (
+                        reviewGeneration == storageReviewGeneration &&
                         state.storageReview.type == type &&
                         state.storageReview.excludeWhatsAppMedia == excludeWhatsAppMedia
                     ) {
@@ -712,7 +730,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun isWhatsAppIndexedPath(relativePath: String): Boolean {
-        val path = "/${relativePath.replace('\\', '/').trim('/')}/".lowercase()
+        val path = StoragePathRules.normalizePath(relativePath)
         return path.contains("/android/media/com.whatsapp/") ||
             path.contains("/android/media/com.whatsapp.w4b/") ||
             path.startsWith("/whatsapp/") ||
@@ -720,6 +738,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun closeStorageReview() {
+        storageReviewGeneration++
         storageReviewJob?.cancel()
         storageReviewJob = null
         _state.update {
@@ -860,6 +879,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_select_item)) }
             return
         }
+
+        storageReviewGeneration++
+        storageReviewJob?.cancel()
+        storageReviewJob = null
+
         val storageBefore = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(

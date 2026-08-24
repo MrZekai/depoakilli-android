@@ -688,7 +688,7 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="storage_analyzer_truth_note">Bu ekran yalnız bilgi amaçlıdır. Burada hiçbir dosya önceden seçilmez veya silinmez. Android/data ve Android/obb gibi korunan özel alanlar taranmaz.</string>
     <string name="tools_broad_scan_section_title">Geniş tarama</string>
     <string name="tools_broad_scan_section_subtitle">Birden fazla depolama kategorisini birlikte incelemek istediğinde tek geniş tarama kullan</string>
-    <string name="screenshots_tool_subtitle">Eski ekran görüntülerini tek, önizlenebilir bir listede incele</string>
+    <string name="screenshots_tool_subtitle">En az 30 günlük ekran görüntülerini tek, önizlenebilir bir listede incele</string>
     <string name="storage_analyzer_review_action">Bu dosya türünü incele →</string>
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>

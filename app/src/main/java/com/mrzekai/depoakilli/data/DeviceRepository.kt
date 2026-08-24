@@ -271,7 +271,10 @@ class DeviceRepository(
             focus == ScanFocus.MEDIA
         ) {
             val duplicateSource = if (focus == ScanFocus.MEDIA) {
-                indexed.filter { it.mimeType.startsWith("image/") || it.mimeType.startsWith("video/") }
+                indexed.filter {
+                    val mime = StoragePathRules.normalizeText(it.mimeType)
+                    mime.startsWith("image/") || mime.startsWith("video/")
+                }
             } else {
                 indexed
             }
@@ -328,10 +331,13 @@ class DeviceRepository(
         val indexed = indexSharedStorage { visitedDirectories, discoveredFiles ->
             onProgress(visitedDirectories, discoveredFiles)
         }
-        val typed = indexed
+        val typedFiles = indexed
             .asSequence()
             .filter { storageFileType(it) == type }
             .filter { !excludeWhatsAppMedia || !isWhatsAppSharedMedia(it) }
+            .toList()
+        val typed = typedFiles
+            .asSequence()
             .sortedByDescending(IndexedFile::sizeBytes)
             .take(MAX_STORAGE_REVIEW_ITEMS)
             .map { StorageReviewItem(file = it, selected = false) }
@@ -340,8 +346,10 @@ class DeviceRepository(
             type = type,
             excludeWhatsAppMedia = excludeWhatsAppMedia,
             items = typed,
-            scannedFileCount = indexed.size,
-            scanLimitReached = indexed.size >= MAX_INDEXED_FILES || typed.size >= MAX_STORAGE_REVIEW_ITEMS,
+            scannedFileCount = typedFiles.size,
+            scanLimitReached =
+                indexed.size >= MAX_INDEXED_FILES ||
+                    typedFiles.size > MAX_STORAGE_REVIEW_ITEMS,
             loading = false,
         )
     }
@@ -360,7 +368,7 @@ class DeviceRepository(
             if (index % 40 == 0) {
                 onProgress((88 + ((index + 1) * 10 / count)).coerceIn(88, 98))
             }
-            val normalized = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
+            val normalized = StoragePathRules.normalizePath(file.relativePath)
             WhatsAppMediaItem(
                 id = file.uri,
                 uri = file.uri,
@@ -472,12 +480,7 @@ class DeviceRepository(
             ScanFocus.DEEP -> aiEngine.assessDeep(file)
 
             ScanFocus.JUNK -> {
-                val normalized = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
-                if (
-                    normalized.contains("/download/") ||
-                    normalized.contains("/downloads/") ||
-                    normalized.contains("/indirilen")
-                ) {
+                if (StoragePathRules.isDownloadPath(file.relativePath)) {
                     null
                 } else {
                     aiEngine.assess(file)?.takeIf {
@@ -515,13 +518,10 @@ class DeviceRepository(
                 }
             }
 
-            ScanFocus.SCREENSHOTS -> aiEngine.assessDeep(file)?.takeIf {
-                it.category == CleanCategory.SCREENSHOT
-            }
+            ScanFocus.SCREENSHOTS -> aiEngine.assessFocusedScreenshot(file)
 
             ScanFocus.DOWNLOADS -> {
-                val normalized = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
-                if (!normalized.contains("/download/") && !normalized.contains("/downloads/")) {
+                if (!StoragePathRules.isDownloadPath(file.relativePath)) {
                     null
                 } else {
                     aiEngine.assessDeep(file)?.takeIf {
@@ -633,12 +633,12 @@ class DeviceRepository(
     }
 
     private fun shouldSkipDirectory(root: File, directory: File): Boolean {
-        val relative = runCatching { directory.relativeTo(root).invariantSeparatorsPath }
-            .getOrDefault(directory.invariantSeparatorsPath)
-            .trim('/')
-            .lowercase()
-        if (relative == "android/data" || relative.startsWith("android/data/")) return true
-        if (relative == "android/obb" || relative.startsWith("android/obb/")) return true
+        val relative = StoragePathRules.normalizePath(
+            runCatching { directory.relativeTo(root).invariantSeparatorsPath }
+                .getOrDefault(directory.invariantSeparatorsPath),
+        )
+        if (relative == "/android/data/" || relative.startsWith("/android/data/")) return true
+        if (relative == "/android/obb/" || relative.startsWith("/android/obb/")) return true
         return false
     }
 
@@ -760,14 +760,15 @@ class DeviceRepository(
         var videoBytes = 0L
 
         files.forEach { file ->
+            val mime = StoragePathRules.normalizeText(file.mimeType)
             when {
-                file.mimeType.startsWith("image/") -> {
+                mime.startsWith("image/") -> {
                     if (!isWhatsAppSharedMedia(file)) {
                         imageCount++
                         imageBytes += file.sizeBytes
                     }
                 }
-                file.mimeType.startsWith("video/") -> {
+                mime.startsWith("video/") -> {
                     if (!isWhatsAppSharedMedia(file)) {
                         videoCount++
                         videoBytes += file.sizeBytes
@@ -783,7 +784,7 @@ class DeviceRepository(
     }
 
     private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean {
-        val path = "/${file.relativePath.replace('\\', '/').trim('/')}/".lowercase()
+        val path = StoragePathRules.normalizePath(file.relativePath)
         return path.contains("/android/media/com.whatsapp/") ||
             path.contains("/android/media/com.whatsapp.w4b/") ||
             path.startsWith("/whatsapp/") ||
@@ -812,8 +813,8 @@ class DeviceRepository(
     }
 
     private fun storageFileType(file: IndexedFile): StorageFileType {
-        val mime = file.mimeType.lowercase()
-        val extension = file.name.substringAfterLast('.', "").lowercase()
+        val mime = StoragePathRules.normalizeText(file.mimeType)
+        val extension = StoragePathRules.normalizeText(file.name.substringAfterLast('.', ""))
         return when {
             mime.startsWith("image/") -> StorageFileType.IMAGES
             mime.startsWith("video/") -> StorageFileType.VIDEOS
@@ -826,7 +827,7 @@ class DeviceRepository(
     }
 
     private fun mimeType(file: File): String {
-        val extension = file.extension.lowercase()
+        val extension = StoragePathRules.normalizeText(file.extension)
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).orEmpty()
     }
 
