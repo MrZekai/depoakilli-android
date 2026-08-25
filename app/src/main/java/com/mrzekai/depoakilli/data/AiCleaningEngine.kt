@@ -160,20 +160,23 @@ class AiCleaningEngine(
     /**
      * Dedicated Screenshots tool policy.
      *
-     * This surface is intentionally more conservative than Deep Clean:
-     * screenshots are user-created content and are never preselected.
+     * Every recognized accessible screenshot is visible regardless of age.
+     * Screenshots are user-created content, so nothing is ever preselected.
      */
     fun assessFocusedScreenshot(file: IndexedFile): AiAssessment? {
         val ageDays = ageDays(file.modifiedAtMillis)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
-        if (!isScreenshot(path, name) || ageDays < FOCUSED_SCREENSHOT_DAYS) return null
+        if (!isScreenshot(path, name)) return null
 
         return AiAssessment(
             category = CleanCategory.SCREENSHOT,
-            safetyScore = if (ageDays >= 90) 88 else 74,
-            reasonRes = R.string.reason_old_screenshot,
-            reasonArgs = listOf(ageDays),
+            safetyScore = when {
+                ageDays >= 90 -> 88
+                ageDays >= 30 -> 78
+                else -> 70
+            },
+            reasonRes = R.string.reason_screenshot_review,
             recommended = false,
         )
     }
@@ -188,7 +191,12 @@ class AiCleaningEngine(
 
     private fun isScreenshot(path: String, name: String): Boolean {
         return path.contains("/screenshots/") ||
+            path.contains("/screenshot/") ||
+            path.endsWith("/screenshots") ||
+            path.endsWith("/screenshot") ||
             name.startsWith("screenshot") ||
+            name.startsWith("screen_shot") ||
+            name.startsWith("screencap") ||
             name.startsWith("ekran_goruntusu") ||
             name.startsWith("ekran goruntusu")
     }
@@ -221,7 +229,6 @@ class AiCleaningEngine(
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private const val DEEP_LARGE_FILE_BYTES = 50L * 1024L * 1024L
         private const val DEEP_SCREENSHOT_DAYS = 7L
-        private const val FOCUSED_SCREENSHOT_DAYS = 30L
         private const val DEEP_DOWNLOAD_DAYS = 30L
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L
         private const val TEMP_MIN_AGE_DAYS = 3L

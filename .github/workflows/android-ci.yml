@@ -82,15 +82,22 @@ jobs:
         shell: bash
         run: bash scripts/verify-qa-apk.sh app/build/outputs/apk/qa/app-qa.apk
 
+      - name: Prepare easy-download QA artifact
+        if: steps.assemble.outcome == 'success'
+        shell: bash
+        run: |
+          rm -rf qa-artifact
+          mkdir -p qa-artifact/audit
+          cp app/build/outputs/apk/qa/app-qa.apk qa-artifact/SmartCleaner-ClosedTest-QA-v39.apk
+          cp app/build/outputs/mapping/qa/mapping.txt qa-artifact/mapping.txt
+          cp -R app/build/reports/qa-apk-audit/. qa-artifact/audit/
+
       - name: Upload slim QA APK
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: depoakilli-slim-qa-apk-${{ github.run_number }}
-          path: |
-            app/build/outputs/apk/qa/app-qa.apk
-            app/build/outputs/mapping/qa/mapping.txt
-            app/build/reports/qa-apk-audit/
+          name: SmartCleaner-ClosedTest-QA-${{ github.run_number }}
+          path: qa-artifact/
           if-no-files-found: warn
           retention-days: 14
 

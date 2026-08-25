@@ -90,25 +90,8 @@ class MainActivity : ComponentActivity() {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
             val app = application as DepoAkilliApplication
             val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
-            val cleanerState by cleanerViewModel.state.collectAsStateWithLifecycle()
-
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
-                app.setAppOpenAdsAllowed(canRequestAds)
-            }
-
-            LaunchedEffect(
-                cleanerState.scanning,
-                cleanerState.dashboardRefreshing,
-                cleanerState.whatsAppScanning,
-                cleanerState.cleanupInProgress,
-            ) {
-                app.setCriticalTaskActive(
-                    cleanerState.scanning ||
-                        cleanerState.dashboardRefreshing ||
-                        cleanerState.whatsAppScanning ||
-                        cleanerState.cleanupInProgress,
-                )
             }
 
             DepoAkilliTheme {
@@ -209,7 +192,6 @@ class MainActivity : ComponentActivity() {
             itemIds = itemIds,
             onPlanReady = { plan ->
                 if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
-                    suppressNextAppOpenAd()
                     runCatching {
                         deleteLauncher.launch(
                             IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
@@ -228,7 +210,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestAllFilesAccess() {
-        suppressNextAppOpenAd()
         val appIntent = Intent(
             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
             Uri.parse("package:$packageName"),
@@ -241,7 +222,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestUsageAccess() {
-        suppressNextAppOpenAd()
         val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).apply {
             data = Uri.parse("package:$packageName")
         }
@@ -259,7 +239,6 @@ class MainActivity : ComponentActivity() {
             requestAllFilesAccess()
             return
         }
-        suppressNextAppOpenAd()
         cleanerViewModel.beginDeepCacheCleanupMeasurement()
         runCatching {
             deepCacheLauncher.launch(Intent(StorageManager.ACTION_CLEAR_APP_CACHE))
@@ -270,7 +249,6 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun openAppCacheSettings(packageName: String) {
-        suppressNextAppOpenAd()
         cleanerViewModel.beginIndividualAppCacheMeasurement(packageName)
 
         val intent = Intent(
@@ -287,14 +265,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun uninstallApp(packageName: String) {
-        suppressNextAppOpenAd()
         val intent = Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName"))
         runCatching { startActivity(intent) }
             .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
     }
 
     private fun openLanguageSettings() {
-        suppressNextAppOpenAd()
         val intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             Intent(
                 Settings.ACTION_APP_LOCALE_SETTINGS,
@@ -347,7 +323,6 @@ class MainActivity : ComponentActivity() {
                 ),
             )
         }
-        suppressNextAppOpenAd()
         runCatching {
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
         }.onFailure {
@@ -356,20 +331,14 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showPrivacyOptions() {
-        suppressNextAppOpenAd()
         consentManager.showPrivacyOptions(this)
     }
 
     private fun startFirstAvailable(vararg intents: Intent) {
         for (intent in intents) {
-            suppressNextAppOpenAd()
             if (runCatching { startActivity(intent) }.isSuccess) return
         }
         cleanerViewModel.showMessage(R.string.message_screen_unavailable)
-    }
-
-    private fun suppressNextAppOpenAd() {
-        (application as DepoAkilliApplication).suppressNextAppOpenAd()
     }
 
     private companion object {

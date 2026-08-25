@@ -12,4 +12,3 @@
 - Cleanup is guarded against duplicate concurrent executions.
 - Final cleanup flow is: user review -> explicit confirmation -> eligible preloaded interstitial -> deletion starts automatically -> Android consent if required for protected media -> rescan after successful deletion.
 - If no interstitial is available, cleanup continues instead of trapping the user.
-- App Open overlap and interstitial cooldown guards remain active.

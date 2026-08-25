@@ -141,7 +141,7 @@
     <string name="category_duplicates">Yinelenenler</string>
     <string name="category_duplicates_description">Aynı içeriğin gereksiz kopyaları</string>
     <string name="category_screenshots">Ekran görüntüleri</string>
-    <string name="category_screenshots_description">Eski ekran görüntüleri</string>
+    <string name="category_screenshots_description">Ekran görüntülerini incele</string>
     <string name="category_large_videos">Büyük videolar</string>
     <string name="category_large_videos_description">Depolamayı en çok kullanan videolar</string>
     <string name="category_old_downloads">Eski indirilenler</string>
@@ -155,6 +155,7 @@
     <string name="reason_old_installer">%1$d günlük kurulum paketi</string>
     <string name="reason_downloaded_installer">İndirilen kurulum paketi</string>
     <string name="reason_old_screenshot">%1$d günlük ekran görüntüsü</string>
+    <string name="reason_screenshot_review">Ekran görüntüsü • yalnızca inceleme</string>
     <string name="reason_large_video">%1$d günlük büyük video</string>
     <string name="reason_old_download">%1$d gündür İndirilenler klasöründe</string>
     <string name="reason_exact_duplicate">İçerik parmak izi birebir aynı</string>
@@ -688,7 +689,7 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="storage_analyzer_truth_note">Bu ekran yalnız bilgi amaçlıdır. Burada hiçbir dosya önceden seçilmez veya silinmez. Android/data ve Android/obb gibi korunan özel alanlar taranmaz.</string>
     <string name="tools_broad_scan_section_title">Geniş tarama</string>
     <string name="tools_broad_scan_section_subtitle">Birden fazla depolama kategorisini birlikte incelemek istediğinde tek geniş tarama kullan</string>
-    <string name="screenshots_tool_subtitle">En az 30 günlük ekran görüntülerini tek, önizlenebilir bir listede incele</string>
+    <string name="screenshots_tool_subtitle">Tüm erişilebilir ekran görüntülerini tek, önizlenebilir listede incele; hiçbir öğe otomatik seçilmez</string>
     <string name="storage_analyzer_review_action">Bu dosya türünü incele →</string>
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>

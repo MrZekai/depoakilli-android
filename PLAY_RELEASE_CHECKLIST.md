@@ -46,13 +46,13 @@ The release workflow must pass `scripts/verify-release-aab.sh` and show:
 
 ## Closed-test device priorities
 1. Result Back: no Interstitial. Explicit Done may show one only when eligible.
-2. Real AdMob: Banner, Native/MREC fallback, Interstitial, App Open after manifest cleanup.
+2. Ads: Banner, result Native/fallback and Interstitial only; returning to the foreground must never be ad-gated.
 3. Turkish/English `İndirilenler` / `INDIRILENLER`.
 4. 100k+ files: Analyzer → category review should reuse the recent index.
 5. SD card / secondary shared volume: Analyzer, Large Files, APK/Downloads and duplicates should see accessible files.
 6. Delete hundreds of media files, open Gallery, and check for stale entries/thumbnails.
 7. Storage Change must show live file/folder counters.
-8. Screenshots: <30 days excluded; ≥30 days review-only and not preselected.
+8. Screenshots: recent and old accessible screenshots are visible; all remain review-only and not preselected.
 9. Verify Sentry receives a controlled test exception before production rollout.
 
 ## Slim QA APK

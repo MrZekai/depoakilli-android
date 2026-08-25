@@ -3,8 +3,8 @@
 ## Build / QA gate
 
 - [ ] `python scripts/validate-project.py` passes.
-- [ ] GitHub Actions passes `testDebugUnitTest`, `lintDebug`, `assembleDebug` and QA signing verification.
-- [ ] QA APK reports version `0.5.1` / versionCode `8`.
+- [ ] GitHub Actions passes project validation, `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing and packaged-binary verification.
+- [ ] QA APK reports version `0.5.18-closedtest1-qa` / versionCode `39`.
 - [ ] Physical-device checklist in `docs/DEVICE_QA_CHECKLIST.md` is recorded before Production.
 - [ ] Android 11–16 permission return paths are tested where devices are available.
 - [ ] No scan/delete path causes ANR or silently drops failed items.
@@ -43,10 +43,10 @@
 ## Ads / consent
 
 - [ ] UMP consent is configured for applicable regions.
-- [ ] Banner, interstitial and App Open placement follows `docs/AD_PLACEMENTS.md`.
+- [ ] Banner, result-ad and Interstitial placement follows `docs/AD_PLACEMENTS.md`.
 - [ ] Ads never cover permission rationales, cleanup confirmation or primary selection controls.
-- [ ] Return from All Files Access, Usage Access, cache cleanup, language settings or uninstall does not immediately stack App Open/interstitial ads.
-- [ ] No obsolete MREC configuration exists.
+- [ ] Returning from Android permission/settings/cache/uninstall screens immediately restores the app without a foreground-return advertisement.
+- [ ] Result Native/fallback behavior is intentional and does not block cleanup or navigation.
 
 ## Localization / settings
 

@@ -127,14 +127,13 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 38",
-    'versionName = "0.5.17-alpha11"',
+    "versionCode = 39",
+    'versionName = "0.5.18-closedtest1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
     'liveBannerId = "ca-app-pub-1380972808968213/2118175647"',
     'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
-    'liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"',
     'sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"',
     'providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")',
     '"ADMOB_RESULT_NATIVE_ID"',
@@ -189,7 +188,6 @@ for expected in (
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
     "interstitialAds.onHostResumed(this)",
     "interstitialAds.onHostPaused(this)",
-    "setCriticalTaskActive",
     "showPostTaskInterstitial",
     "onCleanupResultDismissed",
     "onCleanupResultDismissed = ::onCleanupResultDismissed",
@@ -235,12 +233,7 @@ ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
 result_ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt")
 for expected in (
     "INTERSTITIAL/SHOW_SKIP session-cap",
-    "APP_OPEN/SHOWED_SESSION_ONLY",
-    "MIN_ELIGIBLE_RETURNS_BEFORE_FIRST_AD = 1",
-    "FULL_SCREEN_SEPARATION_MILLIS = 90L * 1000L",
     "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
-    "MIN_BACKGROUND_DURATION_MILLIS = 30L * 1000L",
-    "MIN_SHOW_INTERVAL_MILLIS = 60L * 60L * 1000L",
     "getCurrentOrientationAnchoredAdaptiveBannerAdSize",
     "Lifecycle.Event.ON_RESUME -> adView.resume()",
     "Lifecycle.Event.ON_PAUSE -> adView.pause()",
@@ -248,26 +241,45 @@ for expected in (
     "releaseCachedAd",
 ):
     if expected not in ads:
-        errors.append(f"missing v0.5.17 ad invariant: {expected}")
-if ads.count("private var shownThisProcess = false") != 2:
-    errors.append("exactly one process-session cap is required in each fullscreen ad controller")
+        errors.append(f"missing closed-test ad invariant: {expected}")
+if ads.count("private var shownThisProcess = false") != 1:
+    errors.append("exactly one process-session cap is required for the Interstitial controller")
 if "AdSize.BANNER" in ads:
-    errors.append("fixed 320x50 AdSize.BANNER must not return; v0.5.17 uses anchored adaptive banner")
+    errors.append("fixed 320x50 banner must not return; use anchored adaptive banner")
 if "setImmersiveMode(true)" in ads:
     errors.append("Interstitial must let Google AdActivity own system UI/insets")
 
 application = read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt")
 for expected in (
     "fullScreenAdSurfaceActive",
-    "onAppBackgrounded",
     "beginInterstitialSurface",
     "endInterstitialSurface",
-    "suppressNextAppOpenAd",
-    "releaseCachedAd",
     "ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN",
 ):
     if expected not in application:
         errors.append(f"missing app lifecycle/ad invariant: {expected}")
+
+removed_foreground_tokens = (
+    "App" + "OpenAd",
+    "APP" + "_OPEN",
+    "app" + "_open",
+    "ADMOB_" + "APP_" + "OPEN_ID",
+    "sample" + "App" + "OpenId",
+    "live" + "App" + "OpenId",
+    "set" + "App" + "OpenAdsAllowed",
+    "suppressNext" + "App" + "OpenAd",
+    "on" + "App" + "Backgrounded",
+)
+for surface_name, surface in (
+    ("build.gradle.kts", build_file),
+    ("AdComponents.kt", ads),
+    ("DepoAkilliApplication.kt", application),
+    ("MainActivity.kt", main_activity),
+):
+    for forbidden in removed_foreground_tokens:
+        if forbidden in surface:
+            errors.append(f"removed foreground-return ad implementation remains in {surface_name}")
+
 if "releaseForMemoryOptimization" in application:
     errors.append("obsolete RAM-optimizer-named ad release API remains in Application")
 
@@ -1063,10 +1075,14 @@ for expected in (
     "StoragePathRules.normalizeText(file.name)",
     "StoragePathRules.isDownloadPath(file.relativePath)",
     "fun assessFocusedScreenshot(file: IndexedFile)",
-    "FOCUSED_SCREENSHOT_DAYS = 30L",
+    "R.string.reason_screenshot_review",
+    'path.contains("/screenshots/")',
+    'path.contains("/screenshot/")',
 ):
     if expected not in ai_engine:
-        errors.append(f"missing alpha10 AI matching invariant: {expected}")
+        errors.append(f"missing closed-test AI matching invariant: {expected}")
+if "FOCUSED_SCREENSHOT_DAYS" in ai_engine:
+    errors.append("Dedicated Screenshots tool must not age-filter accessible screenshots")
 if ".lowercase()" in ai_engine:
     errors.append("AiCleaningEngine must not use locale-sensitive lowercase()")
 
@@ -1120,10 +1136,14 @@ for expected in (
 if "StoragePathRules.normalizePath(file.relativePath)" not in duplicate_policy:
     errors.append("Duplicate original-path policy must use stable path normalization")
 
-if "En az 30 günlük ekran görüntülerini" not in tr_strings:
-    errors.append("Turkish Screenshots copy must disclose the 30-day focused threshold")
-if "screenshots at least 30 days old" not in default_strings:
-    errors.append("English Screenshots copy must disclose the 30-day focused threshold")
+if "Tüm erişilebilir ekran görüntülerini" not in tr_strings:
+    errors.append("Turkish Screenshots copy must disclose all-accessible review behavior")
+if "Review all accessible screenshots" not in default_strings:
+    errors.append("English Screenshots copy must disclose all-accessible review behavior")
+if "hiçbir öğe otomatik seçilmez" not in tr_strings:
+    errors.append("Turkish Screenshots copy must disclose that nothing is preselected")
+if "nothing is preselected" not in default_strings:
+    errors.append("English Screenshots copy must disclose that nothing is preselected")
 
 # ------------------------------------------------------------------
 # Alpha11 release-readiness / slim-QA contract.
@@ -1177,4 +1197,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.17-alpha11 release-readiness + slim-QA invariants are valid.")
+print("Smart Cleaner v0.5.18-closedtest1 closed-test + slim-QA invariants are valid.")

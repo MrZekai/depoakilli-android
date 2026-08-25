@@ -59,6 +59,7 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 - Place large ZIP, PDF, APK, audio, video and backup files in shared storage. Large Files must not be video-only.
 - Storage Analyzer totals by Images, Videos, Audio, Documents, Archives, APK and Other should reconcile plausibly with indexed shared-storage bytes.
 - Media Cleaner must identify review candidates without automatically deleting personal photos merely for age or size.
+- Screenshots must list accessible recent and old screenshots, including a 1-day-old sample, and none may be preselected.
 - Test a 10,000+ file library and watch for ANR, runaway memory or permanently stuck scan progress.
 
 ## 8. App Manager
@@ -83,9 +84,9 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 
 ## 11. Ads / consent / navigation
 
-- Clear app data and verify consent flow, banner placement and App Open/interstitial cooldown behavior remain intact.
+- Clear app data and verify consent flow, banner placement and Interstitial cooldown behavior remain intact.
 - No ad should cover a cleanup confirmation, system permission rationale, selection checkbox or primary cleaner CTA.
-- Return from All Files Access, Usage Access, Deep Cache system action, language settings and uninstall confirmation. The app must resume without immediately stacking App Open/interstitial ads.
+- Return from All Files Access, Usage Access, Deep Cache system action, language settings and uninstall confirmation. The app must resume immediately without a foreground-return advertisement.
 - Confirm no obsolete 300x250 MREC configuration exists.
 
 ## 12. Regression / release gate

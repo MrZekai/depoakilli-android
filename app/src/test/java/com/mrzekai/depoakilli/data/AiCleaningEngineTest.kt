@@ -154,24 +154,21 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `focused screenshots wait thirty days and remain review only`() {
-        val twentyNineDays = file(
-            "Screenshot_29.png",
-            "image/png",
-            29,
-            "Pictures/Screenshots/",
-        )
-        val thirtyOneDays = file(
-            "Screenshot_31.png",
-            "image/png",
-            31,
-            "Pictures/Screenshots/",
+    fun `focused screenshots include recent and old items but never preselect`() {
+        val candidates = listOf(
+            file("Screenshot_1.png", "image/png", 1, "DCIM/Screenshots/"),
+            file("holiday.png", "image/png", 2, "Pictures/Screenshots/"),
+            file("Screenshot_31.png", "image/png", 31, "Pictures/Screenshots/"),
         )
 
-        assertNull(engine.assessFocusedScreenshot(twentyNineDays))
-        val result = engine.assessFocusedScreenshot(thirtyOneDays)
-        assertEquals(CleanCategory.SCREENSHOT, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+        for (candidate in candidates) {
+            val result = engine.assessFocusedScreenshot(candidate)
+            assertEquals(CleanCategory.SCREENSHOT, result?.category)
+            assertFalse(requireNotNull(result).recommended)
+        }
+
+        val cameraPhoto = file("IMG_2001.jpg", "image/jpeg", 1, "DCIM/Camera/")
+        assertNull(engine.assessFocusedScreenshot(cameraPhoto))
     }
 
     @Test

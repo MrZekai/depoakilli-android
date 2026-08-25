@@ -7,5 +7,4 @@
 - The sticky “Review and clean” action sits above a dedicated bottom banner slot.
 - Banner ads use Google anchored adaptive sizing and reserve their layout space.
 - After a completed cleanup, an eligible loaded interstitial is shown at the natural cleanup transition; when it closes (or no ad is available), Smart Clean rescans so deleted files disappear from the results.
-- Existing ad-frequency and App Open separation safeguards remain in place.
 - Version: 0.5.3 (versionCode 10).

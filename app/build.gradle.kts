@@ -9,7 +9,6 @@ plugins {
 val sampleAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
 val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
-val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
 val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
 
 // AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
@@ -18,7 +17,6 @@ val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
 val liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"
 val liveBannerId = "ca-app-pub-1380972808968213/2118175647"
 val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
-val liveAppOpenId = "ca-app-pub-1380972808968213/8923257140"
 // Optional production Native unit. Empty means use live MREC fallback.
 val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     .orNull
@@ -46,8 +44,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 38
-        versionName = "0.5.17-alpha11"
+        versionCode = 39
+        versionName = "0.5.18-closedtest1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -56,7 +54,6 @@ android {
 
         buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
-        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
         buildConfigField("String", "SENTRY_DSN", quotedBuildConfig(sentryDsn))
     }
@@ -105,7 +102,6 @@ android {
             manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
@@ -115,7 +111,6 @@ android {
             manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$liveBannerId\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$liveInterstitialId\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
 
             isMinifyEnabled = true
@@ -180,7 +175,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
@@ -214,7 +208,6 @@ val validateReleaseAds by tasks.registering {
             liveAdMobAppId,
             liveBannerId,
             liveInterstitialId,
-            liveAppOpenId,
         )
         check(values.none { it.contains("3940256099942544") }) {
             "Release blocked: Google sample AdMob IDs cannot be used in production."
