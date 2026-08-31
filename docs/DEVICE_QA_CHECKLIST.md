@@ -68,11 +68,11 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 - The implementation must not depend on `QUERY_ALL_PACKAGES`.
 - Trigger uninstall and verify Android's official uninstall confirmation handles the operation; cancellation must return safely to Smart Cleaner.
 
-## 9. RAM Optimization
+## 9. Memory and lifecycle safety
 
-- Run RAM Optimization before and after a scan. It may release Smart Cleaner's own heavy/ad resources and report measured state, but must not claim it killed other apps or recovered fabricated gigabytes.
-- Repeat multiple times and verify no fixed percentage speedup or fake RAM saving is shown.
-- Background/foreground the app after optimization and ensure ads, scan state and navigation recover normally.
+- Background and foreground the app before, during, and after scans. Scan state and navigation must recover without a foreground-return advertisement.
+- Trigger Android low-memory conditions where practical and verify cached previews/ads can be released without losing selected-file safety.
+- Verify no RAM optimizer, fixed percentage speedup, fake recovered-memory total, CPU cooler, or third-party process-killing claim appears.
 
 ## 10. UI / tools / localization
 
@@ -87,11 +87,13 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 - Clear app data and verify consent flow, banner placement and Interstitial cooldown behavior remain intact.
 - No ad should cover a cleanup confirmation, system permission rationale, selection checkbox or primary cleaner CTA.
 - Return from All Files Access, Usage Access, Deep Cache system action, language settings and uninstall confirmation. The app must resume immediately without a foreground-return advertisement.
-- Confirm no obsolete 300x250 MREC configuration exists.
+- Confirm the cleanup result shows either its Native ad or the intentional MREC fallback, never a stacked result ad plus Interstitial for the same cleanup.
 
 ## 12. Regression / release gate
 
 - `python scripts/validate-project.py` must pass.
-- `testDebugUnitTest`, `lintDebug`, `assembleDebug` and QA signing verification must all pass in GitHub Actions.
-- Install the generated `depoakilli-test-apk-*` artifact over the prior QA build and verify version `0.5.1` / versionCode `8`.
+- `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing, and QA binary verification must all pass in normal GitHub Actions.
+- The manual `Play Closed Test AAB + APK` workflow must pass `lintClosedTest`, `bundleClosedTest`, `assembleClosedTest`, signing comparison, and binary verification.
+- Install `SmartCleaner-ClosedTest-v39.apk` for the final direct-device check and verify `0.5.18-closedtest1` / versionCode `39` / package `com.mrzekai.depoakilli`.
+- Upload only `SmartCleaner-ClosedTest-v39.aab` to Play Console.
 - Do not promote to Production until the physical-device cases above are recorded on Android 11, 12, 13, 14, 15 and 16 where devices are available.

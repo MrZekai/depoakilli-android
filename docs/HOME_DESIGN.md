@@ -1,4 +1,4 @@
-# Home design — v0.5.1 Neon Cleaner Dashboard
+# Home design - v0.5.18 closed-test candidate
 
 The production home screen follows the selected dark blue neon concept.
 
@@ -7,11 +7,9 @@ The production home screen follows the selected dark blue neon concept.
 1. centered Smart Cleaner / Akıllı Temizleyici title with teal accent;
 2. total cleanable card + cleaning-score ring;
 3. large blue-to-green Smart Clean CTA;
-4. first row: WhatsApp Cleaner, Duplicate Files, Large Files;
-5. second row: APK Cleaner, Media Cleaner, Deep Cleaner;
-6. third row: Deep App Cache + RAM Optimization;
-7. Deep Clean recommendation banner;
-8. bottom navigation: Home, Tools, Security, Me.
+4. dynamic scan findings and a short set of real storage actions;
+5. Deep Clean recommendation banner;
+6. bottom navigation: Home, Tools, Me.
 
 There is no Pro/Premium badge because the app has no paid tier.
 
@@ -27,6 +25,7 @@ No two home cards are aliases for the same action.
 - APK Cleaner: installer packages only.
 - Media Cleaner: screenshots, large photo/video files and media duplicates.
 - Deep App Cache: StorageStats measurement + Android official cache-clean action.
-- RAM Optimization: releases Smart Cleaner's heavy in-memory scan/ad resources and remeasures RAM.
+
+Permissions &amp; privacy lives under Me instead of competing with the three primary navigation destinations. The full tool catalogue lives in Tools; Home does not duplicate it as a static grid.
 
 The cleaning score is derived locally from storage occupancy plus the latest comprehensive scan's cleanable-space ratio. It is not a benchmark or a promise of device-speed improvement.

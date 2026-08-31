@@ -82,22 +82,31 @@ jobs:
         shell: bash
         run: bash scripts/verify-qa-apk.sh app/build/outputs/apk/qa/app-qa.apk
 
-      - name: Prepare easy-download QA artifact
+      - name: Prepare separated QA artifacts
         if: steps.assemble.outcome == 'success'
         shell: bash
         run: |
-          rm -rf qa-artifact
-          mkdir -p qa-artifact/audit
-          cp app/build/outputs/apk/qa/app-qa.apk qa-artifact/SmartCleaner-ClosedTest-QA-v39.apk
-          cp app/build/outputs/mapping/qa/mapping.txt qa-artifact/mapping.txt
-          cp -R app/build/reports/qa-apk-audit/. qa-artifact/audit/
+          rm -rf qa-apk-artifact qa-diagnostics-artifact
+          mkdir -p qa-apk-artifact qa-diagnostics-artifact/audit
+          cp app/build/outputs/apk/qa/app-qa.apk qa-apk-artifact/SmartCleaner-QA-v39.apk
+          cp app/build/outputs/mapping/qa/mapping.txt qa-diagnostics-artifact/mapping.txt
+          cp -R app/build/reports/qa-apk-audit/. qa-diagnostics-artifact/audit/
 
-      - name: Upload slim QA APK
+      - name: Upload installable slim QA APK
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-ClosedTest-QA-${{ github.run_number }}
-          path: qa-artifact/
+          name: SmartCleaner-QA-APK-${{ github.run_number }}
+          path: qa-apk-artifact/SmartCleaner-QA-v39.apk
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload QA mapping and binary audit
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: SmartCleaner-QA-Diagnostics-${{ github.run_number }}
+          path: qa-diagnostics-artifact/
           if-no-files-found: warn
           retention-days: 14
 

@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for v0.5.17-alpha11.
+# Required project surface for the v39 Play closed-test candidate.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -71,13 +71,18 @@ required = [
     "app/src/main/res/values-tr/strings.xml",
     "app/src/main/res/xml/locales_config.xml",
     ".github/workflows/android-ci.yml",
+    ".github/workflows/closed-test-build.yml",
     ".github/workflows/release-aab.yml",
+    "scripts/verify-closed-test-binaries.sh",
     "scripts/verify-release-aab.sh",
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
+    "docs/CLOSED_TEST_RELEASE_V39.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
+    "TERMS_OF_SERVICE_EN.md",
+    "TERMS_OF_SERVICE_TR.md",
     "keystore/depoakilli-ci-qa.jks",
 ]
 for relative in required:
@@ -136,7 +141,12 @@ for expected in (
     'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
     'sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"',
     'providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")',
+    'providers.environmentVariable("SUPPORT_EMAIL")',
     '"ADMOB_RESULT_NATIVE_ID"',
+    '"SUPPORT_EMAIL"',
+    'create("closedTest") {',
+    "validateClosedTestConfiguration",
+    'tasks.matching { it.name == "preClosedTestBuild" }',
     'manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId',
     'manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId',
 ):
@@ -196,6 +206,8 @@ for expected in (
     "onPrepareWhatsAppCleanup = ::cleanWhatsApp",
     "override fun onTrimMemory(level: Int)",
     "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
+    "BuildConfig.SUPPORT_EMAIL.trim()",
+    'Uri.fromParts("mailto", supportEmail, null)',
 ):
     if expected not in main_activity:
         errors.append(f"missing v0.5.17 activity flow: {expected}")
@@ -225,6 +237,15 @@ if not all(token in main_activity for token in result_handoff):
     errors.append("cleanup-result dismissal must own the natural-break Interstitial handoff")
 if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
     errors.append("MainActivity uses setContent without the required Compose import")
+
+diagnostics = read("app/src/main/java/com/mrzekai/depoakilli/diagnostics/AppDiagnostics.kt")
+for expected in (
+    "diagnosticsEnvironment()",
+    '"closedTest" -> "closed-test"',
+    '"qa" -> "qa"',
+):
+    if expected not in diagnostics:
+        errors.append(f"missing build-specific diagnostics invariant: {expected}")
 
 # ------------------------------------------------------------------
 # Full-screen session caps and adaptive banner.
@@ -861,6 +882,41 @@ if tr_strings.count("aynı temizlik için tam ekran reklam gösterilmez") != 3:
     errors.append("Turkish cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
 if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
     errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
+for expected in (
+    'name="legal_contact"',
+    "aggregate scan/cleanup history",
+    "cannot be restored by Smart Cleaner",
+):
+    if expected not in default_strings:
+        errors.append(f"missing English privacy/contact invariant: {expected}")
+for expected in (
+    'name="legal_contact"',
+    "toplu tarama/temizlik geçmişini",
+    "geri getirilemez",
+):
+    if expected not in tr_strings:
+        errors.append(f"missing Turkish privacy/contact invariant: {expected}")
+for expected in (
+    "BuildConfig.SUPPORT_EMAIL.trim()",
+    "R.string.legal_contact",
+):
+    if expected not in device_center:
+        errors.append(f"in-app legal contact is not build-bound: {expected}")
+
+for legal_document in (
+    "PRIVACY_POLICY_EN.md",
+    "PRIVACY_POLICY_TR.md",
+    "TERMS_OF_SERVICE_EN.md",
+    "TERMS_OF_SERVICE_TR.md",
+):
+    legal_body = read(legal_document)
+    for expected in ("MrZekai", "{{SUPPORT_EMAIL}}"):
+        if expected not in legal_body:
+            errors.append(f"{legal_document} is missing publication invariant: {expected}")
+for privacy_document in ("PRIVACY_POLICY_EN.md", "PRIVACY_POLICY_TR.md"):
+    privacy_body = read(privacy_document)
+    if "retention" not in privacy_body.lower() and "saklama" not in privacy_body.lower():
+        errors.append(f"{privacy_document} is missing a retention/deletion section")
 
 # English/Turkish key parity and Kotlin compile-resource guard.
 default_names = {node.attrib["name"] for node in ET.parse(default_strings_path).getroot().findall("string")}
@@ -1109,11 +1165,20 @@ for expected in (
     "onDone: (resultAdPresented: Boolean) -> Unit",
     "onDismissRequest = onSystemDismiss",
     "dismissOnClickOutside = false",
-    "if (resultAdPresented)",
+    "onDone(resultAdPresented)",
     "Spacer(Modifier.height(33.dp))",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
+
+# v39 accidental-click safety: the gap between the sponsored surface and the
+# primary action must be constant, so the Done button cannot move downwards at
+# the moment the result ad finishes loading.
+if "if (resultAdPresented) {" in cleanup_dialog:
+    errors.append(
+        "result-dialog ad/action separation must not be conditional on the ad "
+        "having loaded (accidental-click layout shift)"
+    )
 
 system_start = cleaner_app.find("onSystemDismiss = {")
 done_start = cleaner_app.find("onDone = { resultAdPresented ->", system_start)
@@ -1146,7 +1211,7 @@ if "nothing is preselected" not in default_strings:
     errors.append("English Screenshots copy must disclose that nothing is preselected")
 
 # ------------------------------------------------------------------
-# Alpha11 release-readiness / slim-QA contract.
+# Release-readiness / slim-QA contract.
 workflow_alpha11 = read(".github/workflows/android-ci.yml")
 # ------------------------------------------------------------------
 for expected in (
@@ -1170,6 +1235,55 @@ for expected in (
         errors.append(f"missing alpha11 slim-QA CI invariant: {expected}")
 
 # ------------------------------------------------------------------
+# Play closed-test build and binary gates.
+# ------------------------------------------------------------------
+closed_test_workflow = read(".github/workflows/closed-test-build.yml")
+for expected in (
+    "Play Closed Test AAB + APK",
+    "bundleClosedTest",
+    "assembleClosedTest",
+    "lintClosedTest",
+    "scripts/verify-closed-test-binaries.sh",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v39",
+    "SmartCleaner-CLOSED-TEST-APK-v39",
+    "SmartCleaner-ClosedTest-Diagnostics-v39",
+    "SmartCleaner-ClosedTest-v39.aab",
+    "SUPPORT_EMAIL",
+    "SENTRY_DSN",
+):
+    if expected not in closed_test_workflow:
+        errors.append(f"missing Play closed-test workflow invariant: {expected}")
+
+closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
+for expected in (
+    "com.mrzekai.depoakilli",
+    "0.5.18-closedtest1",
+    "versionCode='39'",
+    "ca-app-pub-3940256099942544/6300978111",
+    "ca-app-pub-3940256099942544/1033173712",
+    "ca-app-pub-3940256099942544/1044960115",
+    "ca-app-pub-1380972808968213",
+    "android.permission.FOREGROUND_SERVICE",
+    "androidx.work.impl.foreground.SystemForegroundService",
+    "androidx.compose.ui.tooling.PreviewActivity",
+    "AAB and APK are not signed by the same Play upload certificate",
+    "PLAY_CLOSED_TEST_BINARY_GATE_PASS",
+):
+    if expected not in closed_test_verifier:
+        errors.append(f"missing Play closed-test binary invariant: {expected}")
+
+release_workflow = read(".github/workflows/release-aab.yml")
+for expected in ("SUPPORT_EMAIL", "ADMOB_RESULT_NATIVE_ID"):
+    if expected not in release_workflow:
+        errors.append(f"release workflow does not pass required environment: {expected}")
+
+release_environment = read("scripts/validate-release-env.sh")
+for expected in ("SUPPORT_EMAIL", "SENTRY_DSN", "ANDROID_KEYSTORE_BASE64"):
+    normalized = "KEYSTORE_BASE64" if expected == "ANDROID_KEYSTORE_BASE64" else expected
+    if normalized not in release_environment:
+        errors.append(f"release environment validator is missing: {expected}")
+
+# ------------------------------------------------------------------
 # QA signing + CI contract.
 # ------------------------------------------------------------------
 qa_keystore = ROOT / "keystore/depoakilli-ci-qa.jks"
@@ -1190,6 +1304,100 @@ for expected in (
 ):
     if expected not in workflow:
         errors.append(f"missing CI invariant: {expected}")
+
+qa_signing_verifier = read("scripts/verify-qa-signing.sh")
+for expected in ("apksigner", "apksigner.bat", "apksigner.exe"):
+    if expected not in qa_signing_verifier:
+        errors.append(f"QA signing verifier is missing cross-platform tool support: {expected}")
+
+# ------------------------------------------------------------------
+# v39 build-environment contract.
+#
+# Root cause of the v39 BUILD FAILED: Gradle 8.13 embeds Kotlin 2.0.21, whose
+# bundled IntelliJ JavaVersion parser rejects Java 25+ while compiling
+# settings.gradle.kts ("IllegalArgumentException: 25.0.4"). The daemon must run
+# on Java 17 regardless of which JVM launched the wrapper.
+# ------------------------------------------------------------------
+daemon_jvm = read("gradle/gradle-daemon-jvm.properties")
+if "toolchainVersion=17" not in daemon_jvm:
+    errors.append("Gradle daemon must be pinned to the Java 17 toolchain")
+
+settings_file = read("settings.gradle.kts")
+for expected in (
+    "JavaVersion.current()",
+    "feature in 17..24",
+):
+    if expected not in settings_file:
+        errors.append(f"missing build-JDK guard invariant: {expected}")
+
+bootstrap = read("scripts/bootstrap-local-env.sh")
+for expected in ("local.properties", "ANDROID_HOME", "cygpath -m"):
+    if expected not in bootstrap:
+        errors.append(f"clean-clone bootstrap is missing: {expected}")
+if "sdk.dir=C:" in bootstrap or "/Users/" in bootstrap.replace("$HOME/Users", ""):
+    errors.append("bootstrap script must not hard-code a personal SDK path")
+
+gradle_properties = read("gradle.properties")
+if "org.gradle.java.home" in gradle_properties:
+    errors.append("gradle.properties must not pin a machine-specific JDK path")
+for expected in (
+    "org.gradle.jvmargs=-Xmx2g -Xss768k",
+    "org.gradle.parallel=false",
+    "org.gradle.workers.max=2",
+    "kotlin.daemon.jvmargs=-Xmx768m -Xss768k",
+):
+    if expected not in gradle_properties:
+        errors.append(f"missing memory-safe Gradle invariant: {expected}")
+
+gitignore = read(".gitignore")
+if "local.properties" not in gitignore:
+    errors.append("local.properties must stay git-ignored")
+
+# ------------------------------------------------------------------
+# v39 destructive-path safety.
+# ------------------------------------------------------------------
+for expected in (
+    "visitedDirectoryPaths",
+    "visitedFilePaths",
+    "canonicalPathOf",
+    "canonicalPathWithinRoot",
+    "isDeletableSharedStorageFile",
+):
+    if expected not in repository:
+        errors.append(f"missing v39 storage-safety invariant: {expected}")
+
+delete_start = repository.find("private fun deleteUriDirectly(")
+if delete_start < 0:
+    errors.append("deleteUriDirectly is missing")
+else:
+    delete_section = repository[delete_start:delete_start + 900]
+    if "isDeletableSharedStorageFile(file)" not in delete_section:
+        errors.append("direct file deletion must be confined to shared storage roots")
+
+for expected in (
+    "ioStorageSnapshot()",
+    "ioOwnCacheBytes()",
+    "CancellationException",
+):
+    if expected not in view_model:
+        errors.append(f"missing v39 ViewModel main-thread/cancellation invariant: {expected}")
+
+for forbidden in (
+    "= repository.storageSnapshot()",
+    "repository.ownCacheSize(),",
+):
+    if forbidden in view_model.replace(
+        "withContext(Dispatchers.IO) { repository.storageSnapshot() }", ""
+    ).replace("async(Dispatchers.IO) { repository.ownCacheSize() }", ""):
+        errors.append(
+            f"storage/cache probing must stay off the main dispatcher: {forbidden}"
+        )
+
+# Debug and the external-test QA build must not share an applicationId.
+if 'applicationIdSuffix = ".debug"' not in build_file:
+    errors.append("debug build type must use its own .debug applicationId suffix")
+if build_file.count('applicationIdSuffix = ".qa"') != 1:
+    errors.append("exactly one build type may claim the .qa applicationId suffix")
 
 if errors:
     print("Project validation failed:", file=sys.stderr)

@@ -574,6 +574,13 @@ class DeviceRepository(
         val output = ArrayList<IndexedFile>()
         val pending = ArrayDeque<Pair<File, File>>()
         roots.forEach { root -> pending.addLast(root to root) }
+        // Shared storage can contain symlinks and bind mounts (vendor "internal
+        // storage" aliases, user-created links). Without a canonical-path guard
+        // the traversal can loop indefinitely and, worse, index one physical file
+        // several times under different paths - which the duplicate finder would
+        // then offer to "clean", deleting a real and unique file.
+        val visitedDirectoryPaths = hashSetOf<String>()
+        val visitedFilePaths = hashSetOf<String>()
         var visitedDirectories = 0
         var lastProgressDirectories = 0
         var lastProgressFiles = 0
@@ -582,16 +589,23 @@ class DeviceRepository(
         while (pending.isNotEmpty() && output.size < MAX_INDEXED_FILES) {
             coroutineContext.ensureActive()
             val (root, directory) = pending.removeFirst()
+            val directoryPath = canonicalPathWithinRoot(root, directory) ?: continue
+            if (!visitedDirectoryPaths.add(directoryPath)) continue
             visitedDirectories++
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
 
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    if (!shouldSkipDirectory(root, child)) {
+                    if (
+                        canonicalPathWithinRoot(root, child) != null &&
+                        !shouldSkipDirectory(root, child)
+                    ) {
                         pending.addLast(root to child)
                     }
                 } else if (child.isFile) {
+                    val filePath = canonicalPathWithinRoot(root, child) ?: continue
+                    if (!visitedFilePaths.add(filePath)) continue
                     val size = child.length().coerceAtLeast(0L)
                     if (size <= 0L) continue
                     output += indexedFile(root, child)
@@ -626,20 +640,25 @@ class DeviceRepository(
         val output = ArrayList<IndexedFile>()
         val pending = ArrayDeque<Pair<File, File>>()
         rootPairs.forEach(pending::addLast)
-        val visited = hashSetOf<String>()
+        val visitedDirectories = hashSetOf<String>()
+        val visitedFiles = hashSetOf<String>()
 
         while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
             coroutineContext.ensureActive()
             val (storageRoot, directory) = pending.removeFirst()
-            val canonical = runCatching { directory.canonicalPath }.getOrDefault(directory.absolutePath)
-            if (!visited.add(canonical)) continue
+            val directoryPath = canonicalPathWithinRoot(storageRoot, directory) ?: continue
+            if (!visitedDirectories.add(directoryPath)) continue
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
 
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    pending.addLast(storageRoot to child)
+                    if (canonicalPathWithinRoot(storageRoot, child) != null) {
+                        pending.addLast(storageRoot to child)
+                    }
                 } else if (child.isFile && child.length() > 0L) {
+                    val filePath = canonicalPathWithinRoot(storageRoot, child) ?: continue
+                    if (!visitedFiles.add(filePath)) continue
                     output += indexedFile(storageRoot, child)
                     if (output.size % 50 == 0) onDiscovered(output.size)
                     if (output.size >= MAX_WHATSAPP_FILES) break
@@ -693,9 +712,39 @@ class DeviceRepository(
                 .mapNotNullTo(this) { volume -> volume.directory }
         }
             .filter(File::isDirectory)
-            .distinctBy { root ->
-                runCatching { root.canonicalPath }.getOrDefault(root.absolutePath)
-            }
+            .distinctBy(::canonicalPathOf)
+    }
+
+    private fun canonicalPathOf(file: File): String =
+        runCatching { file.canonicalPath }.getOrDefault(file.absolutePath)
+
+    private fun canonicalPathWithinRoot(root: File, file: File): String? {
+        val rootPath = canonicalPathOf(root).trimEnd(File.separatorChar)
+        val filePath = canonicalPathOf(file)
+        if (rootPath.isEmpty()) return null
+        return filePath.takeIf {
+            it == rootPath || it.startsWith("$rootPath${File.separator}")
+        }
+    }
+
+    /**
+     * Defence in depth for every destructive path.
+     *
+     * Scan results already originate from [sharedStorageRoots], but deletion is
+     * irreversible, so the final gate re-resolves the target through its
+     * canonical path and refuses anything that is not inside a shared-storage
+     * volume, or that lives in the app-private Android/data and Android/obb
+     * trees this engine deliberately never manages. This also neutralises
+     * symlinks that point outside shared storage.
+     */
+    private fun isDeletableSharedStorageFile(file: File): Boolean {
+        val canonical = canonicalPathOf(file)
+        val root = sharedStorageRoots().firstOrNull { root ->
+            canonicalPathWithinRoot(root, file) != null
+        } ?: return false
+        val rootPath = canonicalPathOf(root).trimEnd('/')
+        val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
+        return !relative.startsWith("/android/data/") && !relative.startsWith("/android/obb/")
     }
 
     @Suppress("DEPRECATION")
@@ -729,9 +778,7 @@ class DeviceRepository(
         }
     }
         .filter { (_, mediaRoot) -> mediaRoot.isDirectory }
-        .distinctBy { (_, mediaRoot) ->
-            runCatching { mediaRoot.canonicalPath }.getOrDefault(mediaRoot.absolutePath)
-        }
+        .distinctBy { (_, mediaRoot) -> canonicalPathOf(mediaRoot) }
 
     private fun whatsappRoots(): List<File> =
         whatsappRootPairs().map { (_, mediaRoot) -> mediaRoot }
@@ -947,6 +994,7 @@ class DeviceRepository(
             "file" -> {
                 val path = uri.path ?: return@runCatching false
                 val file = File(path)
+                if (!isDeletableSharedStorageFile(file)) return@runCatching false
                 val removed = file.delete()
                 if (removed) {
                     removeDeletedPathFromMediaStore(file.absolutePath)

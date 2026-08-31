@@ -296,8 +296,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun sendFeedback() {
+        val supportEmail = BuildConfig.SUPPORT_EMAIL.trim()
         val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = if (supportEmail.isBlank()) {
+                Uri.parse("mailto:")
+            } else {
+                Uri.fromParts("mailto", supportEmail, null)
+            }
             putExtra(Intent.EXTRA_SUBJECT, getString(R.string.feedback_subject))
             putExtra(
                 Intent.EXTRA_TEXT,

@@ -5,10 +5,12 @@ AAB="${1:-app/build/outputs/bundle/release/app-release.aab}"
 OUT="release-verification"
 BUNDLETOOL_VERSION="1.18.3"
 BUNDLETOOL_SHA256="a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29"
-BUNDLETOOL="$OUT/bundletool-all-$BUNDLETOOL_VERSION.jar"
-APKS="$OUT/release.apks"
-UNIVERSAL="$OUT/release-universal.apk"
 REPORT="$OUT/release-verification.txt"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+BUNDLETOOL="$TMP_DIR/bundletool-all-$BUNDLETOOL_VERSION.jar"
+APKS="$TMP_DIR/release.apks"
+UNIVERSAL="$TMP_DIR/release-universal.apk"
 
 fail() {
   echo "RELEASE VERIFY FAILED: $*" >&2
@@ -41,7 +43,7 @@ AAPT="$(find "${ANDROID_HOME:?ANDROID_HOME missing}/build-tools" -type f -name a
 BADGING="$OUT/badging.txt"
 PERMS="$OUT/permissions.txt"
 MANIFEST="$OUT/manifest-tree.txt"
-DEX_STRINGS="$OUT/dex-strings.txt"
+DEX_STRINGS="$TMP_DIR/dex-strings.txt"
 
 "$AAPT" dump badging "$UNIVERSAL" > "$BADGING"
 "$AAPT" dump permissions "$UNIVERSAL" > "$PERMS"
@@ -70,6 +72,9 @@ grep -Fq "ca-app-pub-1380972808968213" "$DEX_STRINGS" || fail "live AdMob publis
 if grep -Fq "ca-app-pub-3940256099942544" "$DEX_STRINGS"; then
   fail "Google sample AdMob id leaked into release"
 fi
+[[ "${SUPPORT_EMAIL:-}" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] \
+  || fail "SUPPORT_EMAIL is missing or invalid"
+grep -Fq "$SUPPORT_EMAIL" "$DEX_STRINGS" || fail "configured support contact not found"
 
 {
   echo "Smart Cleaner release verification: PASS"
@@ -87,5 +92,8 @@ fi
   cat "$PERMS"
 } | tee "$REPORT"
 
-sha256sum "$AAB" "$UNIVERSAL" > "$OUT/SHA256SUMS.txt"
+{
+  sha256sum "$AAB"
+  printf '%s  %s\n' "$(sha256sum "$UNIVERSAL" | awk '{print $1}')" "release-universal.apk"
+} > "$OUT/SHA256SUMS.txt"
 echo "RELEASE_BINARY_GATE_PASS"

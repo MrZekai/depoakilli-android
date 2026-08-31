@@ -31,6 +31,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
         run: bash ./scripts/validate-release-env.sh
 
       - name: Decode upload key
@@ -45,11 +46,15 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
+          ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: |
           chmod +x gradlew
           ./gradlew --stacktrace bundleRelease
 
       - name: Verify actual release bundle and universal APK
+        env:
+          SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
         run: bash ./scripts/verify-release-aab.sh
 
       - name: Upload signed AAB

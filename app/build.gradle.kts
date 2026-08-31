@@ -26,6 +26,10 @@ val sentryDsn = providers.environmentVariable("SENTRY_DSN")
     .orNull
     ?.trim()
     .orEmpty()
+val supportEmail = providers.environmentVariable("SUPPORT_EMAIL")
+    .orNull
+    ?.trim()
+    .orEmpty()
 
 private fun quotedBuildConfig(value: String): String =
     "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -56,6 +60,7 @@ android {
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
         buildConfigField("String", "SENTRY_DSN", quotedBuildConfig(sentryDsn))
+        buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
 
     signingConfigs {
@@ -82,8 +87,13 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".qa"
-            versionNameSuffix = "-qa"
+            // Local development surface. It must NOT share an applicationId with
+            // the `qa` external-test build: both are signed with the same stable
+            // QA certificate, so an identical id let the two replace each other
+            // on a device and let a debuggable APK masquerade as the verified
+            // slim QA APK in a manual install.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
         }
@@ -120,6 +130,24 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.findByName("release")
+        }
+        create("closedTest") {
+            // Play closed testing must exercise the real Play package and upload
+            // certificate without generating live ad traffic.
+            initWith(getByName("release"))
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
+            buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
+            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
+            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+            signingConfig = signingConfigs.findByName("release")
+            matchingFallbacks += listOf("release")
         }
     }
 
@@ -226,6 +254,9 @@ val validateReleaseAds by tasks.registering {
         check(sentryDsn.isNotBlank()) {
             "Release blocked: configure SENTRY_DSN so closed-test/production crashes are observable."
         }
+        check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
+            "Release blocked: configure a valid public SUPPORT_EMAIL."
+        }
         check(
             releaseKeystorePath.isPresent &&
                 releaseKeystorePassword.isPresent &&
@@ -239,4 +270,41 @@ val validateReleaseAds by tasks.registering {
 
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
     dependsOn(validateReleaseAds)
+}
+
+val validateClosedTestConfiguration by tasks.registering {
+    group = "verification"
+    description = "Validates Play closed-test signing, diagnostics, support and sample ads."
+    doLast {
+        val sampleIds = listOf(
+            sampleAdMobAppId,
+            sampleBannerId,
+            sampleInterstitialId,
+            sampleResultNativeVideoId,
+        )
+        check(sampleIds.all { it.contains("3940256099942544") }) {
+            "Closed test blocked: every ad format must use an official Google sample ID."
+        }
+        check(sampleIds.none { it.contains("1380972808968213") }) {
+            "Closed test blocked: production AdMob IDs cannot be used."
+        }
+        check(sentryDsn.isNotBlank()) {
+            "Closed test blocked: configure SENTRY_DSN for crash observability."
+        }
+        check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
+            "Closed test blocked: configure a valid public SUPPORT_EMAIL."
+        }
+        check(
+            releaseKeystorePath.isPresent &&
+                releaseKeystorePassword.isPresent &&
+                releaseKeyAlias.isPresent &&
+                releaseKeyPassword.isPresent,
+        ) {
+            "Closed test blocked: configure the Play upload keystore environment variables."
+        }
+    }
+}
+
+tasks.matching { it.name == "preClosedTestBuild" }.configureEach {
+    dependsOn(validateClosedTestConfiguration)
 }

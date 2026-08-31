@@ -26,8 +26,7 @@ internal object AppDiagnostics {
 
         SentryAndroid.init(context) { options ->
             options.dsn = dsn
-            options.environment =
-                if (BuildConfig.APPLICATION_ID.endsWith(".qa")) "qa" else "production"
+            options.environment = diagnosticsEnvironment()
             options.release =
                 "${BuildConfig.APPLICATION_ID}@${BuildConfig.VERSION_NAME}+${BuildConfig.VERSION_CODE}"
             options.isSendDefaultPii = false
@@ -37,7 +36,7 @@ internal object AppDiagnostics {
             "app_diagnostics_initialized",
             mapOf(
                 "build" to
-                    if (BuildConfig.APPLICATION_ID.endsWith(".qa")) "qa" else "production",
+                    diagnosticsEnvironment(),
             ),
         )
     }
@@ -67,4 +66,11 @@ internal object AppDiagnostics {
     }
 
     private const val TAG = "AppDiagnostics"
+
+    private fun diagnosticsEnvironment(): String = when (BuildConfig.BUILD_TYPE) {
+        "qa" -> "qa"
+        "closedTest" -> "closed-test"
+        "debug" -> "debug"
+        else -> "production"
+    }
 }

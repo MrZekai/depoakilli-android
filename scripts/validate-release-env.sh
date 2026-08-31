@@ -7,6 +7,7 @@ required=(
   KEY_ALIAS
   KEY_PASSWORD
   SENTRY_DSN
+  SUPPORT_EMAIL
 )
 
 missing=()
@@ -21,4 +22,9 @@ if (( ${#missing[@]} > 0 )); then
   exit 1
 fi
 
-echo "Release signing + crash-diagnostics environment is complete; AdMob IDs are release-pinned in Gradle."
+if [[ ! "$SUPPORT_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]; then
+  echo "Release blocked. SUPPORT_EMAIL must be a valid public contact address." >&2
+  exit 1
+fi
+
+echo "Release signing, crash diagnostics and public support contact are complete; AdMob IDs are variant-pinned in Gradle."

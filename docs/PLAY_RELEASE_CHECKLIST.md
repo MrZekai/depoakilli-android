@@ -5,6 +5,8 @@
 - [ ] `python scripts/validate-project.py` passes.
 - [ ] GitHub Actions passes project validation, `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing and packaged-binary verification.
 - [ ] QA APK reports version `0.5.18-closedtest1-qa` / versionCode `39`.
+- [ ] Manual `Play Closed Test AAB + APK` workflow passes `lintClosedTest`, signed AAB/APK build and binary verification.
+- [ ] Play AAB reports package `com.mrzekai.depoakilli`, version `0.5.18-closedtest1` / `39`, sample ads, non-debuggable state and the existing upload certificate.
 - [ ] Physical-device checklist in `docs/DEVICE_QA_CHECKLIST.md` is recorded before Production.
 - [ ] Android 11–16 permission return paths are tested where devices are available.
 - [ ] No scan/delete path causes ANR or silently drops failed items.
@@ -26,11 +28,10 @@
 - [ ] App Manager only lists apps visible through the launcher query; `QUERY_ALL_PACKAGES` is not requested.
 - [ ] Uninstall uses Android's official confirmation flow.
 
-## RAM / claims
+## Performance claims
 
-- [ ] RAM Optimization does not claim that Smart Cleaner force-stops other apps.
+- [ ] No user-facing RAM Optimizer or third-party process-killing claim exists.
 - [ ] No fixed “phone X% faster”, fake recovered-RAM total, CPU cooler or inaccessible-private-cache claim exists in app or store metadata.
-- [ ] Any measured before/after value is tied to the app's own memory/resource release or Android-provided device state.
 
 ## Permission / Play declarations
 
@@ -39,6 +40,7 @@
 - [ ] Data Safety answers match Google Mobile Ads/UMP SDK behavior and local file processing.
 - [ ] `QUERY_ALL_PACKAGES`, Accessibility Service, `KILL_BACKGROUND_PROCESSES`, privileged `CLEAR_APP_CACHE`, legacy write-storage permissions are absent.
 - [ ] Privacy policy is published over HTTPS before release.
+- [ ] Published privacy policy is a public, non-geofenced webpage (not a PDF) and contains the same `SUPPORT_EMAIL` shown in the app and Play developer contact.
 
 ## Ads / consent
 
@@ -58,6 +60,7 @@
 ## Identity / signing
 
 - [ ] Package name is `com.mrzekai.depoakilli` for Play and QA suffix behavior remains intentional.
+- [ ] Closed-test AAB and APK are signed by the same existing Play upload certificate.
 - [ ] QA certificate SHA-256 is verified by CI: `50:8E:01:21:97:DA:76:D5:16:BA:D2:48:80:B6:7C:6F:06:7F:CD:64:6C:51:A0:43:A1:1C:0C:34:5E:6E:AD:54`.
 - [ ] Play upload keystore and passwords exist only in approved secret storage and are backed up securely.
 

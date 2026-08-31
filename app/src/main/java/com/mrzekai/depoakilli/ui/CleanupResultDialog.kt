@@ -234,9 +234,12 @@ internal fun CleanupResultDialog(
                         modifier = Modifier.fillMaxWidth(),
                     )
 
-                    if (resultAdPresented) {
-                        Spacer(Modifier.height(33.dp))
-                    }
+                    // Constant separation between the sponsored surface and the
+                    // primary action. Making this gap conditional on the ad
+                    // having loaded moved the Done button downwards at the exact
+                    // moment the ad appeared, which is the classic accidental-
+                    // click pattern AdMob ad-placement policy prohibits.
+                    Spacer(Modifier.height(33.dp))
 
                     Button(
                         onClick = { onDone(resultAdPresented) },

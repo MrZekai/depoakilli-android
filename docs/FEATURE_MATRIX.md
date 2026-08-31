@@ -1,4 +1,4 @@
-# Feature matrix — v0.5.1
+# Feature matrix - v0.5.18 closed-test candidate
 
 | Feature | v0.5.1 behavior |
 |---|---|
@@ -12,7 +12,6 @@
 | Deep App Cache | StorageStats measurement + Android official cache-clean action |
 | App Manager | In-app launchable-app list, storage/cache stats, uninstall handoff |
 | Storage Analyzer | File-type totals from the same shared-storage index |
-| RAM Optimization | Releases this app's heavy temporary resources; no fake third-party kill claim |
 | Device status | Not presented as a cleaner tool |
 
 
@@ -21,12 +20,11 @@
 | Home action | Real implementation |
 |---|---|
 | Smart Clean | Standard on-device assessment across shared storage + exact duplicates |
-| Deep Clean | Broader thresholds (50 MB large files, 7-day screenshots, 30-day downloads, 14-day WhatsApp Sent) + exact duplicates; extra items are review-only |
+| Deep Clean | Broader review across accessible storage; lower-confidence personal files remain review-only |
 | WhatsApp Cleaner | Direct shared-media indexing under supported WhatsApp / WhatsApp Business media roots |
 | Duplicate Files | Sample fingerprint followed by full streaming SHA-256 |
 | Large Files | Shared-storage files >= 100 MB |
 | APK Cleaner | APK installer packages only |
-| Media Cleaner | Screenshot / large media review + exact media duplicates |
+| Media Cleaner | Accessible screenshot / large media review + exact media duplicates; nothing is preselected merely for being a screenshot |
 | Deep App Cache | StorageStats measurement + Android `ACTION_CLEAR_APP_CACHE` |
-| RAM Optimization | Releases Smart Cleaner scan-result/ad resources, requests GC, and remeasures actual RAM |
 | Storage Analyzer | File-type totals without presenting files as junk |

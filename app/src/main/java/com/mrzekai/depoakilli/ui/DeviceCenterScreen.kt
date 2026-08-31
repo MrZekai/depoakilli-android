@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mrzekai.depoakilli.BuildConfig
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
@@ -499,10 +500,16 @@ internal fun SettingsDetailScreen(
 
 @Composable
 internal fun LegalDetailScreen(page: LegalPage, info: DeviceInfoSnapshot, modifier: Modifier = Modifier) {
-    val body = when (page) {
+    val policyBody = when (page) {
         LegalPage.PRIVACY -> stringResource(R.string.privacy_policy_body_v050)
         LegalPage.TERMS -> stringResource(R.string.terms_of_service_body_v050)
         LegalPage.ABOUT -> stringResource(R.string.about_app_body_v050, info.appVersion)
+    }
+    val supportEmail = BuildConfig.SUPPORT_EMAIL.trim()
+    val body = if (page != LegalPage.ABOUT && supportEmail.isNotBlank()) {
+        policyBody + "\n\n" + stringResource(R.string.legal_contact, supportEmail)
+    } else {
+        policyBody
     }
     LazyColumn(
         modifier = modifier.fillMaxSize(),

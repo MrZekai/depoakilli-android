@@ -25,8 +25,18 @@ build_tools="$(
 )"
 [[ -n "$build_tools" ]] || fail "Android build-tools klasoru bulunamadi."
 
-apksigner="$build_tools/apksigner"
-[[ -x "$apksigner" ]] || fail "apksigner calistirilabilir degil: $apksigner"
+apksigner=""
+for candidate in \
+    "$build_tools/apksigner" \
+    "$build_tools/apksigner.bat" \
+    "$build_tools/apksigner.exe"
+do
+    if [[ -f "$candidate" ]]; then
+        apksigner="$candidate"
+        break
+    fi
+done
+[[ -n "$apksigner" ]] || fail "apksigner bulunamadi: $build_tools"
 
 echo "Using build-tools: $build_tools"
 if ! raw_output="$("$apksigner" verify --print-certs "$apk_path" 2>&1)"; then

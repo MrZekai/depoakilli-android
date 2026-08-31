@@ -24,6 +24,7 @@ import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -133,6 +134,22 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private var captureAppCacheForStorageChange = false
 
     val state: StateFlow<CleanerUiState> = _state.asStateFlow()
+
+    // Storage and cache probing is disk I/O: StatFs on every mounted volume and
+    // a recursive walk of the app cache directories. viewModelScope dispatches
+    // on Dispatchers.Main.immediate, so these helpers keep the cleanup and scan
+    // paths off the UI thread instead of risking StrictMode violations and ANRs
+    // on slow or heavily populated storage.
+    private suspend fun ioStorageSnapshot(): StorageSnapshot =
+        withContext(Dispatchers.IO) { repository.storageSnapshot() }
+
+    private suspend fun ioAvailableBytes(): Long = ioStorageSnapshot().availableBytes
+
+    private suspend fun ioOwnCacheBytes(): Long =
+        withContext(Dispatchers.IO) { repository.ownCacheSize() }
+
+    private suspend fun ioMemorySnapshot(): MemorySnapshot =
+        withContext(Dispatchers.Default) { repository.memorySnapshot() }
 
     init {
         restoreDashboardSnapshot()
@@ -390,10 +407,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 val comprehensive = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
                 val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE
                 val analyzedAtMillis = if (recordsStorageChange) System.currentTimeMillis() else 0L
-                val storageSnapshot = repository.storageSnapshot()
-                val memorySnapshot = repository.memorySnapshot()
+                val storageSnapshot = ioStorageSnapshot()
+                val memorySnapshot = ioMemorySnapshot()
                 val hasAllFilesAccess = repository.hasAllFilesAccess()
-                val hasWhatsAppAccess = repository.hasWhatsAppAccess()
+                // hasWhatsAppAccess() stats the WhatsApp media roots on disk.
+                val hasWhatsAppAccess = withContext(Dispatchers.IO) { repository.hasWhatsAppAccess() }
                 val storageChangeReport = if (recordsStorageChange) {
                     storageChangeStore.recordFileSnapshot(
                         storage = storageSnapshot,
@@ -474,6 +492,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     refreshAppCaches(force = true)
                 }
             }.onFailure { error ->
+                // A cancelled scan (ViewModel cleared, or a newer scan started)
+                // is not a crash: reporting it would flood Sentry and show a
+                // false "scan failed" message.
+                if (error is CancellationException) return@onFailure
                 AppDiagnostics.captureException(
                     error,
                     "scan_failed",
@@ -528,14 +550,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     )
                 }
                 delay(WHATSAPP_COMPLETION_DELAY_MILLIS)
+                val storageAfter = ioStorageSnapshot()
                 _state.update {
                     it.copy(
                         whatsAppScanning = false,
                         whatsAppLastScanCompleted = true,
-                        storage = repository.storageSnapshot(),
+                        storage = storageAfter,
                     )
                 }
-            }.onFailure {
+            }.onFailure { error ->
+                if (error is CancellationException) return@onFailure
                 _state.update {
                     it.copy(
                         whatsAppScanning = false,
@@ -581,7 +605,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             onCompleted(false)
             return
         }
-        val storageBefore = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -590,9 +613,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         viewModelScope.launch {
+            val storageBefore = ioAvailableBytes()
             runCatching { repository.deleteWhatsAppItems(selected) }
                 .onSuccess { result ->
-                    val storageAfter = repository.storageSnapshot()
+                    val storageAfter = ioStorageSnapshot()
                     val measuredResult = CleanupResult(
                         deletedBytes = result.deletedBytes,
                         deletedCount = result.deletedIds.size,
@@ -624,7 +648,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     recordCleanupHistory(measuredResult)
                     onCompleted(result.deletedIds.isNotEmpty())
                 }
-                .onFailure {
+                .onFailure { error ->
+                    if (error is CancellationException) return@onFailure
                     _state.update { state ->
                         state.copy(
                             cleanupInProgress = false,
@@ -864,7 +889,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             ),
         )
         resetPendingCleanupResult()
-        pendingCleanupStorageBeforeBytes = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -873,6 +897,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         viewModelScope.launch {
+            pendingCleanupStorageBeforeBytes = ioAvailableBytes()
             runCatching {
                 val direct = repository.deleteDirectItems(selected)
                 val remaining = selected.filterNot { it.id in direct.attemptedIds }
@@ -894,7 +919,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     )
                     onPlanReady(plan)
                 }
-            }.onFailure {
+            }.onFailure { error ->
+                if (error is CancellationException) return@onFailure
                 pendingConsentItems = emptyList()
                 resetPendingCleanupResult()
                 _state.update { state ->
@@ -919,7 +945,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         storageReviewJob?.cancel()
         storageReviewJob = null
 
-        val storageBefore = repository.storageSnapshot().availableBytes
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -928,6 +953,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         viewModelScope.launch {
+            val storageBefore = ioAvailableBytes()
             runCatching { repository.deleteStorageReviewItems(selected) }
                 .onSuccess { result ->
                     finishStorageReviewCleanup(
@@ -939,7 +965,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     )
                     onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
-                .onFailure {
+                .onFailure { error ->
+                    if (error is CancellationException) return@onFailure
                     _state.update { state ->
                         state.copy(
                             cleanupInProgress = false,
@@ -953,55 +980,64 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun completeCleanup(approved: Boolean): Boolean {
         val pending = pendingConsentItems
         pendingConsentItems = emptyList()
+        val directDeletedCount = pendingCleanupDeletedCount
+        val directDeletedBytes = pendingCleanupDeletedBytes
+        val directFailedCount = pendingCleanupFailedCount
+        val storageBefore = pendingCleanupStorageBeforeBytes
+
         if (!approved) {
-            val partialResult = if (pendingCleanupDeletedCount > 0 || pendingCleanupFailedCount > 0) {
-                CleanupResult(
-                    deletedBytes = pendingCleanupDeletedBytes,
-                    deletedCount = pendingCleanupDeletedCount,
-                    failedCount = pendingCleanupFailedCount,
-                    cancelledCount = pending.size,
-                    beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
-                    afterAvailableBytes = repository.storageSnapshot().availableBytes,
-                )
-            } else {
-                null
-            }
             resetPendingCleanupResult()
-            _state.update {
-                it.copy(
-                    cleanupInProgress = false,
-                    cleanupResult = partialResult,
-                    message = if (partialResult == null) {
-                        getApplication<Application>().getString(R.string.message_cleanup_cancelled)
-                    } else {
-                        null
-                    },
-                )
+            viewModelScope.launch {
+                val partialResult = if (directDeletedCount > 0 || directFailedCount > 0) {
+                    CleanupResult(
+                        deletedBytes = directDeletedBytes,
+                        deletedCount = directDeletedCount,
+                        failedCount = directFailedCount,
+                        cancelledCount = pending.size,
+                        beforeAvailableBytes = storageBefore,
+                        afterAvailableBytes = ioAvailableBytes(),
+                    )
+                } else {
+                    null
+                }
+                _state.update {
+                    it.copy(
+                        cleanupInProgress = false,
+                        cleanupResult = partialResult,
+                        message = if (partialResult == null) {
+                            getApplication<Application>().getString(R.string.message_cleanup_cancelled)
+                        } else {
+                            null
+                        },
+                    )
+                }
+                partialResult?.let(::recordCleanupHistory)
             }
-            partialResult?.let(::recordCleanupHistory)
             // A cancelled Android consent flow never triggers a monetization break.
             return false
         }
 
         repository.invalidateStorageIndex()
-        val directDeletedCount = pendingCleanupDeletedCount
         val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
         val removedBytes = pending.sumOf(CleanableItem::sizeBytes)
-        val combinedResult = CleanupResult(
-            deletedBytes = pendingCleanupDeletedBytes + removedBytes,
-            deletedCount = directDeletedCount + removedIds.size,
-            failedCount = pendingCleanupFailedCount,
-            beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
-            afterAvailableBytes = repository.storageSnapshot().availableBytes,
-        )
-        finishCleanup(
-            items = pending,
-            deletedIds = removedIds,
-            deletedBytes = removedBytes,
-            failedCount = 0,
-            result = combinedResult,
-        )
         resetPendingCleanupResult()
+        viewModelScope.launch {
+            val combinedResult = CleanupResult(
+                deletedBytes = directDeletedBytes + removedBytes,
+                deletedCount = directDeletedCount + removedIds.size,
+                failedCount = directFailedCount,
+                beforeAvailableBytes = storageBefore,
+                afterAvailableBytes = ioAvailableBytes(),
+            )
+            finishCleanup(
+                items = pending,
+                deletedIds = removedIds,
+                deletedBytes = removedBytes,
+                failedCount = 0,
+                storageBeforeBytes = storageBefore,
+                result = combinedResult,
+            )
+        }
         return directDeletedCount + removedIds.size > 0
     }
 
@@ -1013,21 +1049,24 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun finishCleanup(
+    private suspend fun finishCleanup(
         items: List<CleanableItem>,
         deletedIds: Set<String>,
         deletedBytes: Long,
         failedCount: Int,
+        storageBeforeBytes: Long = pendingCleanupStorageBeforeBytes,
         clearPending: Boolean = true,
         result: CleanupResult? = null,
     ) {
-        val storageAfter = repository.storageSnapshot()
+        val storageAfter = ioStorageSnapshot()
+        val memoryAfter = ioMemorySnapshot()
+        val ownCacheAfter = ioOwnCacheBytes()
         val measuredResult = if (clearPending) {
             result ?: CleanupResult(
                 deletedBytes = deletedBytes,
                 deletedCount = deletedIds.size,
                 failedCount = failedCount,
-                beforeAvailableBytes = pendingCleanupStorageBeforeBytes,
+                beforeAvailableBytes = storageBeforeBytes,
                 afterAvailableBytes = storageAfter.availableBytes,
             )
         } else {
@@ -1054,8 +1093,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     (bytes - (deletedByCategory[category] ?: 0L)).coerceAtLeast(0L)
                 },
                 storage = storageAfter,
-                memory = repository.memorySnapshot(),
-                ownCacheBytes = repository.ownCacheSize(),
+                memory = memoryAfter,
+                ownCacheBytes = ownCacheAfter,
                 cleanupInProgress = if (clearPending) false else state.cleanupInProgress,
                 cleanupResult = measuredResult ?: state.cleanupResult,
                 message = if (measuredResult == null) state.message else null,
@@ -1080,14 +1119,15 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         pendingCleanupStorageBeforeBytes = 0L
     }
 
-    private fun finishStorageReviewCleanup(
+    private suspend fun finishStorageReviewCleanup(
         attempted: List<StorageReviewItem>,
         deletedIds: Set<String>,
         deletedBytes: Long,
         failedCount: Int,
         beforeAvailableBytes: Long,
     ) {
-        val storageAfter = repository.storageSnapshot()
+        val storageAfter = ioStorageSnapshot()
+        val memoryAfter = ioMemorySnapshot()
         val measuredResult = CleanupResult(
             deletedBytes = deletedBytes,
             deletedCount = deletedIds.size,
@@ -1153,7 +1193,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     loading = false,
                 ),
                 storage = storageAfter,
-                memory = repository.memorySnapshot(),
+                memory = memoryAfter,
                 cleanupInProgress = false,
                 cleanupResult = measuredResult,
                 message = null,
@@ -1186,7 +1226,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
         viewModelScope.launch {
             val afterCache = runCatching { repository.appCacheSnapshot() }.getOrNull()
-            val storageAfter = runCatching { repository.storageSnapshot() }
+            val storageAfter = runCatching { ioStorageSnapshot() }
                 .getOrElse { _state.value.storage }
 
             val measuredCacheReduction =
@@ -1261,7 +1301,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             }.getOrNull()
 
             val storageAfter = runCatching {
-                repository.storageSnapshot()
+                ioStorageSnapshot()
             }.getOrElse {
                 _state.value.storage
             }
@@ -1316,14 +1356,15 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun clearOwnAppCache() {
         viewModelScope.launch {
-            val beforeAvailableBytes = repository.storageSnapshot().availableBytes
+            val beforeAvailableBytes = ioAvailableBytes()
             val clearedBytes = repository.clearOwnCache().coerceAtLeast(0L)
-            val storageAfter = repository.storageSnapshot()
+            val storageAfter = ioStorageSnapshot()
+            val ownCacheAfter = ioOwnCacheBytes()
 
             _state.update { current ->
                 if (clearedBytes > 0L) {
                     current.copy(
-                        ownCacheBytes = repository.ownCacheSize(),
+                        ownCacheBytes = ownCacheAfter,
                         storage = storageAfter,
                         cleanupResult = CleanupResult(
                             deletedBytes = clearedBytes,
@@ -1338,7 +1379,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     )
                 } else {
                     current.copy(
-                        ownCacheBytes = repository.ownCacheSize(),
+                        ownCacheBytes = ownCacheAfter,
                         storage = storageAfter,
                         cleanupResult = null,
                         message = getApplication<Application>().getString(

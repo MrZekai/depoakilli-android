@@ -19,8 +19,14 @@ veri silmeden güncelleme olarak kurulabilir.
 `QA` yalnız paket kimliğinde kalır; kullanıcıya görünen uygulama adına eklenmez.
 Test ve Play uygulaması cihazda yan yana bulunursa paket kimlikleri farklıdır.
 
-Eski CI APK'sı `com.mrzekai.depoakilli.debug` paketini kullanıyorsa yeni QA
-APK onun yanına kurulabilir; eski uygulamayı kaldırmak zorunlu değildir.
+## Yerel debug yapısı (v39'da değişti)
+
+Yerel `debug` yapısı artık ayrı bir kimlik kullanır: `com.mrzekai.depoakilli.debug`.
+
+v39 öncesinde `debug` ve `qa` aynı `.qa` kimliğini paylaşıyordu. İkisi de aynı
+QA sertifikasıyla imzalandığı için cihazda birbirinin üzerine kuruluyordu ve
+`debuggable`, küçültülmemiş bir APK, doğrulanmış slim QA APK'sının yerine
+geçebiliyordu. Artık `debug`, `qa` ve Play paketi cihazda yan yana durabilir.
 
 ## Google Play release AAB
 
@@ -35,6 +41,9 @@ CI üç değeri karşılaştırır: kaynakta sabitlenen sertifika parmak izi, de
 QA keystore'dan `keytool -exportcert` ile çalışma anında hesaplanan parmak izi
 ve üretilen APK'dan `apksigner --print-certs` ile okunan parmak izi. Üç değer
 aynı değilse iş akışı başarısız olur.
+
+Yerel denetleyici Linux/macOS'taki uzantısız `apksigner` ile Windows Android
+SDK'daki `apksigner.bat` / `apksigner.exe` biçimlerini birlikte destekler.
 
 Ham `apksigner` çıktısı CI günlüğüne yazılır. Çıktı biçimi değişirse parmak
 izinin okunamaması ile gerçekten farklı bir sertifika kullanılması ayrı hata

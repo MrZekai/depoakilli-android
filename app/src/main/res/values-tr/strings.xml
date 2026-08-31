@@ -234,6 +234,7 @@
     <string name="terms_of_service">Hizmet Şartları</string>
     <string name="terms_of_service_subtitle">Güvenli kullanım ve silme şartlarını oku</string>
     <string name="about_app">Hakkında</string>
+    <string name="legal_contact">Geliştirici: MrZekai\nGizlilik ve destek iletişimi: %1$s</string>
     <string name="about_app_subtitle">Sürüm, ürün ilkeleri ve yetenekler</string>
     <string name="feedback_subject">Akıllı Temizleyici geri bildirimi</string>
     <string name="feedback_template">Cihaz: %1$s %2$s\nAndroid: %3$s\n\nGeri bildirim:\n</string>
@@ -303,7 +304,7 @@ Tüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği 
 
 Kullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Derin Uygulama Önbelleği Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.
 
-Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nTanılama yapılandırıldığında çökme tanılamaları Sentry’ye gönderilebilir. Bunlar stack trace, cihaz/Android/uygulama sürümü ve toplu işlem sayaçlarını içerebilir. Dosya adları, yolları, dosya içerikleri ve kopya parmak izleri çökme raporlamasına asla gönderilmez.</string>
+Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nTanılama yapılandırıldığında çökme tanılamaları Sentry’ye gönderilebilir. Bunlar stack trace, cihaz/Android/uygulama sürümü ve toplu işlem sayaçlarını içerebilir. Dosya adları, yolları, dosya içerikleri ve kopya parmak izleri çökme raporlamasına asla gönderilmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Açıkça sildiğiniz dosyalar Android aracılığıyla kaldırılır ve Akıllı Temizleyici tarafından geri getirilemez. Google ve Sentry işledikleri verileri kendi yayımlanmış politikalarına göre saklar.</string>
     <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
     <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
     <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
@@ -330,7 +331,7 @@ Google Mobile Ads ve onay platformu Google politikaları kapsamında reklam tan�
 
 Akıllı Temizleyici, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Derin Uygulama Önbelleği Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.
 
-Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.</string>
+Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.\n\nSilmeden önce seçimleri incelemek kullanıcının sorumluluğundadır. Silinen dosyalar geri getirilemeyebilir. Reklamlar ve çökme tanılamaları, ilgili üçüncü taraf hizmetlerin kendi şart ve politikalarına tabidir.</string>
     <string name="tools_rebuilt_status">%1$s boş • %2$s uygulama önbelleği raporlandı</string>
     <string name="tools_rebuilt_title">Temizlik ve depolama araçları</string>
     <string name="uninstall">Kaldır</string>

@@ -16,7 +16,6 @@ Core engine capabilities:
 - app cache measurement through Usage Access and StorageStatsManager;
 - Android 11+ official `StorageManager.ACTION_CLEAR_APP_CACHE` flow for device app-cache cleanup;
 - in-app App Manager for launchable applications, with Android system confirmation for uninstall;
-- RAM Optimization limited to releasing Smart Cleaner's temporary heavy resources and re-measuring available RAM.
 
 ## Important Android boundaries
 
@@ -24,11 +23,11 @@ Core engine capabilities:
 
 Device app-cache cleanup does not pretend to silently delete another app's private cache. Android 11+ exposes `ACTION_CLEAR_APP_CACHE`; Android displays the required system confirmation and performs the operation.
 
-RAM Optimization does not claim to force-stop protected third-party applications.
+There is no user-facing RAM optimizer, third-party process-killing action, CPU cooler, or fabricated speed-gain tool.
 
 ## Deletion safety
 
-User-created large files, old downloads, screenshots and WhatsApp sent media are review items and are not automatically selected. High-confidence temporary artifacts, stale installers, WhatsApp statuses and unambiguous exact duplicate copies may be preselected.
+User-created large files, old downloads, screenshots and WhatsApp media are review items and are not automatically selected merely because of age or category. High-confidence temporary artifacts, stale installers and unambiguous exact duplicate copies may be preselected.
 
 The duplicate policy protects a camera original when one copy is in a camera-original path. Ambiguous duplicate groups are not automatically selected.
 
