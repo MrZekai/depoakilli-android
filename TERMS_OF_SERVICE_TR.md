@@ -18,7 +18,7 @@ Silmeyi onaylamadan önce her seçimi inceleyin. Silme işlemi geri döndürüle
 
 ## Reklamlar ve tanılama
 
-Uygulama Google Mobile Ads aracılığıyla reklam gösterebilir ve Google'ın onay platformunu kullanabilir. Yapılandırıldığında çökme tanılamaları Sentry tarafından işlenebilir. Bu hizmetler kendi şart ve politikalarına tabidir.
+Uygulama Google Mobile Ads aracılığıyla reklam gösterebilir ve Google'ın onay platformunu kullanabilir. Akıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Google hizmetleri kendi şart ve politikalarına tabidir.
 
 ## Kabul edilebilir kullanım ve kullanılabilirlik
 

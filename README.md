@@ -16,14 +16,14 @@ Android 11+ storage-management and file-maintenance app. Current Play closed-tes
 
 User-created files remain review-first. Smart Cleaner does not claim silent private-cache deletion, protected third-party app termination, device-wide RAM boosting, CPU cooling, or fabricated performance gains.
 
-## Ads and diagnostics
+## Ads and local diagnostics
 
 - anchored adaptive Banner ads
 - Native cleanup-result ad with MREC fallback
 - at most one eligible Interstitial after the user explicitly closes a cleanup result with Done
 - no App Open or foreground-return ad
 - UMP consent and in-app advertising privacy options where required
-- privacy-minimal Sentry crash diagnostics; file names, paths, contents, and duplicate fingerprints are excluded by app code
+- local-only Android logging; no third-party crash-reporting service is included
 
 ## Build environment
 
@@ -62,7 +62,6 @@ The manual `Play Closed Test AAB + APK` workflow requires:
 - `ANDROID_KEYSTORE_PASSWORD`
 - `ANDROID_KEY_ALIAS`
 - `ANDROID_KEY_PASSWORD`
-- `SENTRY_DSN`
 - `SUPPORT_EMAIL`
 
 It runs project validation, dependency metadata checks, unit tests, `lintClosedTest`, `bundleClosedTest`, `assembleClosedTest`, signature comparison, package/version inspection, merged-manifest checks, and sample-ad verification.

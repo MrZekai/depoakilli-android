@@ -30,7 +30,6 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
         run: bash ./scripts/validate-release-env.sh
 
@@ -45,7 +44,6 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
           ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: |

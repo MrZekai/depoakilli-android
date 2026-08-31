@@ -14,7 +14,7 @@ Smart Cleaner does not upload personal files, file names, file paths, file conte
 
 ## Third-party processing
 
-Google Mobile Ads and Google's User Messaging Platform may process advertising identifiers, consent choices, diagnostics, and app interactions under Google's policies. When crash diagnostics are configured, Sentry may receive stack traces, device/Android/app version, and aggregate operation counters needed to diagnose failures. Smart Cleaner does not intentionally attach file names, paths, contents, duplicate fingerprints, installed-app lists, or user-entered text to Sentry reports.
+Google Mobile Ads and Google's User Messaging Platform may process advertising identifiers, consent choices, diagnostics, and app interactions under Google's policies. Smart Cleaner does not include a third-party crash-reporting service. File names, paths, contents, duplicate fingerprints, installed-app lists, and user-entered text are not uploaded for crash reporting.
 
 Data is transmitted to these providers using encrypted network connections. Their retention and deletion practices are governed by their published policies. Smart Cleaner does not sell personal or sensitive user data.
 

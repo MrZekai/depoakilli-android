@@ -22,10 +22,6 @@ val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     .orNull
     ?.trim()
     .orEmpty()
-val sentryDsn = providers.environmentVariable("SENTRY_DSN")
-    .orNull
-    ?.trim()
-    .orEmpty()
 val supportEmail = providers.environmentVariable("SUPPORT_EMAIL")
     .orNull
     ?.trim()
@@ -59,7 +55,6 @@ android {
         buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
-        buildConfigField("String", "SENTRY_DSN", quotedBuildConfig(sentryDsn))
         buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
 
@@ -209,10 +204,6 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
 
-    // Crash-only diagnostics. Use Android core to avoid Session Replay/NDK
-    // modules that Smart Cleaner does not use.
-    implementation("io.sentry:sentry-android-core:8.53.0")
-
     implementation(libs.google.play.services.ads)
     implementation(libs.google.ump)
     implementation(libs.androidx.media3.exoplayer)
@@ -251,9 +242,6 @@ val validateReleaseAds by tasks.registering {
                 "Release blocked: Result Native ad unit must belong to Smart Cleaner."
             }
         }
-        check(sentryDsn.isNotBlank()) {
-            "Release blocked: configure SENTRY_DSN so closed-test/production crashes are observable."
-        }
         check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
             "Release blocked: configure a valid public SUPPORT_EMAIL."
         }
@@ -287,9 +275,6 @@ val validateClosedTestConfiguration by tasks.registering {
         }
         check(sampleIds.none { it.contains("1380972808968213") }) {
             "Closed test blocked: production AdMob IDs cannot be used."
-        }
-        check(sentryDsn.isNotBlank()) {
-            "Closed test blocked: configure SENTRY_DSN for crash observability."
         }
         check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
             "Closed test blocked: configure a valid public SUPPORT_EMAIL."

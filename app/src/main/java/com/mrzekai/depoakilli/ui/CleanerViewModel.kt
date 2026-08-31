@@ -493,7 +493,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 }
             }.onFailure { error ->
                 // A cancelled scan (ViewModel cleared, or a newer scan started)
-                // is not a crash: reporting it would flood Sentry and show a
+                // is not a crash: reporting it would flood diagnostic logs and show a
                 // false "scan failed" message.
                 if (error is CancellationException) return@onFailure
                 AppDiagnostics.captureException(

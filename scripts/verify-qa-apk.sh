@@ -55,8 +55,6 @@ do
 done
 
 # DEX printable-string scanning is valid for Compose PreviewActivity.
-# Sentry Replay/NDK are checked from qaRuntimeClasspath instead because
-# sentry-android-core may contain optional integration name strings.
 for forbidden in \
   'androidx/compose/ui/tooling/PreviewActivity'
 do

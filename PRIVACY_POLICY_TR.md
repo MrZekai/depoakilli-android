@@ -14,7 +14,7 @@ Akıllı Temizleyici kişisel dosyaları, dosya adlarını, dosya yollarını, d
 
 ## Üçüncü taraf işlemleri
 
-Google Mobile Ads ve Google User Messaging Platform; Google politikaları kapsamında reklam tanımlayıcılarını, onay seçimlerini, tanılama verilerini ve uygulama etkileşimlerini işleyebilir. Çökme tanılamaları yapılandırıldığında Sentry; hataları incelemek için gereken stack trace, cihaz/Android/uygulama sürümü ve toplu işlem sayaçlarını alabilir. Akıllı Temizleyici dosya adı, yol, içerik, kopya parmak izi, kurulu uygulama listesi veya kullanıcı tarafından girilen metni Sentry raporlarına bilerek eklemez.
+Google Mobile Ads ve Google User Messaging Platform; Google politikaları kapsamında reklam tanımlayıcılarını, onay seçimlerini, tanılama verilerini ve uygulama etkileşimlerini işleyebilir. Akıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, içerikler, kopya parmak izleri, kurulu uygulama listeleri ve kullanıcı tarafından girilen metinler çökme raporlaması amacıyla yüklenmez.
 
 Veriler bu sağlayıcılara şifreli ağ bağlantılarıyla iletilir. Saklama ve silme uygulamaları kendi yayımlanmış politikalarına tabidir. Akıllı Temizleyici kişisel veya hassas kullanıcı verilerini satmaz.
 

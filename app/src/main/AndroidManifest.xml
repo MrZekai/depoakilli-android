@@ -38,11 +38,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DepoAkilli">
 
-        <!-- Sentry is initialized manually only when a DSN is configured. -->
-        <meta-data
-            android:name="io.sentry.auto-init"
-            android:value="false" />
-
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />

@@ -1,7 +1,6 @@
 # Smart Cleaner — Play Release Checklist
 
 ## Required before signed release AAB
-- Configure GitHub secret `SENTRY_DSN`.
 - Configure GitHub secret `SUPPORT_EMAIL` with the public privacy/support address.
 - Keep the upload keystore backed up offline.
 - Configure the existing Android signing secrets.
@@ -21,8 +20,7 @@ Prepare a short declaration video showing the in-app disclosure, Android permiss
 ## Data Safety / privacy
 Declare, as applicable:
 - Advertising ID / advertising data used by Google Mobile Ads.
-- Diagnostics/crash data sent to Sentry when the release DSN is configured.
-- Files and duplicate fingerprints remain on-device; Smart Cleaner does not upload file names, paths, content, or fingerprints to Sentry.
+- Diagnostics remain on-device; Smart Cleaner does not upload file names, paths, content, fingerprints, or crash logs to a third-party crash-reporting service.
 - Usage Access is optional and used for Android-reported app/cache/last-use metadata.
 - Target audience: 13+ unless the store strategy changes.
 
@@ -65,7 +63,7 @@ The release workflow must pass `scripts/verify-release-aab.sh` and show:
 6. Delete hundreds of media files, open Gallery, and check for stale entries/thumbnails.
 7. Storage Change must show live file/folder counters.
 8. Screenshots: recent and old accessible screenshots are visible; all remain review-only and not preselected.
-9. Verify Sentry receives a controlled test exception before production rollout.
+9. Verify Android Vitals after the first Play closed-test sessions.
 
 ## Slim QA APK
 The external tester APK is `assembleQa`, not `assembleDebug`.

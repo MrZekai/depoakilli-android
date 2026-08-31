@@ -18,7 +18,7 @@ Review every selection before confirming deletion. A deletion may be irreversibl
 
 ## Ads and diagnostics
 
-The app may display advertising through Google Mobile Ads and use Google's consent platform. Crash diagnostics may be processed by Sentry when configured. These services operate under their own terms and policies.
+The app may display advertising through Google Mobile Ads and use Google's consent platform. Smart Cleaner does not include a third-party crash-reporting service. Google services operate under their own terms and policies.
 
 ## Acceptable use and availability
 

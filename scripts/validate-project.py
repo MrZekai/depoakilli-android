@@ -240,12 +240,11 @@ if "setContent {" in main_activity and "import androidx.activity.compose.setCont
 
 diagnostics = read("app/src/main/java/com/mrzekai/depoakilli/diagnostics/AppDiagnostics.kt")
 for expected in (
-    "diagnosticsEnvironment()",
-    '"closedTest" -> "closed-test"',
-    '"qa" -> "qa"',
+    "Local-only diagnostic logging",
+    'Log.e(TAG, if (details.isBlank()) stage else "$stage [$details]", throwable)',
 ):
     if expected not in diagnostics:
-        errors.append(f"missing build-specific diagnostics invariant: {expected}")
+        errors.append(f"missing local-only diagnostics invariant: {expected}")
 
 # ------------------------------------------------------------------
 # Full-screen session caps and adaptive banner.
@@ -1220,7 +1219,6 @@ for expected in (
     'isMinifyEnabled = true',
     'isShrinkResources = true',
     'getDefaultProguardFile("proguard-android-optimize.txt")',
-    'implementation("io.sentry:sentry-android-core:8.53.0")',
 ):
     if expected not in build_file:
         errors.append(f"missing alpha11 slim-QA/build invariant: {expected}")
@@ -1249,7 +1247,6 @@ for expected in (
     "SmartCleaner-ClosedTest-Diagnostics-v39",
     "SmartCleaner-ClosedTest-v39.aab",
     "SUPPORT_EMAIL",
-    "SENTRY_DSN",
 ):
     if expected not in closed_test_workflow:
         errors.append(f"missing Play closed-test workflow invariant: {expected}")
@@ -1278,7 +1275,7 @@ for expected in ("SUPPORT_EMAIL", "ADMOB_RESULT_NATIVE_ID"):
         errors.append(f"release workflow does not pass required environment: {expected}")
 
 release_environment = read("scripts/validate-release-env.sh")
-for expected in ("SUPPORT_EMAIL", "SENTRY_DSN", "ANDROID_KEYSTORE_BASE64"):
+for expected in ("SUPPORT_EMAIL", "ANDROID_KEYSTORE_BASE64"):
     normalized = "KEYSTORE_BASE64" if expected == "ANDROID_KEYSTORE_BASE64" else expected
     if normalized not in release_environment:
         errors.append(f"release environment validator is missing: {expected}")

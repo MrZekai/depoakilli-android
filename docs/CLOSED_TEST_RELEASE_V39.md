@@ -31,10 +31,9 @@ The binary gate fails unless the AAB and APK have the same upload-certificate SH
 - `ANDROID_KEYSTORE_PASSWORD`
 - `ANDROID_KEY_ALIAS`
 - `ANDROID_KEY_PASSWORD`
-- `SENTRY_DSN`
 - `SUPPORT_EMAIL`
 
-The workflow must stop if any required value is missing. Never add keystore material, passwords, the Sentry DSN, or support-contact substitutions to the repository.
+The workflow must stop if any required value is missing. Never add keystore material, passwords, or support-contact substitutions to the repository.
 
 ## Play Console handoff
 
