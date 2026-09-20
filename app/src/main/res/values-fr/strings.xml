@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Smart Cleaner</string>
-    <string name="app_tagline">RAPIDE • CONTRÔLÉ • SUR L&apos;APPAREIL</string>
+    <string name="app_tagline">RAPIDE • CONTRÔLÉ • SUR L\'APPAREIL</string>
     <string name="rewarded_ad_title">Sans publicité pendant 60 minutes</string>
     <string name="rewarded_ad_subtitle">Regardez une courte vidéo pour masquer les bannières et publicités de transition pendant une heure.</string>
     <string name="rewarded_ad_result_action">Regarder une courte vidéo pour 60 minutes sans publicité</string>
     <string name="rewarded_ad_earned">Le mode sans publicité est actif pendant 60 minutes.</string>
-    <string name="rewarded_ad_unavailable">La vidéo n&apos;est pas encore prête. Réessayez dans un instant.</string>
+    <string name="rewarded_ad_unavailable">La vidéo n\'est pas encore prête. Réessayez dans un instant.</string>
     <string name="ad_free_active_title">Le mode sans publicité est actif</string>
     <string name="ad_free_active_subtitle">Il reste %1$d minutes. Les bannières et publicités de transition sont masquées.</string>
 </resources>
