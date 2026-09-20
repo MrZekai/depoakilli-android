@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="app_name">Smart Cleaner</string>
     <string name="app_tagline">БЫСТРО • ПОД КОНТРОЛЕМ • НА УСТРОЙСТВЕ</string>
     <string name="rewarded_ad_title">Без рекламы 60 минут</string>
