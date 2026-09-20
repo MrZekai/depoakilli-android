@@ -88,6 +88,8 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 - No ad should cover a cleanup confirmation, system permission rationale, selection checkbox or primary cleaner CTA.
 - Return from All Files Access, Usage Access, Deep Cache system action, language settings and uninstall confirmation. The app must resume immediately without a foreground-return advertisement.
 - Confirm the cleanup result shows either its Native ad or the intentional MREC fallback, never a stacked result ad plus Interstitial for the same cleanup.
+- In an EEA test session, reject consent and confirm the in-app advertising privacy control remains visible and reopens the UMP privacy-options form.
+- With the official rewarded demo ID, finish a rewarded video and confirm the 60-minute ad-free state hides banners and suppresses the post-cleanup Interstitial. Close a rewarded video early and confirm no reward is granted.
 
 ## 12. Regression / release gate
 

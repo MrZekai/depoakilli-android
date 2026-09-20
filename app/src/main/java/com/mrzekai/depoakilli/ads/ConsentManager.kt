@@ -15,11 +15,10 @@ class ConsentManager(context: Context) {
     private val consentInformation = UserMessagingPlatform.getConsentInformation(context)
     private val initialized = AtomicBoolean(false)
     private val _canRequestAds = MutableStateFlow(false)
+    private val _privacyOptionsRequired = MutableStateFlow(false)
 
     val canRequestAds: StateFlow<Boolean> = _canRequestAds.asStateFlow()
-    val privacyOptionsRequired: Boolean
-        get() = consentInformation.privacyOptionsRequirementStatus ==
-            ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
+    val privacyOptionsRequired: StateFlow<Boolean> = _privacyOptionsRequired.asStateFlow()
 
     fun gatherConsent(activity: Activity) {
         val parameters = ConsentRequestParameters.Builder()
@@ -50,6 +49,9 @@ class ConsentManager(context: Context) {
     private fun updateAdsState(context: Context) {
         val allowed = consentInformation.canRequestAds()
         _canRequestAds.value = allowed
+        _privacyOptionsRequired.value =
+            consentInformation.privacyOptionsRequirementStatus ==
+                ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED
         if (allowed && initialized.compareAndSet(false, true)) {
             Thread {
                 MobileAds.initialize(context) { }

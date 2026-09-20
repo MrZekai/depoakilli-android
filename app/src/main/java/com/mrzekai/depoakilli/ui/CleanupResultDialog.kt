@@ -51,6 +51,8 @@ import com.mrzekai.depoakilli.ui.theme.Lime400
 internal fun CleanupResultDialog(
     result: CleanupResult,
     canRequestAds: Boolean,
+    showRewardedOffer: Boolean,
+    onShowRewardedAd: () -> Unit,
     onSystemDismiss: () -> Unit,
     onDone: (resultAdPresented: Boolean) -> Unit,
 ) {
@@ -227,6 +229,15 @@ internal fun CleanupResultDialog(
                         lineHeight = 15.sp,
                         textAlign = TextAlign.Center,
                     )
+
+                    if (showRewardedOffer) {
+                        TextButton(onClick = onShowRewardedAd) {
+                            Text(
+                                stringResource(R.string.rewarded_ad_result_action),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
 
                     CleanupResultAdSurface(
                         canRequestAds = canRequestAds,

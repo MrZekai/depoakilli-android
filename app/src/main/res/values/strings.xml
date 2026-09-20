@@ -695,4 +695,11 @@ Smart Cleaner does not claim to kill protected third-party apps, boost device-wi
     <string name="storage_change_create_baseline">Create first measurement</string>
     <string name="storage_change_analysis_scope">Runs a real shared-storage analysis and saves a new snapshot for Storage Change. No cleanup is performed by this action.</string>
     <string name="storage_change_progress">%1$d files • %2$d folders scanned</string>
+    <string name="rewarded_ad_title">Ad-free for 60 minutes</string>
+    <string name="rewarded_ad_subtitle">Watch a short video to hide banner and transition ads for one hour.</string>
+    <string name="rewarded_ad_result_action">Watch a short video for 60 ad-free minutes</string>
+    <string name="rewarded_ad_earned">Ad-free time is active for 60 minutes.</string>
+    <string name="rewarded_ad_unavailable">The video is not ready yet. Please try again in a moment.</string>
+    <string name="ad_free_active_title">Ad-free time is active</string>
+    <string name="ad_free_active_subtitle">%1$d minutes remaining. Banner and transition ads are hidden.</string>
 </resources>

@@ -131,6 +131,7 @@ fun CleanerApp(
     canRequestAds: Boolean,
     fullScreenAdActive: Boolean,
     privacyOptionsRequired: Boolean,
+    adFreeRemainingMillis: Long,
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onClearAllAppCaches: () -> Unit,
@@ -142,6 +143,7 @@ fun CleanerApp(
     onUninstallApp: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
+    onShowRewardedAd: () -> Unit,
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
@@ -287,7 +289,8 @@ fun CleanerApp(
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
                     !state.cleanupInProgress &&
-                    state.cleanupResult == null
+                    state.cleanupResult == null &&
+                    adFreeRemainingMillis <= 0L
 
             if (detailScreen == null) {
                 Column(
@@ -404,11 +407,14 @@ fun CleanerApp(
 
             DetailScreen.SETTINGS -> SettingsDetailScreen(
                 privacyOptionsRequired = privacyOptionsRequired,
+                canRequestAds = canRequestAds,
+                adFreeRemainingMillis = adFreeRemainingMillis,
                 onOpenLanguageSettings = onOpenLanguageSettings,
                 onRateApp = onRateApp,
                 onSendFeedback = onSendFeedback,
                 onShareApp = onShareApp,
                 onShowPrivacyOptions = onShowPrivacyOptions,
+                onShowRewardedAd = onShowRewardedAd,
                 onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                 onOpenLegalPage = ::openLegalPage,
                 modifier = Modifier.padding(padding),
@@ -494,11 +500,14 @@ fun CleanerApp(
 
                 AppTab.ME -> SettingsDetailScreen(
                     privacyOptionsRequired = privacyOptionsRequired,
+                    canRequestAds = canRequestAds,
+                    adFreeRemainingMillis = adFreeRemainingMillis,
                     onOpenLanguageSettings = onOpenLanguageSettings,
                     onRateApp = onRateApp,
                     onSendFeedback = onSendFeedback,
                     onShareApp = onShareApp,
                     onShowPrivacyOptions = onShowPrivacyOptions,
+                    onShowRewardedAd = onShowRewardedAd,
                     onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                     onOpenLegalPage = ::openLegalPage,
                     modifier = Modifier.padding(padding),
@@ -586,6 +595,8 @@ fun CleanerApp(
             CleanupResultDialog(
                 result = result,
                 canRequestAds = canRequestAds,
+                showRewardedOffer = canRequestAds && adFreeRemainingMillis <= 0L,
+                onShowRewardedAd = onShowRewardedAd,
                 onSystemDismiss = {
                     dismissResultAndReturn()
                 },

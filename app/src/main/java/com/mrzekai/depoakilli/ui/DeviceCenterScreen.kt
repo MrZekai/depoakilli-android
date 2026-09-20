@@ -456,11 +456,14 @@ private fun AppManagerRow(app: InstalledAppEntry, onUninstallApp: (String) -> Un
 @Composable
 internal fun SettingsDetailScreen(
     privacyOptionsRequired: Boolean,
+    canRequestAds: Boolean,
+    adFreeRemainingMillis: Long,
     onOpenLanguageSettings: () -> Unit,
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
+    onShowRewardedAd: () -> Unit,
     onOpenPrivacyAccess: () -> Unit,
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
@@ -477,6 +480,28 @@ internal fun SettingsDetailScreen(
                 icon = Icons.Outlined.Security,
                 onClick = onOpenPrivacyAccess,
             )
+        }
+        if (canRequestAds && adFreeRemainingMillis <= 0L) {
+            item {
+                SettingsActionRow(
+                    title = stringResource(R.string.rewarded_ad_title),
+                    subtitle = stringResource(R.string.rewarded_ad_subtitle),
+                    icon = Icons.Outlined.AutoAwesome,
+                    onClick = onShowRewardedAd,
+                )
+            }
+        }
+        if (adFreeRemainingMillis > 0L) {
+            item {
+                SettingsInfoRow(
+                    title = stringResource(R.string.ad_free_active_title),
+                    subtitle = stringResource(
+                        R.string.ad_free_active_subtitle,
+                        ((adFreeRemainingMillis + 59_999L) / 60_000L).toInt(),
+                    ),
+                    icon = Icons.Outlined.AutoAwesome,
+                )
+            }
         }
         item {
             SettingsActionRow(
@@ -544,6 +569,22 @@ private fun SettingsActionRow(title: String, subtitle: String, icon: ImageVector
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+private fun SettingsInfoRow(title: String, subtitle: String, icon: ImageVector) {
+    Card(shape = RoundedCornerShape(20.dp)) {
+        Row(Modifier.fillMaxWidth().padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(color = ElectricBlue.copy(alpha = .12f), shape = CircleShape) {
+                Icon(icon, contentDescription = null, tint = ElectricBlue, modifier = Modifier.padding(10.dp))
+            }
+            Spacer(Modifier.width(13.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.Bold)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
     }
 }

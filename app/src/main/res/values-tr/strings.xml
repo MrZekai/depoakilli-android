@@ -695,4 +695,11 @@ Akıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığın�
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>
     <string name="storage_change_progress">%1$d dosya • %2$d klasör tarandı</string>
+    <string name="rewarded_ad_title">60 dakika reklamsız kullanım</string>
+    <string name="rewarded_ad_subtitle">Kısa bir video izle; banner ve geçiş reklamları bir saat gizlensin.</string>
+    <string name="rewarded_ad_result_action">60 dakika reklamsız kullanım için kısa video izle</string>
+    <string name="rewarded_ad_earned">60 dakika boyunca reklamsız kullanım aktif.</string>
+    <string name="rewarded_ad_unavailable">Video henüz hazır değil. Lütfen biraz sonra tekrar dene.</string>
+    <string name="ad_free_active_title">Reklamsız kullanım aktif</string>
+    <string name="ad_free_active_subtitle">%1$d dakika kaldı. Banner ve geçiş reklamları gizlendi.</string>
 </resources>

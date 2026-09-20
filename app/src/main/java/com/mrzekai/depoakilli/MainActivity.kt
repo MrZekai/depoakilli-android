@@ -17,8 +17,10 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mrzekai.depoakilli.ads.AdFreeWindowStore
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.InterstitialAdController
+import com.mrzekai.depoakilli.ads.RewardedAdController
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.CleanerApp
@@ -29,6 +31,8 @@ class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
+    private lateinit var rewardedAds: RewardedAdController
+    private lateinit var adFreeWindow: AdFreeWindowStore
     private var pendingDeepCacheAfterStorageAccess = false
 
     private val allFilesAccessLauncher = registerForActivityResult(
@@ -84,14 +88,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         consentManager = ConsentManager(applicationContext)
         interstitialAds = InterstitialAdController(applicationContext)
+        rewardedAds = RewardedAdController(applicationContext)
+        adFreeWindow = AdFreeWindowStore(applicationContext)
         consentManager.gatherConsent(this)
 
         setContent {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
+            val privacyOptionsRequired by consentManager.privacyOptionsRequired.collectAsStateWithLifecycle()
+            val adFreeRemainingMillis by adFreeWindow.remainingMillis.collectAsStateWithLifecycle()
             val app = application as DepoAkilliApplication
             val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
             LaunchedEffect(canRequestAds) {
                 interstitialAds.setAdsAllowed(canRequestAds)
+                rewardedAds.setAdsAllowed(canRequestAds)
             }
 
             DepoAkilliTheme {
@@ -99,7 +108,8 @@ class MainActivity : ComponentActivity() {
                     viewModel = cleanerViewModel,
                     canRequestAds = canRequestAds && !fullScreenAdActive,
                     fullScreenAdActive = fullScreenAdActive,
-                    privacyOptionsRequired = consentManager.privacyOptionsRequired,
+                    privacyOptionsRequired = privacyOptionsRequired,
+                    adFreeRemainingMillis = adFreeRemainingMillis,
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
@@ -111,6 +121,7 @@ class MainActivity : ComponentActivity() {
                     onUninstallApp = ::uninstallApp,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
+                    onShowRewardedAd = ::showRewardedAd,
                     onRateApp = ::rateApp,
                     onSendFeedback = ::sendFeedback,
                     onShareApp = ::shareApp,
@@ -124,10 +135,13 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
+        if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
+        if (::adFreeWindow.isInitialized) adFreeWindow.refresh()
     }
 
     override fun onPause() {
         if (::interstitialAds.isInitialized) interstitialAds.onHostPaused(this)
+        if (::rewardedAds.isInitialized) rewardedAds.onHostPaused(this)
         super.onPause()
     }
 
@@ -139,6 +153,7 @@ class MainActivity : ComponentActivity() {
             (application as DepoAkilliApplication).isSystemUnderMemoryPressure()
         ) {
             interstitialAds.releaseCachedAd()
+            if (::rewardedAds.isInitialized) rewardedAds.releaseCachedAd()
         }
     }
 
@@ -167,6 +182,10 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
+        if (::adFreeWindow.isInitialized && adFreeWindow.isActiveNow()) {
+            onFinished()
+            return
+        }
         val app = application as DepoAkilliApplication
 
         // Short neutral settle surface prevents the cleanup-confirm tap from
@@ -337,6 +356,20 @@ class MainActivity : ComponentActivity() {
 
     private fun showPrivacyOptions() {
         consentManager.showPrivacyOptions(this)
+    }
+
+    private fun showRewardedAd() {
+        if (adFreeWindow.isActiveNow()) return
+        rewardedAds.show(
+            activity = this,
+            onWillShow = { (application as DepoAkilliApplication).beginInterstitialSurface() },
+            onUserEarnedReward = {
+                adFreeWindow.grant()
+                cleanerViewModel.showMessage(R.string.rewarded_ad_earned)
+            },
+            onFinished = { (application as DepoAkilliApplication).endInterstitialSurface() },
+            onUnavailable = { cleanerViewModel.showMessage(R.string.rewarded_ad_unavailable) },
+        )
     }
 
     private fun startFirstAvailable(vararg intents: Intent) {

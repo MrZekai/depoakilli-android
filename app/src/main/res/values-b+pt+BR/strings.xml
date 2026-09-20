@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Smart Cleaner</string>
+    <string name="app_tagline">RÁPIDO • CONTROLADO • NO DISPOSITIVO</string>
+    <string name="rewarded_ad_title">Sem anúncios por 60 minutos</string>
+    <string name="rewarded_ad_subtitle">Assista a um vídeo curto para ocultar anúncios de banner e transição por uma hora.</string>
+    <string name="rewarded_ad_result_action">Assista a um vídeo curto para 60 minutos sem anúncios</string>
+    <string name="rewarded_ad_earned">O período sem anúncios está ativo por 60 minutos.</string>
+    <string name="rewarded_ad_unavailable">O vídeo ainda não está pronto. Tente novamente em instantes.</string>
+    <string name="ad_free_active_title">O período sem anúncios está ativo</string>
+    <string name="ad_free_active_subtitle">Restam %1$d minutos. Anúncios de banner e transição estão ocultos.</string>
+</resources>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Smart Cleaner</string>
+    <string name="app_tagline">CEPAT • TERKONTROL • DI PERANGKAT</string>
+    <string name="rewarded_ad_title">Bebas iklan selama 60 menit</string>
+    <string name="rewarded_ad_subtitle">Tonton video singkat untuk menyembunyikan iklan banner dan transisi selama satu jam.</string>
+    <string name="rewarded_ad_result_action">Tonton video singkat untuk 60 menit bebas iklan</string>
+    <string name="rewarded_ad_earned">Waktu bebas iklan aktif selama 60 menit.</string>
+    <string name="rewarded_ad_unavailable">Video belum siap. Coba lagi sebentar lagi.</string>
+    <string name="ad_free_active_title">Waktu bebas iklan aktif</string>
+    <string name="ad_free_active_subtitle">Tersisa %1$d menit. Iklan banner dan transisi disembunyikan.</string>
+</resources>
