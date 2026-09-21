@@ -3,6 +3,7 @@ package com.mrzekai.depoakilli
 import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
+import com.mrzekai.depoakilli.ads.AdFreeWindowStore
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
 import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class DepoAkilliApplication : Application() {
+    val adFreeWindow: AdFreeWindowStore by lazy { AdFreeWindowStore(this) }
     private val _fullScreenAdSurfaceActive = MutableStateFlow(false)
     val fullScreenAdSurfaceActive: StateFlow<Boolean> = _fullScreenAdSurfaceActive.asStateFlow()
 
