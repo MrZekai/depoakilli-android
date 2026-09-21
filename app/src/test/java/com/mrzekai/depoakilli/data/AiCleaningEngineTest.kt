@@ -211,6 +211,19 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `android media whatsapp statuses classify as whatsapp media`() {
+        val paths = listOf(
+            "Android/media/com.whatsapp/WhatsApp/Media/.Statuses/",
+            "Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses/",
+        )
+
+        for (path in paths) {
+            val result = engine.assess(file("status.jpg", "image/jpeg", 1, path))
+            assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
+        }
+    }
+
+    @Test
     fun `old whatsapp sent media is visible but not preselected`() {
         val result = engine.assess(
             file(
