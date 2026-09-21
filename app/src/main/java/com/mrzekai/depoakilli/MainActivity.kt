@@ -17,7 +17,6 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mrzekai.depoakilli.ads.AdFreeWindowStore
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.ads.RewardedAdController
@@ -32,7 +31,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
     private lateinit var rewardedAds: RewardedAdController
-    private lateinit var adFreeWindow: AdFreeWindowStore
     private var pendingDeepCacheAfterStorageAccess = false
 
     private val allFilesAccessLauncher = registerForActivityResult(
@@ -89,18 +87,19 @@ class MainActivity : ComponentActivity() {
         consentManager = ConsentManager(applicationContext)
         interstitialAds = InterstitialAdController(applicationContext)
         rewardedAds = RewardedAdController(applicationContext)
-        adFreeWindow = AdFreeWindowStore(applicationContext)
         consentManager.gatherConsent(this)
 
         setContent {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
             val privacyOptionsRequired by consentManager.privacyOptionsRequired.collectAsStateWithLifecycle()
-            val adFreeRemainingMillis by adFreeWindow.remainingMillis.collectAsStateWithLifecycle()
             val app = application as DepoAkilliApplication
+            val adFreeRemainingMillis by app.adFreeWindow.remainingMillis.collectAsStateWithLifecycle()
+            val rewardedReady by rewardedAds.isReady.collectAsStateWithLifecycle()
             val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
-            LaunchedEffect(canRequestAds) {
-                interstitialAds.setAdsAllowed(canRequestAds)
-                rewardedAds.setAdsAllowed(canRequestAds)
+            val adFreeActive = adFreeRemainingMillis > 0L
+            LaunchedEffect(canRequestAds, adFreeActive) {
+                interstitialAds.setAdsAllowed(canRequestAds && !adFreeActive)
+                rewardedAds.setAdsAllowed(canRequestAds && !adFreeActive)
             }
 
             DepoAkilliTheme {
@@ -116,6 +115,7 @@ class MainActivity : ComponentActivity() {
                     fullScreenAdActive = fullScreenAdActive,
                     privacyOptionsRequired = privacyOptionsRequired,
                     adFreeRemainingMillis = adFreeRemainingMillis,
+                    rewardedAdReady = rewardedReady,
                     onRequestAllFilesAccess = ::requestAllFilesAccess,
                     onRequestUsageAccess = ::requestUsageAccess,
                     onClearAllAppCaches = ::requestDeepCacheCleanup,
@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
         if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
-        if (::adFreeWindow.isInitialized) adFreeWindow.refresh()
+        (application as DepoAkilliApplication).adFreeWindow.refresh()
     }
 
     override fun onPause() {
@@ -188,7 +188,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
-        if (::adFreeWindow.isInitialized && adFreeWindow.isActiveNow()) {
+        if ((application as DepoAkilliApplication).adFreeWindow.isActiveNow()) {
             onFinished()
             return
         }
@@ -365,6 +365,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showRewardedAd() {
+        val adFreeWindow = (application as DepoAkilliApplication).adFreeWindow
         if (adFreeWindow.isActiveNow()) return
         rewardedAds.show(
             activity = this,
