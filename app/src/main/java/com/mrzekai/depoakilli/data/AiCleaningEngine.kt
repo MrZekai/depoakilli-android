@@ -23,7 +23,7 @@ class AiCleaningEngine(
         val name = StoragePathRules.normalizeText(file.name)
         val mime = StoragePathRules.normalizeText(file.mimeType)
 
-        val isWhatsApp = path.contains("whatsapp")
+        val isWhatsApp = isWhatsAppSharedMediaPath(path)
         val isWhatsAppStatus = isWhatsApp && path.contains("/.statuses/")
         val isWhatsAppSent = isWhatsApp && (path.contains("/sent/") || path.endsWith("/sent"))
         if (isWhatsAppStatus || (isWhatsAppSent && ageDays >= 30)) {
@@ -46,18 +46,24 @@ class AiCleaningEngine(
                     R.string.reason_temporary_file
                 },
                 reasonArgs = listOf(ageDays),
-                recommended = true,
+                // Interrupted downloads can contain a user's still-needed work.
+                // Surface them for review, but never preselect them for deletion.
+                recommended = !isInterruptedDownload(name),
             )
         }
 
         if (name.endsWith(".apk") || mime == APK_MIME) {
-            val oldEnough = ageDays >= 7
+            // APK archives are frequently retained deliberately. They remain
+            // discoverable after seven days, but only become a safe default
+            // selection after a full month.
+            val installerIsOld = ageDays >= OLD_INSTALLER_DAYS
+            val autoSelect = ageDays >= APK_AUTO_SELECT_DAYS
             return AiAssessment(
                 category = CleanCategory.APK_PACKAGE,
-                safetyScore = if (ageDays >= 30) 96 else if (oldEnough) 91 else 70,
-                reasonRes = if (oldEnough) R.string.reason_old_installer else R.string.reason_downloaded_installer,
-                reasonArgs = if (oldEnough) listOf(ageDays) else emptyList(),
-                recommended = oldEnough,
+                safetyScore = if (autoSelect) 96 else if (installerIsOld) 91 else 70,
+                reasonRes = if (installerIsOld) R.string.reason_old_installer else R.string.reason_downloaded_installer,
+                reasonArgs = if (installerIsOld) listOf(ageDays) else emptyList(),
+                recommended = autoSelect,
             )
         }
 
@@ -109,7 +115,7 @@ class AiCleaningEngine(
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
 
-        val isWhatsAppSent = path.contains("whatsapp") &&
+        val isWhatsAppSent = isWhatsAppSharedMediaPath(path) &&
             (path.contains("/sent/") || path.endsWith("/sent"))
         if (isWhatsAppSent && ageDays >= DEEP_WHATSAPP_SENT_DAYS) {
             return AiAssessment(
@@ -219,6 +225,15 @@ class AiCleaningEngine(
         return tempExtension || generatedThumbnail || tempFolder || knownTinyArtifact
     }
 
+    private fun isInterruptedDownload(name: String): Boolean =
+        INTERRUPTED_DOWNLOAD_EXTENSIONS.any(name::endsWith)
+
+    private fun isWhatsAppSharedMediaPath(path: String): Boolean =
+        path.contains("/android/media/com.whatsapp/") ||
+            path.contains("/android/media/com.whatsapp.w4b/") ||
+            path.startsWith("/whatsapp/") ||
+            path.startsWith("/whatsapp business/")
+
     private fun ageDays(modifiedAtMillis: Long): Long {
         if (modifiedAtMillis <= 0L) return 0
         return TimeUnit.MILLISECONDS.toDays((nowMillis() - modifiedAtMillis).coerceAtLeast(0))
@@ -232,6 +247,9 @@ class AiCleaningEngine(
         private const val DEEP_DOWNLOAD_DAYS = 30L
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L
         private const val TEMP_MIN_AGE_DAYS = 3L
+        private const val OLD_INSTALLER_DAYS = 7L
+        private const val APK_AUTO_SELECT_DAYS = 30L
         private val TEMP_EXTENSIONS = listOf(".tmp", ".temp", ".part", ".crdownload", ".download", ".cache")
+        private val INTERRUPTED_DOWNLOAD_EXTENSIONS = listOf(".part", ".crdownload", ".download")
     }
 }
