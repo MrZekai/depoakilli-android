@@ -88,7 +88,7 @@ jobs:
         run: |
           rm -rf qa-apk-artifact qa-diagnostics-artifact
           mkdir -p qa-apk-artifact qa-diagnostics-artifact/audit
-          cp app/build/outputs/apk/qa/app-qa.apk qa-apk-artifact/SmartCleaner-QA-v39.apk
+          cp app/build/outputs/apk/qa/app-qa.apk qa-apk-artifact/SmartCleaner-QA-v40.apk
           cp app/build/outputs/mapping/qa/mapping.txt qa-diagnostics-artifact/mapping.txt
           cp -R app/build/reports/qa-apk-audit/. qa-diagnostics-artifact/audit/
 
@@ -97,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: SmartCleaner-QA-APK-${{ github.run_number }}
-          path: qa-apk-artifact/SmartCleaner-QA-v39.apk
+          path: qa-apk-artifact/SmartCleaner-QA-v40.apk
           if-no-files-found: warn
           retention-days: 14
 
