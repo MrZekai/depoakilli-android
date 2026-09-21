@@ -27,7 +27,7 @@ def read(relative: str) -> str:
 
 
 # ------------------------------------------------------------------
-# Required project surface for the v39 Play closed-test candidate.
+# Required project surface for the v40 Play closed-test candidate.
 # Deliberately excludes MemoryOptimizationResultDialog.kt.
 # ------------------------------------------------------------------
 required = [
@@ -78,7 +78,7 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V39.md",
+    "docs/CLOSED_TEST_RELEASE_V40.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -132,8 +132,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 39",
-    'versionName = "0.5.18-closedtest1"',
+    "versionCode = 40",
+    'versionName = "0.5.19-closedtest2"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1170,7 +1170,7 @@ for expected in (
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
 
-# v39 accidental-click safety: the gap between the sponsored surface and the
+# v40 accidental-click safety: the gap between the sponsored surface and the
 # primary action must be constant, so the Done button cannot move downwards at
 # the moment the result ad finishes loading.
 if "if (resultAdPresented) {" in cleanup_dialog:
@@ -1242,10 +1242,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v39",
-    "SmartCleaner-CLOSED-TEST-APK-v39",
-    "SmartCleaner-ClosedTest-Diagnostics-v39",
-    "SmartCleaner-ClosedTest-v39.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v40",
+    "SmartCleaner-CLOSED-TEST-APK-v40",
+    "SmartCleaner-ClosedTest-Diagnostics-v40",
+    "SmartCleaner-ClosedTest-v40.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1254,8 +1254,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "0.5.18-closedtest1",
-    "versionCode='39'",
+    "0.5.19-closedtest2",
+    "versionCode='40'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1308,9 +1308,9 @@ for expected in ("apksigner", "apksigner.bat", "apksigner.exe"):
         errors.append(f"QA signing verifier is missing cross-platform tool support: {expected}")
 
 # ------------------------------------------------------------------
-# v39 build-environment contract.
+# v40 build-environment contract.
 #
-# Root cause of the v39 BUILD FAILED: Gradle 8.13 embeds Kotlin 2.0.21, whose
+# Root cause of the v40 BUILD FAILED: Gradle 8.13 embeds Kotlin 2.0.21, whose
 # bundled IntelliJ JavaVersion parser rejects Java 25+ while compiling
 # settings.gradle.kts ("IllegalArgumentException: 25.0.4"). The daemon must run
 # on Java 17 regardless of which JVM launched the wrapper.
@@ -1351,7 +1351,7 @@ if "local.properties" not in gitignore:
     errors.append("local.properties must stay git-ignored")
 
 # ------------------------------------------------------------------
-# v39 destructive-path safety.
+# v40 destructive-path safety.
 # ------------------------------------------------------------------
 for expected in (
     "visitedDirectoryPaths",
@@ -1361,7 +1361,7 @@ for expected in (
     "isDeletableSharedStorageFile",
 ):
     if expected not in repository:
-        errors.append(f"missing v39 storage-safety invariant: {expected}")
+        errors.append(f"missing v40 storage-safety invariant: {expected}")
 
 delete_start = repository.find("private fun deleteUriDirectly(")
 if delete_start < 0:
@@ -1377,7 +1377,7 @@ for expected in (
     "CancellationException",
 ):
     if expected not in view_model:
-        errors.append(f"missing v39 ViewModel main-thread/cancellation invariant: {expected}")
+        errors.append(f"missing v40 ViewModel main-thread/cancellation invariant: {expected}")
 
 for forbidden in (
     "= repository.storageSnapshot()",
@@ -1402,4 +1402,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.18-closedtest1 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v0.5.19-closedtest2 closed-test + slim-QA invariants are valid.")
