@@ -330,7 +330,7 @@ class DeviceRepository(
             scannedFileCount = indexed.size,
             scannedBytes = indexed.sumOf(IndexedFile::sizeBytes),
             limitedAccess = false,
-            scanLimitReached = indexed.size >= MAX_INDEXED_FILES,
+            scanLimitReached = indexed.size >= indexedFileLimit(),
             storageTypes = storageTypeStats(indexed),
             storagePreviews = storageTypePreviews(indexed),
             smartMediaTypes = smartMediaTypeStats(indexed),
@@ -373,8 +373,8 @@ class DeviceRepository(
             items = typed,
             scannedFileCount = typedFiles.size,
             scanLimitReached =
-                indexed.size >= MAX_INDEXED_FILES ||
-                    typedFiles.size > MAX_STORAGE_REVIEW_ITEMS,
+                indexed.size >= indexedFileLimit() ||
+                    typedFiles.size > storageReviewItemLimit(),
             loading = false,
         )
     }
@@ -752,7 +752,7 @@ class DeviceRepository(
         } ?: return false
         val rootPath = canonicalPathOf(root).trimEnd('/')
         val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
-        return !relative.startsWith("/android/data/") && !relative.startsWith("/android/obb/")
+        return !StoragePathRules.isProtectedAppPrivatePath(relative)
     }
 
     @Suppress("DEPRECATION")
@@ -771,9 +771,7 @@ class DeviceRepository(
             runCatching { directory.relativeTo(root).invariantSeparatorsPath }
                 .getOrDefault(directory.invariantSeparatorsPath),
         )
-        if (relative == "/android/data/" || relative.startsWith("/android/data/")) return true
-        if (relative == "/android/obb/" || relative.startsWith("/android/obb/")) return true
-        return false
+        return StoragePathRules.isProtectedAppPrivatePath(relative)
     }
 
     private fun whatsappRootPairs(): List<Pair<File, File>> = buildList {
@@ -809,7 +807,12 @@ class DeviceRepository(
                 .filter { it.size > 1 }
             for (sameSampleFiles in sampleGroups) {
                 coroutineContext.ensureActive()
-                val contentGroups = sameSampleFiles
+            val contentGroups = sameSampleFiles
+                    // Reading a multi-gigabyte video end to end on every scan
+                    // can freeze a low-end phone. The sample fingerprint still
+                    // surfaces it as a review candidate, but exact auto-clean
+                    // is reserved for files with a bounded verification cost.
+                    .filter { it.sizeBytes <= MAX_FULL_HASH_BYTES }
                     .mapNotNull { file -> fingerprint(file)?.let { it to file } }
                     .groupBy({ it.first }, { it.second })
                     .values
@@ -1087,10 +1090,15 @@ class DeviceRepository(
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
+        // A review list is rebuilt when a checkbox is toggled. Keep the
+        // interactive surface bounded even on high-memory devices so a single
+        // tap cannot allocate and recompose tens of thousands of rows.
+        private const val MAX_SELECTABLE_STORAGE_REVIEW_ITEMS = 10_000
         private const val MAX_RESULT_ITEMS = 4_000
         private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
         private const val HASH_BUFFER_BYTES = 256 * 1024
         private const val HASH_SAMPLE_BYTES = 64 * 1024
+        private const val MAX_FULL_HASH_BYTES = 1L * 1024L * 1024L * 1024L
         private const val MIN_DUPLICATE_BYTES = 32L * 1024L
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private val JUNK_CATEGORIES = setOf(
@@ -1123,7 +1131,11 @@ class DeviceRepository(
     }
 
     private fun storageReviewItemLimit(): Int =
-        minOf(MAX_STORAGE_REVIEW_ITEMS, (indexedFileLimit() / 4).coerceAtLeast(10_000))
+        minOf(
+            MAX_STORAGE_REVIEW_ITEMS,
+            MAX_SELECTABLE_STORAGE_REVIEW_ITEMS,
+            (indexedFileLimit() / 4).coerceAtLeast(10_000),
+        )
 
     private data class ScanRoot(
         val file: File,

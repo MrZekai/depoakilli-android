@@ -37,4 +37,12 @@ internal object StoragePathRules {
         val normalized = normalizePath(path)
         return downloadMarkers.any(normalized::contains)
     }
+
+    fun isProtectedAppPrivatePath(path: String): Boolean {
+        val normalized = normalizePath(path)
+        return normalized == "/android/data/" ||
+            normalized.startsWith("/android/data/") ||
+            normalized == "/android/obb/" ||
+            normalized.startsWith("/android/obb/")
+    }
 }
