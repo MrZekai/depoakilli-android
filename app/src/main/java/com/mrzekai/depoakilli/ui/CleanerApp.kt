@@ -132,6 +132,7 @@ fun CleanerApp(
     fullScreenAdActive: Boolean,
     privacyOptionsRequired: Boolean,
     adFreeRemainingMillis: Long,
+    rewardedAdReady: Boolean,
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onClearAllAppCaches: () -> Unit,
@@ -409,6 +410,7 @@ fun CleanerApp(
                 privacyOptionsRequired = privacyOptionsRequired,
                 canRequestAds = canRequestAds,
                 adFreeRemainingMillis = adFreeRemainingMillis,
+                rewardedAdReady = rewardedAdReady,
                 onOpenLanguageSettings = onOpenLanguageSettings,
                 onRateApp = onRateApp,
                 onSendFeedback = onSendFeedback,
@@ -502,6 +504,7 @@ fun CleanerApp(
                     privacyOptionsRequired = privacyOptionsRequired,
                     canRequestAds = canRequestAds,
                     adFreeRemainingMillis = adFreeRemainingMillis,
+                    rewardedAdReady = rewardedAdReady,
                     onOpenLanguageSettings = onOpenLanguageSettings,
                     onRateApp = onRateApp,
                     onSendFeedback = onSendFeedback,
@@ -595,7 +598,7 @@ fun CleanerApp(
             CleanupResultDialog(
                 result = result,
                 canRequestAds = canRequestAds,
-                showRewardedOffer = canRequestAds && adFreeRemainingMillis <= 0L,
+                showRewardedOffer = canRequestAds && adFreeRemainingMillis <= 0L && rewardedAdReady,
                 onShowRewardedAd = onShowRewardedAd,
                 onSystemDismiss = {
                     dismissResultAndReturn()
