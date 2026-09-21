@@ -182,10 +182,6 @@ android {
     lint {
         abortOnError = true
         checkDependencies = true
-        // New locale packs intentionally fall back to English while their
-        // complete, reviewed translations are prepared. Keep all other lint
-        // checks as release gates; this one is re-enabled with the full packs.
-        disable += "MissingTranslation"
         warningsAsErrors = false
         textReport = true
         textOutput = file("build/reports/lint-results-debug.txt")

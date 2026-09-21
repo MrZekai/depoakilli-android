@@ -106,7 +106,13 @@ class MainActivity : ComponentActivity() {
             DepoAkilliTheme {
                 CleanerApp(
                     viewModel = cleanerViewModel,
-                    canRequestAds = canRequestAds && !fullScreenAdActive,
+                    // A rewarded ad promises an ad-free window. Pass one
+                    // effective UI flag to every ad surface, including the
+                    // cleanup-result Native/MREC placement.
+                    canRequestAds =
+                        canRequestAds &&
+                            adFreeRemainingMillis <= 0L &&
+                            !fullScreenAdActive,
                     fullScreenAdActive = fullScreenAdActive,
                     privacyOptionsRequired = privacyOptionsRequired,
                     adFreeRemainingMillis = adFreeRemainingMillis,
