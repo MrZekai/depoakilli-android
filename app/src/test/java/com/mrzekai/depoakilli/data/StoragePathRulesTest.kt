@@ -9,6 +9,8 @@ class StoragePathRulesTest {
     fun `protected Android private directories are never candidates`() {
         assertTrue(StoragePathRules.isProtectedAppPrivatePath("Android/data/com.example.app/cache"))
         assertTrue(StoragePathRules.isProtectedAppPrivatePath("Android/obb/com.example.game/main.obb"))
+        assertTrue(StoragePathRules.isProtectedAppPrivatePath("Android/data"))
+        assertTrue(StoragePathRules.isProtectedAppPrivatePath("ANDROID/DATA/x"))
         assertFalse(StoragePathRules.isProtectedAppPrivatePath("Android/media/com.whatsapp/WhatsApp/Media"))
         assertFalse(StoragePathRules.isProtectedAppPrivatePath("Download/archive.zip"))
     }
