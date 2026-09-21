@@ -238,6 +238,7 @@ internal fun CleanupResultDialog(
                                 fontWeight = FontWeight.Bold,
                             )
                         }
+                        Spacer(Modifier.height(20.dp))
                     }
 
                     CleanupResultAdSurface(

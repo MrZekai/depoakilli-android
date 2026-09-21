@@ -807,12 +807,13 @@ class DeviceRepository(
                 .filter { it.size > 1 }
             for (sameSampleFiles in sampleGroups) {
                 coroutineContext.ensureActive()
-            val contentGroups = sameSampleFiles
-                    // Reading a multi-gigabyte video end to end on every scan
-                    // can freeze a low-end phone. The sample fingerprint still
-                    // surfaces it as a review candidate, but exact auto-clean
-                    // is reserved for files with a bounded verification cost.
-                    .filter { it.sizeBytes <= MAX_FULL_HASH_BYTES }
+                // Files at or below the full-hash ceiling are verified byte for
+                // byte. Larger sample matches remain visible as review-only
+                // candidates: their protected original is retained and no item
+                // is automatically selected without a complete hash.
+                val small = sameSampleFiles.filter { it.sizeBytes <= MAX_FULL_HASH_BYTES }
+                val large = sameSampleFiles.filter { it.sizeBytes > MAX_FULL_HASH_BYTES }
+                val contentGroups = small
                     .mapNotNull { file -> fingerprint(file)?.let { it to file } }
                     .groupBy({ it.first }, { it.second })
                     .values
@@ -822,6 +823,14 @@ class DeviceRepository(
                     val assessment = aiEngine.duplicateAssessment(decision.automaticSelectionIsSafe)
                     sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
                         duplicates += duplicate.toCleanable(assessment).copy(
+                            protectedDuplicateName = decision.keep.name,
+                        )
+                    }
+                }
+                if (large.size >= 2) {
+                    val decision = DuplicatePolicy.choose(large) ?: continue
+                    large.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
+                        duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(false)).copy(
                             protectedDuplicateName = decision.keep.name,
                         )
                     }

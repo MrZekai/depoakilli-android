@@ -458,6 +458,7 @@ internal fun SettingsDetailScreen(
     privacyOptionsRequired: Boolean,
     canRequestAds: Boolean,
     adFreeRemainingMillis: Long,
+    rewardedAdReady: Boolean,
     onOpenLanguageSettings: () -> Unit,
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
@@ -481,7 +482,7 @@ internal fun SettingsDetailScreen(
                 onClick = onOpenPrivacyAccess,
             )
         }
-        if (canRequestAds && adFreeRemainingMillis <= 0L) {
+        if (canRequestAds && adFreeRemainingMillis <= 0L && rewardedAdReady) {
             item {
                 SettingsActionRow(
                     title = stringResource(R.string.rewarded_ad_title),

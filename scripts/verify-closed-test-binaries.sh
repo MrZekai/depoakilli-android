@@ -81,8 +81,8 @@ audit_binary() {
 
   grep -q "package: name='com.mrzekai.depoakilli'" "$badging" \
     || fail "$label package mismatch"
-  grep -q "versionCode='40'" "$badging" || fail "$label versionCode mismatch"
-  grep -q "versionName='0.5.19-closedtest2'" "$badging" || fail "$label versionName mismatch"
+  grep -q "versionCode='41'" "$badging" || fail "$label versionCode mismatch"
+  grep -q "versionName='0.5.20-closedtest1'" "$badging" || fail "$label versionName mismatch"
   if grep -q "application-debuggable" "$badging"; then
     fail "$label must not be debuggable"
   fi
@@ -116,6 +116,12 @@ audit_binary() {
   if grep -Fq 'ca-app-pub-3940256099942544/9257395921' "$dex_strings"; then
     fail "$label contains the Google sample App Open ad ID"
   fi
+  if ! grep -Fq 'ca-app-pub-3940256099942544/5224354917' "$dex_strings"; then
+    fail "$label is missing Google sample Rewarded ad ID"
+  fi
+  if grep -Fq 'ca-app-pub-1380972808968213/4039180256' "$dex_strings"; then
+    fail "$label contains production Rewarded ad ID"
+  fi
   grep -Fq "$SUPPORT_EMAIL" "$dex_strings" \
     || fail "$label does not contain the configured support contact"
 }
@@ -126,7 +132,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner Play closed-test binary audit: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 0.5.19-closedtest2 (40)"
+  echo "Version: 0.5.20-closedtest1 (41)"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"

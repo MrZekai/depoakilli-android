@@ -96,6 +96,6 @@ Record device model, Android version, app version, available storage, WhatsApp/B
 - `python scripts/validate-project.py` must pass.
 - `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing, and QA binary verification must all pass in normal GitHub Actions.
 - The manual `Play Closed Test AAB + APK` workflow must pass `lintClosedTest`, `bundleClosedTest`, `assembleClosedTest`, signing comparison, and binary verification.
-- Install `SmartCleaner-ClosedTest-v40.apk` for the final direct-device check and verify `0.5.19-closedtest2` / versionCode `40` / package `com.mrzekai.depoakilli`.
-- Upload only `SmartCleaner-ClosedTest-v40.aab` to Play Console.
+- Install `SmartCleaner-ClosedTest-v41.apk` for the final direct-device check and verify `0.5.20-closedtest1` / versionCode `41` / package `com.mrzekai.depoakilli`.
+- Upload only `SmartCleaner-ClosedTest-v41.aab` to Play Console.
 - Do not promote to Production until the physical-device cases above are recorded on Android 11, 12, 13, 14, 15 and 16 where devices are available.

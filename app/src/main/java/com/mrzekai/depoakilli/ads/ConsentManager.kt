@@ -21,6 +21,7 @@ class ConsentManager(context: Context) {
     val privacyOptionsRequired: StateFlow<Boolean> = _privacyOptionsRequired.asStateFlow()
 
     fun gatherConsent(activity: Activity) {
+        updateAdsState(activity.applicationContext)
         val parameters = ConsentRequestParameters.Builder()
             .setTagForUnderAgeOfConsent(false)
             .build()

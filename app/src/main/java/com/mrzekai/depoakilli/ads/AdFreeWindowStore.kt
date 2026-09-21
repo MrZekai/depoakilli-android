@@ -16,6 +16,7 @@ class AdFreeWindowStore(context: Context) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
     private val mainHandler = Handler(Looper.getMainLooper())
     private val _remainingMillis = MutableStateFlow(0L)
+    private val expiryRunnable = Runnable { refresh() }
 
     val remainingMillis: StateFlow<Long> = _remainingMillis.asStateFlow()
 
@@ -49,26 +50,36 @@ class AdFreeWindowStore(context: Context) {
     private fun calculateRemainingMillis(): Long {
         val storedRemaining = preferences.getLong(KEY_REMAINING_AT_CHECKPOINT_MILLIS, 0L)
         val checkpointElapsed = preferences.getLong(KEY_CHECKPOINT_ELAPSED_MILLIS, 0L)
-        val nowElapsed = SystemClock.elapsedRealtime()
-
-        if (storedRemaining > 0L && checkpointElapsed > 0L && nowElapsed >= checkpointElapsed) {
-            return (storedRemaining - (nowElapsed - checkpointElapsed)).coerceAtLeast(0L)
-        }
-
-        // After a device reboot elapsedRealtime restarts. Fall back to the
-        // persisted expiry, while never granting more than one reward window.
-        return (preferences.getLong(KEY_EXPIRY_WALL_MILLIS, 0L) - System.currentTimeMillis())
-            .coerceIn(0L, REWARD_DURATION_MILLIS)
+        return calculateRemaining(
+            storedRemaining = storedRemaining,
+            checkpointElapsed = checkpointElapsed,
+            nowElapsed = SystemClock.elapsedRealtime(),
+            expiryWall = preferences.getLong(KEY_EXPIRY_WALL_MILLIS, 0L),
+            nowWall = System.currentTimeMillis(),
+        )
     }
-
-    private val expiryRunnable = Runnable { refresh() }
 
     companion object {
         const val REWARD_DURATION_MILLIS = 60L * 60L * 1000L
-        private const val MAX_TIMER_DELAY_MILLIS = 60L * 60L * 1000L
+        private const val MAX_TIMER_DELAY_MILLIS = 60_000L
         private const val PREFERENCES_NAME = "rewarded_ad_free_window"
         private const val KEY_EXPIRY_WALL_MILLIS = "expiry_wall_millis"
         private const val KEY_REMAINING_AT_CHECKPOINT_MILLIS = "remaining_at_checkpoint_millis"
         private const val KEY_CHECKPOINT_ELAPSED_MILLIS = "checkpoint_elapsed_millis"
+
+        internal fun calculateRemaining(
+            storedRemaining: Long,
+            checkpointElapsed: Long,
+            nowElapsed: Long,
+            expiryWall: Long,
+            nowWall: Long,
+        ): Long {
+            val wallBased = (expiryWall - nowWall).coerceIn(0L, REWARD_DURATION_MILLIS)
+            if (storedRemaining > 0L && checkpointElapsed > 0L && nowElapsed >= checkpointElapsed) {
+                val elapsedBased = (storedRemaining - (nowElapsed - checkpointElapsed)).coerceAtLeast(0L)
+                return minOf(elapsedBased, wallBased)
+            }
+            return wallBased
+        }
     }
 }
