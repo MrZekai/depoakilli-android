@@ -159,6 +159,7 @@
     <string name="reason_large_video">%1$d günlük büyük video</string>
     <string name="reason_old_download">%1$d gündür İndirilenler klasöründe</string>
     <string name="reason_exact_duplicate">İçerik parmak izi birebir aynı</string>
+    <string name="reason_sampled_duplicate">Muhtemel kopya: boyut ve örnekler eşleşiyor. Tam doğrulanmadı — silmeden önce karşılaştır.</string>
     <string name="reason_probable_duplicate">Boyut ve içerik örnekleri aynı</string>
     <string name="duplicate_original_kept">Korunan orijinal: %1$s</string>
     <string name="scan_limit_note">Performans için önce en eski ve en büyük dosyalar incelendi. Çok büyük arşivlerde yeniden tarama gerekebilir.</string>

@@ -194,6 +194,13 @@ class AiCleaningEngine(
         recommended = automaticSelectionIsSafe,
     )
 
+    fun sampledDuplicateAssessment(): AiAssessment = AiAssessment(
+        category = CleanCategory.DUPLICATE,
+        safetyScore = 80,
+        reasonRes = R.string.reason_sampled_duplicate,
+        recommended = false,
+    )
+
 
     private fun isScreenshot(path: String, name: String): Boolean {
         return path.contains("/screenshots/") ||

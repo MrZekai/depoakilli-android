@@ -30,6 +30,7 @@ class RewardedAdController(private val context: Context) {
     private var retryDelayMillis = INITIAL_RETRY_DELAY_MILLIS
     private val mainHandler = Handler(Looper.getMainLooper())
     private val retryRunnable = Runnable { load() }
+    private val expiryRunnable = Runnable { if (!isFresh()) { rewardedAd = null; loadedAtElapsed = 0L }; publishReady(); load() }
     private val _isReady = MutableStateFlow(false)
 
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
@@ -69,6 +70,8 @@ class RewardedAdController(private val context: Context) {
                     }
                     rewardedAd = ad
                     loadedAtElapsed = SystemClock.elapsedRealtime()
+                    mainHandler.removeCallbacks(expiryRunnable)
+                    mainHandler.postDelayed(expiryRunnable, REWARDED_TTL_MILLIS)
                     logAd("LOAD_OK", ad)
                     publishReady()
                 }
@@ -111,6 +114,7 @@ class RewardedAdController(private val context: Context) {
         rewardedAd = null
         loadedAtElapsed = 0L
         showing = true
+        mainHandler.removeCallbacks(expiryRunnable)
         publishReady()
         val completed = AtomicBoolean(false)
         fun finish(reason: String) {
@@ -167,6 +171,7 @@ class RewardedAdController(private val context: Context) {
 
     private fun clear() {
         mainHandler.removeCallbacks(retryRunnable)
+        mainHandler.removeCallbacks(expiryRunnable)
         rewardedAd = null
         loading = false
         loadedAtElapsed = 0L

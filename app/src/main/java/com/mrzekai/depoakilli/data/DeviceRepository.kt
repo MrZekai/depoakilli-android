@@ -830,7 +830,7 @@ class DeviceRepository(
                 if (large.size >= 2) {
                     val decision = DuplicatePolicy.choose(large) ?: continue
                     large.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
-                        duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(false)).copy(
+                        duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
                             protectedDuplicateName = decision.keep.name,
                         )
                     }

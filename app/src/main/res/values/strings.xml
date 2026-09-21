@@ -159,6 +159,7 @@
     <string name="reason_large_video">%1$d-day-old large video</string>
     <string name="reason_old_download">In Downloads for %1$d days</string>
     <string name="reason_exact_duplicate">Content fingerprint is an exact match</string>
+    <string name="reason_sampled_duplicate">Probable duplicate: same size and matching samples. Not fully verified — compare before deleting.</string>
     <string name="reason_probable_duplicate">Size and content samples match</string>
     <string name="duplicate_original_kept">Protected original: %1$s</string>
     <string name="scan_limit_note">For performance, the oldest and largest files were reviewed first. Very large libraries may require another scan.</string>

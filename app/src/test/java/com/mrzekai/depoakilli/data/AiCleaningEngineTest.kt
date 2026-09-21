@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.data
 
+import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.IndexedFile
 import java.util.Locale
@@ -250,6 +251,15 @@ class AiCleaningEngineTest {
         )
 
         assertNull(result)
+    }
+
+    @Test
+    fun `sampled duplicate assessment is review only with the sampled reason`() {
+        val result = engine.sampledDuplicateAssessment()
+
+        assertEquals(CleanCategory.DUPLICATE, result.category)
+        assertFalse(result.recommended)
+        assertEquals(R.string.reason_sampled_duplicate, result.reasonRes)
     }
 
     private fun file(
