@@ -363,7 +363,7 @@ class DeviceRepository(
         val typed = typedFiles
             .asSequence()
             .sortedByDescending(IndexedFile::sizeBytes)
-            .take(MAX_STORAGE_REVIEW_ITEMS)
+            .take(storageReviewItemLimit())
             .map { StorageReviewItem(file = it, selected = false) }
             .toList()
 
@@ -568,12 +568,12 @@ class DeviceRepository(
     private suspend fun indexSharedStorage(
         onTraversalProgress: (visitedDirectories: Int, discoveredFiles: Int) -> Unit,
     ): List<IndexedFile> {
-        val roots = sharedStorageRoots()
+        val roots = sharedStorageRoots().mapNotNull(::scanRoot)
         if (roots.isEmpty()) return emptyList()
 
         val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<Pair<File, File>>()
-        roots.forEach { root -> pending.addLast(root to root) }
+        val pending = ArrayDeque<Pair<ScanRoot, File>>()
+        roots.forEach { root -> pending.addLast(root to root.file) }
         // Shared storage can contain symlinks and bind mounts (vendor "internal
         // storage" aliases, user-created links). Without a canonical-path guard
         // the traversal can loop indefinitely and, worse, index one physical file
@@ -586,10 +586,11 @@ class DeviceRepository(
         var lastProgressFiles = 0
         var lastProgressAt = 0L
 
-        while (pending.isNotEmpty() && output.size < MAX_INDEXED_FILES) {
+        val indexedFileLimit = indexedFileLimit()
+        while (pending.isNotEmpty() && output.size < indexedFileLimit) {
             coroutineContext.ensureActive()
             val (root, directory) = pending.removeFirst()
-            val directoryPath = canonicalPathWithinRoot(root, directory) ?: continue
+            val directoryPath = canonicalPathWithinRoot(root.canonicalPath, directory) ?: continue
             if (!visitedDirectoryPaths.add(directoryPath)) continue
             visitedDirectories++
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
@@ -598,18 +599,18 @@ class DeviceRepository(
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
                     if (
-                        canonicalPathWithinRoot(root, child) != null &&
-                        !shouldSkipDirectory(root, child)
+                        canonicalPathWithinRoot(root.canonicalPath, child) != null &&
+                        !shouldSkipDirectory(root.file, child)
                     ) {
                         pending.addLast(root to child)
                     }
                 } else if (child.isFile) {
-                    val filePath = canonicalPathWithinRoot(root, child) ?: continue
+                    val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
                     if (!visitedFilePaths.add(filePath)) continue
                     val size = child.length().coerceAtLeast(0L)
                     if (size <= 0L) continue
-                    output += indexedFile(root, child)
-                    if (output.size >= MAX_INDEXED_FILES) break
+                    output += indexedFile(root.file, child)
+                    if (output.size >= indexedFileLimit) break
                 }
             }
 
@@ -634,11 +635,13 @@ class DeviceRepository(
     private suspend fun indexWhatsAppFiles(
         onDiscovered: (Int) -> Unit,
     ): List<IndexedFile> {
-        val rootPairs = whatsappRootPairs()
+        val rootPairs = whatsappRootPairs().mapNotNull { (storageRoot, mediaRoot) ->
+            scanRoot(storageRoot)?.let { it to mediaRoot }
+        }
         if (rootPairs.isEmpty()) return emptyList()
 
         val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<Pair<File, File>>()
+        val pending = ArrayDeque<Pair<ScanRoot, File>>()
         rootPairs.forEach(pending::addLast)
         val visitedDirectories = hashSetOf<String>()
         val visitedFiles = hashSetOf<String>()
@@ -646,20 +649,20 @@ class DeviceRepository(
         while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
             coroutineContext.ensureActive()
             val (storageRoot, directory) = pending.removeFirst()
-            val directoryPath = canonicalPathWithinRoot(storageRoot, directory) ?: continue
+            val directoryPath = canonicalPathWithinRoot(storageRoot.canonicalPath, directory) ?: continue
             if (!visitedDirectories.add(directoryPath)) continue
             val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
 
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    if (canonicalPathWithinRoot(storageRoot, child) != null) {
+                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null) {
                         pending.addLast(storageRoot to child)
                     }
                 } else if (child.isFile && child.length() > 0L) {
-                    val filePath = canonicalPathWithinRoot(storageRoot, child) ?: continue
+                    val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
                     if (!visitedFiles.add(filePath)) continue
-                    output += indexedFile(storageRoot, child)
+                    output += indexedFile(storageRoot.file, child)
                     if (output.size % 50 == 0) onDiscovered(output.size)
                     if (output.size >= MAX_WHATSAPP_FILES) break
                 }
@@ -718,14 +721,19 @@ class DeviceRepository(
     private fun canonicalPathOf(file: File): String =
         runCatching { file.canonicalPath }.getOrDefault(file.absolutePath)
 
-    private fun canonicalPathWithinRoot(root: File, file: File): String? {
-        val rootPath = canonicalPathOf(root).trimEnd(File.separatorChar)
+    private fun canonicalPathWithinRoot(rootPath: String, file: File): String? {
         val filePath = canonicalPathOf(file)
         if (rootPath.isEmpty()) return null
         return filePath.takeIf {
             it == rootPath || it.startsWith("$rootPath${File.separator}")
         }
     }
+
+    private fun scanRoot(file: File): ScanRoot? =
+        canonicalPathOf(file)
+            .trimEnd(File.separatorChar)
+            .takeIf(String::isNotEmpty)
+            ?.let { ScanRoot(file = file, canonicalPath = it) }
 
     /**
      * Defence in depth for every destructive path.
@@ -740,7 +748,7 @@ class DeviceRepository(
     private fun isDeletableSharedStorageFile(file: File): Boolean {
         val canonical = canonicalPathOf(file)
         val root = sharedStorageRoots().firstOrNull { root ->
-            canonicalPathWithinRoot(root, file) != null
+            canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
         } ?: return false
         val rootPath = canonicalPathOf(root).trimEnd('/')
         val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
@@ -1073,6 +1081,8 @@ class DeviceRepository(
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val MAX_INDEXED_FILES = 200_000
+        private const val LOW_MEMORY_INDEXED_FILES = 50_000
+        private const val MEDIUM_MEMORY_INDEXED_FILES = 100_000
         private const val SHARED_INDEX_CACHE_TTL_MILLIS = 90L * 1000L
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
@@ -1102,4 +1112,21 @@ class DeviceRepository(
             "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "rtf", "csv", "epub",
         )
     }
+
+    private fun indexedFileLimit(): Int {
+        val memoryClassMb = context.getSystemService(ActivityManager::class.java)?.memoryClass ?: 256
+        return when {
+            memoryClassMb <= 128 -> LOW_MEMORY_INDEXED_FILES
+            memoryClassMb <= 192 -> MEDIUM_MEMORY_INDEXED_FILES
+            else -> MAX_INDEXED_FILES
+        }
+    }
+
+    private fun storageReviewItemLimit(): Int =
+        minOf(MAX_STORAGE_REVIEW_ITEMS, (indexedFileLimit() / 4).coerceAtLeast(10_000))
+
+    private data class ScanRoot(
+        val file: File,
+        val canonicalPath: String,
+    )
 }
