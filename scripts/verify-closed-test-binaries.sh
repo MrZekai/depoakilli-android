@@ -126,7 +126,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner Play closed-test binary audit: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 0.5.19-closedtest2 (39)"
+  echo "Version: 0.5.19-closedtest2 (40)"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"
