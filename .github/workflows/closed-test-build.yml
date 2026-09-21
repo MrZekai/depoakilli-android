@@ -91,8 +91,8 @@ jobs:
         run: |
           rm -rf closed-test-artifacts
           mkdir -p closed-test-artifacts/aab closed-test-artifacts/apk closed-test-artifacts/diagnostics/legal
-          cp app/build/outputs/bundle/closedTest/app-closedTest.aab closed-test-artifacts/aab/SmartCleaner-ClosedTest-v39.aab
-          cp app/build/outputs/apk/closedTest/app-closedTest.apk closed-test-artifacts/apk/SmartCleaner-ClosedTest-v39.apk
+          cp app/build/outputs/bundle/closedTest/app-closedTest.aab closed-test-artifacts/aab/SmartCleaner-ClosedTest-v40.aab
+          cp app/build/outputs/apk/closedTest/app-closedTest.apk closed-test-artifacts/apk/SmartCleaner-ClosedTest-v40.apk
           cp app/build/outputs/mapping/closedTest/mapping.txt closed-test-artifacts/diagnostics/mapping.txt
           cp -R app/build/reports/closed-test-binary-audit/. closed-test-artifacts/diagnostics/binary-audit/
           find app/build/reports -maxdepth 1 -type f -name 'lint-results-*' -exec cp {} closed-test-artifacts/diagnostics/ \;
@@ -107,23 +107,23 @@ jobs:
       - name: Upload Play closed-test AAB
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-PLAY-CLOSED-TEST-AAB-v39
-          path: closed-test-artifacts/aab/SmartCleaner-ClosedTest-v39.aab
+          name: SmartCleaner-PLAY-CLOSED-TEST-AAB-v40
+          path: closed-test-artifacts/aab/SmartCleaner-ClosedTest-v40.aab
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload closed-test install APK
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-CLOSED-TEST-APK-v39
-          path: closed-test-artifacts/apk/SmartCleaner-ClosedTest-v39.apk
+          name: SmartCleaner-CLOSED-TEST-APK-v40
+          path: closed-test-artifacts/apk/SmartCleaner-ClosedTest-v40.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload closed-test diagnostics
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-ClosedTest-Diagnostics-v39
+          name: SmartCleaner-ClosedTest-Diagnostics-v40
           path: closed-test-artifacts/diagnostics/
           if-no-files-found: error
           retention-days: 30
