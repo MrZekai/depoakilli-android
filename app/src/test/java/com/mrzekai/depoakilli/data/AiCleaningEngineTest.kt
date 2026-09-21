@@ -32,6 +32,14 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `week old apk is visible but not preselected`() {
+        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 8))
+
+        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
+        assertFalse(requireNotNull(result).recommended)
+    }
+
+    @Test
     fun `old screenshot is review only`() {
         val result = engine.assess(
             file("Screenshot_2026.png", "image/png", 40, "Pictures/Screenshots/"),
@@ -60,13 +68,13 @@ class AiCleaningEngineTest {
 
 
     @Test
-    fun `temporary artifact is high confidence junk`() {
+    fun `interrupted download is visible but never preselected`() {
         val result = engine.assess(
             file("partial.crdownload", "application/octet-stream", 5, "Download/"),
         )
 
         assertEquals(CleanCategory.JUNK, result?.category)
-        assertTrue(requireNotNull(result).recommended)
+        assertFalse(requireNotNull(result).recommended)
     }
 
 
@@ -215,6 +223,20 @@ class AiCleaningEngineTest {
 
         assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
         assertFalse(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `personal folder with whatsapp in its name is not classified as whatsapp media`() {
+        val result = engine.assess(
+            file(
+                "sent-video.mp4",
+                "video/mp4",
+                45,
+                "Documents/My WhatsApp Backup/Sent/",
+            ),
+        )
+
+        assertNull(result)
     }
 
     private fun file(
