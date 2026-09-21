@@ -2,6 +2,8 @@ package com.mrzekai.depoakilli.ads
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import com.google.android.gms.ads.AdError
@@ -13,6 +15,9 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.mrzekai.depoakilli.BuildConfig
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /** A user-initiated rewarded placement; it never gates cleaning or scanning. */
 class RewardedAdController(private val context: Context) {
@@ -22,11 +27,19 @@ class RewardedAdController(private val context: Context) {
     private var adsAllowed = false
     private var resumedActivity: Activity? = null
     private var showing = false
+    private var retryDelayMillis = INITIAL_RETRY_DELAY_MILLIS
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val retryRunnable = Runnable { load() }
+    private val _isReady = MutableStateFlow(false)
+
+    val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
 
     fun setAdsAllowed(allowed: Boolean) {
+        if (adsAllowed == allowed) return
         adsAllowed = allowed
         if (allowed) load()
         else clear()
+        publishReady()
     }
 
     fun onHostResumed(activity: Activity) {
@@ -49,10 +62,15 @@ class RewardedAdController(private val context: Context) {
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {
                     loading = false
-                    if (!adsAllowed || resumedActivity == null) return
+                    retryDelayMillis = INITIAL_RETRY_DELAY_MILLIS
+                    if (!adsAllowed) {
+                        publishReady()
+                        return
+                    }
                     rewardedAd = ad
                     loadedAtElapsed = SystemClock.elapsedRealtime()
                     logAd("LOAD_OK", ad)
+                    publishReady()
                 }
 
                 override fun onAdFailedToLoad(error: LoadAdError) {
@@ -60,6 +78,12 @@ class RewardedAdController(private val context: Context) {
                     rewardedAd = null
                     loadedAtElapsed = 0L
                     Log.w(AD_DIAG_TAG, "REWARDED/LOAD_FAIL code=${error.code} domain=${error.domain} message=${error.message}")
+                    if (adsAllowed && !showing) {
+                        mainHandler.removeCallbacks(retryRunnable)
+                        mainHandler.postDelayed(retryRunnable, retryDelayMillis)
+                        retryDelayMillis = (retryDelayMillis * 2L).coerceAtMost(MAX_RETRY_DELAY_MILLIS)
+                    }
+                    publishReady()
                 }
             },
         )
@@ -79,6 +103,7 @@ class RewardedAdController(private val context: Context) {
             loadedAtElapsed = 0L
             Log.i(AD_DIAG_TAG, "REWARDED/SHOW_SKIP no-fresh-ad")
             load()
+            publishReady()
             onUnavailable()
             return
         }
@@ -86,6 +111,7 @@ class RewardedAdController(private val context: Context) {
         rewardedAd = null
         loadedAtElapsed = 0L
         showing = true
+        publishReady()
         val completed = AtomicBoolean(false)
         fun finish(reason: String) {
             if (!completed.compareAndSet(false, true)) return
@@ -93,6 +119,7 @@ class RewardedAdController(private val context: Context) {
             Log.i(AD_DIAG_TAG, "REWARDED/FLOW_FINISH via=$reason")
             onFinished()
             load()
+            publishReady()
         }
 
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -134,10 +161,16 @@ class RewardedAdController(private val context: Context) {
             loadedAtElapsed > 0L &&
             SystemClock.elapsedRealtime() - loadedAtElapsed < REWARDED_TTL_MILLIS
 
+    private fun publishReady() {
+        _isReady.value = adsAllowed && !showing && isFresh()
+    }
+
     private fun clear() {
+        mainHandler.removeCallbacks(retryRunnable)
         rewardedAd = null
         loading = false
         loadedAtElapsed = 0L
+        publishReady()
     }
 
     private fun logAd(stage: String, ad: RewardedAd) {
@@ -148,5 +181,7 @@ class RewardedAdController(private val context: Context) {
     private companion object {
         const val AD_DIAG_TAG = "AdDiag"
         const val REWARDED_TTL_MILLIS = 50L * 60L * 1000L
+        const val INITIAL_RETRY_DELAY_MILLIS = 30_000L
+        const val MAX_RETRY_DELAY_MILLIS = 120_000L
     }
 }
