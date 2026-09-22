@@ -240,11 +240,7 @@
     <string name="feedback_subject">Smart Cleaner feedback</string>
     <string name="feedback_template">Device: %1$s %2$s\nAndroid: %3$s\n\nFeedback:\n</string>
     <string name="share_app_message">Smart Cleaner analyzes storage safely on your device: %1$s</string>
-    <string name="about_app_body_v050">Smart Cleaner %1$s
-
-Smart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.
-
-Package: com.mrzekai.depoakilli</string>
+    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.\n\nPackage: com.mrzekai.depoakilli</string>
     <string name="access_files_missing">File access needed</string>
     <string name="access_files_ready">Files ready</string>
     <string name="access_usage_optional">Usage access optional</string>
@@ -299,13 +295,7 @@ Package: com.mrzekai.depoakilli</string>
     <string name="message_deep_cache_complete">Android completed the requested device cache cleanup.</string>
     <string name="message_own_cache_cleared">%1$s of Smart Cleaner cache was removed.</string>
     <string name="message_whatsapp_not_found">No supported WhatsApp or WhatsApp Business Media folder was found in shared storage.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.
-
-All files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.
-
-Usage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.
-
-Google Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Files you explicitly delete are removed through Android and cannot be restored by Smart Cleaner. Google retains data it processes under its published policies.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Files you explicitly delete are removed through Android and cannot be restored by Smart Cleaner. Google retains data it processes under its published policies.</string>
     <string name="reason_large_file">Large file • %1$d days old</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
@@ -328,11 +318,7 @@ Google Mobile Ads and the consent platform may process advertising identifiers, 
     <string name="storage_type_images">Images</string>
     <string name="storage_type_other">Other files</string>
     <string name="storage_type_videos">Videos</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.
-
-Smart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. Deep App Cache uses Android’s official system action and may display a required Android confirmation.
-
-Smart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable. Ads and crash diagnostics are provided by third-party services under their respective terms and policies.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.\n\nSmart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. Deep App Cache uses Android’s official system action and may display a required Android confirmation.\n\nSmart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable. Ads and crash diagnostics are provided by third-party services under their respective terms and policies.</string>
     <string name="tools_rebuilt_status">%1$s free • %2$s app cache reported</string>
     <string name="tools_rebuilt_title">Cleaning &amp; storage tools</string>
     <string name="uninstall">Uninstall</string>

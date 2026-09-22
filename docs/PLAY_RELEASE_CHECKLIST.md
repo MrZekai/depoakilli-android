@@ -4,9 +4,9 @@
 
 - [ ] `python scripts/validate-project.py` passes.
 - [ ] GitHub Actions passes project validation, `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing and packaged-binary verification.
-- [ ] QA APK reports version `0.5.21-closedtest1-qa` / versionCode `42`.
+- [ ] QA APK reports version `0.5.22-closedtest1-qa` / versionCode `43`.
 - [ ] Manual `Play Closed Test AAB + APK` workflow passes `lintClosedTest`, signed AAB/APK build and binary verification.
-- [ ] Play AAB reports package `com.mrzekai.depoakilli`, version `0.5.21-closedtest1` / `42`, sample ads, non-debuggable state and the existing upload certificate.
+- [ ] Play AAB reports package `com.mrzekai.depoakilli`, version `0.5.22-closedtest1` / `43`, sample ads, non-debuggable state and the existing upload certificate.
 - [ ] Physical-device checklist in `docs/DEVICE_QA_CHECKLIST.md` is recorded before Production.
 - [ ] Android 11–16 permission return paths are tested where devices are available.
 - [ ] No scan/delete path causes ANR or silently drops failed items.

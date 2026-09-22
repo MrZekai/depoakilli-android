@@ -78,7 +78,7 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V42.md",
+    "docs/CLOSED_TEST_RELEASE_V43.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 42",
-    'versionName = "0.5.21-closedtest1"',
+    "versionCode = 43",
+    'versionName = "0.5.22-closedtest1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v42",
-    "SmartCleaner-CLOSED-TEST-APK-v42",
-    "SmartCleaner-ClosedTest-Diagnostics-v42",
-    "SmartCleaner-ClosedTest-v42.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v43",
+    "SmartCleaner-CLOSED-TEST-APK-v43",
+    "SmartCleaner-ClosedTest-Diagnostics-v43",
+    "SmartCleaner-ClosedTest-v43.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "0.5.21-closedtest1",
-    "versionCode='42'",
+    "0.5.22-closedtest1",
+    "versionCode='43'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1403,4 +1403,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.21-closedtest1 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v0.5.22-closedtest1 closed-test + slim-QA invariants are valid.")

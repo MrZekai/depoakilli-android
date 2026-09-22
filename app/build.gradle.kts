@@ -46,8 +46,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 42
-        versionName = "0.5.21-closedtest1"
+        versionCode = 43
+        versionName = "0.5.22-closedtest1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
