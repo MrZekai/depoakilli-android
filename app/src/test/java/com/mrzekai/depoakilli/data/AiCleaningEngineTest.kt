@@ -16,12 +16,28 @@ class AiCleaningEngineTest {
     private val engine = AiCleaningEngine { now }
 
     @Test
-    fun `old apk is a high confidence recommendation`() {
+    fun `old apk is listed for review but never preselected`() {
         val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 45))
 
         assertEquals(CleanCategory.APK_PACKAGE, result?.category)
-        assertTrue(requireNotNull(result).recommended)
-        assertTrue(result.safetyScore >= 90)
+        assertFalse(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `very old apk is still never preselected`() {
+        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 900))
+
+        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
+        assertFalse(requireNotNull(result).recommended)
+    }
+
+    @Test
+    fun `screen recording in the screenshots folder is not a screenshot`() {
+        val recording = file("Screenrecorder-2026.mp4", "video/mp4", 40, "DCIM/Screenshots/")
+
+        assertNull(engine.assessFocusedScreenshot(recording))
+        assertTrue(engine.assess(recording)?.category != CleanCategory.SCREENSHOT)
+        assertTrue(engine.assessDeep(recording)?.category != CleanCategory.SCREENSHOT)
     }
 
     @Test
@@ -197,7 +213,7 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `whatsapp status is a safe temporary recommendation`() {
+    fun `whatsapp status is listed but never preselected`() {
         val result = engine.assess(
             file(
                 "status.jpg",
@@ -208,7 +224,7 @@ class AiCleaningEngineTest {
         )
 
         assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
-        assertTrue(requireNotNull(result).recommended)
+        assertFalse(requireNotNull(result).recommended)
     }
 
     @Test

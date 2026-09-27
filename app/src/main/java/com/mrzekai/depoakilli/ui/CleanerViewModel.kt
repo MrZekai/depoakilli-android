@@ -329,7 +329,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun queueScanAfterPermission(focus: ScanFocus) {
-        _state.update { it.copy(scanFocus = focus, pendingScanFocus = focus) }
+        _state.update {
+            it.copy(
+                scanFocus = focus,
+                pendingScanFocus = focus,
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+            )
+        }
     }
 
     fun refreshDashboard() {
@@ -370,10 +377,21 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             return
         }
         appCacheRefreshJob?.cancel()
+        // A new scan replaces the result set, so any sub-list opened on the
+        // previous results is closed. A stale review left behind here kept its
+        // title ("Old downloads") on the next tool's screen (QA v43 #06).
+        storageReviewGeneration++
+        storageReviewJob?.cancel()
+        storageReviewJob = null
         val scanStartedAtElapsed = SystemClock.elapsedRealtime()
         AppDiagnostics.breadcrumb("scan_started", mapOf("focus" to focus.name))
         _state.update {
             it.copy(
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+                storageReview = StorageReviewSummary(),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
                 scanning = true,
                 scanProgressFiles = 0,
                 scanProgressDirectories = 0,

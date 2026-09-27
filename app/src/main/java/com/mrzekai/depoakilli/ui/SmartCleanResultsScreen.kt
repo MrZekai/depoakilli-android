@@ -18,7 +18,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -63,6 +66,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -80,8 +84,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -877,6 +883,9 @@ private fun unusedAppsForSmartReview(
     val threshold = TimeUnit.DAYS.toMillis(UNUSED_APP_DAYS)
     return apps
         .asSequence()
+        // Preinstalled system apps cannot be uninstalled by the user, so they
+        // are not offered as removable unused apps (QA v43 #08).
+        .filterNot { it.systemApp }
         .filter { it.lastUsedMillis > 0L }
         .filter { now - it.lastUsedMillis >= threshold }
         .filter { it.totalBytes > 0L }
@@ -926,7 +935,7 @@ private fun SmartStorageSuggestionCard(
                         fontSize = 17.sp,
                     )
                     Text(
-                        stringResource(R.string.smart_media_priority_summary, count, ByteFormatter.format(bytes)),
+                        pluralStringResource(R.plurals.smart_media_priority_summary, count, count, ByteFormatter.format(bytes)),
                         color = SmartTextSecondary,
                         fontSize = 12.sp,
                     )
@@ -1065,7 +1074,7 @@ private fun UnusedAppsSectionCard(
                         when {
                             !hasUsageAccess -> stringResource(R.string.smart_unused_apps_permission)
                             loadingApps -> stringResource(R.string.smart_unused_apps_loading)
-                            apps.isNotEmpty() -> stringResource(R.string.smart_unused_apps_summary, apps.size, ByteFormatter.format(totalBytes))
+                            apps.isNotEmpty() -> pluralStringResource(R.plurals.smart_unused_apps_summary, apps.size, apps.size, ByteFormatter.format(totalBytes))
                             installedAppsLoaded -> stringResource(R.string.smart_unused_apps_none)
                             else -> stringResource(R.string.smart_unused_apps_ready)
                         },
@@ -1274,12 +1283,16 @@ private fun SmartCleanHero(summary: ScanSummary) {
                 }
                 Spacer(Modifier.width(18.dp))
                 Column(Modifier.weight(1f)) {
+                    // Lead with what is safe to clean. Personal media that only
+                    // deserves a look is a separate figure below and is never
+                    // added into this headline (QA v43 #11).
                     Text(
-                        ByteFormatter.format(summary.totalSuggestedBytes),
+                        ByteFormatter.format(summary.safeSuggestedBytes),
                         color = Color.White,
-                        fontSize = 40.sp,
+                        fontSize = 36.sp,
+                        lineHeight = 40.sp,
                         fontWeight = FontWeight.Black,
-                        maxLines = 1,
+                        maxLines = 2,
                     )
                     Text(
                         stringResource(R.string.smart_total_opportunity),
@@ -1302,23 +1315,26 @@ private fun SmartCleanHero(summary: ScanSummary) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     HeroStat(
                         icon = Icons.Outlined.CheckCircle,
-                        value = ByteFormatter.format(summary.safeSuggestedBytes),
-                        label = stringResource(R.string.smart_safe_candidates),
+                        value = ByteFormatter.format(summary.selectedBytes),
+                        label = stringResource(R.string.smart_selected_hero_label),
+                        modifier = Modifier.weight(1f),
                     )
                     HeroStat(
                         icon = Icons.Outlined.AutoAwesome,
                         value = ByteFormatter.format(summary.reviewBytes),
                         label = stringResource(R.string.smart_review_candidates),
+                        modifier = Modifier.weight(1f),
                     )
                     HeroStat(
                         icon = Icons.Outlined.Storage,
                         value = summary.scannedFileCount.toString(),
                         label = stringResource(R.string.smart_files_scanned),
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -1327,15 +1343,22 @@ private fun SmartCleanHero(summary: ScanSummary) {
 }
 
 @Composable
-private fun HeroStat(icon: ImageVector, value: String, label: String) {
+private fun HeroStat(
+    icon: ImageVector,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    // Weighted columns instead of fixed 92 dp widths: three fixed columns did
+    // not fit a 360 dp screen and their labels overlapped (QA v43 #05).
     Column(
-        modifier = Modifier.width(92.dp),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Icon(icon, contentDescription = null, tint = Color(0xFF9A8CFF), modifier = Modifier.size(21.dp))
-        Text(value, color = Color.White, fontWeight = FontWeight.Black, maxLines = 1, fontSize = 14.sp)
-        Text(label, color = SmartTextSecondary, fontSize = 10.sp, maxLines = 2)
+        Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 14.sp, textAlign = TextAlign.Center)
+        Text(label, color = SmartTextSecondary, fontSize = 10.sp, textAlign = TextAlign.Center)
     }
 }
 
@@ -1351,9 +1374,10 @@ private fun SmartCategoryStripCard(
     onToggleItem: (String) -> Unit,
 ) {
     val accent = categoryAccent(category)
-    val allSelected = items.isNotEmpty() && items.all(CleanableItem::selected)
-    val selectedBytes = items.filter(CleanableItem::selected).sumOf(CleanableItem::sizeBytes)
+    val selectedItems = items.filter(CleanableItem::selected)
+    val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
     val totalBytes = items.sumOf(CleanableItem::sizeBytes)
+    val selectionState = sectionSelectionState(selectedItems.size, items.size)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -1383,36 +1407,34 @@ private fun SmartCategoryStripCard(
                         color = Color.White,
                         fontWeight = FontWeight.Black,
                         fontSize = 17.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        stringResource(R.string.category_summary, items.size, ByteFormatter.format(totalBytes)),
+                        pluralStringResource(R.plurals.category_summary, items.size, items.size, ByteFormatter.format(totalBytes)),
                         color = SmartTextSecondary,
                         fontSize = 12.sp,
                     )
-                    if (category == CleanCategory.JUNK) {
+                    // One consistent meaning: the subtitle is the section
+                    // total, this line is what is currently selected. The old
+                    // badge switched between the two (QA v43 #14).
+                    if (selectedBytes > 0L) {
+                        Text(
+                            stringResource(R.string.smart_selected_amount, ByteFormatter.format(selectedBytes)),
+                            color = accent,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Black,
+                        )
+                    }
+                    if (category == CleanCategory.JUNK || category == CleanCategory.WHATSAPP_MEDIA) {
                         Text(
                             stringResource(category.shortDescriptionRes),
                             color = Color(0xFF8FDFFF),
                             fontSize = 10.sp,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
-                Surface(color = accent.copy(alpha = .18f), shape = RoundedCornerShape(20.dp)) {
-                    Text(
-                        ByteFormatter.format(if (selectedBytes > 0L) selectedBytes else totalBytes),
-                        color = accent,
-                        fontWeight = FontWeight.Black,
-                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp),
-                        fontSize = 12.sp,
-                    )
-                }
-                Checkbox(
-                    checked = allSelected,
-                    onCheckedChange = { onToggleCategory() },
+                TriStateCheckbox(
+                    state = selectionState,
+                    onClick = onToggleCategory,
                     colors = CheckboxDefaults.colors(
                         checkedColor = ElectricBlue,
                         uncheckedColor = Color(0xFF7187AB),
@@ -1577,7 +1599,7 @@ private fun StorageGridTile(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(ByteFormatter.format(bytes), color = SmartTextSecondary, fontSize = 11.sp)
-                    Text(stringResource(R.string.smart_storage_file_count, count), color = Color(0xFF7187AB), fontSize = 9.sp, maxLines = 1)
+                    Text(pluralStringResource(R.plurals.smart_storage_file_count, count, count), color = Color(0xFF7187AB), fontSize = 9.sp, maxLines = 1)
                 }
                 Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Color(0xFFA9B9D5), modifier = Modifier.size(16.dp))
             }
@@ -1594,12 +1616,17 @@ private fun SmartCleanBottomAction(
 ) {
     Surface(shadowElevation = 18.dp, color = Color(0xFF030B20)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Flexible heights: a fixed 66 dp box cut the amount in half at a
+            // large system font size (QA v43 #05).
             Card(
-                modifier = Modifier.weight(.38f).height(66.dp),
+                modifier = Modifier.weight(.38f).fillMaxHeight().heightIn(min = 66.dp),
                 shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF0A1B41)),
             ) {
@@ -1607,15 +1634,18 @@ private fun SmartCleanBottomAction(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Text(stringResource(R.string.smart_selected_for_cleanup), color = SmartTextSecondary, fontSize = 10.sp, maxLines = 1)
-                    Text(ByteFormatter.format(selectedBytes), color = SmartGreen, fontSize = 21.sp, fontWeight = FontWeight.Black, maxLines = 1)
+                    Text(stringResource(R.string.smart_selected_for_cleanup), color = SmartTextSecondary, fontSize = 10.sp)
+                    Text(ByteFormatter.format(selectedBytes), color = SmartGreen, fontSize = 21.sp, fontWeight = FontWeight.Black)
+                    if (selectedBytes <= 0L) {
+                        Text(stringResource(R.string.nothing_selected_hint), color = SmartTextSecondary, fontSize = 10.sp)
+                    }
                 }
             }
 
             Card(
                 onClick = onClick,
                 enabled = enabled,
-                modifier = Modifier.weight(.62f).height(66.dp),
+                modifier = Modifier.weight(.62f).fillMaxHeight().heightIn(min = 66.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent, disabledContainerColor = Color(0xFF16315A)),
             ) {
@@ -1672,7 +1702,7 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
         title = { Text(stringResource(R.string.smart_cleanup_confirm_title), fontWeight = FontWeight.Black) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                Text(stringResource(R.string.smart_cleanup_confirm_body, ByteFormatter.format(summary.selectedBytes), summary.selectedItems.size))
+                Text(pluralStringResource(R.plurals.smart_cleanup_confirm_body, summary.selectedItems.size, ByteFormatter.format(summary.selectedBytes), summary.selectedItems.size))
                 summary.selectedItems
                     .groupBy { it.assessment.category }
                     .entries
@@ -1689,7 +1719,7 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
                 }
                 if (summary.selectedItems.size > 5) {
                     Text(
-                        stringResource(R.string.smart_cleanup_more_items, summary.selectedItems.size - 5),
+                        pluralStringResource(R.plurals.smart_cleanup_more_items, summary.selectedItems.size - 5, summary.selectedItems.size - 5),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1697,8 +1727,7 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
                 Text(
                     stringResource(R.string.smart_cleanup_ad_notice),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF2867D8),
-                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(stringResource(R.string.smart_cleanup_confirm_warning), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
             }
@@ -1726,8 +1755,9 @@ private fun CleanupItemsConfirmationDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                 Text(
-                    stringResource(
-                        R.string.smart_cleanup_confirm_body,
+                    pluralStringResource(
+                        R.plurals.smart_cleanup_confirm_body,
+                        items.size,
                         ByteFormatter.format(bytes),
                         items.size,
                     ),
@@ -1742,15 +1772,14 @@ private fun CleanupItemsConfirmationDialog(
                 }
                 if (items.size > 5) {
                     Text(
-                        stringResource(R.string.smart_cleanup_more_items, items.size - 5),
+                        pluralStringResource(R.plurals.smart_cleanup_more_items, items.size - 5, items.size - 5),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 Text(
                     stringResource(R.string.smart_cleanup_ad_notice),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF2867D8),
-                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     stringResource(R.string.smart_cleanup_confirm_warning),
@@ -1789,6 +1818,7 @@ private fun CategoryDetailPage(
     val selectedCount = selectedItems.size
     val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
     val allSelected = items.isNotEmpty() && selectedCount == items.size
+    val selectionState = sectionSelectionState(selectedCount, items.size)
     val accent = categoryAccent(category)
 
     Column(
@@ -1852,9 +1882,9 @@ private fun CategoryDetailPage(
                         .padding(horizontal = 10.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Checkbox(
-                        checked = allSelected,
-                        onCheckedChange = { onToggleCategory() },
+                    TriStateCheckbox(
+                        state = selectionState,
+                        onClick = onToggleCategory,
                         colors = CheckboxDefaults.colors(
                             checkedColor = ElectricBlue,
                             uncheckedColor = Color(0xFFA7B8D6),
@@ -1862,18 +1892,14 @@ private fun CategoryDetailPage(
                         ),
                     )
                     Spacer(Modifier.width(5.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            stringResource(R.string.smart_preview_tap_hint),
-                            color = Color(0xFFB8C8E2),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                    }
+                    // The tap/checkbox instruction is already shown once in the
+                    // header above; it is not repeated here (QA v43 polish).
+                    Text(
+                        stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -1936,7 +1962,7 @@ private fun CategoryGridItem(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().height(214.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 214.dp),
         onClick = onPreview,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCard),
@@ -2076,6 +2102,7 @@ private fun StorageDetailPage(
     val selectedCount = selectedItems.size
     val selectedBytes = review.selectedBytes
     val allSelected = review.items.isNotEmpty() && selectedCount == review.items.size
+    val selectionState = sectionSelectionState(selectedCount, review.items.size)
     val accent = storageAccent(type)
     val visualType = type == StorageFileType.IMAGES || type == StorageFileType.VIDEOS
 
@@ -2115,8 +2142,9 @@ private fun StorageDetailPage(
                             if (review.loading) {
                                 stringResource(R.string.storage_review_scanning)
                             } else {
-                                stringResource(
-                                    R.string.storage_review_summary,
+                                pluralStringResource(
+                                    R.plurals.storage_review_summary,
+                                    review.items.size,
                                     review.items.size,
                                     ByteFormatter.format(review.totalBytes),
                                 )
@@ -2167,9 +2195,9 @@ private fun StorageDetailPage(
                             .padding(horizontal = 10.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Checkbox(
-                            checked = allSelected,
-                            onCheckedChange = { onToggleAll() },
+                        TriStateCheckbox(
+                            state = selectionState,
+                            onClick = onToggleAll,
                             colors = CheckboxDefaults.colors(
                                 checkedColor = ElectricBlue,
                                 uncheckedColor = Color(0xFFA7B8D6),
@@ -2305,7 +2333,7 @@ private fun StorageReviewGridItem(
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth().height(210.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 210.dp),
         onClick = onPreview,
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCard),
@@ -2485,11 +2513,18 @@ private fun ReviewCleanupFooter(
                     fontWeight = FontWeight.Black,
                     fontSize = 17.sp,
                 )
+                if (selectedCount == 0) {
+                    Text(
+                        stringResource(R.string.nothing_selected_hint),
+                        color = SmartTextSecondary,
+                        fontSize = 10.sp,
+                    )
+                }
             }
             Button(
                 onClick = onClick,
                 enabled = enabled,
-                modifier = Modifier.weight(.58f).height(54.dp),
+                modifier = Modifier.weight(.58f).heightIn(min = 54.dp),
                 shape = RoundedCornerShape(20.dp),
             ) {
                 Icon(Icons.Outlined.CleaningServices, contentDescription = null)
@@ -2518,8 +2553,9 @@ private fun StorageCleanupConfirmationDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
                 Text(
-                    stringResource(
-                        R.string.storage_review_delete_body,
+                    pluralStringResource(
+                        R.plurals.storage_review_delete_body,
+                        items.size,
                         items.size,
                         ByteFormatter.format(bytes),
                     ),
@@ -2534,15 +2570,14 @@ private fun StorageCleanupConfirmationDialog(
                 }
                 if (items.size > 5) {
                     Text(
-                        stringResource(R.string.smart_cleanup_more_items, items.size - 5),
+                        pluralStringResource(R.plurals.smart_cleanup_more_items, items.size - 5, items.size - 5),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 Text(
                     stringResource(R.string.smart_cleanup_ad_notice),
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF2867D8),
-                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     stringResource(R.string.storage_review_delete_warning),

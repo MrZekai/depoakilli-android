@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -82,6 +83,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -142,6 +144,7 @@ fun CleanerApp(
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onCleanupResultDismissed: () -> Unit,
     onUninstallApp: (String) -> Unit,
+    onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
     onShowPrivacyOptions: () -> Unit,
     onShowRewardedAd: () -> Unit,
@@ -155,6 +158,9 @@ fun CleanerApp(
     var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var accessDisclosure by rememberSaveable { mutableStateOf<AccessDisclosure?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    // Hoisted so the Me list keeps its scroll position while a sub-page such
+    // as Privacy Policy is open (QA v43 polish).
+    val meListState = rememberLazyListState()
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -387,6 +393,7 @@ fun CleanerApp(
                 onRequestUsageAccess = ::requestUsageWithDisclosure,
                 onRefresh = viewModel::refreshInstalledApps,
                 onUninstallApp = onUninstallApp,
+                onOpenAppInfo = onOpenAppInfo,
                 modifier = Modifier.padding(padding),
             )
 
@@ -501,6 +508,7 @@ fun CleanerApp(
                 )
 
                 AppTab.ME -> SettingsDetailScreen(
+                    listState = meListState,
                     privacyOptionsRequired = privacyOptionsRequired,
                     canRequestAds = canRequestAds,
                     adFreeRemainingMillis = adFreeRemainingMillis,
@@ -575,6 +583,11 @@ fun CleanerApp(
 
                 viewModel.dismissCleanupResult()
                 legalReturnScreen = null
+                // Done returns to the tool's main screen with refreshed
+                // totals, not to the sub-list the cleanup was started from,
+                // and never leaves a stale sub-list behind (QA v43 #06).
+                viewModel.closeSmartCategoryReview()
+                viewModel.closeStorageReview()
 
                 when {
                     result.kind != CleanupResultKind.FILES -> {
@@ -884,7 +897,7 @@ private fun CategoryHeader(
         Column(Modifier.weight(1f)) {
             Text(stringResource(category.titleRes), fontWeight = FontWeight.Black)
             Text(
-                stringResource(R.string.category_summary, items.size, ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes))),
+                pluralStringResource(R.plurals.category_summary, items.size, items.size, ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes))),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -3,9 +3,13 @@ package com.mrzekai.depoakilli.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -54,8 +58,6 @@ internal fun NeonDashboardScreen(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val opportunityBytes =
-        (state.dashboardCleanableBytes + state.dashboardReviewBytes).coerceAtLeast(0L)
     val hasSnapshot = state.dashboardSnapshotAtMillis > 0L
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val gaugeSize = if (screenWidthDp < 380) 116.dp else 132.dp
@@ -136,7 +138,6 @@ internal fun NeonDashboardScreen(
             item {
                 HomeOpportunityCard(
                     storage = state.storage,
-                    opportunityBytes = opportunityBytes,
                     safeBytes = state.dashboardCleanableBytes,
                     reviewBytes = state.dashboardReviewBytes,
                     hasSnapshot = hasSnapshot,
@@ -173,6 +174,9 @@ internal fun NeonDashboardScreen(
             } else {
                 item {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Max),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         suggestions.forEach { suggestion ->
@@ -182,7 +186,9 @@ internal fun NeonDashboardScreen(
                                 icon = suggestion.icon,
                                 accent = suggestion.accent,
                                 onClick = suggestion.onClick,
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
                             )
                         }
                     }

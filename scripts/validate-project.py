@@ -78,7 +78,7 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V43.md",
+    "docs/CLOSED_TEST_RELEASE_V44.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 43",
-    'versionName = "0.5.22-closedtest1"',
+    "versionCode = 44",
+    'versionName = "0.5.23-closedtest1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v43",
-    "SmartCleaner-CLOSED-TEST-APK-v43",
-    "SmartCleaner-ClosedTest-Diagnostics-v43",
-    "SmartCleaner-ClosedTest-v43.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v44",
+    "SmartCleaner-CLOSED-TEST-APK-v44",
+    "SmartCleaner-ClosedTest-Diagnostics-v44",
+    "SmartCleaner-ClosedTest-v44.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "0.5.22-closedtest1",
-    "versionCode='43'",
+    "0.5.23-closedtest1",
+    "versionCode='44'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1397,10 +1397,61 @@ if 'applicationIdSuffix = ".debug"' not in build_file:
 if build_file.count('applicationIdSuffix = ".qa"') != 1:
     errors.append("exactly one build type may claim the .qa applicationId suffix")
 
+# ------------------------------------------------------------------
+# v44 QA-report safety contract (QA v43, 27 Sep 2026).
+# ------------------------------------------------------------------
+if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or '".nomedia"' not in storage_path_rules:
+    errors.append("hidden marker files (.nomedia) must be recognised by StoragePathRules")
+if repository.count("StoragePathRules.isSystemMarkerFile(") < 3:
+    errors.append("marker files must be skipped by both indexers and refused at deletion")
+if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" in ai_engine:
+    errors.append("WhatsApp media and APK installers must never be preselected")
+if "isStillImage(" not in ai_engine:
+    errors.append("screen recordings must not be classified as screenshots")
+if "summary.safeSuggestedBytes" not in smart_results:
+    errors.append("Smart Clean headline must lead with the safe amount")
+if "Modifier.width(92.dp)" in smart_results:
+    errors.append("hero stats must use weighted columns (large-font overlap)")
+if "premium_duplicates_kept_short" in premium_tools:
+    errors.append("duplicate copies must not be labelled as the protected original")
+if "BackHandler(enabled = activeDetail != null)" not in premium_tools:
+    errors.append("system Back must close an open tool group first")
+if "smartCategoryReview = null" not in view_model:
+    errors.append("a new scan must close stale sub-lists")
+if "app.systemApp" not in device_center or ".filterNot { it.systemApp }" not in smart_results:
+    errors.append("system apps must not be offered for uninstall")
+if "FLAG_ACTIVITY_NEW_DOCUMENT" not in main_activity or "Intent.createChooser(intent, getString(R.string.send_feedback))" not in main_activity:
+    errors.append("rate/feedback external flows must return to the app / offer a chooser")
+if "FeedbackDialog(" not in device_center:
+    errors.append("feedback must show the support address in-app")
+
+plural_sets = {}
+for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
+    root = ET.parse(strings_path).getroot()
+    plural_sets[strings_path.parent.name] = {node.attrib["name"] for node in root.findall("plurals")}
+    for node in root.findall("plurals"):
+        quantities = {item.attrib.get("quantity") for item in node.findall("item")}
+        if "other" not in quantities or "one" not in quantities:
+            errors.append(f"plural {node.attrib['name']} in {strings_path.parent.name} needs one+other")
+default_plurals = plural_sets.get("values", set())
+for folder, names in plural_sets.items():
+    if names != default_plurals:
+        errors.append(f"plural keys differ between values and {folder}: {sorted(names ^ default_plurals)}")
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    for resource_name in re.findall(r"R\.plurals\.([A-Za-z0-9_]+)", source):
+        if resource_name not in default_plurals:
+            errors.append(f"Kotlin references missing R.plurals.{resource_name}: {kotlin_file.relative_to(ROOT)}")
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    for resource_name in re.findall(r"R\.string\.([A-Za-z0-9_]+)", source):
+        if resource_name in default_plurals:
+            errors.append(f"{resource_name} is a plural; use pluralStringResource in {kotlin_file.relative_to(ROOT)}")
+
 if errors:
     print("Project validation failed:", file=sys.stderr)
     for error in errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.22-closedtest1 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v0.5.23-closedtest1 closed-test + slim-QA invariants are valid.")

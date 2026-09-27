@@ -193,6 +193,8 @@ data class InstalledAppEntry(
     val dataBytes: Long = 0L,
     val cacheBytes: Long = 0L,
     val lastUsedMillis: Long = 0L,
+    /** Preinstalled with the device; Android does not let the user uninstall it. */
+    val systemApp: Boolean = false,
 ) {
     val totalBytes: Long get() = (appBytes + dataBytes).coerceAtLeast(cacheBytes)
 }

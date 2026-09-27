@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -176,8 +177,9 @@ internal fun CleanupResultDialog(
                         ) {
                             if (result.kind == CleanupResultKind.FILES) {
                                 CleanupResultLine(
-                                    text = stringResource(
-                                        R.string.cleanup_result_files_removed,
+                                    text = pluralStringResource(
+                                        R.plurals.cleanup_result_files_removed,
+                                        result.deletedCount,
                                         result.deletedCount,
                                     ),
                                     accent = Lime400,
@@ -195,8 +197,9 @@ internal fun CleanupResultDialog(
                             }
                             if (result.failedCount > 0) {
                                 CleanupResultLine(
-                                    text = stringResource(
-                                        R.string.cleanup_result_failed,
+                                    text = pluralStringResource(
+                                        R.plurals.cleanup_result_failed,
+                                        result.failedCount,
                                         result.failedCount,
                                     ),
                                     accent = Color(0xFFFF8A80),
@@ -204,8 +207,9 @@ internal fun CleanupResultDialog(
                             }
                             if (result.cancelledCount > 0) {
                                 CleanupResultLine(
-                                    text = stringResource(
-                                        R.string.cleanup_result_cancelled,
+                                    text = pluralStringResource(
+                                        R.plurals.cleanup_result_cancelled,
+                                        result.cancelledCount,
                                         result.cancelledCount,
                                     ),
                                     accent = Color(0xFFFFC46B),

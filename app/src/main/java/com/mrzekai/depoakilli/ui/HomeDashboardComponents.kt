@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,26 +69,25 @@ internal fun HomeBrandHeader(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(
-                text = stringResource(R.string.app_tagline),
-                color = Color(0xFF8EE8D0),
-                fontSize = 12.sp,
-                lineHeight = 16.sp,
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
-        Surface(
-            modifier = Modifier.size(52.dp),
-            color = Color(0xFF0B685B).copy(alpha = .38f),
-            shape = CircleShape,
-        ) {
-            Box(contentAlignment = Alignment.Center) {
+            // The shield is a static trust badge next to the tagline, not a
+            // button: a large tappable-looking icon that did nothing on tap
+            // was reported as broken (QA v43 #15).
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+            ) {
                 Icon(
                     Icons.Outlined.Security,
                     contentDescription = null,
                     tint = Color(0xFF64F0C5),
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(14.dp),
+                )
+                Text(
+                    text = stringResource(R.string.app_tagline),
+                    color = Color(0xFF8EE8D0),
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
@@ -96,7 +97,6 @@ internal fun HomeBrandHeader(
 @Composable
 internal fun HomeOpportunityCard(
     storage: StorageSnapshot,
-    opportunityBytes: Long,
     safeBytes: Long,
     reviewBytes: Long,
     hasSnapshot: Boolean,
@@ -132,27 +132,22 @@ internal fun HomeOpportunityCard(
                 fontWeight = FontWeight.Bold,
             )
 
+            // The headline is only what is safe to clean. Personal media that
+            // merely deserves a look is reported separately below, never
+            // added into this figure (QA v43 #11).
             Text(
-                text = when {
-                    !hasSnapshot -> "—"
-                    opportunityBytes > 0L -> ByteFormatter.format(opportunityBytes)
-                    else -> stringResource(R.string.dashboard_no_cleanup_found)
-                },
+                text = if (hasSnapshot) ByteFormatter.format(safeBytes) else "—",
                 color = HomeVisualTokens.TextPrimary,
-                fontSize = 42.sp,
-                lineHeight = 44.sp,
+                fontSize = 38.sp,
+                lineHeight = 42.sp,
                 fontWeight = FontWeight.Black,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                maxLines = 2,
             )
 
             if (hasSnapshot) {
                 HomeMetricLine(
                     icon = Icons.Outlined.CleaningServices,
-                    text = stringResource(
-                        R.string.dashboard_safe_amount,
-                        ByteFormatter.format(safeBytes),
-                    ),
+                    text = stringResource(R.string.dashboard_safe_scope),
                     tint = Color(0xFF9DF1C4),
                 )
                 HomeMetricLine(
@@ -200,8 +195,7 @@ private fun HomeMetricLine(
             color = HomeVisualTokens.TextSecondary,
             fontSize = 13.sp,
             lineHeight = 17.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
         )
     }
 }
@@ -221,6 +215,14 @@ private fun HomeStorageGauge(
         freeFraction < .20f -> HomeVisualTokens.Amber
         else -> HomeVisualTokens.Teal
     }
+
+    // The ring has a fixed size, so the text inside it must not grow with the
+    // system font scale or it runs into the ring (QA v43 #05). Converting dp
+    // to sp through the current density cancels the font scale.
+    val density = LocalDensity.current
+    val valueSize = with(density) { 18.dp.toSp() }
+    val valueLineHeight = with(density) { 20.dp.toSp() }
+    val labelSize = with(density) { 10.dp.toSp() }
 
     Box(
         modifier = Modifier.size(size),
@@ -258,16 +260,17 @@ private fun HomeStorageGauge(
             Text(
                 text = if (hasStorage) ByteFormatter.format(storage.availableBytes) else "—",
                 color = HomeVisualTokens.TextPrimary,
-                fontSize = 18.sp,
-                lineHeight = 20.sp,
+                fontSize = valueSize,
+                lineHeight = valueLineHeight,
                 fontWeight = FontWeight.Black,
                 maxLines = 1,
             )
             Text(
                 text = stringResource(R.string.dashboard_free_space),
                 color = accent,
-                fontSize = 10.sp,
+                fontSize = labelSize,
                 fontWeight = FontWeight.Black,
+                maxLines = 1,
             )
             if (hasStorage) {
                 Text(
@@ -276,7 +279,8 @@ private fun HomeStorageGauge(
                         usedPercent,
                     ),
                     color = HomeVisualTokens.TextSecondary,
-                    fontSize = 10.sp,
+                    fontSize = labelSize,
+                    maxLines = 1,
                 )
             }
         }
@@ -394,8 +398,9 @@ internal fun HomeCleanupProofCard(
 
                 if (history.hasHistory) {
                     Text(
-                        text = stringResource(
-                            R.string.home_last_cleanup_summary,
+                        text = pluralStringResource(
+                            R.plurals.home_last_cleanup_summary,
+                            history.lastDeletedCount,
                             homeRelativeCleanupLabel(history.lastCleanupAtMillis),
                             ByteFormatter.format(history.lastDeletedBytes),
                             history.lastDeletedCount,
@@ -445,30 +450,45 @@ internal fun HomeSuggestionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Three cards share a phone-width row. The amount gets the full card
+    // width on its own line and may wrap, but is never cut off: "5.2 …" hid
+    // the unit and made the number unreadable (QA v43 #04).
     Surface(
         modifier = modifier
-            .height(132.dp)
+            .heightIn(min = 132.dp)
             .clickable(onClick = onClick),
         color = HomeVisualTokens.Surface,
         shape = RoundedCornerShape(HomeVisualTokens.CompactRadius),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Surface(
-                modifier = Modifier.size(42.dp),
-                color = accent.copy(alpha = .16f),
-                shape = RoundedCornerShape(14.dp),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = accent,
-                        modifier = Modifier.size(24.dp),
-                    )
+                Surface(
+                    modifier = Modifier.size(42.dp),
+                    color = accent.copy(alpha = .16f),
+                    shape = RoundedCornerShape(14.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            icon,
+                            contentDescription = null,
+                            tint = accent,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    }
                 }
+                Spacer(Modifier.weight(1f))
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    contentDescription = null,
+                    tint = accent,
+                    modifier = Modifier.size(20.dp),
+                )
             }
 
             Text(
@@ -477,30 +497,15 @@ internal fun HomeSuggestionCard(
                 fontSize = 13.sp,
                 lineHeight = 16.sp,
                 fontWeight = FontWeight.Black,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = amount,
-                    modifier = Modifier.weight(1f),
-                    color = accent,
-                    fontSize = 18.sp,
-                    lineHeight = 20.sp,
-                    fontWeight = FontWeight.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowForward,
-                    contentDescription = null,
-                    tint = accent,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
+            Text(
+                text = amount,
+                color = accent,
+                fontSize = 16.sp,
+                lineHeight = 19.sp,
+                fontWeight = FontWeight.Black,
+            )
         }
     }
 }

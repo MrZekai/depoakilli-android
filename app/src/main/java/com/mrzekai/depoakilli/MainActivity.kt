@@ -125,6 +125,7 @@ class MainActivity : ComponentActivity() {
                     onPrepareWhatsAppCleanup = ::cleanWhatsApp,
                     onCleanupResultDismissed = ::onCleanupResultDismissed,
                     onUninstallApp = ::uninstallApp,
+                    onOpenAppInfo = ::openAppInfo,
                     onOpenLanguageSettings = ::openLanguageSettings,
                     onShowPrivacyOptions = ::showPrivacyOptions,
                     onShowRewardedAd = ::showRewardedAd,
@@ -295,6 +296,15 @@ class MainActivity : ComponentActivity() {
             .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
     }
 
+    private fun openAppInfo(packageName: String) {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:$packageName"),
+        )
+        runCatching { startActivity(intent) }
+            .onFailure { cleanerViewModel.showMessage(R.string.message_screen_unavailable) }
+    }
+
     private fun openLanguageSettings() {
         val intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             Intent(
@@ -309,14 +319,25 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun rateApp() {
+        // The listing opens as its own document task that is dropped from
+        // history when left. Back then closes it and returns here, instead of
+        // landing on the Play Store home page (QA v43 #09).
+        val storeFlags = Intent.FLAG_ACTIVITY_NO_HISTORY or
+            Intent.FLAG_ACTIVITY_NEW_DOCUMENT or
+            Intent.FLAG_ACTIVITY_MULTIPLE_TASK
         val marketIntent = Intent(
             Intent.ACTION_VIEW,
             Uri.parse("market://details?id=$PLAY_PACKAGE_NAME"),
-        )
+        ).apply {
+            setPackage(PLAY_STORE_PACKAGE)
+            addFlags(storeFlags)
+        }
         val webIntent = Intent(
             Intent.ACTION_VIEW,
             Uri.parse("https://play.google.com/store/apps/details?id=$PLAY_PACKAGE_NAME"),
-        )
+        ).apply {
+            addFlags(storeFlags)
+        }
         startFirstAvailable(marketIntent, webIntent)
     }
 
@@ -339,7 +360,10 @@ class MainActivity : ComponentActivity() {
                 ),
             )
         }
-        startFirstAvailable(intent)
+        // An app chooser instead of the default mail app, which on a phone
+        // without a configured account opened straight into account setup
+        // (QA v43 #10). The address itself is shown in the feedback dialog.
+        startFirstAvailable(Intent.createChooser(intent, getString(R.string.send_feedback)))
     }
 
     private fun shareApp() {
@@ -388,6 +412,7 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
+        const val PLAY_STORE_PACKAGE = "com.android.vending"
         const val POST_TASK_AD_SETTLE_MILLIS = 350L
     }
 }

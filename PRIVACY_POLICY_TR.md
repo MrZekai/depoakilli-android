@@ -8,7 +8,7 @@ Akıllı Temizleyici (`com.mrzekai.depoakilli`) MrZekai tarafından sunulur. Giz
 
 Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini analiz eder. Birebir kopya tespiti için içerik parmak izleri yerel olarak hesaplanabilir. Tüm dosyalara erişim; depolama yönetimi ve dosya bakımı temel özellikler olduğu için istenir: çöp bakımı, birebir kopya tespiti, büyük dosya incelemesi, İndirilenler/APK yönetimi, depolama analizi ve WhatsApp paylaşılan medya yönetimi. Android diğer uygulamaların özel dahili verilerini korumaya devam eder.
 
-Kullanım Erişimi isteğe bağlıdır. İzin verildiğinde Android'in bildirdiği uygulama depolama/önbellek istatistikleri ve son kullanım bilgisi için kullanılır. Derin Uygulama Önbelleği Android'in resmî önbellek temizleme işlemini ister; gerekli onayı Android yönetir.
+Kullanım Erişimi isteğe bağlıdır. İzin verildiğinde Android'in bildirdiği uygulama depolama/önbellek istatistikleri ve son kullanım bilgisi için kullanılır. Uygulama Önbelleği Yöneticisi Android'in resmî önbellek temizleme işlemini ister; gerekli onayı Android yönetir.
 
 Akıllı Temizleyici kişisel dosyaları, dosya adlarını, dosya yollarını, dosya içeriklerini, kopya parmak izlerini veya kurulu uygulama listelerini MrZekai'ye yüklemez.
 

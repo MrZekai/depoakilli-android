@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -581,8 +582,9 @@ private fun AnalyzerTypeCard(
                         fontWeight = FontWeight.Black,
                     )
                     Text(
-                        text = stringResource(
-                            R.string.storage_analyzer_type_summary,
+                        text = pluralStringResource(
+                            R.plurals.storage_analyzer_type_summary,
+                            stat.fileCount,
                             stat.fileCount,
                             ByteFormatter.format(stat.totalBytes),
                             percent,

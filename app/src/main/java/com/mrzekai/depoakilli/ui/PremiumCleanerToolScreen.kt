@@ -6,6 +6,7 @@ import android.net.Uri
 import android.util.LruCache
 import android.util.Size
 import android.view.LayoutInflater
+import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -20,7 +21,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -63,6 +67,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -81,6 +86,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -362,6 +368,10 @@ private fun PremiumToolResults(
     val activeDetail = sections.firstOrNull { it.key == detailKey }
     val previewItem = summary.items.firstOrNull { it.id == previewId }
 
+    // System Back closes an open group first, like the on-screen back arrow,
+    // instead of leaving the whole tool.
+    BackHandler(enabled = activeDetail != null) { detailKey = null }
+
     if (previewItem != null) {
         PremiumToolPreviewDialog(
             item = previewItem,
@@ -525,13 +535,39 @@ private fun PremiumCleanupConfirmationDialog(
                     }
 
                     Text(
-                        stringResource(
-                            R.string.premium_cleanup_confirm_body,
+                        pluralStringResource(
+                            R.plurals.premium_cleanup_confirm_body,
+                            selectedItems.size,
                             selectedItems.size,
                             ByteFormatter.format(selectedBytes),
                         ),
                         color = ToolTextSecondary,
                     )
+
+                    // Same file examples as the Smart Clean confirmation, so every
+                    // delete confirmation shows what is about to go (QA v43 polish).
+                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        selectedItems.take(5).forEach { item ->
+                            Text(
+                                "• ${item.name}",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        if (selectedItems.size > 5) {
+                            Text(
+                                pluralStringResource(
+                                    R.plurals.smart_cleanup_more_items,
+                                    selectedItems.size - 5,
+                                    selectedItems.size - 5,
+                                ),
+                                color = ToolTextSecondary,
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                    }
 
                     Surface(
                         color = ToolRed.copy(alpha = .10f),
@@ -648,8 +684,8 @@ private fun PremiumToolHero(
 private fun PremiumHeroStat(value: String, label: String, modifier: Modifier = Modifier) {
     Surface(modifier = modifier, color = Color(0x55020A19), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(horizontal = 9.dp, vertical = 8.dp)) {
-            Text(value, color = Color.White, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 9.sp, maxLines = 1)
+            Text(value, color = Color.White, fontWeight = FontWeight.Black)
+            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 9.sp)
         }
     }
 }
@@ -691,7 +727,7 @@ private fun PremiumToolSectionCard(
     onToggleItem: (String) -> Unit,
     onToggleAll: () -> Unit,
 ) {
-    val allSelected = section.items.isNotEmpty() && section.items.all(CleanableItem::selected)
+    val selectionState = sectionSelectionState(section.items.count(CleanableItem::selected), section.items.size)
     Card(
         colors = CardDefaults.cardColors(containerColor = ToolCard),
         shape = RoundedCornerShape(25.dp),
@@ -704,16 +740,16 @@ private fun PremiumToolSectionCard(
                 }
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(section.title, color = Color.White, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(section.subtitle, color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(section.title, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(section.subtitle, color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall)
                 }
                 TextButton(onClick = onViewAll) {
                     Text(stringResource(R.string.whatsapp_view_all), color = section.accent, fontWeight = FontWeight.Black)
                     Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = section.accent, modifier = Modifier.size(18.dp))
                 }
-                Checkbox(
-                    checked = allSelected,
-                    onCheckedChange = { onToggleAll() },
+                TriStateCheckbox(
+                    state = selectionState,
+                    onClick = onToggleAll,
                     colors = CheckboxDefaults.colors(checkedColor = section.accent, uncheckedColor = Color(0xFFB7C5DB)),
                 )
             }
@@ -799,8 +835,17 @@ private fun PremiumToolItemCard(
             Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
                 Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 9.sp, maxLines = 1)
-                if (item.protectedDuplicateName != null) {
-                    Text(stringResource(R.string.premium_duplicates_kept_short), color = ToolGreen, fontSize = 9.sp, maxLines = 1)
+                // This card is a removable extra copy. Name the protected
+                // original instead of a label that read as if this file were
+                // the original (QA v43 #07).
+                item.protectedDuplicateName?.let { original ->
+                    Text(
+                        stringResource(R.string.premium_duplicate_copy_of, original),
+                        color = ToolGreen,
+                        fontSize = 9.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
@@ -832,7 +877,7 @@ private fun PremiumToolDetailPage(
                 Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
             }
             Column(Modifier.weight(1f)) {
-                Text(section.title, color = Color.White, fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(section.title, color = Color.White, fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(section.subtitle, color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall)
             }
             TextButton(onClick = onToggleAll) {
@@ -886,12 +931,15 @@ private fun PremiumToolBottomAction(
 ) {
     Surface(color = ToolBackground, shadowElevation = 12.dp) {
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                modifier = Modifier.width(122.dp).height(66.dp),
+                modifier = Modifier.width(122.dp).fillMaxHeight().heightIn(min = 66.dp),
                 color = ToolCard,
                 shape = RoundedCornerShape(20.dp),
                 border = BorderStroke(1.dp, accent.copy(alpha = .35f)),
@@ -899,13 +947,21 @@ private fun PremiumToolBottomAction(
                 Column(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalArrangement = Arrangement.Center) {
                     Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 10.sp)
                     Text(ByteFormatter.format(selectedBytes), color = accent, fontWeight = FontWeight.Black, fontSize = 20.sp)
-                    Text(stringResource(R.string.premium_tool_selected_count, selectedCount), color = ToolTextSecondary, fontSize = 9.sp)
+                    Text(
+                        if (selectedCount > 0) {
+                            pluralStringResource(R.plurals.premium_tool_selected_count, selectedCount, selectedCount)
+                        } else {
+                            stringResource(R.string.nothing_selected_hint)
+                        },
+                        color = ToolTextSecondary,
+                        fontSize = 9.sp,
+                    )
                 }
             }
             Button(
                 onClick = onClean,
                 enabled = selectedCount > 0 && !cleanupInProgress,
-                modifier = Modifier.weight(1f).height(66.dp),
+                modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 66.dp),
                 shape = RoundedCornerShape(21.dp),
                 contentPadding = PaddingValues(0.dp),
             ) {

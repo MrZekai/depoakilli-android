@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -64,6 +66,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -82,6 +85,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -102,7 +106,6 @@ import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Purple500
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 import java.io.File
@@ -236,18 +239,8 @@ private fun WhatsAppHeader(
                 )
             }
         }
-        Surface(
-            color = WhatsAppGreen.copy(alpha = .10f),
-            shape = RoundedCornerShape(16.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, WhatsAppGreen.copy(alpha = .30f)),
-        ) {
-            Icon(
-                Icons.Outlined.AutoAwesome,
-                contentDescription = null,
-                tint = WhatsAppGreen,
-                modifier = Modifier.padding(10.dp).size(22.dp),
-            )
-        }
+        // The decorative sparkle button that did nothing on tap was removed
+        // (QA v43 #15).
     }
 }
 
@@ -628,7 +621,7 @@ private fun WhatsAppHeroCard(summary: WhatsAppLibrarySummary) {
                     fontWeight = FontWeight.Black,
                 )
                 Text(
-                    stringResource(R.string.whatsapp_scan_stats, summary.scannedFileCount),
+                    pluralStringResource(R.plurals.whatsapp_scan_stats, summary.scannedFileCount, summary.scannedFileCount),
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -722,7 +715,7 @@ private fun WhatsAppGroupSection(
     onPreview: (WhatsAppMediaItem) -> Unit,
 ) {
     val accent = groupAccent(group)
-    val allSelected = items.isNotEmpty() && items.all(WhatsAppMediaItem::selected)
+    val selectionState = sectionSelectionState(items.count(WhatsAppMediaItem::selected), items.size)
     Card(
         colors = CardDefaults.cardColors(containerColor = WaCard),
         shape = RoundedCornerShape(22.dp),
@@ -748,8 +741,9 @@ private fun WhatsAppGroupSection(
                 Column(Modifier.weight(1f)) {
                     Text(stringResource(groupTitleRes(group)), color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
                     Text(
-                        stringResource(
-                            R.string.whatsapp_category_summary,
+                        pluralStringResource(
+                            R.plurals.whatsapp_category_summary,
+                            items.size,
                             items.size,
                             ByteFormatter.format(items.sumOf(WhatsAppMediaItem::sizeBytes)),
                         ),
@@ -761,9 +755,9 @@ private fun WhatsAppGroupSection(
                     Text(stringResource(R.string.whatsapp_view_all), color = WhatsAppGreen, fontWeight = FontWeight.Bold)
                     Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = WhatsAppGreen, modifier = Modifier.size(18.dp))
                 }
-                Checkbox(
-                    checked = allSelected,
-                    onCheckedChange = { onToggleGroup() },
+                TriStateCheckbox(
+                    state = selectionState,
+                    onClick = onToggleGroup,
                     colors = CheckboxDefaults.colors(
                         checkedColor = accent,
                         uncheckedColor = Color(0xFFB9C7DE),
@@ -950,7 +944,7 @@ private fun WhatsAppGroupDetailPage(
         WhatsAppSortMode.LARGEST -> filtered.sortedByDescending(WhatsAppMediaItem::sizeBytes)
         WhatsAppSortMode.NEWEST -> filtered.sortedByDescending(WhatsAppMediaItem::modifiedAtMillis)
     }
-    val allSelected = filtered.isNotEmpty() && filtered.all(WhatsAppMediaItem::selected)
+    val selectionState = sectionSelectionState(filtered.count(WhatsAppMediaItem::selected), filtered.size)
 
     Column(Modifier.fillMaxSize()) {
         WhatsAppHeader(onBack = onBack, subtitle = stringResource(groupTitleRes(group)))
@@ -969,17 +963,18 @@ private fun WhatsAppGroupDetailPage(
                     Column(Modifier.weight(1f)) {
                         Text(stringResource(groupTitleRes(group)), color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
                         Text(
-                            stringResource(
-                                R.string.whatsapp_category_summary,
+                            pluralStringResource(
+                                R.plurals.whatsapp_category_summary,
+                                filtered.size,
                                 filtered.size,
                                 ByteFormatter.format(filtered.sumOf(WhatsAppMediaItem::sizeBytes)),
                             ),
                             color = WaTextSecondary,
                         )
                     }
-                    Checkbox(
-                        checked = allSelected,
-                        onCheckedChange = { onToggleGroup() },
+                    TriStateCheckbox(
+                        state = selectionState,
+                        onClick = onToggleGroup,
                         colors = CheckboxDefaults.colors(
                             checkedColor = groupAccent(group),
                             uncheckedColor = Color(0xFFB9C7DE),
@@ -1093,18 +1088,23 @@ private fun WhatsAppCleanupFooter(
 ) {
     Surface(color = Color(0xFF020817), shadowElevation = 18.dp) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // Flexible height: the fixed 64 dp card clipped the "0 items"
+            // line (QA v43 polish).
             Card(
-                modifier = Modifier.weight(.38f).height(64.dp),
+                modifier = Modifier.weight(.38f).fillMaxHeight().heightIn(min = 64.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF091B39)),
                 shape = RoundedCornerShape(18.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, WhatsAppGreen.copy(alpha = .20f)),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = WhatsAppGreen, modifier = Modifier.size(25.dp))
@@ -1112,7 +1112,15 @@ private fun WhatsAppCleanupFooter(
                     Column {
                         Text(stringResource(R.string.whatsapp_selected_size), color = WaTextSecondary, fontSize = 9.sp)
                         Text(ByteFormatter.format(selectedBytes), color = WhatsAppGreen, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                        Text(stringResource(R.string.whatsapp_selected_items_short, selectedCount), color = WaTextSecondary, fontSize = 9.sp)
+                        Text(
+                            if (selectedCount > 0) {
+                                pluralStringResource(R.plurals.whatsapp_selected_items_short, selectedCount, selectedCount)
+                            } else {
+                                stringResource(R.string.nothing_selected_hint)
+                            },
+                            color = WaTextSecondary,
+                            fontSize = 9.sp,
+                        )
                     }
                 }
             }
@@ -1120,7 +1128,7 @@ private fun WhatsAppCleanupFooter(
             Card(
                 onClick = onClick,
                 enabled = enabled,
-                modifier = Modifier.weight(.62f).height(64.dp),
+                modifier = Modifier.weight(.62f).fillMaxHeight().heightIn(min = 64.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent, disabledContainerColor = Color(0xFF19304F)),
             ) {
@@ -1166,8 +1174,9 @@ private fun WhatsAppCleanupConfirmationDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    stringResource(
-                        R.string.whatsapp_delete_confirm_message,
+                    pluralStringResource(
+                        R.plurals.whatsapp_delete_confirm_message,
+                        summary.selectedItems.size,
                         summary.selectedItems.size,
                         ByteFormatter.format(summary.selectedBytes),
                     ),
@@ -1186,9 +1195,8 @@ private fun WhatsAppCleanupConfirmationDialog(
                     }
                 Text(
                     stringResource(R.string.whatsapp_cleanup_ad_notice),
-                    color = ElectricBlue,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold,
                 )
                 Text(
                     stringResource(R.string.whatsapp_cleanup_irreversible),

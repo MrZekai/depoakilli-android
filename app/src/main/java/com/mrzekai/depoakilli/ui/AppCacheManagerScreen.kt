@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -137,6 +138,8 @@ internal fun AppCacheManagerScreen(
             CacheManagerHero(
                 totalCacheBytes = state.appCache.totalCacheBytes,
                 scannedAppCount = state.appCache.scannedAppCount,
+                measured = state.appCache.accessGranted,
+                usageAccessMissing = !state.hasUsageAccess,
             )
         }
 
@@ -301,6 +304,8 @@ internal fun AppCacheManagerScreen(
 private fun CacheManagerHero(
     totalCacheBytes: Long,
     scannedAppCount: Int,
+    measured: Boolean,
+    usageAccessMissing: Boolean,
 ) {
     val shape = RoundedCornerShape(28.dp)
     Row(
@@ -329,22 +334,34 @@ private fun CacheManagerHero(
                 color = Color(0xFFD2DAF5),
                 fontWeight = FontWeight.Bold,
             )
+            // Unmeasured is not zero: without Usage Access Android reports
+            // nothing, so no figure is shown (QA v43 #03).
             Text(
-                text = ByteFormatter.format(totalCacheBytes),
+                text = if (measured) ByteFormatter.format(totalCacheBytes) else "—",
                 color = Color.White,
                 fontSize = 38.sp,
                 lineHeight = 40.sp,
                 fontWeight = FontWeight.Black,
                 maxLines = 1,
             )
-            Text(
-                text = stringResource(
-                    R.string.cache_modern_measured_apps,
-                    scannedAppCount,
-                ),
-                color = Color(0xFFB8C6E6),
-                style = MaterialTheme.typography.bodySmall,
-            )
+            if (measured) {
+                Text(
+                    text = pluralStringResource(
+                        R.plurals.cache_modern_measured_apps,
+                        scannedAppCount,
+                        scannedAppCount,
+                    ),
+                    color = Color(0xFFB8C6E6),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            } else if (usageAccessMissing) {
+                Text(
+                    text = stringResource(R.string.cache_modern_not_measured),
+                    color = Color(0xFFFFD580),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             Text(
                 text = stringResource(R.string.cache_modern_hero_helper),
                 color = Color(0xFF8EE8D0),

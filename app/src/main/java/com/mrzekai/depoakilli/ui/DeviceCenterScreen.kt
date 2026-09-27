@@ -1,5 +1,7 @@
 package com.mrzekai.depoakilli.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,9 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
@@ -34,6 +39,7 @@ import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,11 +49,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -259,12 +272,22 @@ private fun ToolsHero(state: CleanerUiState) {
         ) {
             Text(stringResource(R.string.cleaner_engine_badge), color = Color.White.copy(alpha = .78f), fontWeight = FontWeight.Bold)
             Text(stringResource(R.string.tools_rebuilt_title), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black)
+            // Without Usage Access Android reports no per-app cache at all.
+            // Say so instead of printing "0 B", which read as a real
+            // measurement (QA v43 #03).
             Text(
-                stringResource(
-                    R.string.tools_rebuilt_status,
-                    ByteFormatter.format(state.storage.availableBytes),
-                    ByteFormatter.format(state.appCache.totalCacheBytes),
-                ),
+                if (state.appCache.accessGranted) {
+                    stringResource(
+                        R.string.tools_rebuilt_status,
+                        ByteFormatter.format(state.storage.availableBytes),
+                        ByteFormatter.format(state.appCache.totalCacheBytes),
+                    )
+                } else {
+                    stringResource(
+                        R.string.tools_rebuilt_status_cache_unmeasured,
+                        ByteFormatter.format(state.storage.availableBytes),
+                    )
+                },
                 color = Color.White.copy(alpha = .86f),
             )
             Row(
@@ -380,7 +403,9 @@ private fun ToolActionCard(
             Spacer(Modifier.width(13.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, fontWeight = FontWeight.Black)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                // Full description, wrapped: cutting it at two lines hid the
+                // important part ("lower-co…", "outside Downl…") (QA v43 #13).
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent)
         }
@@ -393,6 +418,7 @@ internal fun AppManagerScreen(
     onRequestUsageAccess: () -> Unit,
     onRefresh: () -> Unit,
     onUninstallApp: (String) -> Unit,
+    onOpenAppInfo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -415,18 +441,22 @@ internal fun AppManagerScreen(
         }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.apps_found, state.installedApps.size), fontWeight = FontWeight.Black)
+                Text(pluralStringResource(R.plurals.apps_found, state.installedApps.size, state.installedApps.size), fontWeight = FontWeight.Black)
                 TextButton(onClick = onRefresh) { Text(stringResource(R.string.cache_refresh)) }
             }
         }
         items(state.installedApps, key = InstalledAppEntry::packageName) { app ->
-            AppManagerRow(app, onUninstallApp)
+            AppManagerRow(app, onUninstallApp, onOpenAppInfo)
         }
     }
 }
 
 @Composable
-private fun AppManagerRow(app: InstalledAppEntry, onUninstallApp: (String) -> Unit) {
+private fun AppManagerRow(
+    app: InstalledAppEntry,
+    onUninstallApp: (String) -> Unit,
+    onOpenAppInfo: (String) -> Unit,
+) {
     Card(shape = RoundedCornerShape(18.dp)) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(color = ElectricBlue.copy(alpha = .12f), shape = CircleShape) {
@@ -448,13 +478,21 @@ private fun AppManagerRow(app: InstalledAppEntry, onUninstallApp: (String) -> Un
                     )
                 }
             }
-            TextButton(onClick = { onUninstallApp(app.packageName) }) { Text(stringResource(R.string.uninstall)) }
+            // Preinstalled system apps cannot be uninstalled by the user.
+            // Offer Android's App info page instead, where Android shows what
+            // is actually allowed (disable, clear storage) (QA v43 #08).
+            if (app.systemApp) {
+                TextButton(onClick = { onOpenAppInfo(app.packageName) }) { Text(stringResource(R.string.app_info)) }
+            } else {
+                TextButton(onClick = { onUninstallApp(app.packageName) }) { Text(stringResource(R.string.uninstall)) }
+            }
         }
     }
 }
 
 @Composable
 internal fun SettingsDetailScreen(
+    listState: LazyListState = rememberLazyListState(),
     privacyOptionsRequired: Boolean,
     canRequestAds: Boolean,
     adFreeRemainingMillis: Long,
@@ -469,8 +507,20 @@ internal fun SettingsDetailScreen(
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showFeedbackDialog by rememberSaveable { mutableStateOf(false) }
+    if (showFeedbackDialog) {
+        FeedbackDialog(
+            onOpenEmailApp = {
+                showFeedbackDialog = false
+                onSendFeedback()
+            },
+            onDismiss = { showFeedbackDialog = false },
+        )
+    }
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        state = listState,
         contentPadding = PaddingValues(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -496,8 +546,9 @@ internal fun SettingsDetailScreen(
             item {
                 SettingsInfoRow(
                     title = stringResource(R.string.ad_free_active_title),
-                    subtitle = stringResource(
-                        R.string.ad_free_active_subtitle,
+                    subtitle = pluralStringResource(
+                        R.plurals.ad_free_active_subtitle,
+                        ((adFreeRemainingMillis + 59_999L) / 60_000L).toInt(),
                         ((adFreeRemainingMillis + 59_999L) / 60_000L).toInt(),
                     ),
                     icon = Icons.Outlined.AutoAwesome,
@@ -513,7 +564,11 @@ internal fun SettingsDetailScreen(
             )
         }
         item { SettingsActionRow(stringResource(R.string.rate_us), stringResource(R.string.rate_us_subtitle), Icons.Outlined.Bolt, onRateApp) }
-        item { SettingsActionRow(stringResource(R.string.send_feedback), stringResource(R.string.send_feedback_subtitle), Icons.Outlined.Info, onSendFeedback) }
+        item {
+            SettingsActionRow(stringResource(R.string.send_feedback), stringResource(R.string.send_feedback_subtitle), Icons.Outlined.Info) {
+                showFeedbackDialog = true
+            }
+        }
         item { SettingsActionRow(stringResource(R.string.share_app), stringResource(R.string.share_app_subtitle), Icons.Outlined.Android, onShareApp) }
         item { SettingsActionRow(stringResource(R.string.privacy_policy), stringResource(R.string.privacy_policy_subtitle), Icons.Outlined.Security) { onOpenLegalPage(LegalPage.PRIVACY) } }
         item { SettingsActionRow(stringResource(R.string.terms_of_service), stringResource(R.string.terms_of_service_subtitle), Icons.Outlined.Info) { onOpenLegalPage(LegalPage.TERMS) } }
@@ -522,6 +577,71 @@ internal fun SettingsDetailScreen(
         }
         item { SettingsActionRow(stringResource(R.string.about_app), stringResource(R.string.about_app_subtitle), Icons.Outlined.Info) { onOpenLegalPage(LegalPage.ABOUT) } }
     }
+}
+
+/**
+ * Feedback contact sheet.
+ *
+ * Opening the mail app directly dropped users without a configured account
+ * into the mail app's account setup, with no way to see where to write
+ * (QA v43 #10). The address is now shown and selectable, can be copied, and the
+ * mail app is offered through Android's app chooser.
+ */
+@Composable
+private fun FeedbackDialog(
+    onOpenEmailApp: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val supportEmail = BuildConfig.SUPPORT_EMAIL.trim()
+    var copied by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Outlined.Info, contentDescription = null, tint = ElectricBlue) },
+        title = { Text(stringResource(R.string.send_feedback), fontWeight = FontWeight.Black) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.feedback_dialog_body))
+                if (supportEmail.isNotBlank()) {
+                    SelectionContainer {
+                        Text(
+                            supportEmail,
+                            fontWeight = FontWeight.Bold,
+                            color = ElectricBlue,
+                        )
+                    }
+                    if (copied) {
+                        Text(
+                            stringResource(R.string.feedback_address_copied),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onOpenEmailApp) {
+                Text(stringResource(R.string.feedback_open_email))
+            }
+        },
+        dismissButton = {
+            if (supportEmail.isNotBlank()) {
+                TextButton(
+                    onClick = {
+                        val clipboard = context.getSystemService(ClipboardManager::class.java)
+                        if (clipboard != null) {
+                            clipboard.setPrimaryClip(ClipData.newPlainText(supportEmail, supportEmail))
+                            copied = true
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.feedback_copy_address))
+                }
+            }
+        },
+    )
 }
 
 @Composable

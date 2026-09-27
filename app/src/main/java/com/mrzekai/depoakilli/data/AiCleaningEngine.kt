@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit
  * Conservative on-device rules used by Smart Scan.
  *
  * The engine only preselects items that are strongly likely to be disposable
- * (temporary files, stale installers, WhatsApp statuses, and unambiguous exact
- * duplicate copies). User-created downloads, screenshots, large files and sent
- * media are shown for review but are not silently selected.
+ * (regeneratable thumbnails, temporary files and unambiguous exact duplicate
+ * copies). Installers, WhatsApp media, user-created downloads, screenshots,
+ * large files and sent media are shown for review but are never silently
+ * selected: a user may have kept any of them on purpose.
  */
 class AiCleaningEngine(
     private val nowMillis: () -> Long = System::currentTimeMillis,
@@ -32,7 +33,9 @@ class AiCleaningEngine(
                 safetyScore = if (isWhatsAppStatus) 98 else 78,
                 reasonRes = if (isWhatsAppStatus) R.string.reason_whatsapp_status else R.string.reason_whatsapp_sent,
                 reasonArgs = if (isWhatsAppStatus) emptyList() else listOf(ageDays),
-                recommended = isWhatsAppStatus,
+                // WhatsApp media is personal content. Nothing inside it is
+                // preselected, statuses included; the user decides.
+                recommended = false,
             )
         }
 
@@ -53,21 +56,20 @@ class AiCleaningEngine(
         }
 
         if (name.endsWith(".apk") || mime == APK_MIME) {
-            // APK archives are frequently retained deliberately. They remain
-            // discoverable after seven days, but only become a safe default
-            // selection after a full month.
+            // APK archives are frequently retained deliberately (sideloaded
+            // apps, backups of removed apps). They are always listed for
+            // review and never preselected, whatever their age.
             val installerIsOld = ageDays >= OLD_INSTALLER_DAYS
-            val autoSelect = ageDays >= APK_AUTO_SELECT_DAYS
             return AiAssessment(
                 category = CleanCategory.APK_PACKAGE,
-                safetyScore = if (autoSelect) 96 else if (installerIsOld) 91 else 70,
+                safetyScore = if (ageDays >= APK_LONG_KEPT_DAYS) 91 else if (installerIsOld) 86 else 70,
                 reasonRes = if (installerIsOld) R.string.reason_old_installer else R.string.reason_downloaded_installer,
                 reasonArgs = if (installerIsOld) listOf(ageDays) else emptyList(),
-                recommended = autoSelect,
+                recommended = false,
             )
         }
 
-        val isScreenshot = isScreenshot(path, name)
+        val isScreenshot = isScreenshot(path, name, file.mimeType)
         if (isScreenshot && ageDays >= 14) {
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
@@ -127,7 +129,7 @@ class AiCleaningEngine(
             )
         }
 
-        val isScreenshot = isScreenshot(path, name)
+        val isScreenshot = isScreenshot(path, name, file.mimeType)
         if (isScreenshot && ageDays >= DEEP_SCREENSHOT_DAYS) {
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
@@ -173,7 +175,7 @@ class AiCleaningEngine(
         val ageDays = ageDays(file.modifiedAtMillis)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
-        if (!isScreenshot(path, name)) return null
+        if (!isScreenshot(path, name, file.mimeType)) return null
 
         return AiAssessment(
             category = CleanCategory.SCREENSHOT,
@@ -202,7 +204,11 @@ class AiCleaningEngine(
     )
 
 
-    private fun isScreenshot(path: String, name: String): Boolean {
+    private fun isScreenshot(path: String, name: String, mimeType: String): Boolean {
+        // Many devices save screen recordings (.mp4) into the Screenshots
+        // folder. A recording is not a screenshot and must not be labelled or
+        // grouped as one.
+        if (!isStillImage(name, mimeType)) return false
         return path.contains("/screenshots/") ||
             path.contains("/screenshot/") ||
             path.endsWith("/screenshots") ||
@@ -212,6 +218,12 @@ class AiCleaningEngine(
             name.startsWith("screencap") ||
             name.startsWith("ekran_goruntusu") ||
             name.startsWith("ekran goruntusu")
+    }
+
+    private fun isStillImage(name: String, mimeType: String): Boolean {
+        val mime = StoragePathRules.normalizeText(mimeType)
+        if (mime.isNotEmpty()) return mime.startsWith("image/")
+        return name.substringAfterLast('.', "") in SCREENSHOT_IMAGE_EXTENSIONS
     }
 
     private fun isTemporary(
@@ -255,8 +267,9 @@ class AiCleaningEngine(
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L
         private const val TEMP_MIN_AGE_DAYS = 3L
         private const val OLD_INSTALLER_DAYS = 7L
-        private const val APK_AUTO_SELECT_DAYS = 30L
+        private const val APK_LONG_KEPT_DAYS = 30L
         private val TEMP_EXTENSIONS = listOf(".tmp", ".temp", ".part", ".crdownload", ".download", ".cache")
+        private val SCREENSHOT_IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "webp", "heic", "heif")
         private val INTERRUPTED_DOWNLOAD_EXTENSIONS = listOf(".part", ".crdownload", ".download")
     }
 }

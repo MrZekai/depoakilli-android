@@ -14,4 +14,14 @@ class StoragePathRulesTest {
         assertFalse(StoragePathRules.isProtectedAppPrivatePath("Android/media/com.whatsapp/WhatsApp/Media"))
         assertFalse(StoragePathRules.isProtectedAppPrivatePath("Download/archive.zip"))
     }
+
+    @Test
+    fun `hidden folder marker files are recognised in any case`() {
+        assertTrue(StoragePathRules.isSystemMarkerFile(".nomedia"))
+        assertTrue(StoragePathRules.isSystemMarkerFile(".NOMEDIA"))
+        assertTrue(StoragePathRules.isSystemMarkerFile(".hidden"))
+        assertFalse(StoragePathRules.isSystemMarkerFile("nomedia.jpg"))
+        assertFalse(StoragePathRules.isSystemMarkerFile(".nomedia.jpg"))
+        assertFalse(StoragePathRules.isSystemMarkerFile("IMG_0001.jpg"))
+    }
 }

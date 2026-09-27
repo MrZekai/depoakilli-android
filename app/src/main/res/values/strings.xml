@@ -78,7 +78,10 @@
     <string name="no_safe_suggestions">Great! No safe cleaning suggestions were found.</string>
     <string name="scan_again">Scan again</string>
     <string name="clean_action">%1$s CLEAN</string>
-    <string name="category_summary">%1$d items • %2$s</string>
+    <plurals name="category_summary">
+        <item quantity="one">%1$d item • %2$s</item>
+        <item quantity="other">%1$d items • %2$s</item>
+    </plurals>
     <string name="file_confidence">%1$s • %2$d%% confidence</string>
     <string name="cache_manager_title">App Cache Manager</string>
     <string name="cache_manager_subtitle">Measure real Android-reported cache per app and verify the actual reduction after cleanup</string>
@@ -151,7 +154,7 @@
     <string name="category_app_cache">Cache</string>
     <string name="category_app_cache_description">Safe temporary app files</string>
     <string name="category_whatsapp">WhatsApp media</string>
-    <string name="category_whatsapp_description">Temporary statuses and older sent-media copies</string>
+    <string name="category_whatsapp_description">Statuses and sent media older than 30 days. WhatsApp Cleaner shows all WhatsApp media.</string>
     <string name="reason_old_installer">%1$d-day-old installer package</string>
     <string name="reason_downloaded_installer">Downloaded installer package</string>
     <string name="reason_old_screenshot">%1$d-day-old screenshot</string>
@@ -182,7 +185,10 @@
     <string name="whatsapp_scanning_title">Analyzing WhatsApp Media</string>
     <string name="whatsapp_scanning_description">Reading WhatsApp shared Media directly, classifying files and preparing previews…</string>
     <string name="whatsapp_scan_complete">WHATSAPP MEDIA FOUND</string>
-    <string name="whatsapp_scan_stats">%1$d files classified on this device</string>
+    <plurals name="whatsapp_scan_stats">
+        <item quantity="one">%1$d file classified on this device</item>
+        <item quantity="other">%1$d files classified on this device</item>
+    </plurals>
     <string name="whatsapp_selection_safe">Nothing is preselected. You decide exactly what will be deleted.</string>
     <string name="whatsapp_no_files">No accessible WhatsApp media file was found.</string>
     <string name="whatsapp_category_images">Images</string>
@@ -199,11 +205,17 @@
     <string name="whatsapp_category_stickers_description">Animated and static WhatsApp media</string>
     <string name="whatsapp_category_other">Other files</string>
     <string name="whatsapp_category_other_description">Files outside the standard media groups</string>
-    <string name="whatsapp_category_summary">%1$d files • %2$s</string>
+    <plurals name="whatsapp_category_summary">
+        <item quantity="one">%1$d file • %2$s</item>
+        <item quantity="other">%1$d files • %2$s</item>
+    </plurals>
     <string name="whatsapp_selected_count">%1$d selected</string>
     <string name="whatsapp_delete_action">DELETE %1$s</string>
     <string name="whatsapp_delete_confirm_title">Delete selected WhatsApp files?</string>
-    <string name="whatsapp_delete_confirm_message">%1$d files using %2$s will be permanently deleted. This can’t be undone.</string>
+    <plurals name="whatsapp_delete_confirm_message">
+        <item quantity="one">%1$d file using %2$s will be permanently deleted. This can’t be undone.</item>
+        <item quantity="other">%1$d files using %2$s will be permanently deleted. This can’t be undone.</item>
+    </plurals>
     <string name="device_center_title">Device Center</string>
     <string name="device_center_live_status">Live device status</string>
     <string name="device_android_summary">Android %1$s • API %2$d</string>
@@ -240,7 +252,7 @@
     <string name="feedback_subject">Smart Cleaner feedback</string>
     <string name="feedback_template">Device: %1$s %2$s\nAndroid: %3$s\n\nFeedback:\n</string>
     <string name="share_app_message">Smart Cleaner analyzes storage safely on your device: %1$s</string>
-    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. Deep App Cache uses Android’s official system cache-cleaning flow; Android may require a system confirmation.\n\nPackage: com.mrzekai.depoakilli</string>
+    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner is a storage-management and maintenance app. It scans shared storage on-device for junk, exact duplicates, large files, old downloads, APK installers, media review items and WhatsApp media. App Cache Manager uses Android’s official system cache-cleaning flow; Android may require a system confirmation.\n\nPackage: com.mrzekai.depoakilli</string>
     <string name="access_files_missing">File access needed</string>
     <string name="access_files_ready">Files ready</string>
     <string name="access_usage_optional">Usage access optional</string>
@@ -254,7 +266,10 @@
     <string name="app_manager_title">App Manager</string>
     <string name="app_manager_usage_description">Usage Access lets Smart Cleaner show app storage totals and last-used information. Personal app content is not read.</string>
     <string name="app_manager_usage_title">Enable app usage statistics</string>
-    <string name="apps_found">%1$d apps found</string>
+    <plurals name="apps_found">
+        <item quantity="one">%1$d app found</item>
+        <item quantity="other">%1$d apps found</item>
+    </plurals>
     <string name="cache_access_explanation_v050">Usage Access lets Smart Cleaner measure cache across launchable apps and report the device cache total without reading personal app content.</string>
     <string name="category_junk">Junk files</string>
     <string name="category_junk_description">Old temporary, thumbnail and incomplete download artifacts</string>
@@ -295,8 +310,8 @@
     <string name="message_deep_cache_complete">Android completed the requested device cache cleanup.</string>
     <string name="message_own_cache_cleared">%1$s of Smart Cleaner cache was removed.</string>
     <string name="message_whatsapp_not_found">No supported WhatsApp or WhatsApp Business Media folder was found in shared storage.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. Deep App Cache invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Files you explicitly delete are removed through Android and cannot be restored by Smart Cleaner. Google retains data it processes under its published policies.</string>
-    <string name="reason_large_file">Large file • %1$d days old</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. App Cache Manager invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Files you explicitly delete are removed through Android and cannot be restored by Smart Cleaner. Google retains data it processes under its published policies.</string>
+    <string name="reason_large_file">Large file • age: %1$d d</string>
     <string name="reason_temporary_file">Temporary/incomplete artifact • %1$d days old</string>
     <string name="reason_thumbnail_cache">Not the original photo: regeneratable thumbnail cache • %1$d days old</string>
     <string name="reason_whatsapp_review">WhatsApp shared media — review before deletion</string>
@@ -318,7 +333,7 @@
     <string name="storage_type_images">Images</string>
     <string name="storage_type_other">Other files</string>
     <string name="storage_type_videos">Videos</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.\n\nSmart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. Deep App Cache uses Android’s official system action and may display a required Android confirmation.\n\nSmart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable. Ads and crash diagnostics are provided by third-party services under their respective terms and policies.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.\n\nSmart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. App Cache Manager uses Android’s official system action and may display a required Android confirmation.\n\nSmart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable. Ads and crash diagnostics are provided by third-party services under their respective terms and policies.</string>
     <string name="tools_rebuilt_status">%1$s free • %2$s app cache reported</string>
     <string name="tools_rebuilt_title">Cleaning &amp; storage tools</string>
     <string name="uninstall">Uninstall</string>
@@ -351,9 +366,9 @@
     <string name="security_local_processing_desc">File analysis, fingerprints and storage comparisons stay on this device.</string>
     <string name="status_ready">Ready</string>
     <string name="status_needed">Needed</string>
-    <string name="scan_focus_deep">Deep Clean</string>
+    <string name="scan_focus_deep">Deep Cleaner</string>
     <string name="scan_focus_apks">APK Packages</string>
-    <string name="scan_focus_analyze">Storage analysis</string>
+    <string name="scan_focus_analyze">Storage Analyzer</string>
     <string name="clean_results_title">Cleaning results</string>
     <string name="dashboard_deep_detail">Detailed scan</string>
     <string name="dashboard_ram_available">%1$s available</string>
@@ -369,12 +384,17 @@
     <string name="smart_review_and_clean">Review &amp; clean</string>
     <string name="smart_show_all_count">View all (%1$d)</string>
     <string name="smart_storage_analyzer_subtitle">Tap Photos, Videos, Audio, Documents, APKs or other categories to see the files behind the numbers.</string>
-    <string name="smart_storage_file_count">%1$d files</string>
+    <plurals name="smart_storage_file_count">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
     <string name="smart_cleanup_confirm_title">Clean selected items?</string>
-    <string name="smart_cleanup_confirm_body">You selected %1$s across %2$d items. Review the breakdown below before continuing.</string>
+    <plurals name="smart_cleanup_confirm_body">
+        <item quantity="one">You selected %1$s in %2$d item. Review the breakdown below before continuing.</item>
+        <item quantity="other">You selected %1$s in %2$d items. Review the breakdown below before continuing.</item>
+    </plurals>
     <string name="smart_cleanup_confirm_warning">Deletion cannot be undone. Android may show its own confirmation for protected media.</string>
     <string name="smart_cleanup_confirm_action">Clean selected</string>
-    <string name="smart_preview_tap_hint">Tap a file to preview it. Use the checkbox only when you want it included in cleanup.</string>
     <string name="smart_storage_preview_note">Showing up to %1$d of the largest files found in this category. Storage analysis does not select these files for cleanup automatically.</string>
     <string name="smart_storage_preview_empty">No previewable files were captured for this category.</string>
     <string name="smart_included_in_cleanup">Included in cleanup</string>
@@ -384,12 +404,15 @@
     <string name="smart_generic_preview_title">File details</string>
 
     <string name="smart_cleanup_selected_examples">Selected file examples</string>
-    <string name="smart_cleanup_more_items">+%1$d more selected items</string>
+    <plurals name="smart_cleanup_more_items">
+        <item quantity="one">+%1$d more selected item</item>
+        <item quantity="other">+%1$d more selected items</item>
+    </plurals>
 
     <string name="smart_clean_hero_subtitle">Review what will be removed before cleanup starts.</string>
     <string name="smart_items_selected">items selected</string>
     <string name="smart_total_suggestions">total suggested</string>
-    <string name="smart_review_candidates">review suggestions</string>
+    <string name="smart_review_candidates">worth reviewing</string>
     <string name="smart_reason_title">Why is this suggested?</string>
     <string name="smart_files_scanned">files scanned</string>
 
@@ -429,14 +452,20 @@
     <string name="storage_review_action_hint">This is a separate manual review screen. Nothing is selected automatically; only files you choose can be deleted.</string>
     <string name="storage_review_manual_reason">Storage Analysis is manual review only. This file is protected unless you select it for cleanup.</string>
     <string name="storage_review_scanning">Preparing the full category…</string>
-    <string name="storage_review_summary">%1$d files • %2$s</string>
+    <plurals name="storage_review_summary">
+        <item quantity="one">%1$d file • %2$s</item>
+        <item quantity="other">%1$d files • %2$s</item>
+    </plurals>
     <string name="storage_review_no_auto_select">Nothing is auto-selected here. Tap a file to preview it; use the checkbox only when you want to delete it.</string>
     <string name="storage_review_scan_progress">Indexed %1$d files across %2$d folders</string>
     <string name="storage_review_selected_summary">Selected: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Building a full, selectable view of this storage category…</string>
     <string name="storage_review_limit_note">A very large category reached the safety display limit. Refine the folder or run the analysis again after cleaning.</string>
     <string name="storage_review_delete_title">Delete selected storage files?</string>
-    <string name="storage_review_delete_body">You selected %1$d files using %2$s. Review the examples below before continuing.</string>
+    <plurals name="storage_review_delete_body">
+        <item quantity="one">You selected %1$d file using %2$s. Review it below before continuing.</item>
+        <item quantity="other">You selected %1$d files using %2$s. Review the examples below before continuing.</item>
+    </plurals>
     <string name="storage_review_delete_warning">These are user-selected files, not automatic junk. Deletion cannot be undone.</string>
 
     <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
@@ -455,7 +484,10 @@
     <string name="whatsapp_sort_newest">Newest first</string>
     <string name="whatsapp_no_files_for_filter">No files match this filter.</string>
     <string name="whatsapp_selected_size">Selected</string>
-    <string name="whatsapp_selected_items_short">%1$d items</string>
+    <plurals name="whatsapp_selected_items_short">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
     <string name="whatsapp_review_and_clean">Review &amp; clean</string>
     <string name="whatsapp_cleanup_in_progress">Cleaning…</string>
     <string name="whatsapp_cleanup_irreversible">Selected files are permanently deleted from shared storage. This cannot be undone.</string>
@@ -477,7 +509,10 @@
     <string name="premium_tool_candidates">Candidates</string>
     <string name="premium_tool_selected">Selected</string>
     <string name="premium_tool_scanned">Scanned</string>
-    <string name="premium_tool_selected_count">%1$d items</string>
+    <plurals name="premium_tool_selected_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
     <string name="premium_sort_largest">Largest first</string>
     <string name="premium_sort_newest">Newest first</string>
     <string name="premium_sort_selected">Selected first</string>
@@ -489,7 +524,6 @@
     <string name="premium_downloads_subtitle">Review older downloads and incomplete download artifacts without auto-selecting personal files.</string>
     <string name="premium_deep_subtitle">Broad one-pass review across the main storage categories. Lower-confidence personal files stay review-only.</string>
     <string name="premium_duplicates_original_safe">The protected original is never placed in the delete selection. Only verified extra copies are shown here.</string>
-    <string name="premium_duplicates_kept_short">Original protected</string>
     <string name="premium_duplicate_unknown_original">protected original</string>
     <string name="premium_duplicate_group_title">Copies of %1$s</string>
     <string name="premium_apk_installer_note">Deleting an APK here removes only the installer file. It does not uninstall the app already installed on your phone.</string>
@@ -501,13 +535,19 @@
     <string name="premium_duplicate_more_groups">More duplicate groups</string>
 
     <string name="smart_clean_suggestions_subtitle_v0512">Priority review: videos, images, WhatsApp, large files, unused apps and safe cleanup candidates. The same file is not repeated across these top sections.</string>
-    <string name="smart_media_priority_summary">%1$d files • %2$s</string>
+    <plurals name="smart_media_priority_summary">
+        <item quantity="one">%1$d file • %2$s</item>
+        <item quantity="other">%1$d files • %2$s</item>
+    </plurals>
     <string name="smart_media_priority_note">Manual review • WhatsApp media is shown separately • nothing is preselected</string>
     <string name="smart_unused_apps_title">Unused apps</string>
     <string name="smart_unused_apps_permission">Usage Access is needed to identify apps that have not been used for a long time.</string>
     <string name="smart_unused_apps_permission_action">Enable Usage Access</string>
     <string name="smart_unused_apps_loading">Analyzing installed apps in the background…</string>
-    <string name="smart_unused_apps_summary">%1$d apps • %2$s installed size</string>
+    <plurals name="smart_unused_apps_summary">
+        <item quantity="one">%1$d app • %2$s installed size</item>
+        <item quantity="other">%1$d apps • %2$s installed size</item>
+    </plurals>
     <string name="smart_unused_apps_none">No app with a known last-used time has been unused for 60+ days.</string>
     <string name="smart_unused_apps_ready">App review is ready to run without slowing the file scan.</string>
     <string name="smart_unused_apps_analyze">Analyze apps</string>
@@ -518,22 +558,33 @@
     <string name="smart_unused_apps_last_used">Last used %1$d days ago</string>
 
     <string name="premium_cleanup_confirm_title">Delete selected files?</string>
-    <string name="premium_cleanup_confirm_body">You selected %1$d items using %2$s. Continue only if you want these files removed.</string>
+    <plurals name="premium_cleanup_confirm_body">
+        <item quantity="one">You selected %1$d item using %2$s. Continue only if you want this file removed.</item>
+        <item quantity="other">You selected %1$d items using %2$s. Continue only if you want these files removed.</item>
+    </plurals>
     <string name="premium_cleanup_irreversible">Selected files will be permanently removed. This cannot be undone.</string>
     <string name="premium_cleanup_confirm_action">Yes, continue</string>
     <string name="cleanup_result_title">Cleanup complete</string>
     <string name="cleanup_result_partial_title">Cleanup partially completed</string>
     <string name="cleanup_result_space_reclaimed">Space reclaimed</string>
-    <string name="cleanup_result_files_removed">%1$d files removed</string>
-    <string name="cleanup_result_failed">%1$d files could not be removed</string>
-    <string name="cleanup_result_cancelled">%1$d files were left untouched after Android confirmation was cancelled</string>
+    <plurals name="cleanup_result_files_removed">
+        <item quantity="one">%1$d file removed</item>
+        <item quantity="other">%1$d files removed</item>
+    </plurals>
+    <plurals name="cleanup_result_failed">
+        <item quantity="one">%1$d file could not be removed</item>
+        <item quantity="other">%1$d files could not be removed</item>
+    </plurals>
+    <plurals name="cleanup_result_cancelled">
+        <item quantity="one">%1$d file was left untouched after Android confirmation was cancelled</item>
+        <item quantity="other">%1$d files were left untouched after Android confirmation was cancelled</item>
+    </plurals>
     <string name="cleanup_result_zero">No additional space was reclaimed.</string>
     <string name="cleanup_result_note">These values are calculated from files Smart Cleaner actually removed on this device.</string>
     <string name="cleanup_result_done">Done</string>
 
-    <string name="dashboard_cleanup_opportunity">Cleanup opportunity</string>
-    <string name="dashboard_safe_amount">%1$s ready to clean</string>
-    <string name="dashboard_review_amount">%1$s review and decide</string>
+    <string name="dashboard_cleanup_opportunity">Safe to clean</string>
+    <string name="dashboard_review_amount">%1$s worth reviewing</string>
     <string name="dashboard_last_analysis_now">Last analysis: just now</string>
     <string name="dashboard_last_analysis_minutes">Last analysis: %1$d min ago</string>
     <string name="dashboard_last_analysis_hours">Last analysis: %1$d h ago</string>
@@ -545,9 +596,9 @@
     <string name="dashboard_storage_unknown">Storage unavailable</string>
     <string name="dashboard_opportunity_ready">%1$s cleanup opportunity</string>
     <string name="dashboard_no_current_opportunity">No current cleanup candidates from the last analysis</string>
-    <string name="smart_total_opportunity">Cleanup opportunity</string>
+    <string name="smart_total_opportunity">Safe to clean</string>
     <string name="smart_safe_candidates">Safe cleanup</string>
-    <string name="smart_clean_hero_subtitle_v0514">Real candidates from this analysis. Personal media remains manual review.</string>
+    <string name="smart_clean_hero_subtitle_v0514">Only low-risk junk is preselected. Personal media is never selected automatically.</string>
     <string name="cleanup_result_storage_snapshot">Free-space snapshot: %1$s → %2$s</string>
 
     <!-- v0.5.16.1 hardening -->
@@ -568,14 +619,17 @@
     <string name="home_last_cleanup_title">Last cleanup</string>
     <string name="home_last_cleanup_empty">No cleanup recorded yet</string>
     <string name="home_last_cleanup_empty_subtitle">Verified reclaimed space will appear here after your first cleanup.</string>
-    <string name="home_last_cleanup_summary">%1$s • %2$s reclaimed • %3$d files removed</string>
+    <plurals name="home_last_cleanup_summary">
+        <item quantity="one">%1$s • %2$s reclaimed • %3$d file removed</item>
+        <item quantity="other">%1$s • %2$s reclaimed • %3$d files removed</item>
+    </plurals>
     <string name="home_last_cleanup_total">%1$s reclaimed in total</string>
     <string name="home_last_cleanup_now">Just now</string>
     <string name="home_last_cleanup_minutes">%1$d min ago</string>
     <string name="home_last_cleanup_hours">%1$d h ago</string>
     <string name="home_last_cleanup_days">%1$d d ago</string>
     <string name="home_smart_suggestions_title">Smart suggestions</string>
-    <string name="home_different_tools_title">Different tools</string>
+    <string name="home_different_tools_title">More tools</string>
     <string name="home_suggestion_empty">No priority suggestion right now</string>
     <string name="home_suggestion_empty_subtitle">Run Smart Clean to refresh your on-device analysis.</string>
     <string name="home_cache_title">App cache</string>
@@ -591,7 +645,10 @@
     <string name="home_discover_action">Explore</string>
 
     <string name="cache_modern_total_label">Total app cache</string>
-    <string name="cache_modern_measured_apps">%1$d apps measured</string>
+    <plurals name="cache_modern_measured_apps">
+        <item quantity="one">%1$d app measured</item>
+        <item quantity="other">%1$d apps measured</item>
+    </plurals>
     <string name="cache_modern_hero_helper">Measured from Android storage statistics</string>
     <string name="cache_modern_system_action">Clean cache with Android</string>
     <string name="cache_modern_system_action_subtitle">Open Android’s official cache cleanup flow</string>
@@ -671,7 +728,10 @@
     <string name="storage_analyzer_indexed_label">INDEXED SHARED FILES</string>
     <string name="storage_analyzer_indexed_summary">%1$d files indexed • %2$s device storage free</string>
     <string name="storage_analyzer_types_title">File types</string>
-    <string name="storage_analyzer_type_summary">%1$d files • %2$s • %3$d%% of indexed bytes</string>
+    <plurals name="storage_analyzer_type_summary">
+        <item quantity="one">%1$d file • %2$s • %3$d%% of indexed bytes</item>
+        <item quantity="other">%1$d files • %2$s • %3$d%% of indexed bytes</item>
+    </plurals>
     <string name="storage_analyzer_largest_examples">Largest examples</string>
     <string name="storage_analyzer_no_files">No accessible file was found for this analysis.</string>
     <string name="storage_analyzer_truth_note">This screen is informational. Nothing is preselected or deleted here. Protected private areas such as Android/data and Android/obb are not scanned.</string>
@@ -688,5 +748,20 @@
     <string name="rewarded_ad_earned">Ad-free time is active for 60 minutes.</string>
     <string name="rewarded_ad_unavailable">The video is not ready yet. Please try again in a moment.</string>
     <string name="ad_free_active_title">Ad-free time is active</string>
-    <string name="ad_free_active_subtitle">%1$d minutes remaining. Banner and transition ads are hidden.</string>
+    <plurals name="ad_free_active_subtitle">
+        <item quantity="one">%1$d minute remaining. Banner and transition ads are hidden.</item>
+        <item quantity="other">%1$d minutes remaining. Banner and transition ads are hidden.</item>
+    </plurals>
+    <string name="dashboard_safe_scope">Only low-risk junk is preselected</string>
+    <string name="smart_selected_hero_label">selected</string>
+    <string name="smart_selected_amount">Selected: %1$s</string>
+    <string name="nothing_selected_hint">Select files to clean</string>
+    <string name="premium_duplicate_copy_of">Copy of %1$s</string>
+    <string name="tools_rebuilt_status_cache_unmeasured">%1$s free • App cache not measured – allow Usage Access</string>
+    <string name="cache_modern_not_measured">Not measured – allow Usage Access</string>
+    <string name="app_info">App info</string>
+    <string name="feedback_dialog_body">Write to us at the address below. You can copy it or open an email app.</string>
+    <string name="feedback_copy_address">Copy address</string>
+    <string name="feedback_open_email">Open email app</string>
+    <string name="feedback_address_copied">Address copied</string>
 </resources>

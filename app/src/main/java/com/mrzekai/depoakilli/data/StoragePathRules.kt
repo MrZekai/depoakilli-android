@@ -19,6 +19,11 @@ internal object StoragePathRules {
         "/indirilenler/",
     )
 
+    private val systemMarkerNames = setOf(
+        ".nomedia",
+        ".hidden",
+    )
+
     fun normalizeText(value: String): String {
         val decomposed = Normalizer.normalize(value, Normalizer.Form.NFD)
             .lowercase(Locale.ROOT)
@@ -37,6 +42,17 @@ internal object StoragePathRules {
         val normalized = normalizePath(path)
         return downloadMarkers.any(normalized::contains)
     }
+
+    /**
+     * Hidden marker files that control how other software treats a folder.
+     *
+     * `.nomedia` tells Android's media scanner and every gallery app to hide a
+     * folder. WhatsApp writes one into its `.Statuses` folder; deleting it makes
+     * private media appear in the Gallery. These files are never cleanup
+     * candidates, so they are excluded from indexing and refused at deletion.
+     */
+    fun isSystemMarkerFile(name: String): Boolean =
+        normalizeText(name.trim()) in systemMarkerNames
 
     fun isProtectedAppPrivatePath(path: String): Boolean {
         val normalized = normalizePath(path)

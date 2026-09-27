@@ -248,6 +248,10 @@ class DeviceRepository(
                 dataBytes = stats?.dataBytes ?: 0L,
                 cacheBytes = stats?.cacheBytes ?: 0L,
                 lastUsedMillis = usageMap[application.packageName]?.lastTimeUsed ?: 0L,
+                systemApp = (
+                    application.flags and
+                        (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)
+                    ) != 0,
             )
         }.sortedByDescending(InstalledAppEntry::totalBytes)
     }
@@ -275,6 +279,7 @@ class DeviceRepository(
             }.also(::cacheSharedIndex)
         }
         val assessments = ArrayList<CleanableItem>()
+        val duplicateItems = ArrayList<CleanableItem>()
 
         indexed.forEach { file ->
             coroutineContext.ensureActive()
@@ -298,10 +303,15 @@ class DeviceRepository(
             } else {
                 indexed
             }
-            assessments += findDuplicates(duplicateSource)
+            duplicateItems += findDuplicates(duplicateSource)
         }
 
-        val focusedItems = assessments.asSequence()
+        // A verified extra copy is shown as a duplicate (with its protected
+        // original) even when it also matches a broader rule such as "old
+        // download". Listing duplicates first lets distinctBy keep that
+        // classification, so Deep Clean and Delete Duplicates report the same
+        // duplicate set.
+        val focusedItems = (duplicateItems.asSequence() + assessments.asSequence())
             .filter { item ->
                 when (focus) {
                     ScanFocus.SMART,
@@ -605,6 +615,7 @@ class DeviceRepository(
                         pending.addLast(root to child)
                     }
                 } else if (child.isFile) {
+                    if (StoragePathRules.isSystemMarkerFile(child.name)) continue
                     val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
                     if (!visitedFilePaths.add(filePath)) continue
                     val size = child.length().coerceAtLeast(0L)
@@ -660,6 +671,7 @@ class DeviceRepository(
                         pending.addLast(storageRoot to child)
                     }
                 } else if (child.isFile && child.length() > 0L) {
+                    if (StoragePathRules.isSystemMarkerFile(child.name)) continue
                     val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
                     if (!visitedFiles.add(filePath)) continue
                     output += indexedFile(storageRoot.file, child)
@@ -1015,6 +1027,7 @@ class DeviceRepository(
                 val path = uri.path ?: return@runCatching false
                 val file = File(path)
                 if (!isDeletableSharedStorageFile(file)) return@runCatching false
+                if (StoragePathRules.isSystemMarkerFile(file.name)) return@runCatching false
                 val removed = file.delete()
                 if (removed) {
                     removeDeletedPathFromMediaStore(file.absolutePath)

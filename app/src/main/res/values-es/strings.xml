@@ -79,7 +79,11 @@
     <string name="no_safe_suggestions">¡Genial! No se encontraron sugerencias de limpieza seguras.</string>
     <string name="scan_again">Analizar de nuevo</string>
     <string name="clean_action">LIMPIAR %1$s</string>
-    <string name="category_summary">Elementos: %1$d • %2$s</string>
+    <plurals name="category_summary">
+        <item quantity="one">Elementos: %1$d • %2$s</item>
+        <item quantity="many">Elementos: %1$d • %2$s</item>
+        <item quantity="other">Elementos: %1$d • %2$s</item>
+    </plurals>
     <string name="file_confidence">%1$s • %2$d%% de confianza</string>
     <string name="cache_manager_title">Gestor de caché de apps</string>
     <string name="cache_manager_subtitle">Mide la caché real reportada por Android por app y verifica la reducción real tras la limpieza</string>
@@ -152,7 +156,7 @@
     <string name="category_app_cache">Caché</string>
     <string name="category_app_cache_description">Archivos temporales seguros de la app</string>
     <string name="category_whatsapp">Contenido multimedia de WhatsApp</string>
-    <string name="category_whatsapp_description">Estados temporales y copias de contenido multimedia enviado más antiguo</string>
+    <string name="category_whatsapp_description">Estados y contenido enviado de hace más de 30 días. El Limpiador de WhatsApp muestra todo el contenido.</string>
     <string name="reason_old_installer">Paquete instalador • antigüedad: %1$d d</string>
     <string name="reason_downloaded_installer">Paquete instalador descargado</string>
     <string name="reason_old_screenshot">Captura de pantalla • antigüedad: %1$d d</string>
@@ -183,7 +187,11 @@
     <string name="whatsapp_scanning_title">Analizando contenido multimedia de WhatsApp</string>
     <string name="whatsapp_scanning_description">Leyendo el contenido multimedia compartido de WhatsApp directamente, clasificando archivos y preparando vistas previas…</string>
     <string name="whatsapp_scan_complete">CONTENIDO MULTIMEDIA DE WHATSAPP ENCONTRADO</string>
-    <string name="whatsapp_scan_stats">Archivos clasificados en este dispositivo: %1$d</string>
+    <plurals name="whatsapp_scan_stats">
+        <item quantity="one">Archivos clasificados en este dispositivo: %1$d</item>
+        <item quantity="many">Archivos clasificados en este dispositivo: %1$d</item>
+        <item quantity="other">Archivos clasificados en este dispositivo: %1$d</item>
+    </plurals>
     <string name="whatsapp_selection_safe">Nada está preseleccionado. Tú decides exactamente qué se eliminará.</string>
     <string name="whatsapp_no_files">No se encontró ningún archivo multimedia de WhatsApp accesible.</string>
     <string name="whatsapp_category_images">Imágenes</string>
@@ -200,11 +208,19 @@
     <string name="whatsapp_category_stickers_description">Contenido multimedia animado y estático de WhatsApp</string>
     <string name="whatsapp_category_other">Otros archivos</string>
     <string name="whatsapp_category_other_description">Archivos fuera de los grupos multimedia estándar</string>
-    <string name="whatsapp_category_summary">Archivos: %1$d • %2$s</string>
+    <plurals name="whatsapp_category_summary">
+        <item quantity="one">Archivos: %1$d • %2$s</item>
+        <item quantity="many">Archivos: %1$d • %2$s</item>
+        <item quantity="other">Archivos: %1$d • %2$s</item>
+    </plurals>
     <string name="whatsapp_selected_count">Seleccionados: %1$d</string>
     <string name="whatsapp_delete_action">ELIMINAR %1$s</string>
     <string name="whatsapp_delete_confirm_title">¿Eliminar los archivos de WhatsApp seleccionados?</string>
-    <string name="whatsapp_delete_confirm_message">Archivos: %1$d (%2$s). Se eliminarán permanentemente. Esto no se puede deshacer.</string>
+    <plurals name="whatsapp_delete_confirm_message">
+        <item quantity="one">Archivos: %1$d (%2$s). Se eliminarán permanentemente. Esto no se puede deshacer.</item>
+        <item quantity="many">Archivos: %1$d (%2$s). Se eliminarán permanentemente. Esto no se puede deshacer.</item>
+        <item quantity="other">Archivos: %1$d (%2$s). Se eliminarán permanentemente. Esto no se puede deshacer.</item>
+    </plurals>
     <string name="device_center_title">Centro del dispositivo</string>
     <string name="device_center_live_status">Estado del dispositivo en vivo</string>
     <string name="device_android_summary">Android %1$s • API %2$d</string>
@@ -241,7 +257,7 @@
     <string name="feedback_subject">Comentarios de Smart Cleaner</string>
     <string name="feedback_template">Dispositivo: %1$s %2$s\nAndroid: %3$s\n\nComentarios:\n</string>
     <string name="share_app_message">Smart Cleaner analiza el almacenamiento de forma segura en tu dispositivo: %1$s</string>
-    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner es una app de gestión y mantenimiento de almacenamiento. Analiza el almacenamiento compartido en el dispositivo en busca de archivos basura, duplicados exactos, archivos grandes, descargas antiguas, instaladores APK, elementos de revisión de contenido multimedia y contenido multimedia de WhatsApp. La caché profunda de apps usa el flujo oficial de limpieza de caché del sistema de Android; Android puede requerir una confirmación del sistema.\n\nPaquete: com.mrzekai.depoakilli</string>
+    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner es una app de gestión y mantenimiento de almacenamiento. Analiza el almacenamiento compartido en el dispositivo en busca de archivos basura, duplicados exactos, archivos grandes, descargas antiguas, instaladores APK, elementos de revisión de contenido multimedia y contenido multimedia de WhatsApp. El Gestor de caché de apps usa el flujo oficial de limpieza de caché del sistema de Android; Android puede requerir una confirmación del sistema.\n\nPaquete: com.mrzekai.depoakilli</string>
     <string name="access_files_missing">Se necesita acceso a archivos</string>
     <string name="access_files_ready">Archivos listos</string>
     <string name="access_usage_optional">Acceso de uso opcional</string>
@@ -255,7 +271,11 @@
     <string name="app_manager_title">Gestor de apps</string>
     <string name="app_manager_usage_description">El acceso de uso permite que Smart Cleaner muestre los totales de almacenamiento de las apps y la información de último uso. No se lee el contenido personal de las apps.</string>
     <string name="app_manager_usage_title">Habilitar estadísticas de uso de apps</string>
-    <string name="apps_found">Apps encontradas: %1$d</string>
+    <plurals name="apps_found">
+        <item quantity="one">Apps encontradas: %1$d</item>
+        <item quantity="many">Apps encontradas: %1$d</item>
+        <item quantity="other">Apps encontradas: %1$d</item>
+    </plurals>
     <string name="cache_access_explanation_v050">El acceso de uso permite que Smart Cleaner mida la caché de las apps que se pueden abrir y reporte el total de caché del dispositivo sin leer contenido personal de las apps.</string>
     <string name="category_junk">Archivos basura</string>
     <string name="category_junk_description">Archivos temporales, miniaturas antiguas y restos de descargas incompletas</string>
@@ -296,7 +316,7 @@
     <string name="message_deep_cache_complete">Android completó la limpieza de caché del dispositivo solicitada.</string>
     <string name="message_own_cache_cleared">Se eliminaron %1$s de caché de Smart Cleaner.</string>
     <string name="message_whatsapp_not_found">No se encontró ninguna carpeta de contenido multimedia de WhatsApp o WhatsApp Business compatible en el almacenamiento compartido.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. La caché profunda de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. Los archivos que elimines explícitamente se eliminan mediante Android y Smart Cleaner no puede restaurarlos. Google conserva los datos que procesa según sus políticas publicadas.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. El Gestor de caché de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. Los archivos que elimines explícitamente se eliminan mediante Android y Smart Cleaner no puede restaurarlos. Google conserva los datos que procesa según sus políticas publicadas.</string>
     <string name="reason_large_file">Archivo grande • antigüedad: %1$d d</string>
     <string name="reason_temporary_file">Elemento temporal o incompleto • antigüedad: %1$d d</string>
     <string name="reason_thumbnail_cache">No es la foto original: caché de miniatura regenerable • antigüedad: %1$d d</string>
@@ -319,7 +339,7 @@
     <string name="storage_type_images">Imágenes</string>
     <string name="storage_type_other">Otros archivos</string>
     <string name="storage_type_videos">Videos</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner ofrece análisis de almacenamiento y herramientas de gestión de archivos en el dispositivo. Los resultados del análisis son recomendaciones, no copias de seguridad. Revisa los archivos de usuario seleccionados antes de eliminarlos.\n\nSmart Cleaner puede gestionar archivos del almacenamiento compartido accesible después de que Android otorgue el acceso a todos los archivos. Android sigue protegiendo los datos internos privados de otras apps. La caché profunda de apps usa la acción oficial del sistema de Android y puede mostrar una confirmación de Android requerida.\n\nSmart Cleaner no afirma cerrar apps protegidas de terceros, aumentar la RAM de todo el dispositivo, enfriar la CPU ni crear mejoras de rendimiento ficticias. La disponibilidad puede variar según la versión de Android y el fabricante del dispositivo.\n\nEres responsable de revisar las selecciones antes de eliminar. Es posible que los archivos eliminados no se puedan recuperar. Los anuncios y los diagnósticos de fallos son proporcionados por servicios de terceros según sus propios términos y políticas.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner ofrece análisis de almacenamiento y herramientas de gestión de archivos en el dispositivo. Los resultados del análisis son recomendaciones, no copias de seguridad. Revisa los archivos de usuario seleccionados antes de eliminarlos.\n\nSmart Cleaner puede gestionar archivos del almacenamiento compartido accesible después de que Android otorgue el acceso a todos los archivos. Android sigue protegiendo los datos internos privados de otras apps. El Gestor de caché de apps usa la acción oficial del sistema de Android y puede mostrar una confirmación de Android requerida.\n\nSmart Cleaner no afirma cerrar apps protegidas de terceros, aumentar la RAM de todo el dispositivo, enfriar la CPU ni crear mejoras de rendimiento ficticias. La disponibilidad puede variar según la versión de Android y el fabricante del dispositivo.\n\nEres responsable de revisar las selecciones antes de eliminar. Es posible que los archivos eliminados no se puedan recuperar. Los anuncios y los diagnósticos de fallos son proporcionados por servicios de terceros según sus propios términos y políticas.</string>
     <string name="tools_rebuilt_status">%1$s libres • %2$s de caché de apps reportada</string>
     <string name="tools_rebuilt_title">Herramientas de limpieza y almacenamiento</string>
     <string name="uninstall">Desinstalar</string>
@@ -352,9 +372,9 @@
     <string name="security_local_processing_desc">El análisis de archivos, las huellas digitales y las comparaciones de almacenamiento permanecen en este dispositivo.</string>
     <string name="status_ready">Listo</string>
     <string name="status_needed">Necesario</string>
-    <string name="scan_focus_deep">Limpieza profunda</string>
+    <string name="scan_focus_deep">Limpiador profundo</string>
     <string name="scan_focus_apks">Paquetes APK</string>
-    <string name="scan_focus_analyze">Análisis de almacenamiento</string>
+    <string name="scan_focus_analyze">Analizador de almacenamiento</string>
     <string name="clean_results_title">Resultados de limpieza</string>
     <string name="dashboard_deep_detail">Análisis detallado</string>
     <string name="dashboard_ram_available">%1$s disponible</string>
@@ -370,12 +390,19 @@
     <string name="smart_review_and_clean">Revisar y limpiar</string>
     <string name="smart_show_all_count">Ver todo (%1$d)</string>
     <string name="smart_storage_analyzer_subtitle">Toca Fotos, Videos, Audio, Documentos, APKs u otras categorías para ver los archivos detrás de las cifras.</string>
-    <string name="smart_storage_file_count">Archivos: %1$d</string>
+    <plurals name="smart_storage_file_count">
+        <item quantity="one">Archivos: %1$d</item>
+        <item quantity="many">Archivos: %1$d</item>
+        <item quantity="other">Archivos: %1$d</item>
+    </plurals>
     <string name="smart_cleanup_confirm_title">¿Limpiar los elementos seleccionados?</string>
-    <string name="smart_cleanup_confirm_body">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</string>
+    <plurals name="smart_cleanup_confirm_body">
+        <item quantity="one">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</item>
+        <item quantity="many">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</item>
+        <item quantity="other">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</item>
+    </plurals>
     <string name="smart_cleanup_confirm_warning">La eliminación no se puede deshacer. Android puede mostrar su propia confirmación para contenido multimedia protegido.</string>
     <string name="smart_cleanup_confirm_action">Limpiar seleccionados</string>
-    <string name="smart_preview_tap_hint">Toca un archivo para previsualizarlo. Usa la casilla solo cuando quieras incluirlo en la limpieza.</string>
     <string name="smart_storage_preview_note">Máximo de archivos más grandes mostrados en esta categoría: %1$d. El análisis de almacenamiento no selecciona estos archivos automáticamente para limpiar.</string>
     <string name="smart_storage_preview_empty">No se capturó ningún archivo previsualizable para esta categoría.</string>
     <string name="smart_included_in_cleanup">Incluido en la limpieza</string>
@@ -384,11 +411,15 @@
     <string name="smart_audio_pause">Pausar audio</string>
     <string name="smart_generic_preview_title">Detalles del archivo</string>
     <string name="smart_cleanup_selected_examples">Ejemplos de archivos seleccionados</string>
-    <string name="smart_cleanup_more_items">Otros elementos seleccionados: +%1$d</string>
+    <plurals name="smart_cleanup_more_items">
+        <item quantity="one">Otros elementos seleccionados: +%1$d</item>
+        <item quantity="many">Otros elementos seleccionados: +%1$d</item>
+        <item quantity="other">Otros elementos seleccionados: +%1$d</item>
+    </plurals>
     <string name="smart_clean_hero_subtitle">Revisa lo que se eliminará antes de iniciar la limpieza.</string>
     <string name="smart_items_selected">elementos seleccionados</string>
     <string name="smart_total_suggestions">sugerencias totales</string>
-    <string name="smart_review_candidates">sugerencias para revisar</string>
+    <string name="smart_review_candidates">para revisar</string>
     <string name="smart_reason_title">¿Por qué se sugiere esto?</string>
     <string name="smart_files_scanned">archivos analizados</string>
     <string name="smart_cleanup_in_progress">Limpiando…</string>
@@ -424,14 +455,22 @@
     <string name="storage_review_action_hint">Esta es una pantalla de revisión manual independiente. Nada se selecciona automáticamente; solo se pueden eliminar los archivos que elijas.</string>
     <string name="storage_review_manual_reason">El análisis de almacenamiento es solo revisión manual. Este archivo está protegido a menos que lo selecciones para limpiar.</string>
     <string name="storage_review_scanning">Preparando la categoría completa…</string>
-    <string name="storage_review_summary">Archivos: %1$d • %2$s</string>
+    <plurals name="storage_review_summary">
+        <item quantity="one">Archivos: %1$d • %2$s</item>
+        <item quantity="many">Archivos: %1$d • %2$s</item>
+        <item quantity="other">Archivos: %1$d • %2$s</item>
+    </plurals>
     <string name="storage_review_no_auto_select">Nada se selecciona automáticamente aquí. Toca un archivo para previsualizarlo; usa la casilla solo cuando quieras eliminarlo.</string>
     <string name="storage_review_scan_progress">Archivos indexados: %1$d • Carpetas: %2$d</string>
     <string name="storage_review_selected_summary">Seleccionados: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Creando una vista completa y seleccionable de esta categoría de almacenamiento…</string>
     <string name="storage_review_limit_note">Una categoría muy grande alcanzó el límite de seguridad de visualización. Refina la carpeta o vuelve a ejecutar el análisis después de limpiar.</string>
     <string name="storage_review_delete_title">¿Eliminar los archivos de almacenamiento seleccionados?</string>
-    <string name="storage_review_delete_body">Seleccionaste archivos: %1$d (%2$s). Revisa los ejemplos a continuación antes de continuar.</string>
+    <plurals name="storage_review_delete_body">
+        <item quantity="one">Seleccionaste archivos: %1$d (%2$s). Revisa los ejemplos a continuación antes de continuar.</item>
+        <item quantity="many">Seleccionaste archivos: %1$d (%2$s). Revisa los ejemplos a continuación antes de continuar.</item>
+        <item quantity="other">Seleccionaste archivos: %1$d (%2$s). Revisa los ejemplos a continuación antes de continuar.</item>
+    </plurals>
     <string name="storage_review_delete_warning">Estos son archivos seleccionados por el usuario, no basura automática. La eliminación no se puede deshacer.</string>
     <string name="whatsapp_scanning_short">Análisis inteligente de contenido multimedia</string>
     <string name="whatsapp_local_processing_note">El contenido multimedia se analiza en este dispositivo.</string>
@@ -448,7 +487,11 @@
     <string name="whatsapp_sort_newest">Más recientes primero</string>
     <string name="whatsapp_no_files_for_filter">Ningún archivo coincide con este filtro.</string>
     <string name="whatsapp_selected_size">Seleccionado</string>
-    <string name="whatsapp_selected_items_short">Elementos: %1$d</string>
+    <plurals name="whatsapp_selected_items_short">
+        <item quantity="one">Elementos: %1$d</item>
+        <item quantity="many">Elementos: %1$d</item>
+        <item quantity="other">Elementos: %1$d</item>
+    </plurals>
     <string name="whatsapp_review_and_clean">Revisar y limpiar</string>
     <string name="whatsapp_cleanup_in_progress">Limpiando…</string>
     <string name="whatsapp_cleanup_irreversible">Los archivos seleccionados se eliminan de forma permanente del almacenamiento compartido. Esto no se puede deshacer.</string>
@@ -468,7 +511,11 @@
     <string name="premium_tool_candidates">Candidatos</string>
     <string name="premium_tool_selected">Seleccionados</string>
     <string name="premium_tool_scanned">Analizados</string>
-    <string name="premium_tool_selected_count">Elementos: %1$d</string>
+    <plurals name="premium_tool_selected_count">
+        <item quantity="one">Elementos: %1$d</item>
+        <item quantity="many">Elementos: %1$d</item>
+        <item quantity="other">Elementos: %1$d</item>
+    </plurals>
     <string name="premium_sort_largest">Más grandes primero</string>
     <string name="premium_sort_newest">Más recientes primero</string>
     <string name="premium_sort_selected">Seleccionados primero</string>
@@ -480,7 +527,6 @@
     <string name="premium_downloads_subtitle">Revisa descargas antiguas y restos de descargas incompletas sin seleccionar automáticamente archivos personales.</string>
     <string name="premium_deep_subtitle">Revisión amplia en un solo paso de las principales categorías de almacenamiento. Los archivos personales de menor confianza permanecen solo para revisión.</string>
     <string name="premium_duplicates_original_safe">El original protegido nunca se incluye en la selección de eliminación. Aquí solo se muestran las copias adicionales verificadas.</string>
-    <string name="premium_duplicates_kept_short">Original protegido</string>
     <string name="premium_duplicate_unknown_original">original protegido</string>
     <string name="premium_duplicate_group_title">Copias de %1$s</string>
     <string name="premium_apk_installer_note">Eliminar un APK aquí solo elimina el archivo instalador. No desinstala la app ya instalada en tu teléfono.</string>
@@ -490,13 +536,21 @@
     <string name="premium_media_review">Otra revisión de contenido multimedia</string>
     <string name="premium_duplicate_more_groups">Más grupos de duplicados</string>
     <string name="smart_clean_suggestions_subtitle_v0512">Revisión prioritaria: videos, imágenes, WhatsApp, archivos grandes, apps sin usar y candidatos seguros de limpieza. El mismo archivo no se repite en estas secciones principales.</string>
-    <string name="smart_media_priority_summary">Archivos: %1$d • %2$s</string>
+    <plurals name="smart_media_priority_summary">
+        <item quantity="one">Archivos: %1$d • %2$s</item>
+        <item quantity="many">Archivos: %1$d • %2$s</item>
+        <item quantity="other">Archivos: %1$d • %2$s</item>
+    </plurals>
     <string name="smart_media_priority_note">Revisión manual • el contenido multimedia de WhatsApp se muestra por separado • nada está preseleccionado</string>
     <string name="smart_unused_apps_title">Apps sin usar</string>
     <string name="smart_unused_apps_permission">Se necesita el acceso de uso para identificar apps que no se han usado en mucho tiempo.</string>
     <string name="smart_unused_apps_permission_action">Habilitar acceso de uso</string>
     <string name="smart_unused_apps_loading">Analizando apps instaladas en segundo plano…</string>
-    <string name="smart_unused_apps_summary">Apps: %1$d • %2$s de tamaño instalado</string>
+    <plurals name="smart_unused_apps_summary">
+        <item quantity="one">Apps: %1$d • %2$s de tamaño instalado</item>
+        <item quantity="many">Apps: %1$d • %2$s de tamaño instalado</item>
+        <item quantity="other">Apps: %1$d • %2$s de tamaño instalado</item>
+    </plurals>
     <string name="smart_unused_apps_none">Ninguna app con hora de último uso conocida lleva 60 días o más sin usarse.</string>
     <string name="smart_unused_apps_ready">La revisión de apps está lista para ejecutarse sin ralentizar el análisis de archivos.</string>
     <string name="smart_unused_apps_analyze">Analizar apps</string>
@@ -506,21 +560,36 @@
     <string name="smart_unused_apps_dialog_note">Solo se muestran las apps con una hora de último uso conocida de al menos 60 días. Nada se elimina automáticamente.</string>
     <string name="smart_unused_apps_last_used">Último uso: hace %1$d d</string>
     <string name="premium_cleanup_confirm_title">¿Eliminar los archivos seleccionados?</string>
-    <string name="premium_cleanup_confirm_body">Seleccionaste elementos: %1$d (%2$s). Continúa solo si quieres que se eliminen estos archivos.</string>
+    <plurals name="premium_cleanup_confirm_body">
+        <item quantity="one">Seleccionaste elementos: %1$d (%2$s). Continúa solo si quieres que se eliminen estos archivos.</item>
+        <item quantity="many">Seleccionaste elementos: %1$d (%2$s). Continúa solo si quieres que se eliminen estos archivos.</item>
+        <item quantity="other">Seleccionaste elementos: %1$d (%2$s). Continúa solo si quieres que se eliminen estos archivos.</item>
+    </plurals>
     <string name="premium_cleanup_irreversible">Los archivos seleccionados se eliminarán de forma permanente. Esto no se puede deshacer.</string>
     <string name="premium_cleanup_confirm_action">Sí, continuar</string>
     <string name="cleanup_result_title">Limpieza completada</string>
     <string name="cleanup_result_partial_title">Limpieza parcialmente completada</string>
     <string name="cleanup_result_space_reclaimed">Espacio recuperado</string>
-    <string name="cleanup_result_files_removed">Archivos eliminados: %1$d</string>
-    <string name="cleanup_result_failed">Archivos que no se pudieron eliminar: %1$d</string>
-    <string name="cleanup_result_cancelled">Archivos sin modificar tras cancelar la confirmación de Android: %1$d</string>
+    <plurals name="cleanup_result_files_removed">
+        <item quantity="one">Archivos eliminados: %1$d</item>
+        <item quantity="many">Archivos eliminados: %1$d</item>
+        <item quantity="other">Archivos eliminados: %1$d</item>
+    </plurals>
+    <plurals name="cleanup_result_failed">
+        <item quantity="one">Archivos que no se pudieron eliminar: %1$d</item>
+        <item quantity="many">Archivos que no se pudieron eliminar: %1$d</item>
+        <item quantity="other">Archivos que no se pudieron eliminar: %1$d</item>
+    </plurals>
+    <plurals name="cleanup_result_cancelled">
+        <item quantity="one">Archivos sin modificar tras cancelar la confirmación de Android: %1$d</item>
+        <item quantity="many">Archivos sin modificar tras cancelar la confirmación de Android: %1$d</item>
+        <item quantity="other">Archivos sin modificar tras cancelar la confirmación de Android: %1$d</item>
+    </plurals>
     <string name="cleanup_result_zero">No se recuperó espacio adicional.</string>
     <string name="cleanup_result_note">Estos valores se calculan a partir de los archivos que Smart Cleaner realmente eliminó en este dispositivo.</string>
     <string name="cleanup_result_done">Listo</string>
-    <string name="dashboard_cleanup_opportunity">Oportunidad de limpieza</string>
-    <string name="dashboard_safe_amount">%1$s listos para limpiar</string>
-    <string name="dashboard_review_amount">%1$s para revisar y decidir</string>
+    <string name="dashboard_cleanup_opportunity">Limpieza segura</string>
+    <string name="dashboard_review_amount">%1$s para revisar</string>
     <string name="dashboard_last_analysis_now">Último análisis: justo ahora</string>
     <string name="dashboard_last_analysis_minutes">Último análisis: hace %1$d min</string>
     <string name="dashboard_last_analysis_hours">Último análisis: hace %1$d h</string>
@@ -532,9 +601,9 @@
     <string name="dashboard_storage_unknown">Almacenamiento no disponible</string>
     <string name="dashboard_opportunity_ready">%1$s de oportunidad de limpieza</string>
     <string name="dashboard_no_current_opportunity">No hay candidatos de limpieza actuales del último análisis</string>
-    <string name="smart_total_opportunity">Oportunidad de limpieza</string>
+    <string name="smart_total_opportunity">Limpieza segura</string>
     <string name="smart_safe_candidates">Limpieza segura</string>
-    <string name="smart_clean_hero_subtitle_v0514">Candidatos reales de este análisis. El contenido multimedia personal sigue siendo de revisión manual.</string>
+    <string name="smart_clean_hero_subtitle_v0514">Solo se preselecciona basura de bajo riesgo. El contenido multimedia personal nunca se selecciona automáticamente.</string>
     <string name="cleanup_result_storage_snapshot">Instantánea de espacio libre: %1$s → %2$s</string>
     <string name="dashboard_no_cleanup_found">Listo</string>
     <string name="dashboard_no_risky_auto_selection">Sin selección automática riesgosa</string>
@@ -552,14 +621,18 @@
     <string name="home_last_cleanup_title">Última limpieza</string>
     <string name="home_last_cleanup_empty">Aún no se registró ninguna limpieza</string>
     <string name="home_last_cleanup_empty_subtitle">El espacio recuperado verificado aparecerá aquí después de tu primera limpieza.</string>
-    <string name="home_last_cleanup_summary">%1$s • %2$s recuperados • Archivos eliminados: %3$d</string>
+    <plurals name="home_last_cleanup_summary">
+        <item quantity="one">%1$s • %2$s recuperados • Archivos eliminados: %3$d</item>
+        <item quantity="many">%1$s • %2$s recuperados • Archivos eliminados: %3$d</item>
+        <item quantity="other">%1$s • %2$s recuperados • Archivos eliminados: %3$d</item>
+    </plurals>
     <string name="home_last_cleanup_total">%1$s recuperados en total</string>
     <string name="home_last_cleanup_now">Justo ahora</string>
     <string name="home_last_cleanup_minutes">Hace %1$d min</string>
     <string name="home_last_cleanup_hours">Hace %1$d h</string>
     <string name="home_last_cleanup_days">Hace %1$d d</string>
     <string name="home_smart_suggestions_title">Sugerencias inteligentes</string>
-    <string name="home_different_tools_title">Otras herramientas</string>
+    <string name="home_different_tools_title">Más herramientas</string>
     <string name="home_suggestion_empty">No hay ninguna sugerencia prioritaria por ahora</string>
     <string name="home_suggestion_empty_subtitle">Ejecuta la limpieza inteligente para actualizar tu análisis en el dispositivo.</string>
     <string name="home_cache_title">Caché de la app</string>
@@ -574,7 +647,11 @@
     <string name="home_discover_subtitle">Ver todas las herramientas de limpieza y almacenamiento</string>
     <string name="home_discover_action">Explorar</string>
     <string name="cache_modern_total_label">Caché total de apps</string>
-    <string name="cache_modern_measured_apps">Apps medidas: %1$d</string>
+    <plurals name="cache_modern_measured_apps">
+        <item quantity="one">Apps medidas: %1$d</item>
+        <item quantity="many">Apps medidas: %1$d</item>
+        <item quantity="other">Apps medidas: %1$d</item>
+    </plurals>
     <string name="cache_modern_hero_helper">Medido a partir de las estadísticas de almacenamiento de Android</string>
     <string name="cache_modern_system_action">Limpiar caché con Android</string>
     <string name="cache_modern_system_action_subtitle">Abre el flujo oficial de limpieza de caché de Android</string>
@@ -652,7 +729,11 @@
     <string name="storage_analyzer_indexed_label">ARCHIVOS COMPARTIDOS INDEXADOS</string>
     <string name="storage_analyzer_indexed_summary">Archivos indexados: %1$d • %2$s de almacenamiento del dispositivo libres</string>
     <string name="storage_analyzer_types_title">Tipos de archivo</string>
-    <string name="storage_analyzer_type_summary">Archivos: %1$d • %2$s • %3$d%% de los bytes indexados</string>
+    <plurals name="storage_analyzer_type_summary">
+        <item quantity="one">Archivos: %1$d • %2$s • %3$d%% de los bytes indexados</item>
+        <item quantity="many">Archivos: %1$d • %2$s • %3$d%% de los bytes indexados</item>
+        <item quantity="other">Archivos: %1$d • %2$s • %3$d%% de los bytes indexados</item>
+    </plurals>
     <string name="storage_analyzer_largest_examples">Ejemplos más grandes</string>
     <string name="storage_analyzer_no_files">No se encontró ningún archivo accesible para este análisis.</string>
     <string name="storage_analyzer_truth_note">Esta pantalla es informativa. Nada se preselecciona ni se elimina aquí. Las áreas privadas protegidas como Android/data y Android/obb no se analizan.</string>
@@ -669,5 +750,21 @@
     <string name="rewarded_ad_earned">El tiempo sin anuncios está activo durante 60 minutos.</string>
     <string name="rewarded_ad_unavailable">El video aún no está listo. Inténtalo de nuevo en un momento.</string>
     <string name="ad_free_active_title">El tiempo sin anuncios está activo</string>
-    <string name="ad_free_active_subtitle">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</string>
+    <plurals name="ad_free_active_subtitle">
+        <item quantity="one">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
+        <item quantity="many">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
+        <item quantity="other">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
+    </plurals>
+    <string name="dashboard_safe_scope">Solo se preselecciona basura de bajo riesgo</string>
+    <string name="smart_selected_hero_label">seleccionado</string>
+    <string name="smart_selected_amount">Seleccionado: %1$s</string>
+    <string name="nothing_selected_hint">Selecciona archivos para limpiar</string>
+    <string name="premium_duplicate_copy_of">Copia de %1$s</string>
+    <string name="tools_rebuilt_status_cache_unmeasured">%1$s libres • Caché de apps sin medir: permite el acceso de uso</string>
+    <string name="cache_modern_not_measured">Sin medir: permite el acceso de uso</string>
+    <string name="app_info">Info. de la app</string>
+    <string name="feedback_dialog_body">Escríbenos a la dirección de abajo. Puedes copiarla o abrir una app de correo.</string>
+    <string name="feedback_copy_address">Copiar dirección</string>
+    <string name="feedback_open_email">Abrir app de correo</string>
+    <string name="feedback_address_copied">Dirección copiada</string>
 </resources>
