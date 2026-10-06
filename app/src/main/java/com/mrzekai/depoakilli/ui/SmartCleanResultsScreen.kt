@@ -431,18 +431,18 @@ private fun ScanMetricCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.height(86.dp),
+        modifier = modifier.heightIn(min = 100.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCard),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(12.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Icon(icon, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(22.dp))
             Column {
-                Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp, maxLines = 1)
-                Text(label, color = SmartTextSecondary, fontSize = 10.sp, maxLines = 1)
+                Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Text(label, color = SmartTextSecondary, fontSize = 10.sp)
             }
         }
     }
@@ -476,8 +476,6 @@ private fun ScanStagePill(
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
             )
         }
     }

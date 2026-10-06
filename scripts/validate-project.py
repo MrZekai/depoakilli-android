@@ -78,7 +78,7 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V44.md",
+    "docs/CLOSED_TEST_RELEASE_V45.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 44",
-    'versionName = "0.5.23-closedtest1"',
+    "versionCode = 45",
+    'versionName = "1.0.0"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v44",
-    "SmartCleaner-CLOSED-TEST-APK-v44",
-    "SmartCleaner-ClosedTest-Diagnostics-v44",
-    "SmartCleaner-ClosedTest-v44.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v45",
+    "SmartCleaner-CLOSED-TEST-APK-v45",
+    "SmartCleaner-ClosedTest-Diagnostics-v45",
+    "SmartCleaner-ClosedTest-v45.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "0.5.23-closedtest1",
-    "versionCode='44'",
+    "1.0.0",
+    "versionCode='45'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1398,7 +1398,7 @@ if build_file.count('applicationIdSuffix = ".qa"') != 1:
     errors.append("exactly one build type may claim the .qa applicationId suffix")
 
 # ------------------------------------------------------------------
-# v44 QA-report safety contract (QA v43, 27 Sep 2026).
+# v45 QA-report safety contract (QA v43, 27 Sep 2026).
 # ------------------------------------------------------------------
 if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or '".nomedia"' not in storage_path_rules:
     errors.append("hidden marker files (.nomedia) must be recognised by StoragePathRules")
@@ -1454,4 +1454,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v0.5.23-closedtest1 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v1.0.0 closed-test + slim-QA invariants are valid.")

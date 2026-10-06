@@ -81,8 +81,8 @@ audit_binary() {
 
   grep -q "package: name='com.mrzekai.depoakilli'" "$badging" \
     || fail "$label package mismatch"
-  grep -q "versionCode='44'" "$badging" || fail "$label versionCode mismatch"
-  grep -q "versionName='0.5.23-closedtest1'" "$badging" || fail "$label versionName mismatch"
+  grep -q "versionCode='45'" "$badging" || fail "$label versionCode mismatch"
+  grep -q "versionName='1.0.0'" "$badging" || fail "$label versionName mismatch"
   if grep -q "application-debuggable" "$badging"; then
     fail "$label must not be debuggable"
   fi
@@ -132,7 +132,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner Play closed-test binary audit: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 0.5.23-closedtest1 (44)"
+  echo "Version: 1.0.0 (45)"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"

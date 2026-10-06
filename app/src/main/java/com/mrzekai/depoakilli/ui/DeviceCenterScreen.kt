@@ -144,7 +144,7 @@ internal fun DeviceCenterScreen(
         }
         item {
             ToolActionCard(
-                title = stringResource(R.string.duplicates_tool_title),
+                title = stringResource(R.string.scan_focus_duplicates),
                 subtitle = stringResource(R.string.duplicates_tool_subtitle_v050),
                 icon = Icons.Outlined.ContentCopy,
                 accent = Color(0xFF7047E8),

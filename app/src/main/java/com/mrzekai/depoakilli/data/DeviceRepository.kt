@@ -272,14 +272,14 @@ class DeviceRepository(
         }
 
         val indexed = if (focus == ScanFocus.WHATSAPP) {
-            indexWhatsAppFiles { files -> onProgress(files, files) }
+            indexWhatsAppFiles(onProgress)
         } else {
             indexSharedStorage { visitedDirectories, discoveredFiles ->
                 onProgress(visitedDirectories, discoveredFiles)
             }.also(::cacheSharedIndex)
         }
         val assessments = ArrayList<CleanableItem>()
-        val duplicateItems = ArrayList<CleanableItem>()
+        var duplicateResult = DuplicatePolicy.ScanResult()
 
         indexed.forEach { file ->
             coroutineContext.ensureActive()
@@ -303,7 +303,7 @@ class DeviceRepository(
             } else {
                 indexed
             }
-            duplicateItems += findDuplicates(duplicateSource)
+            duplicateResult = findDuplicates(duplicateSource)
         }
 
         // A verified extra copy is shown as a duplicate (with its protected
@@ -311,7 +311,7 @@ class DeviceRepository(
         // download". Listing duplicates first lets distinctBy keep that
         // classification, so Deep Clean and Delete Duplicates report the same
         // duplicate set.
-        val focusedItems = (duplicateItems.asSequence() + assessments.asSequence())
+        val focusedItems = duplicateResult.mergeWith(assessments)
             .filter { item ->
                 when (focus) {
                     ScanFocus.SMART,
@@ -394,7 +394,7 @@ class DeviceRepository(
     ): WhatsAppLibrarySummary = withContext(Dispatchers.IO) {
         if (!hasAllFilesAccess()) return@withContext WhatsAppLibrarySummary()
         onProgress(2)
-        val indexed = indexWhatsAppFiles { discovered ->
+        val indexed = indexWhatsAppFiles { _, discovered ->
             onProgress((5 + discovered / 75).coerceIn(5, 88))
         }
         val count = indexed.size.coerceAtLeast(1)
@@ -644,7 +644,7 @@ class DeviceRepository(
     }
 
     private suspend fun indexWhatsAppFiles(
-        onDiscovered: (Int) -> Unit,
+        onDiscovered: (Int, Int) -> Unit,
     ): List<IndexedFile> {
         val rootPairs = whatsappRootPairs().mapNotNull { (storageRoot, mediaRoot) ->
             scanRoot(storageRoot)?.let { it to mediaRoot }
@@ -675,11 +675,12 @@ class DeviceRepository(
                     val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
                     if (!visitedFiles.add(filePath)) continue
                     output += indexedFile(storageRoot.file, child)
-                    if (output.size % 50 == 0) onDiscovered(output.size)
+                    if (output.size % 50 == 0) onDiscovered(visitedDirectories.size, output.size)
                     if (output.size >= MAX_WHATSAPP_FILES) break
                 }
             }
         }
+        onDiscovered(visitedDirectories.size, output.size)
         return output.distinctBy(IndexedFile::uri)
     }
 
@@ -801,8 +802,9 @@ class DeviceRepository(
     private fun whatsappRoots(): List<File> =
         whatsappRootPairs().map { (_, mediaRoot) -> mediaRoot }
 
-    private suspend fun findDuplicates(files: List<IndexedFile>): List<CleanableItem> {
+    private suspend fun findDuplicates(files: List<IndexedFile>): DuplicatePolicy.ScanResult {
         val duplicates = ArrayList<CleanableItem>()
+        val protectedUris = hashSetOf<String>()
         val sameSizeGroups = files.asSequence()
             .filter { it.sizeBytes >= MIN_DUPLICATE_BYTES }
             .groupBy(IndexedFile::sizeBytes)
@@ -832,6 +834,7 @@ class DeviceRepository(
                     .filter { it.size > 1 }
                 for (sameContentFiles in contentGroups) {
                     val decision = DuplicatePolicy.choose(sameContentFiles) ?: continue
+                    protectedUris += decision.keep.uri
                     val assessment = aiEngine.duplicateAssessment(decision.automaticSelectionIsSafe)
                     sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
                         duplicates += duplicate.toCleanable(assessment).copy(
@@ -841,6 +844,7 @@ class DeviceRepository(
                 }
                 if (large.size >= 2) {
                     val decision = DuplicatePolicy.choose(large) ?: continue
+                    protectedUris += decision.keep.uri
                     large.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
                         duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
                             protectedDuplicateName = decision.keep.name,
@@ -849,7 +853,7 @@ class DeviceRepository(
                 }
             }
         }
-        return duplicates
+        return DuplicatePolicy.ScanResult(duplicates, protectedUris)
     }
 
     private fun sampleFingerprint(file: IndexedFile): String? = withFileInput(file) { input ->
