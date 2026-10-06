@@ -16,6 +16,29 @@ class AiCleaningEngineTest {
     private val engine = AiCleaningEngine { now }
 
     @Test
+    fun `personal documents in temporary folders are review only`() {
+        for (folder in listOf("Temp", "tmp", "temporary")) {
+            for (name in listOf("lease.pdf", "notes.docx", "song.mp3", "backup.zip")) {
+                val candidate = file(name, "application/octet-stream", 120, "Documents/$folder/")
+                for (result in listOf(engine.assess(candidate), engine.assessDeep(candidate))) {
+                    assertEquals(CleanCategory.JUNK, result?.category)
+                    assertFalse(requireNotNull(result).recommended)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `only disposable extensions and thumbnails are preselected as junk`() {
+        for (extension in listOf("tmp", "temp", "cache", "part", "crdownload", "download")) {
+            val candidate = file("work.$extension", "application/octet-stream", 5, "Documents/Temp/")
+            val result = requireNotNull(engine.assess(candidate))
+            assertEquals(extension in listOf("tmp", "temp", "cache"), result.recommended)
+            assertNull(engine.assess(candidate.copy(modifiedAtMillis = now)))
+        }
+    }
+
+    @Test
     fun `old apk is listed for review but never preselected`() {
         val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 45))
 

@@ -43,7 +43,7 @@
     <string name="cleaning_tools_subtitle">Each tool performs a separate, focused task</string>
     <string name="junk_cleaner_title">Junk Cleaner</string>
     <string name="junk_cleaner_subtitle">This app’s cache and accessible downloaded media</string>
-    <string name="duplicates_tool_title">Delete Duplicates</string>
+    <string name="duplicates_tool_title">Duplicate Cleaner</string>
     <string name="duplicates_tool_subtitle">Find exact copies by content fingerprint</string>
     <string name="whatsapp_cleaner_title">WhatsApp Cleaner</string>
     <string name="whatsapp_cleaner_subtitle">Connect the Media folder and review temporary items</string>

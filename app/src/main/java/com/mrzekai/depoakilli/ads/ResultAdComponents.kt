@@ -12,9 +12,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdListener
@@ -87,23 +88,29 @@ fun CleanupResultAdSurface(
     }
 
     val loadedNative = nativeAd
-    when {
-        loadedNative != null -> {
-            LaunchedEffect(loadedNative) {
-                onAdPresented()
+    // Reserve the complete slot before loading, including larger accessibility text.
+    val slotHeight = (330 + 180 * (LocalDensity.current.fontScale - 1).coerceAtLeast(0f)).dp
+    Box(
+        modifier = modifier.fillMaxWidth().height(slotHeight),
+        contentAlignment = Alignment.Center,
+    ) {
+        when {
+            loadedNative != null -> {
+                LaunchedEffect(loadedNative) {
+                    onAdPresented()
+                }
+                NativeResultAd(
+                    nativeAd = loadedNative,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
-            NativeResultAd(
-                nativeAd = loadedNative,
-                modifier = modifier,
-            )
-        }
 
-        nativeFailed -> {
-            ResultMrecAd(
-                canRequestAds = canRequestAds,
-                onAdPresented = onAdPresented,
-                modifier = modifier,
-            )
+            nativeFailed -> {
+                ResultMrecAd(
+                    canRequestAds = canRequestAds,
+                    onAdPresented = onAdPresented,
+                )
+            }
         }
     }
 }
@@ -124,9 +131,7 @@ private fun NativeResultAd(
         update = { view ->
             bindNativeAd(view, nativeAd)
         },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 245.dp, max = 330.dp),
+        modifier = modifier,
     )
 }
 

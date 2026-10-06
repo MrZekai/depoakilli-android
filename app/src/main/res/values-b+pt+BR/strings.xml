@@ -44,7 +44,7 @@
     <string name="cleaning_tools_subtitle">Cada ferramenta realiza uma tarefa separada e específica</string>
     <string name="junk_cleaner_title">Limpador de arquivos temporários</string>
     <string name="junk_cleaner_subtitle">Cache deste app e mídia baixada acessível</string>
-    <string name="duplicates_tool_title">Excluir duplicados</string>
+    <string name="duplicates_tool_title">Limpador de duplicados</string>
     <string name="duplicates_tool_subtitle">Encontre cópias exatas pela impressão digital de conteúdo</string>
     <string name="whatsapp_cleaner_title">Limpador do WhatsApp</string>
     <string name="whatsapp_cleaner_subtitle">Conecte a pasta de mídia e revise os itens temporários</string>

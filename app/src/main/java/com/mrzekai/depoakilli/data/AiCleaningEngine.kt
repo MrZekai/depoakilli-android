@@ -49,9 +49,10 @@ class AiCleaningEngine(
                     R.string.reason_temporary_file
                 },
                 reasonArgs = listOf(ageDays),
-                // Interrupted downloads can contain a user's still-needed work.
-                // Surface them for review, but never preselect them for deletion.
-                recommended = !isInterruptedDownload(name),
+                // A folder name alone does not make personal documents disposable.
+                recommended = !isInterruptedDownload(name) &&
+                    (path.contains("/.thumbnails/") ||
+                        listOf(".tmp", ".temp", ".cache").any(name::endsWith)),
             )
         }
 
