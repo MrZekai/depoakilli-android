@@ -311,6 +311,7 @@
     <string name="message_all_files_required">Habilita el acceso a todos los archivos para que Smart Cleaner pueda realizar un análisis completo del almacenamiento del dispositivo.</string>
     <string name="message_all_files_required_for_cache">La limpieza profunda de caché requiere primero el acceso a todos los archivos de Android.</string>
     <string name="message_cache_cleanup_cancelled">La limpieza de caché del dispositivo se canceló.</string>
+    <string name="message_cache_system_unavailable">No se pudo confirmar la limpieza de la caché. Selecciona una aplicación de abajo y abre sus ajustes de Android para borrarla.</string>
     <string name="message_cleanup_complete_detail">Se limpiaron %1$s.</string>
     <string name="message_cleanup_partial_detail">%1$s limpiados • Elementos que no se pudieron eliminar: %2$d.</string>
     <string name="message_deep_cache_complete">Android completó la limpieza de caché del dispositivo solicitada.</string>

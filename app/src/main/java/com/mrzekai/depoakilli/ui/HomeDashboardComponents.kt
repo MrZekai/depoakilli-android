@@ -195,7 +195,6 @@ private fun HomeMetricLine(
             color = HomeVisualTokens.TextSecondary,
             fontSize = 13.sp,
             lineHeight = 17.sp,
-            maxLines = 2,
         )
     }
 }
@@ -220,7 +219,7 @@ private fun HomeStorageGauge(
     // system font scale or it runs into the ring (QA v43 #05). Converting dp
     // to sp through the current density cancels the font scale.
     val density = LocalDensity.current
-    val valueSize = with(density) { 18.dp.toSp() }
+    val valueSize = with(density) { 14.dp.toSp() }
     val valueLineHeight = with(density) { 20.dp.toSp() }
     val labelSize = with(density) { 10.dp.toSp() }
 

@@ -220,7 +220,7 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `deep clean surfaces a fifty megabyte review file without auto selecting it`() {
+    fun `deep clean uses the same one hundred megabyte large file threshold`() {
         val candidate = file(
             "archive.bin",
             "application/octet-stream",
@@ -230,9 +230,10 @@ class AiCleaningEngineTest {
         )
 
         assertNull(engine.assess(candidate))
-        val deep = engine.assessDeep(candidate)
-        assertEquals(CleanCategory.LARGE_FILE, deep?.category)
-        assertFalse(requireNotNull(deep).recommended)
+        assertNull(engine.assessDeep(candidate))
+        val large = candidate.copy(sizeBytes = 120L * 1024L * 1024L)
+        assertEquals(CleanCategory.LARGE_FILE, engine.assessDeep(large)?.category)
+        assertFalse(requireNotNull(engine.assessDeep(large)).recommended)
     }
 
     @Test

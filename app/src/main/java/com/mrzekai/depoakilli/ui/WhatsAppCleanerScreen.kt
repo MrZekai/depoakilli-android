@@ -629,8 +629,6 @@ private fun WhatsAppHeroCard(summary: WhatsAppLibrarySummary) {
                     stringResource(R.string.whatsapp_selection_safe),
                     color = Color.White.copy(alpha = .78f),
                     style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }

@@ -305,6 +305,7 @@
     <string name="message_all_files_required">Akıllı Temizleyici’nin kapsamlı cihaz depolama taraması yapabilmesi için Tüm dosyalara erişimi etkinleştir.</string>
     <string name="message_all_files_required_for_cache">Derin önbellek temizliği için önce Android Tüm dosyalara erişim izni gerekir.</string>
     <string name="message_cache_cleanup_cancelled">Cihaz önbelleği temizliği iptal edildi.</string>
+    <string name="message_cache_system_unavailable">Önbelleğin temizlendiği doğrulanamadı. Aşağıdan bir uygulama seçip Android ayarlarından önbelleğini temizleyin.</string>
     <string name="message_cleanup_complete_detail">%1$s temizlendi.</string>
     <string name="message_cleanup_partial_detail">%1$s temizlendi • %2$d öğe kaldırılamadı.</string>
     <string name="message_deep_cache_complete">Android istenen cihaz önbelleği temizliğini tamamladı.</string>

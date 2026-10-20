@@ -78,7 +78,7 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V45.md",
+    "docs/CLOSED_TEST_RELEASE_V46.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 45",
-    'versionName = "1.0.0"',
+    "versionCode = 46",
+    'versionName = "1.0.1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -474,7 +474,7 @@ for expected in (
     "onSystemDismiss: () -> Unit",
     "onDone: (resultAdPresented: Boolean) -> Unit",
     "dismissOnClickOutside = false",
-    "Spacer(Modifier.height(33.dp))",
+    "Spacer(Modifier.height(16.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
     "verticalScroll(rememberScrollState())",
 ):
@@ -1164,7 +1164,7 @@ for expected in (
     "onDismissRequest = onSystemDismiss",
     "dismissOnClickOutside = false",
     "onDone(resultAdPresented)",
-    "Spacer(Modifier.height(33.dp))",
+    "Spacer(Modifier.height(16.dp))",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v45",
-    "SmartCleaner-CLOSED-TEST-APK-v45",
-    "SmartCleaner-ClosedTest-Diagnostics-v45",
-    "SmartCleaner-ClosedTest-v45.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v46",
+    "SmartCleaner-CLOSED-TEST-APK-v46",
+    "SmartCleaner-ClosedTest-Diagnostics-v46",
+    "SmartCleaner-ClosedTest-v46.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "1.0.0",
-    "versionCode='45'",
+    "1.0.1",
+    "versionCode='46'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1265,6 +1265,7 @@ for expected in (
     "androidx.work.impl.foreground.SystemForegroundService",
     "androidx.compose.ui.tooling.PreviewActivity",
     "AAB and APK are not signed by the same Play upload certificate",
+    "Play upload certificate differs from v45",
     "PLAY_CLOSED_TEST_BINARY_GATE_PASS",
 ):
     if expected not in closed_test_verifier:
@@ -1400,8 +1401,8 @@ if build_file.count('applicationIdSuffix = ".qa"') != 1:
 # ------------------------------------------------------------------
 # v45 QA-report safety contract (QA v43, 27 Sep 2026).
 # ------------------------------------------------------------------
-if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or '".nomedia"' not in storage_path_rules:
-    errors.append("hidden marker files (.nomedia) must be recognised by StoragePathRules")
+if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or 'normalizeText(name.trim()).startsWith(".")' not in storage_path_rules:
+    errors.append("hidden dot-files must be recognised by StoragePathRules")
 if repository.count("StoragePathRules.isSystemMarkerFile(") < 3:
     errors.append("marker files must be skipped by both indexers and refused at deletion")
 if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" in ai_engine:
@@ -1454,4 +1455,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.0 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v1.0.1 closed-test + slim-QA invariants are valid.")

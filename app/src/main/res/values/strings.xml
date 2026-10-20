@@ -305,6 +305,7 @@
     <string name="message_all_files_required">Enable All files access so Smart Cleaner can perform a full device storage scan.</string>
     <string name="message_all_files_required_for_cache">Deep cache cleanup requires Android All files access first.</string>
     <string name="message_cache_cleanup_cancelled">Device cache cleanup was cancelled.</string>
+    <string name="message_cache_system_unavailable">Cache clearing could not be confirmed. Select an app below and open its Android settings to clear its cache.</string>
     <string name="message_cleanup_complete_detail">%1$s was cleaned.</string>
     <string name="message_cleanup_partial_detail">%1$s cleaned • %2$d items could not be removed.</string>
     <string name="message_deep_cache_complete">Android completed the requested device cache cleanup.</string>

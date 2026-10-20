@@ -6,6 +6,7 @@ APK="${2:-app/build/outputs/apk/closedTest/app-closedTest.apk}"
 OUT="${3:-app/build/reports/closed-test-binary-audit}"
 BUNDLETOOL_VERSION="1.18.3"
 BUNDLETOOL_SHA256="a099cfa1543f55593bc2ed16a70a7c67fe54b1747bb7301f37fdfd6d91028e29"
+EXPECTED_UPLOAD_CERT_SHA256="e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 BUNDLETOOL="$TMP_DIR/bundletool-all-$BUNDLETOOL_VERSION.jar"
@@ -52,6 +53,7 @@ AAB_CERT="$({ sed -nE 's/^[[:space:]]*SHA256:[[:space:]]*//p' "$AAB_CERT_REPORT"
 [[ "$APK_CERT" =~ ^[0-9a-f]{64}$ ]] || fail "APK signer SHA-256 could not be parsed"
 [[ "$AAB_CERT" =~ ^[0-9a-f]{64}$ ]] || fail "AAB signer SHA-256 could not be parsed"
 [ "$APK_CERT" = "$AAB_CERT" ] || fail "AAB and APK are not signed by the same Play upload certificate"
+[ "$AAB_CERT" = "$EXPECTED_UPLOAD_CERT_SHA256" ] || fail "Play upload certificate differs from v45"
 
 rm -f "$APKS" "$UNIVERSAL"
 java -jar "$BUNDLETOOL" build-apks \
@@ -81,8 +83,8 @@ audit_binary() {
 
   grep -q "package: name='com.mrzekai.depoakilli'" "$badging" \
     || fail "$label package mismatch"
-  grep -q "versionCode='45'" "$badging" || fail "$label versionCode mismatch"
-  grep -q "versionName='1.0.0'" "$badging" || fail "$label versionName mismatch"
+  grep -q "versionCode='46'" "$badging" || fail "$label versionCode mismatch"
+  grep -q "versionName='1.0.1'" "$badging" || fail "$label versionName mismatch"
   if grep -q "application-debuggable" "$badging"; then
     fail "$label must not be debuggable"
   fi
@@ -132,7 +134,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner Play closed-test binary audit: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 1.0.0 (45)"
+  echo "Version: 1.0.1 (46)"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"

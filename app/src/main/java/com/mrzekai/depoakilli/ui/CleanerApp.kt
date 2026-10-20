@@ -157,6 +157,13 @@ fun CleanerApp(
     var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var accessDisclosure by rememberSaveable { mutableStateOf<AccessDisclosure?>(null) }
+    // Scan data lives in the ViewModel, not saved navigation state. After a
+    // process restart the saved results route must not reopen without its data.
+    LaunchedEffect(Unit) {
+        if (detailScreen == DetailScreen.CLEAN_RESULTS && !state.lastScanCompleted && !state.scanning) {
+            detailScreen = null
+        }
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     // Hoisted so the Me list keeps its scroll position while a sub-page such
     // as Privacy Policy is open (QA v43 polish).

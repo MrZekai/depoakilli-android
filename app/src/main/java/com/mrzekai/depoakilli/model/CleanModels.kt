@@ -252,9 +252,9 @@ object ByteFormatter {
             unitIndex++
         }
         return if (value >= 100 || unitIndex == 0) {
-            String.format(Locale.getDefault(), "%.0f %s", value, units[unitIndex])
+            String.format(Locale.ROOT, "%.0f %s", value, units[unitIndex])
         } else {
-            String.format(Locale.getDefault(), "%.1f %s", value, units[unitIndex])
+            String.format(Locale.ROOT, "%.1f %s", value, units[unitIndex])
         }
     }
 }
