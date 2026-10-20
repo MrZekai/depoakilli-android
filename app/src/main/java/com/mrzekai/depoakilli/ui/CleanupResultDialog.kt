@@ -108,11 +108,14 @@ internal fun CleanupResultDialog(
                                 ),
                             ),
                         )
-                        .verticalScroll(rememberScrollState())
                         .padding(22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(15.dp),
                 ) {
+                    Column(
+                        modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(15.dp),
+                    ) {
                     Surface(
                         color = accent.copy(alpha = .16f),
                         shape = CircleShape,
@@ -250,13 +253,11 @@ internal fun CleanupResultDialog(
                         onAdPresented = { resultAdPresented = true },
                         modifier = Modifier.fillMaxWidth(),
                     )
+                    }
 
-                    // Constant separation between the sponsored surface and the
-                    // primary action. Making this gap conditional on the ad
-                    // having loaded moved the Done button downwards at the exact
-                    // moment the ad appeared, which is the classic accidental-
-                    // click pattern AdMob ad-placement policy prohibits.
-                    Spacer(Modifier.height(33.dp))
+                    // Keep the primary action visible while the ad slot loads
+                    // or the scrollable result content grows on a small device.
+                    Spacer(Modifier.height(16.dp))
 
                     Button(
                         onClick = { onDone(resultAdPresented) },

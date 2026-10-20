@@ -1234,6 +1234,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         pendingDeepCacheStorageBeforeBytes = 0L
 
         if (!approved) {
+            showMessage(R.string.message_cache_system_unavailable)
             refreshDeviceState(force = true)
             refreshAppCaches(force = true)
             return
@@ -1263,7 +1264,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     appCache = afterCache ?: current.appCache,
                     storage = storageAfter,
                     scanningAppCaches = false,
-                    cleanupResult = CleanupResult(
+                    cleanupResult = if (measuredCacheReduction > 0L) CleanupResult(
                         deletedBytes = measuredCacheReduction,
                         deletedCount = 0,
                         failedCount = 0,
@@ -1271,8 +1272,10 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         afterAvailableBytes = storageAfter.availableBytes,
                         kind = CleanupResultKind.SYSTEM_CACHE,
                         operationSucceeded = true,
-                    ),
-                    message = null,
+                    ) else null,
+                    message = if (measuredCacheReduction == 0L) {
+                        getApplication<Application>().getString(R.string.message_cache_system_unavailable)
+                    } else null,
                 )
             }
         }

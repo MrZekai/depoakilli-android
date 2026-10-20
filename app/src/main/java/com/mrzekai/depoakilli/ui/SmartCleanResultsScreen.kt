@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -253,7 +255,7 @@ private fun SmartScanningState(state: CleanerUiState, modifier: Modifier) {
             .padding(horizontal = 18.dp, vertical = 14.dp),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Card(
@@ -339,12 +341,6 @@ private fun SmartScanningState(state: CleanerUiState, modifier: Modifier) {
                     value = state.scanProgressDirectories.toString(),
                     label = stringResource(R.string.smart_scan_folders_label),
                     icon = Icons.Outlined.Folder,
-                    modifier = Modifier.weight(1f),
-                )
-                ScanMetricCard(
-                    value = stringResource(R.string.smart_scan_on_device_value),
-                    label = stringResource(R.string.smart_scan_on_device_label),
-                    icon = Icons.Outlined.Security,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -755,7 +751,7 @@ private fun SmartResultsContent(
                 }
             }
 
-            val storageRows = summary.storageTypes.chunked(3)
+            val storageRows = summary.storageTypes.chunked(2)
             storageRows.forEachIndexed { rowIndex, rowStats ->
                 item(key = "storage-row-$rowIndex") {
                     Row(
@@ -774,7 +770,7 @@ private fun SmartResultsContent(
                                 modifier = Modifier.weight(1f),
                             )
                         }
-                        repeat(3 - rowStats.size) {
+                        repeat(2 - rowStats.size) {
                             Spacer(Modifier.weight(1f))
                         }
                     }
@@ -941,8 +937,6 @@ private fun SmartStorageSuggestionCard(
                         stringResource(R.string.smart_media_priority_note),
                         color = Color(0xFF8FDFFF),
                         fontSize = 10.sp,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Surface(color = accent.copy(alpha = .18f), shape = RoundedCornerShape(20.dp)) {
@@ -994,7 +988,7 @@ private fun SmartStoragePreviewTile(
     }
 
     Card(
-        modifier = Modifier.width(142.dp).height(116.dp).clickable(onClick = onClick),
+        modifier = Modifier.width(142.dp).height(132.dp).clickable(onClick = onClick),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCardAlt),
     ) {
@@ -1018,16 +1012,12 @@ private fun SmartStoragePreviewTile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(fileVisual(file.mimeType, file.name), contentDescription = null, tint = accent, modifier = Modifier.size(34.dp))
-                    Spacer(Modifier.height(8.dp))
-                    Text(file.name, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
                 }
             }
             Column(
                 modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
             ) {
-                if (bitmap != null) {
-                    Text(file.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+                Text(file.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(ByteFormatter.format(file.sizeBytes), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Black)
             }
         }
@@ -1078,8 +1068,6 @@ private fun UnusedAppsSectionCard(
                         },
                         color = SmartTextSecondary,
                         fontSize = 12.sp,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -1494,7 +1482,7 @@ private fun SmartHorizontalPreviewTile(
     }
 
     Card(
-        modifier = Modifier.width(142.dp).height(116.dp).clickable(onClick = onPreview),
+        modifier = Modifier.width(142.dp).height(132.dp).clickable(onClick = onPreview),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCardAlt),
     ) {
@@ -1518,8 +1506,6 @@ private fun SmartHorizontalPreviewTile(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(fileVisual(item.mimeType, item.name), contentDescription = null, tint = accent, modifier = Modifier.size(34.dp))
-                    Spacer(Modifier.height(8.dp))
-                    Text(item.name, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
                 }
             }
 
@@ -1537,9 +1523,7 @@ private fun SmartHorizontalPreviewTile(
             Column(
                 modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
             ) {
-                if (bitmap != null) {
-                    Text(item.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+                Text(item.name, color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(ByteFormatter.format(item.sizeBytes), color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Black)
             }
         }
@@ -1571,13 +1555,13 @@ private fun StorageGridTile(
     val accent = storageAccent(type)
     Card(
         onClick = onClick,
-        modifier = modifier.height(96.dp),
+        modifier = modifier.heightIn(min = 96.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = SmartCard),
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(10.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().padding(10.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Surface(color = accent.copy(alpha = .18f), shape = RoundedCornerShape(10.dp)) {
@@ -1589,8 +1573,7 @@ private fun StorageGridTile(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
                     modifier = Modifier.weight(1f),
                 )
             }

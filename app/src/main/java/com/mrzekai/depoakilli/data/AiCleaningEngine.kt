@@ -152,7 +152,7 @@ class AiCleaningEngine(
             )
         }
 
-        if (file.sizeBytes >= DEEP_LARGE_FILE_BYTES) {
+        if (file.sizeBytes >= LARGE_FILE_BYTES) {
             return AiAssessment(
                 category = CleanCategory.LARGE_FILE,
                 safetyScore = 50,
@@ -262,7 +262,6 @@ class AiCleaningEngine(
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
-        private const val DEEP_LARGE_FILE_BYTES = 50L * 1024L * 1024L
         private const val DEEP_SCREENSHOT_DAYS = 7L
         private const val DEEP_DOWNLOAD_DAYS = 30L
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L

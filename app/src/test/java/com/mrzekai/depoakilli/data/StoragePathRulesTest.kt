@@ -20,8 +20,10 @@ class StoragePathRulesTest {
         assertTrue(StoragePathRules.isSystemMarkerFile(".nomedia"))
         assertTrue(StoragePathRules.isSystemMarkerFile(".NOMEDIA"))
         assertTrue(StoragePathRules.isSystemMarkerFile(".hidden"))
+        assertTrue(StoragePathRules.isSystemMarkerFile(".database_uuid"))
+        assertTrue(StoragePathRules.isSystemMarkerFile(".private-notes"))
         assertFalse(StoragePathRules.isSystemMarkerFile("nomedia.jpg"))
-        assertFalse(StoragePathRules.isSystemMarkerFile(".nomedia.jpg"))
+        assertTrue(StoragePathRules.isSystemMarkerFile(".nomedia.jpg"))
         assertFalse(StoragePathRules.isSystemMarkerFile("IMG_0001.jpg"))
     }
 }
