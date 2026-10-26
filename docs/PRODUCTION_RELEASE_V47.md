@@ -1,0 +1,7 @@
+# Smart Cleaner production v47
+
+Production uses package `com.mrzekai.depoakilli`, version `1.0.1` (`versionCode 47`), and target API 36. It continues the closed-test v46 app with the existing Play upload key. The release workflow rejects any AAB or APK whose upload certificate SHA-256 differs from `e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd`.
+
+Run **Play Production AAB + APK** on `main` after Android CI passes. Upload only the `app-release.aab` inside `SmartCleaner-PLAY-PRODUCTION-AAB-v47` to the Play production track. `SmartCleaner-PRODUCTION-APK-v47` is an installable copy for device checks, not the Play upload. Keep `SmartCleaner-Production-Diagnostics-v47` with the release: it includes the certificate, package, version, ad-ID audit and R8 mapping.
+
+Production embeds Smart Cleaner's live AdMob app, banner, interstitial and rewarded IDs. The optional `ADMOB_RESULT_NATIVE_ID` secret enables a live Native result ad; when it is absent, the result uses the live banner unit in MREC size. The binary gate rejects Google's sample publisher IDs. Ad serving, AdMob account status, UMP regional configuration, Data Safety answers, All Files Access declaration and store listing still require checks in their respective consoles; a successful build cannot prove those external settings. AdMob may limit ads while its app-readiness review runs after the app is published and linked to the store.
