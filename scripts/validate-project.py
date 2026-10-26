@@ -131,7 +131,7 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 46",
+    "versionCode = 47",
     'versionName = "1.0.1"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v46",
-    "SmartCleaner-CLOSED-TEST-APK-v46",
-    "SmartCleaner-ClosedTest-Diagnostics-v46",
-    "SmartCleaner-ClosedTest-v46.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v47",
+    "SmartCleaner-CLOSED-TEST-APK-v47",
+    "SmartCleaner-ClosedTest-Diagnostics-v47",
+    "SmartCleaner-ClosedTest-v47.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1254,7 +1254,7 @@ closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
     "1.0.1",
-    "versionCode='46'",
+    "versionCode='47'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1272,9 +1272,33 @@ for expected in (
         errors.append(f"missing Play closed-test binary invariant: {expected}")
 
 release_workflow = read(".github/workflows/release-aab.yml")
-for expected in ("SUPPORT_EMAIL", "ADMOB_RESULT_NATIVE_ID"):
+for expected in (
+    "Play Production AAB + APK",
+    "SUPPORT_EMAIL",
+    "ADMOB_RESULT_NATIVE_ID",
+    "testDebugUnitTest",
+    "lintRelease",
+    "bundleRelease assembleRelease",
+    "scripts/verify-release-aab.sh",
+    "SmartCleaner-PLAY-PRODUCTION-AAB-v47",
+    "SmartCleaner-PRODUCTION-APK-v47",
+):
     if expected not in release_workflow:
-        errors.append(f"release workflow does not pass required environment: {expected}")
+        errors.append(f"missing production workflow invariant: {expected}")
+
+release_verifier = read("scripts/verify-release-aab.sh")
+for expected in (
+    "versionCode='47'",
+    "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
+    "ca-app-pub-1380972808968213~9043355268",
+    "ca-app-pub-1380972808968213/2118175647",
+    "ca-app-pub-1380972808968213/8492012303",
+    "ca-app-pub-1380972808968213/4039180256",
+    "ca-app-pub-3940256099942544",
+    "RELEASE_BINARY_GATE_PASS",
+):
+    if expected not in release_verifier:
+        errors.append(f"missing production binary gate: {expected}")
 
 release_environment = read("scripts/validate-release-env.sh")
 for expected in ("SUPPORT_EMAIL", "ANDROID_KEYSTORE_BASE64"):
@@ -1455,4 +1479,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.1 closed-test + slim-QA invariants are valid.")
+print("Smart Cleaner v1.0.1 (47) production + QA invariants are valid.")

@@ -1,12 +1,13 @@
-# Google Play release checklist — Cleaner Engine 0.5
+# Google Play production checklist — Smart Cleaner v47
 
 ## Build / QA gate
 
 - [ ] `python scripts/validate-project.py` passes.
 - [ ] GitHub Actions passes project validation, `testDebugUnitTest`, `lintDebug`, `assembleQa`, QA signing and packaged-binary verification.
-- [ ] QA APK reports version `0.5.23-closedtest1-qa` / versionCode `44`.
+- [ ] QA APK reports version `1.0.1-qa` / versionCode `47`.
 - [ ] Manual `Play Closed Test AAB + APK` workflow passes `lintClosedTest`, signed AAB/APK build and binary verification.
-- [ ] Play AAB reports package `com.mrzekai.depoakilli`, version `0.5.23-closedtest1` / `44`, sample ads, non-debuggable state and the existing upload certificate.
+- [x] Closed-test v46 AAB was built with package `com.mrzekai.depoakilli`, version `1.0.1` / `46`, sample ads and the existing upload certificate.
+- [ ] Production v47 AAB reports package `com.mrzekai.depoakilli`, version `1.0.1` / `47`, API 36, live AdMob IDs, non-debuggable state and the same upload certificate SHA-256 `e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd`.
 - [ ] Physical-device checklist in `docs/DEVICE_QA_CHECKLIST.md` is recorded before Production.
 - [ ] Android 11–16 permission return paths are tested where devices are available.
 - [ ] No scan/delete path causes ANR or silently drops failed items.
@@ -45,6 +46,8 @@
 ## Ads / consent
 
 - [ ] UMP consent is configured for applicable regions.
+- [ ] AdMob app is linked to the correct Play listing; check its app-readiness and Policy Center status after production publication.
+- [ ] The Play listing has the developer website used for AdMob `app-ads.txt`, and AdMob verifies that file.
 - [ ] Banner, result-ad and Interstitial placement follows `docs/AD_PLACEMENTS.md`.
 - [ ] Ads never cover permission rationales, cleanup confirmation or primary selection controls.
 - [ ] Returning from Android permission/settings/cache/uninstall screens immediately restores the app without a foreground-return advertisement.
@@ -60,12 +63,12 @@
 ## Identity / signing
 
 - [ ] Package name is `com.mrzekai.depoakilli` for Play and QA suffix behavior remains intentional.
-- [ ] Closed-test AAB and APK are signed by the same existing Play upload certificate.
+- [ ] Production AAB and APK are signed by the same existing Play upload certificate.
 - [ ] QA certificate SHA-256 is verified by CI: `50:8E:01:21:97:DA:76:D5:16:BA:D2:48:80:B6:7C:6F:06:7F:CD:64:6C:51:A0:43:A1:1C:0C:34:5E:6E:AD:54`.
 - [ ] Play upload keystore and passwords exist only in approved secret storage and are backed up securely.
 
 ## Store assets / metadata
 
-- [ ] 512×512 icon, 1024×500 feature graphic and at least four phone screenshots represent the real 0.5 behavior.
+- [ ] 512×512 icon, 1024×500 feature graphic and at least four phone screenshots represent the current app behavior.
 - [ ] English store listing is complete; localized listings are published only for supported/reviewed locales.
 - [ ] Store copy clearly positions Smart Cleaner as storage management / file maintenance and does not promise inaccessible Android operations.
