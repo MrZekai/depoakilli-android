@@ -1,0 +1,53 @@
+## es
+
+Title (30):
+Smart Cleaner: Storage Manager
+
+Short description (70):
+Revisa archivos basura, duplicados y grandes antes de liberar espacio.
+
+Full description (3685):
+Smart Cleaner es un limpiador de almacenamiento y administrador de archivos para Android. Escanea el almacenamiento de tu teléfono en busca de archivos basura, duplicados, archivos grandes, descargas antiguas, capturas de pantalla e instaladores APK residuales, y te permite revisar todo antes de eliminarlo.
+
+<b>Libera espacio sin adivinar</b>
+¿El almacenamiento del teléfono está lleno? Smart Cleaner muestra qué ocupa espacio, agrupa los archivos en categorías claras y te ayuda a liberar espacio eliminando solo lo que elijas.
+
+<b>Funciones:</b>
+
+Limpiador de archivos basura: encuentra archivos temporales, miniaturas antiguas y restos de descargas incompletas.
+
+Buscador de archivos duplicados: encuentra fotos, vídeos y documentos duplicados. Las copias exactas se verifican por su contenido y siempre se conserva un original. Los archivos muy grandes se marcan como posibles coincidencias para que puedas compararlos primero.
+
+Buscador de archivos grandes: encuentra archivos de más de 100 MB de cualquier tipo, incluyendo vídeos, archivos comprimidos y APK.
+
+Limpiador de descargas y APK: revisa las descargas antiguas y los archivos de instalación que ya no necesitas. Eliminar un archivo APK no desinstala la aplicación.
+
+Revisión de fotos, vídeos y capturas de pantalla: explora capturas de pantalla y archivos multimedia grandes en un solo lugar. Las fotos y vídeos personales nunca se seleccionan automáticamente.
+
+Limpiador de contenido multimedia de WhatsApp: revisa imágenes, videos, notas de voz, documentos y estados compartidos en WhatsApp y WhatsApp Business, ordenados por categoría.
+
+Analizador de almacenamiento: consulta cuánto espacio ocupan imágenes, videos, audio, documentos, archivos comprimidos y APK.
+
+Caché y administrador de aplicaciones: consulta cuánta caché usa cada aplicación, borra la caché con la herramienta oficial del sistema Android y revisa las aplicaciones que ocupan mucho espacio o que no usas.
+
+Cambios en el almacenamiento: compara dos análisis para ver qué archivos aumentaron o disminuyeron en tu almacenamiento.
+
+<b>Tienes el control</b>
+
+Nada se elimina sin tu selección y confirmación. Los resultados del análisis son sugerencias, y puedes abrir cada categoría para revisar cada archivo antes de limpiarlo. Los archivos eliminados no se pueden recuperar, así que revisa tu selección con cuidado.
+
+<b>¿Por qué la aplicación solicita acceso a todos los archivos?</b>
+
+La gestión de archivos es el objetivo principal de Smart Cleaner. Para analizar todas las carpetas, encontrar duplicados de diferentes tipos de archivos y gestionar APK, archivos comprimidos y documentos, la aplicación necesita el permiso de acceso a todos los archivos de Android. La aplicación explica el motivo antes de solicitarlo, y puedes desactivarlo en cualquier momento en la configuración de Android. Las carpetas protegidas de las aplicaciones, como Android/data y Android/obb, nunca se acceden.
+
+El acceso al uso es opcional. Solo se utiliza para mostrar el espacio de almacenamiento y el tamaño de la caché de las aplicaciones, así como la fecha de su último uso.
+
+<b>Privacidad</b>
+
+El análisis y la limpieza de archivos se realizan en tu dispositivo. Tus archivos, nombres de archivos y rutas de carpetas no se suben a la aplicación. Smart Cleaner incluye anuncios de Google AdMob; puedes revisar tus preferencias de consentimiento publicitario en la aplicación. También puedes ver un breve vídeo opcional para ocultar los anuncios durante 60 minutos.
+
+Disponible en inglés, turco, español y portugués (Brasil).
+
+Analiza tu almacenamiento y libera espacio con seguridad, revisando cada archivo.
+
+Smart Cleaner no está afiliado a WhatsApp ni a Meta.
