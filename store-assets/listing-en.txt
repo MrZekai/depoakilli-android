@@ -1,0 +1,53 @@
+## en
+
+Title (30):
+Smart Cleaner: Storage Manager
+
+Short description (71):
+Clean junk, duplicates and large files. Review storage before deleting.
+
+Full description (2986):
+Smart Cleaner is a storage cleaner and file manager for Android. It scans your phone's storage for junk files, duplicate files, large files, old downloads, screenshots and leftover APK installers, then lets you review everything before anything is deleted.
+
+<b>Free up space without guesswork</b>
+Phone storage full? Smart Cleaner works as a phone cleaner and storage cleaner in one: it shows what is filling your storage, groups it into clear categories and lets you free up space by deleting only what you choose.
+
+<b>What you can do</b>
+
+Junk file cleaner: find temporary files, old thumbnails and unfinished download leftovers.
+
+Duplicate file finder: find duplicate photos, videos and documents. Exact copies are verified by their content, and one original is always kept. Very large files are marked as probable matches so you can compare them first.
+
+Large file finder: find files over 100 MB of any type, including videos, archives and APKs.
+
+Downloads and APK cleaner: review old downloads and installer files you no longer need. Removing an APK file does not uninstall the app.
+
+Photo, video and screenshot review: browse screenshots and large media in one place. Personal photos and videos are never selected automatically.
+
+WhatsApp media cleaner: review images, videos, voice notes, documents and statuses shared in WhatsApp and WhatsApp Business, sorted by category.
+
+Storage analyzer: see how much space images, videos, audio, documents, archives and APKs use.
+
+App cache and app manager: see how much cache each app uses, clear app cache with Android's official system tool, and review large or unused apps.
+
+Storage change: compare two scans to see what grew or shrank on your storage.
+
+<b>You stay in control</b>
+
+Nothing is deleted without your selection and confirmation. Scan results are suggestions, and you can open each category to check every file before cleaning. Deleted files cannot be restored, so review your selection carefully.
+
+<b>Why the app asks for All files access</b>
+
+Managing files is the core purpose of Smart Cleaner. To scan all folders, find duplicates across file types and manage APKs, archives and documents, the app needs Android's All files access permission. The app explains why before asking, and you can turn it off at any time in Android settings. Protected app folders such as Android/data and Android/obb are never accessed.
+
+Usage access is optional. It is only used to show app storage and cache sizes and when apps were last used.
+
+<b>Privacy</b>
+
+File scanning and cleanup happen on your device. Your files, file names and folder paths are not uploaded. Smart Cleaner is supported by ads from Google AdMob, and you can review your ad consent choices in the app. You can also watch a short optional video to hide ads for 60 minutes.
+
+Available in English, Turkish, Spanish and Portuguese (Brazil).
+
+Scan your storage and free up space safely, one reviewed file at a time.
+
+Smart Cleaner is not affiliated with WhatsApp or Meta.
