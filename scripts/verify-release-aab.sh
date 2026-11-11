@@ -70,8 +70,8 @@ audit_binary() {
   done < <(unzip -Z1 "$binary" | grep -E '^classes([0-9]+)?\.dex$')
 
   grep -Fq "package: name='com.mrzekai.depoakilli'" "$badging" || fail "$label package mismatch"
-  grep -Fq "versionCode='47'" "$badging" || fail "$label versionCode mismatch"
-  grep -Fq "versionName='1.0.1'" "$badging" || fail "$label versionName mismatch"
+  grep -Fq "versionCode='48'" "$badging" || fail "$label versionCode mismatch"
+  grep -Fq "versionName='1.0.2'" "$badging" || fail "$label versionName mismatch"
   grep -Fq "targetSdkVersion:'36'" "$badging" || fail "$label target API mismatch"
   ! grep -Fq 'application-debuggable' "$badging" || fail "$label is debuggable"
   grep -Fq 'ca-app-pub-1380972808968213~9043355268' "$manifest" \
@@ -109,7 +109,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner production release verification: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 1.0.1 (47)"
+  echo "Version: 1.0.2 (48)"
   echo "Target API: 36"
   echo "Upload certificate SHA-256: $AAB_CERT"
   echo "AdMob: live app, banner, interstitial and rewarded IDs; no Google sample IDs"

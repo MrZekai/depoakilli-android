@@ -3,12 +3,14 @@ package com.mrzekai.depoakilli
 import android.app.Activity
 import android.content.ComponentCallbacks2
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.storage.StorageManager
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.IntentSenderRequest
@@ -17,6 +19,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.ads.RewardedAdController
@@ -32,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var interstitialAds: InterstitialAdController
     private lateinit var rewardedAds: RewardedAdController
     private var pendingDeepCacheAfterStorageAccess = false
+    private var reviewPromptInFlight = false
 
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -83,7 +87,15 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // The UI is always dark, so both system bars use light icons on a
+        // transparent bar regardless of the device's light/dark setting.
+        val darkBars = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        enableEdgeToEdge(statusBarStyle = darkBars, navigationBarStyle = darkBars)
+        // Phones stay portrait; tablets, foldables and desktop windows are
+        // free to rotate and resize (Play large-screen quality guideline).
+        if (resources.configuration.smallestScreenWidthDp < 600) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         consentManager = ConsentManager(applicationContext)
         interstitialAds = InterstitialAdController(applicationContext)
         rewardedAds = RewardedAdController(applicationContext)
@@ -124,6 +136,7 @@ class MainActivity : ComponentActivity() {
                     onPrepareStorageCleanup = ::cleanStorage,
                     onPrepareWhatsAppCleanup = ::cleanWhatsApp,
                     onCleanupResultDismissed = ::onCleanupResultDismissed,
+                    onCleanupSucceeded = ::maybeAskForReview,
                     onUninstallApp = ::uninstallApp,
                     onOpenAppInfo = ::openAppInfo,
                     onOpenLanguageSettings = ::openLanguageSettings,
@@ -185,7 +198,31 @@ class MainActivity : ComponentActivity() {
         // The destructive operation and measured result are already complete.
         // Monetization happens only after the user closes the result.
         cleanerViewModel.refreshDeviceState(force = true)
+        // Never stack a full-screen ad on top of the Play rating sheet.
+        if (reviewPromptInFlight) return
         showPostTaskInterstitial()
+    }
+
+    /**
+     * Google Play in-app review, requested right after a successful cleanup.
+     * Play decides whether the sheet is actually shown (its own quota); this
+     * app additionally asks at most once every [REVIEW_PROMPT_INTERVAL_MILLIS].
+     */
+    private fun maybeAskForReview() {
+        val prefs = getSharedPreferences("review_prompt", MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        if (now - prefs.getLong("last_asked", 0L) < REVIEW_PROMPT_INTERVAL_MILLIS) return
+        prefs.edit().putLong("last_asked", now).apply()
+        reviewPromptInFlight = true
+        val manager = ReviewManagerFactory.create(this)
+        manager.requestReviewFlow().addOnCompleteListener { request ->
+            if (request.isSuccessful && !isFinishing && !isDestroyed) {
+                manager.launchReviewFlow(this, request.result)
+                    .addOnCompleteListener { reviewPromptInFlight = false }
+            } else {
+                reviewPromptInFlight = false
+            }
+        }
     }
 
     private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
@@ -414,5 +451,6 @@ class MainActivity : ComponentActivity() {
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
         const val PLAY_STORE_PACKAGE = "com.android.vending"
         const val POST_TASK_AD_SETTLE_MILLIS = 350L
+        const val REVIEW_PROMPT_INTERVAL_MILLIS = 30L * 24L * 60L * 60L * 1000L
     }
 }

@@ -72,7 +72,7 @@ jobs:
       - name: Upload signed production AAB
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-PLAY-PRODUCTION-AAB-v47
+          name: SmartCleaner-PLAY-PRODUCTION-AAB-v48
           path: app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 30
@@ -80,7 +80,7 @@ jobs:
       - name: Upload signed production APK
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-PRODUCTION-APK-v47
+          name: SmartCleaner-PRODUCTION-APK-v48
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
@@ -88,7 +88,7 @@ jobs:
       - name: Upload production verification and mapping
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-Production-Diagnostics-v47
+          name: SmartCleaner-Production-Diagnostics-v48
           path: |
             app/build/outputs/mapping/release/mapping.txt
             release-verification/

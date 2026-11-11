@@ -143,6 +143,7 @@ fun CleanerApp(
     onPrepareStorageCleanup: () -> Unit,
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onCleanupResultDismissed: () -> Unit,
+    onCleanupSucceeded: () -> Unit,
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -634,6 +635,7 @@ fun CleanerApp(
 
                     dismissResultAndReturn()
 
+                    if (eligibleForNaturalBreakAd) onCleanupSucceeded()
                     if (eligibleForNaturalBreakAd && !resultAdPresented) {
                         onCleanupResultDismissed()
                     }

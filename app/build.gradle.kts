@@ -46,8 +46,8 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 47
-        versionName = "1.0.1"
+        versionCode = 48
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -225,6 +225,7 @@ dependencies {
 
     implementation(libs.google.play.services.ads)
     implementation(libs.google.ump)
+    implementation(libs.google.play.review)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
 

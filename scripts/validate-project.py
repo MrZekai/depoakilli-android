@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 47",
-    'versionName = "1.0.1"',
+    "versionCode = 48",
+    'versionName = "1.0.2"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v47",
-    "SmartCleaner-CLOSED-TEST-APK-v47",
-    "SmartCleaner-ClosedTest-Diagnostics-v47",
-    "SmartCleaner-ClosedTest-v47.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v48",
+    "SmartCleaner-CLOSED-TEST-APK-v48",
+    "SmartCleaner-ClosedTest-Diagnostics-v48",
+    "SmartCleaner-ClosedTest-v48.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "1.0.1",
-    "versionCode='47'",
+    "1.0.2",
+    "versionCode='48'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1280,15 +1280,15 @@ for expected in (
     "lintRelease",
     "bundleRelease assembleRelease",
     "scripts/verify-release-aab.sh",
-    "SmartCleaner-PLAY-PRODUCTION-AAB-v47",
-    "SmartCleaner-PRODUCTION-APK-v47",
+    "SmartCleaner-PLAY-PRODUCTION-AAB-v48",
+    "SmartCleaner-PRODUCTION-APK-v48",
 ):
     if expected not in release_workflow:
         errors.append(f"missing production workflow invariant: {expected}")
 
 release_verifier = read("scripts/verify-release-aab.sh")
 for expected in (
-    "versionCode='47'",
+    "versionCode='48'",
     "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
     "ca-app-pub-1380972808968213~9043355268",
     "ca-app-pub-1380972808968213/2118175647",
@@ -1479,4 +1479,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.1 (47) production + QA invariants are valid.")
+print("Smart Cleaner v1.0.2 (48) production + QA invariants are valid.")
