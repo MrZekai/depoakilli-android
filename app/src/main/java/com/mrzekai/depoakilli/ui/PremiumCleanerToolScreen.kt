@@ -1198,11 +1198,15 @@ private fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolSe
 
     return when (focus) {
         ScanFocus.DUPLICATES -> {
+            // Group by the protected original's URI: two different originals
+            // that merely share a file name must not be merged into one group.
+            val unknownOriginal = stringResource(R.string.premium_duplicate_unknown_original)
             val grouped = items
-                .groupBy { it.protectedDuplicateName ?: stringResource(R.string.premium_duplicate_unknown_original) }
-                .entries
-                .sortedByDescending { (_, list) -> list.sumOf(CleanableItem::sizeBytes) }
-            val visibleGroups = grouped.take(5).mapIndexed { index, (kept, list) ->
+                .groupBy { it.protectedDuplicateUri ?: it.protectedDuplicateName.orEmpty() }
+                .values
+                .sortedByDescending { list -> list.sumOf(CleanableItem::sizeBytes) }
+            val visibleGroups = grouped.take(5).mapIndexed { index, list ->
+                val kept = list.first().protectedDuplicateName ?: unknownOriginal
                 section(
                     key = "duplicate-$index-$kept",
                     title = stringResource(R.string.premium_duplicate_group_title, kept),
@@ -1210,7 +1214,7 @@ private fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolSe
                     accent = if (index % 2 == 0) ToolPurple else ToolCyan,
                 )
             }
-            val remaining = grouped.drop(5).flatMap { it.value }
+            val remaining = grouped.drop(5).flatten()
             if (remaining.isEmpty()) visibleGroups else visibleGroups + section(
                 key = "duplicate-more",
                 title = stringResource(R.string.premium_duplicate_more_groups),

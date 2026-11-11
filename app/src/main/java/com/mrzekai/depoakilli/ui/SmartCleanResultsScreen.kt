@@ -662,6 +662,7 @@ private fun SmartResultsContent(
             }
 
             listOf(
+                CleanCategory.DUPLICATE,
                 CleanCategory.WHATSAPP_MEDIA,
                 CleanCategory.LARGE_FILE,
             ).forEach { smartCategory ->

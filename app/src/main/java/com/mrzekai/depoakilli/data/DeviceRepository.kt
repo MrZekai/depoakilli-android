@@ -288,9 +288,11 @@ class DeviceRepository(
             }
         }
 
-        // Smart Clean must stay fast: exact whole-file duplicate hashing belongs
-        // to the dedicated Duplicate Cleaner and deeper review tools.
+        // Smart Clean promises duplicates too, but must stay fast: it verifies
+        // files up to SMART_FULL_HASH_BYTES byte for byte and lists larger
+        // sample matches as review-only. Deep/Duplicate/Media verify up to 1 GB.
         if (
+            focus == ScanFocus.SMART ||
             focus == ScanFocus.DEEP ||
             focus == ScanFocus.DUPLICATES ||
             focus == ScanFocus.MEDIA
@@ -303,7 +305,10 @@ class DeviceRepository(
             } else {
                 indexed
             }
-            duplicateResult = findDuplicates(duplicateSource)
+            duplicateResult = findDuplicates(
+                duplicateSource,
+                maxFullHashBytes = if (focus == ScanFocus.SMART) SMART_FULL_HASH_BYTES else MAX_FULL_HASH_BYTES,
+            )
         }
 
         // A verified extra copy is shown as a duplicate (with its protected
@@ -802,7 +807,10 @@ class DeviceRepository(
     private fun whatsappRoots(): List<File> =
         whatsappRootPairs().map { (_, mediaRoot) -> mediaRoot }
 
-    private suspend fun findDuplicates(files: List<IndexedFile>): DuplicatePolicy.ScanResult {
+    private suspend fun findDuplicates(
+        files: List<IndexedFile>,
+        maxFullHashBytes: Long,
+    ): DuplicatePolicy.ScanResult {
         val duplicates = ArrayList<CleanableItem>()
         val protectedUris = hashSetOf<String>()
         val sameSizeGroups = files.asSequence()
@@ -825,8 +833,8 @@ class DeviceRepository(
                 // byte. Larger sample matches remain visible as review-only
                 // candidates: their protected original is retained and no item
                 // is automatically selected without a complete hash.
-                val small = sameSampleFiles.filter { it.sizeBytes <= MAX_FULL_HASH_BYTES }
-                val large = sameSampleFiles.filter { it.sizeBytes > MAX_FULL_HASH_BYTES }
+                val small = sameSampleFiles.filter { it.sizeBytes <= maxFullHashBytes }
+                val large = sameSampleFiles.filter { it.sizeBytes > maxFullHashBytes }
                 val contentGroups = small
                     .mapNotNull { file -> fingerprint(file)?.let { it to file } }
                     .groupBy({ it.first }, { it.second })
@@ -839,6 +847,7 @@ class DeviceRepository(
                     sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
                         duplicates += duplicate.toCleanable(assessment).copy(
                             protectedDuplicateName = decision.keep.name,
+                            protectedDuplicateUri = decision.keep.uri,
                         )
                     }
                 }
@@ -848,6 +857,7 @@ class DeviceRepository(
                     large.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
                         duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
                             protectedDuplicateName = decision.keep.name,
+                            protectedDuplicateUri = decision.keep.uri,
                         )
                     }
                 }
@@ -1125,6 +1135,7 @@ class DeviceRepository(
         private const val HASH_BUFFER_BYTES = 256 * 1024
         private const val HASH_SAMPLE_BYTES = 64 * 1024
         private const val MAX_FULL_HASH_BYTES = 1L * 1024L * 1024L * 1024L
+        private const val SMART_FULL_HASH_BYTES = 32L * 1024L * 1024L
         private const val MIN_DUPLICATE_BYTES = 32L * 1024L
         private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private val JUNK_CATEGORIES = setOf(

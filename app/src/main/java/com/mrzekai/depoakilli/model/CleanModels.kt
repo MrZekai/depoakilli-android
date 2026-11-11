@@ -106,6 +106,7 @@ data class CleanableItem(
     val assessment: AiAssessment,
     val selected: Boolean = true,
     val protectedDuplicateName: String? = null,
+    val protectedDuplicateUri: String? = null,
 )
 
 data class WhatsAppMediaItem(
