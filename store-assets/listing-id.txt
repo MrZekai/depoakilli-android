@@ -1,0 +1,44 @@
+## id
+
+Title (30):
+Smart Cleaner: Storage Manager
+
+Short description (79):
+Kelola penyimpanan: file tak terpakai, duplikat, file besar, dan cache aplikasi
+
+Full description (3138):
+Penyimpanan ponsel penuh? Smart Cleaner adalah pembersih telepon dan pengelola penyimpanan untuk Android. Smart Clean memindai file sampah, video besar, unduhan, penginstal APK, dan duplikat. Tinjau hasilnya, pilih file dan konfirmasi sebelum penghapusan.
+
+<b>Tidak ada langganan. Tidak ada akun. File Anda tetap ada di ponsel Anda.</b>
+Didukung iklan, tanpa pendaftaran atau paket berbayar. Pemindaian dan pembersihan terjadi pada perangkat Anda. File, nama file, dan jalur tidak pernah diunggah.
+
+<b>Smart Clean: satu pemindaian, jawaban yang jelas</b>
+Lihat ruang pembersihan yang disarankan. Hanya sampah berisiko rendah dan salinan tambahan terverifikasi dengan dokumen asli yang disimpan yang dipilih sebelumnya. Anda meninjau, memilih dan mengonfirmasi penghapusan. Saran beranda menyorot file besar, media APK dan WhatsApp.
+
+<b>Alat pembersihan</b>
+Pembersih sampah: file sementara, thumbnail lama, dan unduhan yang belum selesai.
+Pencari file besar: file lebih dari 100 MB, termasuk video, arsip, dan APK.
+Unduhan dan pembersih APK: tinjau unduhan dan penginstal lama. Menghapus APK tidak menghapus instalasi aplikasi.
+Pencari duplikat: temukan salinan foto, video, dan dokumen. Salinan persisnya diverifikasi berdasarkan konten; yang asli disimpan. Kemungkinan kecocokan yang lebih besar memerlukan peninjauan.
+Tangkapan layar dan tinjauan media: jelajahi tangkapan layar serta foto dan video berukuran besar.
+Cache aplikasi dan manajer aplikasi: melihat ukuran cache, menggunakan alat pembersihan sistem resmi Android, dan meninjau aplikasi besar atau yang tidak digunakan.
+Media WhatsApp: meninjau gambar, video, catatan suara, dokumen, dan status dari WhatsApp dan WhatsApp Business berdasarkan kategori.
+
+<b>Alat penyimpanan</b>
+Penganalisis penyimpanan: melihat ruang yang digunakan oleh foto, video, audio, dokumen, arsip, dan APK.
+Perubahan penyimpanan: bandingkan dua pemindaian untuk melihat perubahan penggunaan penyimpanan.
+
+<b>Pembersih yang jujur: Anda tetap memegang kendali</b>
+Tidak ada janji yang menyesatkan atau peringatan yang menakutkan. Anda memilih file dan mengonfirmasi penghapusan. Tinjau setiap kategori sebelum dibersihkan. File yang terhapus tidak dapat dikembalikan.
+
+<b>Mengapa aplikasi meminta akses Semua file</b>
+Manajemen file adalah tujuan inti Smart Cleaner. Izin akses Semua file Android memungkinkan pemindaian folder, menemukan duplikat, dan mengelola APK, arsip, dan dokumen. Aplikasi menjelaskan hal ini sebelum bertanya. Nonaktifkan akses kapan saja di pengaturan Android. Android/data dan Android/obb tidak pernah diakses.
+Akses Penggunaan opsional menunjukkan penyimpanan aplikasi, ukuran cache, dan penggunaan terakhir.
+
+<b>AIklan dan persetujuan</b>
+Iklan Google AdMob mendukung Smart Cleaner. Tinjau pilihan izin iklan di aplikasi. Video opsional menyembunyikan iklan selama 60 menit.
+
+Tersedia dalam bahasa Indonesia, Inggris, Turki, Spanyol, Portugis (Brasil), Jerman, Prancis, Italia, Rusia, dan Arab. Untuk Android 11 atau lebih baru.
+
+Tinjau, pilih, dan konfirmasi untuk menghapus file yang tidak lagi Anda perlukan.
+Smart Cleaner tidak berafiliasi dengan WhatsApp atau Meta.

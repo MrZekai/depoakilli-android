@@ -3,51 +3,59 @@
 Title (30):
 Smart Cleaner: Storage Manager
 
-Short description (71):
-Clean junk, duplicates and large files. Review storage before deleting.
+Short description (77):
+Clean up your phone: junk files, large videos, APKs, duplicates and app cache
 
-Full description (2986):
-Smart Cleaner is a storage cleaner and file manager for Android. It scans your phone's storage for junk files, duplicate files, large files, old downloads, screenshots and leftover APK installers, then lets you review everything before anything is deleted.
+Full description (3339):
+Phone storage full? Smart Cleaner is a phone cleaner and storage manager for Android. Tap Smart Clean once and it scans your phone for junk files, large videos, old downloads, leftover APK installers and duplicate files, shows exactly what is taking up space, and lets you review everything before anything is deleted.
 
-<b>Free up space without guesswork</b>
-Phone storage full? Smart Cleaner works as a phone cleaner and storage cleaner in one: it shows what is filling your storage, groups it into clear categories and lets you free up space by deleting only what you choose.
+<b>No subscription. No account. Your files stay on your phone.</b>
+Smart Cleaner is ad-supported, with no sign-up and no paid plan. Scanning and cleanup run on your device, and your files, file names and folder paths are never uploaded.
 
-<b>What you can do</b>
+<b>Smart Clean: one scan, clear answers</b>
 
-Junk file cleaner: find temporary files, old thumbnails and unfinished download leftovers.
+See how much space is safe to clean before you delete anything. Only low-risk items are preselected: junk files and verified extra copies of a file whose original is kept. Everything else waits for your choice.
 
-Duplicate file finder: find duplicate photos, videos and documents. Exact copies are verified by their content, and one original is always kept. Very large files are marked as probable matches so you can compare them first.
+Smart suggestions on the home screen point you to the biggest wins first: large files, leftover APKs and WhatsApp media.
+
+<b>Cleanup tools</b>
+
+Junk cleaner: find temporary files, old thumbnails and unfinished download leftovers.
 
 Large file finder: find files over 100 MB of any type, including videos, archives and APKs.
 
 Downloads and APK cleaner: review old downloads and installer files you no longer need. Removing an APK file does not uninstall the app.
 
-Photo, video and screenshot review: browse screenshots and large media in one place. Personal photos and videos are never selected automatically.
+Duplicate finder: review photo, video and document copies. Exact matches are verified; an original is kept. Larger possible matches need review.
 
-WhatsApp media cleaner: review images, videos, voice notes, documents and statuses shared in WhatsApp and WhatsApp Business, sorted by category.
+Screenshot and media review: browse screenshots and large photos and videos in one place.
 
-Storage analyzer: see how much space images, videos, audio, documents, archives and APKs use.
+App cache cleaner and app manager: see how much cache each app uses, clear app cache with Android's official system tool, and review large or unused apps.
 
-App cache and app manager: see how much cache each app uses, clear app cache with Android's official system tool, and review large or unused apps.
+WhatsApp media cleaner: review images, videos, voice notes, documents and statuses from WhatsApp and WhatsApp Business, sorted by category.
+
+<b>Storage tools</b>
+
+Storage analyzer: see how much space photos, videos, audio, documents, archives and APKs use.
 
 Storage change: compare two scans to see what grew or shrank on your storage.
 
-<b>You stay in control</b>
+<b>An honest cleaner: you stay in control</b>
 
-Nothing is deleted without your selection and confirmation. Scan results are suggestions, and you can open each category to check every file before cleaning. Deleted files cannot be restored, so review your selection carefully.
+No fake speed boosts and no scare warnings. Nothing is deleted without your confirmation. Scan results are suggestions, and you can open each category to check every file before cleaning. Deleted files cannot be restored, so review your selection carefully.
 
 <b>Why the app asks for All files access</b>
 
-Managing files is the core purpose of Smart Cleaner. To scan all folders, find duplicates across file types and manage APKs, archives and documents, the app needs Android's All files access permission. The app explains why before asking, and you can turn it off at any time in Android settings. Protected app folders such as Android/data and Android/obb are never accessed.
+Managing files is the core purpose of Smart Cleaner. To scan all folders, find duplicate files across file types and manage APKs, archives and documents, the app needs Android's All files access permission. The app explains why before asking, and you can turn it off at any time in Android settings. Protected app folders such as Android/data and Android/obb are never accessed.
 
 Usage access is optional. It is only used to show app storage and cache sizes and when apps were last used.
 
-<b>Privacy</b>
+<b>Ads and consent</b>
 
-File scanning and cleanup happen on your device. Your files, file names and folder paths are not uploaded. Smart Cleaner is supported by ads from Google AdMob, and you can review your ad consent choices in the app. You can also watch a short optional video to hide ads for 60 minutes.
+Smart Cleaner is supported by ads from Google AdMob, and you can review your ad consent choices in the app. You can also watch a short optional video to hide ads for 60 minutes.
 
-Available in English, Turkish, Spanish and Portuguese (Brazil).
+Available in English, Turkish, Spanish, Portuguese (Brazil), German, French, Italian, Russian, Indonesian and Arabic. Works on Android 11 and later.
 
-Scan your storage and free up space safely, one reviewed file at a time.
+Clean up your phone and free up storage space safely, one reviewed file at a time.
 
 Smart Cleaner is not affiliated with WhatsApp or Meta.

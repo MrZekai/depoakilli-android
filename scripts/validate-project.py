@@ -131,8 +131,8 @@ for expected in (
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 49",
-    'versionName = "1.0.3"',
+    "versionCode = 50",
+    'versionName = "1.0.4"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1241,10 +1241,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v49",
-    "SmartCleaner-CLOSED-TEST-APK-v49",
-    "SmartCleaner-ClosedTest-Diagnostics-v49",
-    "SmartCleaner-ClosedTest-v49.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v50",
+    "SmartCleaner-CLOSED-TEST-APK-v50",
+    "SmartCleaner-ClosedTest-Diagnostics-v50",
+    "SmartCleaner-ClosedTest-v50.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1253,8 +1253,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "1.0.3",
-    "versionCode='49'",
+    "1.0.4",
+    "versionCode='50'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1280,15 +1280,15 @@ for expected in (
     "lintRelease",
     "bundleRelease assembleRelease",
     "scripts/verify-release-aab.sh",
-    "SmartCleaner-PLAY-PRODUCTION-AAB-v49",
-    "SmartCleaner-PRODUCTION-APK-v49",
+    "SmartCleaner-PLAY-PRODUCTION-AAB-v50",
+    "SmartCleaner-PRODUCTION-APK-v50",
 ):
     if expected not in release_workflow:
         errors.append(f"missing production workflow invariant: {expected}")
 
 release_verifier = read("scripts/verify-release-aab.sh")
 for expected in (
-    "versionCode='49'",
+    "versionCode='50'",
     "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
     "ca-app-pub-1380972808968213~9043355268",
     "ca-app-pub-1380972808968213/2118175647",
@@ -1456,8 +1456,13 @@ for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml
     plural_sets[strings_path.parent.name] = {node.attrib["name"] for node in root.findall("plurals")}
     for node in root.findall("plurals"):
         quantities = {item.attrib.get("quantity") for item in node.findall("item")}
-        if "other" not in quantities or "one" not in quantities:
-            errors.append(f"plural {node.attrib['name']} in {strings_path.parent.name} needs one+other")
+        required_quantities = {
+            "values-in": {"other"},
+            "values-ru": {"one", "few", "many", "other"},
+            "values-ar": {"zero", "one", "two", "few", "many", "other"},
+        }.get(strings_path.parent.name, {"one", "other"})
+        if not required_quantities.issubset(quantities):
+            errors.append(f"plural {node.attrib['name']} in {strings_path.parent.name} needs {sorted(required_quantities)}")
 default_plurals = plural_sets.get("values", set())
 for folder, names in plural_sets.items():
     if names != default_plurals:
@@ -1479,4 +1484,4 @@ if errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.3 (49) production + QA invariants are valid.")
+print("Smart Cleaner v1.0.4 (50) production + QA invariants are valid.")

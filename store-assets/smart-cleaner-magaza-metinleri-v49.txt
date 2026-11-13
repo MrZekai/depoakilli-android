@@ -1,0 +1,247 @@
+SMART CLEANER - PLAY MAGAZA METINLERI (surum 1.0.3 / 49)
+Her dil icin: KISA ACIKLAMA ve TAM ACIKLAMA. Baslik degismiyor.
+Her alani ayri ayri kopyalayin. Cizgili satirlari kopyalamayin.
+
+==================================================================
+ENGLISH (en-US)
+==================================================================
+
+--- KISA ACIKLAMA ---
+Clean up your phone: junk files, large videos, APKs, duplicates and app cache
+
+--- TAM ACIKLAMA ---
+Phone storage full? Smart Cleaner is a phone cleaner and storage manager for Android. Tap Smart Clean once and it scans your phone for junk files, large videos, old downloads, leftover APK installers and duplicate files, shows exactly what is taking up space, and lets you review everything before anything is deleted.
+
+<b>No subscription. No account. Your files stay on your phone.</b>
+Smart Cleaner is ad-supported, with no sign-up and no paid plan. Scanning and cleanup run on your device, and your files, file names and folder paths are never uploaded.
+
+<b>Smart Clean: one scan, clear answers</b>
+
+See how much space is safe to clean before you delete anything. Only low-risk items are preselected: junk files and verified extra copies of a file whose original is kept. Everything else waits for your choice.
+
+Smart suggestions on the home screen point you to the biggest wins first: large files, leftover APKs and WhatsApp media.
+
+<b>Cleanup tools</b>
+
+Junk cleaner: find temporary files, old thumbnails and unfinished download leftovers.
+
+Large file finder: find files over 100 MB of any type, including videos, archives and APKs.
+
+Downloads and APK cleaner: review old downloads and installer files you no longer need. Removing an APK file does not uninstall the app.
+
+Duplicate file finder: find exact copies of photos, videos and documents. Every duplicate is verified by its content, and one original is always kept.
+
+Screenshot and media review: browse screenshots and large photos and videos in one place.
+
+App cache cleaner and app manager: see how much cache each app uses, clear app cache with Android's official system tool, and review large or unused apps.
+
+WhatsApp media cleaner: review images, videos, voice notes, documents and statuses from WhatsApp and WhatsApp Business, sorted by category.
+
+<b>Storage tools</b>
+
+Storage analyzer: see how much space photos, videos, audio, documents, archives and APKs use.
+
+Storage change: compare two scans to see what grew or shrank on your storage.
+
+<b>An honest cleaner: you stay in control</b>
+
+No fake speed boosts and no scare warnings. Nothing is deleted without your confirmation. Scan results are suggestions, and you can open each category to check every file before cleaning. Deleted files cannot be restored, so review your selection carefully.
+
+<b>Why the app asks for All files access</b>
+
+Managing files is the core purpose of Smart Cleaner. To scan all folders, find duplicate files across file types and manage APKs, archives and documents, the app needs Android's All files access permission. The app explains why before asking, and you can turn it off at any time in Android settings. Protected app folders such as Android/data and Android/obb are never accessed.
+
+Usage access is optional. It is only used to show app storage and cache sizes and when apps were last used.
+
+<b>Ads and consent</b>
+
+Smart Cleaner is supported by ads from Google AdMob, and you can review your ad consent choices in the app. You can also watch a short optional video to hide ads for 60 minutes.
+
+Available in English and Spanish, plus Portuguese (Brazil) and Turkish. Works on Android 11 and newer.
+
+Clean up your phone and free up storage space safely, one reviewed file at a time.
+
+Smart Cleaner is not affiliated with WhatsApp or Meta.
+
+==================================================================
+TURKCE (tr-TR)
+==================================================================
+
+--- KISA ACIKLAMA ---
+Telefonunuzu temizleyin: gereksiz dosya, büyük video, APK, kopya ve önbellek
+
+--- TAM ACIKLAMA ---
+Telefonunuzun depolama alanı mı doldu? Smart Cleaner, Android için bir telefon temizleyici ve depolama yöneticisidir. Smart Clean'e bir kez dokunun: gereksiz dosyaları, büyük videoları, eski indirmeleri, kalan APK yükleyicilerini ve kopya dosyaları tarar, neyin yer kapladığını açıkça gösterir ve herhangi bir şey silinmeden önce her şeyi incelemenize izin verir.
+
+<b>Abonelik yok. Hesap yok. Dosyalarınız telefonunuzda kalır.</b>
+Smart Cleaner reklam destekli çalışır; kayıt ve ücretli plan yoktur. Tarama ve temizlik cihazınızda yapılır; dosyalarınız, dosya adlarınız ve klasör yollarınız hiçbir yere yüklenmez.
+
+<b>Smart Clean: tek tarama, net sonuç</b>
+
+Hiçbir şeyi silmeden önce ne kadar alanın güvenle temizlenebileceğini görün. Yalnızca düşük riskli öğeler önceden seçilir: gereksiz dosyalar ve aslı korunan bir dosyanın doğrulanmış fazladan kopyaları. Geri kalan her şey sizin seçiminizi bekler.
+
+Ana ekrandaki akıllı öneriler sizi en çok yer açacak alanlara yönlendirir: büyük dosyalar, kalan APK'lar ve WhatsApp medyası.
+
+<b>Temizlik araçları</b>
+
+Gereksiz dosya temizleyici: geçici dosyaları, eski küçük resimleri ve yarım kalmış indirme artıklarını bulun.
+
+Büyük dosya bulucu: videolar, arşivler ve APK'lar dahil, her türden 100 MB üzerindeki dosyaları bulun.
+
+İndirmeler ve APK temizleyici: artık ihtiyacınız olmayan eski indirmeleri ve yükleyici dosyalarını inceleyin. Bir APK dosyasını silmek uygulamayı kaldırmaz.
+
+Kopya dosya bulucu: fotoğrafların, videoların ve belgelerin birebir kopyalarını bulun. Her kopya içeriğine göre doğrulanır ve bir asıl dosya her zaman korunur.
+
+Ekran görüntüsü ve medya incelemesi: ekran görüntülerini, büyük fotoğrafları ve videoları tek yerde inceleyin.
+
+Uygulama önbelleği temizleyici ve uygulama yöneticisi: her uygulamanın ne kadar önbellek kullandığını görün, önbelleği Android'in resmi sistem aracıyla temizleyin, büyük veya kullanılmayan uygulamaları inceleyin.
+
+WhatsApp medya temizleyici: WhatsApp ve WhatsApp Business'taki resimleri, videoları, sesli notları, belgeleri ve durumları kategoriye göre inceleyin.
+
+<b>Depolama araçları</b>
+
+Depolama analizi: fotoğrafların, videoların, seslerin, belgelerin, arşivlerin ve APK'ların ne kadar yer kapladığını görün.
+
+Depolama değişimi: iki taramayı karşılaştırarak neyin büyüdüğünü veya küçüldüğünü görün.
+
+<b>Dürüst bir temizleyici: kontrol sizde</b>
+
+Sahte hızlandırma yok, korkutucu uyarı yok. Onayınız olmadan hiçbir şey silinmez. Tarama sonuçları öneridir; temizlemeden önce her kategoriyi açıp her dosyayı kontrol edebilirsiniz. Silinen dosyalar geri getirilemez, bu yüzden seçiminizi dikkatle gözden geçirin.
+
+<b>Uygulama neden Tüm dosyalara erişim izni istiyor?</b>
+
+Dosyaları yönetmek Smart Cleaner'ın temel amacıdır. Tüm klasörleri taramak, farklı dosya türlerinde kopyaları bulmak ve APK'ları, arşivleri ve belgeleri yönetmek için uygulamanın Android'in Tüm dosyalara erişim iznine ihtiyacı vardır. Uygulama izni istemeden önce nedenini açıklar; izni Android ayarlarından istediğiniz zaman kapatabilirsiniz. Android/data ve Android/obb gibi korumalı uygulama klasörlerine hiçbir zaman erişilmez.
+
+Kullanım erişimi isteğe bağlıdır. Yalnızca uygulama depolama ve önbellek boyutlarını ve uygulamaların en son ne zaman kullanıldığını göstermek için kullanılır.
+
+<b>Reklamlar ve izin</b>
+
+Smart Cleaner, Google AdMob reklamlarıyla desteklenir; reklam izni tercihlerinizi uygulama içinden gözden geçirebilirsiniz. İsterseniz kısa bir video izleyerek reklamları 60 dakika gizleyebilirsiniz.
+
+Türkçe, İngilizce, İspanyolca ve Portekizce (Brezilya) olarak kullanılabilir. Android 11 ve üzerinde çalışır.
+
+Telefonunuzu temizleyin ve depolama alanını güvenle, incelediğiniz dosyaları tek tek seçerek açın.
+
+Smart Cleaner'ın WhatsApp veya Meta ile bir bağlantısı yoktur.
+
+==================================================================
+ESPANOL (es)
+==================================================================
+
+--- KISA ACIKLAMA ---
+Limpia tu teléfono: archivos basura, videos grandes, APK, duplicados y caché
+
+--- TAM ACIKLAMA ---
+¿Almacenamiento del teléfono lleno? Smart Cleaner es un limpiador de teléfono y administrador de almacenamiento para Android. Toca Smart Clean una vez y analizará tu teléfono en busca de archivos basura, videos grandes, descargas antiguas, instaladores APK sobrantes y archivos duplicados; te muestra exactamente qué ocupa espacio y te permite revisar todo antes de eliminar nada.
+
+<b>Sin suscripción. Sin cuenta. Tus archivos se quedan en tu teléfono.</b>
+Smart Cleaner se financia con anuncios, sin registro ni plan de pago. El análisis y la limpieza se realizan en tu dispositivo, y tus archivos, nombres de archivo y rutas de carpetas nunca se suben.
+
+<b>Smart Clean: un análisis, respuestas claras</b>
+
+Mira cuánto espacio se puede limpiar con seguridad antes de eliminar nada. Solo se preseleccionan los elementos de bajo riesgo: archivos basura y copias adicionales verificadas de un archivo cuyo original se conserva. Todo lo demás espera tu decisión.
+
+Las sugerencias inteligentes de la pantalla de inicio te llevan primero a lo que más espacio recupera: archivos grandes, APK sobrantes y multimedia de WhatsApp.
+
+<b>Herramientas de limpieza</b>
+
+Limpiador de archivos basura: encuentra archivos temporales, miniaturas antiguas y restos de descargas incompletas.
+
+Buscador de archivos grandes: encuentra archivos de más de 100 MB de cualquier tipo, incluidos videos, archivos comprimidos y APK.
+
+Limpiador de descargas y APK: revisa las descargas antiguas y los instaladores que ya no necesitas. Eliminar un archivo APK no desinstala la aplicación.
+
+Buscador de archivos duplicados: encuentra copias exactas de fotos, videos y documentos. Cada duplicado se verifica por su contenido y siempre se conserva un original.
+
+Revisión de capturas y multimedia: explora capturas de pantalla, fotos y videos grandes en un solo lugar.
+
+Limpiador de caché y administrador de aplicaciones: consulta cuánta caché usa cada aplicación, borra la caché con la herramienta oficial de Android y revisa las aplicaciones grandes o sin uso.
+
+Limpiador de multimedia de WhatsApp: revisa imágenes, videos, notas de voz, documentos y estados de WhatsApp y WhatsApp Business, ordenados por categoría.
+
+<b>Herramientas de almacenamiento</b>
+
+Analizador de almacenamiento: consulta cuánto espacio ocupan fotos, videos, audio, documentos, archivos comprimidos y APK.
+
+Cambios en el almacenamiento: compara dos análisis para ver qué creció o se redujo.
+
+<b>Un limpiador honesto: tú tienes el control</b>
+
+Sin falsos aceleradores ni avisos alarmistas. No se elimina nada sin tu confirmación. Los resultados del análisis son sugerencias, y puedes abrir cada categoría para revisar cada archivo antes de limpiar. Los archivos eliminados no se pueden recuperar, así que revisa bien tu selección.
+
+<b>Por qué la aplicación pide acceso a todos los archivos</b>
+
+Administrar archivos es la función principal de Smart Cleaner. Para analizar todas las carpetas, encontrar archivos duplicados de distintos tipos y administrar APK, archivos comprimidos y documentos, la aplicación necesita el permiso de Android de acceso a todos los archivos. La aplicación explica el motivo antes de pedirlo y puedes desactivarlo en cualquier momento en los ajustes de Android. Nunca se accede a carpetas protegidas de aplicaciones como Android/data y Android/obb.
+
+El acceso de uso es opcional. Solo se utiliza para mostrar el tamaño del almacenamiento y de la caché de las aplicaciones y cuándo se usaron por última vez.
+
+<b>Anuncios y consentimiento</b>
+
+Smart Cleaner se financia con anuncios de Google AdMob, y puedes revisar tus opciones de consentimiento de anuncios en la aplicación. También puedes ver un video corto opcional para ocultar los anuncios durante 60 minutos.
+
+Disponible en español e inglés, además de portugués (Brasil) y turco. Funciona en Android 11 o posterior.
+
+Limpia tu teléfono y libera espacio de almacenamiento con seguridad, revisando cada archivo.
+
+Smart Cleaner no está afiliado a WhatsApp ni a Meta.
+
+==================================================================
+PORTUGUES (pt-BR)
+==================================================================
+
+--- KISA ACIKLAMA ---
+Limpe seu celular: arquivos inúteis, vídeos grandes, APKs, duplicados e cache
+
+--- TAM ACIKLAMA ---
+Armazenamento do celular cheio? O Smart Cleaner é um limpador de celular e gerenciador de armazenamento para Android. Toque em Smart Clean uma vez e ele analisa seu celular em busca de arquivos inúteis, vídeos grandes, downloads antigos, instaladores APK restantes e arquivos duplicados, mostra exatamente o que está ocupando espaço e permite revisar tudo antes de excluir qualquer coisa.
+
+<b>Sem assinatura. Sem conta. Seus arquivos ficam no seu celular.</b>
+O Smart Cleaner é mantido por anúncios, sem cadastro e sem plano pago. A análise e a limpeza acontecem no seu dispositivo, e seus arquivos, nomes de arquivos e caminhos de pastas nunca são enviados para lugar nenhum.
+
+<b>Smart Clean: uma análise, respostas claras</b>
+
+Veja quanto espaço pode ser limpo com segurança antes de excluir qualquer coisa. Apenas itens de baixo risco vêm pré-selecionados: arquivos inúteis e cópias extras verificadas de um arquivo cujo original é mantido. Todo o resto espera a sua escolha.
+
+As sugestões inteligentes da tela inicial levam você primeiro ao que mais recupera espaço: arquivos grandes, APKs restantes e mídia do WhatsApp.
+
+<b>Ferramentas de limpeza</b>
+
+Limpador de arquivos inúteis: encontre arquivos temporários, miniaturas antigas e restos de downloads incompletos.
+
+Localizador de arquivos grandes: encontre arquivos com mais de 100 MB de qualquer tipo, incluindo vídeos, arquivos compactados e APKs.
+
+Limpador de downloads e APKs: revise downloads antigos e instaladores de que você não precisa mais. Excluir um arquivo APK não desinstala o aplicativo.
+
+Localizador de arquivos duplicados: encontre cópias exatas de fotos, vídeos e documentos. Cada duplicado é verificado pelo conteúdo, e um original é sempre mantido.
+
+Revisão de capturas de tela e mídia: veja capturas de tela, fotos e vídeos grandes em um só lugar.
+
+Limpador de cache e gerenciador de aplicativos: veja quanto cache cada aplicativo usa, limpe o cache com a ferramenta oficial do sistema Android e revise aplicativos grandes ou sem uso.
+
+Limpador de mídia do WhatsApp: revise imagens, vídeos, mensagens de voz, documentos e status do WhatsApp e do WhatsApp Business, organizados por categoria.
+
+<b>Ferramentas de armazenamento</b>
+
+Analisador de armazenamento: veja quanto espaço fotos, vídeos, áudio, documentos, arquivos compactados e APKs ocupam.
+
+Mudanças no armazenamento: compare duas análises para ver o que cresceu ou diminuiu.
+
+<b>Um limpador honesto: você no controle</b>
+
+Sem aceleração falsa e sem avisos alarmistas. Nada é excluído sem a sua confirmação. Os resultados da análise são sugestões, e você pode abrir cada categoria para conferir cada arquivo antes de limpar. Arquivos excluídos não podem ser recuperados, então revise sua seleção com cuidado.
+
+<b>Por que o aplicativo pede acesso a todos os arquivos</b>
+
+Gerenciar arquivos é a função principal do Smart Cleaner. Para analisar todas as pastas, encontrar arquivos duplicados de vários tipos e gerenciar APKs, arquivos compactados e documentos, o aplicativo precisa da permissão do Android de acesso a todos os arquivos. O aplicativo explica o motivo antes de pedir, e você pode desativá-la a qualquer momento nas configurações do Android. Pastas protegidas de aplicativos, como Android/data e Android/obb, nunca são acessadas.
+
+O acesso de uso é opcional. Ele é usado apenas para mostrar o tamanho do armazenamento e do cache dos aplicativos e quando foram usados pela última vez.
+
+<b>Anúncios e consentimento</b>
+
+O Smart Cleaner é mantido por anúncios do Google AdMob, e você pode revisar suas opções de consentimento de anúncios no aplicativo. Você também pode assistir a um vídeo curto opcional para ocultar os anúncios por 60 minutos.
+
+Disponível em português (Brasil), inglês, espanhol e turco. Funciona no Android 11 e versões mais recentes.
+
+Limpe seu celular e libere espaço de armazenamento com segurança, revisando cada arquivo.
+
+O Smart Cleaner não é afiliado ao WhatsApp nem à Meta.

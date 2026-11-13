@@ -3,51 +3,59 @@
 Title (30):
 Smart Cleaner: Storage Manager
 
-Short description (77):
-Gereksiz, yinelenen ve büyük dosyaları inceleyip depolama alanını temizleyin.
+Short description (76):
+Telefonunuzu temizleyin: gereksiz dosya, büyük video, APK, kopya ve önbellek
 
-Full description (3567):
-Smart Cleaner, Android için bir depolama temizleyici ve dosya yöneticisidir. Telefonunuzun depolama alanını gereksiz dosyalar, yinelenen dosyalar, büyük dosyalar, eski indirmeler, ekran görüntüleri ve kalan APK yükleyicileri için tarar ve ardından herhangi bir şey silinmeden önce her şeyi incelemenize olanak tanır.
+Full description (3825):
+Telefonunuzun depolama alanı mı doldu? Smart Cleaner, Android için bir telefon temizleyici ve depolama yöneticisidir. Smart Clean'e bir kez dokunun: gereksiz dosyaları, büyük videoları, eski indirmeleri, kalan APK yükleyicilerini ve kopya dosyaları tarar, neyin yer kapladığını açıkça gösterir ve herhangi bir şey silinmeden önce her şeyi incelemenize izin verir.
 
-<b>Tahmin etmeden depolama alanı açın</b>
-Telefonunuzun depolama alanı dolu mu? Smart Cleaner, depolama alanını dolduran dosyaları gösterir, anlaşılır kategorilere ayırır ve yalnızca seçtiğiniz dosyaları silerek yer açmanıza yardımcı olur.
+<b>Abonelik yok. Hesap yok. Dosyalarınız telefonunuzda kalır.</b>
+Smart Cleaner reklam destekli çalışır; kayıt ve ücretli plan yoktur. Tarama ve temizlik cihazınızda yapılır; dosyalarınız, dosya adlarınız ve klasör yollarınız hiçbir yere yüklenmez.
 
-<b>Yapabilecekleriniz</b>
+<b>Smart Clean: tek tarama, net sonuç</b>
 
-Gereksiz dosya temizleyici: Geçici dosyaları, eski küçük resimleri ve tamamlanmamış indirme kalıntılarını bulun.
+Hiçbir şeyi silmeden önce ne kadar alanın güvenle temizlenebileceğini görün. Yalnızca düşük riskli öğeler önceden seçilir: gereksiz dosyalar ve aslı korunan bir dosyanın doğrulanmış fazladan kopyaları. Geri kalan her şey sizin seçiminizi bekler.
 
-Yinelenen dosya bulucu: Yinelenen fotoğrafları, videoları ve belgeleri bulun. Tam kopyalar içeriklerine göre doğrulanır ve her zaman bir orijinal dosya saklanır. Çok büyük dosyalar olası eşleşmeler olarak işaretlenir, böylece önce bunları karşılaştırabilirsiniz.
+Ana ekrandaki akıllı öneriler sizi en çok yer açacak alanlara yönlendirir: büyük dosyalar, kalan APK'lar ve WhatsApp medyası.
 
-Büyük dosya bulucu: Videolar, arşivler ve APK'lar dahil olmak üzere her türden 100 MB'ın üzerindeki dosyaları bulun.
+<b>Temizlik araçları</b>
 
-İndirmeler ve APK temizleyici: Artık ihtiyacınız olmayan eski indirmeleri ve yükleyici dosyalarını inceleyin. Bir APK dosyasını silmek uygulamayı kaldırmaz.
+Gereksiz dosya temizleyici: geçici dosyaları, eski küçük resimleri ve yarım kalmış indirme artıklarını bulun.
 
-Fotoğraf, video ve ekran görüntüsü incelemesi: Ekran görüntülerini ve büyük medya dosyalarını tek bir yerde inceleyin. Kişisel fotoğraflar ve videolar asla otomatik olarak seçilmez.
+Büyük dosya bulucu: videolar, arşivler ve APK'lar dahil, her türden 100 MB üzerindeki dosyaları bulun.
 
-WhatsApp medya temizleyici: WhatsApp ve WhatsApp Business'ta paylaşılan resimleri, videoları, sesli notları, belgeleri ve durumları kategoriye göre sıralayarak inceleyin.
+İndirmeler ve APK temizleyici: artık ihtiyacınız olmayan eski indirmeleri ve yükleyici dosyalarını inceleyin. Bir APK dosyasını silmek uygulamayı kaldırmaz.
 
-Depolama analizcisi: Resimlerin, videoların, ses dosyalarının, belgelerin, arşivlerin ve APK'ların ne kadar yer kapladığını görün.
+Kopya bulucu: fotoğraf, video ve belge kopyalarını inceleyin. Tam eşleşmeler doğrulanır, bir asıl dosya korunur. Büyük olası eşleşmeler inceleme gerektirir.
 
-Uygulama önbelleği ve uygulama yöneticisi: Her uygulamanın ne kadar önbellek kullandığını görün, Android'in resmi sistem aracıyla uygulama önbelleğini temizleyin ve büyük veya kullanılmayan uygulamaları inceleyin.
+Ekran görüntüsü ve medya incelemesi: ekran görüntülerini, büyük fotoğrafları ve videoları tek yerde inceleyin.
 
-Depolama değişikliği: Depolama alanınızda nelerin büyüdüğünü veya küçüldüğünü görmek için iki taramayı karşılaştırın.
+Uygulama önbelleği temizleyici ve uygulama yöneticisi: her uygulamanın ne kadar önbellek kullandığını görün, önbelleği Android'in resmi sistem aracıyla temizleyin, büyük veya kullanılmayan uygulamaları inceleyin.
 
-<b>Kontrol sizde</b>
+WhatsApp medya temizleyici: WhatsApp ve WhatsApp Business'taki resimleri, videoları, sesli notları, belgeleri ve durumları kategoriye göre inceleyin.
 
-Seçiminiz ve onayınız olmadan hiçbir şey silinmez. Tarama sonuçları öneri niteliğindedir ve temizlemeden önce her dosyayı kontrol etmek için her kategoriyi açabilirsiniz. Silinen dosyalar geri yüklenemez, bu nedenle seçiminizi dikkatlice gözden geçirin.
+<b>Depolama araçları</b>
+
+Depolama analizi: fotoğrafların, videoların, seslerin, belgelerin, arşivlerin ve APK'ların ne kadar yer kapladığını görün.
+
+Depolama değişimi: iki taramayı karşılaştırarak neyin büyüdüğünü veya küçüldüğünü görün.
+
+<b>Dürüst bir temizleyici: kontrol sizde</b>
+
+Sahte hızlandırma yok, korkutucu uyarı yok. Onayınız olmadan hiçbir şey silinmez. Tarama sonuçları öneridir; temizlemeden önce her kategoriyi açıp her dosyayı kontrol edebilirsiniz. Silinen dosyalar geri getirilemez, bu yüzden seçiminizi dikkatle gözden geçirin.
 
 <b>Uygulama neden Tüm dosyalara erişim izni istiyor?</b>
 
-Dosyaları yönetmek, Smart Cleaner'ın temel amacıdır. Tüm klasörleri taramak, dosya türleri arasında yinelenenleri bulmak ve APK'ları, arşivleri ve belgeleri yönetmek için uygulama, Android'in Tüm dosyalara erişim iznine ihtiyaç duyar. Uygulama, sormadan önce nedenini açıklar ve Android ayarlarından istediğiniz zaman kapatabilirsiniz. Android/data ve Android/obb gibi korumalı uygulama klasörlerine asla erişilmez.
+Dosyaları yönetmek Smart Cleaner'ın temel amacıdır. Tüm klasörleri taramak, farklı dosya türlerinde kopyaları bulmak ve APK'ları, arşivleri ve belgeleri yönetmek için uygulamanın Android'in Tüm dosyalara erişim iznine ihtiyacı vardır. Uygulama izni istemeden önce nedenini açıklar; izni Android ayarlarından istediğiniz zaman kapatabilirsiniz. Android/data ve Android/obb gibi korumalı uygulama klasörlerine hiçbir zaman erişilmez.
 
 Kullanım erişimi isteğe bağlıdır. Yalnızca uygulama depolama ve önbellek boyutlarını ve uygulamaların en son ne zaman kullanıldığını göstermek için kullanılır.
 
-<b>Gizlilik</b>
+<b>Reklamlar ve izin</b>
 
-Dosya tarama ve temizleme işlemleri cihazınızda gerçekleşir. Dosyalarınız, dosya adlarınız ve klasör yollarınız yüklenmez. Smart Cleaner, Google AdMob'dan gelen reklamlarla desteklenmektedir ve reklam onay seçeneklerinizi uygulamada inceleyebilirsiniz. Ayrıca, reklamları 60 dakika boyunca gizlemek için kısa bir isteğe bağlı video izleyebilirsiniz.
+Smart Cleaner, Google AdMob reklamlarıyla desteklenir; reklam izni tercihlerinizi uygulama içinden gözden geçirebilirsiniz. İsterseniz kısa bir video izleyerek reklamları 60 dakika gizleyebilirsiniz.
 
-İngilizce, Türkçe, İspanyolca ve Portekizce (Brezilya) dillerinde mevcuttur.
+Türkçe, İngilizce, İspanyolca, Portekizce (Brezilya), Almanca, Fransızca, İtalyanca, Rusça, Endonezce ve Arapça olarak kullanılabilir. Android 11 ve üzerinde çalışır.
 
-Depolama alanınızı tarayın ve incelediğiniz dosyaları tek tek seçerek güvenle yer açın.
+Telefonunuzu temizleyin ve depolama alanını güvenle, incelediğiniz dosyaları tek tek seçerek açın.
 
-Smart Cleaner, WhatsApp veya Meta ile bağlantılı değildir.
+Smart Cleaner'ın WhatsApp veya Meta ile bir bağlantısı yoktur.
