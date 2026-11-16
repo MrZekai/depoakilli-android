@@ -52,10 +52,6 @@ class TrashStore(
         val modified = file.lastModified()
         val id = UUID.randomUUID().toString()
         val target = File(directory, id)
-        if (!runCatching { file.renameTo(target) }.getOrDefault(false)) return null
-        // The trash clock starts now, also for orphan cleanup after a lost index.
-        runCatching { target.setLastModified(nowMillis()) }
-        removeFromMediaStore(file.absolutePath)
         val entry = TrashEntry(
             id = id,
             originalPath = file.absolutePath,
@@ -65,7 +61,26 @@ class TrashStore(
             deletedAtMillis = nowMillis(),
             group = group.name,
         )
-        save(load() + entry)
+        // Record first, move second: a file is never in the trash without a
+        // record of where it came from. Each entry also gets a sidecar next to
+        // the file so the index can be rebuilt if it is ever lost.
+        val sidecar = sidecarOf(target)
+        val previous = load()
+        val recorded = runCatching { sidecar.writeText(TrashIndexCodec.encode(listOf(entry))); true }.getOrDefault(false) &&
+            save(previous + entry)
+        if (!recorded) {
+            runCatching { sidecar.delete() }
+            save(previous)
+            return null
+        }
+        if (!runCatching { file.renameTo(target) }.getOrDefault(false)) {
+            runCatching { sidecar.delete() }
+            save(previous)
+            return null
+        }
+        // The trash clock starts now, also for files adopted after a lost index.
+        runCatching { target.setLastModified(nowMillis()) }
+        removeFromMediaStore(file.absolutePath)
         entry
     }
 
@@ -78,6 +93,10 @@ class TrashStore(
         var restoredBytes = 0L
         for (entry in entries.filter { it.id in wanted }) {
             val source = File(entry.trashPath)
+            if (entry.originalPath.isBlank()) {
+                failed += entry.id
+                continue
+            }
             val target = freeTarget(File(entry.originalPath))
             val parent = target.parentFile
             val ok = source.isFile &&
@@ -86,6 +105,7 @@ class TrashStore(
                 runCatching { source.renameTo(target) }.getOrDefault(false)
             if (ok) {
                 runCatching { target.setLastModified(entry.modifiedAtMillis) }
+                runCatching { sidecarOf(source).delete() }
                 restored += entry.id
                 restoredBytes += entry.sizeBytes
                 restoredPaths += target.absolutePath
@@ -113,18 +133,10 @@ class TrashStore(
                 else -> stillPresent += entry
             }
         }
-        val known = stillPresent.mapTo(hashSetOf()) { File(it.trashPath).absolutePath }
-        val retention = TimeUnit.DAYS.toMillis(CleaningThresholds.TRASH_RETENTION_DAYS.toLong())
-        trashRoots().forEach { root ->
-            File(root, TRASH_DIRECTORY).listFiles()?.forEach { file ->
-                if (file.isFile && file.name !in SYSTEM_FILES && file.absolutePath !in known &&
-                    file.lastModified() + retention <= now
-                ) {
-                    val size = file.length()
-                    if (deleteTrashFile(file)) freed += size
-                }
-            }
-        }
+        // Files without a record are never deleted blindly: they are adopted
+        // back into the index (from their sidecar when present) and expire
+        // like any other entry, visible in the Trash screen meanwhile.
+        stillPresent += orphanEntries(stillPresent)
         save(stillPresent)
         freed
     }
@@ -158,7 +170,9 @@ class TrashStore(
     private fun deleteTrashFile(file: File): Boolean {
         val parent = file.parentFile ?: return false
         if (parent.name != TRASH_DIRECTORY || !isAllowed(file)) return false
-        return runCatching { file.delete() }.getOrDefault(false)
+        val deleted = runCatching { file.delete() }.getOrDefault(false)
+        if (deleted) runCatching { sidecarOf(file).delete() }
+        return deleted
     }
 
     private fun trashDirectory(volumeRoot: File): File? {
@@ -185,19 +199,59 @@ class TrashStore(
         }
     }
 
-    private fun load(): List<TrashEntry> = runCatching {
-        if (!indexFile.isFile) return@runCatching emptyList()
-        TrashIndexCodec.decode(indexFile.readText())
-    }.getOrDefault(emptyList())
+    /**
+     * Reads the index. A damaged index is kept as `.bak` and rebuilt from the
+     * per-file sidecars and the files in the trash folders, so no trashed file
+     * becomes unrestorable or is overwritten by the next save.
+     */
+    private fun load(): List<TrashEntry> {
+        if (!indexFile.isFile) return emptyList()
+        val text = runCatching { indexFile.readText() }.getOrNull()
+        val decoded = text?.let { runCatching { TrashIndexCodec.decode(it) }.getOrNull() }
+        if (decoded != null) return decoded
+        runCatching { indexFile.copyTo(File(indexFile.parentFile, indexFile.name + ".bak"), overwrite = true) }
+        val rebuilt = orphanEntries(emptyList())
+        save(rebuilt)
+        return rebuilt
+    }
 
-    private fun save(entries: List<TrashEntry>) {
+    private fun save(entries: List<TrashEntry>): Boolean = runCatching {
         indexFile.parentFile?.mkdirs()
         val temp = File(indexFile.parentFile, indexFile.name + ".tmp")
         temp.writeText(TrashIndexCodec.encode(entries))
         if (!temp.renameTo(indexFile)) {
             indexFile.delete()
-            temp.renameTo(indexFile)
+            check(temp.renameTo(indexFile))
         }
+        true
+    }.getOrDefault(false)
+
+    private fun sidecarOf(trashFile: File): File = File(trashFile.parentFile, trashFile.name + SIDECAR_SUFFIX)
+
+    /** Entries for trash files that have no record in [known]. */
+    private fun orphanEntries(known: List<TrashEntry>): List<TrashEntry> {
+        val knownPaths = known.mapTo(hashSetOf()) { File(it.trashPath).absolutePath }
+        val adopted = ArrayList<TrashEntry>()
+        trashRoots().forEach { root ->
+            File(root, TRASH_DIRECTORY).listFiles()?.forEach { file ->
+                if (!file.isFile || file.name in SYSTEM_FILES || file.name.endsWith(SIDECAR_SUFFIX) ||
+                    file.absolutePath in knownPaths
+                ) return@forEach
+                val fromSidecar = runCatching {
+                    TrashIndexCodec.decode(sidecarOf(file).readText()).singleOrNull()
+                }.getOrNull()
+                adopted += fromSidecar?.copy(trashPath = file.absolutePath) ?: TrashEntry(
+                    id = file.name,
+                    originalPath = "",
+                    trashPath = file.absolutePath,
+                    sizeBytes = file.length(),
+                    modifiedAtMillis = 0L,
+                    deletedAtMillis = file.lastModified(),
+                    group = "",
+                )
+            }
+        }
+        return adopted
     }
 
     companion object {
@@ -205,6 +259,7 @@ class TrashStore(
         private const val NO_MEDIA = ".nomedia"
         private const val README = "README.txt"
         private const val README_TEXT = "Smart Cleaner trash. Files here are removed automatically. Safe to delete.\n"
+        private const val SIDECAR_SUFFIX = ".entry"
         private val SYSTEM_FILES = setOf(NO_MEDIA, README)
     }
 }

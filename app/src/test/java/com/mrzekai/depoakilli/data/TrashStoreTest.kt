@@ -86,6 +86,10 @@ class TrashStoreTest {
         orphan.setLastModified(now - TimeUnit.DAYS.toMillis(8))
         val fresh = File(volume, ".SmartCleanerTrash/fresh").apply { writeText("zz") }
         fresh.setLastModified(now)
+        // First pass adopts unknown files into the index; nothing is deleted blindly.
+        trash.purgeExpired()
+        assertTrue(orphan.exists())
+        assertTrue(trash.entries().any { it.trashPath == orphan.absolutePath })
         trash.purgeExpired()
         assertFalse(orphan.exists())
         assertTrue(fresh.exists())
@@ -104,13 +108,37 @@ class TrashStoreTest {
     }
 
     @Test
-    fun `corrupt index reads as empty without crashing`() {
-        indexFile.parentFile?.mkdirs()
-        indexFile.writeText("{not json")
+    fun `corrupt index is kept and rebuilt from sidecars`() {
         val trash = store()
+        val file = write("Movies/keep.mp4", "data")
+        trash.moveToTrash(file, volume, CleanupGroup.LARGE_VIDEO)
+        indexFile.writeText("{not json")
+        val rebuilt = trash.entries().single()
+        assertEquals(file.absolutePath, rebuilt.originalPath)
+        assertTrue(File(indexFile.parentFile, indexFile.name + ".bak").exists())
+        trash.restore(listOf(rebuilt.id))
+        assertEquals("data", file.readText())
+    }
+
+    @Test
+    fun `lost index is recovered on the next purge`() {
+        val trash = store()
+        val file = write("Movies/clip.mp4", "abc")
+        trash.moveToTrash(file, volume, CleanupGroup.LARGE_VIDEO)
+        indexFile.delete()
         assertTrue(trash.entries().isEmpty())
-        assertNotNull(trash.moveToTrash(write("c.bin", "1"), volume, CleanupGroup.LARGE_OTHER))
-        assertEquals(1, trash.entries().size)
+        trash.purgeExpired()
+        assertEquals(file.absolutePath, trash.entries().single().originalPath)
+    }
+
+    @Test
+    fun `failed index write leaves the file in place`() {
+        val file = write("Movies/keep.mp4", "data")
+        val indexDir = indexFile.parentFile!!.apply { mkdirs() }
+        assumeTrue(indexDir.setWritable(false))
+        assumeTrue(!indexDir.canWrite())
+        assertNull(store().moveToTrash(file, volume, CleanupGroup.LARGE_VIDEO))
+        assertEquals("data", file.readText())
     }
 
     @Test
