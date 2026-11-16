@@ -15,6 +15,7 @@ import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
@@ -961,6 +962,30 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Selects or clears a whole plan group. Groups that are not group-selectable are ignored. */
+    fun setGroupSelected(group: CleanupGroup, selected: Boolean) {
+        _state.update { state ->
+            state.copy(summary = state.summary.copy(items = PlanSelection.setGroupSelected(state.summary.items, group, selected)))
+        }
+    }
+
+    fun toggleGroup(group: CleanupGroup) {
+        _state.update { state ->
+            state.copy(summary = state.summary.copy(items = PlanSelection.toggleGroup(state.summary.items, group)))
+        }
+    }
+
+    /** Full content check of one look-alike copy; a mismatch removes it from the list. */
+    fun verifyDuplicate(id: String) {
+        val item = _state.value.summary.items.firstOrNull { it.id == id } ?: return
+        viewModelScope.launch {
+            val verified = runSuspendCatching { repository.verifyDuplicate(item) }.getOrNull()
+            _state.update { state ->
+                state.copy(summary = state.summary.copy(items = PlanSelection.applyVerification(state.summary.items, id, verified)))
+            }
+        }
+    }
+
     fun setItemsSelected(ids: Set<String>, selected: Boolean) {
         if (ids.isEmpty()) return
         _state.update { state ->
@@ -1540,4 +1565,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         const val DEVICE_REFRESH_INTERVAL_MILLIS = 1_500L
         const val APP_CACHE_REFRESH_INTERVAL_MILLIS = 60L * 1000L
     }
+}
+
+/** Like runCatching, but never swallows coroutine cancellation. */
+internal suspend inline fun <T> runSuspendCatching(block: () -> T): Result<T> = try {
+    Result.success(block())
+} catch (cancellation: CancellationException) {
+    throw cancellation
+} catch (failure: Exception) {
+    Result.failure(failure)
 }

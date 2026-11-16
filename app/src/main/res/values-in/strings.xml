@@ -773,4 +773,90 @@
     <plurals name="reason_whatsapp_voice">
         <item quantity="other">Pesan suara • Usia dalam hari: %1$d</item>
     </plurals>
+    <string name="plan_recommended_title">Pembersihan yang disarankan</string>
+    <string name="plan_clean_action">Bersihkan %1$s</string>
+    <string name="plan_nothing_big">Tidak ada yang besar untuk dibersihkan otomatis</string>
+    <string name="plan_biggest_space_in">Ruang terbesar ada di:</string>
+    <string name="plan_section_included">Termasuk</string>
+    <string name="plan_section_system">Langkah sistem</string>
+    <string name="plan_section_review">Layak dilihat</string>
+    <string name="plan_small_items">Item kecil</string>
+    <string name="plan_clear_app_caches">Hapus cache aplikasi</string>
+    <string name="plan_cache_about">sekitar %1$s</string>
+    <string name="plan_selected">Dipilih: %1$s</string>
+    <string name="plan_preview_title">Tinjau sebelum membersihkan</string>
+    <string name="plan_preview_whatsapp">Media WhatsApp yang dihapus tidak akan terbuka di chat.</string>
+    <string name="plan_preview_cloud">Cadangan cloud tidak diperiksa.</string>
+    <string name="plan_preview_clean">Bersihkan</string>
+    <string name="plan_preview_remove">Hapus dari pilihan</string>
+    <string name="plan_verify">Verifikasi</string>
+    <string name="result_freed_now">Dikosongkan sekarang: %1$s</string>
+    <string name="result_undo">Urungkan</string>
+    <string name="result_empty_trash_now">Kosongkan Sampah sekarang</string>
+    <string name="result_empty_trash_confirm">Hapus %1$s secara permanen? Tindakan ini tidak dapat diurungkan.</string>
+    <string name="result_delete_permanently">Hapus</string>
+    <string name="trash_title">Sampah</string>
+    <string name="trash_description">Pulihkan atau hapus file yang dibersihkan</string>
+    <string name="trash_restore">Pulihkan</string>
+    <string name="trash_delete_forever">Hapus permanen</string>
+    <string name="trash_empty">Kosongkan Sampah</string>
+    <string name="trash_empty_state">Sampah kosong</string>
+    <string name="scan_stage_exact_copies">Memeriksa salinan persis…</string>
+    <string name="tab_trash">Sampah</string>
+    <string name="home_checking_storage">Memeriksa penyimpanan Anda…</string>
+    <string name="home_updating">Memperbarui…</string>
+    <string name="home_allow_access">Izinkan akses</string>
+    <string name="home_access_explainer">Smart Cleaner memerlukan akses ke semua file untuk menemukan yang dapat dibersihkan. Tidak ada yang dihapus tanpa konfirmasi Anda.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d%% terpakai · %2$s kosong</string>
+    <string name="swipe_delete">Hapus</string>
+    <string name="swipe_keep">Simpan</string>
+    <string name="swipe_undo">Urungkan</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Selesai</string>
+    <string name="swipe_continue">Lanjutkan</string>
+    <string name="swipe_grid_view">Tampilan petak</string>
+    <string name="swipe_review_view">Tinjau dengan geser</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="other">%1$d item · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="other">Aplikasi tak terpakai (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="other">Menampilkan %1$d item terbesar. Pindai lagi setelah membersihkan untuk melihat lebih banyak.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="other">%1$s dihapus sekarang · %2$s ke Sampah selama %3$d hari</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="other">Di Sampah: %1$s — kosong dalam %2$d hari</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="other">%1$d berubah sejak pemindaian</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="other">%1$d tidak dapat dihapus</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="other">%1$d file dipulihkan</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="other">Sampah: %1$s — kosong dalam %2$d hari</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="other">%1$d hari lagi</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="other">File disimpan di sini selama %1$d hari, lalu dihapus. Sampah tetap memakai penyimpanan sampai dikosongkan. Jika Anda mencopot Smart Cleaner, hapus folder .SmartCleanerTrash dengan pengelola file.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="other">Ditandai: %1$d file · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="other">%1$d ditinjau · %2$s ditandai</item>
+    </plurals>
 </resources>

@@ -841,4 +841,116 @@
         <item quantity="many">Message vocal • Âge en jours : %1$d</item>
         <item quantity="other">Message vocal • Âge en jours : %1$d</item>
     </plurals>
+    <string name="plan_recommended_title">Nettoyage recommandé</string>
+    <string name="plan_clean_action">Nettoyer %1$s</string>
+    <string name="plan_nothing_big">Rien d’important à nettoyer automatiquement</string>
+    <string name="plan_biggest_space_in">Le plus d’espace se trouve dans :</string>
+    <string name="plan_section_included">Inclus</string>
+    <string name="plan_section_system">Étapes système</string>
+    <string name="plan_section_review">À vérifier</string>
+    <string name="plan_small_items">Petits éléments</string>
+    <string name="plan_clear_app_caches">Vider le cache des applis</string>
+    <string name="plan_cache_about">environ %1$s</string>
+    <string name="plan_selected">Sélection : %1$s</string>
+    <string name="plan_preview_title">Vérifiez avant de nettoyer</string>
+    <string name="plan_preview_whatsapp">Les médias WhatsApp supprimés ne s’ouvriront plus dans les discussions.</string>
+    <string name="plan_preview_cloud">La sauvegarde cloud n’est pas vérifiée.</string>
+    <string name="plan_preview_clean">Nettoyer</string>
+    <string name="plan_preview_remove">Retirer de la sélection</string>
+    <string name="plan_verify">Vérifier</string>
+    <string name="result_freed_now">Libéré maintenant : %1$s</string>
+    <string name="result_undo">Annuler</string>
+    <string name="result_empty_trash_now">Vider la corbeille maintenant</string>
+    <string name="result_empty_trash_confirm">Supprimer définitivement %1$s ? Cette action est irréversible.</string>
+    <string name="result_delete_permanently">Supprimer</string>
+    <string name="trash_title">Corbeille</string>
+    <string name="trash_description">Restaurez ou supprimez les fichiers nettoyés</string>
+    <string name="trash_restore">Restaurer</string>
+    <string name="trash_delete_forever">Supprimer définitivement</string>
+    <string name="trash_empty">Vider la corbeille</string>
+    <string name="trash_empty_state">La corbeille est vide</string>
+    <string name="scan_stage_exact_copies">Recherche de copies exactes…</string>
+    <string name="tab_trash">Corbeille</string>
+    <string name="home_checking_storage">Analyse de votre stockage…</string>
+    <string name="home_updating">Mise à jour…</string>
+    <string name="home_allow_access">Autoriser l’accès</string>
+    <string name="home_access_explainer">Smart Cleaner a besoin d’accéder à tous les fichiers pour trouver ce qui peut être nettoyé. Rien n’est supprimé sans votre confirmation.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d %% utilisé · %2$s libre</string>
+    <string name="swipe_delete">Supprimer</string>
+    <string name="swipe_keep">Garder</string>
+    <string name="swipe_undo">Annuler</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Terminer</string>
+    <string name="swipe_continue">Continuer</string>
+    <string name="swipe_grid_view">Vue en grille</string>
+    <string name="swipe_review_view">Revue par balayage</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Éléments : %1$d · %2$s</item>
+        <item quantity="many">Éléments : %1$d · %2$s</item>
+        <item quantity="other">Éléments : %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Applis inutilisées (%1$d)</item>
+        <item quantity="many">Applis inutilisées (%1$d)</item>
+        <item quantity="other">Applis inutilisées (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+        <item quantity="many">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+        <item quantity="other">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+        <item quantity="many">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+        <item quantity="other">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+        <item quantity="many">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+        <item quantity="other">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Modifiés depuis l’analyse : %1$d</item>
+        <item quantity="many">Modifiés depuis l’analyse : %1$d</item>
+        <item quantity="other">Modifiés depuis l’analyse : %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">Impossible de supprimer : %1$d</item>
+        <item quantity="many">Impossible de supprimer : %1$d</item>
+        <item quantity="other">Impossible de supprimer : %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">Fichiers restaurés : %1$d</item>
+        <item quantity="many">Fichiers restaurés : %1$d</item>
+        <item quantity="other">Fichiers restaurés : %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+        <item quantity="many">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+        <item quantity="other">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Jours restants : %1$d</item>
+        <item quantity="many">Jours restants : %1$d</item>
+        <item quantity="other">Jours restants : %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+        <item quantity="many">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+        <item quantity="other">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Marqués : %1$d · %2$s</item>
+        <item quantity="many">Marqués : %1$d · %2$s</item>
+        <item quantity="other">Marqués : %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Examinés : %1$d · marqués : %2$s</item>
+        <item quantity="many">Examinés : %1$d · marqués : %2$s</item>
+        <item quantity="other">Examinés : %1$d · marqués : %2$s</item>
+    </plurals>
 </resources>

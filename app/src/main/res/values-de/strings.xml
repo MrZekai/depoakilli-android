@@ -807,4 +807,103 @@
         <item quantity="one">Sprachnachricht • Alter in Tagen: %1$d</item>
         <item quantity="other">Sprachnachricht • Alter in Tagen: %1$d</item>
     </plurals>
+    <string name="plan_recommended_title">Empfohlene Bereinigung</string>
+    <string name="plan_clean_action">%1$s bereinigen</string>
+    <string name="plan_nothing_big">Nichts Großes automatisch zu bereinigen</string>
+    <string name="plan_biggest_space_in">Am meisten Platz belegen:</string>
+    <string name="plan_section_included">Enthalten</string>
+    <string name="plan_section_system">Systemschritte</string>
+    <string name="plan_section_review">Einen Blick wert</string>
+    <string name="plan_small_items">Kleine Elemente</string>
+    <string name="plan_clear_app_caches">App-Caches leeren</string>
+    <string name="plan_cache_about">etwa %1$s</string>
+    <string name="plan_selected">Ausgewählt: %1$s</string>
+    <string name="plan_preview_title">Vor dem Bereinigen prüfen</string>
+    <string name="plan_preview_whatsapp">Gelöschte WhatsApp-Medien lassen sich in Chats nicht mehr öffnen.</string>
+    <string name="plan_preview_cloud">Cloud-Sicherungen werden nicht geprüft.</string>
+    <string name="plan_preview_clean">Bereinigen</string>
+    <string name="plan_preview_remove">Aus Auswahl entfernen</string>
+    <string name="plan_verify">Prüfen</string>
+    <string name="result_freed_now">Jetzt frei: %1$s</string>
+    <string name="result_undo">Rückgängig</string>
+    <string name="result_empty_trash_now">Papierkorb jetzt leeren</string>
+    <string name="result_empty_trash_confirm">%1$s endgültig löschen? Dies kann nicht rückgängig gemacht werden.</string>
+    <string name="result_delete_permanently">Löschen</string>
+    <string name="trash_title">Papierkorb</string>
+    <string name="trash_description">Bereinigte Dateien wiederherstellen oder entfernen</string>
+    <string name="trash_restore">Wiederherstellen</string>
+    <string name="trash_delete_forever">Endgültig löschen</string>
+    <string name="trash_empty">Papierkorb leeren</string>
+    <string name="trash_empty_state">Der Papierkorb ist leer</string>
+    <string name="scan_stage_exact_copies">Exakte Kopien werden geprüft…</string>
+    <string name="tab_trash">Papierkorb</string>
+    <string name="home_checking_storage">Speicher wird geprüft…</string>
+    <string name="home_updating">Wird aktualisiert…</string>
+    <string name="home_allow_access">Zugriff erlauben</string>
+    <string name="home_access_explainer">Smart Cleaner benötigt Zugriff auf alle Dateien, um Bereinigbares zu finden. Ohne Ihre Bestätigung wird nichts gelöscht.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d %% belegt · %2$s frei</string>
+    <string name="swipe_delete">Löschen</string>
+    <string name="swipe_keep">Behalten</string>
+    <string name="swipe_undo">Rückgängig</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Fertig</string>
+    <string name="swipe_continue">Weiter</string>
+    <string name="swipe_grid_view">Rasteransicht</string>
+    <string name="swipe_review_view">Wischen zum Prüfen</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Elemente: %1$d · %2$s</item>
+        <item quantity="other">Elemente: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Nicht genutzte Apps (%1$d)</item>
+        <item quantity="other">Nicht genutzte Apps (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Die %1$d größten Elemente werden angezeigt. Nach dem Bereinigen erneut scannen, um mehr zu sehen.</item>
+        <item quantity="other">Die %1$d größten Elemente werden angezeigt. Nach dem Bereinigen erneut scannen, um mehr zu sehen.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s jetzt gelöscht · %2$s in den Papierkorb (Tage: %3$d)</item>
+        <item quantity="other">%1$s jetzt gelöscht · %2$s in den Papierkorb (Tage: %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">Im Papierkorb: %1$s – frei in Tagen: %2$d</item>
+        <item quantity="other">Im Papierkorb: %1$s – frei in Tagen: %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Seit dem Scan geändert: %1$d</item>
+        <item quantity="other">Seit dem Scan geändert: %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">Nicht gelöscht: %1$d</item>
+        <item quantity="other">Nicht gelöscht: %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">Wiederhergestellte Dateien: %1$d</item>
+        <item quantity="other">Wiederhergestellte Dateien: %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Papierkorb: %1$s – wird geleert in Tagen: %2$d</item>
+        <item quantity="other">Papierkorb: %1$s – wird geleert in Tagen: %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Verbleibende Tage: %1$d</item>
+        <item quantity="other">Verbleibende Tage: %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">Dateien bleiben hier (Tage: %1$d) und werden dann gelöscht. Der Papierkorb belegt Speicher, bis er geleert wird. Wenn Sie Smart Cleaner deinstallieren, löschen Sie den Ordner .SmartCleanerTrash mit einem Dateimanager.</item>
+        <item quantity="other">Dateien bleiben hier (Tage: %1$d) und werden dann gelöscht. Der Papierkorb belegt Speicher, bis er geleert wird. Wenn Sie Smart Cleaner deinstallieren, löschen Sie den Ordner .SmartCleanerTrash mit einem Dateimanager.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Markiert: %1$d · %2$s</item>
+        <item quantity="other">Markiert: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Geprüft: %1$d · markiert: %2$s</item>
+        <item quantity="other">Geprüft: %1$d · markiert: %2$s</item>
+    </plurals>
 </resources>

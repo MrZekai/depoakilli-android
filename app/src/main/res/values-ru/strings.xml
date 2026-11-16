@@ -876,4 +876,129 @@
         <item quantity="many">Голосовое сообщение • Возраст (дней): %1$d</item>
         <item quantity="other">Голосовое сообщение • Возраст (дней): %1$d</item>
     </plurals>
+    <string name="plan_recommended_title">Рекомендуемая очистка</string>
+    <string name="plan_clean_action">Очистить %1$s</string>
+    <string name="plan_nothing_big">Нет ничего крупного для автоматической очистки</string>
+    <string name="plan_biggest_space_in">Больше всего места занимают:</string>
+    <string name="plan_section_included">Включено</string>
+    <string name="plan_section_system">Системные шаги</string>
+    <string name="plan_section_review">Стоит посмотреть</string>
+    <string name="plan_small_items">Мелкие элементы</string>
+    <string name="plan_clear_app_caches">Очистить кэш приложений</string>
+    <string name="plan_cache_about">около %1$s</string>
+    <string name="plan_selected">Выбрано: %1$s</string>
+    <string name="plan_preview_title">Проверьте перед очисткой</string>
+    <string name="plan_preview_whatsapp">Удалённые медиафайлы WhatsApp не откроются в чатах.</string>
+    <string name="plan_preview_cloud">Облачная резервная копия не проверяется.</string>
+    <string name="plan_preview_clean">Очистить</string>
+    <string name="plan_preview_remove">Убрать из выбора</string>
+    <string name="plan_verify">Проверить</string>
+    <string name="result_freed_now">Освобождено сейчас: %1$s</string>
+    <string name="result_undo">Отменить</string>
+    <string name="result_empty_trash_now">Очистить корзину сейчас</string>
+    <string name="result_empty_trash_confirm">Удалить %1$s навсегда? Это нельзя отменить.</string>
+    <string name="result_delete_permanently">Удалить</string>
+    <string name="trash_title">Корзина</string>
+    <string name="trash_description">Восстановите или удалите очищенные файлы</string>
+    <string name="trash_restore">Восстановить</string>
+    <string name="trash_delete_forever">Удалить навсегда</string>
+    <string name="trash_empty">Очистить корзину</string>
+    <string name="trash_empty_state">Корзина пуста</string>
+    <string name="scan_stage_exact_copies">Проверка точных копий…</string>
+    <string name="tab_trash">Корзина</string>
+    <string name="home_checking_storage">Проверка хранилища…</string>
+    <string name="home_updating">Обновление…</string>
+    <string name="home_allow_access">Разрешить доступ</string>
+    <string name="home_access_explainer">Smart Cleaner нужен доступ ко всем файлам, чтобы найти то, что можно очистить. Ничего не удаляется без вашего подтверждения.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">Занято %1$d%% · свободно %2$s</string>
+    <string name="swipe_delete">Удалить</string>
+    <string name="swipe_keep">Оставить</string>
+    <string name="swipe_undo">Отменить</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Готово</string>
+    <string name="swipe_continue">Продолжить</string>
+    <string name="swipe_grid_view">Сетка</string>
+    <string name="swipe_review_view">Просмотр свайпами</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Элементов: %1$d · %2$s</item>
+        <item quantity="few">Элементов: %1$d · %2$s</item>
+        <item quantity="many">Элементов: %1$d · %2$s</item>
+        <item quantity="other">Элементов: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Неиспользуемые приложения (%1$d)</item>
+        <item quantity="few">Неиспользуемые приложения (%1$d)</item>
+        <item quantity="many">Неиспользуемые приложения (%1$d)</item>
+        <item quantity="other">Неиспользуемые приложения (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
+        <item quantity="few">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
+        <item quantity="many">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
+        <item quantity="other">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
+        <item quantity="few">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
+        <item quantity="many">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
+        <item quantity="other">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">В корзине: %1$s — освободится через дней: %2$d</item>
+        <item quantity="few">В корзине: %1$s — освободится через дней: %2$d</item>
+        <item quantity="many">В корзине: %1$s — освободится через дней: %2$d</item>
+        <item quantity="other">В корзине: %1$s — освободится через дней: %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Изменено после сканирования: %1$d</item>
+        <item quantity="few">Изменено после сканирования: %1$d</item>
+        <item quantity="many">Изменено после сканирования: %1$d</item>
+        <item quantity="other">Изменено после сканирования: %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">Не удалось удалить: %1$d</item>
+        <item quantity="few">Не удалось удалить: %1$d</item>
+        <item quantity="many">Не удалось удалить: %1$d</item>
+        <item quantity="other">Не удалось удалить: %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">Восстановлено файлов: %1$d</item>
+        <item quantity="few">Восстановлено файлов: %1$d</item>
+        <item quantity="many">Восстановлено файлов: %1$d</item>
+        <item quantity="other">Восстановлено файлов: %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Корзина: %1$s — очистится через дней: %2$d</item>
+        <item quantity="few">Корзина: %1$s — очистится через дней: %2$d</item>
+        <item quantity="many">Корзина: %1$s — очистится через дней: %2$d</item>
+        <item quantity="other">Корзина: %1$s — очистится через дней: %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Осталось дней: %1$d</item>
+        <item quantity="few">Осталось дней: %1$d</item>
+        <item quantity="many">Осталось дней: %1$d</item>
+        <item quantity="other">Осталось дней: %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
+        <item quantity="few">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
+        <item quantity="many">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
+        <item quantity="other">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Отмечено: %1$d · %2$s</item>
+        <item quantity="few">Отмечено: %1$d · %2$s</item>
+        <item quantity="many">Отмечено: %1$d · %2$s</item>
+        <item quantity="other">Отмечено: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Просмотрено: %1$d · отмечено: %2$s</item>
+        <item quantity="few">Просмотрено: %1$d · отмечено: %2$s</item>
+        <item quantity="many">Просмотрено: %1$d · отмечено: %2$s</item>
+        <item quantity="other">Просмотрено: %1$d · отмечено: %2$s</item>
+    </plurals>
 </resources>

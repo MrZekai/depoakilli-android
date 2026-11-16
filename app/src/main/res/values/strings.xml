@@ -826,4 +826,100 @@
         <item quantity="one">Voice note • Age in days: %1$d</item>
         <item quantity="other">Voice note • Age in days: %1$d</item>
     </plurals>
+    <string name="plan_recommended_title">Recommended cleanup</string>
+    <string name="plan_clean_action">Clean %1$s</string>
+    <string name="plan_nothing_big">Nothing big to clean automatically</string>
+    <string name="plan_biggest_space_in">Biggest space is in:</string>
+    <string name="plan_section_included">Included</string>
+    <string name="plan_section_system">System steps</string>
+    <string name="plan_section_review">Worth a look</string>
+    <string name="plan_small_items">Small items</string>
+    <string name="plan_clear_app_caches">Clear app caches</string>
+    <string name="plan_cache_about">about %1$s</string>
+    <string name="plan_selected">Selected: %1$s</string>
+    <string name="plan_preview_title">Review before cleaning</string>
+    <string name="plan_preview_whatsapp">Deleted WhatsApp media won’t open in chats.</string>
+    <string name="plan_preview_cloud">Cloud backup isn’t checked.</string>
+    <string name="plan_preview_clean">Clean</string>
+    <string name="plan_preview_remove">Remove from selection</string>
+    <string name="plan_verify">Verify</string>
+    <string name="result_freed_now">Freed now: %1$s</string>
+    <string name="result_undo">Undo</string>
+    <string name="result_empty_trash_now">Empty Trash now</string>
+    <string name="result_empty_trash_confirm">Delete %1$s permanently? This can’t be undone.</string>
+    <string name="result_delete_permanently">Delete</string>
+    <string name="trash_title">Trash</string>
+    <string name="trash_description">Restore or remove files you cleaned</string>
+    <string name="trash_restore">Restore</string>
+    <string name="trash_delete_forever">Delete forever</string>
+    <string name="trash_empty">Empty Trash</string>
+    <string name="trash_empty_state">Trash is empty</string>
+    <string name="scan_stage_exact_copies">Checking for exact copies…</string>
+    <string name="tab_trash">Trash</string>
+    <string name="home_checking_storage">Checking your storage…</string>
+    <string name="home_updating">Updating…</string>
+    <string name="home_allow_access">Allow access</string>
+    <string name="home_access_explainer">Smart Cleaner needs access to all files to find what can be cleaned. Nothing is deleted without your confirmation.</string>
+    <string name="home_storage_line">%1$d%% used · %2$s free</string>
+    <string name="swipe_delete">Delete</string>
+    <string name="swipe_keep">Keep</string>
+    <string name="swipe_undo">Undo</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Finish</string>
+    <string name="swipe_continue">Continue</string>
+    <string name="swipe_grid_view">Grid view</string>
+    <string name="swipe_review_view">Swipe review</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">%1$d item · %2$s</item>
+        <item quantity="other">%1$d items · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Unused apps (%1$d)</item>
+        <item quantity="other">Unused apps (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Showing the largest %1$d items. Scan again after cleaning to see more.</item>
+        <item quantity="other">Showing the largest %1$d items. Scan again after cleaning to see more.</item>
+    </plurals>
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s deleted now · %2$s moved to Trash for %3$d day</item>
+        <item quantity="other">%1$s deleted now · %2$s moved to Trash for %3$d days</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">In Trash: %1$s — frees in %2$d day</item>
+        <item quantity="other">In Trash: %1$s — frees in %2$d days</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">%1$d changed since the scan</item>
+        <item quantity="other">%1$d changed since the scan</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">%1$d could not be deleted</item>
+        <item quantity="other">%1$d could not be deleted</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">%1$d file put back</item>
+        <item quantity="other">%1$d files put back</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Trash: %1$s — empties in %2$d day</item>
+        <item quantity="other">Trash: %1$s — empties in %2$d days</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">%1$d day left</item>
+        <item quantity="other">%1$d days left</item>
+    </plurals>
+    <plurals name="trash_footer">
+        <item quantity="one">Files stay here for %1$d day, then they’re deleted. Trash still uses storage until it’s emptied. If you uninstall Smart Cleaner, delete the .SmartCleanerTrash folder with a file manager.</item>
+        <item quantity="other">Files stay here for %1$d days, then they’re deleted. Trash still uses storage until it’s emptied. If you uninstall Smart Cleaner, delete the .SmartCleanerTrash folder with a file manager.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Marked: %1$d file · %2$s</item>
+        <item quantity="other">Marked: %1$d files · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">%1$d reviewed · %2$s marked</item>
+        <item quantity="other">%1$d reviewed · %2$s marked</item>
+    </plurals>
 </resources>

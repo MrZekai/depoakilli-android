@@ -368,6 +368,8 @@ fun CleanerApp(
                 onClean = onPrepareCleanup,
                 onCleanStorage = onPrepareStorageCleanup,
                 modifier = Modifier.padding(padding),
+                onToggleGroup = viewModel::toggleGroup,
+                onClearAppCaches = onClearAllAppCaches,
             )
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -685,6 +687,8 @@ private fun CleanScreen(
     onClean: (Set<String>?) -> Unit,
     onCleanStorage: () -> Unit,
     modifier: Modifier = Modifier,
+    onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
+    onClearAppCaches: () -> Unit = {},
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -707,6 +711,8 @@ private fun CleanScreen(
             onClean = onClean,
             onCleanStorage = onCleanStorage,
             modifier = modifier,
+            onToggleGroup = onToggleGroup,
+            onClearAppCaches = onClearAppCaches,
         )
         return
     }

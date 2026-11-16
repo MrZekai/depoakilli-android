@@ -943,8 +943,17 @@ for resource_name in sorted(set(kotlin_refs) - default_names):
 # Existing key feature UI must remain intact.
 # ------------------------------------------------------------------
 smart_results = read("app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt")
+cleanup_plan_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt")
+preview_sheet_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/SelectedItemsPreviewSheet.kt")
+for expected in ("RecommendedCleanupCard", "PlanBottomBar", "SystemStepRow", "plan.isAlreadyTidy"):
+    if expected not in cleanup_plan_ui:
+        errors.append(f"missing cleanup plan invariant: {expected}")
+for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
+    if expected not in preview_sheet_ui:
+        errors.append(f"missing single-confirmation preview invariant: {expected}")
+if "SelectedItemsPreviewSheet(" not in smart_results:
+    errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
 for expected in (
-    "SmartCleanHero",
     "CleanupConfirmationDialog",
     "StorageDetailPage",
     "StorageCleanupConfirmationDialog",
@@ -1077,8 +1086,6 @@ for expected in (
 
 if "R.string.storage_analyzer_action_hint" in smart_results:
     errors.append("destructive storage review must not use the read-only Analyzer resource prefix")
-if "R.string.storage_review_action_hint" not in smart_results:
-    errors.append("manual storage review must use storage_review_action_hint")
 
 for required_copy in (
     "sponsored ad panel",
@@ -1451,8 +1458,8 @@ if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" i
     errors.append("WhatsApp media and APK installers must never be preselected")
 if "isStillImage(" not in ai_engine:
     errors.append("screen recordings must not be classified as screenshots")
-if "summary.safeSuggestedBytes" not in smart_results:
-    errors.append("Smart Clean headline must lead with the safe amount")
+if "summary.plan" not in smart_results or "plan.recommendedBytes" not in read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt"):
+    errors.append("Smart Clean headline must lead with the measured plan amount")
 if "Modifier.width(92.dp)" in smart_results:
     errors.append("hero stats must use weighted columns (large-font overlap)")
 if "premium_duplicates_kept_short" in premium_tools:
