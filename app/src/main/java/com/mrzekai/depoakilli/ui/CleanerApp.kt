@@ -315,7 +315,7 @@ fun CleanerApp(
                 ) {
                     if (bannerAllowed) {
                         BannerAd(canRequestAds = true)
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(24.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
                     }
                     NavigationBar(containerColor = Color(0xFF07132C)) {

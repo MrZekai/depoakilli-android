@@ -474,12 +474,15 @@ for expected in (
     "onSystemDismiss: () -> Unit",
     "onDone: (resultAdPresented: Boolean) -> Unit",
     "dismissOnClickOutside = false",
-    "Spacer(Modifier.height(16.dp))",
+    "Spacer(Modifier.height(24.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
     "verticalScroll(rememberScrollState())",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha5 result-dialog invariant: {expected}")
+
+if cleanup_dialog.find("R.string.cleanup_result_done") > cleanup_dialog.rfind("CleanupResultAdSurface("):
+    errors.append("result Done button must precede the ad surface")
 
 for expected in (
     "beginDeepCacheCleanupMeasurement()",
