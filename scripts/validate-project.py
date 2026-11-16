@@ -1141,7 +1141,7 @@ if ".lowercase()" in ai_engine:
     errors.append("AiCleaningEngine must not use locale-sensitive lowercase()")
 
 for expected in (
-    "StoragePathRules.normalizePath(relativePath)",
+    "StoragePathRules.isWhatsAppPath(relativePath)",
     "storageReviewGeneration",
     "val reviewGeneration = ++storageReviewGeneration",
     "reviewGeneration == storageReviewGeneration",
@@ -1155,7 +1155,11 @@ for expected in (
 
 if "review.loading && review.items.isEmpty()" not in smart_results:
     errors.append("Storage Review previews must remain visible while background expansion loads")
-if "StoragePathRules.isWhatsAppPath(relativePath)" not in smart_results or "fun isWhatsAppPath(path: String)" not in read("app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt"):
+path_rules = read("app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt")
+whatsapp_path_rule = path_rules.split("fun isWhatsAppPath(path: String)", 1)[-1].split("fun isProtectedUserDataPath", 1)[0]
+if ("StoragePathRules.isWhatsAppPath(relativePath)" not in smart_results or
+        "fun isWhatsAppPath(path: String)" not in path_rules or
+        "val normalized = normalizePath(path)" not in whatsapp_path_rule):
     errors.append("Smart review WhatsApp path matching must be locale-stable")
 
 for expected in (
