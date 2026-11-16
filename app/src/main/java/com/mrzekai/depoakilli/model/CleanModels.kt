@@ -75,7 +75,6 @@ enum class ScanFocus {
     JUNK,
     DUPLICATES,
     LARGE_FILES,
-    WHATSAPP,
     MEDIA,
     SCREENSHOTS,
     DOWNLOADS,

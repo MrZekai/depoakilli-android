@@ -2,10 +2,8 @@ package com.mrzekai.depoakilli.data
 
 import android.app.ActivityManager
 import android.app.AppOpsManager
-import android.app.PendingIntent
 import android.app.usage.StorageStatsManager
 import android.app.usage.UsageStatsManager
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -288,15 +286,11 @@ class DeviceRepository(
         }
 
         // Smart and Deep always re-index; tool scans reuse a fresh (90 s) index.
-        val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP && focus != ScanFocus.WHATSAPP
-        val indexed = if (focus == ScanFocus.WHATSAPP) {
-            indexWhatsAppFiles(onProgress)
-        } else {
-            (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
-                ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
-                    onProgress(visitedDirectories, discoveredFiles)
-                }.also(::cacheSharedIndex)
-        }
+        val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
+        val indexed = (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
+            ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
+                onProgress(visitedDirectories, discoveredFiles)
+            }.also(::cacheSharedIndex)
         val assessments = ArrayList<CleanableItem>()
         var duplicateResult = DuplicatePolicy.ScanResult()
 
@@ -349,7 +343,6 @@ class DeviceRepository(
                     ScanFocus.JUNK -> item.assessment.category == CleanCategory.JUNK
                     ScanFocus.DUPLICATES -> item.assessment.category == CleanCategory.DUPLICATE
                     ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
-                    ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
                     ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
                     ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
                     ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS
@@ -615,15 +608,6 @@ class DeviceRepository(
         canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
     }
 
-    fun createDeleteRequest(items: List<CleanableItem>): DeletePlan {
-        val mediaUris = items
-            .filter { Uri.parse(it.uri).scheme == "content" }
-            .map { Uri.parse(it.uri) }
-        if (mediaUris.isEmpty()) return DeletePlan.NoMediaFiles
-        val pendingIntent: PendingIntent = MediaStore.createDeleteRequest(resolver, mediaUris)
-        return DeletePlan.RequiresConsent(pendingIntent)
-    }
-
     private fun assessmentForFocus(file: IndexedFile, focus: ScanFocus): AiAssessment? {
         return when (focus) {
             ScanFocus.SMART -> aiEngine.assess(file)
@@ -679,13 +663,6 @@ class DeviceRepository(
                     aiEngine.assessDeep(file)?.takeIf { it.group in DOWNLOAD_TOOL_GROUPS }
                 }
             }
-
-            ScanFocus.WHATSAPP -> aiEngine.assessDeep(file) ?: AiAssessment(
-                category = CleanCategory.WHATSAPP_MEDIA,
-                safetyScore = 55,
-                reasonRes = R.string.reason_whatsapp_review,
-                recommended = false,
-            )
         }
     }
 
@@ -1097,10 +1074,6 @@ class DeviceRepository(
     }
 
 
-    sealed interface DeletePlan {
-        data class RequiresConsent(val pendingIntent: PendingIntent) : DeletePlan
-        data object NoMediaFiles : DeletePlan
-    }
 
     enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE, TRASH_FOLDER_UNAVAILABLE }
 
@@ -1194,11 +1167,6 @@ class DeviceRepository(
         // tap cannot allocate and recompose tens of thousands of rows.
         private const val MAX_SELECTABLE_STORAGE_REVIEW_ITEMS = 10_000
         private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
-        private val JUNK_CATEGORIES = setOf(
-            CleanCategory.JUNK,
-            CleanCategory.OLD_DOWNLOAD,
-            CleanCategory.APK_PACKAGE,
-        )
         private val MEDIA_CATEGORIES = setOf(
             CleanCategory.SCREENSHOT,
             CleanCategory.LARGE_FILE,

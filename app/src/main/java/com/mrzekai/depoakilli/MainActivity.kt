@@ -13,7 +13,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
@@ -86,13 +85,6 @@ class MainActivity : ComponentActivity() {
     ) { result ->
         val approved = result.resultCode == Activity.RESULT_OK
         cleanerViewModel.onDeepCacheCleanupResult(approved)
-    }
-
-    private val deleteLauncher = registerForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult(),
-    ) { result ->
-        val approved = result.resultCode == Activity.RESULT_OK
-        cleanerViewModel.completeCleanup(approved)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -350,18 +342,6 @@ class MainActivity : ComponentActivity() {
     private fun executeCleanupPlan(itemIds: Set<String>? = null) {
         cleanerViewModel.prepareCleanup(
             itemIds = itemIds,
-            onPlanReady = { plan ->
-                if (plan is DeviceRepository.DeletePlan.RequiresConsent) {
-                    runCatching {
-                        deleteLauncher.launch(
-                            IntentSenderRequest.Builder(plan.pendingIntent.intentSender).build(),
-                        )
-                    }.onFailure {
-                        cleanerViewModel.completeCleanup(false)
-                        cleanerViewModel.showMessage(R.string.message_screen_unavailable)
-                    }
-                }
-            },
             onCleanupCompleted = {
                 // Result state is already produced by CleanerViewModel.
                 // Never gate that result on a Google Mobile Ads callback.

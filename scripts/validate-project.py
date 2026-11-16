@@ -60,10 +60,8 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/StorageAnalyzerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
@@ -320,8 +318,15 @@ view_model = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.
 cleaner_app = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
 device_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt")
 app_cache_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt")
-dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt")
-home_components = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt")
+# T3.1: the old dashboard Home is gone; the Clean tab (plan) is Home. The
+# remaining Home checks run on the new surface.
+for removed_home in ("NeonDashboardScreen.kt", "HomeDashboardComponents.kt"):
+    if (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui" / removed_home).exists():
+        errors.append(f"dead dashboard file must stay deleted: {removed_home}")
+dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt") + read(
+    "app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt"
+)
+home_components = dashboard
 home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt")
 cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
 storage_change_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt")
@@ -374,18 +379,8 @@ for expected in (
     if expected not in cleaner_app:
         errors.append(f"missing alpha7 storage-change navigation invariant: {expected}")
 
-different_tools_start = dashboard.find("R.string.home_different_tools_title")
-if different_tools_start >= 0:
-    different_tools = dashboard[different_tools_start:]
-    if "R.string.home_privacy_title" in different_tools:
-        errors.append("Privacy Center must not remain as a Home different-tools card")
-    if "R.string.storage_change_title" not in different_tools:
-        errors.append("Storage Change must replace Privacy Center on Home")
-
 if "onPrivacyAccess: () -> Unit" in home_components:
     errors.append("Home header privacy action must be removed")
-if "icon = Icons.Outlined.CleaningServices" not in home_components:
-    errors.append("Home cleanup-ready metric must use cleaning semantics")
 
 for forbidden in (
     "onClick = if (state.hasAllFilesAccess) null else",
@@ -545,27 +540,6 @@ for expected in (
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha6 app-cache dialog invariant: {expected}")
 
-different_tools_start = dashboard.find("R.string.home_different_tools_title")
-if different_tools_start < 0:
-    errors.append("Home different-tools section is missing")
-else:
-    different_tools_section = dashboard[different_tools_start:]
-    if "modifier = Modifier.weight(1f)" in different_tools_section:
-        errors.append("Home different-tools cards must not remain in the cramped 3-column layout")
-
-shortcut_start = home_components.find("internal fun HomeToolShortcut(")
-shortcut_end = home_components.find("internal fun HomeExploreCard(", shortcut_start)
-if shortcut_start < 0 or shortcut_end <= shortcut_start:
-    errors.append("unable to inspect HomeToolShortcut")
-else:
-    shortcut_section = home_components[shortcut_start:shortcut_end]
-    for expected in (
-        ".fillMaxWidth()",
-        "fontSize = 16.sp",
-        "text = subtitle",
-    ):
-        if expected not in shortcut_section:
-            errors.append(f"missing alpha6 HomeToolShortcut invariant: {expected}")
 
 
 for forbidden in (
@@ -649,32 +623,6 @@ for expected in (
 ):
     if expected not in cleaner_app and expected not in device_center:
         errors.append(f"missing Phase-2 navigation invariant: {expected}")
-
-for expected in (
-    "HomeOpportunityCard(",
-    "HomeSmartCleanCard(",
-    "HomeCleanupProofCard(",
-    "HomeSuggestionCard(",
-    "HomeToolShortcut(",
-    "HomeExploreCard(",
-    "onOpenAppCache: () -> Unit",
-    "onOpenStorageChange: () -> Unit",
-    "onOpenTools: () -> Unit",
-):
-    if expected not in dashboard:
-        errors.append(f"missing alpha3 premium Home invariant: {expected}")
-
-for expected in (
-    "HomeBrandHeader",
-    "HomeOpportunityCard",
-    "HomeSmartCleanCard",
-    "HomeCleanupProofCard",
-    "HomeSuggestionCard",
-    "HomeToolShortcut",
-    "HomeExploreCard",
-):
-    if expected not in home_components:
-        errors.append(f"missing alpha3 Home component: {expected}")
 
 for expected in (
     "HeroGradient",
@@ -1037,7 +985,7 @@ for expected in (
 junk_start = repository.find("ScanFocus.JUNK -> {")
 junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
 downloads_start = repository.find("ScanFocus.DOWNLOADS -> {")
-downloads_end = repository.find("ScanFocus.WHATSAPP", downloads_start)
+downloads_end = repository.find("private suspend fun indexSharedStorage", downloads_start)
 if junk_start < 0 or junk_end <= junk_start or downloads_start < 0 or downloads_end <= downloads_start:
     errors.append("unable to inspect alpha10 Junk/Downloads partition")
 else:
@@ -1097,7 +1045,8 @@ if "onPrepareWhatsAppCleanup { changed ->" in cleaner_app:
 for expected in (
     "state.scanFocus == ScanFocus.ANALYZE && state.storageReview.type != null",
     "onReviewType = { type -> onOpenStorageReview(type, false) }",
-    "ScanFocus.SCREENSHOTS,",
+    # Screenshots and every other tool focus route to the tool screen (T3.1).
+    "Every remaining focus is a tool scan",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing alpha9 CleanerApp routing invariant: {expected}")
