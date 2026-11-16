@@ -21,7 +21,7 @@ User-created files remain review-first. Smart Cleaner does not claim silent priv
 - anchored adaptive Banner ads
 - Native cleanup-result ad with MREC fallback
 - Interstitial after a cleanup result is closed with Done, or after 20 s on a tool screen when returning to Clean (3 min apart, at most 6 per day)
-- App Open ad on the loading cover from the second launch, and after the user left the app for 30 s via Home/Recents; never after Android settings, permission, cache, uninstall, review or share screens
+- App Open ad on the loading cover from the first launch (after consent), and after the user left the app for 30 s via Home/Recents; never after Android settings, permission, cache, uninstall, review or share screens
 - UMP consent and in-app advertising privacy options where required
 - local-only Android logging; no third-party crash-reporting service is included
 

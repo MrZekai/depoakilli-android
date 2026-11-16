@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * App open ad (T1B.2), following AdMob's app-open guidance: shown only over
  * the app's own loading cover, before the user can use the content.
  *
- * - Cold start: from the second launch on, the cover waits at most
+ * - Cold start: from the first launch on (after consent), the cover waits at most
  *   [AdPolicy.APP_OPEN_MAX_WAIT_MS]; if no ad is ready by then nothing is shown
  *   and the content opens. Once the content is visible, no app open ad appears.
  * - Return from background: only after the user left the app himself

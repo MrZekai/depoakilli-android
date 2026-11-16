@@ -24,7 +24,7 @@ enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN }
  * window; those two checks stay with the callers.
  */
 object AdPolicy {
-    const val APP_OPEN_MIN_LAUNCH = 2
+    const val APP_OPEN_MIN_LAUNCH = 1
     const val APP_OPEN_MIN_INTERVAL_HOURS = 4L
     const val APP_OPEN_MAX_PER_DAY = 3
     const val APP_OPEN_MAX_WAIT_MS = 3000L

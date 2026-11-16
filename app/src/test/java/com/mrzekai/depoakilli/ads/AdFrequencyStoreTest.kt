@@ -68,7 +68,8 @@ class AdFrequencyStoreTest {
 
     @Test
     fun `app open eligibility`() {
-        assertFalse(AdPolicy.canShowAppOpen(AdFrequencyState(launchCount = 1), start, utc))
+        assertTrue(AdPolicy.canShowAppOpen(AdFrequencyState(launchCount = 1), start, utc))
+        assertFalse(AdPolicy.canShowAppOpen(AdFrequencyState(launchCount = 0), start, utc))
         val shown = AdPolicy.recordAppOpen(returning, start, utc)
         assertFalse(AdPolicy.canShowAppOpen(shown, start + 3 * 3_600_000L, utc))
         assertTrue(AdPolicy.canShowAppOpen(shown, start + 4 * 3_600_000L, utc))
