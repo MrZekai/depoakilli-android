@@ -1335,12 +1335,14 @@ for expected in (
     if expected not in workflow:
         errors.append(f"missing CI invariant: {expected}")
 
-phase_check = workflow.split("  phase-zero-full:", 1)
+phase_check = workflow.split("  full-checks:", 1)
 if len(phase_check) != 2 or not all(
     expected in phase_check[1]
     for expected in ("./gradlew --stacktrace test", "./gradlew --stacktrace lint")
 ):
-    errors.append("phase-zero CI must run full test and lint tasks")
+    errors.append("full-checks CI must run full test and lint tasks")
+if len(phase_check) == 2 and ("ANDROID_KEYSTORE" in phase_check[1] or "head.ref ==" in phase_check[1]):
+    errors.append("full-checks CI must run on every PR without the production upload key")
 
 qa_signing_verifier = read("scripts/verify-qa-signing.sh")
 for expected in ("apksigner", "apksigner.bat", "apksigner.exe"):

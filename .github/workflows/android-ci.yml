@@ -168,8 +168,10 @@ jobs:
           fi
           echo "Android lint, slim QA APK, signing and packaged-binary checks passed."
 
-  phase-zero-full:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'codex/faz0-guvenli-kopyalar'
+  full-checks:
+    # Every variant (debug, qa, closedTest, release) unit tests and lint.
+    # Runs without the production upload key: release/closed-test config
+    # validation tasks are skipped here and still gate real release builds.
     runs-on: ubuntu-latest
     timeout-minutes: 50
     steps:
@@ -179,24 +181,8 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v6
-      - name: Decode existing upload key for variant configuration
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          test -n "$KEYSTORE_BASE64"
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/phase-zero-upload.jks"
       - name: Run all unit tests and lint
-        env:
-          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/phase-zero-upload.jks
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-          SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
-          ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: |
           chmod +x gradlew
-          ./gradlew --stacktrace test
-          ./gradlew --stacktrace lint
-      - name: Remove temporary upload key
-        if: always()
-        run: rm -f "$RUNNER_TEMP/phase-zero-upload.jks"
+          ./gradlew --stacktrace test -x validateReleaseAds -x validateClosedTestConfiguration
+          ./gradlew --stacktrace lint -x validateReleaseAds -x validateClosedTestConfiguration
