@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 50
 
     steps:
       - name: Checkout sources
@@ -33,6 +33,9 @@ jobs:
       - name: Verify project invariants
         run: python3 scripts/validate-project.py
 
+      - name: Verify translations
+        run: python3 scripts/validate-translations.py
+
       - name: Verify Android dependency metadata
         run: ./gradlew --stacktrace :app:checkDebugAarMetadata
 
@@ -40,12 +43,12 @@ jobs:
         run: ./gradlew :app:dependencyInsight --configuration debugRuntimeClasspath --dependency androidx.fragment:fragment
 
       - name: Run unit tests
-        run: ./gradlew --stacktrace testDebugUnitTest
+        run: ./gradlew --stacktrace test
 
       - name: Run Android lint
         id: lint
         continue-on-error: true
-        run: ./gradlew --stacktrace lintDebug
+        run: ./gradlew --stacktrace lint
 
       - name: Print full lint report
         if: always()
