@@ -151,6 +151,7 @@ fun CleanerApp(
     onCleanupResultDismissed: () -> Unit,
     onCleanupSucceeded: () -> Unit,
     onReturnedToClean: (dwellMillis: Long) -> Unit = {},
+    onDeepDuplicateCheck: () -> Unit = {},
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -575,6 +576,7 @@ fun CleanerApp(
                                 viewModel.openPlanGroupGrid(group, items)
                                 detailScreen = DetailScreen.CLEAN_RESULTS
                             },
+                            onDeepCheck = onDeepDuplicateCheck,
                             reviewAd = { index ->
                                 val plan = displayState.summary.plan
                                 val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +

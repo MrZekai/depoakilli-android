@@ -76,6 +76,9 @@ internal fun LazyListScope.cleanupPlanItems(
     onOpenUnusedApps: () -> Unit,
     onScanAgain: () -> Unit,
     afterReviewRow: LazyListScope.(index: Int) -> Unit = {},
+    deepCheck: Pair<Int, Long> = 0 to 0L,
+    deepCheckRunning: Boolean = false,
+    onDeepCheck: () -> Unit = {},
 ) {
     item(key = "plan-card") {
         RecommendedCleanupCard(
@@ -118,6 +121,11 @@ internal fun LazyListScope.cleanupPlanItems(
                 PlanRow(row = row, onToggle = { onToggleRow(row) }, onOpen = { onOpenRow(row) })
             }
             afterReviewRow(this, index)
+        }
+    }
+    if (deepCheck.first > 0 || deepCheckRunning) {
+        item(key = "plan-deep-check") {
+            DeepCheckRow(groups = deepCheck.first, bytes = deepCheck.second, running = deepCheckRunning, onClick = onDeepCheck)
         }
     }
     if (plan.truncated) {
@@ -381,4 +389,27 @@ internal fun PlanListContainer(
 @Composable
 internal fun PlanTextButton(text: String, onClick: () -> Unit) {
     TextButton(onClick = onClick, modifier = Modifier.heightIn(min = 48.dp)) { Text(text) }
+}
+
+/** Optional rewarded feature: verify large look-alike files (T1B.6). */
+@Composable
+internal fun DeepCheckRow(groups: Int, bytes: Long, running: Boolean, onClick: () -> Unit) {
+    Surface(modifier = Modifier.fillMaxWidth(), color = PlanCard, shape = RoundedCornerShape(18.dp)) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (running) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanCyan)
+                    Text(stringResource(R.string.deep_check_running), color = Color.White)
+                }
+            } else {
+                Text(
+                    pluralStringResource(R.plurals.deep_check_row, groups, groups, ByteFormatter.format(bytes)),
+                    color = Color.White,
+                )
+                OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                    Text(stringResource(R.string.deep_check_action))
+                }
+            }
+        }
+    }
 }

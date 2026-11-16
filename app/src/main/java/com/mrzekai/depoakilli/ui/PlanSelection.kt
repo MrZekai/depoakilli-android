@@ -16,6 +16,25 @@ internal object PlanSelection {
     fun toggleGroup(items: List<CleanableItem>, group: CleanupGroup): List<CleanableItem> =
         setGroupSelected(items, group, items.any { it.assessment.group == group && !it.selected })
 
+    /**
+     * Large look-alike groups the "Deep duplicate check" can verify:
+     * group count and the most space they could free (size × extra copies).
+     */
+    fun deepCheckCandidates(items: List<CleanableItem>): Pair<Int, Long> {
+        val groups = items.asSequence()
+            .filter { it.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED }
+            .filter { it.sizeBytes > com.mrzekai.depoakilli.data.CleaningThresholds.QUICK_FULL_HASH_BYTES }
+            .filter { it.protectedDuplicateUri != null }
+            .groupBy { it.protectedDuplicateUri }
+        return groups.size to groups.values.sumOf { copies -> copies.sumOf(CleanableItem::sizeBytes) }
+    }
+
+    /** Applies a batch of verification results (null = not an exact copy). */
+    fun applyVerifications(items: List<CleanableItem>, results: Map<String, CleanableItem?>): List<CleanableItem> =
+        items.mapNotNull { current ->
+            if (current.id !in results) current else results[current.id]?.copy(selected = current.selected)
+        }
+
     /** Replaces a verified copy, or drops it when the full check showed it is different. */
     fun applyVerification(items: List<CleanableItem>, id: String, verified: CleanableItem?): List<CleanableItem> =
         items.mapNotNull { current ->

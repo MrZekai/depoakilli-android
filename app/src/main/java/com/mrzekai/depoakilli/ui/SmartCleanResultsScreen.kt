@@ -200,6 +200,7 @@ internal fun SmartCleanResultsScreen(
     onSwipeGrid: () -> Unit = {},
     onSwipeFinished: () -> Unit = {},
     listAd: @Composable () -> Unit = {},
+    onDeepCheck: () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -261,6 +262,8 @@ internal fun SmartCleanResultsScreen(
             reviewAd = reviewAd,
             onOpenSwipeReview = onOpenSwipeReview,
             onOpenPlanGrid = onOpenPlanGrid,
+            deepCheckRunning = state.deepCheckRunning,
+            onDeepCheck = onDeepCheck,
         )
     }
 }
@@ -612,6 +615,8 @@ private fun SmartResultsContent(
     reviewAd: LazyListScope.(Int) -> Unit,
     onOpenSwipeReview: (CleanupGroup) -> Unit,
     onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit,
+    deepCheckRunning: Boolean,
+    onDeepCheck: () -> Unit,
 ) {
     var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
@@ -683,6 +688,7 @@ private fun SmartResultsContent(
     }
 
     val plan = summary.plan
+    val deepCheck = remember(summary.items) { PlanSelection.deepCheckCandidates(summary.items) }
     Column(
         modifier
             .fillMaxSize()
@@ -726,6 +732,9 @@ private fun SmartResultsContent(
                 },
                 onScanAgain = onScan,
                 afterReviewRow = reviewAd,
+                deepCheck = deepCheck,
+                deepCheckRunning = deepCheckRunning,
+                onDeepCheck = onDeepCheck,
             )
         }
 

@@ -54,6 +54,19 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `deep check candidates and verification results`() {
+        val big = 300 * mb
+        val a = item("a", CleanupGroup.DUPLICATE_UNVERIFIED, big).copy(protectedDuplicateUri = "file:///keep1")
+        val b = item("b", CleanupGroup.DUPLICATE_UNVERIFIED, big).copy(protectedDuplicateUri = "file:///keep1")
+        val small = item("s", CleanupGroup.DUPLICATE_UNVERIFIED, 10 * mb).copy(protectedDuplicateUri = "file:///keep2")
+        assertEquals(1 to 2 * big, PlanSelection.deepCheckCandidates(listOf(a, b, small)))
+        val verified = a.copy(assessment = engine.duplicateAssessment(true))
+        val after = PlanSelection.applyVerifications(listOf(a, b, small), mapOf("a" to verified, "b" to null))
+        assertEquals(listOf("a", "s"), after.map(CleanableItem::id))
+        assertEquals(CleanupGroup.DUPLICATE_SAFE, after.first().assessment.group)
+    }
+
+    @Test
     fun `app open starts a quick scan only when needed`() {
         val hour = 3_600_000L
         val now = 100 * hour

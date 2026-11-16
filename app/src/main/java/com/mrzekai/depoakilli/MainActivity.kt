@@ -163,6 +163,7 @@ class MainActivity : ComponentActivity() {
                         onCleanupResultDismissed = ::onCleanupResultDismissed,
                         onCleanupSucceeded = ::onCleanupSucceeded,
                         onReturnedToClean = ::onReturnedToClean,
+                        onDeepDuplicateCheck = ::runDeepDuplicateCheck,
                         onUninstallApp = ::uninstallApp,
                         onOpenAppInfo = ::openAppInfo,
                         onOpenLanguageSettings = ::openLanguageSettings,
@@ -482,6 +483,30 @@ class MainActivity : ComponentActivity() {
 
     private fun showPrivacyOptions() {
         consentManager.showPrivacyOptions(this)
+    }
+
+    /**
+     * "Watch and verify" (T1B.6): the reward runs the deep duplicate check.
+     * Without a ready ad, inside the ad-free window or without consent the
+     * check runs right away; the user is never locked out. Closing the ad
+     * early (no reward) does not start it.
+     */
+    private fun runDeepDuplicateCheck() {
+        val app = application as DepoAkilliApplication
+        if (app.adFreeWindow.isActiveNow() || !consentManager.canRequestAds.value || !rewardedAds.isReady.value) {
+            cleanerViewModel.runDeepDuplicateCheck()
+            return
+        }
+        rewardedAds.show(
+            activity = this,
+            onWillShow = {
+                adFrequency.update { AdPolicy.recordFullScreen(it, System.currentTimeMillis()) }
+                app.beginInterstitialSurface()
+            },
+            onUserEarnedReward = { cleanerViewModel.runDeepDuplicateCheck() },
+            onFinished = { app.endInterstitialSurface() },
+            onUnavailable = { cleanerViewModel.runDeepDuplicateCheck() },
+        )
     }
 
     private fun showRewardedAd() {

@@ -131,6 +131,8 @@ data class CleanerUiState(
     val swipeStates: Map<CleanupGroup, SwipeReviewState> = emptyMap(),
     /** Plan group behind the open grid review, used for the grid/swipe toggle. */
     val smartCategoryReviewGroup: CleanupGroup? = null,
+    /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
+    val deepCheckRunning: Boolean = false,
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -1080,6 +1082,26 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             val verified = runSuspendCatching { repository.verifyDuplicate(item) }.getOrNull()
             _state.update { state ->
                 state.copy(summary = state.summary.copy(items = PlanSelection.applyVerification(state.summary.items, id, verified)))
+            }
+        }
+    }
+
+    /**
+     * Deep duplicate check (T1B.6): full verification of the largest
+     * look-alike groups. Started by the user only, never during a scan.
+     */
+    fun runDeepDuplicateCheck() {
+        val current = _state.value
+        if (current.deepCheckRunning || current.scanning || current.cleanupInProgress) return
+        _state.update { it.copy(deepCheckRunning = true) }
+        viewModelScope.launch {
+            val results = runSuspendCatching { repository.verifyLargeDuplicateGroups(current.summary.items) }
+                .getOrDefault(emptyMap())
+            _state.update { state ->
+                state.copy(
+                    deepCheckRunning = false,
+                    summary = state.summary.copy(items = PlanSelection.applyVerifications(state.summary.items, results)),
+                )
             }
         }
     }
