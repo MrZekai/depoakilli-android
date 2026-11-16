@@ -792,4 +792,38 @@
     <string name="feedback_copy_address">Adresi kopyala</string>
     <string name="feedback_open_email">E-posta uygulamasını aç</string>
     <string name="feedback_address_copied">Adres kopyalandı</string>
+    <string name="plan_group_apk_installed">Yüklü uygulamaların kurulum dosyaları</string>
+    <string name="plan_group_duplicate_safe">Fazla kopyalar</string>
+    <string name="plan_group_thumbnails">Önizleme önbelleği</string>
+    <string name="plan_group_temp_files">Artık geçici dosyalar</string>
+    <string name="plan_group_partial_downloads">Yarım kalmış indirmeler</string>
+    <string name="plan_group_apk_old_version">Eski kurulum dosyası sürümleri</string>
+    <string name="plan_group_apk_other">Diğer kurulum dosyaları</string>
+    <string name="plan_group_duplicate_personal">Dosyalarınızın kopyaları</string>
+    <string name="plan_group_duplicate_unverified">Aynı görünen dosyalar</string>
+    <string name="plan_group_large_video">Büyük eski videolar</string>
+    <string name="plan_group_screen_recording">Ekran kayıtları</string>
+    <string name="plan_group_screenshot">Eski ekran görüntüleri</string>
+    <string name="plan_group_download_file">Eski indirmeler</string>
+    <string name="plan_group_download_document">Eski indirilen belgeler ve fotoğraflar</string>
+    <string name="plan_group_large_other">Büyük dosyalar</string>
+    <string name="plan_group_whatsapp_sent">WhatsApp\'ta gönderdiğiniz medya</string>
+    <string name="plan_group_whatsapp_video">Büyük WhatsApp videoları</string>
+    <string name="plan_group_whatsapp_voice">Eski WhatsApp sesli mesajları</string>
+    <string name="plan_group_whatsapp_status">Eski WhatsApp durumları</string>
+    <string name="reason_apk_installed">Bu uygulama bu sürüm veya daha yenisiyle zaten yüklü</string>
+    <string name="reason_apk_old_version">Bu uygulamanın daha yeni bir kurulum dosyası da cihazınızda</string>
+    <string name="reason_whatsapp_video">Büyük WhatsApp videosu</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Yarım kalmış indirme • Yaş (gün): %1$d</item>
+        <item quantity="other">Yarım kalmış indirme • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Ekran kaydı • Yaş (gün): %1$d</item>
+        <item quantity="other">Ekran kaydı • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Sesli mesaj • Yaş (gün): %1$d</item>
+        <item quantity="other">Sesli mesaj • Yaş (gün): %1$d</item>
+    </plurals>
 </resources>

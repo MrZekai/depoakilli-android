@@ -795,4 +795,38 @@
     <string name="feedback_copy_address">Copiar dirección</string>
     <string name="feedback_open_email">Abrir app de correo</string>
     <string name="feedback_address_copied">Dirección copiada</string>
+    <string name="plan_group_apk_installed">Instaladores de apps que ya tienes</string>
+    <string name="plan_group_duplicate_safe">Copias adicionales</string>
+    <string name="plan_group_thumbnails">Caché de vistas previas</string>
+    <string name="plan_group_temp_files">Archivos temporales sobrantes</string>
+    <string name="plan_group_partial_downloads">Descargas sin terminar</string>
+    <string name="plan_group_apk_old_version">Versiones antiguas de instaladores</string>
+    <string name="plan_group_apk_other">Otros instaladores</string>
+    <string name="plan_group_duplicate_personal">Copias de tus archivos</string>
+    <string name="plan_group_duplicate_unverified">Archivos que parecen idénticos</string>
+    <string name="plan_group_large_video">Videos antiguos grandes</string>
+    <string name="plan_group_screen_recording">Grabaciones de pantalla</string>
+    <string name="plan_group_screenshot">Capturas de pantalla antiguas</string>
+    <string name="plan_group_download_file">Descargas antiguas</string>
+    <string name="plan_group_download_document">Documentos y fotos descargados antiguos</string>
+    <string name="plan_group_large_other">Archivos grandes</string>
+    <string name="plan_group_whatsapp_sent">Archivos de WhatsApp que enviaste</string>
+    <string name="plan_group_whatsapp_video">Videos grandes de WhatsApp</string>
+    <string name="plan_group_whatsapp_voice">Notas de voz antiguas de WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Estados antiguos de WhatsApp</string>
+    <string name="reason_apk_installed">Esta app ya está instalada con esta versión o una más reciente</string>
+    <string name="reason_apk_old_version">También tienes un instalador más reciente de esta app</string>
+    <string name="reason_whatsapp_video">Video grande de WhatsApp</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Descarga sin terminar • Antigüedad en días: %1$d</item>
+        <item quantity="other">Descarga sin terminar • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Grabación de pantalla • Antigüedad en días: %1$d</item>
+        <item quantity="other">Grabación de pantalla • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Nota de voz • Antigüedad en días: %1$d</item>
+        <item quantity="other">Nota de voz • Antigüedad en días: %1$d</item>
+    </plurals>
 </resources>

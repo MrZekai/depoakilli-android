@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.model
 
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import com.mrzekai.depoakilli.R
 import java.util.Locale
@@ -16,6 +17,56 @@ enum class CleanCategory(
     APK_PACKAGE(R.string.category_apk_packages, R.string.category_apk_packages_description),
     APP_CACHE(R.string.category_app_cache, R.string.category_app_cache_description),
     WHATSAPP_MEDIA(R.string.category_whatsapp, R.string.category_whatsapp_description),
+}
+
+enum class DeleteMode { PERMANENT, TRASH }
+
+/**
+ * Rows of the cleanup plan. Auto groups are preselected; Review groups are
+ * listed for the user to decide. Nothing is deleted without confirmation.
+ */
+enum class CleanupGroup(
+    @StringRes val titleRes: Int,
+    @StringRes val reasonRes: Int,
+    @PluralsRes val reasonPluralRes: Int?,
+    val auto: Boolean,
+    val deleteMode: DeleteMode,
+    val groupSelectable: Boolean = true,
+) {
+    APK_INSTALLED(R.string.plan_group_apk_installed, R.string.reason_apk_installed, null, true, DeleteMode.PERMANENT),
+    DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.PERMANENT),
+    THUMBNAILS(R.string.plan_group_thumbnails, 0, R.plurals.reason_thumbnail_cache, true, DeleteMode.PERMANENT),
+    TEMP_FILES(R.string.plan_group_temp_files, 0, R.plurals.reason_temporary_file, true, DeleteMode.PERMANENT),
+    PARTIAL_DOWNLOADS(R.string.plan_group_partial_downloads, 0, R.plurals.reason_partial_download, true, DeleteMode.TRASH),
+    APK_OLD_VERSION(R.string.plan_group_apk_old_version, R.string.reason_apk_old_version, null, false, DeleteMode.TRASH),
+    APK_OTHER(R.string.plan_group_apk_other, R.string.reason_downloaded_installer, null, false, DeleteMode.TRASH),
+    DUPLICATE_PERSONAL(R.string.plan_group_duplicate_personal, R.string.reason_exact_duplicate, null, false, DeleteMode.TRASH),
+    DUPLICATE_UNVERIFIED(R.string.plan_group_duplicate_unverified, R.string.reason_sampled_duplicate, null, false, DeleteMode.TRASH, groupSelectable = false),
+    LARGE_VIDEO(R.string.plan_group_large_video, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
+    SCREEN_RECORDING(R.string.plan_group_screen_recording, 0, R.plurals.reason_screen_recording, false, DeleteMode.TRASH),
+    SCREENSHOT(R.string.plan_group_screenshot, 0, R.plurals.reason_old_screenshot, false, DeleteMode.TRASH),
+    DOWNLOAD_FILE(R.string.plan_group_download_file, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
+    DOWNLOAD_DOCUMENT(R.string.plan_group_download_document, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH, groupSelectable = false),
+    LARGE_OTHER(R.string.plan_group_large_other, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
+    WHATSAPP_SENT(R.string.plan_group_whatsapp_sent, 0, R.plurals.reason_whatsapp_sent, false, DeleteMode.TRASH),
+    WHATSAPP_VIDEO(R.string.plan_group_whatsapp_video, R.string.reason_whatsapp_video, null, false, DeleteMode.TRASH),
+    WHATSAPP_VOICE(R.string.plan_group_whatsapp_voice, 0, R.plurals.reason_whatsapp_voice, false, DeleteMode.TRASH),
+    WHATSAPP_STATUS(R.string.plan_group_whatsapp_status, R.string.reason_whatsapp_status, null, false, DeleteMode.TRASH),
+    ;
+
+    companion object {
+        /** Fallback used by tool screens that build assessments without the plan engine. */
+        fun fromCategory(category: CleanCategory): CleanupGroup = when (category) {
+            CleanCategory.JUNK -> TEMP_FILES
+            CleanCategory.DUPLICATE -> DUPLICATE_PERSONAL
+            CleanCategory.SCREENSHOT -> SCREENSHOT
+            CleanCategory.LARGE_FILE -> LARGE_OTHER
+            CleanCategory.OLD_DOWNLOAD -> DOWNLOAD_FILE
+            CleanCategory.APK_PACKAGE -> APK_OTHER
+            CleanCategory.APP_CACHE -> LARGE_OTHER
+            CleanCategory.WHATSAPP_MEDIA -> WHATSAPP_SENT
+        }
+    }
 }
 
 enum class ScanFocus {
@@ -64,6 +115,7 @@ data class IndexedFile(
     val modifiedAtMillis: Long,
     val relativePath: String,
     val volumeRoot: String = "",
+    val createdAtMillis: Long = 0,
 )
 
 
@@ -96,6 +148,9 @@ data class AiAssessment(
     val recommended: Boolean,
     val reasonPluralRes: Int? = null,
     val reasonQuantity: Int = 0,
+    val group: CleanupGroup = CleanupGroup.fromCategory(category),
+    val apkPackageName: String? = null,
+    val apkVersionCode: Long? = null,
 )
 
 data class CleanableItem(
@@ -111,6 +166,9 @@ data class CleanableItem(
     val protectedDuplicateName: String? = null,
     val protectedDuplicateUri: String? = null,
     val protectedDuplicateSizeBytes: Long? = null,
+    val volumeRoot: String = "",
+    val protectedDuplicateRelativePath: String? = null,
+    val protectedDuplicateVolumeRoot: String = "",
 )
 
 data class WhatsAppMediaItem(
@@ -219,18 +277,17 @@ data class ScanSummary(
     val storageTypes: List<StorageTypeStat> = emptyList(),
     val storagePreviews: Map<StorageFileType, List<IndexedFile>> = emptyMap(),
     val smartMediaTypes: List<StorageTypeStat> = emptyList(),
+    val truncated: Boolean = false,
 ) {
+    /** Cleanup plan derived from [items]; always reflects the current selection. */
+    val plan: CleanupPlan by lazy(LazyThreadSafetyMode.NONE) { buildPlan(items, truncated) }
     val selectedItems: List<CleanableItem> by lazy(LazyThreadSafetyMode.NONE) {
         items.filter(CleanableItem::selected)
     }
     val selectedBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
         selectedItems.sumOf(CleanableItem::sizeBytes)
     }
-    val safeSuggestedBytes: Long by lazy(LazyThreadSafetyMode.NONE) {
-        items.asSequence()
-            .filter { it.assessment.recommended }
-            .sumOf(CleanableItem::sizeBytes)
-    }
+    val safeSuggestedBytes: Long by lazy(LazyThreadSafetyMode.NONE) { plan.recommendedBytes }
     val reviewItems: List<CleanableItem> by lazy(LazyThreadSafetyMode.NONE) {
         items.filterNot { it.assessment.recommended }
     }

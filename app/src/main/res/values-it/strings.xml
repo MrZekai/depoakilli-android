@@ -804,4 +804,41 @@
     <string name="feedback_copy_address">Copia indirizzo</string>
     <string name="feedback_open_email">Apri l\'app di posta elettronica</string>
     <string name="feedback_address_copied">Indirizzo copiato</string>
+    <string name="plan_group_apk_installed">Installer di app già presenti</string>
+    <string name="plan_group_duplicate_safe">Copie in più</string>
+    <string name="plan_group_thumbnails">Cache delle anteprime</string>
+    <string name="plan_group_temp_files">File temporanei residui</string>
+    <string name="plan_group_partial_downloads">Download non completati</string>
+    <string name="plan_group_apk_old_version">Versioni precedenti degli installer</string>
+    <string name="plan_group_apk_other">Altri installer</string>
+    <string name="plan_group_duplicate_personal">Copie dei tuoi file</string>
+    <string name="plan_group_duplicate_unverified">File che sembrano identici</string>
+    <string name="plan_group_large_video">Video vecchi di grandi dimensioni</string>
+    <string name="plan_group_screen_recording">Registrazioni dello schermo</string>
+    <string name="plan_group_screenshot">Schermate vecchie</string>
+    <string name="plan_group_download_file">Download vecchi</string>
+    <string name="plan_group_download_document">Documenti e foto scaricati vecchi</string>
+    <string name="plan_group_large_other">File di grandi dimensioni</string>
+    <string name="plan_group_whatsapp_sent">Media WhatsApp che hai inviato</string>
+    <string name="plan_group_whatsapp_video">Video WhatsApp di grandi dimensioni</string>
+    <string name="plan_group_whatsapp_voice">Vecchi messaggi vocali WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Vecchi stati WhatsApp</string>
+    <string name="reason_apk_installed">Questa app è già installata con questa versione o una più recente</string>
+    <string name="reason_apk_old_version">Sul dispositivo c’è anche un installer più recente di questa app</string>
+    <string name="reason_whatsapp_video">Video WhatsApp di grandi dimensioni</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Download non completato • Età in giorni: %1$d</item>
+        <item quantity="many">Download non completato • Età in giorni: %1$d</item>
+        <item quantity="other">Download non completato • Età in giorni: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Registrazione dello schermo • Età in giorni: %1$d</item>
+        <item quantity="many">Registrazione dello schermo • Età in giorni: %1$d</item>
+        <item quantity="other">Registrazione dello schermo • Età in giorni: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Messaggio vocale • Età in giorni: %1$d</item>
+        <item quantity="many">Messaggio vocale • Età in giorni: %1$d</item>
+        <item quantity="other">Messaggio vocale • Età in giorni: %1$d</item>
+    </plurals>
 </resources>

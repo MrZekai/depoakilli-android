@@ -795,4 +795,38 @@
     <string name="feedback_copy_address">Copiar endereço</string>
     <string name="feedback_open_email">Abrir app de e-mail</string>
     <string name="feedback_address_copied">Endereço copiado</string>
+    <string name="plan_group_apk_installed">Instaladores de apps que você já tem</string>
+    <string name="plan_group_duplicate_safe">Cópias extras</string>
+    <string name="plan_group_thumbnails">Cache de pré-visualização</string>
+    <string name="plan_group_temp_files">Arquivos temporários restantes</string>
+    <string name="plan_group_partial_downloads">Downloads incompletos</string>
+    <string name="plan_group_apk_old_version">Versões antigas de instaladores</string>
+    <string name="plan_group_apk_other">Outros instaladores</string>
+    <string name="plan_group_duplicate_personal">Cópias dos seus arquivos</string>
+    <string name="plan_group_duplicate_unverified">Arquivos que parecem idênticos</string>
+    <string name="plan_group_large_video">Vídeos antigos grandes</string>
+    <string name="plan_group_screen_recording">Gravações de tela</string>
+    <string name="plan_group_screenshot">Capturas de tela antigas</string>
+    <string name="plan_group_download_file">Downloads antigos</string>
+    <string name="plan_group_download_document">Documentos e fotos baixados antigos</string>
+    <string name="plan_group_large_other">Arquivos grandes</string>
+    <string name="plan_group_whatsapp_sent">Mídia do WhatsApp que você enviou</string>
+    <string name="plan_group_whatsapp_video">Vídeos grandes do WhatsApp</string>
+    <string name="plan_group_whatsapp_voice">Mensagens de voz antigas do WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Status antigos do WhatsApp</string>
+    <string name="reason_apk_installed">Este app já está instalado nesta versão ou em uma mais recente</string>
+    <string name="reason_apk_old_version">Há também um instalador mais recente deste app no dispositivo</string>
+    <string name="reason_whatsapp_video">Vídeo grande do WhatsApp</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Download incompleto • Idade em dias: %1$d</item>
+        <item quantity="other">Download incompleto • Idade em dias: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Gravação de tela • Idade em dias: %1$d</item>
+        <item quantity="other">Gravação de tela • Idade em dias: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Mensagem de voz • Idade em dias: %1$d</item>
+        <item quantity="other">Mensagem de voz • Idade em dias: %1$d</item>
+    </plurals>
 </resources>

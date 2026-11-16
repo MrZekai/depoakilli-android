@@ -897,4 +897,52 @@
     <string name="feedback_copy_address">انسخ العنوان</string>
     <string name="feedback_open_email">افتح تطبيق البريد الإلكتروني</string>
     <string name="feedback_address_copied">تم نسخ العنوان</string>
+    <string name="plan_group_apk_installed">مثبّتات لتطبيقات مثبّتة بالفعل</string>
+    <string name="plan_group_duplicate_safe">نسخ إضافية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_thumbnails">ذاكرة المعاينات المؤقتة</string>
+    <string name="plan_group_temp_files">ملفات مؤقتة متبقية</string>
+    <string name="plan_group_partial_downloads">تنزيلات غير مكتملة</string>
+    <string name="plan_group_apk_old_version">إصدارات أقدم من المثبّتات</string>
+    <string name="plan_group_apk_other">مثبّتات أخرى</string>
+    <string name="plan_group_duplicate_personal">نسخ من ملفاتك</string>
+    <string name="plan_group_duplicate_unverified">ملفات تبدو متطابقة</string>
+    <string name="plan_group_large_video">مقاطع فيديو قديمة كبيرة</string>
+    <string name="plan_group_screen_recording">تسجيلات الشاشة</string>
+    <string name="plan_group_screenshot">لقطات شاشة قديمة</string>
+    <string name="plan_group_download_file">تنزيلات قديمة</string>
+    <string name="plan_group_download_document">مستندات وصور قديمة تم تنزيلها</string>
+    <string name="plan_group_large_other">ملفات كبيرة</string>
+    <string name="plan_group_whatsapp_sent">وسائط WhatsApp التي أرسلتها</string>
+    <string name="plan_group_whatsapp_video">مقاطع فيديو WhatsApp كبيرة</string>
+    <string name="plan_group_whatsapp_voice">رسائل WhatsApp الصوتية القديمة</string>
+    <string name="plan_group_whatsapp_status">حالات WhatsApp القديمة</string>
+    <string name="reason_apk_installed">هذا التطبيق مثبّت بالفعل بهذا الإصدار أو بإصدار أحدث</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_apk_old_version">يوجد أيضًا مثبّت أحدث لهذا التطبيق على جهازك</string>
+    <string name="reason_whatsapp_video">مقطع فيديو WhatsApp كبير</string>
+    <plurals name="reason_partial_download">
+        <item quantity="zero">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="one">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="two">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="few">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="many">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="other">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="zero">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="one">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="two">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="few">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="many">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="other">تسجيل شاشة • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="zero">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="one">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="two">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="few">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="many">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="other">رسالة صوتية • العمر بالأيام: %1$d</item>
+    </plurals>
 </resources>

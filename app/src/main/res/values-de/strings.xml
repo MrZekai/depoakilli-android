@@ -773,4 +773,38 @@
     <string name="feedback_copy_address">Adresse kopieren</string>
     <string name="feedback_open_email">E-Mail-App öffnen</string>
     <string name="feedback_address_copied">Adresse kopiert</string>
+    <string name="plan_group_apk_installed">Installer bereits installierter Apps</string>
+    <string name="plan_group_duplicate_safe">Zusätzliche Kopien</string>
+    <string name="plan_group_thumbnails">Vorschau-Cache</string>
+    <string name="plan_group_temp_files">Übrige temporäre Dateien</string>
+    <string name="plan_group_partial_downloads">Unvollständige Downloads</string>
+    <string name="plan_group_apk_old_version">Ältere Installer-Versionen</string>
+    <string name="plan_group_apk_other">Andere Installer</string>
+    <string name="plan_group_duplicate_personal">Kopien Ihrer Dateien</string>
+    <string name="plan_group_duplicate_unverified">Scheinbar identische Dateien</string>
+    <string name="plan_group_large_video">Große alte Videos</string>
+    <string name="plan_group_screen_recording">Bildschirmaufnahmen</string>
+    <string name="plan_group_screenshot">Alte Screenshots</string>
+    <string name="plan_group_download_file">Alte Downloads</string>
+    <string name="plan_group_download_document">Alte heruntergeladene Dokumente und Fotos</string>
+    <string name="plan_group_large_other">Große Dateien</string>
+    <string name="plan_group_whatsapp_sent">Von Ihnen gesendete WhatsApp-Medien</string>
+    <string name="plan_group_whatsapp_video">Große WhatsApp-Videos</string>
+    <string name="plan_group_whatsapp_voice">Alte WhatsApp-Sprachnachrichten</string>
+    <string name="plan_group_whatsapp_status">Alte WhatsApp-Status</string>
+    <string name="reason_apk_installed">Diese App ist bereits in dieser oder einer neueren Version installiert</string>
+    <string name="reason_apk_old_version">Auf dem Gerät gibt es auch einen neueren Installer dieser App</string>
+    <string name="reason_whatsapp_video">Großes WhatsApp-Video</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Unvollständiger Download • Alter in Tagen: %1$d</item>
+        <item quantity="other">Unvollständiger Download • Alter in Tagen: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Bildschirmaufnahme • Alter in Tagen: %1$d</item>
+        <item quantity="other">Bildschirmaufnahme • Alter in Tagen: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Sprachnachricht • Alter in Tagen: %1$d</item>
+        <item quantity="other">Sprachnachricht • Alter in Tagen: %1$d</item>
+    </plurals>
 </resources>

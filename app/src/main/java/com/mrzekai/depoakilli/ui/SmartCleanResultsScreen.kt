@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.ui
 
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
@@ -870,7 +871,7 @@ private fun unusedAppsForSmartReview(
 ): List<InstalledAppEntry> {
     if (!hasUsageAccess) return emptyList()
     val now = System.currentTimeMillis()
-    val threshold = TimeUnit.DAYS.toMillis(UNUSED_APP_DAYS)
+    val threshold = TimeUnit.DAYS.toMillis(CleaningThresholds.UNUSED_APP_DAYS)
     return apps
         .asSequence()
         // Preinstalled system apps cannot be uninstalled by the user, so they
@@ -1220,7 +1221,6 @@ private fun daysSinceLastUse(lastUsedMillis: Long): Long {
     )
 }
 
-private const val UNUSED_APP_DAYS = 60L
 
 @Composable
 private fun SmartCleanHero(summary: ScanSummary) {

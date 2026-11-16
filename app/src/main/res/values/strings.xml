@@ -792,4 +792,38 @@
     <string name="feedback_copy_address">Copy address</string>
     <string name="feedback_open_email">Open email app</string>
     <string name="feedback_address_copied">Address copied</string>
+    <string name="plan_group_apk_installed">Installers for apps you already have</string>
+    <string name="plan_group_duplicate_safe">Extra copies</string>
+    <string name="plan_group_thumbnails">Preview cache</string>
+    <string name="plan_group_temp_files">Leftover temporary files</string>
+    <string name="plan_group_partial_downloads">Unfinished downloads</string>
+    <string name="plan_group_apk_old_version">Older installer versions</string>
+    <string name="plan_group_apk_other">Other installers</string>
+    <string name="plan_group_duplicate_personal">Copies of your files</string>
+    <string name="plan_group_duplicate_unverified">Files that look identical</string>
+    <string name="plan_group_large_video">Large old videos</string>
+    <string name="plan_group_screen_recording">Screen recordings</string>
+    <string name="plan_group_screenshot">Old screenshots</string>
+    <string name="plan_group_download_file">Old downloads</string>
+    <string name="plan_group_download_document">Old downloaded documents and photos</string>
+    <string name="plan_group_large_other">Large files</string>
+    <string name="plan_group_whatsapp_sent">WhatsApp media you sent</string>
+    <string name="plan_group_whatsapp_video">Large WhatsApp videos</string>
+    <string name="plan_group_whatsapp_voice">Old WhatsApp voice notes</string>
+    <string name="plan_group_whatsapp_status">Old WhatsApp statuses</string>
+    <string name="reason_apk_installed">This app is already installed with this version or newer</string>
+    <string name="reason_apk_old_version">A newer installer for this app is also on your device</string>
+    <string name="reason_whatsapp_video">Large WhatsApp video</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Unfinished download • Age in days: %1$d</item>
+        <item quantity="other">Unfinished download • Age in days: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Screen recording • Age in days: %1$d</item>
+        <item quantity="other">Screen recording • Age in days: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Voice note • Age in days: %1$d</item>
+        <item quantity="other">Voice note • Age in days: %1$d</item>
+    </plurals>
 </resources>

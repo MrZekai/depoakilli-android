@@ -742,4 +742,35 @@
     <string name="feedback_copy_address">Salin alamat</string>
     <string name="feedback_open_email">Buka aplikasi email</string>
     <string name="feedback_address_copied">Alamat disalin</string>
+    <string name="plan_group_apk_installed">Penginstal aplikasi yang sudah terpasang</string>
+    <string name="plan_group_duplicate_safe">Salinan tambahan</string>
+    <string name="plan_group_thumbnails">Cache pratinjau</string>
+    <string name="plan_group_temp_files">Sisa file sementara</string>
+    <string name="plan_group_partial_downloads">Unduhan yang belum selesai</string>
+    <string name="plan_group_apk_old_version">Versi penginstal lama</string>
+    <string name="plan_group_apk_other">Penginstal lainnya</string>
+    <string name="plan_group_duplicate_personal">Salinan file Anda</string>
+    <string name="plan_group_duplicate_unverified">File yang tampak identik</string>
+    <string name="plan_group_large_video">Video lama berukuran besar</string>
+    <string name="plan_group_screen_recording">Rekaman layar</string>
+    <string name="plan_group_screenshot">Tangkapan layar lama</string>
+    <string name="plan_group_download_file">Unduhan lama</string>
+    <string name="plan_group_download_document">Dokumen dan foto unduhan lama</string>
+    <string name="plan_group_large_other">File besar</string>
+    <string name="plan_group_whatsapp_sent">Media WhatsApp yang Anda kirim</string>
+    <string name="plan_group_whatsapp_video">Video WhatsApp berukuran besar</string>
+    <string name="plan_group_whatsapp_voice">Pesan suara WhatsApp lama</string>
+    <string name="plan_group_whatsapp_status">Status WhatsApp lama</string>
+    <string name="reason_apk_installed">Aplikasi ini sudah terpasang dengan versi ini atau yang lebih baru</string>
+    <string name="reason_apk_old_version">Penginstal yang lebih baru untuk aplikasi ini juga ada di perangkat</string>
+    <string name="reason_whatsapp_video">Video WhatsApp berukuran besar</string>
+    <plurals name="reason_partial_download">
+        <item quantity="other">Unduhan belum selesai • Usia dalam hari: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="other">Rekaman layar • Usia dalam hari: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="other">Pesan suara • Usia dalam hari: %1$d</item>
+    </plurals>
 </resources>

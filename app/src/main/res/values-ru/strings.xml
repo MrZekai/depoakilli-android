@@ -835,4 +835,45 @@
     <string name="feedback_copy_address">Копировать адрес</string>
     <string name="feedback_open_email">Открыть почтовое приложение</string>
     <string name="feedback_address_copied">Адрес скопирован</string>
+    <string name="plan_group_apk_installed">Установщики уже установленных приложений</string>
+    <string name="plan_group_duplicate_safe">Лишние копии</string>
+    <string name="plan_group_thumbnails">Кэш миниатюр</string>
+    <string name="plan_group_temp_files">Оставшиеся временные файлы</string>
+    <string name="plan_group_partial_downloads">Незавершённые загрузки</string>
+    <string name="plan_group_apk_old_version">Старые версии установщиков</string>
+    <string name="plan_group_apk_other">Другие установщики</string>
+    <string name="plan_group_duplicate_personal">Копии ваших файлов</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">Файлы, похожие на одинаковые</string>
+    <string name="plan_group_large_video">Большие старые видео</string>
+    <string name="plan_group_screen_recording">Записи экрана</string>
+    <string name="plan_group_screenshot">Старые снимки экрана</string>
+    <string name="plan_group_download_file">Старые загрузки</string>
+    <string name="plan_group_download_document">Старые загруженные документы и фото</string>
+    <string name="plan_group_large_other">Большие файлы</string>
+    <string name="plan_group_whatsapp_sent">Отправленные вами медиафайлы WhatsApp</string>
+    <string name="plan_group_whatsapp_video">Большие видео WhatsApp</string>
+    <string name="plan_group_whatsapp_voice">Старые голосовые сообщения WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Старые статусы WhatsApp</string>
+    <string name="reason_apk_installed">Это приложение уже установлено в этой или более новой версии</string>
+    <string name="reason_apk_old_version">На устройстве есть и более новый установщик этого приложения</string>
+    <string name="reason_whatsapp_video">Большое видео WhatsApp</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Незавершённая загрузка • Возраст (дней): %1$d</item>
+        <item quantity="few">Незавершённая загрузка • Возраст (дней): %1$d</item>
+        <item quantity="many">Незавершённая загрузка • Возраст (дней): %1$d</item>
+        <item quantity="other">Незавершённая загрузка • Возраст (дней): %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Запись экрана • Возраст (дней): %1$d</item>
+        <item quantity="few">Запись экрана • Возраст (дней): %1$d</item>
+        <item quantity="many">Запись экрана • Возраст (дней): %1$d</item>
+        <item quantity="other">Запись экрана • Возраст (дней): %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Голосовое сообщение • Возраст (дней): %1$d</item>
+        <item quantity="few">Голосовое сообщение • Возраст (дней): %1$d</item>
+        <item quantity="many">Голосовое сообщение • Возраст (дней): %1$d</item>
+        <item quantity="other">Голосовое сообщение • Возраст (дней): %1$d</item>
+    </plurals>
 </resources>
