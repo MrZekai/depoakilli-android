@@ -1327,13 +1327,20 @@ for expected in (
     "actions/checkout@v7",
     "actions/setup-java@v5",
     "gradle/actions/setup-gradle@v6",
-    "run: ./gradlew --stacktrace test",
-    "run: ./gradlew --stacktrace lint",
+    "run: ./gradlew --stacktrace testDebugUnitTest",
+    "run: ./gradlew --stacktrace lintDebug",
     "assembleQa",
     "Verify stable test signing certificate",
 ):
     if expected not in workflow:
         errors.append(f"missing CI invariant: {expected}")
+
+phase_check = workflow.split("  phase-zero-full:", 1)
+if len(phase_check) != 2 or not all(
+    expected in phase_check[1]
+    for expected in ("./gradlew --stacktrace test", "./gradlew --stacktrace lint")
+):
+    errors.append("phase-zero CI must run full test and lint tasks")
 
 qa_signing_verifier = read("scripts/verify-qa-signing.sh")
 for expected in ("apksigner", "apksigner.bat", "apksigner.exe"):
