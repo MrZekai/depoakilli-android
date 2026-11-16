@@ -281,17 +281,21 @@ class DeviceRepository(
     suspend fun scan(
         focus: ScanFocus = ScanFocus.SMART,
         onProgress: (Int, Int) -> Unit = { _, _ -> },
+        onHashProgress: HashProgress = { _, _ -> },
     ): ScanSummary = withContext(Dispatchers.IO) {
         if (!hasAllFilesAccess()) {
             return@withContext ScanSummary(limitedAccess = true)
         }
 
+        // Smart and Deep always re-index; tool scans reuse a fresh (90 s) index.
+        val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP && focus != ScanFocus.WHATSAPP
         val indexed = if (focus == ScanFocus.WHATSAPP) {
             indexWhatsAppFiles(onProgress)
         } else {
-            indexSharedStorage { visitedDirectories, discoveredFiles ->
-                onProgress(visitedDirectories, discoveredFiles)
-            }.also(::cacheSharedIndex)
+            (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
+                ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
+                    onProgress(visitedDirectories, discoveredFiles)
+                }.also(::cacheSharedIndex)
         }
         val assessments = ArrayList<CleanableItem>()
         var duplicateResult = DuplicatePolicy.ScanResult()
@@ -328,6 +332,7 @@ class DeviceRepository(
                 } else {
                     CleaningThresholds.SMART_VERIFY_MAX_BYTES
                 },
+                onHashProgress = onHashProgress,
             )
         }
 
@@ -666,6 +671,11 @@ class DeviceRepository(
     ): List<IndexedFile> {
         val roots = sharedStorageRoots().mapNotNull(::scanRoot)
         if (roots.isEmpty()) return emptyList()
+        // An unreadable primary volume must surface as a failed scan, never as
+        // an empty "nothing to clean" result or a fake storage-change snapshot.
+        if (runCatching { roots.first().file.listFiles() }.getOrNull() == null) {
+            throw java.io.IOException("Shared storage root is not readable")
+        }
 
         val output = ArrayList<IndexedFile>()
         val pending = ArrayDeque<Pair<ScanRoot, File>>()

@@ -70,6 +70,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -184,6 +185,7 @@ internal fun SmartCleanResultsScreen(
     onClearAppCaches: () -> Unit = {},
     planHeader: LazyListScope.() -> Unit = {},
     reviewAd: LazyListScope.(Int) -> Unit = {},
+    onCancelScan: () -> Unit = {},
 ) {
     when {
         !state.hasAllFilesAccess -> SmartAccessRequired(
@@ -191,7 +193,7 @@ internal fun SmartCleanResultsScreen(
             modifier = modifier,
         )
 
-        state.scanning -> SmartScanningState(state = state, modifier = modifier)
+        state.scanning -> SmartScanningState(state = state, onCancel = onCancelScan, modifier = modifier)
         !state.lastScanCompleted -> SmartEmptyState(onScan = onScan, modifier = modifier)
         else -> SmartResultsContent(
             summary = state.summary,
@@ -254,7 +256,7 @@ private fun SmartAccessRequired(onRequest: () -> Unit, modifier: Modifier) {
 }
 
 @Composable
-private fun SmartScanningState(state: CleanerUiState, modifier: Modifier) {
+internal fun SmartScanningState(state: CleanerUiState, onCancel: () -> Unit, modifier: Modifier) {
     Box(
         modifier
             .fillMaxSize()
@@ -429,6 +431,31 @@ private fun SmartScanningState(state: CleanerUiState, modifier: Modifier) {
                         fontWeight = FontWeight.SemiBold,
                     )
                 }
+            }
+
+            if (state.scanHashing) {
+                Text(
+                    stringResource(R.string.scan_stage_exact_copies),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                )
+                val total = state.scanHashTotalBytes
+                if (total > 0L) {
+                    LinearProgressIndicator(
+                        progress = { (state.scanHashDoneBytes.toFloat() / total.toFloat()).coerceIn(0f, 1f) },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = SmartGreen,
+                    )
+                } else {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = SmartGreen)
+                }
+            }
+
+            OutlinedButton(
+                onClick = onCancel,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) {
+                Text(stringResource(R.string.cancel))
             }
         }
     }
