@@ -1482,7 +1482,8 @@ private fun StorageDetailPage(
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
-                } else if (review.items.isNotEmpty()) {
+                } else if (review.items.isNotEmpty() && type !in PERSONAL_STORAGE_TYPES) {
+                    // Photos, videos and documents are personal: no "Select all" (T2.4).
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -2381,3 +2382,5 @@ private fun fileVisual(mimeType: String, name: String): ImageVector {
 }
 
 private const val LIST_AD_AFTER_ITEMS = 12
+
+internal val PERSONAL_STORAGE_TYPES = setOf(StorageFileType.IMAGES, StorageFileType.VIDEOS, StorageFileType.DOCUMENTS)

@@ -1027,6 +1027,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun toggleAllStorageReviewItems() {
+        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES) return
         _state.update { state ->
             val items = state.storageReview.items
             val select = items.any { !it.selected }
@@ -1057,7 +1058,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        if (item.assessment.category == category) item.copy(selected = select) else item
+                        val excluded = select && item.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED
+                        if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
             )
@@ -1208,11 +1210,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
 
     fun setItemsSelected(ids: Set<String>, selected: Boolean) {
         if (ids.isEmpty()) return
+        // Look-alike copies are never part of a bulk "select all" (T2.4).
+        val bulk = ids.size > 1
         _state.update { state ->
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        if (item.id in ids && item.selected != selected) item.copy(selected = selected) else item
+                        val excluded = bulk && selected && item.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED
+                        if (item.id in ids && item.selected != selected && !excluded) item.copy(selected = selected) else item
                     },
                 ),
             )
