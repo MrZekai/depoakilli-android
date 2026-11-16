@@ -1327,8 +1327,8 @@ for expected in (
     "actions/checkout@v7",
     "actions/setup-java@v5",
     "gradle/actions/setup-gradle@v6",
-    "testDebugUnitTest",
-    "lintDebug",
+    "run: ./gradlew --stacktrace test",
+    "run: ./gradlew --stacktrace lint",
     "assembleQa",
     "Verify stable test signing certificate",
 ):
