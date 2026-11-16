@@ -699,6 +699,7 @@ class DeviceRepository(
             mimeType = mimeType(file),
             modifiedAtMillis = file.lastModified().coerceAtLeast(0L),
             relativePath = parentPath,
+            volumeRoot = canonicalPathOf(storageRoot),
         )
     }
 
@@ -843,9 +844,11 @@ class DeviceRepository(
                 for (sameContentFiles in contentGroups) {
                     val decision = DuplicatePolicy.choose(sameContentFiles) ?: continue
                     protectedUris += decision.keep.uri
-                    val assessment = aiEngine.duplicateAssessment(decision.automaticSelectionIsSafe)
                     sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
-                        duplicates += duplicate.toCleanable(assessment).copy(
+                        val safe = DuplicatePolicy.autoSelectable(
+                            duplicate, decision.keep, duplicate.volumeRoot, decision.keep.volumeRoot,
+                        )
+                        duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(safe)).copy(
                             protectedDuplicateName = decision.keep.name,
                             protectedDuplicateUri = decision.keep.uri,
                         )

@@ -63,6 +63,7 @@ data class IndexedFile(
     val mimeType: String,
     val modifiedAtMillis: Long,
     val relativePath: String,
+    val volumeRoot: String = "",
 )
 
 

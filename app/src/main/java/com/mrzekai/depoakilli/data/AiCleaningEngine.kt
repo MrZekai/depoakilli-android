@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit
  * Conservative on-device rules used by Smart Scan.
  *
  * The engine only preselects items that are strongly likely to be disposable
- * (regeneratable thumbnails, temporary files and unambiguous exact duplicate
- * copies). Installers, WhatsApp media, user-created downloads, screenshots,
+ * (regeneratable thumbnails, temporary files and fully verified duplicate
+ * copies in suitable locations on the same storage volume). Installers, WhatsApp media, user-created downloads, screenshots,
  * large files and sent media are shown for review but are never silently
  * selected: a user may have kept any of them on purpose.
  */
