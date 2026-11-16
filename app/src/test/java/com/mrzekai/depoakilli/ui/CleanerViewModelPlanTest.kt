@@ -96,6 +96,26 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `a saved summary younger than six hours avoids a scan after restart`() {
+        val hour = 3_600_000L
+        val wall = 1_800_000_000_000L
+        fun scan(savedAt: Long) = AutoScanPolicy.shouldScan(
+            hasAccess = true,
+            scanning = false,
+            hasPlan = false,
+            planScannedAtElapsed = 0L,
+            nowElapsed = 5_000L,
+            savedSummaryAtMillis = savedAt,
+            nowMillis = wall,
+        )
+        assertFalse(scan(wall - 2 * hour))
+        assertTrue(scan(wall - 7 * hour))
+        assertTrue(scan(0L))
+        // A clock moved backwards never counts as fresh.
+        assertTrue(scan(wall + hour))
+    }
+
+    @Test
     fun `trash days left round up and never go negative`() {
         val day = 86_400_000L
         val entry = com.mrzekai.depoakilli.data.TrashEntry("id", "/a", "/t", 1L, 0L, deletedAtMillis = 0L, group = "")

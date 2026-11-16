@@ -631,4 +631,11 @@
         <item quantity="one">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
         <item quantity="other">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s temizlenmeye hazır · %2$s göz atmaya değer</string>
+    <string name="home_saved_checked_recently">Bir saatten kısa süre önce kontrol edildi</string>
+    <string name="home_saved_details">Ayrıntıları göster</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">%1$d saat önce kontrol edildi</item>
+        <item quantity="other">%1$d saat önce kontrol edildi</item>
+    </plurals>
 </resources>

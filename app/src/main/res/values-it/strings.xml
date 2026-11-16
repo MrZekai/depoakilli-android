@@ -659,4 +659,12 @@
         <item quantity="many">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
         <item quantity="other">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s pronti da pulire · %2$s da controllare</string>
+    <string name="home_saved_checked_recently">Controllato meno di un’ora fa</string>
+    <string name="home_saved_details">Mostra dettagli</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Controllato %1$d ora fa</item>
+        <item quantity="many">Controllato %1$d ore fa</item>
+        <item quantity="other">Controllato %1$d ore fa</item>
+    </plurals>
 </resources>

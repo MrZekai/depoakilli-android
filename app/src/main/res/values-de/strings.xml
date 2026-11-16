@@ -619,4 +619,11 @@
         <item quantity="one">%1$s kommt für %2$d Tag in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
         <item quantity="other">%1$s kommt für %2$d Tage in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s bereit zum Bereinigen · %2$s zum Ansehen</string>
+    <string name="home_saved_checked_recently">Vor weniger als einer Stunde geprüft</string>
+    <string name="home_saved_details">Details anzeigen</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Vor %1$d Stunde geprüft</item>
+        <item quantity="other">Vor %1$d Stunden geprüft</item>
+    </plurals>
 </resources>

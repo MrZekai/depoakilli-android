@@ -784,4 +784,17 @@
         <item quantity="many">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
         <item quantity="other">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_saved_totals">%1$s جاهزة للتنظيف · %2$s تستحق المراجعة</string>
+    <string name="home_saved_checked_recently">تم الفحص قبل أقل من ساعة</string>
+    <string name="home_saved_details">عرض التفاصيل</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="home_saved_checked_hours">
+        <item quantity="zero">تم الفحص قبل %1$d ساعة</item>
+        <item quantity="one">تم الفحص قبل %1$d ساعة</item>
+        <item quantity="two">تم الفحص قبل %1$d ساعة</item>
+        <item quantity="few">تم الفحص قبل %1$d ساعة</item>
+        <item quantity="many">تم الفحص قبل %1$d ساعة</item>
+        <item quantity="other">تم الفحص قبل %1$d ساعة</item>
+    </plurals>
 </resources>

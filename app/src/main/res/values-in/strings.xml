@@ -581,4 +581,10 @@
     <plurals name="delete_confirm_trash">
         <item quantity="other">%1$s dipindahkan ke Sampah selama %2$d hari. Kamu bisa memulihkannya sampai saat itu.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s siap dibersihkan · %2$s layak dicek</string>
+    <string name="home_saved_checked_recently">Dicek kurang dari satu jam lalu</string>
+    <string name="home_saved_details">Lihat detail</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="other">Dicek %1$d jam lalu</item>
+    </plurals>
 </resources>

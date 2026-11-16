@@ -631,4 +631,11 @@
         <item quantity="one">%1$s goes to Trash for %2$d day. You can restore it until then.</item>
         <item quantity="other">%1$s goes to Trash for %2$d days. You can restore it until then.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s ready to clean · %2$s worth a look</string>
+    <string name="home_saved_checked_recently">Checked less than an hour ago</string>
+    <string name="home_saved_details">Show details</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Checked %1$d hour ago</item>
+        <item quantity="other">Checked %1$d hours ago</item>
+    </plurals>
 </resources>

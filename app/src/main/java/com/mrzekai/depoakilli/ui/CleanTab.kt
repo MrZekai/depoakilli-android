@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,6 +51,7 @@ internal fun CleanTab(
     onOpenSettings: () -> Unit = onAllowAccess,
     onOpenTrash: () -> Unit,
     modifier: Modifier = Modifier,
+    onShowDetails: () -> Unit = {},
     plan: @Composable (displayState: CleanerUiState, header: LazyListScope.() -> Unit) -> Unit,
 ) {
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
@@ -76,6 +78,14 @@ internal fun CleanTab(
             )
         }
         state.scanning -> SmartScanningState(state = state, onCancel = onCancelScan, modifier = modifier)
+        // Finding 8: after a restart the last totals are shown instead of a new
+        // full scan on every launch; details are one tap away.
+        state.planSummary == null && state.dashboardSnapshotAtMillis > 0L -> SavedSummaryCard(
+            state = state,
+            onShowDetails = onShowDetails,
+            onOpenTrash = onOpenTrash,
+            modifier = modifier,
+        )
         else -> plan(state.copy(lastScanCompleted = false), {})
     }
 }
@@ -149,6 +159,66 @@ private fun AccessCard(onAllowAccess: () -> Unit, deniedOnce: Boolean, modifier:
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SavedSummaryCard(
+    state: CleanerUiState,
+    onShowDetails: () -> Unit,
+    onOpenTrash: () -> Unit,
+    modifier: Modifier,
+) {
+    val hours = ((System.currentTimeMillis() - state.dashboardSnapshotAtMillis).coerceAtLeast(0L) / 3_600_000L).toInt()
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(CleanTabBackground)
+            .padding(18.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        StorageLine(state)
+        Surface(color = CleanTabCard, shape = RoundedCornerShape(24.dp)) {
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    stringResource(R.string.plan_recommended_title),
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    stringResource(
+                        R.string.home_saved_totals,
+                        ByteFormatter.format(state.dashboardCleanableBytes),
+                        ByteFormatter.format(state.dashboardReviewBytes),
+                    ),
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    if (hours < 1) {
+                        stringResource(R.string.home_saved_checked_recently)
+                    } else {
+                        pluralStringResource(R.plurals.home_saved_checked_hours, hours, hours)
+                    },
+                    color = CleanTabSecondary,
+                )
+                Button(
+                    onClick = onShowDetails,
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CleanTabAccent,
+                        contentColor = CleanTabButtonText,
+                    ),
+                ) {
+                    Text(stringResource(R.string.home_saved_details), fontWeight = FontWeight.Black)
+                }
+            }
+        }
+        if (state.trashEntries.isNotEmpty()) {
+            TrashSummaryLine(state.trashEntries, onOpen = onOpenTrash)
         }
     }
 }

@@ -520,6 +520,7 @@ fun CleanerApp(
                         onOpenSettings = onRequestAllFilesAccess,
                         onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
                         modifier = Modifier.padding(padding),
+                        onShowDetails = { viewModel.scan(ScanFocus.SMART) },
                     ) { displayState, header ->
                         SmartCleanResultsScreen(
                             state = displayState,

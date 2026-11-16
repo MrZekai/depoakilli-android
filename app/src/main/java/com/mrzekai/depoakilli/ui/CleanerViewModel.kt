@@ -515,6 +515,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 hasPlan = hasPlan,
                 planScannedAtElapsed = current.planScannedAtElapsed,
                 nowElapsed = SystemClock.elapsedRealtime(),
+                savedSummaryAtMillis = current.dashboardSnapshotAtMillis,
+                nowMillis = System.currentTimeMillis(),
             )
         ) {
             scan(ScanFocus.SMART)
@@ -1748,9 +1750,19 @@ internal object AutoScanPolicy {
         hasPlan: Boolean,
         planScannedAtElapsed: Long,
         nowElapsed: Long,
+        savedSummaryAtMillis: Long = 0L,
+        nowMillis: Long = 0L,
     ): Boolean {
         if (!hasAccess || scanning) return false
-        if (!hasPlan || planScannedAtElapsed <= 0L) return true
-        return nowElapsed - planScannedAtElapsed > java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
+        val maxAge = java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
+        if (hasPlan && planScannedAtElapsed > 0L) return nowElapsed - planScannedAtElapsed > maxAge
+        // After the app was closed the plan is gone from memory, but the saved
+        // card totals (finding 8) are enough for 6 hours: no scan on every launch.
+        return !savedSummaryIsFresh(savedSummaryAtMillis, nowMillis)
     }
+
+    fun savedSummaryIsFresh(savedSummaryAtMillis: Long, nowMillis: Long): Boolean =
+        savedSummaryAtMillis > 0L &&
+            nowMillis >= savedSummaryAtMillis &&
+            nowMillis - savedSummaryAtMillis <= java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
 }

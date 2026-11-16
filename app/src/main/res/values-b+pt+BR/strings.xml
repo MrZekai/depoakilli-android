@@ -631,4 +631,11 @@
         <item quantity="one">%1$s vai para a Lixeira por %2$d dia. Você pode restaurar até lá.</item>
         <item quantity="other">%1$s vai para a Lixeira por %2$d dias. Você pode restaurar até lá.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s pronto para limpar · %2$s para revisar</string>
+    <string name="home_saved_checked_recently">Verificado há menos de uma hora</string>
+    <string name="home_saved_details">Ver detalhes</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Verificado há %1$d hora</item>
+        <item quantity="other">Verificado há %1$d horas</item>
+    </plurals>
 </resources>

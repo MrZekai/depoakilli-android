@@ -659,4 +659,12 @@
         <item quantity="many">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
         <item quantity="other">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s prêts à nettoyer · %2$s à vérifier</string>
+    <string name="home_saved_checked_recently">Vérifié il y a moins d’une heure</string>
+    <string name="home_saved_details">Voir les détails</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Vérifié il y a %1$d heure</item>
+        <item quantity="many">Vérifié il y a %1$d heures</item>
+        <item quantity="other">Vérifié il y a %1$d heures</item>
+    </plurals>
 </resources>

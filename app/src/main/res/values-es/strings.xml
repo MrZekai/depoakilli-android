@@ -631,4 +631,11 @@
         <item quantity="one">%1$s irá a la Papelera durante %2$d día. Puedes restaurarlo hasta entonces.</item>
         <item quantity="other">%1$s irá a la Papelera durante %2$d días. Puedes restaurarlo hasta entonces.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s listo para limpiar · %2$s para revisar</string>
+    <string name="home_saved_checked_recently">Revisado hace menos de una hora</string>
+    <string name="home_saved_details">Ver detalles</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Revisado hace %1$d hora</item>
+        <item quantity="other">Revisado hace %1$d horas</item>
+    </plurals>
 </resources>

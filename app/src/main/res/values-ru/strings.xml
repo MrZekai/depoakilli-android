@@ -702,4 +702,13 @@
         <item quantity="many">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
         <item quantity="other">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
     </plurals>
+    <string name="home_saved_totals">%1$s можно очистить · %2$s стоит проверить</string>
+    <string name="home_saved_checked_recently">Проверено меньше часа назад</string>
+    <string name="home_saved_details">Подробнее</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">Проверено %1$d час назад</item>
+        <item quantity="few">Проверено %1$d часа назад</item>
+        <item quantity="many">Проверено %1$d часов назад</item>
+        <item quantity="other">Проверено %1$d часа назад</item>
+    </plurals>
 </resources>
