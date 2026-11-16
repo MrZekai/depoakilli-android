@@ -936,4 +936,8 @@
     <string name="cache_none_found">Uygulama önbelleği bulunamadı</string>
     <string name="access_not_granted">Erişim verilmedi. Ayarlar\'dan izin verebilirsiniz.</string>
     <string name="open_settings">Ayarları aç</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
+        <item quantity="other">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
+    </plurals>
 </resources>

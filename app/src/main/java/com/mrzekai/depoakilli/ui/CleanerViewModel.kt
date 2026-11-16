@@ -23,6 +23,7 @@ import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -133,11 +134,23 @@ data class CleanerUiState(
     val smartCategoryReviewGroup: CleanupGroup? = null,
     /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
     val deepCheckRunning: Boolean = false,
-    /** Items that could not go to Trash (e.g. storage full); the user may delete them permanently. */
-    val trashFallbackIds: Set<String> = emptySet(),
+    /** Items that could not go to Trash; the user may delete them permanently. */
+    val trashFallback: TrashFallback? = null,
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
+}
+
+/**
+ * Files a cleanup could not move to Trash. [folderMissing] means the Trash
+ * folder itself cannot be created on this device (not a one-off failure).
+ */
+data class TrashFallback(
+    val source: Source,
+    val ids: Set<String>,
+    val folderMissing: Boolean,
+) {
+    enum class Source { PLAN, WHATSAPP, STORAGE_REVIEW }
 }
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
@@ -816,6 +829,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             onCompleted(false)
             return
         }
+        runWhatsAppDeletion(selected, forcePermanent = false, onCompleted = onCompleted)
+    }
+
+    private fun runWhatsAppDeletion(
+        selected: List<WhatsAppMediaItem>,
+        forcePermanent: Boolean,
+        onCompleted: (Boolean) -> Unit,
+    ) {
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -825,7 +846,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             val storageBefore = ioAvailableBytes()
-            runCatching { repository.deleteWhatsAppItems(selected) }
+            runSuspendCatching { repository.deleteWhatsAppItems(selected, forcePermanent) }
                 .onSuccess { result ->
                     val storageAfter = ioStorageSnapshot()
                     val measuredResult = CleanupResult(
@@ -861,6 +882,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     }
                     persistDashboardSnapshot()
                     recordCleanupHistory(measuredResult)
+                    offerTrashFallback(TrashFallback.Source.WHATSAPP, result.trashUnavailableIds, result.trashFolderMissing)
                     onCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->
@@ -1058,7 +1080,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        val excluded = select && item.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED
+                        val excluded = select && !item.assessment.group.groupSelectable
                         if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
@@ -1111,7 +1133,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun dismissTrashFallback() {
-        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        _state.update { it.copy(trashFallback = null) }
+    }
+
+    private fun offerTrashFallback(source: TrashFallback.Source, ids: Set<String>, folderMissing: Boolean) {
+        if (ids.isEmpty()) return
+        _state.update { it.copy(trashFallback = TrashFallback(source, ids, folderMissing)) }
     }
 
     /**
@@ -1119,8 +1146,23 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
      * Trash are deleted permanently only after the user confirmed that.
      */
     fun deleteTrashFallbackPermanently() {
-        val ids = _state.value.trashFallbackIds
-        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        val fallback = _state.value.trashFallback ?: return
+        _state.update { it.copy(trashFallback = null) }
+        if (_state.value.cleanupInProgress) return
+        val ids = fallback.ids
+        when (fallback.source) {
+            TrashFallback.Source.WHATSAPP -> {
+                val items = _state.value.whatsAppSummary.items.filter { it.id in ids }
+                if (items.isNotEmpty()) runWhatsAppDeletion(items, forcePermanent = true, onCompleted = {})
+                return
+            }
+            TrashFallback.Source.STORAGE_REVIEW -> {
+                val items = _state.value.storageReview.items.filter { it.id in ids }
+                if (items.isNotEmpty()) runStorageReviewDeletion(items, forcePermanent = true, onCleanupCompleted = {})
+                return
+            }
+            TrashFallback.Source.PLAN -> Unit
+        }
         val items = _state.value.summary.items.filter { it.id in ids }
         if (items.isEmpty() || _state.value.cleanupInProgress) return
         _state.update { it.copy(cleanupInProgress = true, cleanupResult = null) }
@@ -1208,19 +1250,15 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun setItemsSelected(ids: Set<String>, selected: Boolean) {
+    /**
+     * [bulk] is true for "select all" style actions; those never select items
+     * from groups that are not group-selectable (personal documents, look-alike
+     * copies). Explicit choices (swipe confirmation) pass false (T2.4).
+     */
+    fun setItemsSelected(ids: Set<String>, selected: Boolean, bulk: Boolean) {
         if (ids.isEmpty()) return
-        // Look-alike copies are never part of a bulk "select all" (T2.4).
-        val bulk = ids.size > 1
         _state.update { state ->
-            state.copy(
-                summary = state.summary.copy(
-                    items = state.summary.items.map { item ->
-                        val excluded = bulk && selected && item.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED
-                        if (item.id in ids && item.selected != selected && !excluded) item.copy(selected = selected) else item
-                    },
-                ),
-            )
+            state.copy(summary = state.summary.copy(items = PlanSelection.setItemsSelected(state.summary.items, ids, selected, bulk)))
         }
     }
 
@@ -1271,9 +1309,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         changedCount = direct.changedCount,
                     )
                     refreshTrash()
-                    if (direct.trashUnavailableIds.isNotEmpty()) {
-                        _state.update { it.copy(trashFallbackIds = direct.trashUnavailableIds) }
-                    }
+                    offerTrashFallback(TrashFallback.Source.PLAN, direct.trashUnavailableIds, direct.trashFolderMissing)
                     onCleanupCompleted(direct.deletedIds.isNotEmpty())
                 } else {
                     pendingConsentItems = remaining
@@ -1314,7 +1350,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         storageReviewGeneration++
         storageReviewJob?.cancel()
         storageReviewJob = null
+        runStorageReviewDeletion(selected, forcePermanent = false, onCleanupCompleted = onCleanupCompleted)
+    }
 
+    private fun runStorageReviewDeletion(
+        selected: List<StorageReviewItem>,
+        forcePermanent: Boolean,
+        onCleanupCompleted: (Boolean) -> Unit,
+    ) {
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -1324,7 +1367,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             val storageBefore = ioAvailableBytes()
-            runCatching { repository.deleteStorageReviewItems(selected) }
+            runSuspendCatching { repository.deleteStorageReviewItems(selected, forcePermanent) }
                 .onSuccess { result ->
                     finishStorageReviewCleanup(
                         attempted = selected,
@@ -1337,6 +1380,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         changedCount = result.changedCount,
                     )
                     refreshTrash()
+                    offerTrashFallback(TrashFallback.Source.STORAGE_REVIEW, result.trashUnavailableIds, result.trashFolderMissing)
                     onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->

@@ -1485,6 +1485,25 @@ if "FLAG_ACTIVITY_NEW_DOCUMENT" not in main_activity or "Intent.createChooser(in
 if "FeedbackDialog(" not in device_center:
     errors.append("feedback must show the support address in-app")
 
+# T2.2 / T2.5: button text contrast and minimum text size are checked in source.
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    relative = kotlin_file.relative_to(ROOT)
+    if re.search(r"buttonColors\((?:[^()]|\([^()]*\))*?contentColor\s*=\s*Color\.White", source, re.S):
+        errors.append(f"white text on a coloured button fails contrast; use ContrastTokens.OnBrightAction: {relative}")
+    for size in re.findall(r"(?<![\w.])(\d+(?:\.\d+)?)\.sp", source):
+        if float(size) < 12:
+            errors.append(f"text below 12 sp in {relative}: {size}.sp")
+            break
+if "labelSmall = base.labelSmall.copy(fontSize = 12.sp" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/theme/Theme.kt"):
+    errors.append("Material labelSmall (11 sp) must be raised to 12 sp in the theme")
+
+for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
+    names = [node.attrib.get("name") for node in ET.parse(strings_path).getroot()]
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        errors.append(f"duplicate resource names in {strings_path.parent.name}: {duplicates}")
+
 plural_sets = {}
 for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
     root = ET.parse(strings_path).getroot()

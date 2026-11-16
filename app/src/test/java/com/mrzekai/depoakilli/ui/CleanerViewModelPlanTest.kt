@@ -45,6 +45,24 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `bulk selection skips documents and look alikes but explicit selection does not`() {
+        val items = listOf(
+            item("doc", CleanupGroup.DOWNLOAD_DOCUMENT, 10 * mb),
+            item("u", CleanupGroup.DUPLICATE_UNVERIFIED, 10 * mb),
+            item("f", CleanupGroup.DOWNLOAD_FILE, 10 * mb),
+        )
+        val ids = setOf("doc", "u", "f")
+        val bulk = PlanSelection.setItemsSelected(items, ids, selected = true, bulk = true)
+        assertEquals(setOf("f"), bulk.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+
+        val explicit = PlanSelection.setItemsSelected(items, setOf("doc", "u"), selected = true, bulk = false)
+        assertEquals(setOf("doc", "u"), explicit.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+
+        val cleared = PlanSelection.setItemsSelected(explicit, ids, selected = false, bulk = true)
+        assertTrue(cleared.none(CleanableItem::selected))
+    }
+
+    @Test
     fun `verification replaces or removes a look alike`() {
         val items = listOf(item("u", CleanupGroup.DUPLICATE_UNVERIFIED, 100 * mb))
         val verified = items.single().copy(assessment = engine.duplicateAssessment(false))

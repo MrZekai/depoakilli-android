@@ -171,7 +171,7 @@ internal fun PremiumCleanerToolScreen(
     onRequestAllFilesAccess: () -> Unit,
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -354,7 +354,7 @@ private fun PremiumToolResults(
     cleanupInProgress: Boolean,
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
 ) {
     val config = toolConfig(focus)
@@ -827,7 +827,7 @@ private fun PremiumToolItemCard(
                 }
             }
             Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
+                Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
                 Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 12.sp, maxLines = 1)
                 // This card is a removable extra copy. Name the protected
                 // original instead of a label that read as if this file were
@@ -1273,11 +1273,11 @@ private fun sortItems(items: List<CleanableItem>, sortMode: ToolSortMode): List<
 
 private fun setSectionSelection(
     items: List<CleanableItem>,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
 ) {
     if (items.isEmpty()) return
     val targetSelected = !items.all(CleanableItem::selected)
-    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected)
+    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected, true)
 }
 
 private fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {

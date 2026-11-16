@@ -368,7 +368,7 @@ private fun CacheManagerHero(
             Text(
                 text = stringResource(R.string.cache_modern_hero_helper),
                 color = Color(0xFF8EE8D0),
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 lineHeight = 15.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -517,7 +517,7 @@ private fun CacheSystemActionCard(
             Text(
                 text = stringResource(R.string.cache_modern_system_action_subtitle),
                 color = Color.White.copy(alpha = .82f),
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 lineHeight = 15.sp,
             )
         }
@@ -717,7 +717,7 @@ private fun OwnCacheCard(
                         ByteFormatter.format(ownCacheBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
             Button(

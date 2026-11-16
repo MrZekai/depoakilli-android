@@ -36,6 +36,17 @@ class TrashStoreTest {
     }
 
     @Test
+    fun `a blocked trash folder is reported and the file stays in place`() {
+        val file = write("Movies/clip.mp4", "video-bytes")
+        // A plain file where the Trash folder should be: mkdirs cannot succeed.
+        File(volume, ".SmartCleanerTrash").writeText("blocked")
+        val trash = store()
+        assertFalse(trash.canUseTrash(volume))
+        assertNull(trash.moveToTrash(file, volume, CleanupGroup.LARGE_VIDEO))
+        assertTrue(file.isFile)
+    }
+
+    @Test
     fun `move then restore keeps path and bytes`() {
         val file = write("Movies/clip.mp4", "video-bytes")
         val trash = store()

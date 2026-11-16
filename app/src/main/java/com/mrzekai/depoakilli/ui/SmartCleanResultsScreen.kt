@@ -173,7 +173,7 @@ internal fun SmartCleanResultsScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
     onOpenStorageReview: (StorageFileType, Boolean) -> Unit,
     onRequestUsageAccess: () -> Unit,
@@ -214,7 +214,7 @@ internal fun SmartCleanResultsScreen(
             onContinue = onSwipeContinue,
             onShowGrid = onSwipeGrid,
             onConfirmClean = { ids ->
-                onSetItemsSelected(ids, true)
+                onSetItemsSelected(ids, true, false)
                 onClean(ids)
                 onSwipeFinished()
             },
@@ -553,7 +553,7 @@ private fun ScanStagePill(
             Text(
                 title,
                 color = Color.White,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -599,7 +599,7 @@ private fun SmartResultsContent(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
     onOpenStorageReview: (StorageFileType, Boolean) -> Unit,
     onRequestUsageAccess: () -> Unit,
@@ -641,7 +641,7 @@ private fun SmartResultsContent(
             cleanupInProgress = cleanupInProgress,
             onToggleCategory = {
                 val ids = reviewItems.mapTo(linkedSetOf(), CleanableItem::id)
-                onSetItemsSelected(ids, reviewItems.any { !it.selected })
+                onSetItemsSelected(ids, reviewItems.any { !it.selected }, true)
             },
             onToggleItem = onToggleItem,
             onPreview = { previewItemId = it.id },
@@ -719,7 +719,7 @@ private fun SmartResultsContent(
                     if (group != null) {
                         onToggleGroup(group)
                     } else {
-                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allSelected)
+                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allSelected, true)
                     }
                 },
                 onOpenRow = { row ->
@@ -866,7 +866,7 @@ private fun UnusedAppsSectionCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = accent)
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.smart_unused_apps_loading), color = SmartTextSecondary, fontSize = 11.sp)
+                        Text(stringResource(R.string.smart_unused_apps_loading), color = SmartTextSecondary, fontSize = 12.sp)
                     }
                 }
                 apps.isNotEmpty() -> {
@@ -886,7 +886,7 @@ private fun UnusedAppsSectionCard(
                             Text(
                                 ByteFormatter.format(app.totalBytes),
                                 color = accent,
-                                fontSize = 11.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                             )
                         }
@@ -983,7 +983,7 @@ private fun UnusedAppsReviewDialog(
                                             color = SmartTextSecondary,
                                             fontSize = 12.sp,
                                         )
-                                        Text(ByteFormatter.format(app.totalBytes), color = Color(0xFF70E58E), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                        Text(ByteFormatter.format(app.totalBytes), color = Color(0xFF70E58E), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                     TextButton(onClick = { onUninstallApp(app.packageName) }) {
                                         Text(stringResource(R.string.uninstall), color = Color(0xFFFF8794), fontWeight = FontWeight.Bold)
@@ -1337,7 +1337,7 @@ private fun CategoryGridItem(
                         ByteFormatter.format(item.sizeBytes),
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
                     )
                 }
@@ -1683,7 +1683,7 @@ private fun StorageReviewGridItem(
                         ByteFormatter.format(file.sizeBytes),
                         color = Color.White,
                         fontWeight = FontWeight.Black,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
                     )
                 }
@@ -1992,7 +1992,7 @@ private fun FilePreviewDialog(
                                         stringResource(R.string.smart_reason_title),
                                         color = SmartCyan,
                                         fontWeight = FontWeight.Black,
-                                        fontSize = 11.sp,
+                                        fontSize = 12.sp,
                                     )
                                     Text(
                                         reason,
@@ -2065,7 +2065,7 @@ private fun PreviewInfoPill(
         Text(
             text,
             color = Color.White,
-            fontSize = 11.sp,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 9.dp, vertical = 7.dp),
             maxLines = 1,

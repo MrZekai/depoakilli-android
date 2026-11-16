@@ -945,4 +945,8 @@
     <string name="cache_none_found">No se encontró caché de apps</string>
     <string name="access_not_granted">No se concedió el acceso. Puedes permitirlo en Ajustes.</string>
     <string name="open_settings">Abrir ajustes</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Este dispositivo no permite que Smart Cleaner cree su carpeta de Papelera, así que %1$d archivo no se puede guardar para deshacer. ¿Eliminarlo de forma permanente? No se puede deshacer.</item>
+        <item quantity="other">Este dispositivo no permite que Smart Cleaner cree su carpeta de Papelera, así que %1$d archivos no se pueden guardar para deshacer. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
+    </plurals>
 </resources>

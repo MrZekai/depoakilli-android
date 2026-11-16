@@ -644,12 +644,21 @@ fun CleanerApp(
         }
     }
 
-    if (state.trashFallbackIds.isNotEmpty() && state.cleanupResult == null && !state.cleanupInProgress) {
-        val count = state.trashFallbackIds.size
+    val trashFallback = state.trashFallback
+    if (trashFallback != null && state.cleanupResult == null && !state.cleanupInProgress) {
+        val count = trashFallback.ids.size
         AlertDialog(
             onDismissRequest = viewModel::dismissTrashFallback,
             title = { Text(stringResource(R.string.trash_full_title), fontWeight = FontWeight.Black) },
-            text = { Text(pluralStringResource(R.plurals.trash_full_body, count, count)) },
+            text = {
+                Text(
+                    pluralStringResource(
+                        if (trashFallback.folderMissing) R.plurals.trash_folder_missing_body else R.plurals.trash_full_body,
+                        count,
+                        count,
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = viewModel::deleteTrashFallbackPermanently) {
                     Text(stringResource(R.string.trash_delete_forever))

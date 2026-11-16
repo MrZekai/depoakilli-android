@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.ContrastTokens
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.ui.GenericFilePreview
@@ -144,7 +145,7 @@ internal fun SwipeReviewScreen(
                     Button(
                         onClick = { onMark(true) },
                         modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = ContrastTokens.OnBrightAction),
                     ) { Text(stringResource(R.string.swipe_delete), fontWeight = FontWeight.Black) }
                     Button(
                         onClick = { onMark(false) },

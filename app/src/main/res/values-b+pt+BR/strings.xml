@@ -945,4 +945,8 @@
     <string name="cache_none_found">Nenhum cache de app encontrado</string>
     <string name="access_not_granted">O acesso não foi concedido. Você pode permitir nas Configurações.</string>
     <string name="open_settings">Abrir configurações</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivo não pode ser guardado para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
+        <item quantity="other">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivos não podem ser guardados para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
+    </plurals>
 </resources>

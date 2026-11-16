@@ -417,7 +417,7 @@ internal fun HomeCleanupProofCard(
                                 ByteFormatter.format(history.totalDeletedBytes),
                             ),
                             color = HomeVisualTokens.Teal,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -430,7 +430,7 @@ internal fun HomeCleanupProofCard(
                     Text(
                         text = stringResource(R.string.home_last_cleanup_empty_subtitle),
                         color = HomeVisualTokens.TextMuted,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         lineHeight = 15.sp,
                         maxLines = 2,
                     )

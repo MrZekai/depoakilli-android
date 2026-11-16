@@ -453,15 +453,19 @@ class DeviceRepository(
         WhatsAppLibrarySummary(items = items, scannedFileCount = indexed.size)
     }
 
-    suspend fun deleteWhatsAppItems(items: List<WhatsAppMediaItem>): WhatsAppDeleteResult =
+    suspend fun deleteWhatsAppItems(
+        items: List<WhatsAppMediaItem>,
+        forcePermanent: Boolean = false,
+    ): WhatsAppDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
                     item.id,
                     item.sizeBytes,
-                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, DeleteMode.TRASH, CleanupGroup.WHATSAPP_SENT),
+                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, CleanupGroup.WHATSAPP_SENT),
                 )
             }
             WhatsAppDeleteResult(
@@ -474,9 +478,13 @@ class DeviceRepository(
             )
         }
 
-    suspend fun deleteStorageReviewItems(items: List<StorageReviewItem>): DirectDeleteResult =
+    suspend fun deleteStorageReviewItems(
+        items: List<StorageReviewItem>,
+        forcePermanent: Boolean = false,
+    ): DirectDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
@@ -486,7 +494,7 @@ class DeviceRepository(
                         item.file.uri,
                         item.file.sizeBytes,
                         item.file.modifiedAtMillis,
-                        DeleteMode.TRASH,
+                        mode,
                         CleanupGroup.LARGE_OTHER,
                     ),
                 )
@@ -582,7 +590,13 @@ class DeviceRepository(
             DeleteMode.TRASH -> {
                 val root = volumeRootOf(file)
                 val entry = root?.let { trashStore.moveToTrash(file, it, group) }
-                if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
+                when {
+                    entry != null -> Removal.Trashed(entry.id)
+                    // The Trash folder itself cannot be created on this volume
+                    // (some manufacturers block it): reported separately.
+                    root == null || !trashStore.canUseTrash(root) -> Removal.Failed(FailureReason.TRASH_FOLDER_UNAVAILABLE)
+                    else -> Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
+                }
             }
             DeleteMode.PERMANENT -> {
                 if (FileDeleter.deleteUnprotected(file, relativeDir)) {
@@ -1088,7 +1102,7 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
-    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE }
+    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE, TRASH_FOLDER_UNAVAILABLE }
 
     private sealed interface Removal {
         data object Deleted : Removal
@@ -1142,8 +1156,8 @@ class DeviceRepository(
         val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
-        val trashUnavailableIds: Set<String> get() =
-            failed.filterValues { it == FailureReason.TRASH_UNAVAILABLE }.keys
+        val trashUnavailableIds: Set<String> get() = failed.trashUnavailableIds()
+        val trashFolderMissing: Boolean get() = failed.trashFolderMissing()
         val changedCount: Int get() = failed.values.count {
             it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
         }
@@ -1158,6 +1172,8 @@ class DeviceRepository(
         val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedCount - deletedIds.size
+        val trashUnavailableIds: Set<String> get() = failed.trashUnavailableIds()
+        val trashFolderMissing: Boolean get() = failed.trashFolderMissing()
         val changedCount: Int get() = failed.values.count {
             it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
         }
@@ -1223,3 +1239,12 @@ class DeviceRepository(
         val canonicalPath: String,
     )
 }
+
+private fun Map<String, DeviceRepository.FailureReason>.trashUnavailableIds(): Set<String> =
+    filterValues {
+        it == DeviceRepository.FailureReason.TRASH_UNAVAILABLE ||
+            it == DeviceRepository.FailureReason.TRASH_FOLDER_UNAVAILABLE
+    }.keys
+
+private fun Map<String, DeviceRepository.FailureReason>.trashFolderMissing(): Boolean =
+    values.any { it == DeviceRepository.FailureReason.TRASH_FOLDER_UNAVAILABLE }

@@ -288,7 +288,7 @@ internal fun CleanupResultDialog(
                             },
                         ),
                         color = Color(0xFF9FB8C2),
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                         lineHeight = 15.sp,
                         textAlign = TextAlign.Center,
                     )

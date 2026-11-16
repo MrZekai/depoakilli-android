@@ -923,4 +923,8 @@
     <string name="cache_none_found">Kein App-Cache gefunden</string>
     <string name="access_not_granted">Zugriff wurde nicht gewährt. Sie können ihn in den Einstellungen erlauben.</string>
     <string name="open_settings">Einstellungen öffnen</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Dieses Gerät erlaubt Smart Cleaner nicht, einen Papierkorb-Ordner anzulegen. %1$d Datei kann daher nicht zum Rückgängigmachen aufbewahrt werden. Stattdessen endgültig löschen? Das kann nicht rückgängig gemacht werden.</item>
+        <item quantity="other">Dieses Gerät erlaubt Smart Cleaner nicht, einen Papierkorb-Ordner anzulegen. %1$d Dateien können daher nicht zum Rückgängigmachen aufbewahrt werden. Stattdessen endgültig löschen? Das kann nicht rückgängig gemacht werden.</item>
+    </plurals>
 </resources>

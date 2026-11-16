@@ -175,7 +175,7 @@ internal fun TrashScreen(
                 Button(
                     onClick = { confirmEmptyAll = true },
                     modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TrashRed, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = TrashRed, contentColor = ContrastTokens.OnBrightAction),
                 ) {
                     Text(stringResource(R.string.trash_empty), fontWeight = FontWeight.Bold)
                 }

@@ -936,4 +936,8 @@
     <string name="cache_none_found">No app cache found</string>
     <string name="access_not_granted">Access wasn’t granted. You can allow it in Settings.</string>
     <string name="open_settings">Open settings</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d file can’t be kept for undo. Delete it permanently instead? This can’t be undone.</item>
+        <item quantity="other">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d files can’t be kept for undo. Delete them permanently instead? This can’t be undone.</item>
+    </plurals>
 </resources>

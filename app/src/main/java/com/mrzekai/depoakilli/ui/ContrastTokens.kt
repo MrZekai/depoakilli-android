@@ -4,7 +4,8 @@ import androidx.compose.ui.graphics.Color
 
 /**
  * Text/icon colour on bright action buttons (green, cyan, purple, amber
- * gradients). Every pair below is checked for WCAG AA (≥4.5:1) by ContrastTest.
+ * gradients, destructive red). A validator check forbids white content on
+ * `ButtonDefaults.buttonColors`, so new buttons must use this token. Every pair below is checked for WCAG AA (≥4.5:1) by ContrastTest.
  */
 internal object ContrastTokens {
     val OnBrightAction = Color(0xFF03122B)
@@ -21,6 +22,7 @@ internal object ContrastTokens {
         Color(0xFF9A63FF), // tool purple
         Color(0xFFFFB21A), // tool amber
         Color(0xFFDA57FF), // tool magenta
+        Color(0xFFFF5D68), // destructive red (Swipe "Delete", Trash "Empty")
     )
 
     /** WCAG 2.x relative-luminance contrast ratio. */

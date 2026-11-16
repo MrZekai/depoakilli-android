@@ -972,4 +972,9 @@
     <string name="cache_none_found">Nessuna cache delle app trovata</string>
     <string name="access_not_granted">Accesso non concesso. Puoi consentirlo nelle Impostazioni.</string>
     <string name="open_settings">Apri impostazioni</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Questo dispositivo non consente a Smart Cleaner di creare la cartella Cestino, quindi %1$d file non può essere conservato per annullare. Eliminarlo definitivamente? L’operazione è irreversibile.</item>
+        <item quantity="many">Questo dispositivo non consente a Smart Cleaner di creare la cartella Cestino, quindi %1$d file non possono essere conservati per annullare. Eliminarli definitivamente? L’operazione è irreversibile.</item>
+        <item quantity="other">Questo dispositivo non consente a Smart Cleaner di creare la cartella Cestino, quindi %1$d file non possono essere conservati per annullare. Eliminarli definitivamente? L’operazione è irreversibile.</item>
+    </plurals>
 </resources>

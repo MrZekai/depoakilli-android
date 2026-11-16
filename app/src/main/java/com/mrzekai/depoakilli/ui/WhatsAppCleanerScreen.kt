@@ -695,7 +695,7 @@ private fun DirectionTab(
                 title,
                 color = if (selected) Color.White else WaTextSecondary,
                 fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -746,7 +746,7 @@ private fun WhatsAppGroupSection(
                             ByteFormatter.format(items.sumOf(WhatsAppMediaItem::sizeBytes)),
                         ),
                         color = WaTextSecondary,
-                        fontSize = 11.sp,
+                        fontSize = 12.sp,
                     )
                 }
                 TextButton(onClick = onViewAll) {
@@ -900,7 +900,7 @@ private fun WhatsAppMediaCard(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
                 Text(
                     localDate(item.modifiedAtMillis),
@@ -1071,7 +1071,7 @@ private fun SortTab(
         ) {
             Icon(icon, contentDescription = null, tint = if (selected) WaCyan else WaTextSecondary, modifier = Modifier.size(17.dp))
             Spacer(Modifier.width(6.dp))
-            Text(title, color = if (selected) Color.White else WaTextSecondary, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            Text(title, color = if (selected) Color.White else WaTextSecondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
     }
 }

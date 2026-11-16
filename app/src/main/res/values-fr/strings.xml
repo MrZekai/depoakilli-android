@@ -972,4 +972,9 @@
     <string name="cache_none_found">Aucun cache d’appli trouvé</string>
     <string name="access_not_granted">L’accès n’a pas été accordé. Vous pouvez l’autoriser dans les Paramètres.</string>
     <string name="open_settings">Ouvrir les paramètres</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Cet appareil n’autorise pas Smart Cleaner à créer son dossier Corbeille : %1$d fichier ne peut pas être conservé pour l’annulation. Le supprimer définitivement ? Cette action est irréversible.</item>
+        <item quantity="many">Cet appareil n’autorise pas Smart Cleaner à créer son dossier Corbeille : %1$d fichiers ne peuvent pas être conservés pour l’annulation. Les supprimer définitivement ? Cette action est irréversible.</item>
+        <item quantity="other">Cet appareil n’autorise pas Smart Cleaner à créer son dossier Corbeille : %1$d fichiers ne peuvent pas être conservés pour l’annulation. Les supprimer définitivement ? Cette action est irréversible.</item>
+    </plurals>
 </resources>

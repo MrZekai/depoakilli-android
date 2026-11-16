@@ -5,7 +5,7 @@ import org.junit.Test
 
 class ContrastTest {
     @Test
-    fun `dark text on every bright action background meets WCAG AA`() {
+    fun `dark text on every bright and destructive action background meets WCAG AA`() {
         ContrastTokens.BrightActionBackgrounds.forEach { background ->
             val ratio = ContrastTokens.contrastRatio(ContrastTokens.OnBrightAction, background)
             assertTrue("ratio $ratio for $background", ratio >= 4.5)

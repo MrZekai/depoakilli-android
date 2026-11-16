@@ -418,7 +418,7 @@ private fun StorageTypeChangeRow(change: StorageTypeChange) {
                         ByteFormatter.format(change.currentBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
 
@@ -466,7 +466,7 @@ private fun AppCacheChangeRow(change: AppCacheChange) {
                         ByteFormatter.format(change.currentBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
 
