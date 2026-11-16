@@ -11,6 +11,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
@@ -30,6 +31,7 @@ import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
+import com.mrzekai.depoakilli.model.DeleteMode
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
@@ -70,6 +72,13 @@ class DeviceRepository(
     ),
 ) {
     private val duplicateFinder = DuplicateFinder(aiEngine, ::openUriInput)
+    private val trashStore = TrashStore(
+        indexFile = File(context.filesDir, TRASH_INDEX_FILE),
+        trashRoots = { sharedStorageRoots() },
+        isAllowed = ::isDeletableSharedStorageFile,
+        removeFromMediaStore = ::removeDeletedPathFromMediaStore,
+        rescan = { path -> MediaScannerConnection.scanFile(context, arrayOf(path), null, null) },
+    )
     private val resolver = context.contentResolver
     private var sharedIndexCache: SoftReference<List<IndexedFile>>? = null
     private var sharedIndexCachedAtElapsed = 0L
@@ -441,90 +450,141 @@ class DeviceRepository(
 
     suspend fun deleteWhatsAppItems(items: List<WhatsAppMediaItem>): WhatsAppDeleteResult =
         withContext(Dispatchers.IO) {
-            var deletedBytes = 0L
-            val deletedIds = hashSetOf<String>()
+            val outcome = RemovalTally()
             items.forEach { item ->
                 coroutineContext.ensureActive()
-                if (
-                    fileSnapshotStillMatches(
-                        item.uri,
-                        item.sizeBytes,
-                        item.modifiedAtMillis,
-                    ) &&
-                    deleteUriDirectly(item.uri)
-                ) {
-                    deletedIds += item.id
-                    deletedBytes += item.sizeBytes
-                }
+                outcome.record(
+                    item.id,
+                    item.sizeBytes,
+                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, DeleteMode.TRASH, CleanupGroup.WHATSAPP_SENT),
+                )
             }
             WhatsAppDeleteResult(
                 attemptedCount = items.size,
-                deletedIds = deletedIds,
-                deletedBytes = deletedBytes,
+                deletedIds = outcome.removedIds,
+                deletedBytes = outcome.deletedBytes,
+                trashedBytes = outcome.trashedBytes,
+                trashEntryIds = outcome.trashEntryIds,
+                failed = outcome.failed,
             )
         }
 
     suspend fun deleteStorageReviewItems(items: List<StorageReviewItem>): DirectDeleteResult =
         withContext(Dispatchers.IO) {
-            val attemptedIds = items.mapTo(hashSetOf(), StorageReviewItem::id)
-            val deletedIds = hashSetOf<String>()
-            var deletedBytes = 0L
+            val outcome = RemovalTally()
             items.forEach { item ->
                 coroutineContext.ensureActive()
-                if (
-                    fileSnapshotStillMatches(
+                outcome.record(
+                    item.id,
+                    item.file.sizeBytes,
+                    removeFile(
                         item.file.uri,
                         item.file.sizeBytes,
                         item.file.modifiedAtMillis,
-                    ) &&
-                    deleteUriDirectly(item.file.uri)
-                ) {
-                    deletedIds += item.id
-                    deletedBytes += item.file.sizeBytes
-                }
+                        DeleteMode.TRASH,
+                        CleanupGroup.LARGE_OTHER,
+                    ),
+                )
             }
-            DirectDeleteResult(
-                attemptedIds = attemptedIds,
-                deletedIds = deletedIds,
-                deletedBytes = deletedBytes,
-            )
+            outcome.toDirectResult(items.mapTo(hashSetOf(), StorageReviewItem::id))
         }
 
+    /**
+     * Removes the selected items. [DeleteMode.TRASH] groups are moved to the
+     * in-app trash, [DeleteMode.PERMANENT] groups are deleted. A copy is only
+     * removed while its protected original still exists unchanged.
+     */
     suspend fun deleteDirectItems(items: List<CleanableItem>): DirectDeleteResult = withContext(Dispatchers.IO) {
         val directItems = items.filter { Uri.parse(it.uri).scheme == "file" }
-        val deletedIds = hashSetOf<String>()
-        val failureReasons = mutableMapOf<String, DeleteFailureReason>()
-        var deletedBytes = 0L
+        val outcome = RemovalTally()
         directItems.forEach { item ->
             coroutineContext.ensureActive()
-            if (!fileSnapshotStillMatches(item.uri, item.sizeBytes, item.modifiedAtMillis)) return@forEach
+            val group = item.assessment.group
+            val remove = {
+                removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, group.deleteMode, group)
+            }
             val originalUri = item.protectedDuplicateUri
-            val result = if (originalUri == null) {
-                if (deleteUriDirectly(item.uri)) FileDeleter.Result.DELETED else FileDeleter.Result.DELETE_FAILED
+            val removal = if (originalUri == null) {
+                remove()
             } else {
                 val original = runCatching {
                     val uri = Uri.parse(originalUri)
                     if (uri.scheme != "file") null else uri.path?.let(::File)
                 }.getOrNull()
-                FileDeleter.deleteIfOriginalUnchanged(original, item.protectedDuplicateSizeBytes) {
-                    deleteUriDirectly(item.uri)
+                var inner: Removal = Removal.Failed(FailureReason.DENIED)
+                val checked = FileDeleter.deleteIfOriginalUnchanged(original, item.protectedDuplicateSizeBytes) {
+                    inner = remove()
+                    inner !is Removal.Failed
+                }
+                if (checked == FileDeleter.Result.ORIGINAL_CHANGED) {
+                    Removal.Failed(FailureReason.ORIGINAL_CHANGED)
+                } else {
+                    inner
                 }
             }
-            when (result) {
-                FileDeleter.Result.DELETED -> {
-                    deletedIds += item.id
-                    deletedBytes += item.sizeBytes
+            outcome.record(item.id, item.sizeBytes, removal)
+        }
+        outcome.toDirectResult(directItems.mapTo(hashSetOf(), CleanableItem::id))
+    }
+
+    fun trashEntries(): List<TrashEntry> = trashStore.entries()
+
+    fun trashBytes(): Long = trashStore.trashBytes()
+
+    suspend fun restoreFromTrash(ids: Collection<String>): RestoreResult = withContext(Dispatchers.IO) {
+        trashStore.restore(ids).also { if (it.restoredIds.isNotEmpty()) invalidateStorageIndex() }
+    }
+
+    suspend fun emptyTrash(ids: Collection<String>? = null): Long = withContext(Dispatchers.IO) {
+        trashStore.emptyNow(ids)
+    }
+
+    suspend fun purgeExpiredTrash(): Long = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess()) 0L else trashStore.purgeExpired()
+    }
+
+    private fun removeFile(
+        uriString: String,
+        expectedSizeBytes: Long,
+        expectedModifiedAtMillis: Long,
+        mode: DeleteMode,
+        group: CleanupGroup,
+    ): Removal = runCatching {
+        val uri = Uri.parse(uriString)
+        if (uri.scheme != "file") return@runCatching Removal.Failed(FailureReason.DENIED)
+        val file = File(uri.path ?: return@runCatching Removal.Failed(FailureReason.DENIED))
+        if (!file.exists()) return@runCatching Removal.Failed(FailureReason.MISSING)
+        if (!fileSnapshotStillMatches(uriString, expectedSizeBytes, expectedModifiedAtMillis)) {
+            return@runCatching Removal.Failed(FailureReason.CHANGED)
+        }
+        if (
+            !isDeletableSharedStorageFile(file) ||
+            StoragePathRules.isSystemMarkerFile(file.name) ||
+            StoragePathRules.isProtectedUserDataPath(file.parent.orEmpty(), file.name)
+        ) {
+            return@runCatching Removal.Failed(FailureReason.PROTECTED)
+        }
+        val removal = when (mode) {
+            DeleteMode.TRASH -> {
+                val root = volumeRootOf(file)
+                val entry = root?.let { trashStore.moveToTrash(file, it, group) }
+                if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.DENIED)
+            }
+            DeleteMode.PERMANENT -> {
+                if (FileDeleter.deleteUnprotected(file, file.parent.orEmpty())) {
+                    removeDeletedPathFromMediaStore(file.absolutePath)
+                    Removal.Deleted
+                } else {
+                    Removal.Failed(FailureReason.DENIED)
                 }
-                FileDeleter.Result.ORIGINAL_CHANGED -> failureReasons[item.id] = DeleteFailureReason.ORIGINAL_CHANGED
-                FileDeleter.Result.DELETE_FAILED -> Unit
             }
         }
-        DirectDeleteResult(
-            attemptedIds = directItems.mapTo(hashSetOf(), CleanableItem::id),
-            deletedIds = deletedIds,
-            deletedBytes = deletedBytes,
-            failureReasons = failureReasons,
-        )
+        if (removal !is Removal.Failed) invalidateStorageIndex()
+        removal
+    }.getOrDefault(Removal.Failed(FailureReason.DENIED))
+
+    private fun volumeRootOf(file: File): File? = sharedStorageRoots().firstOrNull { root ->
+        canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
     }
 
     fun createDeleteRequest(items: List<CleanableItem>): DeletePlan {
@@ -980,31 +1040,6 @@ class DeviceRepository(
             (expectedModifiedAtMillis <= 0L || file.lastModified() == expectedModifiedAtMillis)
     }.getOrDefault(false)
 
-    private fun deleteUriDirectly(uriString: String): Boolean = runCatching {
-        val uri = Uri.parse(uriString)
-        val deleted = when (uri.scheme) {
-            "file" -> {
-                val path = uri.path ?: return@runCatching false
-                val file = File(path)
-                if (!isDeletableSharedStorageFile(file)) return@runCatching false
-                if (StoragePathRules.isSystemMarkerFile(file.name)) return@runCatching false
-                val removed = FileDeleter.deleteUnprotected(file, file.parent.orEmpty())
-                if (removed) {
-                    removeDeletedPathFromMediaStore(file.absolutePath)
-                }
-                removed
-            }
-
-            "content" -> resolver.delete(uri, null, null) > 0
-            else -> false
-        }
-
-        if (deleted) {
-            invalidateStorageIndex()
-        }
-        deleted
-    }.getOrDefault(false)
-
     private fun directorySize(root: File): Long {
         if (!root.exists()) return 0L
         var total = 0L
@@ -1034,27 +1069,82 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
-    enum class DeleteFailureReason { ORIGINAL_CHANGED }
+    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED }
 
+    private sealed interface Removal {
+        data object Deleted : Removal
+        data class Trashed(val entryId: String) : Removal
+        data class Failed(val reason: FailureReason) : Removal
+    }
+
+    private class RemovalTally {
+        val removedIds = hashSetOf<String>()
+        val failed = LinkedHashMap<String, FailureReason>()
+        val trashEntryIds = ArrayList<String>()
+        var deletedBytes = 0L
+        var trashedBytes = 0L
+
+        fun record(id: String, sizeBytes: Long, removal: Removal) {
+            when (removal) {
+                Removal.Deleted -> {
+                    removedIds += id
+                    deletedBytes += sizeBytes
+                }
+                is Removal.Trashed -> {
+                    removedIds += id
+                    trashedBytes += sizeBytes
+                    trashEntryIds += removal.entryId
+                }
+                is Removal.Failed -> failed[id] = removal.reason
+            }
+        }
+
+        fun toDirectResult(attemptedIds: Set<String>) = DirectDeleteResult(
+            attemptedIds = attemptedIds,
+            deletedIds = removedIds,
+            deletedBytes = deletedBytes,
+            trashedBytes = trashedBytes,
+            trashEntryIds = trashEntryIds,
+            failed = failed,
+        )
+    }
+
+    /**
+     * [deletedIds] are every item that left its original place; [deletedBytes]
+     * counts only permanently deleted files, [trashedBytes] the files moved to
+     * the in-app trash.
+     */
     data class DirectDeleteResult(
         val attemptedIds: Set<String>,
         val deletedIds: Set<String>,
         val deletedBytes: Long,
-        val failureReasons: Map<String, DeleteFailureReason> = emptyMap(),
+        val trashedBytes: Long = 0L,
+        val trashEntryIds: List<String> = emptyList(),
+        val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
+        val changedCount: Int get() = failed.values.count {
+            it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
+        }
     }
 
     data class WhatsAppDeleteResult(
         val attemptedCount: Int,
         val deletedIds: Set<String>,
         val deletedBytes: Long,
+        val trashedBytes: Long = 0L,
+        val trashEntryIds: List<String> = emptyList(),
+        val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedCount - deletedIds.size
+        val changedCount: Int get() = failed.values.count {
+            it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
+        }
     }
 
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
+        private const val TRASH_INDEX_FILE = "trash_index.json"
         private const val MAX_INDEXED_FILES = 200_000
         private const val LOW_MEMORY_INDEXED_FILES = 50_000
         private const val MEDIUM_MEMORY_INDEXED_FILES = 100_000

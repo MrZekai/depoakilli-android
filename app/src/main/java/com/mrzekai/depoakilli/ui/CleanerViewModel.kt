@@ -7,7 +7,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
+import com.mrzekai.depoakilli.data.RestoreResult
 import com.mrzekai.depoakilli.data.StoragePathRules
+import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
@@ -53,6 +55,14 @@ data class CleanupResult(
     val kind: CleanupResultKind = CleanupResultKind.FILES,
     val operationSucceeded: Boolean = true,
     val subjectLabel: String? = null,
+    /** Bytes moved to the in-app trash; not included in [deletedBytes] (not freed yet). */
+    val trashedBytes: Long = 0L,
+    /** Trash entries created by this cleanup, used by Undo. */
+    val trashEntryIds: List<String> = emptyList(),
+    /** Items skipped because they changed or disappeared after the scan. */
+    val changedCount: Int = 0,
+    /** Items put back with Undo. */
+    val restoredCount: Int = 0,
 )
 
 private data class DeviceRefreshSnapshot(
@@ -104,8 +114,11 @@ data class CleanerUiState(
     val whatsAppScanProgress: Int = 0,
     val whatsAppLastScanCompleted: Boolean = false,
     val deviceInfo: DeviceInfoSnapshot = DeviceInfoSnapshot(),
+    val trashEntries: List<TrashEntry> = emptyList(),
     val message: String? = null,
-)
+) {
+    val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
+}
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = DeviceRepository(application)
@@ -157,6 +170,84 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         restoreStorageChange()
         refreshDeviceState()
         refreshAppCaches()
+        purgeExpiredTrash()
+    }
+
+    /** Deletes trash entries older than the retention period, then refreshes the trash list. */
+    fun purgeExpiredTrash() {
+        viewModelScope.launch {
+            runCatching { repository.purgeExpiredTrash() }
+            refreshTrash()
+        }
+    }
+
+    fun refreshTrash() {
+        viewModelScope.launch {
+            val entries = runCatching { withContext(Dispatchers.IO) { repository.trashEntries() } }
+                .getOrDefault(emptyList())
+            _state.update { it.copy(trashEntries = entries) }
+        }
+    }
+
+    /** Puts the files of the shown cleanup back where they were. */
+    fun undoCleanup() {
+        val result = _state.value.cleanupResult ?: return
+        if (result.trashEntryIds.isEmpty()) return
+        restoreTrash(result.trashEntryIds) { restored ->
+            _state.update { state ->
+                val current = state.cleanupResult ?: return@update state
+                val remaining = current.trashEntryIds.filterNot { it in restored.restoredIds }
+                state.copy(
+                    cleanupResult = current.copy(
+                        trashEntryIds = remaining,
+                        trashedBytes = (current.trashedBytes - restored.restoredBytes).coerceAtLeast(0L),
+                        restoredCount = current.restoredCount + restored.restoredIds.size,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun restoreTrash(ids: Collection<String>, onDone: (RestoreResult) -> Unit = {}) {
+        if (ids.isEmpty()) return
+        viewModelScope.launch {
+            val result = runCatching { repository.restoreFromTrash(ids) }.getOrNull() ?: return@launch
+            val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
+            _state.update { it.copy(trashEntries = entries) }
+            onDone(result)
+        }
+    }
+
+    /** Permanently deletes trash entries (all when [ids] is null) and reports the measured result. */
+    fun emptyTrash(ids: Collection<String>? = null, onDone: (Long) -> Unit = {}) {
+        viewModelScope.launch {
+            val before = ioAvailableBytes()
+            val freed = runCatching { repository.emptyTrash(ids) }.getOrDefault(0L)
+            val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
+            val storageAfter = ioStorageSnapshot()
+            _state.update { state ->
+                val current = state.cleanupResult
+                state.copy(
+                    trashEntries = entries,
+                    storage = storageAfter,
+                    cleanupResult = current?.let { result ->
+                        val gone = result.trashEntryIds.filterNot { id -> entries.any { it.id == id } }
+                        if (gone.isEmpty()) {
+                            result
+                        } else {
+                            result.copy(
+                                trashEntryIds = result.trashEntryIds - gone.toSet(),
+                                trashedBytes = (result.trashedBytes - freed).coerceAtLeast(0L),
+                                deletedBytes = result.deletedBytes + freed,
+                                afterAvailableBytes = storageAfter.availableBytes,
+                                beforeAvailableBytes = if (result.beforeAvailableBytes > 0L) result.beforeAvailableBytes else before,
+                            )
+                        }
+                    },
+                )
+            }
+            onDone(freed)
+        }
     }
 
     private fun restoreDashboardSnapshot() {
@@ -641,10 +732,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         failedCount = result.failedCount,
                         beforeAvailableBytes = storageBefore,
                         afterAvailableBytes = storageAfter.availableBytes,
+                        trashedBytes = result.trashedBytes,
+                        trashEntryIds = result.trashEntryIds,
+                        changedCount = result.changedCount,
                     )
+                    refreshTrash()
                     _state.update { state ->
                         val trackedWhatsAppBytes = state.dashboardCategoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
-                        val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes)
+                        val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes + result.trashedBytes)
                         state.copy(
                             whatsAppSummary = state.whatsAppSummary.copy(
                                 items = state.whatsAppSummary.items.filterNot { it.id in result.deletedIds },
@@ -916,7 +1011,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 val remaining = selected.filterNot { it.id in direct.attemptedIds }
                 val plan = repository.createDeleteRequest(remaining)
                 if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
-                    finishCleanup(selected, direct.deletedIds, direct.deletedBytes, direct.failedCount)
+                    finishCleanup(
+                        items = selected,
+                        deletedIds = direct.deletedIds,
+                        deletedBytes = direct.deletedBytes,
+                        failedCount = direct.failedCount,
+                        trashedBytes = direct.trashedBytes,
+                        trashEntryIds = direct.trashEntryIds,
+                        changedCount = direct.changedCount,
+                    )
+                    refreshTrash()
                     onCleanupCompleted(direct.deletedIds.isNotEmpty())
                 } else {
                     pendingConsentItems = remaining
@@ -975,7 +1079,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         deletedBytes = result.deletedBytes,
                         failedCount = result.failedCount,
                         beforeAvailableBytes = storageBefore,
+                        trashedBytes = result.trashedBytes,
+                        trashEntryIds = result.trashEntryIds,
+                        changedCount = result.changedCount,
                     )
+                    refreshTrash()
                     onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->
@@ -1070,6 +1178,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         storageBeforeBytes: Long = pendingCleanupStorageBeforeBytes,
         clearPending: Boolean = true,
         result: CleanupResult? = null,
+        trashedBytes: Long = 0L,
+        trashEntryIds: List<String> = emptyList(),
+        changedCount: Int = 0,
     ) {
         val storageAfter = ioStorageSnapshot()
         val memoryAfter = ioMemorySnapshot()
@@ -1081,6 +1192,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 failedCount = failedCount,
                 beforeAvailableBytes = storageBeforeBytes,
                 afterAvailableBytes = storageAfter.availableBytes,
+                trashedBytes = trashedBytes,
+                trashEntryIds = trashEntryIds,
+                changedCount = changedCount,
             )
         } else {
             null
@@ -1138,6 +1252,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         deletedBytes: Long,
         failedCount: Int,
         beforeAvailableBytes: Long,
+        trashedBytes: Long = 0L,
+        trashEntryIds: List<String> = emptyList(),
+        changedCount: Int = 0,
     ) {
         val storageAfter = ioStorageSnapshot()
         val memoryAfter = ioMemorySnapshot()
@@ -1147,6 +1264,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             failedCount = failedCount,
             beforeAvailableBytes = beforeAvailableBytes,
             afterAvailableBytes = storageAfter.availableBytes,
+            trashedBytes = trashedBytes,
+            trashEntryIds = trashEntryIds,
+            changedCount = changedCount,
         )
         _state.update { state ->
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)

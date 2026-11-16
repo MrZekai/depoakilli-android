@@ -1407,11 +1407,11 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing v41 storage-safety invariant: {expected}")
 
-delete_start = repository.find("private fun deleteUriDirectly(")
+delete_start = repository.find("private fun removeFile(")
 if delete_start < 0:
-    errors.append("deleteUriDirectly is missing")
+    errors.append("removeFile is missing")
 else:
-    delete_section = repository[delete_start:delete_start + 900]
+    delete_section = repository[delete_start:delete_start + 1400]
     if "isDeletableSharedStorageFile(file)" not in delete_section:
         errors.append("direct file deletion must be confined to shared storage roots")
 
