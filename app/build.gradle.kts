@@ -228,6 +228,8 @@ dependencies {
     implementation(libs.google.play.review)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    // Explicit (already present through Google Mobile Ads) for the daily trash purge.
+    implementation(libs.androidx.work.runtime)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
