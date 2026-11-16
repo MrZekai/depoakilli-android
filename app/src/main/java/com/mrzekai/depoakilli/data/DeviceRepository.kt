@@ -483,25 +483,37 @@ class DeviceRepository(
     suspend fun deleteDirectItems(items: List<CleanableItem>): DirectDeleteResult = withContext(Dispatchers.IO) {
         val directItems = items.filter { Uri.parse(it.uri).scheme == "file" }
         val deletedIds = hashSetOf<String>()
+        val failureReasons = mutableMapOf<String, DeleteFailureReason>()
         var deletedBytes = 0L
         directItems.forEach { item ->
             coroutineContext.ensureActive()
-            if (
-                fileSnapshotStillMatches(
-                    item.uri,
-                    item.sizeBytes,
-                    item.modifiedAtMillis,
-                ) &&
-                deleteUriDirectly(item.uri)
-            ) {
-                deletedIds += item.id
-                deletedBytes += item.sizeBytes
+            if (!fileSnapshotStillMatches(item.uri, item.sizeBytes, item.modifiedAtMillis)) return@forEach
+            val originalUri = item.protectedDuplicateUri
+            val result = if (originalUri == null) {
+                if (deleteUriDirectly(item.uri)) FileDeleter.Result.DELETED else FileDeleter.Result.DELETE_FAILED
+            } else {
+                val original = runCatching {
+                    val uri = Uri.parse(originalUri)
+                    if (uri.scheme != "file") null else uri.path?.let(::File)
+                }.getOrNull()
+                FileDeleter.deleteIfOriginalUnchanged(original, item.protectedDuplicateSizeBytes) {
+                    deleteUriDirectly(item.uri)
+                }
+            }
+            when (result) {
+                FileDeleter.Result.DELETED -> {
+                    deletedIds += item.id
+                    deletedBytes += item.sizeBytes
+                }
+                FileDeleter.Result.ORIGINAL_CHANGED -> failureReasons[item.id] = DeleteFailureReason.ORIGINAL_CHANGED
+                FileDeleter.Result.DELETE_FAILED -> Unit
             }
         }
         DirectDeleteResult(
             attemptedIds = directItems.mapTo(hashSetOf(), CleanableItem::id),
             deletedIds = deletedIds,
             deletedBytes = deletedBytes,
+            failureReasons = failureReasons,
         )
     }
 
@@ -851,6 +863,7 @@ class DeviceRepository(
                         duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(safe)).copy(
                             protectedDuplicateName = decision.keep.name,
                             protectedDuplicateUri = decision.keep.uri,
+                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
                         )
                     }
                 }
@@ -861,6 +874,7 @@ class DeviceRepository(
                         duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
                             protectedDuplicateName = decision.keep.name,
                             protectedDuplicateUri = decision.keep.uri,
+                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
                         )
                     }
                 }
@@ -1104,10 +1118,13 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
+    enum class DeleteFailureReason { ORIGINAL_CHANGED }
+
     data class DirectDeleteResult(
         val attemptedIds: Set<String>,
         val deletedIds: Set<String>,
         val deletedBytes: Long,
+        val failureReasons: Map<String, DeleteFailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
     }
