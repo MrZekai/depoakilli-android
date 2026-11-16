@@ -21,7 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.ads.ConsentManager
+import com.mrzekai.depoakilli.ads.AdFrequencyStore
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.InterstitialAdController
+import com.mrzekai.depoakilli.ads.InterstitialTrigger
 import com.mrzekai.depoakilli.ads.RewardedAdController
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
@@ -33,6 +36,7 @@ class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
+    private lateinit var adFrequency: AdFrequencyStore
     private lateinit var rewardedAds: RewardedAdController
     private var pendingDeepCacheAfterStorageAccess = false
     private var reviewPromptInFlight = false
@@ -97,7 +101,9 @@ class MainActivity : ComponentActivity() {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         consentManager = ConsentManager(applicationContext)
-        interstitialAds = InterstitialAdController(applicationContext)
+        adFrequency = AdFrequencyStore(applicationContext)
+        if (savedInstanceState == null) adFrequency.recordLaunch()
+        interstitialAds = InterstitialAdController(applicationContext, adFrequency)
         rewardedAds = RewardedAdController(applicationContext)
         consentManager.gatherConsent(this)
 
@@ -136,7 +142,8 @@ class MainActivity : ComponentActivity() {
                     onPrepareStorageCleanup = ::cleanStorage,
                     onPrepareWhatsAppCleanup = ::cleanWhatsApp,
                     onCleanupResultDismissed = ::onCleanupResultDismissed,
-                    onCleanupSucceeded = ::maybeAskForReview,
+                    onCleanupSucceeded = ::onCleanupSucceeded,
+                    onReturnedToClean = ::onReturnedToClean,
                     onUninstallApp = ::uninstallApp,
                     onOpenAppInfo = ::openAppInfo,
                     onOpenLanguageSettings = ::openLanguageSettings,
@@ -208,6 +215,17 @@ class MainActivity : ComponentActivity() {
      * Play decides whether the sheet is actually shown (its own quota); this
      * app additionally asks at most once every [REVIEW_PROMPT_INTERVAL_MILLIS].
      */
+    private fun onCleanupSucceeded() {
+        adFrequency.recordCleanupCompleted()
+        maybeAskForReview()
+    }
+
+    /** Trigger (b): back on the Clean tab after at least 20 s on a tool or detail screen. */
+    private fun onReturnedToClean(dwellMillis: Long) {
+        if (reviewPromptInFlight) return
+        showPostTaskInterstitial(trigger = InterstitialTrigger.RETURN_TO_CLEAN, dwellMillis = dwellMillis)
+    }
+
     private fun maybeAskForReview() {
         val prefs = getSharedPreferences("review_prompt", MODE_PRIVATE)
         val now = System.currentTimeMillis()
@@ -225,7 +243,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showPostTaskInterstitial(onFinished: () -> Unit = {}) {
+    private fun showPostTaskInterstitial(
+        trigger: InterstitialTrigger = InterstitialTrigger.CLEANUP_DONE,
+        dwellMillis: Long = Long.MAX_VALUE,
+        onFinished: () -> Unit = {},
+    ) {
         if ((application as DepoAkilliApplication).adFreeWindow.isActiveNow()) {
             onFinished()
             return
@@ -239,6 +261,8 @@ class MainActivity : ComponentActivity() {
             {
                 interstitialAds.showAtNaturalBreak(
                     activity = this,
+                    trigger = trigger,
+                    dwellMillis = dwellMillis,
                     onWillShow = {},
                     onFinished = {
                         app.endInterstitialSurface()
@@ -430,7 +454,10 @@ class MainActivity : ComponentActivity() {
         if (adFreeWindow.isActiveNow()) return
         rewardedAds.show(
             activity = this,
-            onWillShow = { (application as DepoAkilliApplication).beginInterstitialSurface() },
+            onWillShow = {
+                adFrequency.update { AdPolicy.recordFullScreen(it, System.currentTimeMillis()) }
+                (application as DepoAkilliApplication).beginInterstitialSurface()
+            },
             onUserEarnedReward = {
                 adFreeWindow.grant()
                 cleanerViewModel.showMessage(R.string.rewarded_ad_earned)

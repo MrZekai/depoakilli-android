@@ -253,8 +253,9 @@ for expected in (
 ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
 result_ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt")
 for expected in (
-    "INTERSTITIAL/SHOW_SKIP session-cap",
-    "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
+    "INTERSTITIAL/SHOW_SKIP policy",
+    "AdPolicy.canShowInterstitial(",
+    "AdPolicy.recordInterstitial(",
     "getCurrentOrientationAnchoredAdaptiveBannerAdSize",
     "Lifecycle.Event.ON_RESUME -> adView.resume()",
     "Lifecycle.Event.ON_PAUSE -> adView.pause()",
@@ -263,8 +264,17 @@ for expected in (
 ):
     if expected not in ads:
         errors.append(f"missing closed-test ad invariant: {expected}")
-if ads.count("private var shownThisProcess = false") != 1:
-    errors.append("exactly one process-session cap is required for the Interstitial controller")
+ad_policy = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt")
+for expected in (
+    "INTERSTITIAL_MIN_INTERVAL_SEC = 180L",
+    "INTERSTITIAL_MAX_PER_DAY = 6",
+    "FULLSCREEN_GAP_SEC = 60L",
+    "s.cleanupsCompleted == 0 && s.launchCount <= 1",
+):
+    if expected not in ad_policy:
+        errors.append(f"missing full-screen ad limit: {expected}")
+if "shownThisProcess" in ads:
+    errors.append("the per-process interstitial cap is replaced by AdPolicy limits")
 if "AdSize.BANNER" in ads:
     errors.append("fixed 320x50 banner must not return; use anchored adaptive banner")
 if "setImmersiveMode(true)" in ads:
@@ -497,8 +507,8 @@ for expected in (
 if "state.cleanupResult == null" not in cleaner_app:
     errors.append("normal bottom banner must be disabled while cleanup result is visible")
 
-if "eligibleForNaturalBreakAd && !resultAdPresented" not in cleaner_app:
-    errors.append("Interstitial must be fallback-only when result ad was not presented")
+if "if (eligibleForNaturalBreakAd) {\n                        onCleanupResultDismissed()" not in cleaner_app:
+    errors.append("Interstitial follows result Done for successful cleanups (frequency limited by AdPolicy)")
 
 # ------------------------------------------------------------------
 # Alpha6 measurable cache results + readable Home tool cards.
@@ -604,7 +614,6 @@ for expected in (
     "onCleanupResultDismissed()",
     "eligibleForNaturalBreakAd",
     "resultAdPresented",
-    "!resultAdPresented",
     "state.cleanupResult == null",
     "CleanupResultKind.SYSTEM_CACHE",
     "selectedTabIndex = AppTab.HOME.ordinal",

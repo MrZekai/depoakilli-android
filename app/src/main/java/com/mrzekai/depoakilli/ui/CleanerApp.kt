@@ -147,6 +147,7 @@ fun CleanerApp(
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onCleanupResultDismissed: () -> Unit,
     onCleanupSucceeded: () -> Unit,
+    onReturnedToClean: (dwellMillis: Long) -> Unit = {},
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -169,6 +170,20 @@ fun CleanerApp(
         }
     }
     val snackbarHostState = remember { SnackbarHostState() }
+    // Trigger (b): time spent on a tool/detail screen before returning to Clean.
+    var detailEnteredAt by remember { mutableStateOf(0L) }
+    LaunchedEffect(detailScreen, selectedTabIndex) {
+        val onCleanTab = detailScreen == null && selectedTabIndex == AppTab.HOME.ordinal
+        if (detailScreen != null && detailEnteredAt == 0L) {
+            detailEnteredAt = android.os.SystemClock.elapsedRealtime()
+        } else if (onCleanTab && detailEnteredAt > 0L) {
+            val dwell = android.os.SystemClock.elapsedRealtime() - detailEnteredAt
+            detailEnteredAt = 0L
+            if (state.cleanupResult == null && !state.cleanupInProgress && !state.scanning) onReturnedToClean(dwell)
+        } else if (detailScreen == null) {
+            detailEnteredAt = 0L
+        }
+    }
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -648,6 +663,8 @@ fun CleanerApp(
                 val returnTabIndex = selectedTabIndex
 
                 viewModel.dismissCleanupResult()
+                // Done already gives the post-cleanup break; no second one on return.
+                detailEnteredAt = 0L
                 legalReturnScreen = null
                 // Done returns to the tool's main screen with refreshed
                 // totals, not to the sub-list the cleanup was started from,
@@ -696,7 +713,9 @@ fun CleanerApp(
                     dismissResultAndReturn()
 
                     if (eligibleForNaturalBreakAd && result.failedCount == 0) onCleanupSucceeded()
-                    if (eligibleForNaturalBreakAd && !resultAdPresented) {
+                    // Trigger (a): Done closes the result, also when the result
+                    // panel already showed an ad; AdPolicy limits frequency.
+                    if (eligibleForNaturalBreakAd) {
                         onCleanupResultDismissed()
                     }
                 },
