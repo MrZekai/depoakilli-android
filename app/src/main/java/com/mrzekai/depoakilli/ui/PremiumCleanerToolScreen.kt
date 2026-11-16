@@ -83,6 +83,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.FileVisuals
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
@@ -845,7 +846,7 @@ private fun PremiumToolPreviewDialog(
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                Text(compactPath(item.relativePath), color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(bidiWrap(compactPath(item.relativePath)), color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(ByteFormatter.format(item.sizeBytes), color = accent, fontWeight = FontWeight.Black)

@@ -1524,6 +1524,11 @@ byte_formatter_models = read("app/src/main/java/com/mrzekai/depoakilli/model/Cle
 if "Formatter.formatShortFileSize" not in byte_formatter_models or "ByteFormatter.install(this)" not in read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt"):
     errors.append("ByteFormatter must use Formatter.formatShortFileSize with the app context installed at start")
 
+if '"$progress%"' in read("app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt"):
+    errors.append("WhatsApp progress percent must come from a string resource")
+if "unicodeWrap" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/common/BidiText.kt"):
+    errors.append("paths and sizes must be bidi-wrapped for right-to-left languages")
+
 plural_sets = {}
 for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
     root = ET.parse(strings_path).getroot()

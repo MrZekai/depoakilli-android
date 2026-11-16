@@ -87,6 +87,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.FileVisuals
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
@@ -1811,7 +1812,7 @@ private fun FilePreviewDialog(
                             )
                         }
                         Text(
-                            file.relativePath.ifBlank { stringResource(R.string.smart_path_unknown) },
+                            file.relativePath.ifBlank { stringResource(R.string.smart_path_unknown) }.let(::bidiWrap),
                             color = Color(0xFFA9B9D5),
                             style = MaterialTheme.typography.bodySmall,
                             maxLines = 2,
@@ -1918,10 +1919,7 @@ private fun compactRelativePath(path: String): String {
     val clean = path.trim().trim('/')
     if (clean.isBlank()) return "—"
     val parts = clean.split('/').filter(String::isNotBlank)
-    return when {
-        parts.size <= 2 -> parts.joinToString("/")
-        else -> parts.takeLast(2).joinToString("/")
-    }
+    return bidiWrap(parts.takeLast(2).joinToString("/"))
 }
 
 @Composable

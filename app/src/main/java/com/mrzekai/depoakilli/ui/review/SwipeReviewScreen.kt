@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.ContrastTokens
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -223,7 +224,7 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(item.relativePath, color = SwipeSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(bidiWrap(item.relativePath), color = SwipeSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val days = if (item.modifiedAtMillis > 0L) {
                     TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis() - item.modifiedAtMillis).coerceAtLeast(0L)).toInt()
                 } else {

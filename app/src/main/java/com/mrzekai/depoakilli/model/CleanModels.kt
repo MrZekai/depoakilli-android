@@ -319,7 +319,8 @@ object ByteFormatter {
             val localized = runCatching {
                 android.text.format.Formatter.formatShortFileSize(context, bytes.coerceAtLeast(0L))
             }.getOrNull()
-            if (!localized.isNullOrBlank()) return localized
+            // Kept in one direction inside right-to-left text (Arabic).
+            if (!localized.isNullOrBlank()) return runCatching { android.text.BidiFormatter.getInstance().unicodeWrap(localized) }.getOrDefault(localized)
         }
         return formatRoot(bytes)
     }
