@@ -1038,3 +1038,10 @@ private fun compactPath(path: String): String {
         else -> parts.takeLast(3).joinToString(" › ")
     }
 }
+
+private fun isDocumentOrArchive(item: CleanableItem): Boolean {
+    val ext = item.name.substringAfterLast('.', "").lowercase()
+    return item.mimeType.startsWith("text/") ||
+        item.mimeType.contains("pdf") ||
+        ext in setOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "tar", "gz")
+}
