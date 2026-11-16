@@ -647,7 +647,8 @@
     <string name="disclosure_usage_body">L\'accesso all\'utilizzo è facoltativo. Consente a Smart Cleaner di leggere i totali di archiviazione/cache delle app segnalati da Android e gli ultimi tempi di utilizzo in modo da poter esaminare app di grandi dimensioni o inutilizzate. Non legge i contenuti privati ​​all\'interno di tali app e non elimina silenziosamente i dati protetti.</string>
     <string name="disclosure_continue">Continua</string>
     <string name="disclosure_not_now">Non ora</string>
-    <string name="smart_cleanup_ad_notice">La pulizia viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner è gratuita e mostra annunci: un banner, un annuncio nativo contrassegnato in alcuni elenchi, un pannello pubblicitario nel risultato della pulizia, talvolta un annuncio a schermo intero dopo una pulizia o al ritorno alla scheda Pulisci e un annuncio all’apertura mentre l’app si carica. Gli annunci non compaiono mai nei passaggi di autorizzazione o conferma; un breve video rimuove banner e annunci a schermo intero per 60 minuti.</string>
     <string name="whatsapp_cleanup_ad_notice">La pulizia WhatsApp viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
     <string name="premium_cleanup_ad_notice">La pulizia viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
     <string name="home_smart_clean_subtitle">Esaminare i veri candidati alla pulizia</string>
@@ -952,5 +953,13 @@
         <item quantity="one">Esaminati: %1$d · contrassegnati: %2$s</item>
         <item quantity="many">Esaminati: %1$d · contrassegnati: %2$s</item>
         <item quantity="other">Esaminati: %1$d · contrassegnati: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Guarda e verifica</string>
+    <string name="deep_check_running">Controllo dei file grandi che sembrano identici…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
+        <item quantity="many">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
+        <item quantity="other">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
     </plurals>
 </resources>

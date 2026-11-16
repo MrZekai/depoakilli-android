@@ -804,8 +804,8 @@ for required_name in (
     "terms_of_service_body_v050",
     "about_app_body_v050",
     "smart_cleanup_ad_notice",
-    "whatsapp_cleanup_ad_notice",
-    "premium_cleanup_ad_notice",
+
+
     "home_last_cleanup_title",
     "home_last_cleanup_summary",
     "home_smart_suggestions_title",
@@ -884,14 +884,15 @@ for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
                 f"stale/misleading copy remains in {strings_path.relative_to(ROOT)}: {stale_copy}"
             )
 
-if default_strings.count("sponsored ad panel") != 3:
-    errors.append("all three English cleanup notices must disclose the result-screen sponsored panel")
-if tr_strings.count("sponsorlu reklam paneli") != 3:
-    errors.append("all three Turkish cleanup notices must disclose the result-screen sponsored panel")
-if default_strings.count("no full-screen ad follows for the same cleanup") != 3:
-    errors.append("English cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
-if tr_strings.count("aynı temizlik için tam ekran reklam gösterilmez") != 3:
-    errors.append("Turkish cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
+# Ad disclosure lives on the About screen, not inside deletion confirmations,
+# and names every format in use (T0.6, T1B.7).
+for name, body in (("English", default_strings), ("Turkish", tr_strings)):
+    notice = re.search(r'<string name="smart_cleanup_ad_notice">(.*?)</string>', body, re.S)
+    text = notice.group(1) if notice else ""
+    for token in (("app open", "native", "full-screen", "60 minutes") if name == "English"
+                  else ("açılış reklamı", "yerel reklam", "tam ekran", "60 dakika")):
+        if token not in text:
+            errors.append(f"{name} ad disclosure must mention: {token}")
 if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
     errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
 for expected in (
@@ -980,7 +981,7 @@ for expected in (
     "WhatsAppGroupSection",
     "WhatsAppPreviewDialog",
     "ExoPlayer.Builder",
-    "whatsapp_cleanup_ad_notice",
+
 ):
     if expected not in whatsapp_ui:
         errors.append(f"missing WhatsApp review invariant: {expected}")
@@ -989,7 +990,7 @@ premium_tools = read("app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleaner
 for expected in (
     "PremiumCleanerToolScreen",
     "PremiumCleanupConfirmationDialog",
-    "premium_cleanup_ad_notice",
+
     "ExoPlayer.Builder",
 ):
     if expected not in premium_tools:

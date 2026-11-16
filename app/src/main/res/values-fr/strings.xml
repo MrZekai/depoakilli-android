@@ -647,7 +647,8 @@
     <string name="disclosure_usage_body">L\'accès à l\'utilisation est facultatif. Il permet à Smart Cleaner de lire les totaux de stockage/cache des applications signalés par Android et les heures de dernière utilisation afin que vous puissiez examiner les applications volumineuses ou inutilisées. Il ne lit pas le contenu privé de ces applications et ne supprime pas silencieusement leurs données protégées.</string>
     <string name="disclosure_continue">Continuer</string>
     <string name="disclosure_not_now">Pas maintenant</string>
-    <string name="smart_cleanup_ad_notice">Le nettoyage s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner est gratuit et affiche des annonces : une bannière, une annonce native identifiée dans certaines listes, un encart publicitaire sur le résultat du nettoyage, parfois une annonce plein écran après un nettoyage ou au retour dans l’onglet Nettoyer, et une annonce à l’ouverture pendant le chargement. Aucune annonce n’apparaît pendant les étapes d’autorisation ou de confirmation ; une courte vidéo supprime la bannière et les annonces plein écran pendant 60 minutes.</string>
     <string name="whatsapp_cleanup_ad_notice">Le nettoyage WhatsApp s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
     <string name="premium_cleanup_ad_notice">Le nettoyage s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
     <string name="home_smart_clean_subtitle">Examinez les vrais candidats au nettoyage</string>
@@ -952,5 +953,13 @@
         <item quantity="one">Examinés : %1$d · marqués : %2$s</item>
         <item quantity="many">Examinés : %1$d · marqués : %2$s</item>
         <item quantity="other">Examinés : %1$d · marqués : %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Regarder et vérifier</string>
+    <string name="deep_check_running">Vérification des gros fichiers qui semblent identiques…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
+        <item quantity="many">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
+        <item quantity="other">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
     </plurals>
 </resources>

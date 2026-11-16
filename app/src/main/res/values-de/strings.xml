@@ -621,7 +621,8 @@
     <string name="disclosure_usage_body">Der Nutzungszugriff ist optional. Damit kann Smart Cleaner die von Android gemeldeten App-Speicher-/Cache-Gesamtwerte und die zuletzt genutzten Zeiten lesen, sodass Sie große oder ungenutzte Apps überprüfen können. Die privaten Inhalte in diesen Apps werden nicht gelesen und ihre geschützten Daten werden nicht stillschweigend gelöscht.</string>
     <string name="disclosure_continue">Weiter</string>
     <string name="disclosure_not_now">Nicht jetzt</string>
-    <string name="smart_cleanup_ad_notice">Zuerst wird die Bereinigung durchgeführt und das gemessene Ergebnis wird zuerst angezeigt. Der Ergebnisbildschirm kann ein gesponsertes Anzeigenfeld enthalten. Wenn dieses Panel angezeigt wird, folgt für dieselbe Bereinigung keine Vollbildanzeige. Wenn sie nicht angezeigt wird, erscheint möglicherweise eine geeignete Vollbildanzeige, nachdem Sie das Ergebnis geschlossen haben.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner ist kostenlos und zeigt Werbung: ein Banner, eine gekennzeichnete native Anzeige in manchen Listen, ein Werbefeld im Bereinigungsergebnis, gelegentlich eine Vollbildanzeige nach einer Bereinigung oder bei der Rückkehr zum Tab „Bereinigen“ sowie eine App-Start-Anzeige beim Laden. In Berechtigungs- oder Bestätigungsschritten erscheint nie Werbung; ein kurzes Video entfernt Banner und Vollbildanzeigen für 60 Minuten.</string>
     <string name="whatsapp_cleanup_ad_notice">Die WhatsApp-Bereinigung wird zuerst ausgeführt und das gemessene Ergebnis wird zuerst angezeigt. Der Ergebnisbildschirm kann ein gesponsertes Anzeigenfeld enthalten. Wenn dieses Panel angezeigt wird, folgt für dieselbe Bereinigung keine Vollbildanzeige. Wenn sie nicht angezeigt wird, erscheint möglicherweise eine geeignete Vollbildanzeige, nachdem Sie das Ergebnis geschlossen haben.</string>
     <string name="premium_cleanup_ad_notice">Zuerst wird die Bereinigung durchgeführt und das gemessene Ergebnis wird zuerst angezeigt. Der Ergebnisbildschirm kann ein gesponsertes Anzeigenfeld enthalten. Wenn dieses Panel angezeigt wird, folgt für dieselbe Bereinigung keine Vollbildanzeige. Wenn sie nicht angezeigt wird, erscheint möglicherweise eine geeignete Vollbildanzeige, nachdem Sie das Ergebnis geschlossen haben.</string>
     <string name="home_smart_clean_subtitle">Überprüfen Sie echte Aufräumkandidaten</string>
@@ -905,5 +906,12 @@
     <plurals name="swipe_break">
         <item quantity="one">Geprüft: %1$d · markiert: %2$s</item>
         <item quantity="other">Geprüft: %1$d · markiert: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Ansehen und prüfen</string>
+    <string name="deep_check_running">Große, scheinbar identische Dateien werden geprüft…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">Große, scheinbar identische Dateien: %1$d · bis zu %2$s. Kurzes Video ansehen, um sie zu prüfen.</item>
+        <item quantity="other">Große, scheinbar identische Dateien: %1$d · bis zu %2$s. Kurzes Video ansehen, um sie zu prüfen.</item>
     </plurals>
 </resources>

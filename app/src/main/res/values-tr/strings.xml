@@ -636,7 +636,7 @@
     <string name="disclosure_usage_body">Kullanım Erişimi isteğe bağlıdır. Android’in bildirdiği uygulama depolama/önbellek toplamlarını ve son kullanım zamanlarını okuyarak büyük veya uzun süredir kullanılmayan uygulamaları incelemeni sağlar. Uygulamaların özel içeriğini okumaz ve korunan verilerini sessizce silmez.</string>
     <string name="disclosure_continue">Devam et</string>
     <string name="disclosure_not_now">Şimdi değil</string>
-    <string name="smart_cleanup_ad_notice">Temizlik önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
+    <string name="smart_cleanup_ad_notice">Smart Cleaner ücretsizdir ve reklam gösterir: banner, bazı listelerde \"Reklam\" etiketli tek bir yerel reklam, temizlik sonucunda bir reklam paneli, temizlikten sonra ya da Temizle sekmesine dönerken zaman zaman tam ekran reklam ve uygulama açılırken bir açılış reklamı. İzin ve onay adımlarında reklam çıkmaz; kısa bir video izleyerek banner ve tam ekran reklamları 60 dakika kaldırabilirsiniz.</string>
     <string name="whatsapp_cleanup_ad_notice">WhatsApp temizliği önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
     <string name="premium_cleanup_ad_notice">Temizlik önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
 
@@ -921,5 +921,11 @@
     <plurals name="swipe_break">
         <item quantity="one">%1$d incelendi · %2$s işaretli</item>
         <item quantity="other">%1$d incelendi · %2$s işaretli</item>
+    </plurals>
+    <string name="deep_check_action">İzle ve doğrula</string>
+    <string name="deep_check_running">Aynı görünen büyük dosyalar kontrol ediliyor…</string>
+    <plurals name="deep_check_row">
+        <item quantity="one">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
+        <item quantity="other">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
     </plurals>
 </resources>

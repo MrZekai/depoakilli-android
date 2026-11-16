@@ -639,7 +639,8 @@
     <string name="disclosure_usage_body">O acesso de uso é opcional. Ele permite que o Smart Cleaner leia os totais de armazenamento/cache de apps reportados pelo Android e os horários de último uso, para que você possa revisar apps grandes ou não usados. Ele não lê o conteúdo privado dentro desses apps e não exclui silenciosamente seus dados protegidos.</string>
     <string name="disclosure_continue">Continuar</string>
     <string name="disclosure_not_now">Agora não</string>
-    <string name="smart_cleanup_ad_notice">A limpeza é executada primeiro e o resultado medido é mostrado primeiro. A tela de resultado pode incluir um painel de anúncio patrocinado. Se esse painel for mostrado, nenhum anúncio em tela cheia será exibido para a mesma limpeza. Se não for mostrado, um anúncio em tela cheia qualificado poderá aparecer depois que você fechar o resultado.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">O Smart Cleaner é gratuito e exibe anúncios: um banner, um anúncio nativo identificado em algumas listas, um painel de anúncio no resultado da limpeza, às vezes um anúncio em tela cheia após uma limpeza ou ao voltar para a aba Limpar e um anúncio de abertura enquanto o app carrega. Anúncios nunca aparecem em etapas de permissão ou confirmação; um vídeo curto remove o banner e os anúncios em tela cheia por 60 minutos.</string>
     <string name="whatsapp_cleanup_ad_notice">A limpeza do WhatsApp é executada primeiro e o resultado medido é mostrado primeiro. A tela de resultado pode incluir um painel de anúncio patrocinado. Se esse painel for mostrado, nenhum anúncio em tela cheia será exibido para a mesma limpeza. Se não for mostrado, um anúncio em tela cheia qualificado poderá aparecer depois que você fechar o resultado.</string>
     <string name="premium_cleanup_ad_notice">A limpeza é executada primeiro e o resultado medido é mostrado primeiro. A tela de resultado pode incluir um painel de anúncio patrocinado. Se esse painel for mostrado, nenhum anúncio em tela cheia será exibido para a mesma limpeza. Se não for mostrado, um anúncio em tela cheia qualificado poderá aparecer depois que você fechar o resultado.</string>
     <string name="home_smart_clean_subtitle">Revise candidatos reais à limpeza</string>
@@ -927,5 +928,12 @@
     <plurals name="swipe_break">
         <item quantity="one">Revisados: %1$d · marcados: %2$s</item>
         <item quantity="other">Revisados: %1$d · marcados: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Assistir e verificar</string>
+    <string name="deep_check_running">Verificando arquivos grandes que parecem idênticos…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
+        <item quantity="other">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
     </plurals>
 </resources>

@@ -636,7 +636,7 @@
     <string name="disclosure_usage_body">Usage Access is optional. It lets Smart Cleaner read Android-reported app storage/cache totals and last-used times so you can review large or unused apps. It does not read the private content inside those apps and does not silently delete their protected data.</string>
     <string name="disclosure_continue">Continue</string>
     <string name="disclosure_not_now">Not now</string>
-    <string name="smart_cleanup_ad_notice">Cleanup runs first and the measured result is shown first. The result screen may include one sponsored ad panel. If that panel is shown, no full-screen ad follows for the same cleanup. If it is not shown, one eligible full-screen ad may appear after you close the result.</string>
+    <string name="smart_cleanup_ad_notice">Smart Cleaner is free and shows ads: a banner, one labeled native ad in some lists, an ad panel on the cleanup result, an occasional full-screen ad after a cleanup or when you return to the Clean tab, and an app open ad while the app loads. Ads never appear inside permission or confirmation steps, and a short video can remove banner and full-screen ads for 60 minutes.</string>
     <string name="whatsapp_cleanup_ad_notice">WhatsApp cleanup runs first and the measured result is shown first. The result screen may include one sponsored ad panel. If that panel is shown, no full-screen ad follows for the same cleanup. If it is not shown, one eligible full-screen ad may appear after you close the result.</string>
     <string name="premium_cleanup_ad_notice">Cleanup runs first and the measured result is shown first. The result screen may include one sponsored ad panel. If that panel is shown, no full-screen ad follows for the same cleanup. If it is not shown, one eligible full-screen ad may appear after you close the result.</string>
 
@@ -921,5 +921,11 @@
     <plurals name="swipe_break">
         <item quantity="one">%1$d reviewed · %2$s marked</item>
         <item quantity="other">%1$d reviewed · %2$s marked</item>
+    </plurals>
+    <string name="deep_check_action">Watch and verify</string>
+    <string name="deep_check_running">Checking large look-alike files…</string>
+    <plurals name="deep_check_row">
+        <item quantity="one">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
+        <item quantity="other">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
     </plurals>
 </resources>
