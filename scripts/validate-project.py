@@ -618,7 +618,7 @@ for expected in (
 for expected in (
     "AppTab.HOME,",
     "AppTab.TOOLS -> true",
-    "AppTab.ME -> false",
+    "AppTab.TRASH -> false",
     "DetailScreen.ACCESS,",
     "DetailScreen.SETTINGS,",
 ):
@@ -635,7 +635,9 @@ for forbidden in (
         errors.append(f"obsolete four-tab/dead-home architecture remains: {forbidden}")
 
 for expected in (
-    "AppTab.ME -> SettingsDetailScreen(",
+    "DetailScreen.SETTINGS -> SettingsDetailScreen(",
+    "AppTab.TRASH -> TrashScreen(",
+    "Icons.Outlined.Settings",
     "DetailScreen.ACCESS -> SecurityCenterScreen(",
 ):
     if expected not in cleaner_app and expected not in device_center:

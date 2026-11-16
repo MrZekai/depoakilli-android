@@ -116,6 +116,14 @@ data class CleanerUiState(
     val whatsAppLastScanCompleted: Boolean = false,
     val deviceInfo: DeviceInfoSnapshot = DeviceInfoSnapshot(),
     val trashEntries: List<TrashEntry> = emptyList(),
+    /** Full-content duplicate check in progress during a scan. */
+    val scanHashing: Boolean = false,
+    val scanHashDoneBytes: Long = 0L,
+    val scanHashTotalBytes: Long = 0L,
+    /** The Smart plan, kept while a tool scan temporarily owns [summary]. */
+    val planSummary: ScanSummary? = null,
+    /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */
+    val planScannedAtElapsed: Long = 0L,
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -457,6 +465,63 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         scan(focus)
     }
 
+    private var scanJob: Job? = null
+
+    /** Cancels a running scan; the screen closes immediately and a new scan can start. */
+    fun cancelScan() {
+        scanJob?.cancel()
+        scanJob = null
+        _state.update {
+            it.copy(
+                scanning = false,
+                dashboardRefreshing = false,
+                scanHashing = false,
+                message = null,
+            )
+        }
+    }
+
+    /**
+     * Quick plan scan on app open (T1.10): only with all-files access, never
+     * while another scan runs, and only when there is no plan or it is older
+     * than [QUICK_SCAN_MAX_AGE_HOURS]. Nothing is ever deleted automatically.
+     */
+    fun onAppOpened() {
+        val current = _state.value
+        val hasPlan = current.planSummary != null ||
+            (current.scanFocus == ScanFocus.SMART && current.lastScanCompleted)
+        if (
+            AutoScanPolicy.shouldScan(
+                hasAccess = repository.hasAllFilesAccess(),
+                scanning = current.scanning,
+                hasPlan = hasPlan,
+                planScannedAtElapsed = current.planScannedAtElapsed,
+                nowElapsed = SystemClock.elapsedRealtime(),
+            )
+        ) {
+            scan(ScanFocus.SMART)
+        }
+    }
+
+    /** Brings the Smart plan back after a tool scan replaced the shown results. */
+    fun showPlan() {
+        _state.update { state ->
+            val stashed = state.planSummary
+            if (state.scanning || state.scanFocus == ScanFocus.SMART || stashed == null) {
+                state
+            } else {
+                state.copy(
+                    summary = stashed,
+                    planSummary = null,
+                    scanFocus = ScanFocus.SMART,
+                    lastScanCompleted = true,
+                    smartCategoryReview = null,
+                    smartCategoryReviewIds = null,
+                )
+            }
+        }
+    }
+
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
         if (!repository.hasAllFilesAccess()) {
@@ -478,7 +543,17 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         val scanStartedAtElapsed = SystemClock.elapsedRealtime()
         AppDiagnostics.breadcrumb("scan_started", mapOf("focus" to focus.name))
         _state.update {
+            // Keep the Smart plan while a tool scan borrows the results area.
+            val stash = when {
+                focus == ScanFocus.SMART -> null
+                it.scanFocus == ScanFocus.SMART && it.lastScanCompleted -> it.summary
+                else -> it.planSummary
+            }
             it.copy(
+                planSummary = stash,
+                scanHashing = false,
+                scanHashDoneBytes = 0L,
+                scanHashTotalBytes = 0L,
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
                 storageReview = StorageReviewSummary(),
@@ -493,16 +568,24 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 message = null,
             )
         }
-        viewModelScope.launch {
+        scanJob = viewModelScope.launch {
             runCatching {
-                repository.scan(focus) { directories, files ->
-                    _state.update { current ->
-                        current.copy(
-                            scanProgressDirectories = directories,
-                            scanProgressFiles = files,
-                        )
-                    }
-                }
+                repository.scan(
+                    focus = focus,
+                    onProgress = { directories, files ->
+                        _state.update { current ->
+                            current.copy(
+                                scanProgressDirectories = directories,
+                                scanProgressFiles = files,
+                            )
+                        }
+                    },
+                    onHashProgress = { done, total ->
+                        _state.update { current ->
+                            current.copy(scanHashing = true, scanHashDoneBytes = done, scanHashTotalBytes = total)
+                        }
+                    },
+                )
             }.onSuccess { summary ->
                 AppDiagnostics.breadcrumb(
                     "scan_completed",
@@ -584,7 +667,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         },
                         scanning = false,
                         dashboardRefreshing = false,
+                        scanHashing = false,
                         lastScanCompleted = true,
+                        planScannedAtElapsed = if (focus == ScanFocus.SMART) {
+                            SystemClock.elapsedRealtime()
+                        } else {
+                            it.planScannedAtElapsed
+                        },
                         storage = storageSnapshot,
                         memory = memorySnapshot,
                         hasAllFilesAccess = hasAllFilesAccess,
@@ -615,6 +704,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     current.copy(
                         scanning = false,
                         dashboardRefreshing = false,
+                        scanHashing = false,
                         message = getApplication<Application>().getString(R.string.message_scan_failed),
                     )
                 }
@@ -1237,8 +1327,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 .asSequence()
                 .filterNot { it.assessment.recommended }
                 .sumOf(CleanableItem::sizeBytes)
+            val removedUris = deletedItems.mapTo(hashSetOf(), CleanableItem::uri)
             state.copy(
                 summary = state.summary.copy(items = state.summary.items.filterNot { it.id in deletedIds }),
+                planSummary = state.planSummary?.let { plan ->
+                    plan.copy(items = plan.items.filterNot { it.uri in removedUris })
+                },
                 dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedAutoSelectedBytes).coerceAtLeast(0L),
                 dashboardReviewBytes = (state.dashboardReviewBytes - deletedReviewBytes).coerceAtLeast(0L),
                 dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
@@ -1574,4 +1668,21 @@ internal suspend inline fun <T> runSuspendCatching(block: () -> T): Result<T> = 
     throw cancellation
 } catch (failure: Exception) {
     Result.failure(failure)
+}
+
+/** Pure rule for the automatic quick scan on app open (T1.10). */
+internal object AutoScanPolicy {
+    const val QUICK_SCAN_MAX_AGE_HOURS = 6L
+
+    fun shouldScan(
+        hasAccess: Boolean,
+        scanning: Boolean,
+        hasPlan: Boolean,
+        planScannedAtElapsed: Long,
+        nowElapsed: Long,
+    ): Boolean {
+        if (!hasAccess || scanning) return false
+        if (!hasPlan || planScannedAtElapsed <= 0L) return true
+        return nowElapsed - planScannedAtElapsed > java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
+    }
 }

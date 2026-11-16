@@ -53,6 +53,26 @@ class CleanerViewModelPlanTest {
         assertTrue(PlanSelection.applyVerification(items, "u", null).isEmpty())
     }
 
+    @Test
+    fun `app open starts a quick scan only when needed`() {
+        val hour = 3_600_000L
+        val now = 100 * hour
+        assertFalse(AutoScanPolicy.shouldScan(hasAccess = true, scanning = false, hasPlan = true, planScannedAtElapsed = now - hour, nowElapsed = now))
+        assertTrue(AutoScanPolicy.shouldScan(hasAccess = true, scanning = false, hasPlan = true, planScannedAtElapsed = now - 7 * hour, nowElapsed = now))
+        assertTrue(AutoScanPolicy.shouldScan(hasAccess = true, scanning = false, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
+        assertFalse(AutoScanPolicy.shouldScan(hasAccess = false, scanning = false, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
+        assertFalse(AutoScanPolicy.shouldScan(hasAccess = true, scanning = true, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
+    }
+
+    @Test
+    fun `trash days left round up and never go negative`() {
+        val day = 86_400_000L
+        val entry = com.mrzekai.depoakilli.data.TrashEntry("id", "/a", "/t", 1L, 0L, deletedAtMillis = 0L, group = "")
+        assertEquals(7, trashDaysLeft(entry, 0L))
+        assertEquals(1, trashDaysLeft(entry, 6 * day + 1))
+        assertEquals(0, trashDaysLeft(entry, 8 * day))
+    }
+
     private fun item(id: String, group: CleanupGroup, size: Long): CleanableItem {
         val assessment = engine.assessment(group, 0)
         return CleanableItem(
