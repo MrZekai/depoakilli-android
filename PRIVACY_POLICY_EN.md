@@ -12,9 +12,11 @@ Usage Access is optional. When granted, it is used for Android-reported app stor
 
 Smart Cleaner does not upload personal files, file names, file paths, file contents, duplicate fingerprints, or installed-app lists to MrZekai.
 
+The app itself does not send file names, file contents, or search terms off the device.
+
 ## Third-party processing
 
-Google Mobile Ads and Google's User Messaging Platform may process advertising identifiers, consent choices, diagnostics, and app interactions under Google's policies. Smart Cleaner does not include a third-party crash-reporting service. File names, paths, contents, duplicate fingerprints, installed-app lists, and user-entered text are not uploaded for crash reporting.
+To display ads, the Google Mobile Ads SDK processes IP address (to estimate approximate location), advertising ID or app set ID, app interactions, and diagnostic data. Google Mobile Ads and Google's User Messaging Platform may process advertising identifiers, consent choices, diagnostics, and app interactions under Google's policies. Smart Cleaner does not include a third-party crash-reporting service. File names, paths, contents, duplicate fingerprints, installed-app lists, and user-entered text are not uploaded for crash reporting.
 
 Data is transmitted to these providers using encrypted network connections. Their retention and deletion practices are governed by their published policies. Smart Cleaner does not sell personal or sensitive user data.
 

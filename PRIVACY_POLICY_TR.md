@@ -12,9 +12,11 @@ Kullanım Erişimi isteğe bağlıdır. İzin verildiğinde Android'in bildirdi�
 
 Akıllı Temizleyici kişisel dosyaları, dosya adlarını, dosya yollarını, dosya içeriklerini, kopya parmak izlerini veya kurulu uygulama listelerini MrZekai'ye yüklemez.
 
+Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.
+
 ## Üçüncü taraf işlemleri
 
-Google Mobile Ads ve Google User Messaging Platform; Google politikaları kapsamında reklam tanımlayıcılarını, onay seçimlerini, tanılama verilerini ve uygulama etkileşimlerini işleyebilir. Akıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, içerikler, kopya parmak izleri, kurulu uygulama listeleri ve kullanıcı tarafından girilen metinler çökme raporlaması amacıyla yüklenmez.
+Google Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Google Mobile Ads ve Google User Messaging Platform; Google politikaları kapsamında reklam tanımlayıcılarını, onay seçimlerini, tanılama verilerini ve uygulama etkileşimlerini işleyebilir. Akıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, içerikler, kopya parmak izleri, kurulu uygulama listeleri ve kullanıcı tarafından girilen metinler çökme raporlaması amacıyla yüklenmez.
 
 Veriler bu sağlayıcılara şifreli ağ bağlantılarıyla iletilir. Saklama ve silme uygulamaları kendi yayımlanmış politikalarına tabidir. Akıllı Temizleyici kişisel veya hassas kullanıcı verilerini satmaz.
 
