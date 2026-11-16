@@ -26,4 +26,18 @@ class StoragePathRulesTest {
         assertTrue(StoragePathRules.isSystemMarkerFile(".nomedia.jpg"))
         assertFalse(StoragePathRules.isSystemMarkerFile("IMG_0001.jpg"))
     }
+
+    @Test fun `WhatsApp backups and encrypted databases are protected`() {
+        assertTrue(StoragePathRules.isProtectedUserDataPath("Android/media/com.whatsapp/WhatsApp/Databases", "msgstore.db.crypt14"))
+        assertTrue(StoragePathRules.isProtectedUserDataPath("WhatsApp/Backups", "backup.zip"))
+        assertTrue(StoragePathRules.isProtectedUserDataPath("Download", "anything.crypt15"))
+        assertTrue(StoragePathRules.isProtectedUserDataPath("Download", "msgstore.db"))
+        assertFalse(StoragePathRules.isProtectedUserDataPath("Pictures/Backups", "photo.jpg"))
+    }
+
+    @Test fun `only recognized hidden media folders are allowed`() {
+        assertTrue(StoragePathRules.isHiddenDirectoryAllowed(".thumbnails"))
+        assertTrue(StoragePathRules.isHiddenDirectoryAllowed(".STATUSES"))
+        assertFalse(StoragePathRules.isHiddenDirectoryAllowed(".vault"))
+    }
 }

@@ -633,6 +633,8 @@ class DeviceRepository(
                     }
                 } else if (child.isFile) {
                     if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    val relative = runCatching { child.parentFile?.relativeTo(root.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
+                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
                     if (!visitedFilePaths.add(filePath)) continue
                     val size = child.length().coerceAtLeast(0L)
@@ -684,11 +686,14 @@ class DeviceRepository(
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null) {
+                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null &&
+                        !shouldSkipDirectory(storageRoot.file, child)) {
                         pending.addLast(storageRoot to child)
                     }
                 } else if (child.isFile && child.length() > 0L) {
                     if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    val relative = runCatching { child.parentFile?.relativeTo(storageRoot.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
+                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
                     if (!visitedFiles.add(filePath)) continue
                     output += indexedFile(storageRoot.file, child)
@@ -783,7 +788,8 @@ class DeviceRepository(
         } ?: return false
         val rootPath = canonicalPathOf(root).trimEnd('/')
         val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
-        return !StoragePathRules.isProtectedAppPrivatePath(relative)
+        return !StoragePathRules.isProtectedAppPrivatePath(relative) &&
+            !StoragePathRules.isProtectedUserDataPath(relative.substringBeforeLast('/', ""), file.name)
     }
 
     @Suppress("DEPRECATION")
@@ -802,7 +808,8 @@ class DeviceRepository(
             runCatching { directory.relativeTo(root).invariantSeparatorsPath }
                 .getOrDefault(directory.invariantSeparatorsPath),
         )
-        return StoragePathRules.isProtectedAppPrivatePath(relative)
+        return StoragePathRules.isProtectedAppPrivatePath(relative) ||
+            (directory.name.startsWith(".") && !StoragePathRules.isHiddenDirectoryAllowed(directory.name))
     }
 
     private fun whatsappRootPairs(): List<Pair<File, File>> = buildList {
@@ -976,13 +983,8 @@ class DeviceRepository(
         }
     }
 
-    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean {
-        val path = StoragePathRules.normalizePath(file.relativePath)
-        return path.contains("/android/media/com.whatsapp/") ||
-            path.contains("/android/media/com.whatsapp.w4b/") ||
-            path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")
-    }
+    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean =
+        StoragePathRules.isWhatsAppPath(file.relativePath)
 
     private fun storageTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
         return files.groupBy(::storageFileType)

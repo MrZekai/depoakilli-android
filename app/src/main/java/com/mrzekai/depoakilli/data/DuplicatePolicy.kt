@@ -32,8 +32,7 @@ internal object DuplicatePolicy {
     fun autoSelectable(copy: IndexedFile, keep: IndexedFile, copyVolumeRoot: String, keepVolumeRoot: String): Boolean {
         if (copyVolumeRoot.isBlank() || copyVolumeRoot != keepVolumeRoot) return false
         val path = StoragePathRules.normalizePath(copy.relativePath)
-        if (path.contains("/android/media/") || path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")) return false
+        if (path.contains("/android/media/") || StoragePathRules.isWhatsAppPath(path)) return false
         val name = StoragePathRules.normalizeText(copy.name).substringBeforeLast('.', copy.name)
         val copyName = Regex("""(?i).*( \([1-9][0-9]?\)| - copy|_copy| copy)$""").matches(name)
         return StoragePathRules.isDownloadPath(copy.relativePath) ||

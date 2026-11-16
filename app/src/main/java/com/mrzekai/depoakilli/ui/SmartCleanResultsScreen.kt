@@ -861,13 +861,8 @@ private fun smartMediaPreviews(
         .toList()
 }
 
-private fun isWhatsAppRelativePath(relativePath: String): Boolean {
-    val path = StoragePathRules.normalizePath(relativePath)
-    return path.contains("/android/media/com.whatsapp/") ||
-        path.contains("/android/media/com.whatsapp.w4b/") ||
-        path.startsWith("/whatsapp/") ||
-        path.startsWith("/whatsapp business/")
-}
+private fun isWhatsAppRelativePath(relativePath: String): Boolean =
+    StoragePathRules.isWhatsAppPath(relativePath)
 
 private fun unusedAppsForSmartReview(
     apps: List<InstalledAppEntry>,

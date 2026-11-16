@@ -1155,7 +1155,7 @@ for expected in (
 
 if "review.loading && review.items.isEmpty()" not in smart_results:
     errors.append("Storage Review previews must remain visible while background expansion loads")
-if "StoragePathRules.normalizePath(relativePath)" not in smart_results:
+if "StoragePathRules.isWhatsAppPath(relativePath)" not in smart_results or "fun isWhatsAppPath(path: String)" not in read("app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt"):
     errors.append("Smart review WhatsApp path matching must be locale-stable")
 
 for expected in (

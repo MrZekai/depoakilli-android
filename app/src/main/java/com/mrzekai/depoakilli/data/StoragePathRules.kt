@@ -38,6 +38,24 @@ internal object StoragePathRules {
         return downloadMarkers.any(normalized::contains)
     }
 
+    fun isWhatsAppPath(path: String): Boolean {
+        val normalized = normalizePath(path)
+        return normalized.contains("/android/media/com.whatsapp/") ||
+            normalized.contains("/android/media/com.whatsapp.w4b/") ||
+            normalized.startsWith("/whatsapp/") ||
+            normalized.startsWith("/whatsapp business/")
+    }
+
+    fun isProtectedUserDataPath(relativeDirPath: String, fileName: String): Boolean {
+        val path = normalizePath(relativeDirPath)
+        val name = normalizeText(fileName)
+        return (isWhatsAppPath(path) && (path.contains("/databases/") || path.contains("/backups/"))) ||
+            Regex(""".*\.crypt\d+$""").matches(name) || name.startsWith("msgstore")
+    }
+
+    fun isHiddenDirectoryAllowed(name: String): Boolean =
+        normalizeText(name) in setOf(".thumbnails", ".statuses")
+
     /** Hidden dot-files may be system metadata or personal content. Never offer or delete them. */
     fun isSystemMarkerFile(name: String): Boolean =
         normalizeText(name.trim()).startsWith(".")

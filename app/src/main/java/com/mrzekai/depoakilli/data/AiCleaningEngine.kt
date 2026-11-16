@@ -248,11 +248,7 @@ class AiCleaningEngine(
     private fun isInterruptedDownload(name: String): Boolean =
         INTERRUPTED_DOWNLOAD_EXTENSIONS.any(name::endsWith)
 
-    private fun isWhatsAppSharedMediaPath(path: String): Boolean =
-        path.contains("/android/media/com.whatsapp/") ||
-            path.contains("/android/media/com.whatsapp.w4b/") ||
-            path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")
+    private fun isWhatsAppSharedMediaPath(path: String): Boolean = StoragePathRules.isWhatsAppPath(path)
 
     private fun ageDays(modifiedAtMillis: Long): Long {
         if (modifiedAtMillis <= 0L) return 0
