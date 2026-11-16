@@ -1063,7 +1063,7 @@ class DeviceRepository(
                 val file = File(path)
                 if (!isDeletableSharedStorageFile(file)) return@runCatching false
                 if (StoragePathRules.isSystemMarkerFile(file.name)) return@runCatching false
-                val removed = file.delete()
+                val removed = FileDeleter.deleteUnprotected(file, file.parent.orEmpty())
                 if (removed) {
                     removeDeletedPathFromMediaStore(file.absolutePath)
                 }

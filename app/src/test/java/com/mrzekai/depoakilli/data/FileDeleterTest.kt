@@ -27,4 +27,10 @@ class FileDeleterTest {
         assertEquals(FileDeleter.Result.ORIGINAL_CHANGED, FileDeleter.deleteIfOriginalUnchanged(original, 3) { copy.delete() })
         assertTrue(copy.exists())
     }
+    @Test fun `protected WhatsApp backup cannot be deleted`() {
+        val backup = folder.newFile("msgstore.db.crypt14")
+        assertFalse(FileDeleter.deleteUnprotected(backup, "Android/media/com.whatsapp/WhatsApp/Databases"))
+        assertTrue(backup.exists())
+    }
+
 }
