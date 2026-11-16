@@ -92,6 +92,7 @@ internal fun DeviceCenterScreen(
     onOpenStorageChange: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenTrash: () -> Unit = {},
+    listAd: @Composable () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -127,6 +128,9 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.DEEP) },
             )
         }
+
+        // At most one in-list native ad, before the second group (T1B.4).
+        item(key = "tools-list-native") { listAd() }
 
         item {
             ToolsSectionHeader(

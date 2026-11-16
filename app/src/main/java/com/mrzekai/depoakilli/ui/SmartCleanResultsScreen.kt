@@ -199,6 +199,7 @@ internal fun SmartCleanResultsScreen(
     onSwipeContinue: () -> Unit = {},
     onSwipeGrid: () -> Unit = {},
     onSwipeFinished: () -> Unit = {},
+    listAd: @Composable () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -216,6 +217,7 @@ internal fun SmartCleanResultsScreen(
                 onSwipeFinished()
             },
             modifier = modifier,
+            breakCardContent = listAd,
         )
         return
     }

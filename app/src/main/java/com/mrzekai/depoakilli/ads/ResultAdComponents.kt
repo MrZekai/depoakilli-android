@@ -184,7 +184,7 @@ private fun ResultMrecAd(
     }
 }
 
-private fun createNativeAdView(context: android.content.Context): NativeAdView {
+internal fun createNativeAdView(context: android.content.Context): NativeAdView {
     val nativeAdView = NativeAdView(context)
 
     val container = LinearLayout(context).apply {
@@ -350,7 +350,7 @@ private fun createNativeAdView(context: android.content.Context): NativeAdView {
     return nativeAdView
 }
 
-private fun bindNativeAd(
+internal fun bindNativeAd(
     view: NativeAdView,
     nativeAd: NativeAd,
 ) {

@@ -12,6 +12,7 @@ val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
 val sampleRewardedId = "ca-app-pub-3940256099942544/5224354917"
 val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
 val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
+val sampleListNativeId = "ca-app-pub-3940256099942544/2247696110"
 
 // AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
 // Keep QA/debug on Google's official sample IDs and bind production only
@@ -22,6 +23,8 @@ val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
 val liveRewardedId = "ca-app-pub-1380972808968213/4039180256"
 // App open unit created by the owner in AdMob (16 Nov 2026).
 val liveAppOpenId = "ca-app-pub-1380972808968213/1593948887"
+// In-list Native advanced unit created by the owner in AdMob (16 Nov 2026).
+val liveListNativeId = "ca-app-pub-1380972808968213/6870326296"
 // Optional production Native unit. Empty means use live MREC fallback.
 val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     .orNull
@@ -62,6 +65,7 @@ android {
         buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
         buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
         buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
 
@@ -130,6 +134,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
         }
@@ -141,6 +146,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$liveRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$liveListNativeId\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -167,6 +173,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.findByName("release")
             matchingFallbacks += listOf("release")
         }
@@ -258,6 +265,7 @@ val validateReleaseAds by tasks.registering {
             liveInterstitialId,
             liveRewardedId,
             liveAppOpenId,
+            liveListNativeId,
         )
         check(values.none { it.contains("3940256099942544") }) {
             "Release blocked: Google sample AdMob IDs cannot be used in production."
@@ -302,6 +310,7 @@ val validateClosedTestConfiguration by tasks.registering {
             sampleRewardedId,
             sampleResultNativeVideoId,
             sampleAppOpenId,
+            sampleListNativeId,
         )
         check(sampleIds.all { it.contains("3940256099942544") }) {
             "Closed test blocked: every ad format must use an official Google sample ID."

@@ -93,7 +93,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd
+import com.mrzekai.depoakilli.ads.ListNativeAdCard
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -423,6 +425,7 @@ fun CleanerApp(
                 onToggleGroup = viewModel::toggleGroup,
                 onClearAppCaches = onClearAllAppCaches,
                 viewModel = viewModel,
+                canRequestAds = canRequestAds,
             )
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -572,6 +575,14 @@ fun CleanerApp(
                                 viewModel.openPlanGroupGrid(group, items)
                                 detailScreen = DetailScreen.CLEAN_RESULTS
                             },
+                            reviewAd = { index ->
+                                val plan = displayState.summary.plan
+                                val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +
+                                    plan.review.size + 1
+                                if (index == 1 && rows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
+                                    item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
+                                }
+                            },
                         )
                     }
                 }
@@ -597,6 +608,7 @@ fun CleanerApp(
                     },
                     modifier = Modifier.padding(padding),
                     onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
+                    listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                 )
 
                 AppTab.TRASH -> TrashScreen(
@@ -769,6 +781,7 @@ private fun CleanScreen(
     onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
     onClearAppCaches: () -> Unit = {},
     viewModel: CleanerViewModel? = null,
+    canRequestAds: Boolean = false,
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -800,6 +813,7 @@ private fun CleanScreen(
             onSwipeContinue = { viewModel?.swipeContinue() },
             onSwipeGrid = { viewModel?.switchSwipeToGrid() },
             onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
+            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         )
         return
     }
