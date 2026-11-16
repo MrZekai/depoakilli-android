@@ -249,7 +249,7 @@
         <item quantity="other">%1$d dosya • %2$s</item>
     </plurals>
     <string name="storage_review_no_auto_select">Burada hiçbir şey otomatik seçilmez. Önizlemek için dosyaya, silmek istediğinde yalnızca seçim kutusuna dokun.</string>
-    <string name="storage_review_scan_progress">%1$d dosya indekslendi • %2$d klasör gezildi</string>
+    <string name="storage_review_scan_progress">Dizine eklenen dosya: %1$d • Klasör: %2$d</string>
     <string name="storage_review_selected_summary">Seçili: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Bu depolama kategorisinin tam ve seçilebilir görünümü hazırlanıyor…</string>
     <string name="storage_review_limit_note">Çok büyük kategori güvenlik gösterim sınırına ulaştı. Bir miktar temizlikten sonra analizi yeniden çalıştırabilirsin.</string>
@@ -440,7 +440,7 @@
     <string name="storage_analyzer_scanning_subtitle">Erişilebilir paylaşılan dosyalar türlerine ayrılıyor…</string>
     <string name="storage_analyzer_empty_subtitle">Görsel, video, ses, belge, arşiv, APK ve diğer erişilebilir dosyaların alan kullanımını gör.</string>
     <string name="storage_analyzer_indexed_label">İNDEKSLENEN PAYLAŞILAN DOSYALAR</string>
-    <string name="storage_analyzer_indexed_summary">%1$d dosya indekslendi • cihazda %2$s boş</string>
+    <string name="storage_analyzer_indexed_summary">Dizine eklenen dosya: %1$d • Boş alan: %2$s</string>
     <string name="storage_analyzer_types_title">Dosya türleri</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="one">%1$d dosya • %2$s • indekslenen verinin %%%3$d kadarı</item>
@@ -453,7 +453,7 @@
     <string name="storage_analyzer_review_action">Bu dosya türünü incele →</string>
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>
-    <string name="storage_change_progress">%1$d dosya • %2$d klasör tarandı</string>
+    <string name="storage_change_progress">Dosya: %1$d • Taranan klasör: %2$d</string>
     <string name="rewarded_ad_title">60 dakika reklamsız kullanım</string>
     <string name="rewarded_ad_subtitle">Kısa bir video izle; banner ve geçiş reklamları bir saat gizlensin.</string>
     <string name="rewarded_ad_result_action">60 dakika reklamsız kullanım için kısa video izle</string>

@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Smart Cleaner</string>
-    <string name="tab_clean">نظيفة</string>
+    <string name="tab_clean">تنظيف</string>
     <string name="tab_tools">أدوات</string>
     <string name="home_storage_percent">%1$d%%</string>
-    <string name="junk_cleaner_title">نظافة غير المرغوب فيه</string>
+    <string name="junk_cleaner_title">تنظيف الملفات غير المرغوب فيها</string>
     <string name="whatsapp_cleaner_title">منظف WhatsApp</string>
     <string name="large_files_tool_title">ملفات كبيرة</string>
     <string name="grant_access">السماح</string>
@@ -18,9 +18,9 @@
     <string name="cache_refresh">تحديث</string>
     <string name="cache_own_app">ذاكرة التخزين المؤقت Smart Cleaner</string>
     <string name="cache_own_app_subtitle">يمكن إزالة %1$s بشكل مباشر وآمن</string>
-    <string name="scan_focus_smart">نتيجة نظيفة ذكية</string>
-    <string name="scan_focus_junk">نظافة غير المرغوب فيه</string>
-    <string name="scan_focus_duplicates">منظف مكرر</string>
+    <string name="scan_focus_smart">نتيجة التنظيف الذكي</string>
+    <string name="scan_focus_junk">تنظيف الملفات غير المرغوب فيها</string>
+    <string name="scan_focus_duplicates">تنظيف الملفات المكررة</string>
     <string name="scan_focus_large">ملفات كبيرة</string>
     <string name="language_settings">لغة التطبيق</string>
     <string name="ad_privacy_preferences">تفضيلات خصوصية الإعلان</string>
@@ -41,9 +41,9 @@
     <string name="category_apk_packages_description">حزم المثبت المتبقية بعد التثبيت</string>
     <string name="category_app_cache">ذاكرة التخزين المؤقت</string>
     <string name="category_app_cache_description">ملفات التطبيق المؤقتة الآمنة</string>
-    <string name="category_whatsapp">الوسائط WhatsApp</string>
+    <string name="category_whatsapp">وسائط WhatsApp</string>
     <string name="category_whatsapp_description">الحالات والوسائط المرسلة الأقدم من 30 يومًا. يعرض WhatsApp Cleaner جميع وسائط WhatsApp.</string>
-    <string name="reason_downloaded_installer">تم تنزيل حزمة التثبيت</string>
+    <string name="reason_downloaded_installer">حزمة تثبيت تم تنزيلها</string>
     <plurals name="reason_old_screenshot">
         <item quantity="zero">لقطة شاشة • العمر بالأيام: %1$d</item>
         <item quantity="one">لقطة شاشة • العمر بالأيام: %1$d</item>
@@ -64,7 +64,7 @@
     <string name="reason_exact_duplicate">بصمة المحتوى متطابقة تمامًا</string>
     <string name="reason_sampled_duplicate">التكرار المحتمل: نفس الحجم والعينات المطابقة. لم يتم التحقق منه بالكامل — قارن قبل الحذف.</string>
     <string name="duplicate_original_kept">الأصل المحمي: %1$s</string>
-    <string name="reason_whatsapp_status">ملف الحالة المؤقت WhatsApp</string>
+    <string name="reason_whatsapp_status">ملف حالة WhatsApp مؤقت</string>
     <plurals name="reason_whatsapp_sent">
         <item quantity="zero">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
         <item quantity="one">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
@@ -83,7 +83,7 @@
     <string name="whatsapp_ready_title">وسائط WhatsApp جاهزة</string>
     <string name="whatsapp_ready_description">قم بمسح الوسائط المشتركة WhatsApp وWhatsApp Business مباشرة داخل Smart Cleaner وقم بمراجعة كل فئة قبل الحذف.</string>
     <string name="whatsapp_scan_action">مسح ملفات WhatsApp</string>
-    <string name="whatsapp_scanning_title">تحليل الوسائط WhatsApp</string>
+    <string name="whatsapp_scanning_title">جارٍ تحليل وسائط WhatsApp</string>
     <string name="whatsapp_scanning_description">قراءة الوسائط المشتركة WhatsApp مباشرة، وتصنيف الملفات وإعداد المعاينات...</string>
     <plurals name="whatsapp_scan_stats">
         <item quantity="zero">عدد الملفات المصنفة على هذا الجهاز: %1$d</item>
@@ -96,15 +96,15 @@
     <string name="whatsapp_selection_safe">لم يتم تحديد أي شيء مسبقًا. عليك أن تقرر بالضبط ما سيتم حذفه.</string>
     <string name="whatsapp_no_files">لم يتم العثور على ملف وسائط WhatsApp يمكن الوصول إليه.</string>
     <string name="whatsapp_category_images">الصور</string>
-    <string name="whatsapp_category_images_description">استقبلت وأرسلت الصور</string>
+    <string name="whatsapp_category_images_description">الصور المستلمة والمرسلة</string>
     <string name="whatsapp_category_videos">فيديوهات</string>
-    <string name="whatsapp_category_videos_description">تم استلام وإرسال مقاطع الفيديو</string>
+    <string name="whatsapp_category_videos_description">مقاطع الفيديو المستلمة والمرسلة</string>
     <string name="whatsapp_category_documents">المستندات</string>
     <string name="whatsapp_category_documents_description">PDF وOffice والمحفوظات والملفات النصية</string>
     <string name="whatsapp_category_audio">الصوت والموسيقى</string>
     <string name="whatsapp_category_audio_description">الأغاني والملفات الصوتية المشتركة</string>
-    <string name="whatsapp_category_voice">الملاحظات الصوتية</string>
-    <string name="whatsapp_category_voice_description">الرسائل الصوتية WhatsApp</string>
+    <string name="whatsapp_category_voice">الرسائل الصوتية</string>
+    <string name="whatsapp_category_voice_description">رسائل WhatsApp الصوتية</string>
     <string name="whatsapp_category_stickers">الملصقات وصور GIF</string>
     <string name="whatsapp_category_stickers_description">وسائط WhatsApp متحركة وثابتة</string>
     <string name="whatsapp_category_other">ملفات أخرى</string>
@@ -123,15 +123,15 @@
     <string name="send_feedback">إرسال ردود الفعل</string>
     <string name="send_feedback_subtitle">الإبلاغ عن مشكلة أو مشاركة الاقتراح</string>
     <string name="share_app">مشاركة Smart Cleaner</string>
-    <string name="share_app_subtitle">يوصي التطبيق لشخص ما</string>
+    <string name="share_app_subtitle">أوصِ بالتطبيق لشخص ما</string>
     <string name="privacy_policy">سياسة الخصوصية</string>
     <string name="privacy_policy_subtitle">اقرأ كيفية التعامل مع بيانات الجهاز والإعلانات</string>
     <string name="terms_of_service">شروط الخدمة</string>
     <string name="terms_of_service_subtitle">اقرأ شروط الاستخدام الآمن والحذف</string>
-    <string name="about_app">حول</string>
+    <string name="about_app">حول التطبيق</string>
     <string name="legal_contact">المطور: MrZekai\n جهة اتصال الخصوصية والدعم: %1$s</string>
     <string name="about_app_subtitle">الإصدار ومبادئ المنتج وقدراته</string>
-    <string name="feedback_subject">ردود الفعل Smart Cleaner</string>
+    <string name="feedback_subject">ملاحظات حول Smart Cleaner</string>
     <string name="feedback_template">الجهاز: %1$s %2$s\nAndroid: %3$s\n\nالتعليقات:\n</string>
     <string name="share_app_message">يقوم Smart Cleaner بتحليل التخزين بأمان على جهازك: %1$s</string>
     <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner هو تطبيق لإدارة التخزين والصيانة. يقوم بمسح وحدة التخزين المشتركة على الجهاز بحثًا عن الملفات غير المرغوب فيها والنسخ المكررة تمامًا والملفات الكبيرة والتنزيلات القديمة ومثبتات APK وعناصر مراجعة الوسائط ووسائط WhatsApp. يستخدم App Cache Manager التدفق الرسمي لتنظيف ذاكرة التخزين المؤقت للنظام Android؛ قد يتطلب Android تأكيدًا للنظام. \n\nحزمة: com.mrzekai.depoakilli</string>
@@ -162,7 +162,7 @@
     <string name="category_large_files">ملفات كبيرة</string>
     <string name="category_large_files_description">ملفات تزيد عن 100 MB عبر مساحة تخزين مشتركة يمكن الوصول إليها</string>
     <string name="deep_cleaner_subtitle">مراجعة شاملة لمرة واحدة عبر فئات التخزين الرئيسية؛ تبقى الملفات الشخصية ذات الثقة المنخفضة للمراجعة فقط</string>
-    <string name="deep_cleaner_title">منظف عميق</string>
+    <string name="deep_cleaner_title">التنظيف العميق</string>
     <string name="duplicates_tool_subtitle_v050">البحث عن التكرارات الدقيقة التي تم التحقق منها من خلال المحتوى؛ يتم دائمًا الاحتفاظ بنسخة أصلية واحدة</string>
     <string name="junk_cleaner_subtitle_v050">مراجعة الملفات المؤقتة والعناصر المصغرة خارج التنزيلات؛ تنزيل بقايا الطعام يبقى في التنزيلات</string>
     <string name="language_settings_subtitle_v050">استخدم إعدادات لغة التطبيق Android. تعود اللغات غير المدعومة بأمان إلى اللغة الإنجليزية.</string>
@@ -205,7 +205,7 @@
     <string name="scan_limit_note_v050">تم الوصول إلى الحد الأقصى الآمن وهو 200.000 ملف مفهرس. النتائج حقيقية لكن الجهاز يحتوي على ملفات أكثر من هذه المفهرسة.</string>
     <string name="storage_analyzer_subtitle">قم بتقسيم ملفات التخزين المشتركة التي يمكن الوصول إليها حسب النوع دون تحديد أي شيء للحذف</string>
     <string name="storage_analyzer_title">محلل التخزين</string>
-    <string name="storage_type_apk">المثبتات APK</string>
+    <string name="storage_type_apk">مثبّتات APK</string>
     <string name="storage_type_archives">المحفوظات</string>
     <string name="storage_type_audio">الصوت والموسيقى</string>
     <string name="storage_type_documents">المستندات</string>
@@ -229,7 +229,7 @@
     <string name="security_local_processing">المعالجة على الجهاز</string>
     <string name="security_local_processing_desc">يبقى تحليل الملفات وبصمات الأصابع ومقارنات التخزين على هذا الجهاز.</string>
     <string name="status_ready">جاهز</string>
-    <string name="scan_focus_deep">منظف عميق</string>
+    <string name="scan_focus_deep">التنظيف العميق</string>
     <string name="scan_focus_apks">حزم APK</string>
     <string name="scan_focus_analyze">محلل التخزين</string>
     <string name="clean_results_title">نتائج التنظيف</string>
@@ -284,7 +284,7 @@
         <item quantity="other">عدد الملفات: %1$d • %2$s</item>
     </plurals>
     <string name="storage_review_no_auto_select">لم يتم تحديد أي شيء تلقائيًا هنا. اضغط على الملف لمعاينته؛ استخدم مربع الاختيار فقط عندما تريد حذفه.</string>
-    <string name="storage_review_scan_progress">ملفات %1$d المفهرسة عبر مجلدات %2$d</string>
+    <string name="storage_review_scan_progress">الملفات المفهرسة: %1$d • المجلدات: %2$d</string>
     <string name="storage_review_selected_summary">تم التحديد: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">إنشاء عرض كامل وقابل للتحديد لفئة التخزين هذه...</string>
     <string name="storage_review_limit_note">فئة كبيرة جدًا وصلت إلى حد العرض الآمن. قم بتحسين المجلد أو قم بتشغيل التحليل مرة أخرى بعد التنظيف.</string>
@@ -302,7 +302,7 @@
     <string name="whatsapp_sort_largest">الأكبر أولاً</string>
     <string name="whatsapp_sort_newest">الأحدث أولاً</string>
     <string name="whatsapp_no_files_for_filter">لا توجد ملفات تتطابق مع هذا الفلتر.</string>
-    <string name="whatsapp_selected_size">مختارة</string>
+    <string name="whatsapp_selected_size">المحدد</string>
     <plurals name="whatsapp_selected_items_short">
         <item quantity="zero">عدد العناصر: %1$d</item>
         <item quantity="one">عدد العناصر: %1$d</item>
@@ -311,7 +311,7 @@
         <item quantity="many">عدد العناصر: %1$d</item>
         <item quantity="other">عدد العناصر: %1$d</item>
     </plurals>
-    <string name="whatsapp_review_and_clean">مراجعة ونظيفة</string>
+    <string name="whatsapp_review_and_clean">مراجعة وتنظيف</string>
     <string name="whatsapp_cleanup_in_progress">تنظيف…</string>
     <string name="whatsapp_preview_title">معاينة</string>
     <string name="whatsapp_included">المدرجة في التنظيف</string>
@@ -325,8 +325,8 @@
     <string name="premium_tool_nothing_found_detail">لم يتم العثور على ملفات مطابقة في مساحة التخزين المشتركة التي يمكن الوصول إليها.</string>
     <string name="premium_tool_found_size">إجمالي حجم المراجعة</string>
     <string name="premium_tool_candidates">المرشحين</string>
-    <string name="premium_tool_selected">مختارة</string>
-    <string name="premium_tool_scanned">الممسوحة ضوئيا</string>
+    <string name="premium_tool_selected">المحدد</string>
+    <string name="premium_tool_scanned">تم فحصها</string>
     <plurals name="premium_tool_selected_count">
         <item quantity="zero">عدد العناصر: %1$d</item>
         <item quantity="one">عدد العناصر: %1$d</item>
@@ -337,7 +337,7 @@
     </plurals>
     <string name="premium_sort_largest">الأكبر أولاً</string>
     <string name="premium_sort_newest">الأحدث أولاً</string>
-    <string name="premium_sort_selected">تم اختياره أولاً</string>
+    <string name="premium_sort_selected">المحددة أولاً</string>
     <string name="premium_duplicates_subtitle">يتم تجميع مطابقات المحتوى التام حتى تتمكن من الاحتفاظ بالنسخة الأصلية وإزالة النسخ الإضافية فقط.</string>
     <string name="premium_large_subtitle">قم بمراجعة الملفات التي تستخدم أكبر مساحة تخزينية قبل تحديد ما يجب إزالته.</string>
     <string name="premium_apk_subtitle">قم بمراجعة حزم تثبيت Android التي تم تنزيلها دون التأثير على التطبيقات المثبتة.</string>
@@ -349,10 +349,10 @@
     <string name="premium_duplicate_unknown_original">الأصلي المحمي</string>
     <string name="premium_duplicate_group_title">نسخ من %1$s</string>
     <string name="premium_apk_installer_note">يؤدي حذف APK هنا إلى إزالة ملف التثبيت فقط. ولا يؤدي إلى إلغاء تثبيت التطبيق المثبت بالفعل على هاتفك.</string>
-    <string name="premium_apk_old">المثبتون الأقدم</string>
+    <string name="premium_apk_old">مثبّتات أقدم</string>
     <string name="premium_apk_recent">المثبتات الأخيرة</string>
     <string name="premium_documents_archives">الوثائق والمحفوظات</string>
-    <string name="premium_media_review">مراجعة وسائل الإعلام الأخرى</string>
+    <string name="premium_media_review">وسائط أخرى للمراجعة</string>
     <string name="premium_duplicate_more_groups">المزيد من المجموعات المكررة</string>
     <string name="smart_unused_apps_title">التطبيقات غير المستخدمة</string>
     <string name="smart_unused_apps_permission">الوصول إلى الاستخدام ضروري لتحديد التطبيقات التي لم يتم استخدامها لفترة طويلة.</string>
@@ -383,7 +383,7 @@
     </plurals>
     <string name="cleanup_result_title">اكتملت عملية التنظيف</string>
     <string name="cleanup_result_partial_title">اكتملت عملية التنظيف جزئيًا</string>
-    <string name="cleanup_result_space_reclaimed">تم استصلاح الفضاء</string>
+    <string name="cleanup_result_space_reclaimed">المساحة المحررة</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="zero">عدد الملفات المحذوفة: %1$d</item>
         <item quantity="one">عدد الملفات المحذوفة: %1$d</item>
@@ -403,7 +403,7 @@
     <string name="cleanup_result_zero">لم يتم استعادة أي مساحة إضافية.</string>
     <string name="cleanup_result_note">يتم حساب هذه القيم من الملفات التي تمت إزالتها بالفعل Smart Cleaner على هذا الجهاز.</string>
     <string name="cleanup_result_done">تم</string>
-    <string name="cleanup_result_storage_snapshot">لقطة من الفضاء الحر: %1$s → %2$s</string>
+    <string name="cleanup_result_storage_snapshot">المساحة الفارغة: %1$s → %2$s</string>
     <string name="disclosure_all_files_title">لماذا الوصول إلى مساحة التخزين الكاملة؟</string>
     <string name="disclosure_all_files_body">يستخدم Smart Cleaner إمكانية الوصول إلى جميع الملفات الخاصة بـ Android فقط لميزات إدارة الملفات الأساسية: فحص التخزين المشترك بحثًا عن المرشحين غير المهمين والنسخ المكررة والملفات الكبيرة والتنزيلات ومثبتات APK ووسائط المراسلة المشتركة. تبقى الملفات على جهازك. تقوم بمراجعة ما سيتم حذفه. لا يزال Android يحمي البيانات الخاصة للتطبيقات الأخرى.</string>
     <string name="disclosure_usage_title">لماذا الوصول إلى الاستخدام؟</string>
@@ -425,9 +425,9 @@
     <string name="cache_modern_system_action">تنظيف ذاكرة التخزين المؤقت باستخدام Android</string>
     <string name="cache_modern_system_action_subtitle">افتح مسار تنظيف ذاكرة التخزين المؤقت الرسمي لـ Android</string>
     <string name="cache_modern_list_title">التطبيقات التي تستخدم معظم ذاكرة التخزين المؤقت</string>
-    <string name="cache_modern_search_hint">تطبيقات البحث</string>
+    <string name="cache_modern_search_hint">البحث في التطبيقات</string>
     <string name="cache_modern_sort_largest">أكبر ذاكرة تخزين مؤقت</string>
-    <string name="cache_modern_sort_az">من الألف إلى الياء</string>
+    <string name="cache_modern_sort_az">أ–ي</string>
     <string name="cache_modern_no_result">لا يوجد تطبيق مطابق</string>
     <string name="cache_modern_no_result_subtitle">جرب اسم تطبيق آخر أو قم بتحديث قائمة ذاكرة التخزين المؤقت المقاسة.</string>
     <string name="cache_modern_open_actions">فتح إجراءات ذاكرة التخزين المؤقت</string>
@@ -439,7 +439,7 @@
     <string name="cache_modern_clean_now">تنظيف الآن</string>
     <string name="cache_modern_safety_note">يقيس Smart Cleaner ذاكرة التخزين المؤقت التي أبلغ عنها Android. ولا يحذف الملفات الخاصة لتطبيق آخر بصمت؛ اكتمال التنظيف الفردي من شاشة التطبيق الرسمية لـ Android.</string>
     <string name="cleanup_result_system_cache_title">تم الانتهاء من تنظيف ذاكرة التخزين المؤقت Android</string>
-    <string name="cleanup_result_system_cache_reduced">قياس الحد من ذاكرة التخزين المؤقت</string>
+    <string name="cleanup_result_system_cache_reduced">انخفاض مُقاس في ذاكرة التخزين المؤقت</string>
     <string name="cleanup_result_system_cache_unmeasured">أكمل Android عملية تنظيف ذاكرة التخزين المؤقت. لم يكن تقليل البايت الموثوق به متاحًا على هذا الجهاز.</string>
     <string name="cleanup_result_system_cache_note">يتم قياس تقليل ذاكرة التخزين المؤقت من خلال إحصائيات تخزين Android قبل وبعد تنظيف النظام. إذا لم يكشف Android عن دلتا موثوقة، فلن يتم اختراع رقم المساحة المستصلحة.</string>
     <string name="cleanup_result_app_cache_title">تم تنظيف ذاكرة التخزين المؤقت %1$s</string>
@@ -450,7 +450,7 @@
     <string name="permissions_on_device_badge">على الجهاز</string>
     <string name="permissions_privacy_policy_title">سياسة الخصوصية</string>
     <string name="permissions_privacy_policy_subtitle">تعرف على كيفية التعامل مع الملفات والأذونات وخصوصية الإعلانات والمعالجة على الجهاز.</string>
-    <string name="storage_change_title">تغيير التخزين</string>
+    <string name="storage_change_title">تغيّر التخزين</string>
     <string name="storage_change_hero_label">ما الذي تغير؟</string>
     <string name="storage_change_hero_no_baseline">قم بإنشاء القياس الأول هنا. يحفظ Smart Cleaner لقطة تخزين حقيقية؛ لم يتم اختراع أي تاريخ.</string>
     <string name="storage_change_hero_baseline">خط الأساس الأول جاهز. التحليل القادم سيوضح الفرق</string>
@@ -491,7 +491,7 @@
     <string name="storage_analyzer_scanning_subtitle">تصنيف ملفات التخزين المشتركة التي يمكن الوصول إليها حسب النوع...</string>
     <string name="storage_analyzer_empty_subtitle">تعرف على كيفية استخدام الصور ومقاطع الفيديو والصوت والمستندات والمحفوظات وAPK والملفات الأخرى التي يمكن الوصول إليها للمساحة.</string>
     <string name="storage_analyzer_indexed_label">الملفات المشتركة المفهرسة</string>
-    <string name="storage_analyzer_indexed_summary">عدد الملفات المفهرسة: %1$d • مساحة التخزين المتاحة على الجهاز: %2$s</string>
+    <string name="storage_analyzer_indexed_summary">الملفات المفهرسة: %1$d • المساحة الفارغة: %2$s</string>
     <string name="storage_analyzer_types_title">أنواع الملفات</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="zero">عدد الملفات: %1$d • %2$s • %3$d%% من وحدات البايت المفهرسة</item>
@@ -505,10 +505,10 @@
     <string name="storage_analyzer_no_files">لم يتم العثور على ملف يمكن الوصول إليه لهذا التحليل.</string>
     <string name="storage_analyzer_truth_note">هذه الشاشة إعلامية. لم يتم تحديد أي شيء أو حذفه هنا. لا يتم فحص المناطق الخاصة المحمية مثل Android/data وAndroid/obb.</string>
     <string name="screenshots_tool_subtitle">قم بمراجعة جميع لقطات الشاشة التي يمكن الوصول إليها في قائمة واحدة قابلة للمعاينة؛ لم يتم تحديد أي شيء مسبقًا</string>
-    <string name="storage_analyzer_review_action">قم بمراجعة نوع الملف هذا →</string>
+    <string name="storage_analyzer_review_action">مراجعة هذا النوع من الملفات →</string>
     <string name="storage_change_create_baseline">إنشاء القياس الأول</string>
     <string name="storage_change_analysis_scope">يقوم بتشغيل تحليل حقيقي للتخزين المشترك ويحفظ لقطة جديدة لتغيير التخزين. لا يتم تنفيذ أي تنظيف بواسطة هذا الإجراء.</string>
-    <string name="storage_change_progress">ملفات %1$d • تم فحص مجلدات %2$d</string>
+    <string name="storage_change_progress">الملفات: %1$d • المجلدات التي تم فحصها: %2$d</string>
     <string name="rewarded_ad_title">خالية من الإعلانات لمدة 60 دقيقة</string>
     <string name="rewarded_ad_subtitle">شاهد فيديو قصير لإخفاء البانر والإعلانات الانتقالية لمدة ساعة واحدة.</string>
     <string name="rewarded_ad_result_action">شاهد مقطع فيديو قصيرًا لمدة 60 دقيقة بدون إعلانات</string>

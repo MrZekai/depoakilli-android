@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Smart Cleaner</string>
-    <string name="tab_clean">Bersih</string>
+    <string name="tab_clean">Bersihkan</string>
     <string name="tab_tools">Alat</string>
     <string name="home_storage_percent">%1$d%%</string>
-    <string name="junk_cleaner_title">Pembersih Sampah</string>
+    <string name="junk_cleaner_title">Pembersih File Sampah</string>
     <string name="whatsapp_cleaner_title">Pembersih WhatsApp</string>
     <string name="large_files_tool_title">File Besar</string>
     <string name="grant_access">Izinkan</string>
@@ -18,8 +18,8 @@
     <string name="cache_refresh">Segarkan</string>
     <string name="cache_own_app">Tembolok Smart Cleaner</string>
     <string name="cache_own_app_subtitle">%1$s dapat dilepas secara langsung dan aman</string>
-    <string name="scan_focus_smart">Hasil bersih yang cerdas</string>
-    <string name="scan_focus_junk">Pembersih Sampah</string>
+    <string name="scan_focus_smart">Hasil pembersihan cerdas</string>
+    <string name="scan_focus_junk">Pembersih File Sampah</string>
     <string name="scan_focus_duplicates">Pembersih Duplikat</string>
     <string name="scan_focus_large">File Besar</string>
     <string name="language_settings">Bahasa aplikasi</string>
@@ -41,13 +41,13 @@
     <string name="category_apk_packages_description">Paket penginstal tersisa setelah instalasi</string>
     <string name="category_app_cache">Tembolok</string>
     <string name="category_app_cache_description">File aplikasi sementara yang aman</string>
-    <string name="category_whatsapp">media WhatsApp</string>
+    <string name="category_whatsapp">Media WhatsApp</string>
     <string name="category_whatsapp_description">Status dan media terkirim lebih lama dari 30 hari. WhatsApp Cleaner menampilkan semua media WhatsApp.</string>
     <string name="reason_downloaded_installer">Paket penginstal yang diunduh</string>
     <plurals name="reason_old_screenshot">
         <item quantity="other">Tangkapan layar • Usia dalam hari: %1$d</item>
     </plurals>
-    <string name="reason_screenshot_review">Tangkapan layar • ulasan saja</string>
+    <string name="reason_screenshot_review">Tangkapan layar • tinjau saja</string>
     <plurals name="reason_old_download">
         <item quantity="other">Waktu di Unduhan • Usia dalam hari: %1$d</item>
     </plurals>
@@ -76,13 +76,13 @@
     <string name="whatsapp_selection_safe">Tidak ada yang dipilih sebelumnya. Anda memutuskan dengan tepat apa yang akan dihapus.</string>
     <string name="whatsapp_no_files">Tidak ditemukan file media WhatsApp yang dapat diakses.</string>
     <string name="whatsapp_category_images">Gambar</string>
-    <string name="whatsapp_category_images_description">Menerima dan mengirim foto</string>
+    <string name="whatsapp_category_images_description">Foto yang diterima dan dikirim</string>
     <string name="whatsapp_category_videos">Video</string>
-    <string name="whatsapp_category_videos_description">Menerima dan mengirim video</string>
+    <string name="whatsapp_category_videos_description">Video yang diterima dan dikirim</string>
     <string name="whatsapp_category_documents">Dokumen</string>
     <string name="whatsapp_category_documents_description">PDF, Office, arsip, dan file teks</string>
     <string name="whatsapp_category_audio">Audio dan musik</string>
-    <string name="whatsapp_category_audio_description">Berbagi lagu dan file audio</string>
+    <string name="whatsapp_category_audio_description">Lagu dan file audio yang dibagikan</string>
     <string name="whatsapp_category_voice">Catatan suara</string>
     <string name="whatsapp_category_voice_description">Pesan suara WhatsApp</string>
     <string name="whatsapp_category_stickers">Stiker dan GIF</string>
@@ -234,7 +234,7 @@
         <item quantity="other">File %1$d • %2$s</item>
     </plurals>
     <string name="storage_review_no_auto_select">Tidak ada yang dipilih secara otomatis di sini. Ketuk file untuk mempratinjaunya; gunakan kotak centang hanya ketika Anda ingin menghapusnya.</string>
-    <string name="storage_review_scan_progress">File %1$d yang diindeks di seluruh folder %2$d</string>
+    <string name="storage_review_scan_progress">File diindeks: %1$d • Folder: %2$d</string>
     <string name="storage_review_selected_summary">Terpilih: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Membuat tampilan kategori penyimpanan ini secara penuh dan dapat dipilih…</string>
     <string name="storage_review_limit_note">Kategori yang sangat besar mencapai batas tampilan keamanan. Perbaiki folder atau jalankan analisis lagi setelah dibersihkan.</string>
@@ -249,8 +249,8 @@
     <string name="whatsapp_group_documents_more">Dokumen &amp; Lainnya</string>
     <string name="whatsapp_view_all">Lihat semuanya</string>
     <string name="whatsapp_card_hint">Ketuk file untuk dipratinjau • centang kotak untuk menambahkannya ke pembersihan</string>
-    <string name="whatsapp_sort_largest">Yang terbesar terlebih dahulu</string>
-    <string name="whatsapp_sort_newest">Yang terbaru dulu</string>
+    <string name="whatsapp_sort_largest">Terbesar dulu</string>
+    <string name="whatsapp_sort_newest">Terbaru dulu</string>
     <string name="whatsapp_no_files_for_filter">Tidak ada file yang cocok dengan filter ini.</string>
     <string name="whatsapp_selected_size">Dipilih</string>
     <plurals name="whatsapp_selected_items_short">
@@ -268,16 +268,16 @@
     <string name="premium_tool_on_device_title">Analisis pada perangkat</string>
     <string name="premium_tool_nothing_found">Tidak ada yang perlu ditinjau</string>
     <string name="premium_tool_nothing_found_detail">Tidak ditemukan file yang cocok di penyimpanan bersama yang dapat diakses.</string>
-    <string name="premium_tool_found_size">Ukuran ulasan total</string>
+    <string name="premium_tool_found_size">Total ukuran untuk ditinjau</string>
     <string name="premium_tool_candidates">Kandidat</string>
     <string name="premium_tool_selected">Dipilih</string>
     <string name="premium_tool_scanned">Dipindai</string>
     <plurals name="premium_tool_selected_count">
         <item quantity="other">Barang %1$d</item>
     </plurals>
-    <string name="premium_sort_largest">Yang terbesar terlebih dahulu</string>
-    <string name="premium_sort_newest">Yang terbaru dulu</string>
-    <string name="premium_sort_selected">Dipilih terlebih dahulu</string>
+    <string name="premium_sort_largest">Terbesar dulu</string>
+    <string name="premium_sort_newest">Terbaru dulu</string>
+    <string name="premium_sort_selected">Yang dipilih dulu</string>
     <string name="premium_duplicates_subtitle">Konten yang sama persis dikelompokkan sehingga Anda dapat menyimpan yang asli dan hanya menghapus salinan tambahan.</string>
     <string name="premium_large_subtitle">Tinjau file yang menggunakan penyimpanan paling banyak sebelum memutuskan apa yang harus dihapus.</string>
     <string name="premium_apk_subtitle">Tinjau paket penginstal Android yang diunduh tanpa memengaruhi aplikasi yang diinstal.</string>
@@ -313,7 +313,7 @@
     </plurals>
     <string name="cleanup_result_title">Pembersihan selesai</string>
     <string name="cleanup_result_partial_title">Pembersihan selesai sebagian</string>
-    <string name="cleanup_result_space_reclaimed">Ruang direklamasi</string>
+    <string name="cleanup_result_space_reclaimed">Ruang dikosongkan</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="other">File %1$d dihapus</item>
     </plurals>
@@ -360,7 +360,7 @@
     <string name="cleanup_result_app_cache_title">Cache %1$s dibersihkan</string>
     <string name="cleanup_result_app_cache_note">Pengurangan yang ditampilkan didasarkan pada cache yang sebenarnya dibersihkan atau diukur sebelum dan sesudah tindakan cache Android.</string>
     <string name="message_individual_cache_no_change">Tidak ada pengurangan cache terukur yang terdeteksi setelah kembali dari pengaturan Android.</string>
-    <string name="permissions_review_status">Ulasan</string>
+    <string name="permissions_review_status">Tinjau</string>
     <string name="permissions_manage_android">Kelola di Android</string>
     <string name="permissions_on_device_badge">DI PERANGKAT</string>
     <string name="permissions_privacy_policy_title">Kebijakan privasi</string>
@@ -390,7 +390,7 @@
     <string name="storage_change_refresh">Jalankan analisis baru</string>
     <string name="storage_change_refreshing">Menganalisis…</string>
     <string name="storage_change_truth_note">Perubahan total perangkat berasal dari pengukuran penyimpanan Android. Perubahan jenis file berasal dari snapshot Analisis Penyimpanan nyata. Perubahan cache aplikasi menggunakan nilai cache yang dilaporkan Android saat Akses Penggunaan diaktifkan. Tidak ada konten aplikasi pribadi yang dibaca.</string>
-    <string name="storage_change_time_now">sekarang</string>
+    <string name="storage_change_time_now">baru saja</string>
     <string name="storage_change_time_minutes">%1$d menit yang lalu</string>
     <string name="storage_change_time_hours">%1$d jam yang lalu</string>
     <string name="storage_change_time_days">%1$d hari yang lalu</string>
@@ -406,7 +406,7 @@
     <string name="storage_analyzer_scanning_subtitle">Mengklasifikasikan file penyimpanan bersama yang dapat diakses berdasarkan jenis…</string>
     <string name="storage_analyzer_empty_subtitle">Lihat bagaimana gambar, video, audio, dokumen, arsip, APK, dan file lain yang dapat diakses menggunakan ruang.</string>
     <string name="storage_analyzer_indexed_label">FILE BERBAGI YANG DIINDEKSKAN</string>
-    <string name="storage_analyzer_indexed_summary">%1$d file diindeks • Penyimpanan perangkat tersedia: %2$s</string>
+    <string name="storage_analyzer_indexed_summary">File diindeks: %1$d • Ruang kosong: %2$s</string>
     <string name="storage_analyzer_types_title">Jenis berkas</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="other">File %1$d • %2$s • %3$d%% byte yang diindeks</item>
@@ -418,7 +418,7 @@
     <string name="storage_analyzer_review_action">Tinjau jenis file ini →</string>
     <string name="storage_change_create_baseline">Buat pengukuran pertama</string>
     <string name="storage_change_analysis_scope">Menjalankan analisis penyimpanan bersama yang sebenarnya dan menyimpan snapshot baru untuk Perubahan Penyimpanan. Tidak ada pembersihan yang dilakukan dengan tindakan ini.</string>
-    <string name="storage_change_progress">File %1$d • Folder %2$d dipindai</string>
+    <string name="storage_change_progress">File: %1$d • Folder dipindai: %2$d</string>
     <string name="rewarded_ad_title">Bebas iklan selama 60 menit</string>
     <string name="rewarded_ad_subtitle">Tonton video pendek untuk menyembunyikan spanduk dan transisi iklan selama satu jam.</string>
     <string name="rewarded_ad_result_action">Tonton video pendek selama 60 menit bebas iklan</string>

@@ -433,7 +433,7 @@
     <string name="storage_analyzer_scanning_subtitle">Classificando os arquivos do armazenamento compartilhado acessível por tipo…</string>
     <string name="storage_analyzer_empty_subtitle">Veja quanto espaço imagens, vídeos, áudio, documentos, arquivos compactados, APKs e outros arquivos acessíveis usam.</string>
     <string name="storage_analyzer_indexed_label">ARQUIVOS COMPARTILHADOS INDEXADOS</string>
-    <string name="storage_analyzer_indexed_summary">Arquivos indexados: %1$d • %2$s de armazenamento do dispositivo livres</string>
+    <string name="storage_analyzer_indexed_summary">Arquivos indexados: %1$d • Espaço livre: %2$s</string>
     <string name="storage_analyzer_types_title">Tipos de arquivo</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="one">Arquivos: %1$d • %2$s • %3$d%% dos bytes indexados</item>
@@ -447,7 +447,7 @@
     <string name="storage_analyzer_review_action">Revisar este tipo de arquivo →</string>
     <string name="storage_change_create_baseline">Criar primeira medição</string>
     <string name="storage_change_analysis_scope">Executa uma análise real do armazenamento compartilhado e salva um novo registro para Mudança no armazenamento. Esta ação não realiza nenhuma limpeza.</string>
-    <string name="storage_change_progress">Arquivos: %1$d • Pastas analisadas: %2$d</string>
+    <string name="storage_change_progress">Arquivos: %1$d • Pastas verificadas: %2$d</string>
     <string name="rewarded_ad_title">Sem anúncios por 60 minutos</string>
     <string name="rewarded_ad_subtitle">Assista a um vídeo curto para ocultar anúncios de banner e de transição por uma hora.</string>
     <string name="rewarded_ad_result_action">Assista a um vídeo curto para ter 60 minutos sem anúncios</string>

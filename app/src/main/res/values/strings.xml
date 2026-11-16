@@ -249,7 +249,7 @@
         <item quantity="other">%1$d files • %2$s</item>
     </plurals>
     <string name="storage_review_no_auto_select">Nothing is auto-selected here. Tap a file to preview it; use the checkbox only when you want to delete it.</string>
-    <string name="storage_review_scan_progress">Indexed %1$d files across %2$d folders</string>
+    <string name="storage_review_scan_progress">Files indexed: %1$d • Folders: %2$d</string>
     <string name="storage_review_selected_summary">Selected: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Building a full, selectable view of this storage category…</string>
     <string name="storage_review_limit_note">A very large category reached the safety display limit. Refine the folder or run the analysis again after cleaning.</string>
@@ -440,7 +440,7 @@
     <string name="storage_analyzer_scanning_subtitle">Classifying accessible shared-storage files by type…</string>
     <string name="storage_analyzer_empty_subtitle">See how images, videos, audio, documents, archives, APKs and other accessible files use space.</string>
     <string name="storage_analyzer_indexed_label">INDEXED SHARED FILES</string>
-    <string name="storage_analyzer_indexed_summary">%1$d files indexed • %2$s device storage free</string>
+    <string name="storage_analyzer_indexed_summary">Files indexed: %1$d • Free storage: %2$s</string>
     <string name="storage_analyzer_types_title">File types</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="one">%1$d file • %2$s • %3$d%% of indexed bytes</item>
@@ -453,7 +453,7 @@
     <string name="storage_analyzer_review_action">Review this file type →</string>
     <string name="storage_change_create_baseline">Create first measurement</string>
     <string name="storage_change_analysis_scope">Runs a real shared-storage analysis and saves a new snapshot for Storage Change. No cleanup is performed by this action.</string>
-    <string name="storage_change_progress">%1$d files • %2$d folders scanned</string>
+    <string name="storage_change_progress">Files: %1$d • Folders scanned: %2$d</string>
     <string name="rewarded_ad_title">Ad-free for 60 minutes</string>
     <string name="rewarded_ad_subtitle">Watch a short video to hide banner and transition ads for one hour.</string>
     <string name="rewarded_ad_result_action">Watch a short video for 60 ad-free minutes</string>

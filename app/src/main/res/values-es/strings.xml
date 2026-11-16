@@ -433,7 +433,7 @@
     <string name="storage_analyzer_scanning_subtitle">Clasificando los archivos del almacenamiento compartido accesible por tipo…</string>
     <string name="storage_analyzer_empty_subtitle">Consulta cuánto espacio usan las imágenes, videos, audio, documentos, comprimidos, APKs y otros archivos accesibles.</string>
     <string name="storage_analyzer_indexed_label">ARCHIVOS COMPARTIDOS INDEXADOS</string>
-    <string name="storage_analyzer_indexed_summary">Archivos indexados: %1$d • %2$s de almacenamiento del dispositivo libres</string>
+    <string name="storage_analyzer_indexed_summary">Archivos indexados: %1$d • Espacio libre: %2$s</string>
     <string name="storage_analyzer_types_title">Tipos de archivo</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="one">Archivos: %1$d • %2$s • %3$d%% de los bytes indexados</item>
