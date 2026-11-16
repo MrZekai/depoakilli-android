@@ -3,114 +3,153 @@ package com.mrzekai.depoakilli.data
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AiAssessment
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.IndexedFile
+import java.net.URI
 import java.util.concurrent.TimeUnit
 
 /**
- * Conservative on-device rules used by Smart Scan.
+ * On-device cleanup rules (Smart plan engine).
  *
- * The engine only preselects items that are strongly likely to be disposable
- * (regeneratable thumbnails, temporary files and fully verified duplicate
- * copies in suitable locations on the same storage volume). Installers, WhatsApp media, user-created downloads, screenshots,
- * large files and sent media are shown for review but are never silently
- * selected: a user may have kept any of them on purpose.
+ * Every candidate is placed in exactly one [CleanupGroup] by the first matching
+ * rule. Only Auto groups (installers of apps that are already installed with
+ * the same or a newer version, verified extra copies in suitable locations,
+ * generated preview caches, old temporary files and old unfinished downloads)
+ * are preselected. Nothing inside WhatsApp, the camera folder or personal
+ * documents is ever preselected; the user decides and confirms every deletion.
  */
 class AiCleaningEngine(
+    private val apkInfoReader: ApkInfoReader = ApkInfoReader.NONE,
+    private val installedVersions: InstalledVersionLookup = InstalledVersionLookup.NONE,
     private val nowMillis: () -> Long = System::currentTimeMillis,
 ) {
     fun assess(file: IndexedFile): AiAssessment? {
-        val ageDays = ageDays(file.modifiedAtMillis)
+        val ageDays = ageDays(file)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
         val mime = StoragePathRules.normalizeText(file.mimeType)
+        val isVideo = mime.startsWith("video/")
 
-        val isWhatsApp = isWhatsAppSharedMediaPath(path)
-        val isWhatsAppStatus = isWhatsApp && path.contains("/.statuses/")
-        val isWhatsAppSent = isWhatsApp && (path.contains("/sent/") || path.endsWith("/sent"))
-        if (isWhatsAppStatus || (isWhatsAppSent && ageDays >= 30)) {
-            return AiAssessment(
-                category = CleanCategory.WHATSAPP_MEDIA,
-                safetyScore = if (isWhatsAppStatus) 98 else 78,
-                reasonRes = if (isWhatsAppStatus) R.string.reason_whatsapp_status else 0,
-                reasonPluralRes = if (isWhatsAppStatus) null else R.plurals.reason_whatsapp_sent,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = if (isWhatsAppStatus) emptyList() else listOf(ageDays),
-                // WhatsApp media is personal content. Nothing inside it is
-                // preselected, statuses included; the user decides.
-                recommended = false,
-            )
+        // 1. Protected user data is never a candidate.
+        if (StoragePathRules.isProtectedUserDataPath(file.relativePath, file.name)) return null
+
+        // 2. WhatsApp: review only, never Auto.
+        if (StoragePathRules.isWhatsAppPath(path)) {
+            return when {
+                path.contains("/.statuses/") && ageDays >= CleaningThresholds.WHATSAPP_STATUS_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_STATUS, ageDays)
+                path.contains("/sent/") && ageDays >= CleaningThresholds.WHATSAPP_SENT_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_SENT, ageDays)
+                isVideo && file.sizeBytes >= CleaningThresholds.WHATSAPP_VIDEO_BYTES ->
+                    assessment(CleanupGroup.WHATSAPP_VIDEO, ageDays)
+                (path.contains("voice notes/") || name.startsWith("ptt-")) &&
+                    ageDays >= CleaningThresholds.WHATSAPP_VOICE_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_VOICE, ageDays)
+                else -> null
+            }
         }
 
-        if (isTemporary(file, path, name, ageDays)) {
-            return AiAssessment(
-                category = CleanCategory.JUNK,
-                safetyScore = if (path.contains("/.thumbnails/")) 97 else 94,
-                reasonRes = 0,
-                reasonPluralRes = if (path.contains("/.thumbnails/")) R.plurals.reason_thumbnail_cache else R.plurals.reason_temporary_file,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                // A folder name alone does not make personal documents disposable.
-                recommended = !isInterruptedDownload(name) &&
-                    (path.contains("/.thumbnails/") ||
-                        listOf(".tmp", ".temp", ".cache").any(name::endsWith)),
-            )
+        // 3. Generated preview caches in the standard media folders.
+        if (THUMBNAIL_PREFIXES.any(path::startsWith)) {
+            return assessment(CleanupGroup.THUMBNAILS, ageDays)
         }
 
+        // 4. Old unfinished downloads.
+        if (
+            PARTIAL_DOWNLOAD_EXTENSIONS.any(name::endsWith) &&
+            StoragePathRules.isDownloadPath(file.relativePath) &&
+            ageDays >= CleaningThresholds.PARTIAL_DOWNLOAD_DAYS
+        ) {
+            return assessment(CleanupGroup.PARTIAL_DOWNLOADS, ageDays)
+        }
+
+        // 5. Old temporary files outside other apps' media folders.
+        if (
+            TEMP_EXTENSIONS.any(name::endsWith) &&
+            ageDays >= CleaningThresholds.TEMP_DAYS &&
+            !path.contains("/android/media/")
+        ) {
+            return assessment(CleanupGroup.TEMP_FILES, ageDays)
+        }
+
+        // 6. Installers.
         if (name.endsWith(".apk") || mime == APK_MIME) {
-            // APK archives are frequently retained deliberately (sideloaded
-            // apps, backups of removed apps). They are always listed for
-            // review and never preselected, whatever their age.
-            val installerIsOld = ageDays >= OLD_INSTALLER_DAYS
-            return AiAssessment(
-                category = CleanCategory.APK_PACKAGE,
-                safetyScore = if (ageDays >= APK_LONG_KEPT_DAYS) 91 else if (installerIsOld) 86 else 70,
-                reasonRes = if (installerIsOld) 0 else R.string.reason_downloaded_installer,
-                reasonPluralRes = if (installerIsOld) R.plurals.reason_old_installer else null,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = if (installerIsOld) listOf(ageDays) else emptyList(),
-                recommended = false,
-            )
+            val info = absolutePath(file)?.let(apkInfoReader::read)
+            val installed = info?.let { installedVersions.versionOf(it.packageName) }
+            val group = if (info != null && installed != null && installed >= info.versionCode) {
+                CleanupGroup.APK_INSTALLED
+            } else {
+                CleanupGroup.APK_OTHER
+            }
+            return assessment(group, ageDays, apkPackage = info)
         }
 
-        val isScreenshot = isScreenshot(path, name, file.mimeType)
-        if (isScreenshot && ageDays >= 14) {
-            return AiAssessment(
-                category = CleanCategory.SCREENSHOT,
-                safetyScore = if (ageDays >= 90) 88 else 78,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_old_screenshot,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                recommended = false,
-            )
+        // 7. Screen recordings.
+        if (isVideo && isScreenRecording(path, name) && ageDays >= CleaningThresholds.SCREEN_RECORDING_DAYS) {
+            return assessment(CleanupGroup.SCREEN_RECORDING, ageDays)
         }
 
-        val isDownload = StoragePathRules.isDownloadPath(file.relativePath)
-        if (isDownload && ageDays >= 90) {
-            return AiAssessment(
-                category = CleanCategory.OLD_DOWNLOAD,
-                safetyScore = if (ageDays >= 365) 84 else 72,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_old_download,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                recommended = false,
-            )
+        // 8. Screenshots.
+        if (isScreenshot(path, name, file.mimeType) && ageDays >= CleaningThresholds.SCREENSHOT_DAYS) {
+            return assessment(CleanupGroup.SCREENSHOT, ageDays)
         }
 
-        if (file.sizeBytes >= LARGE_FILE_BYTES) {
-            return AiAssessment(
-                category = CleanCategory.LARGE_FILE,
-                safetyScore = if (ageDays >= 180) 76 else 60,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_large_file,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays.coerceAtLeast(0)),
-                recommended = false,
-            )
+        // 9. Large old videos.
+        if (
+            isVideo &&
+            file.sizeBytes >= CleaningThresholds.LARGE_BYTES &&
+            ageDays >= CleaningThresholds.LARGE_VIDEO_DAYS
+        ) {
+            return assessment(CleanupGroup.LARGE_VIDEO, ageDays)
+        }
+
+        // 10. Old downloads.
+        if (StoragePathRules.isDownloadPath(file.relativePath) && ageDays >= CleaningThresholds.DOWNLOAD_DAYS) {
+            val extension = name.substringAfterLast('.', "")
+            val group = if (extension in DOCUMENT_EXTENSIONS) {
+                CleanupGroup.DOWNLOAD_DOCUMENT
+            } else {
+                CleanupGroup.DOWNLOAD_FILE
+            }
+            return assessment(group, ageDays)
+        }
+
+        // 11. Other large files.
+        if (file.sizeBytes >= CleaningThresholds.LARGE_BYTES) {
+            return assessment(CleanupGroup.LARGE_OTHER, ageDays)
         }
 
         return null
+    }
+
+    /**
+     * When several installers of the same app are present, every installer
+     * below the highest version (and not already covered by [CleanupGroup.APK_INSTALLED])
+     * becomes [CleanupGroup.APK_OLD_VERSION].
+     */
+    fun markOlderApkVersions(items: List<CleanableItem>): List<CleanableItem> {
+        val newestByPackage = items.asSequence()
+            .filter { it.assessment.group == CleanupGroup.APK_OTHER }
+            .filter { it.assessment.apkPackageName != null && it.assessment.apkVersionCode != null }
+            .groupBy { it.assessment.apkPackageName!! }
+            .filterValues { it.size > 1 }
+            .mapValues { (_, apks) -> apks.maxOf { it.assessment.apkVersionCode!! } }
+        if (newestByPackage.isEmpty()) return items
+        return items.map { item ->
+            val current = item.assessment
+            val newest = current.apkPackageName?.let(newestByPackage::get)
+            val version = current.apkVersionCode
+            if (current.group == CleanupGroup.APK_OTHER && newest != null && version != null && version < newest) {
+                val old = assessment(CleanupGroup.APK_OLD_VERSION, current.reasonQuantity.toLong()).copy(
+                    apkPackageName = current.apkPackageName,
+                    apkVersionCode = version,
+                )
+                item.copy(assessment = old, selected = old.recommended)
+            } else {
+                item
+            }
+        }
     }
 
     /**
@@ -121,66 +160,36 @@ class AiCleaningEngine(
      */
     fun assessDeep(file: IndexedFile): AiAssessment? {
         assess(file)?.let { return it }
+        if (StoragePathRules.isProtectedUserDataPath(file.relativePath, file.name)) return null
 
-        val ageDays = ageDays(file.modifiedAtMillis)
+        val ageDays = ageDays(file)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
+        val isWhatsApp = StoragePathRules.isWhatsAppPath(path)
 
-        val isWhatsAppSent = isWhatsAppSharedMediaPath(path) &&
-            (path.contains("/sent/") || path.endsWith("/sent"))
-        if (isWhatsAppSent && ageDays >= DEEP_WHATSAPP_SENT_DAYS) {
-            return AiAssessment(
-                category = CleanCategory.WHATSAPP_MEDIA,
-                safetyScore = 64,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_whatsapp_sent,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                recommended = false,
+        if (isWhatsApp && path.contains("/sent/") && ageDays >= DEEP_WHATSAPP_SENT_DAYS) {
+            return assessment(CleanupGroup.WHATSAPP_SENT, ageDays)
+        }
+        if (isWhatsApp) return null
+
+        if (isScreenshot(path, name, file.mimeType) && ageDays >= DEEP_SCREENSHOT_DAYS) {
+            return assessment(CleanupGroup.SCREENSHOT, ageDays)
+        }
+
+        if (StoragePathRules.isDownloadPath(file.relativePath) && ageDays >= DEEP_DOWNLOAD_DAYS) {
+            val extension = name.substringAfterLast('.', "")
+            return assessment(
+                if (extension in DOCUMENT_EXTENSIONS) CleanupGroup.DOWNLOAD_DOCUMENT else CleanupGroup.DOWNLOAD_FILE,
+                ageDays,
             )
         }
 
-        val isScreenshot = isScreenshot(path, name, file.mimeType)
-        if (isScreenshot && ageDays >= DEEP_SCREENSHOT_DAYS) {
-            return AiAssessment(
-                category = CleanCategory.SCREENSHOT,
-                safetyScore = 62,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_old_screenshot,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                recommended = false,
-            )
-        }
-
-        val isDownload = StoragePathRules.isDownloadPath(file.relativePath)
-        if (isDownload && ageDays >= DEEP_DOWNLOAD_DAYS) {
-            return AiAssessment(
-                category = CleanCategory.OLD_DOWNLOAD,
-                safetyScore = 58,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_old_download,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays),
-                recommended = false,
-            )
-        }
-
-        if (file.sizeBytes >= LARGE_FILE_BYTES) {
-            return AiAssessment(
-                category = CleanCategory.LARGE_FILE,
-                safetyScore = 50,
-                reasonRes = 0,
-                reasonPluralRes = R.plurals.reason_large_file,
-                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                reasonArgs = listOf(ageDays.coerceAtLeast(0)),
-                recommended = false,
-            )
+        if (file.sizeBytes >= CleaningThresholds.LARGE_BYTES) {
+            return assessment(CleanupGroup.LARGE_OTHER, ageDays)
         }
 
         return null
     }
-
 
     /**
      * Dedicated Screenshots tool policy.
@@ -189,7 +198,7 @@ class AiCleaningEngine(
      * Screenshots are user-created content, so nothing is ever preselected.
      */
     fun assessFocusedScreenshot(file: IndexedFile): AiAssessment? {
-        val ageDays = ageDays(file.modifiedAtMillis)
+        val ageDays = ageDays(file)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
         if (!isScreenshot(path, name, file.mimeType)) return null
@@ -203,23 +212,38 @@ class AiCleaningEngine(
             },
             reasonRes = R.string.reason_screenshot_review,
             recommended = false,
+            group = CleanupGroup.SCREENSHOT,
         )
     }
 
-    fun duplicateAssessment(automaticSelectionIsSafe: Boolean): AiAssessment = AiAssessment(
-        category = CleanCategory.DUPLICATE,
-        safetyScore = if (automaticSelectionIsSafe) 99 else 86,
-        reasonRes = R.string.reason_exact_duplicate,
-        recommended = automaticSelectionIsSafe,
+    /** Fully verified copy. Auto only when [DuplicatePolicy.autoSelectable] allows it. */
+    fun duplicateAssessment(automaticSelectionIsSafe: Boolean): AiAssessment = assessment(
+        if (automaticSelectionIsSafe) CleanupGroup.DUPLICATE_SAFE else CleanupGroup.DUPLICATE_PERSONAL,
+        ageDays = 0,
     )
 
-    fun sampledDuplicateAssessment(): AiAssessment = AiAssessment(
-        category = CleanCategory.DUPLICATE,
-        safetyScore = 80,
-        reasonRes = R.string.reason_sampled_duplicate,
-        recommended = false,
-    )
+    /** Same size and matching samples only; never selectable as a group. */
+    fun sampledDuplicateAssessment(): AiAssessment = assessment(CleanupGroup.DUPLICATE_UNVERIFIED, ageDays = 0)
 
+    fun assessment(group: CleanupGroup, ageDays: Long, apkPackage: ApkInfo? = null): AiAssessment {
+        val quantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
+        return AiAssessment(
+            category = categoryOf(group),
+            safetyScore = if (group.auto) 95 else 70,
+            reasonRes = group.reasonRes,
+            reasonArgs = emptyList(),
+            recommended = group.auto,
+            reasonPluralRes = group.reasonPluralRes,
+            reasonQuantity = quantity,
+            group = group,
+            apkPackageName = apkPackage?.packageName,
+            apkVersionCode = apkPackage?.versionCode,
+        )
+    }
+
+    private fun isScreenRecording(path: String, name: String): Boolean =
+        SCREEN_RECORDING_FOLDERS.any(path::contains) ||
+            SCREEN_RECORDING_NAME_PREFIXES.any(name::startsWith)
 
     private fun isScreenshot(path: String, name: String, mimeType: String): Boolean {
         // Many devices save screen recordings (.mp4) into the Screenshots
@@ -228,8 +252,6 @@ class AiCleaningEngine(
         if (!isStillImage(name, mimeType)) return false
         return path.contains("/screenshots/") ||
             path.contains("/screenshot/") ||
-            path.endsWith("/screenshots") ||
-            path.endsWith("/screenshot") ||
             name.startsWith("screenshot") ||
             name.startsWith("screen_shot") ||
             name.startsWith("screencap") ||
@@ -243,45 +265,64 @@ class AiCleaningEngine(
         return name.substringAfterLast('.', "") in SCREENSHOT_IMAGE_EXTENSIONS
     }
 
-    private fun isTemporary(
-        file: IndexedFile,
-        path: String,
-        name: String,
-        ageDays: Long,
-    ): Boolean {
-        if (ageDays < TEMP_MIN_AGE_DAYS) return false
-        val tempExtension = TEMP_EXTENSIONS.any(name::endsWith)
-        val generatedThumbnail = path.contains("/.thumbnails/")
-        val mediaMime = StoragePathRules.normalizeText(file.mimeType)
-        val mediaFile = mediaMime.startsWith("image/") || mediaMime.startsWith("video/")
-        val tempFolder = !mediaFile &&
-            (path.contains("/temp/") || path.contains("/tmp/") || path.contains("/temporary/"))
-        val knownTinyArtifact = file.sizeBytes <= 10L * 1024L * 1024L &&
-            (name == "thumbs.db" || name.endsWith(".log.old") || name.endsWith(".bak.tmp"))
-        return tempExtension || generatedThumbnail || tempFolder || knownTinyArtifact
-    }
+    private fun absolutePath(file: IndexedFile): String? = runCatching {
+        val uri = URI(file.uri)
+        if (uri.scheme != "file") null else uri.path
+    }.getOrNull()
 
-    private fun isInterruptedDownload(name: String): Boolean =
-        INTERRUPTED_DOWNLOAD_EXTENSIONS.any(name::endsWith)
-
-    private fun isWhatsAppSharedMediaPath(path: String): Boolean = StoragePathRules.isWhatsAppPath(path)
-
-    private fun ageDays(modifiedAtMillis: Long): Long {
-        if (modifiedAtMillis <= 0L) return 0
-        return TimeUnit.MILLISECONDS.toDays((nowMillis() - modifiedAtMillis).coerceAtLeast(0))
+    /** Age from the newer of creation and modification time. */
+    fun ageDays(file: IndexedFile): Long {
+        val reference = maxOf(file.createdAtMillis, file.modifiedAtMillis)
+        if (reference <= 0L) return 0
+        return TimeUnit.MILLISECONDS.toDays((nowMillis() - reference).coerceAtLeast(0))
     }
 
     companion object {
         private const val APK_MIME = "application/vnd.android.package-archive"
-        private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private const val DEEP_SCREENSHOT_DAYS = 7L
         private const val DEEP_DOWNLOAD_DAYS = 30L
         private const val DEEP_WHATSAPP_SENT_DAYS = 14L
-        private const val TEMP_MIN_AGE_DAYS = 3L
-        private const val OLD_INSTALLER_DAYS = 7L
-        private const val APK_LONG_KEPT_DAYS = 30L
-        private val TEMP_EXTENSIONS = listOf(".tmp", ".temp", ".part", ".crdownload", ".download", ".cache")
+        private val THUMBNAIL_PREFIXES = listOf(
+            "/dcim/.thumbnails/",
+            "/pictures/.thumbnails/",
+            "/movies/.thumbnails/",
+            "/music/.thumbnails/",
+        )
+        private val PARTIAL_DOWNLOAD_EXTENSIONS = listOf(".crdownload", ".part", ".download")
+        private val TEMP_EXTENSIONS = listOf(".tmp", ".temp")
+        private val SCREEN_RECORDING_FOLDERS = listOf(
+            "/screenrecord",
+            "/screen recordings/",
+            "/screenshots/",
+            "/screenrecorder/",
+        )
+        private val SCREEN_RECORDING_NAME_PREFIXES = listOf("screen_recording", "screenrecord", "screen-")
         private val SCREENSHOT_IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "webp", "heic", "heif")
-        private val INTERRUPTED_DOWNLOAD_EXTENSIONS = listOf(".part", ".crdownload", ".download")
+        val DOCUMENT_EXTENSIONS = setOf(
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "rtf", "csv", "epub",
+            "jpg", "jpeg", "png", "heic", "webp",
+        )
+
+        fun categoryOf(group: CleanupGroup): CleanCategory = when (group) {
+            CleanupGroup.THUMBNAILS,
+            CleanupGroup.TEMP_FILES,
+            CleanupGroup.PARTIAL_DOWNLOADS -> CleanCategory.JUNK
+            CleanupGroup.APK_INSTALLED,
+            CleanupGroup.APK_OLD_VERSION,
+            CleanupGroup.APK_OTHER -> CleanCategory.APK_PACKAGE
+            CleanupGroup.DUPLICATE_SAFE,
+            CleanupGroup.DUPLICATE_PERSONAL,
+            CleanupGroup.DUPLICATE_UNVERIFIED -> CleanCategory.DUPLICATE
+            CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.SCREEN_RECORDING,
+            CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
+            CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT
+            CleanupGroup.DOWNLOAD_FILE,
+            CleanupGroup.DOWNLOAD_DOCUMENT -> CleanCategory.OLD_DOWNLOAD
+            CleanupGroup.WHATSAPP_SENT,
+            CleanupGroup.WHATSAPP_VIDEO,
+            CleanupGroup.WHATSAPP_VOICE,
+            CleanupGroup.WHATSAPP_STATUS -> CleanCategory.WHATSAPP_MEDIA
+        }
     }
 }

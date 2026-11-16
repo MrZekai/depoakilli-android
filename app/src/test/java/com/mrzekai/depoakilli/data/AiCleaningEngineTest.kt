@@ -1,7 +1,9 @@
 package com.mrzekai.depoakilli.data
 
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.AiAssessment
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.IndexedFile
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -14,164 +16,210 @@ import org.junit.Test
 class AiCleaningEngineTest {
     private val now = 2_000_000_000_000L
     private val engine = AiCleaningEngine { now }
+    private val mb = 1_000_000L
+
+    private fun group(file: IndexedFile, e: AiCleaningEngine = engine): CleanupGroup? = e.assess(file)?.group
+
+    // --- thresholds: threshold - 1 and threshold for each age/size rule ---
 
     @Test
-    fun `personal documents in temporary folders are review only`() {
+    fun `whatsapp status needs two days`() {
+        val path = "Android/media/com.whatsapp/WhatsApp/Media/.Statuses/"
+        assertNull(group(file("s.jpg", "image/jpeg", 1, path)))
+        assertEquals(CleanupGroup.WHATSAPP_STATUS, group(file("s.jpg", "image/jpeg", 2, path)))
+    }
+
+    @Test
+    fun `whatsapp sent needs thirty days`() {
+        val path = "WhatsApp/Media/WhatsApp Images/Sent/"
+        assertNull(group(file("a.jpg", "image/jpeg", 29, path)))
+        assertEquals(CleanupGroup.WHATSAPP_SENT, group(file("a.jpg", "image/jpeg", 30, path)))
+    }
+
+    @Test
+    fun `whatsapp video needs twenty five megabytes`() {
+        val path = "WhatsApp/Media/WhatsApp Video/"
+        assertNull(group(file("v.mp4", "video/mp4", 1, path, 25 * mb - 1)))
+        assertEquals(CleanupGroup.WHATSAPP_VIDEO, group(file("v.mp4", "video/mp4", 1, path, 25 * mb)))
+    }
+
+    @Test
+    fun `whatsapp voice notes need one hundred eighty days`() {
+        val path = "WhatsApp/Media/WhatsApp Voice Notes/202401/"
+        assertNull(group(file("PTT-1.opus", "audio/ogg", 179, path)))
+        assertEquals(CleanupGroup.WHATSAPP_VOICE, group(file("PTT-1.opus", "audio/ogg", 180, path)))
+        assertEquals(
+            CleanupGroup.WHATSAPP_VOICE,
+            group(file("ptt-2.opus", "audio/ogg", 200, "WhatsApp/Media/WhatsApp Audio/")),
+        )
+    }
+
+    @Test
+    fun `other whatsapp media is never a candidate and nothing in whatsapp is auto`() {
+        assertNull(group(file("photo.jpg", "image/jpeg", 900, "WhatsApp/Media/WhatsApp Images/")))
+        val all = listOf(
+            file("s.jpg", "image/jpeg", 5, "WhatsApp/Media/.Statuses/"),
+            file("a.jpg", "image/jpeg", 50, "WhatsApp/Media/WhatsApp Images/Sent/"),
+            file("v.mp4", "video/mp4", 1, "WhatsApp/Media/WhatsApp Video/", 500 * mb),
+            file("big.tmp", "application/octet-stream", 50, "WhatsApp/Media/"),
+            file("old.apk", APK, 50, "WhatsApp/Media/WhatsApp Documents/"),
+        )
+        all.forEach { candidate -> assertFalse(engine.assess(candidate)?.recommended ?: false) }
+    }
+
+    @Test
+    fun `thumbnails only in the standard media folders`() {
+        for (path in listOf("DCIM/.thumbnails/", "Pictures/.thumbnails/", "Movies/.thumbnails/", "Music/.thumbnails/")) {
+            val result = requireNotNull(engine.assess(file("t.jpg", "image/jpeg", 0, path)))
+            assertEquals(CleanupGroup.THUMBNAILS, result.group)
+            assertTrue(result.recommended)
+        }
+        assertNull(group(file("holiday.jpg", "image/jpeg", 45, "Pictures/Thumbnails/")))
+        assertNull(group(file("t.jpg", "image/jpeg", 45, "Documents/.thumbnails/")))
+    }
+
+    @Test
+    fun `unfinished downloads need fourteen days in downloads`() {
+        assertNull(group(file("a.crdownload", OCTET, 13)))
+        for (ext in listOf("crdownload", "part", "download")) {
+            val result = requireNotNull(engine.assess(file("a.$ext", OCTET, 14)))
+            assertEquals(CleanupGroup.PARTIAL_DOWNLOADS, result.group)
+            assertTrue(result.recommended)
+        }
+        assertNull(group(file("a.part", OCTET, 40, "Documents/")))
+    }
+
+    @Test
+    fun `temporary files need seven days and stay out of android media`() {
+        assertNull(group(file("x.tmp", OCTET, 6, "Documents/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file("x.tmp", OCTET, 7, "Documents/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file("x.temp", OCTET, 7, "Documents/")))
+        assertFalse(engine.assess(file("x.tmp", OCTET, 50, "Android/media/com.other/"))?.recommended ?: false)
+        assertNull(group(file("x.cache", OCTET, 50, "Documents/")))
+    }
+
+    @Test
+    fun `files in temp folders are no longer junk by folder name`() {
         for (folder in listOf("Temp", "tmp", "temporary")) {
-            for (name in listOf("lease.pdf", "notes.docx", "song.mp3", "backup.zip")) {
-                val candidate = file(name, "application/octet-stream", 120, "Documents/$folder/")
-                for (result in listOf(engine.assess(candidate), engine.assessDeep(candidate))) {
-                    assertEquals(CleanCategory.JUNK, result?.category)
-                    assertFalse(requireNotNull(result).recommended)
-                }
-            }
+            assertNull(engine.assess(file("lease.pdf", "application/pdf", 120, "Documents/$folder/")))
         }
     }
 
     @Test
-    fun `only disposable extensions and thumbnails are preselected as junk`() {
-        for (extension in listOf("tmp", "temp", "cache", "part", "crdownload", "download")) {
-            val candidate = file("work.$extension", "application/octet-stream", 5, "Documents/Temp/")
-            val result = requireNotNull(engine.assess(candidate))
-            assertEquals(extension in listOf("tmp", "temp", "cache"), result.recommended)
-            assertNull(engine.assess(candidate.copy(modifiedAtMillis = now)))
-        }
+    fun `screen recordings need thirty days`() {
+        val path = "DCIM/Screen recordings/"
+        assertNull(group(file("rec.mp4", "video/mp4", 29, path)))
+        assertEquals(CleanupGroup.SCREEN_RECORDING, group(file("rec.mp4", "video/mp4", 30, path)))
+        assertEquals(CleanupGroup.SCREEN_RECORDING, group(file("Screenrecorder-1.mp4", "video/mp4", 40, "DCIM/Screenshots/")))
+        assertEquals(CleanupGroup.SCREEN_RECORDING, group(file("screen-2024.mp4", "video/mp4", 40, "Movies/")))
     }
 
     @Test
-    fun `old apk is listed for review but never preselected`() {
-        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 45))
-
-        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
-    }
-
-    @Test
-    fun `very old apk is still never preselected`() {
-        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 900))
-
-        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
-    }
-
-    @Test
-    fun `screen recording in the screenshots folder is not a screenshot`() {
+    fun `screenshots need thirty days and recordings are not screenshots`() {
+        val path = "Pictures/Screenshots/"
+        assertNull(group(file("Screenshot_1.png", "image/png", 29, path)))
+        assertEquals(CleanupGroup.SCREENSHOT, group(file("Screenshot_1.png", "image/png", 30, path)))
         val recording = file("Screenrecorder-2026.mp4", "video/mp4", 40, "DCIM/Screenshots/")
-
         assertNull(engine.assessFocusedScreenshot(recording))
         assertTrue(engine.assess(recording)?.category != CleanCategory.SCREENSHOT)
-        assertTrue(engine.assessDeep(recording)?.category != CleanCategory.SCREENSHOT)
     }
 
     @Test
-    fun `fresh apk is visible but not preselected`() {
-        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 1))
-
-        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+    fun `large videos need one hundred megabytes and ninety days`() {
+        assertNull(group(file("clip.mp4", "video/mp4", 90, "Movies/", 100 * mb - 1)))
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(file("clip.mp4", "video/mp4", 90, "Movies/", 100 * mb)))
+        assertEquals(CleanupGroup.LARGE_OTHER, group(file("clip.mp4", "video/mp4", 89, "Movies/", 100 * mb)))
     }
 
     @Test
-    fun `week old apk is visible but not preselected`() {
-        val result = engine.assess(file("installer.apk", "application/vnd.android.package-archive", 8))
-
-        assertEquals(CleanCategory.APK_PACKAGE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+    fun `downloads need ninety days and documents are separated`() {
+        assertNull(group(file("a.zip", "application/zip", 89)))
+        assertEquals(CleanupGroup.DOWNLOAD_FILE, group(file("a.zip", "application/zip", 90)))
+        for (name in listOf("lease.pdf", "cv.docx", "photo.jpg", "scan.heic", "book.epub")) {
+            val result = requireNotNull(engine.assess(file(name, OCTET, 90)))
+            assertEquals(CleanupGroup.DOWNLOAD_DOCUMENT, result.group)
+            assertFalse(result.recommended)
+        }
+        assertFalse(CleanupGroup.DOWNLOAD_DOCUMENT.groupSelectable)
     }
 
     @Test
-    fun `old screenshot is review only`() {
-        val result = engine.assess(
-            file("Screenshot_2026.png", "image/png", 40, "Pictures/Screenshots/"),
+    fun `other large files need one hundred megabytes`() {
+        assertNull(group(file("backup.zip", "application/zip", 1, "Backups/", 100 * mb - 1)))
+        assertEquals(CleanupGroup.LARGE_OTHER, group(file("backup.zip", "application/zip", 1, "Backups/", 100 * mb)))
+    }
+
+    // --- installers ---
+
+    @Test
+    fun `four installer cases`() {
+        val apk = file("app.apk", APK, 1, "Download/").copy(uri = "file:///storage/emulated/0/Download/app.apk")
+        fun engineWith(info: ApkInfo?, installed: Long?) = AiCleaningEngine(
+            apkInfoReader = { info },
+            installedVersions = { installed },
+            nowMillis = { now },
         )
-
-        assertEquals(CleanCategory.SCREENSHOT, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+        val info = ApkInfo("com.example", 10)
+        val sameVersion = requireNotNull(engineWith(info, 10).assess(apk))
+        assertEquals(CleanupGroup.APK_INSTALLED, sameVersion.group)
+        assertTrue(sameVersion.recommended)
+        assertEquals(CleanupGroup.APK_INSTALLED, group(apk, engineWith(info, 11)))
+        assertEquals(CleanupGroup.APK_OTHER, group(apk, engineWith(info, 9)))
+        assertEquals(CleanupGroup.APK_OTHER, group(apk, engineWith(info, null)))
+        assertEquals(CleanupGroup.APK_OTHER, group(apk, engineWith(null, 10)))
+        assertFalse(requireNotNull(engineWith(null, null).assess(apk)).recommended)
     }
 
     @Test
-    fun `recent camera photo is protected from suggestions`() {
-        val result = engine.assess(file("IMG_1001.jpg", "image/jpeg", 2, "DCIM/Camera/"))
-
-        assertNull(result)
-    }
-
-    @Test
-    fun `large old video is review only`() {
-        val result = engine.assess(
-            file("clip.mp4", "video/mp4", 75, "Movies/", 300L * 1024L * 1024L),
+    fun `older versions of the same installer are marked`() {
+        val e = AiCleaningEngine(
+            apkInfoReader = { path -> ApkInfo("com.example", path.substringAfterLast('v').substringBefore('.').toLong()) },
+            installedVersions = { null },
+            nowMillis = { now },
         )
-
-        assertEquals(CleanCategory.LARGE_FILE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+        val items = (1..3).map { version ->
+            val f = file("app-v$version.apk", APK, 1).copy(uri = "file:///sdcard/Download/app-v$version.apk")
+            f.toCleanable(requireNotNull(e.assess(f)))
+        }
+        val marked = e.markOlderApkVersions(items).associate { it.name to it.assessment.group }
+        assertEquals(CleanupGroup.APK_OLD_VERSION, marked["app-v1.apk"])
+        assertEquals(CleanupGroup.APK_OLD_VERSION, marked["app-v2.apk"])
+        assertEquals(CleanupGroup.APK_OTHER, marked["app-v3.apk"])
     }
 
+    // --- priority order ---
 
     @Test
-    fun `interrupted download is visible but never preselected`() {
-        val result = engine.assess(
-            file("partial.crdownload", "application/octet-stream", 5, "Download/"),
+    fun `rules apply in priority order`() {
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(file("old.mp4", "video/mp4", 200, "Download/", 300 * mb)))
+        assertEquals(
+            CleanupGroup.WHATSAPP_VIDEO,
+            group(file("old.mp4", "video/mp4", 200, "WhatsApp/Media/WhatsApp Video/", 300 * mb)),
         )
-
-        assertEquals(CleanCategory.JUNK, result?.category)
-        assertFalse(requireNotNull(result).recommended)
-    }
-
-
-
-    @Test
-    fun `generated hidden thumbnails are high confidence junk`() {
-        val result = engine.assess(
-            file("thumb_1001.jpg", "image/jpeg", 5, "DCIM/.thumbnails/"),
-        )
-
-        assertEquals(CleanCategory.JUNK, result?.category)
-        assertTrue(requireNotNull(result).recommended)
+        assertEquals(CleanupGroup.PARTIAL_DOWNLOADS, group(file("big.part", OCTET, 30, "Download/", 300 * mb)))
+        assertEquals(CleanupGroup.SCREENSHOT, group(file("Screenshot_1.png", "image/png", 200, "Download/")))
     }
 
     @Test
-    fun `ordinary image inside a user thumbnails folder is not junk`() {
-        val result = engine.assess(
-            file("holiday.jpg", "image/jpeg", 45, "Pictures/Thumbnails/"),
-        )
-
-        assertNull(result)
+    fun `protected user data is never assessed`() {
+        assertNull(engine.assess(file("msgstore.db.crypt14", OCTET, 400, "Android/media/com.whatsapp/WhatsApp/Databases/", 300 * mb)))
+        assertNull(engine.assessDeep(file("backup.crypt15", OCTET, 400, "Download/", 300 * mb)))
     }
 
     @Test
-    fun `ordinary image inside temp folder is not auto classified as junk`() {
-        val result = engine.assess(
-            file("edited-photo.jpg", "image/jpeg", 12, "Pictures/Temp/"),
-        )
-
-        assertNull(result)
+    fun `camera photos documents and dcim items are never auto`() {
+        assertNull(engine.assess(file("IMG_1001.jpg", "image/jpeg", 2, "DCIM/Camera/")))
+        val cameraVideo = requireNotNull(engine.assess(file("VID_1.mp4", "video/mp4", 400, "DCIM/Camera/", 900 * mb)))
+        assertFalse(cameraVideo.recommended)
+        val doc = requireNotNull(engine.assess(file("tax.pdf", "application/pdf", 400)))
+        assertFalse(doc.recommended)
     }
 
     @Test
-    fun `large archive is discovered as a large file`() {
-        val result = engine.assess(
-            file("backup.zip", "application/zip", 10, "Backups/", 600L * 1024L * 1024L),
-        )
-
-        assertEquals(CleanCategory.LARGE_FILE, result?.category)
-        assertFalse(requireNotNull(result).recommended)
+    fun `age uses the newer of creation and modification time`() {
+        val copied = file("a.zip", "application/zip", 400).copy(createdAtMillis = now - TimeUnit.DAYS.toMillis(5))
+        assertNull(engine.assess(copied))
     }
-
-    @Test
-    fun `deep clean surfaces a seven day screenshot that smart clean protects`() {
-        val candidate = file(
-            "Screenshot_recent.png",
-            "image/png",
-            10,
-            "Pictures/Screenshots/",
-        )
-
-        assertNull(engine.assess(candidate))
-        val deep = engine.assessDeep(candidate)
-        assertEquals(CleanCategory.SCREENSHOT, deep?.category)
-        assertFalse(requireNotNull(deep).recommended)
-    }
-
 
     @Test
     fun `download path matching is stable across Turkish I variants and locales`() {
@@ -179,127 +227,72 @@ class AiCleaningEngineTest {
         try {
             for (locale in listOf(Locale.forLanguageTag("tr-TR"), Locale.ENGLISH)) {
                 Locale.setDefault(locale)
-
                 assertTrue(StoragePathRules.isDownloadPath("İndirilenler/"))
                 assertTrue(StoragePathRules.isDownloadPath("INDIRILENLER/"))
-                assertTrue(StoragePathRules.isDownloadPath("Download/"))
-                assertTrue(StoragePathRules.isDownloadPath("Downloads/"))
                 assertFalse(StoragePathRules.isDownloadPath("Pictures/"))
-
-                val result = engine.assess(
-                    file(
-                        "old.zip",
-                        "application/zip",
-                        120,
-                        "İndirilenler/",
-                    ),
-                )
-                assertEquals(CleanCategory.OLD_DOWNLOAD, result?.category)
+                assertEquals(CleanCategory.OLD_DOWNLOAD, engine.assess(file("old.zip", "application/zip", 120, "İndirilenler/"))?.category)
             }
         } finally {
             Locale.setDefault(previous)
         }
     }
 
+    // --- tool-screen policies kept from earlier versions ---
+
     @Test
     fun `focused screenshots include recent and old items but never preselect`() {
-        val candidates = listOf(
+        for (candidate in listOf(
             file("Screenshot_1.png", "image/png", 1, "DCIM/Screenshots/"),
-            file("holiday.png", "image/png", 2, "Pictures/Screenshots/"),
             file("Screenshot_31.png", "image/png", 31, "Pictures/Screenshots/"),
-        )
-
-        for (candidate in candidates) {
-            val result = engine.assessFocusedScreenshot(candidate)
-            assertEquals(CleanCategory.SCREENSHOT, result?.category)
-            assertFalse(requireNotNull(result).recommended)
+        )) {
+            val result = requireNotNull(engine.assessFocusedScreenshot(candidate))
+            assertEquals(CleanCategory.SCREENSHOT, result.category)
+            assertFalse(result.recommended)
         }
-
-        val cameraPhoto = file("IMG_2001.jpg", "image/jpeg", 1, "DCIM/Camera/")
-        assertNull(engine.assessFocusedScreenshot(cameraPhoto))
+        assertNull(engine.assessFocusedScreenshot(file("IMG_2001.jpg", "image/jpeg", 1, "DCIM/Camera/")))
     }
 
     @Test
-    fun `deep clean uses the same one hundred megabyte large file threshold`() {
-        val candidate = file(
-            "archive.bin",
-            "application/octet-stream",
-            5,
-            "Backups/",
-            70L * 1024L * 1024L,
-        )
-
+    fun `deep clean surfaces recent screenshots without preselecting`() {
+        val candidate = file("Screenshot_recent.png", "image/png", 10, "Pictures/Screenshots/")
         assertNull(engine.assess(candidate))
-        assertNull(engine.assessDeep(candidate))
-        val large = candidate.copy(sizeBytes = 120L * 1024L * 1024L)
-        assertEquals(CleanCategory.LARGE_FILE, engine.assessDeep(large)?.category)
-        assertFalse(requireNotNull(engine.assessDeep(large)).recommended)
+        val deep = requireNotNull(engine.assessDeep(candidate))
+        assertEquals(CleanupGroup.SCREENSHOT, deep.group)
+        assertFalse(deep.recommended)
     }
 
     @Test
-    fun `whatsapp status is listed but never preselected`() {
-        val result = engine.assess(
-            file(
-                "status.jpg",
-                "image/jpeg",
-                1,
-                "WhatsApp/Media/.Statuses/",
-            ),
-        )
-
-        assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
-        assertFalse(requireNotNull(result).recommended)
-    }
-
-    @Test
-    fun `android media whatsapp statuses classify as whatsapp media`() {
-        val paths = listOf(
-            "Android/media/com.whatsapp/WhatsApp/Media/.Statuses/",
-            "Android/media/com.whatsapp.w4b/WhatsApp Business/Media/.Statuses/",
-        )
-
-        for (path in paths) {
-            val result = engine.assess(file("status.jpg", "image/jpeg", 1, path))
-            assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
-        }
-    }
-
-    @Test
-    fun `old whatsapp sent media is visible but not preselected`() {
-        val result = engine.assess(
-            file(
-                "sent-video.mp4",
-                "video/mp4",
-                45,
-                "WhatsApp/Media/WhatsApp Video/Sent/",
-            ),
-        )
-
-        assertEquals(CleanCategory.WHATSAPP_MEDIA, result?.category)
-        assertFalse(requireNotNull(result).recommended)
-    }
-
-    @Test
-    fun `personal folder with whatsapp in its name is not classified as whatsapp media`() {
-        val result = engine.assess(
-            file(
-                "sent-video.mp4",
-                "video/mp4",
-                45,
-                "Documents/My WhatsApp Backup/Sent/",
-            ),
-        )
-
+    fun `personal folder with whatsapp in its name is not whatsapp media`() {
+        val result = engine.assess(file("sent-video.mp4", "video/mp4", 45, "Documents/My WhatsApp Backup/Sent/"))
         assertNull(result)
     }
 
     @Test
-    fun `sampled duplicate assessment is review only with the sampled reason`() {
-        val result = engine.sampledDuplicateAssessment()
+    fun `duplicate assessments map to their groups`() {
+        assertEquals(CleanupGroup.DUPLICATE_SAFE, engine.duplicateAssessment(true).group)
+        assertTrue(engine.duplicateAssessment(true).recommended)
+        assertEquals(CleanupGroup.DUPLICATE_PERSONAL, engine.duplicateAssessment(false).group)
+        assertFalse(engine.duplicateAssessment(false).recommended)
+        val sampled: AiAssessment = engine.sampledDuplicateAssessment()
+        assertEquals(CleanupGroup.DUPLICATE_UNVERIFIED, sampled.group)
+        assertFalse(sampled.recommended)
+        assertEquals(R.string.reason_sampled_duplicate, sampled.reasonRes)
+        assertFalse(CleanupGroup.DUPLICATE_UNVERIFIED.groupSelectable)
+    }
 
-        assertEquals(CleanCategory.DUPLICATE, result.category)
-        assertFalse(result.recommended)
-        assertEquals(R.string.reason_sampled_duplicate, result.reasonRes)
+    @Test
+    fun `auto groups match the plan specification`() {
+        val auto = CleanupGroup.entries.filter(CleanupGroup::auto).toSet()
+        assertEquals(
+            setOf(
+                CleanupGroup.APK_INSTALLED,
+                CleanupGroup.DUPLICATE_SAFE,
+                CleanupGroup.THUMBNAILS,
+                CleanupGroup.TEMP_FILES,
+                CleanupGroup.PARTIAL_DOWNLOADS,
+            ),
+            auto,
+        )
     }
 
     private fun file(
@@ -307,7 +300,7 @@ class AiCleaningEngineTest {
         mime: String,
         ageDays: Long,
         path: String = "Download/",
-        size: Long = 2L * 1024L * 1024L,
+        size: Long = 2L * mb,
     ) = IndexedFile(
         uri = "content://test/$name",
         name = name,
@@ -316,4 +309,9 @@ class AiCleaningEngineTest {
         modifiedAtMillis = now - TimeUnit.DAYS.toMillis(ageDays),
         relativePath = path,
     )
+
+    private companion object {
+        const val APK = "application/vnd.android.package-archive"
+        const val OCTET = "application/octet-stream"
+    }
 }
