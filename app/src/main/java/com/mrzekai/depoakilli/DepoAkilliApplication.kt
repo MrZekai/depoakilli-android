@@ -6,6 +6,7 @@ import android.content.ComponentCallbacks2
 import com.mrzekai.depoakilli.ads.AdFreeWindowStore
 import com.mrzekai.depoakilli.data.TrashPurgeWorker
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
+import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.media.MediaThumbnails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,7 @@ class DepoAkilliApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        ByteFormatter.install(this)
         AppDiagnostics.initialize(this)
         TrashPurgeWorker.schedule(this)
     }

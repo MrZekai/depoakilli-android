@@ -1519,6 +1519,11 @@ for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml
     if duplicates:
         errors.append(f"duplicate resource names in {strings_path.parent.name}: {duplicates}")
 
+# T2.7: sizes follow the phone's language through Formatter, with a root fallback.
+byte_formatter_models = read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt")
+if "Formatter.formatShortFileSize" not in byte_formatter_models or "ByteFormatter.install(this)" not in read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt"):
+    errors.append("ByteFormatter must use Formatter.formatShortFileSize with the app context installed at start")
+
 plural_sets = {}
 for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
     root = ET.parse(strings_path).getroot()
