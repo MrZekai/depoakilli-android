@@ -16,6 +16,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Debug
 import android.os.Environment
+import android.os.ParcelFileDescriptor
 import android.os.Process
 import android.os.StatFs
 import android.os.SystemClock
@@ -28,6 +29,7 @@ import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
@@ -44,9 +46,9 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import java.io.File
 import java.io.FileInputStream
+import java.nio.file.Files
+import java.nio.file.attribute.BasicFileAttributes
 import java.lang.ref.SoftReference
-import java.nio.ByteBuffer
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
@@ -62,8 +64,12 @@ import kotlin.coroutines.coroutineContext
  */
 class DeviceRepository(
     private val context: Context,
-    private val aiEngine: AiCleaningEngine = AiCleaningEngine(),
+    private val aiEngine: AiCleaningEngine = AiCleaningEngine(
+        apkInfoReader = AndroidApkInfoReader(context.packageManager),
+        installedVersions = AndroidInstalledVersionLookup(context.packageManager),
+    ),
 ) {
+    private val duplicateFinder = DuplicateFinder(aiEngine, ::openUriInput)
     private val resolver = context.contentResolver
     private var sharedIndexCache: SoftReference<List<IndexedFile>>? = null
     private var sharedIndexCachedAtElapsed = 0L
@@ -287,9 +293,10 @@ class DeviceRepository(
                 assessments += file.toCleanable(assessment)
             }
         }
+        val assessed = aiEngine.markOlderApkVersions(assessments)
 
         // Smart Clean promises duplicates too, but must stay fast: it verifies
-        // files up to SMART_FULL_HASH_BYTES byte for byte and lists larger
+        // files up to QUICK_FULL_HASH_BYTES byte for byte and lists larger
         // sample matches as review-only. Deep/Duplicate/Media verify up to 1 GB.
         if (
             focus == ScanFocus.SMART ||
@@ -307,7 +314,11 @@ class DeviceRepository(
             }
             duplicateResult = findDuplicates(
                 duplicateSource,
-                maxFullHashBytes = if (focus == ScanFocus.SMART) SMART_FULL_HASH_BYTES else MAX_FULL_HASH_BYTES,
+                maxFullHashBytes = if (focus == ScanFocus.SMART) {
+                    CleaningThresholds.QUICK_FULL_HASH_BYTES
+                } else {
+                    CleaningThresholds.SMART_VERIFY_MAX_BYTES
+                },
             )
         }
 
@@ -316,7 +327,7 @@ class DeviceRepository(
         // download". Listing duplicates first lets distinctBy keep that
         // classification, so Deep Clean and Delete Duplicates report the same
         // duplicate set.
-        val focusedItems = duplicateResult.mergeWith(assessments)
+        val ranked = duplicateResult.mergeWith(assessed)
             .filter { item ->
                 when (focus) {
                     ScanFocus.SMART,
@@ -327,18 +338,16 @@ class DeviceRepository(
                     ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
                     ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
                     ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
-                    ScanFocus.DOWNLOADS -> item.assessment.category in DOWNLOAD_CATEGORIES
+                    ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS
                     ScanFocus.APKS -> item.assessment.category == CleanCategory.APK_PACKAGE
                     ScanFocus.ANALYZE -> false
                 }
             }
             .distinctBy(CleanableItem::uri)
-            .sortedWith(
-                compareByDescending<CleanableItem> { it.assessment.safetyScore }
-                    .thenByDescending { it.sizeBytes },
-            )
-            .take(MAX_RESULT_ITEMS)
+            .sortedByDescending(CleanableItem::sizeBytes)
             .toList()
+        val truncated = ranked.size > CleaningThresholds.MAX_RESULT_ITEMS
+        val focusedItems = ranked.take(CleaningThresholds.MAX_RESULT_ITEMS)
 
         ScanSummary(
             items = focusedItems,
@@ -349,6 +358,7 @@ class DeviceRepository(
             storageTypes = storageTypeStats(indexed),
             storagePreviews = storageTypePreviews(indexed),
             smartMediaTypes = smartMediaTypeStats(indexed),
+            truncated = truncated,
         )
     }
 
@@ -548,7 +558,7 @@ class DeviceRepository(
                 it.category == CleanCategory.APK_PACKAGE
             }
 
-            ScanFocus.LARGE_FILES -> if (file.sizeBytes >= LARGE_FILE_BYTES) {
+            ScanFocus.LARGE_FILES -> if (file.sizeBytes >= CleaningThresholds.LARGE_BYTES) {
                 AiAssessment(
                     category = CleanCategory.LARGE_FILE,
                     safetyScore = 60,
@@ -578,10 +588,7 @@ class DeviceRepository(
                 if (!StoragePathRules.isDownloadPath(file.relativePath)) {
                     null
                 } else {
-                    aiEngine.assessDeep(file)?.takeIf {
-                        it.category == CleanCategory.OLD_DOWNLOAD ||
-                            it.category == CleanCategory.JUNK
-                    }
+                    aiEngine.assessDeep(file)?.takeIf { it.group in DOWNLOAD_TOOL_GROUPS }
                 }
             }
 
@@ -719,9 +726,14 @@ class DeviceRepository(
             modifiedAtMillis = file.lastModified().coerceAtLeast(0L),
             relativePath = parentPath,
             volumeRoot = canonicalPathOf(storageRoot),
+            createdAtMillis = creationTimeOf(file),
         )
     }
 
+
+    private fun creationTimeOf(file: File): Long = runCatching {
+        Files.readAttributes(file.toPath(), BasicFileAttributes::class.java).creationTime().toMillis()
+    }.getOrDefault(0L).coerceAtLeast(0L)
 
     fun invalidateStorageIndex() {
         sharedIndexCache = null
@@ -832,128 +844,41 @@ class DeviceRepository(
     private suspend fun findDuplicates(
         files: List<IndexedFile>,
         maxFullHashBytes: Long,
-    ): DuplicatePolicy.ScanResult {
-        val duplicates = ArrayList<CleanableItem>()
-        val protectedUris = hashSetOf<String>()
-        val sameSizeGroups = files.asSequence()
-            .filter { it.sizeBytes >= MIN_DUPLICATE_BYTES }
-            .groupBy(IndexedFile::sizeBytes)
-            .values
-            .filter { it.size > 1 }
-            .sortedByDescending { group -> group.first().sizeBytes * group.size }
+        onHashProgress: HashProgress = { _, _ -> },
+    ): DuplicatePolicy.ScanResult = duplicateFinder.find(files, maxFullHashBytes, onHashProgress)
 
-        for (sameSizeFiles in sameSizeGroups) {
-            coroutineContext.ensureActive()
-            val sampleGroups = sameSizeFiles
-                .mapNotNull { file -> sampleFingerprint(file)?.let { it to file } }
-                .groupBy({ it.first }, { it.second })
-                .values
-                .filter { it.size > 1 }
-            for (sameSampleFiles in sampleGroups) {
-                coroutineContext.ensureActive()
-                // Files at or below the full-hash ceiling are verified byte for
-                // byte. Larger sample matches remain visible as review-only
-                // candidates: their protected original is retained and no item
-                // is automatically selected without a complete hash.
-                val small = sameSampleFiles.filter { it.sizeBytes <= maxFullHashBytes }
-                val large = sameSampleFiles.filter { it.sizeBytes > maxFullHashBytes }
-                val contentGroups = small
-                    .mapNotNull { file -> fingerprint(file)?.let { it to file } }
-                    .groupBy({ it.first }, { it.second })
-                    .values
-                    .filter { it.size > 1 }
-                for (sameContentFiles in contentGroups) {
-                    val decision = DuplicatePolicy.choose(sameContentFiles) ?: continue
-                    protectedUris += decision.keep.uri
-                    sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
-                        val safe = DuplicatePolicy.autoSelectable(
-                            duplicate, decision.keep, duplicate.volumeRoot, decision.keep.volumeRoot,
-                        )
-                        duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(safe)).copy(
-                            protectedDuplicateName = decision.keep.name,
-                            protectedDuplicateUri = decision.keep.uri,
-                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
-                        )
-                    }
-                }
-                if (large.size >= 2) {
-                    val decision = DuplicatePolicy.choose(large) ?: continue
-                    protectedUris += decision.keep.uri
-                    large.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
-                        duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
-                            protectedDuplicateName = decision.keep.name,
-                            protectedDuplicateUri = decision.keep.uri,
-                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
-                        )
-                    }
-                }
-            }
-        }
-        return DuplicatePolicy.ScanResult(duplicates, protectedUris)
+    /**
+     * Deep duplicate check: fully verifies the largest look-alike groups. Never
+     * runs during a scan; only when the user asks for it.
+     */
+    suspend fun verifyLargeDuplicateGroups(
+        items: List<CleanableItem>,
+        onHashProgress: HashProgress = { _, _ -> },
+    ): Map<String, CleanableItem?> = withContext(Dispatchers.IO) {
+        duplicateFinder.verifyLargeGroups(items, onHashProgress)
     }
 
-    private fun sampleFingerprint(file: IndexedFile): String? = withFileInput(file) { input ->
-        val digest = MessageDigest.getInstance("SHA-256")
-        digest.update(ByteBuffer.allocate(Long.SIZE_BYTES).putLong(file.sizeBytes).array())
-        val channel = input.channel
-        updateDigestFromChannel(channel, digest, 0L, HASH_SAMPLE_BYTES)
-        if (file.sizeBytes > HASH_SAMPLE_BYTES * 2L) {
-            updateDigestFromChannel(
-                channel,
-                digest,
-                (file.sizeBytes / 2L - HASH_SAMPLE_BYTES / 2L).coerceAtLeast(0L),
-                HASH_SAMPLE_BYTES,
-            )
-        }
-        if (file.sizeBytes > HASH_SAMPLE_BYTES) {
-            updateDigestFromChannel(
-                channel,
-                digest,
-                (file.sizeBytes - HASH_SAMPLE_BYTES).coerceAtLeast(0L),
-                HASH_SAMPLE_BYTES,
-            )
-        }
-        digest.digest().toHex()
+    fun largeDuplicateGroupSummary(items: List<CleanableItem>): Pair<Int, Long> =
+        duplicateFinder.largeGroupSummary(items)
+
+    /** Full check of one look-alike copy. `null` means it is not an exact copy. */
+    suspend fun verifyDuplicate(
+        item: CleanableItem,
+        onHashProgress: HashProgress = { _, _ -> },
+    ): CleanableItem? = withContext(Dispatchers.IO) {
+        duplicateFinder.verify(item, onHashProgress)
     }
 
-    private fun fingerprint(file: IndexedFile): String? = withFileInput(file) { input ->
-        val digest = MessageDigest.getInstance("SHA-256")
-        val channel = input.channel
-        val buffer = ByteBuffer.allocate(HASH_BUFFER_BYTES)
-        while (channel.read(buffer) > 0) {
-            buffer.flip()
-            digest.update(buffer)
-            buffer.clear()
-        }
-        digest.digest().toHex()
-    }
-
-    private fun <T> withFileInput(file: IndexedFile, block: (FileInputStream) -> T): T? = runCatching {
-        val uri = Uri.parse(file.uri)
+    private fun openUriInput(uriString: String): FileInputStream? = runCatching {
+        val uri = Uri.parse(uriString)
         if (uri.scheme == "file") {
-            FileInputStream(File(requireNotNull(uri.path))).use(block)
+            FileInputStream(File(requireNotNull(uri.path)))
         } else {
-            resolver.openFileDescriptor(uri, "r")?.use { descriptor ->
-                FileInputStream(descriptor.fileDescriptor).use(block)
+            resolver.openFileDescriptor(uri, "r")?.let { descriptor ->
+                ParcelFileDescriptor.AutoCloseInputStream(descriptor)
             }
         }
     }.getOrNull()
-
-    private fun updateDigestFromChannel(
-        channel: java.nio.channels.FileChannel,
-        digest: MessageDigest,
-        position: Long,
-        byteCount: Int,
-    ) {
-        channel.position(position)
-        val buffer = ByteBuffer.allocate(byteCount)
-        while (buffer.hasRemaining()) {
-            val read = channel.read(buffer)
-            if (read <= 0) break
-        }
-        buffer.flip()
-        digest.update(buffer)
-    }
 
     private fun smartMediaTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
         var imageCount = 0
@@ -1080,18 +1005,6 @@ class DeviceRepository(
         deleted
     }.getOrDefault(false)
 
-    private fun IndexedFile.toCleanable(assessment: AiAssessment) = CleanableItem(
-        id = "$uri-${assessment.category}",
-        uri = uri,
-        name = name,
-        sizeBytes = sizeBytes,
-        mimeType = mimeType,
-        modifiedAtMillis = modifiedAtMillis,
-        relativePath = relativePath,
-        assessment = assessment,
-        selected = assessment.recommended,
-    )
-
     private fun directorySize(root: File): Long {
         if (!root.exists()) return 0L
         var total = 0L
@@ -1115,7 +1028,6 @@ class DeviceRepository(
         )
     }
 
-    private fun ByteArray.toHex(): String = joinToString("") { "%02x".format(it) }
 
     sealed interface DeletePlan {
         data class RequiresConsent(val pendingIntent: PendingIntent) : DeletePlan
@@ -1154,14 +1066,7 @@ class DeviceRepository(
         // interactive surface bounded even on high-memory devices so a single
         // tap cannot allocate and recompose tens of thousands of rows.
         private const val MAX_SELECTABLE_STORAGE_REVIEW_ITEMS = 10_000
-        private const val MAX_RESULT_ITEMS = 4_000
         private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
-        private const val HASH_BUFFER_BYTES = 256 * 1024
-        private const val HASH_SAMPLE_BYTES = 64 * 1024
-        private const val MAX_FULL_HASH_BYTES = 1L * 1024L * 1024L * 1024L
-        private const val SMART_FULL_HASH_BYTES = 32L * 1024L * 1024L
-        private const val MIN_DUPLICATE_BYTES = 32L * 1024L
-        private const val LARGE_FILE_BYTES = 100L * 1024L * 1024L
         private val JUNK_CATEGORIES = setOf(
             CleanCategory.JUNK,
             CleanCategory.OLD_DOWNLOAD,
@@ -1172,9 +1077,13 @@ class DeviceRepository(
             CleanCategory.LARGE_FILE,
             CleanCategory.DUPLICATE,
         )
-        private val DOWNLOAD_CATEGORIES = setOf(
-            CleanCategory.JUNK,
-            CleanCategory.OLD_DOWNLOAD,
+        private val DOWNLOAD_TOOL_GROUPS = setOf(
+            CleanupGroup.DOWNLOAD_FILE,
+            CleanupGroup.DOWNLOAD_DOCUMENT,
+            CleanupGroup.PARTIAL_DOWNLOADS,
+            CleanupGroup.TEMP_FILES,
+            CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.LARGE_OTHER,
         )
         private val ARCHIVE_EXTENSIONS = setOf("zip", "rar", "7z", "tar", "gz", "bz2", "xz")
         private val DOCUMENT_EXTENSIONS = setOf(

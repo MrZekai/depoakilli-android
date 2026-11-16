@@ -160,8 +160,6 @@ for expected in (
     "Environment.isExternalStorageManager()",
     "indexSharedStorage",
     "indexWhatsAppFiles",
-    "sampleFingerprint",
-    "fingerprint(file",
     "MAX_INDEXED_FILES = 200_000",
     "MAX_WHATSAPP_FILES = 100_000",
     "scanStorageReview",
@@ -173,6 +171,10 @@ for expected in (
 ):
     if expected not in repository:
         errors.append(f"missing storage engine invariant: {expected}")
+duplicate_finder = read("app/src/main/java/com/mrzekai/depoakilli/data/DuplicateFinder.kt")
+for expected in ("sampleFingerprint", "fingerprint(file", "ensureActive()"):
+    if expected not in duplicate_finder:
+        errors.append(f"missing duplicate finder invariant: {expected}")
 for forbidden in (
     "MAX_HASH_BYTES",
     "MAX_DUPLICATE_GROUP",
@@ -439,12 +441,12 @@ for forbidden in (
     if forbidden in storage_analyzer:
         errors.append(f"Storage Analyzer must remain read-only: {forbidden}")
 
-download_block_start = repository.find("private val DOWNLOAD_CATEGORIES")
+download_block_start = repository.find("private val DOWNLOAD_TOOL_GROUPS")
 if download_block_start < 0:
-    errors.append("DOWNLOAD_CATEGORIES missing")
+    errors.append("DOWNLOAD_TOOL_GROUPS missing")
 else:
-    download_block = repository[download_block_start:download_block_start + 220]
-    if "CleanCategory.APK_PACKAGE" in download_block:
+    download_block = repository[download_block_start:repository.find(")", download_block_start)]
+    if "CleanupGroup.APK_" in download_block:
         errors.append("Downloads tool must not overlap the dedicated APK tool")
 
 # ------------------------------------------------------------------
