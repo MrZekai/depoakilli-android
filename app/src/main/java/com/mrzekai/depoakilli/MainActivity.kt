@@ -23,6 +23,11 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.ads.ConsentManager
 import com.mrzekai.depoakilli.ads.AdFrequencyStore
 import com.mrzekai.depoakilli.ads.AdPolicy
+import com.mrzekai.depoakilli.ads.AppOpenCover
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Box
+import com.mrzekai.depoakilli.ads.AppOpenAdController
 import com.mrzekai.depoakilli.ads.InterstitialAdController
 import com.mrzekai.depoakilli.ads.InterstitialTrigger
 import com.mrzekai.depoakilli.ads.RewardedAdController
@@ -37,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var consentManager: ConsentManager
     private lateinit var interstitialAds: InterstitialAdController
     private lateinit var adFrequency: AdFrequencyStore
+    private lateinit var appOpenAds: AppOpenAdController
     private lateinit var rewardedAds: RewardedAdController
     private var pendingDeepCacheAfterStorageAccess = false
     private var reviewPromptInFlight = false
@@ -105,7 +111,16 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) adFrequency.recordLaunch()
         interstitialAds = InterstitialAdController(applicationContext, adFrequency)
         rewardedAds = RewardedAdController(applicationContext)
+        appOpenAds = AppOpenAdController(applicationContext, adFrequency)
         consentManager.gatherConsent(this)
+        if (savedInstanceState == null) {
+            val app = application as DepoAkilliApplication
+            appOpenAds.onColdStart(
+                activity = this,
+                adsAllowedNow = consentManager.canRequestAds.value && !app.adFreeWindow.isActiveNow(),
+                otherFullScreenActive = { app.fullScreenAdSurfaceActive.value },
+            )
+        }
 
         setContent {
             val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
@@ -114,45 +129,51 @@ class MainActivity : ComponentActivity() {
             val adFreeRemainingMillis by app.adFreeWindow.remainingMillis.collectAsStateWithLifecycle()
             val rewardedReady by rewardedAds.isReady.collectAsStateWithLifecycle()
             val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
+            val appOpenCover by appOpenAds.coverVisible.collectAsStateWithLifecycle()
             val adFreeActive = adFreeRemainingMillis > 0L
             LaunchedEffect(canRequestAds, adFreeActive) {
                 interstitialAds.setAdsAllowed(canRequestAds && !adFreeActive)
+                appOpenAds.setAdsAllowed(canRequestAds && !adFreeActive)
                 rewardedAds.setAdsAllowed(canRequestAds && !adFreeActive)
             }
 
             DepoAkilliTheme {
-                CleanerApp(
-                    viewModel = cleanerViewModel,
-                    // A rewarded ad promises an ad-free window. Pass one
-                    // effective UI flag to every ad surface, including the
-                    // cleanup-result Native/MREC placement.
-                    canRequestAds =
-                        canRequestAds &&
-                            adFreeRemainingMillis <= 0L &&
-                            !fullScreenAdActive,
-                    fullScreenAdActive = fullScreenAdActive,
-                    privacyOptionsRequired = privacyOptionsRequired,
-                    adFreeRemainingMillis = adFreeRemainingMillis,
-                    rewardedAdReady = rewardedReady,
-                    onRequestAllFilesAccess = ::requestAllFilesAccess,
-                    onRequestUsageAccess = ::requestUsageAccess,
-                    onClearAllAppCaches = ::requestDeepCacheCleanup,
-                    onOpenAppDetails = ::openAppCacheSettings,
-                    onPrepareCleanup = ::cleanSelected,
-                    onPrepareStorageCleanup = ::cleanStorage,
-                    onPrepareWhatsAppCleanup = ::cleanWhatsApp,
-                    onCleanupResultDismissed = ::onCleanupResultDismissed,
-                    onCleanupSucceeded = ::onCleanupSucceeded,
-                    onReturnedToClean = ::onReturnedToClean,
-                    onUninstallApp = ::uninstallApp,
-                    onOpenAppInfo = ::openAppInfo,
-                    onOpenLanguageSettings = ::openLanguageSettings,
-                    onShowPrivacyOptions = ::showPrivacyOptions,
-                    onShowRewardedAd = ::showRewardedAd,
-                    onRateApp = ::rateApp,
-                    onSendFeedback = ::sendFeedback,
-                    onShareApp = ::shareApp,
-                )
+                Box(Modifier.fillMaxSize()) {
+                    CleanerApp(
+                        viewModel = cleanerViewModel,
+                        // A rewarded ad promises an ad-free window. Pass one
+                        // effective UI flag to every ad surface, including the
+                        // cleanup-result Native/MREC placement.
+                        canRequestAds =
+                            canRequestAds &&
+                                adFreeRemainingMillis <= 0L &&
+                                !fullScreenAdActive,
+                        fullScreenAdActive = fullScreenAdActive,
+                        appOpenCoverVisible = appOpenCover,
+                        privacyOptionsRequired = privacyOptionsRequired,
+                        adFreeRemainingMillis = adFreeRemainingMillis,
+                        rewardedAdReady = rewardedReady,
+                        onRequestAllFilesAccess = ::requestAllFilesAccess,
+                        onRequestUsageAccess = ::requestUsageAccess,
+                        onClearAllAppCaches = ::requestDeepCacheCleanup,
+                        onOpenAppDetails = ::openAppCacheSettings,
+                        onPrepareCleanup = ::cleanSelected,
+                        onPrepareStorageCleanup = ::cleanStorage,
+                        onPrepareWhatsAppCleanup = ::cleanWhatsApp,
+                        onCleanupResultDismissed = ::onCleanupResultDismissed,
+                        onCleanupSucceeded = ::onCleanupSucceeded,
+                        onReturnedToClean = ::onReturnedToClean,
+                        onUninstallApp = ::uninstallApp,
+                        onOpenAppInfo = ::openAppInfo,
+                        onOpenLanguageSettings = ::openLanguageSettings,
+                        onShowPrivacyOptions = ::showPrivacyOptions,
+                        onShowRewardedAd = ::showRewardedAd,
+                        onRateApp = ::rateApp,
+                        onSendFeedback = ::sendFeedback,
+                        onShareApp = ::shareApp,
+                    )
+                    if (appOpenCover) AppOpenCover()
+                }
             }
         }
     }
@@ -163,7 +184,21 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshAppCaches()
         if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
         if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
-        (application as DepoAkilliApplication).adFreeWindow.refresh()
+        val app = application as DepoAkilliApplication
+        app.adFreeWindow.refresh()
+        if (::appOpenAds.isInitialized) {
+            appOpenAds.onReturnedToForeground(
+                activity = this,
+                otherFullScreenActive = app.fullScreenAdSurfaceActive.value,
+                blocked = reviewPromptInFlight || app.adFreeWindow.isActiveNow(),
+            )
+        }
+    }
+
+    /** Home/Recents pressed by the user; screens the app opens itself do not call this. */
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (::appOpenAds.isInitialized) appOpenAds.onUserLeftApp()
     }
 
     override fun onPause() {

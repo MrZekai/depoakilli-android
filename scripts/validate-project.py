@@ -290,26 +290,24 @@ for expected in (
     if expected not in application:
         errors.append(f"missing app lifecycle/ad invariant: {expected}")
 
-removed_foreground_tokens = (
-    "App" + "OpenAd",
-    "APP" + "_OPEN",
-    "app" + "_open",
-    "ADMOB_" + "APP_" + "OPEN_ID",
-    "sample" + "App" + "OpenId",
-    "live" + "App" + "OpenId",
-    "set" + "App" + "OpenAdsAllowed",
-    "suppressNext" + "App" + "OpenAd",
-    "on" + "App" + "Backgrounded",
-)
-for surface_name, surface in (
-    ("build.gradle.kts", build_file),
-    ("AdComponents.kt", ads),
-    ("DepoAkilliApplication.kt", application),
-    ("MainActivity.kt", main_activity),
+# App open ad (T1B.2): allowed only behind the loading cover, never after a
+# return from a screen the app opened itself (settings, permissions, cache,
+# uninstall, review, share).
+app_open = read("app/src/main/java/com/mrzekai/depoakilli/ads/AppOpenAdController.kt")
+for expected in (
+    "AdPolicy.canShowAppOpen(",
+    "AdPolicy.APP_OPEN_MAX_WAIT_MS",
+    "MIN_BACKGROUND_MILLIS",
+    "MAX_AD_AGE_MILLIS",
+    "adUnitId.isNotBlank()",
 ):
-    for forbidden in removed_foreground_tokens:
-        if forbidden in surface:
-            errors.append(f"removed foreground-return ad implementation remains in {surface_name}")
+    if expected not in app_open:
+        errors.append(f"missing app open safety invariant: {expected}")
+for expected in ("override fun onUserLeaveHint()", "appOpenAds.onUserLeftApp()", "AppOpenCover()"):
+    if expected not in main_activity:
+        errors.append(f"app open must only follow a user-initiated absence: {expected}")
+if 'sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"' not in build_file:
+    errors.append("debug/QA/closed-test builds must use Google's sample app open unit")
 
 if "releaseForMemoryOptimization" in application:
     errors.append("obsolete RAM-optimizer-named ad release API remains in Application")

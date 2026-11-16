@@ -135,6 +135,7 @@ fun CleanerApp(
     viewModel: CleanerViewModel,
     canRequestAds: Boolean,
     fullScreenAdActive: Boolean,
+    appOpenCoverVisible: Boolean = false,
     privacyOptionsRequired: Boolean,
     adFreeRemainingMillis: Long,
     rewardedAdReady: Boolean,
@@ -347,6 +348,7 @@ fun CleanerApp(
                     screenAllowsBanner &&
                     accessDisclosure == null &&
                     !fullScreenAdActive &&
+                    !appOpenCoverVisible &&
                     !state.scanning &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
