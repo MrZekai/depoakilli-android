@@ -144,9 +144,9 @@ private fun ResultMrecAd(
     val context = LocalContext.current
     var presented by remember { mutableStateOf(false) }
 
-    val adView = remember(context, BuildConfig.ADMOB_BANNER_ID) {
+    val adView = remember(context, BuildConfig.ADMOB_RESULT_MREC_ID) {
         AdView(context).apply {
-            adUnitId = BuildConfig.ADMOB_BANNER_ID
+            adUnitId = BuildConfig.ADMOB_RESULT_MREC_ID
             setAdSize(AdSize.MEDIUM_RECTANGLE)
         }
     }

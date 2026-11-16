@@ -33,6 +33,11 @@ val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     ?.trim()
     .orEmpty()
     .ifBlank { "ca-app-pub-1380972808968213/6870326296" }
+// Result-screen MREC (300x250) unit; empty means the existing banner unit at MREC size.
+val liveResultMrecId = providers.environmentVariable("ADMOB_RESULT_MREC_ID")
+    .orNull
+    ?.trim()
+    .orEmpty()
 val supportEmail = providers.environmentVariable("SUPPORT_EMAIL")
     .orNull
     ?.trim()
@@ -68,6 +73,7 @@ android {
         buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
         buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
             buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
         buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
@@ -137,6 +143,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
             buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
@@ -149,6 +156,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$liveRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"${liveResultMrecId.ifBlank { liveBannerId }}\"")
             buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$liveListNativeId\"")
 
             isMinifyEnabled = true
@@ -176,6 +184,7 @@ android {
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
             buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
             buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.findByName("release")
             matchingFallbacks += listOf("release")

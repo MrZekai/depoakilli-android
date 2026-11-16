@@ -16,17 +16,17 @@ class AdFrequencyStoreTest {
         AdPolicy.canShowInterstitial(state, now, trigger, dwell, utc)
 
     @Test
-    fun `interstitial respects the three minute interval`() {
+    fun `interstitial respects the two minute interval`() {
         val shown = AdPolicy.recordInterstitial(returning, start, utc)
-        assertFalse(can(shown, start + 179_000))
-        assertTrue(can(shown, start + 180_000))
+        assertFalse(can(shown, start + 119_000))
+        assertTrue(can(shown, start + 120_000))
     }
 
     @Test
-    fun `two interstitials three minutes apart in one session`() {
+    fun `two interstitials two minutes apart in one session`() {
         assertTrue(can(returning, start))
         val first = AdPolicy.recordInterstitial(returning, start, utc)
-        assertTrue(can(first, start + 180_000))
+        assertTrue(can(first, start + 120_000))
     }
 
     @Test
@@ -36,7 +36,7 @@ class AdFrequencyStoreTest {
         repeat(AdPolicy.INTERSTITIAL_MAX_PER_DAY) {
             assertTrue(can(s, now))
             s = AdPolicy.recordInterstitial(s, now, utc)
-            now += 200_000
+            now += 130_000
         }
         assertFalse(can(s, now))
         val tomorrow = (AdPolicy.dayOf(now, utc) + 1) * day + 1
@@ -71,7 +71,7 @@ class AdFrequencyStoreTest {
         assertTrue(AdPolicy.canShowAppOpen(AdFrequencyState(launchCount = 1), start, utc))
         assertFalse(AdPolicy.canShowAppOpen(AdFrequencyState(launchCount = 0), start, utc))
         val shown = AdPolicy.recordAppOpen(returning, start, utc)
-        assertFalse(AdPolicy.canShowAppOpen(shown, start + 3 * 3_600_000L, utc))
-        assertTrue(AdPolicy.canShowAppOpen(shown, start + 4 * 3_600_000L, utc))
+        assertFalse(AdPolicy.canShowAppOpen(shown, start + 1 * 3_600_000L, utc))
+        assertTrue(AdPolicy.canShowAppOpen(shown, start + 2 * 3_600_000L, utc))
     }
 }

@@ -25,13 +25,15 @@ enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN }
  */
 object AdPolicy {
     const val APP_OPEN_MIN_LAUNCH = 1
-    const val APP_OPEN_MIN_INTERVAL_HOURS = 4L
-    const val APP_OPEN_MAX_PER_DAY = 3
+    const val APP_OPEN_MIN_INTERVAL_HOURS = 2L
+    const val APP_OPEN_MAX_PER_DAY = 4
     const val APP_OPEN_MAX_WAIT_MS = 3000L
-    const val INTERSTITIAL_MIN_INTERVAL_SEC = 180L
-    const val INTERSTITIAL_MAX_PER_DAY = 6
+    const val INTERSTITIAL_MIN_INTERVAL_SEC = 120L
+    const val INTERSTITIAL_MAX_PER_DAY = 8
     const val FULLSCREEN_GAP_SEC = 60L
     const val NATIVE_LIST_MIN_ROWS = 6
+    /** Clean tab: the list native ad follows the 4th "Worth a look" row. */
+    const val NATIVE_LIST_AFTER_REVIEW_ROW = 4
     const val SWIPE_BREAK_EVERY = 8
     const val RETURN_TO_CLEAN_MIN_DWELL_SEC = 20L
 

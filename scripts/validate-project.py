@@ -266,8 +266,8 @@ for expected in (
         errors.append(f"missing closed-test ad invariant: {expected}")
 ad_policy = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt")
 for expected in (
-    "INTERSTITIAL_MIN_INTERVAL_SEC = 180L",
-    "INTERSTITIAL_MAX_PER_DAY = 6",
+    "INTERSTITIAL_MIN_INTERVAL_SEC = 120L",
+    "INTERSTITIAL_MAX_PER_DAY = 8",
     "FULLSCREEN_GAP_SEC = 60L",
     "s.cleanupsCompleted == 0 && s.launchCount <= 1",
 ):

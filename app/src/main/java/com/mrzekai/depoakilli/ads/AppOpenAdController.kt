@@ -2,6 +2,8 @@ package com.mrzekai.depoakilli.ads
 
 import android.app.Activity
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -63,6 +65,8 @@ class AppOpenAdController(
     fun onColdStart(activity: Activity, adsAllowedNow: Boolean, otherFullScreenActive: () -> Boolean) {
         adsAllowed = adsAllowedNow && enabled
         if (!adsAllowed || !AdPolicy.canShowAppOpen(frequency.load(), System.currentTimeMillis())) return
+        // Offline: no ad can arrive, so the content opens without any wait.
+        if (!isOnline()) return
         coldStartPending = true
         _coverVisible.value = true
         load()
@@ -127,6 +131,12 @@ class AppOpenAdController(
         coldStartPending = false
         _coverVisible.value = false
     }
+
+    private fun isOnline(): Boolean = runCatching {
+        val manager = context.getSystemService(ConnectivityManager::class.java)
+        val capabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+        capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    }.getOrDefault(true)
 
     private fun load() {
         if (!adsAllowed || loading || isFresh()) return

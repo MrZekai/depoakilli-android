@@ -596,7 +596,7 @@ fun CleanerApp(
                                 val plan = displayState.summary.plan
                                 val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +
                                     plan.review.size + 1
-                                if (index == 1 && rows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
+                                if (index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1 && rows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
                                     item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
                                 }
                             },
@@ -637,6 +637,23 @@ fun CleanerApp(
                 )
             }
         }
+    }
+
+    if (state.trashFallbackIds.isNotEmpty() && state.cleanupResult == null && !state.cleanupInProgress) {
+        val count = state.trashFallbackIds.size
+        AlertDialog(
+            onDismissRequest = viewModel::dismissTrashFallback,
+            title = { Text(stringResource(R.string.trash_full_title), fontWeight = FontWeight.Black) },
+            text = { Text(pluralStringResource(R.plurals.trash_full_body, count, count)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::deleteTrashFallbackPermanently) {
+                    Text(stringResource(R.string.trash_delete_forever))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissTrashFallback) { Text(stringResource(R.string.cancel)) }
+            },
+        )
     }
 
     accessDisclosure?.let { disclosure ->
