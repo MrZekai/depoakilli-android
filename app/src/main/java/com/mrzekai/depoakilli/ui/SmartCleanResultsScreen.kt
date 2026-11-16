@@ -3,6 +3,8 @@ package com.mrzekai.depoakilli.ui
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.ui.smart.PlanBottomBar
+import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
+import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
 import androidx.compose.foundation.lazy.LazyListScope
@@ -136,7 +138,7 @@ private val SmartTextSecondary = Color(0xFFB4C4DF)
 private val SmartCyan = Color(0xFF16C7FF)
 private val SmartGreen = Color(0xFF28E58A)
 
-private data class SmartPreviewFile(
+internal data class SmartPreviewFile(
     val uri: String,
     val name: String,
     val sizeBytes: Long,
@@ -145,7 +147,7 @@ private data class SmartPreviewFile(
     val relativePath: String,
 )
 
-private fun CleanableItem.toSmartPreview() = SmartPreviewFile(
+internal fun CleanableItem.toSmartPreview() = SmartPreviewFile(
     uri = uri,
     name = name,
     sizeBytes = sizeBytes,
@@ -186,7 +188,37 @@ internal fun SmartCleanResultsScreen(
     planHeader: LazyListScope.() -> Unit = {},
     reviewAd: LazyListScope.(Int) -> Unit = {},
     onCancelScan: () -> Unit = {},
+    onOpenSwipeReview: (CleanupGroup) -> Unit = {},
+    onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit = { _, items ->
+        if (items.isNotEmpty()) {
+            onOpenCategoryReview(items.first().assessment.category, items.mapTo(linkedSetOf(), CleanableItem::id))
+        }
+    },
+    onSwipeMark: (Boolean) -> Unit = {},
+    onSwipeUndo: () -> Unit = {},
+    onSwipeContinue: () -> Unit = {},
+    onSwipeGrid: () -> Unit = {},
+    onSwipeFinished: () -> Unit = {},
 ) {
+    val swipeGroup = state.swipeReviewGroup
+    val swipe = swipeGroup?.let(state.swipeStates::get)
+    if (swipe != null && state.hasAllFilesAccess && !state.scanning) {
+        SwipeReviewScreen(
+            review = swipe,
+            items = state.summary.items.filter { it.assessment.group == swipeGroup },
+            onMark = onSwipeMark,
+            onUndo = onSwipeUndo,
+            onContinue = onSwipeContinue,
+            onShowGrid = onSwipeGrid,
+            onConfirmClean = { ids ->
+                onSetItemsSelected(ids, true)
+                onClean(ids)
+                onSwipeFinished()
+            },
+            modifier = modifier,
+        )
+        return
+    }
     when {
         !state.hasAllFilesAccess -> SmartAccessRequired(
             onRequest = onRequestAllFilesAccess,
@@ -225,6 +257,8 @@ internal fun SmartCleanResultsScreen(
             onClearAppCaches = onClearAppCaches,
             planHeader = planHeader,
             reviewAd = reviewAd,
+            onOpenSwipeReview = onOpenSwipeReview,
+            onOpenPlanGrid = onOpenPlanGrid,
         )
     }
 }
@@ -574,6 +608,8 @@ private fun SmartResultsContent(
     onClearAppCaches: () -> Unit,
     planHeader: LazyListScope.() -> Unit,
     reviewAd: LazyListScope.(Int) -> Unit,
+    onOpenSwipeReview: (CleanupGroup) -> Unit,
+    onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit,
 ) {
     var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
@@ -675,8 +711,12 @@ private fun SmartResultsContent(
                     }
                 },
                 onOpenRow = { row ->
-                    val ids = row.items.mapTo(linkedSetOf(), CleanableItem::id)
-                    onOpenCategoryReview(row.items.first().assessment.category, ids)
+                    val group = row.group
+                    if (group != null && group in SwipeReviewState.SWIPE_GROUPS) {
+                        onOpenSwipeReview(group)
+                    } else {
+                        onOpenPlanGrid(group, row.items)
+                    }
                 },
                 onClearAppCaches = onClearAppCaches,
                 onOpenUnusedApps = {
@@ -2004,7 +2044,7 @@ private fun PreviewInfoPill(
 }
 
 @Composable
-private fun ImageFilePreview(file: SmartPreviewFile) {
+internal fun ImageFilePreview(file: SmartPreviewFile) {
     val context = LocalContext.current
     val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = file.uri) {
         value = loadDisplayBitmap(context, file)
@@ -2022,7 +2062,7 @@ private fun ImageFilePreview(file: SmartPreviewFile) {
 }
 
 @Composable
-private fun VideoFilePreview(file: SmartPreviewFile) {
+internal fun VideoFilePreview(file: SmartPreviewFile) {
     val context = LocalContext.current
     val player = remember(file.uri) {
         ExoPlayer.Builder(context).build().apply {
@@ -2148,7 +2188,7 @@ private fun VideoFilePreview(file: SmartPreviewFile) {
 }
 
 @Composable
-private fun AudioFilePreview(file: SmartPreviewFile) {
+internal fun AudioFilePreview(file: SmartPreviewFile) {
     val context = LocalContext.current
     var player by remember(file.uri) { mutableStateOf<MediaPlayer?>(null) }
     var playing by remember(file.uri) { mutableStateOf(false) }
@@ -2189,7 +2229,7 @@ private fun AudioFilePreview(file: SmartPreviewFile) {
 }
 
 @Composable
-private fun GenericFilePreview(file: SmartPreviewFile) {
+internal fun GenericFilePreview(file: SmartPreviewFile) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Icon(fileVisual(file.mimeType, file.name), contentDescription = null, tint = Color(0xFF65E8FF), modifier = Modifier.size(86.dp))
         Text(stringResource(R.string.smart_generic_preview_title), color = Color.White, fontWeight = FontWeight.Black)

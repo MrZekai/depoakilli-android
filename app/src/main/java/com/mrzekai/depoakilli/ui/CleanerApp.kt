@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -208,6 +209,10 @@ fun CleanerApp(
         when {
             detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
                 viewModel.closeStorageReview()
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null -> {
+                viewModel.closeSwipeReview()
+                detailScreen = null
+            }
             detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null -> {
                 viewModel.closeSmartCategoryReview()
                 // Plan rows open from the Clean tab; going back returns there.
@@ -275,6 +280,20 @@ fun CleanerApp(
                         }
                     },
                     actions = {
+                        val gridGroup = state.smartCategoryReviewGroup
+                        if (
+                            detailScreen == DetailScreen.CLEAN_RESULTS &&
+                            state.smartCategoryReview != null &&
+                            gridGroup != null &&
+                            gridGroup in com.mrzekai.depoakilli.ui.review.SwipeReviewState.SWIPE_GROUPS
+                        ) {
+                            IconButton(onClick = { viewModel.openSwipeReview(gridGroup) }) {
+                                Icon(
+                                    Icons.Outlined.SwipeLeft,
+                                    contentDescription = stringResource(R.string.swipe_review_view),
+                                )
+                            }
+                        }
                         if (detailScreen == null) {
                             IconButton(onClick = { detailScreen = DetailScreen.SETTINGS }) {
                                 Icon(
@@ -386,6 +405,7 @@ fun CleanerApp(
                 modifier = Modifier.padding(padding),
                 onToggleGroup = viewModel::toggleGroup,
                 onClearAppCaches = onClearAllAppCaches,
+                viewModel = viewModel,
             )
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -527,6 +547,14 @@ fun CleanerApp(
                             modifier = Modifier.padding(padding),
                             planHeader = header,
                             onCancelScan = viewModel::cancelScan,
+                            onOpenSwipeReview = { group ->
+                                viewModel.openSwipeReview(group)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onOpenPlanGrid = { group, items ->
+                                viewModel.openPlanGroupGrid(group, items)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
                         )
                     }
                 }
@@ -719,6 +747,7 @@ private fun CleanScreen(
     modifier: Modifier = Modifier,
     onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
     onClearAppCaches: () -> Unit = {},
+    viewModel: CleanerViewModel? = null,
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -743,6 +772,13 @@ private fun CleanScreen(
             modifier = modifier,
             onToggleGroup = onToggleGroup,
             onClearAppCaches = onClearAppCaches,
+            onOpenSwipeReview = { group -> viewModel?.openSwipeReview(group) },
+            onOpenPlanGrid = { group, items -> viewModel?.openPlanGroupGrid(group, items) },
+            onSwipeMark = { delete -> viewModel?.swipeMark(delete) },
+            onSwipeUndo = { viewModel?.swipeUndo() },
+            onSwipeContinue = { viewModel?.swipeContinue() },
+            onSwipeGrid = { viewModel?.switchSwipeToGrid() },
+            onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
         )
         return
     }

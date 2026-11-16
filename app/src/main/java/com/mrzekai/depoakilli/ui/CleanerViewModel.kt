@@ -27,6 +27,7 @@ import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
+import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -124,6 +125,12 @@ data class CleanerUiState(
     val planSummary: ScanSummary? = null,
     /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */
     val planScannedAtElapsed: Long = 0L,
+    /** Group shown in the swipe review, null when closed. */
+    val swipeReviewGroup: CleanupGroup? = null,
+    /** Swipe marks per group; kept when the review is left and reopened. */
+    val swipeStates: Map<CleanupGroup, SwipeReviewState> = emptyMap(),
+    /** Plan group behind the open grid review, used for the grid/swipe toggle. */
+    val smartCategoryReviewGroup: CleanupGroup? = null,
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -879,6 +886,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             it.copy(
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
+                smartCategoryReviewGroup = null,
             )
         }
     }
@@ -1073,6 +1081,66 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             _state.update { state ->
                 state.copy(summary = state.summary.copy(items = PlanSelection.applyVerification(state.summary.items, id, verified)))
             }
+        }
+    }
+
+    /** Opens the swipe review for a plan group, keeping earlier marks for the same files. */
+    fun openSwipeReview(group: CleanupGroup) {
+        _state.update { state ->
+            val items = state.summary.items.filter { it.assessment.group == group }
+            val fresh = SwipeReviewState.start(items)
+            val previous = state.swipeStates[group]
+            val review = if (previous != null && previous.itemIds == fresh.itemIds) previous else fresh
+            state.copy(
+                swipeReviewGroup = group,
+                swipeStates = state.swipeStates + (group to review),
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+                smartCategoryReviewGroup = null,
+            )
+        }
+    }
+
+    fun swipeMark(delete: Boolean) = updateSwipe { it.mark(delete) }
+
+    fun swipeUndo() = updateSwipe { it.undo() }
+
+    fun swipeContinue() = updateSwipe { it.continueAfterBreak() }
+
+    /** Leaves the swipe review; marks stay unless [clearMarks] is set (after cleaning). */
+    fun closeSwipeReview(clearMarks: Boolean = false) {
+        _state.update { state ->
+            val group = state.swipeReviewGroup
+            state.copy(
+                swipeReviewGroup = null,
+                swipeStates = if (clearMarks && group != null) state.swipeStates - group else state.swipeStates,
+            )
+        }
+    }
+
+    /** Switches from the swipe review to the grid of the same group. */
+    fun switchSwipeToGrid() {
+        val state = _state.value
+        val group = state.swipeReviewGroup ?: return
+        val items = state.summary.items.filter { it.assessment.group == group }
+        closeSwipeReview()
+        if (items.isEmpty()) return
+        openSmartCategoryReview(items.first().assessment.category, items.mapTo(linkedSetOf(), CleanableItem::id))
+        _state.update { it.copy(smartCategoryReviewGroup = group) }
+    }
+
+    /** Grid review opened from a plan row; remembers the group for the swipe toggle. */
+    fun openPlanGroupGrid(group: CleanupGroup?, items: List<CleanableItem>) {
+        if (items.isEmpty()) return
+        openSmartCategoryReview(items.first().assessment.category, items.mapTo(linkedSetOf(), CleanableItem::id))
+        _state.update { it.copy(smartCategoryReviewGroup = group) }
+    }
+
+    private fun updateSwipe(change: (SwipeReviewState) -> SwipeReviewState) {
+        _state.update { state ->
+            val group = state.swipeReviewGroup ?: return@update state
+            val current = state.swipeStates[group] ?: return@update state
+            state.copy(swipeStates = state.swipeStates + (group to change(current)))
         }
     }
 
