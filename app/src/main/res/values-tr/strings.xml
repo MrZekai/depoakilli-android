@@ -928,4 +928,9 @@
         <item quantity="one">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
         <item quantity="other">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
     </plurals>
+    <string name="trash_full_title">Çöpe taşınamadı</string>
+    <plurals name="trash_full_body">
+        <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
+        <item quantity="other">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
+    </plurals>
 </resources>

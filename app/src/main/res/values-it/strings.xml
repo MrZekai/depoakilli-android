@@ -962,4 +962,11 @@
         <item quantity="many">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
         <item quantity="other">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
     </plurals>
+    <string name="trash_full_title">Impossibile spostare nel cestino</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+        <item quantity="many">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+        <item quantity="other">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+    </plurals>
 </resources>

@@ -499,14 +499,18 @@ class DeviceRepository(
      * in-app trash, [DeleteMode.PERMANENT] groups are deleted. A copy is only
      * removed while its protected original still exists unchanged.
      */
-    suspend fun deleteDirectItems(items: List<CleanableItem>): DirectDeleteResult = withContext(Dispatchers.IO) {
+    suspend fun deleteDirectItems(
+        items: List<CleanableItem>,
+        forcePermanent: Boolean = false,
+    ): DirectDeleteResult = withContext(Dispatchers.IO) {
         val directItems = items.filter { Uri.parse(it.uri).scheme == "file" }
         val outcome = RemovalTally()
         directItems.forEach { item ->
             coroutineContext.ensureActive()
             val group = item.assessment.group
             val remove = {
-                removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, group.deleteMode, group)
+                val mode = if (forcePermanent) DeleteMode.PERMANENT else group.deleteMode
+                removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, group)
             }
             val originalUri = item.protectedDuplicateUri
             val removal = if (originalUri == null) {
@@ -578,7 +582,7 @@ class DeviceRepository(
             DeleteMode.TRASH -> {
                 val root = volumeRootOf(file)
                 val entry = root?.let { trashStore.moveToTrash(file, it, group) }
-                if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.DENIED)
+                if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
             }
             DeleteMode.PERMANENT -> {
                 if (FileDeleter.deleteUnprotected(file, relativeDir)) {
@@ -1084,7 +1088,7 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
-    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED }
+    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE }
 
     private sealed interface Removal {
         data object Deleted : Removal
@@ -1138,6 +1142,8 @@ class DeviceRepository(
         val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
+        val trashUnavailableIds: Set<String> get() =
+            failed.filterValues { it == FailureReason.TRASH_UNAVAILABLE }.keys
         val changedCount: Int get() = failed.values.count {
             it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
         }

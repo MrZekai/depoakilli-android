@@ -936,4 +936,10 @@
         <item quantity="one">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
         <item quantity="other">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
     </plurals>
+    <string name="trash_full_title">Não foi possível mover para a lixeira</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Não foi possível mover para a lixeira (arquivos: %1$d); o armazenamento pode estar cheio. Excluir permanentemente? Isso não pode ser desfeito.</item>
+        <item quantity="other">Não foi possível mover para a lixeira (arquivos: %1$d); o armazenamento pode estar cheio. Excluir permanentemente? Isso não pode ser desfeito.</item>
+    </plurals>
 </resources>

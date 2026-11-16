@@ -91,8 +91,10 @@ class TrashStoreTest {
         assertTrue(orphan.exists())
         assertTrue(trash.entries().any { it.trashPath == orphan.absolutePath })
         trash.purgeExpired()
+        assertTrue(orphan.exists())
+        now += TimeUnit.DAYS.toMillis(8)
+        trash.purgeExpired()
         assertFalse(orphan.exists())
-        assertTrue(fresh.exists())
         assertTrue(File(volume, ".SmartCleanerTrash/README.txt").exists())
     }
 

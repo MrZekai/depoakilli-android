@@ -936,4 +936,10 @@
         <item quantity="one">Archivos grandes que parecen idénticos: %1$d · hasta %2$s. Mira un vídeo corto para verificarlos.</item>
         <item quantity="other">Archivos grandes que parecen idénticos: %1$d · hasta %2$s. Mira un vídeo corto para verificarlos.</item>
     </plurals>
+    <string name="trash_full_title">No se pudo mover a la papelera</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">No se pudieron mover a la papelera (archivos: %1$d); puede que el almacenamiento esté lleno. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
+        <item quantity="other">No se pudieron mover a la papelera (archivos: %1$d); puede que el almacenamiento esté lleno. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
+    </plurals>
 </resources>

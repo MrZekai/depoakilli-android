@@ -928,4 +928,9 @@
         <item quantity="one">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
         <item quantity="other">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
     </plurals>
+    <string name="trash_full_title">Couldn’t move to Trash</string>
+    <plurals name="trash_full_body">
+        <item quantity="one">%1$d file couldn’t be moved to Trash, possibly because storage is full. Delete it permanently instead? This can’t be undone.</item>
+        <item quantity="other">%1$d files couldn’t be moved to Trash, possibly because storage is full. Delete them permanently instead? This can’t be undone.</item>
+    </plurals>
 </resources>

@@ -246,7 +246,8 @@ class TrashStore(
                     trashPath = file.absolutePath,
                     sizeBytes = file.length(),
                     modifiedAtMillis = 0L,
-                    deletedAtMillis = file.lastModified(),
+                    // Unknown age: the full retention period starts now.
+                    deletedAtMillis = nowMillis(),
                     group = "",
                 )
             }

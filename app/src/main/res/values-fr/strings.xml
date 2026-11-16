@@ -962,4 +962,11 @@
         <item quantity="many">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
         <item quantity="other">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
     </plurals>
+    <string name="trash_full_title">Impossible de déplacer dans la corbeille</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+        <item quantity="many">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+        <item quantity="other">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+    </plurals>
 </resources>

@@ -133,6 +133,8 @@ data class CleanerUiState(
     val smartCategoryReviewGroup: CleanupGroup? = null,
     /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
     val deepCheckRunning: Boolean = false,
+    /** Items that could not go to Trash (e.g. storage full); the user may delete them permanently. */
+    val trashFallbackIds: Set<String> = emptySet(),
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -1106,6 +1108,44 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun dismissTrashFallback() {
+        _state.update { it.copy(trashFallbackIds = emptySet()) }
+    }
+
+    /**
+     * Second, explicit confirmation path: files that could not be moved to
+     * Trash are deleted permanently only after the user confirmed that.
+     */
+    fun deleteTrashFallbackPermanently() {
+        val ids = _state.value.trashFallbackIds
+        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        val items = _state.value.summary.items.filter { it.id in ids }
+        if (items.isEmpty() || _state.value.cleanupInProgress) return
+        _state.update { it.copy(cleanupInProgress = true, cleanupResult = null) }
+        viewModelScope.launch {
+            val before = ioAvailableBytes()
+            runSuspendCatching { repository.deleteDirectItems(items, forcePermanent = true) }
+                .onSuccess { direct ->
+                    finishCleanup(
+                        items = items,
+                        deletedIds = direct.deletedIds,
+                        deletedBytes = direct.deletedBytes,
+                        failedCount = direct.failedCount,
+                        storageBeforeBytes = before,
+                        changedCount = direct.changedCount,
+                    )
+                }
+                .onFailure {
+                    _state.update { state ->
+                        state.copy(
+                            cleanupInProgress = false,
+                            message = getApplication<Application>().getString(R.string.message_cleanup_failed),
+                        )
+                    }
+                }
+        }
+    }
+
     /** Opens the swipe review for a plan group, keeping earlier marks for the same files. */
     fun openSwipeReview(group: CleanupGroup) {
         _state.update { state ->
@@ -1226,6 +1266,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         changedCount = direct.changedCount,
                     )
                     refreshTrash()
+                    if (direct.trashUnavailableIds.isNotEmpty()) {
+                        _state.update { it.copy(trashFallbackIds = direct.trashUnavailableIds) }
+                    }
                     onCleanupCompleted(direct.deletedIds.isNotEmpty())
                 } else {
                     pendingConsentItems = remaining

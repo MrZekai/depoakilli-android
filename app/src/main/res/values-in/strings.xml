@@ -866,4 +866,9 @@
     <plurals name="deep_check_row">
         <item quantity="other">File besar yang tampak identik: %1$d · hingga %2$s. Tonton video singkat untuk memverifikasinya.</item>
     </plurals>
+    <string name="trash_full_title">Tidak dapat dipindahkan ke Sampah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="other">%1$d file tidak dapat dipindahkan ke Sampah; penyimpanan mungkin penuh. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
+    </plurals>
 </resources>

@@ -914,4 +914,10 @@
         <item quantity="one">Große, scheinbar identische Dateien: %1$d · bis zu %2$s. Kurzes Video ansehen, um sie zu prüfen.</item>
         <item quantity="other">Große, scheinbar identische Dateien: %1$d · bis zu %2$s. Kurzes Video ansehen, um sie zu prüfen.</item>
     </plurals>
+    <string name="trash_full_title">Verschieben in den Papierkorb nicht möglich</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Verschieben in den Papierkorb nicht möglich (Dateien: %1$d); der Speicher ist eventuell voll. Endgültig löschen? Dies kann nicht rückgängig gemacht werden.</item>
+        <item quantity="other">Verschieben in den Papierkorb nicht möglich (Dateien: %1$d); der Speicher ist eventuell voll. Endgültig löschen? Dies kann nicht rückgängig gemacht werden.</item>
+    </plurals>
 </resources>
