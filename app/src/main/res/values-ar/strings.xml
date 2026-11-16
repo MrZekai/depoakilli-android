@@ -1130,4 +1130,26 @@
         <item quantity="many">لا يسمح هذا الجهاز لـ Smart Cleaner بإنشاء مجلد سلة المهملات، لذا لا يمكن الاحتفاظ بالملفات (%1$d) للتراجع. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
         <item quantity="other">لا يسمح هذا الجهاز لـ Smart Cleaner بإنشاء مجلد سلة المهملات، لذا لا يمكن الاحتفاظ بالملفات (%1$d) للتراجع. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
     </plurals>
+    <string name="delete_confirm_permanent">سيتم حذف %1$s نهائيًا. لا يمكن التراجع عن ذلك.</string>
+    <string name="delete_confirm_show_all">عرض الكل</string>
+    <string name="delete_confirm_show_less">عرض أقل</string>
+    <string name="delete_confirm_action">حذف</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="delete_confirm_title">
+        <item quantity="zero">حذف %1$d من الملفات؟</item>
+        <item quantity="one">حذف %1$d من الملفات؟</item>
+        <item quantity="two">حذف %1$d من الملفات؟</item>
+        <item quantity="few">حذف %1$d من الملفات؟</item>
+        <item quantity="many">حذف %1$d من الملفات؟</item>
+        <item quantity="other">حذف %1$d من الملفات؟</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="delete_confirm_trash">
+        <item quantity="zero">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+        <item quantity="one">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+        <item quantity="two">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+        <item quantity="few">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+        <item quantity="many">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+        <item quantity="other">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
+    </plurals>
 </resources>

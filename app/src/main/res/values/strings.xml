@@ -940,4 +940,16 @@
         <item quantity="one">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d file can’t be kept for undo. Delete it permanently instead? This can’t be undone.</item>
         <item quantity="other">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d files can’t be kept for undo. Delete them permanently instead? This can’t be undone.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s will be deleted permanently. This can’t be undone.</string>
+    <string name="delete_confirm_show_all">Show all</string>
+    <string name="delete_confirm_show_less">Show less</string>
+    <string name="delete_confirm_action">Delete</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">Delete %1$d file?</item>
+        <item quantity="other">Delete %1$d files?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s goes to Trash for %2$d day. You can restore it until then.</item>
+        <item quantity="other">%1$s goes to Trash for %2$d days. You can restore it until then.</item>
+    </plurals>
 </resources>

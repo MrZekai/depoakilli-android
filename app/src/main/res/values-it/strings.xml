@@ -977,4 +977,18 @@
         <item quantity="many">Questo dispositivo non consente a Smart Cleaner di creare la cartella Cestino, quindi %1$d file non possono essere conservati per annullare. Eliminarli definitivamente? L’operazione è irreversibile.</item>
         <item quantity="other">Questo dispositivo non consente a Smart Cleaner di creare la cartella Cestino, quindi %1$d file non possono essere conservati per annullare. Eliminarli definitivamente? L’operazione è irreversibile.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s verrà eliminato definitivamente. L’operazione è irreversibile.</string>
+    <string name="delete_confirm_show_all">Mostra tutto</string>
+    <string name="delete_confirm_show_less">Mostra meno</string>
+    <string name="delete_confirm_action">Elimina</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">Eliminare %1$d file?</item>
+        <item quantity="many">Eliminare %1$d file?</item>
+        <item quantity="other">Eliminare %1$d file?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s va nel Cestino per %2$d giorno. Puoi ripristinarlo fino ad allora.</item>
+        <item quantity="many">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
+        <item quantity="other">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
+    </plurals>
 </resources>

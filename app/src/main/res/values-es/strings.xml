@@ -949,4 +949,16 @@
         <item quantity="one">Este dispositivo no permite que Smart Cleaner cree su carpeta de Papelera, así que %1$d archivo no se puede guardar para deshacer. ¿Eliminarlo de forma permanente? No se puede deshacer.</item>
         <item quantity="other">Este dispositivo no permite que Smart Cleaner cree su carpeta de Papelera, así que %1$d archivos no se pueden guardar para deshacer. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s se eliminará de forma permanente. No se puede deshacer.</string>
+    <string name="delete_confirm_show_all">Ver todo</string>
+    <string name="delete_confirm_show_less">Ver menos</string>
+    <string name="delete_confirm_action">Eliminar</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">¿Eliminar %1$d archivo?</item>
+        <item quantity="other">¿Eliminar %1$d archivos?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s irá a la Papelera durante %2$d día. Puedes restaurarlo hasta entonces.</item>
+        <item quantity="other">%1$s irá a la Papelera durante %2$d días. Puedes restaurarlo hasta entonces.</item>
+    </plurals>
 </resources>

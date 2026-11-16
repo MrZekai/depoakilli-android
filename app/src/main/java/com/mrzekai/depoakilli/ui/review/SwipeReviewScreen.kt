@@ -41,10 +41,9 @@ import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ui.ContrastTokens
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
-import com.mrzekai.depoakilli.ui.GenericFilePreview
-import com.mrzekai.depoakilli.ui.ImageFilePreview
-import com.mrzekai.depoakilli.ui.VideoFilePreview
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
+import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.toMediaPreview
 import com.mrzekai.depoakilli.ui.toSmartPreview
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
@@ -214,12 +213,7 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
     ) {
         Column {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val mime = item.mimeType.lowercase()
-                when {
-                    mime.startsWith("image/") -> ImageFilePreview(preview)
-                    mime.startsWith("video/") -> VideoFilePreview(preview)
-                    else -> GenericFilePreview(preview)
-                }
+                MediaPreviewContent(preview.toMediaPreview(), allowAudio = false)
             }
             Column(Modifier.padding(14.dp)) {
                 Text(

@@ -927,4 +927,16 @@
         <item quantity="one">Dieses Gerät erlaubt Smart Cleaner nicht, einen Papierkorb-Ordner anzulegen. %1$d Datei kann daher nicht zum Rückgängigmachen aufbewahrt werden. Stattdessen endgültig löschen? Das kann nicht rückgängig gemacht werden.</item>
         <item quantity="other">Dieses Gerät erlaubt Smart Cleaner nicht, einen Papierkorb-Ordner anzulegen. %1$d Dateien können daher nicht zum Rückgängigmachen aufbewahrt werden. Stattdessen endgültig löschen? Das kann nicht rückgängig gemacht werden.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s wird endgültig gelöscht. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_confirm_show_all">Alle anzeigen</string>
+    <string name="delete_confirm_show_less">Weniger anzeigen</string>
+    <string name="delete_confirm_action">Löschen</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">%1$d Datei löschen?</item>
+        <item quantity="other">%1$d Dateien löschen?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s kommt für %2$d Tag in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
+        <item quantity="other">%1$s kommt für %2$d Tage in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
+    </plurals>
 </resources>

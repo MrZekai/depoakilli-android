@@ -1,11 +1,5 @@
 package com.mrzekai.depoakilli.ui
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.LruCache
-import android.util.Size
-import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,13 +40,11 @@ import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material.icons.outlined.VideoFile
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -68,10 +60,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -80,39 +70,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.Tracks
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
+import com.mrzekai.depoakilli.ui.media.rememberThumbnail
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.ui.theme.Purple500
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
-import java.io.File
 import java.text.DateFormat
 import java.util.Date
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 private val WaBackground = Color(0xFF030A1D)
 private val WaCard = Color(0xFF081A38)
@@ -136,24 +117,6 @@ private enum class WhatsAppUiGroup {
 private enum class WhatsAppSortMode {
     LARGEST,
     NEWEST,
-}
-
-private object WhatsAppThumbnailCache {
-    private val cache = object : LruCache<String, ImageBitmap>(72) {}
-
-    fun get(key: String): ImageBitmap? = synchronized(cache) { cache.get(key) }
-
-    fun put(key: String, bitmap: ImageBitmap) {
-        synchronized(cache) { cache.put(key, bitmap) }
-    }
-
-    fun clear() {
-        synchronized(cache) { cache.evictAll() }
-    }
-}
-
-internal fun releaseWhatsAppThumbnailMemory() {
-    WhatsAppThumbnailCache.clear()
 }
 
 @Composable
@@ -467,13 +430,17 @@ private fun WhatsAppResultsScreen(
     BackHandler(enabled = detailGroup != null) { detailGroupName = null }
 
     if (showDeleteConfirmation) {
-        WhatsAppCleanupConfirmationDialog(
-            summary = summary,
+        val selectedItems = summary.selectedItems
+        DeleteConfirmDialog(
+            names = selectedItems.map(WhatsAppMediaItem::name),
+            trashBytes = summary.selectedBytes,
+            permanentBytes = 0L,
             onDismiss = { showDeleteConfirmation = false },
             onConfirm = {
                 showDeleteConfirmation = false
                 onDeleteSelected()
             },
+            extraContent = { WhatsAppDeleteBreakdown(selectedItems) },
         )
     }
 
@@ -826,10 +793,7 @@ private fun WhatsAppMediaCard(
     onToggle: () -> Unit,
 ) {
     val accent = groupAccent(group)
-    val context = LocalContext.current
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri, key2 = item.modifiedAtMillis) {
-        value = loadWhatsAppThumbnail(context, item)
-    }
+    val bitmap by rememberThumbnail(item.uri, item.mimeType)
     val width = if (compact) 148.dp else 160.dp
     val height = if (compact) 174.dp else 200.dp
     val previewHeight = if (compact) 100.dp else 120.dp
@@ -858,7 +822,7 @@ private fun WhatsAppMediaCard(
                     )
                 } else {
                     Icon(
-                        fileIcon(item),
+                        whatsAppFileIcon(item),
                         contentDescription = null,
                         tint = accent,
                         modifier = Modifier.size(42.dp),
@@ -1161,56 +1125,6 @@ private fun WhatsAppCleanupFooter(
 }
 
 @Composable
-private fun WhatsAppCleanupConfirmationDialog(
-    summary: WhatsAppLibrarySummary,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = WhatsAppGreen) },
-        title = { Text(stringResource(R.string.whatsapp_delete_confirm_title), fontWeight = FontWeight.Black) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(
-                    pluralStringResource(
-                        R.plurals.whatsapp_delete_confirm_message,
-                        summary.selectedItems.size,
-                        summary.selectedItems.size,
-                        ByteFormatter.format(summary.selectedBytes),
-                    ),
-                )
-                summary.selectedItems
-                    .groupBy(::uiGroupOf)
-                    .forEach { (group, items) ->
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(stringResource(groupTitleRes(group)), style = MaterialTheme.typography.bodySmall)
-                            Text(
-                                "${items.size} • ${ByteFormatter.format(items.sumOf(WhatsAppMediaItem::sizeBytes))}",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                Text(
-                    stringResource(R.string.whatsapp_cleanup_irreversible),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelSmall,
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(stringResource(R.string.whatsapp_confirm_and_continue))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-        },
-    )
-}
-
-@Composable
 private fun WhatsAppPreviewDialog(
     item: WhatsAppMediaItem,
     selected: Boolean,
@@ -1242,12 +1156,16 @@ private fun WhatsAppPreviewDialog(
                         .background(Color(0xFF020713)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    when {
-                        item.mimeType.startsWith("image/") -> WhatsAppImagePreview(item)
-                        item.mimeType.startsWith("video/") -> WhatsAppVideoPreview(item)
-                        item.mimeType.startsWith("audio/") || item.category == WhatsAppMediaCategory.VOICE_NOTES -> WhatsAppAudioPreview(item)
-                        else -> WhatsAppGenericPreview(item)
-                    }
+                    MediaPreviewContent(
+                        MediaPreviewFile(
+                            uri = item.uri,
+                            name = item.name,
+                            mimeType = item.mimeType,
+                            sizeBytes = item.sizeBytes,
+                            voiceNote = item.category == WhatsAppMediaCategory.VOICE_NOTES,
+                        ),
+                        accent = WhatsAppGreen,
+                    )
                 }
 
                 Card(
@@ -1258,7 +1176,7 @@ private fun WhatsAppPreviewDialog(
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(color = groupAccent(uiGroupOf(item)).copy(alpha = .15f), shape = RoundedCornerShape(14.dp)) {
-                                Icon(fileIcon(item), contentDescription = null, tint = groupAccent(uiGroupOf(item)), modifier = Modifier.padding(10.dp).size(25.dp))
+                                Icon(whatsAppFileIcon(item), contentDescription = null, tint = groupAccent(uiGroupOf(item)), modifier = Modifier.padding(10.dp).size(25.dp))
                             }
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
@@ -1312,143 +1230,6 @@ private fun WhatsAppPreviewDialog(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun WhatsAppImagePreview(item: WhatsAppMediaItem) {
-    val context = LocalContext.current
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri) {
-        value = loadWhatsAppDisplayBitmap(context, item)
-    }
-    if (bitmap == null) {
-        CircularProgressIndicator(color = WhatsAppGreen)
-    } else {
-        Image(
-            bitmap = requireNotNull(bitmap),
-            contentDescription = item.name,
-            modifier = Modifier.fillMaxSize().padding(8.dp),
-            contentScale = ContentScale.Fit,
-        )
-    }
-}
-
-@Composable
-private fun WhatsAppVideoPreview(item: WhatsAppMediaItem) {
-    val context = LocalContext.current
-    val player = remember(item.uri) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(item.uri))
-            prepare()
-        }
-    }
-    var failed by remember(item.uri) { mutableStateOf(false) }
-    var noVideoTrack by remember(item.uri) { mutableStateOf(false) }
-
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onTracksChanged(tracks: Tracks) {
-                if (tracks.groups.isEmpty()) return
-                noVideoTrack = !tracks.groups.any { group -> group.type == C.TRACK_TYPE_VIDEO && group.isSelected }
-                if (noVideoTrack) player.pause()
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                failed = true
-            }
-        }
-        player.addListener(listener)
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-
-    Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { viewContext ->
-                (LayoutInflater.from(viewContext).inflate(R.layout.smart_video_player, null, false) as PlayerView).apply {
-                    this.player = player
-                    useController = true
-                }
-            },
-            update = { view -> if (view.player !== player) view.player = player },
-        )
-        if (failed || noVideoTrack) {
-            Surface(color = Color(0xDD06132F), shape = RoundedCornerShape(18.dp)) {
-                Column(
-                    modifier = Modifier.padding(18.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Icon(Icons.Outlined.VideoFile, contentDescription = null, tint = WaAmber, modifier = Modifier.size(42.dp))
-                    Text(
-                        stringResource(if (noVideoTrack) R.string.smart_video_no_picture else R.string.smart_video_preview_error),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WhatsAppAudioPreview(item: WhatsAppMediaItem) {
-    val context = LocalContext.current
-    val player = remember(item.uri) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(item.uri))
-            prepare()
-        }
-    }
-    var playing by remember(item.uri) { mutableStateOf(false) }
-    var failed by remember(item.uri) { mutableStateOf(false) }
-
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                playing = isPlaying
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                failed = true
-            }
-        }
-        player.addListener(listener)
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Surface(color = Purple500.copy(alpha = .16f), shape = CircleShape) {
-            Icon(Icons.Outlined.MusicNote, contentDescription = null, tint = Purple500, modifier = Modifier.padding(24.dp).size(56.dp))
-        }
-        Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (failed) {
-            Text(stringResource(R.string.whatsapp_audio_preview_error), color = WaAmber)
-        } else {
-            Button(onClick = { if (player.isPlaying) player.pause() else player.play() }) {
-                Icon(if (playing) Icons.Outlined.CheckCircle else Icons.Outlined.PlayArrow, contentDescription = null)
-                Spacer(Modifier.width(7.dp))
-                Text(stringResource(if (playing) R.string.smart_video_pause else R.string.smart_video_play))
-            }
-        }
-    }
-}
-
-@Composable
-private fun WhatsAppGenericPreview(item: WhatsAppMediaItem) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Surface(color = WaAmber.copy(alpha = .15f), shape = RoundedCornerShape(26.dp)) {
-            Icon(fileIcon(item), contentDescription = null, tint = WaAmber, modifier = Modifier.padding(26.dp).size(64.dp))
-        }
-        Text(stringResource(R.string.whatsapp_file_preview), color = Color.White, fontWeight = FontWeight.Black)
-        Text(item.name, color = WaTextSecondary, maxLines = 3, overflow = TextOverflow.Ellipsis)
-        Text(ByteFormatter.format(item.sizeBytes), color = WhatsAppGreen, fontWeight = FontWeight.Black)
     }
 }
 
@@ -1521,14 +1302,6 @@ private fun groupAccent(group: WhatsAppUiGroup): Color = when (group) {
     WhatsAppUiGroup.DOCUMENTS_OTHER -> WaAmber
 }
 
-private fun fileIcon(item: WhatsAppMediaItem): ImageVector = when {
-    item.mimeType.startsWith("image/") -> Icons.Outlined.PhotoLibrary
-    item.mimeType.startsWith("video/") -> Icons.Outlined.VideoFile
-    item.mimeType.startsWith("audio/") || item.category == WhatsAppMediaCategory.VOICE_NOTES -> Icons.Outlined.MusicNote
-    item.category == WhatsAppMediaCategory.DOCUMENTS -> Icons.Outlined.Description
-    else -> Icons.Outlined.Folder
-}
-
 @Composable
 private fun localDate(millis: Long): String = remember(millis) {
     DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(millis))
@@ -1543,48 +1316,32 @@ private fun compactPath(path: String): String {
     }
 }
 
-private suspend fun loadWhatsAppThumbnail(context: Context, item: WhatsAppMediaItem): ImageBitmap? = withContext(Dispatchers.IO) {
-    WhatsAppThumbnailCache.get(item.uri)?.let { return@withContext it }
-    val bitmap = runCatching {
-        val uri = Uri.parse(item.uri)
-        val loaded = if (uri.scheme == "content") {
-            context.contentResolver.loadThumbnail(uri, Size(420, 320), null)
-        } else {
-            val path = uri.path ?: return@runCatching null
-            val file = File(path)
-            if (!file.isFile) return@runCatching null
-            when {
-                item.mimeType.startsWith("video/") -> android.media.ThumbnailUtils.createVideoThumbnail(file, Size(420, 320), null)
-                item.mimeType.startsWith("image/") -> decodeSampledBitmap(file, 520)
-                else -> null
+private fun whatsAppFileIcon(item: WhatsAppMediaItem): ImageVector =
+    FileVisuals.icon(item.mimeType, item.name, voiceNote = item.category == WhatsAppMediaCategory.VOICE_NOTES)
+
+/** Sent / received split and the chat warning shown inside the delete confirmation (T2.4). */
+@Composable
+private fun WhatsAppDeleteBreakdown(items: List<WhatsAppMediaItem>) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        val (sent, received) = items.partition(::isSentWhatsAppItem)
+        listOf(
+            R.string.whatsapp_filter_sent to sent,
+            R.string.whatsapp_filter_incoming to received,
+        ).filter { (_, list) -> list.isNotEmpty() }.forEach { (label, list) ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(stringResource(label), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    pluralStringResource(
+                        R.plurals.whatsapp_category_summary,
+                        list.size,
+                        list.size,
+                        ByteFormatter.format(list.sumOf(WhatsAppMediaItem::sizeBytes)),
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                )
             }
         }
-        loaded?.asImageBitmap()
-    }.getOrNull()
-    if (bitmap != null) WhatsAppThumbnailCache.put(item.uri, bitmap)
-    bitmap
-}
-
-private suspend fun loadWhatsAppDisplayBitmap(context: Context, item: WhatsAppMediaItem): ImageBitmap? = withContext(Dispatchers.IO) {
-    runCatching {
-        val uri = Uri.parse(item.uri)
-        if (uri.scheme == "content") {
-            context.contentResolver.loadThumbnail(uri, Size(1600, 1600), null).asImageBitmap()
-        } else {
-            val path = uri.path ?: return@runCatching null
-            val file = File(path)
-            if (!file.isFile) return@runCatching null
-            decodeSampledBitmap(file, 1600)?.asImageBitmap()
-        }
-    }.getOrNull()
-}
-
-private fun decodeSampledBitmap(file: File, maxSide: Int): android.graphics.Bitmap? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeFile(file.absolutePath, bounds)
-    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-    var sample = 1
-    val largest = maxOf(bounds.outWidth, bounds.outHeight)
-    while (largest / sample > maxSide) sample *= 2
-    return BitmapFactory.decodeFile(file.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample })
+        Text(stringResource(R.string.plan_preview_whatsapp), style = MaterialTheme.typography.bodySmall)
+    }
 }

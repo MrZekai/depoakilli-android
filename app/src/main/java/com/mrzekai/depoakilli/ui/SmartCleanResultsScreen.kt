@@ -8,12 +8,6 @@ import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
 import androidx.compose.foundation.lazy.LazyListScope
-import android.content.Context
-import android.graphics.BitmapFactory
-import android.media.MediaPlayer
-import android.net.Uri
-import android.util.Size
-import android.view.LayoutInflater
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,8 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -36,7 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -50,7 +41,6 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteSweep
@@ -59,11 +49,8 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -80,10 +67,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -91,29 +76,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.Tracks
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
+import com.mrzekai.depoakilli.ui.media.rememberThumbnail
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
@@ -125,12 +103,7 @@ import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
-import com.mrzekai.depoakilli.ui.theme.Lime400
-import java.io.File
 import java.util.concurrent.TimeUnit
-import kotlin.math.max
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 private val SmartBackground = Color(0xFF030B20)
 private val SmartCard = Color(0xFF0A1C42)
@@ -155,6 +128,13 @@ internal fun CleanableItem.toSmartPreview() = SmartPreviewFile(
     mimeType = mimeType,
     modifiedAtMillis = modifiedAtMillis,
     relativePath = relativePath,
+)
+
+internal fun SmartPreviewFile.toMediaPreview() = MediaPreviewFile(
+    uri = uri,
+    name = name,
+    mimeType = mimeType,
+    sizeBytes = sizeBytes,
 )
 
 private fun IndexedFile.toSmartPreview() = SmartPreviewFile(
@@ -1009,80 +989,6 @@ private fun daysSinceLastUse(lastUsedMillis: Long): Long {
 }
 
 
-private suspend fun loadPreviewThumbnail(context: Context, file: SmartPreviewFile): ImageBitmap? = withContext(Dispatchers.IO) {
-    runCatching {
-        val uri = Uri.parse(file.uri)
-        if (uri.scheme == "content") {
-            return@runCatching context.contentResolver.loadThumbnail(uri, Size(360, 260), null).asImageBitmap()
-        }
-        val path = uri.path ?: file.uri
-        val source = File(path)
-        if (!source.isFile) return@runCatching null
-        when {
-            file.mimeType.startsWith("video/") -> {
-                android.media.ThumbnailUtils.createVideoThumbnail(source, Size(360, 260), null)?.asImageBitmap()
-            }
-            file.mimeType.startsWith("image/") -> loadDisplayBitmap(context, file, maxSide = 480)
-            else -> null
-        }
-    }.getOrNull()
-}
-
-@Composable
-private fun CleanupItemsConfirmationDialog(
-    items: List<CleanableItem>,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    val bytes = items.sumOf(CleanableItem::sizeBytes)
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Outlined.DeleteSweep, contentDescription = null, tint = ElectricBlue) },
-        title = { Text(stringResource(R.string.smart_cleanup_confirm_title), fontWeight = FontWeight.Black) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                Text(
-                    pluralStringResource(
-                        R.plurals.smart_cleanup_confirm_body,
-                        items.size,
-                        ByteFormatter.format(bytes),
-                        items.size,
-                    ),
-                )
-                items.take(5).forEach { item ->
-                    Text(
-                        "• ${item.name}",
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                if (items.size > 5) {
-                    Text(
-                        pluralStringResource(R.plurals.smart_cleanup_more_items, items.size - 5, items.size - 5),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                Text(
-                    stringResource(R.string.smart_cleanup_confirm_warning),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(stringResource(R.string.smart_cleanup_confirm_action))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
-            }
-        },
-    )
-}
-
 @Composable
 private fun CategoryDetailPage(
     category: CleanCategory,
@@ -1234,7 +1140,7 @@ private fun CategoryDetailPage(
     }
 
     if (confirmCleanup) {
-        CleanupItemsConfirmationDialog(
+        DeleteConfirmDialog(
             items = selectedItems,
             onDismiss = { confirmCleanup = false },
             onConfirm = {
@@ -1252,11 +1158,7 @@ private fun CategoryGridItem(
     onPreview: () -> Unit,
     onToggle: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val preview = item.toSmartPreview()
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri, key2 = item.mimeType) {
-        value = loadPreviewThumbnail(context, preview)
-    }
+    val bitmap by rememberThumbnail(item.uri, item.mimeType)
 
     Card(
         modifier = Modifier.fillMaxWidth().heightIn(min = 214.dp),
@@ -1294,7 +1196,7 @@ private fun CategoryGridItem(
                         shape = RoundedCornerShape(18.dp),
                     ) {
                         Icon(
-                            fileVisual(item.mimeType, item.name),
+                            FileVisuals.icon(item.mimeType, item.name),
                             contentDescription = null,
                             tint = accent,
                             modifier = Modifier.padding(18.dp).size(38.dp),
@@ -1605,8 +1507,10 @@ private fun StorageDetailPage(
     }
 
     if (confirmCleanup) {
-        StorageCleanupConfirmationDialog(
-            items = selectedItems,
+        DeleteConfirmDialog(
+            names = selectedItems.map { it.file.name },
+            trashBytes = selectedItems.sumOf { it.file.sizeBytes },
+            permanentBytes = 0L,
             onDismiss = { confirmCleanup = false },
             onConfirm = {
                 confirmCleanup = false
@@ -1624,11 +1528,7 @@ private fun StorageReviewGridItem(
     onToggle: () -> Unit,
 ) {
     val file = item.file
-    val context = LocalContext.current
-    val preview = file.toSmartPreview()
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = file.uri, key2 = file.mimeType) {
-        value = loadPreviewThumbnail(context, preview)
-    }
+    val bitmap by rememberThumbnail(file.uri, file.mimeType)
 
     Card(
         modifier = Modifier.fillMaxWidth().heightIn(min = 210.dp),
@@ -1653,7 +1553,7 @@ private fun StorageReviewGridItem(
                     )
                 } else {
                     Icon(
-                        fileVisual(file.mimeType, file.name),
+                        FileVisuals.icon(file.mimeType, file.name),
                         contentDescription = null,
                         tint = accent,
                         modifier = Modifier.size(42.dp),
@@ -1740,7 +1640,7 @@ private fun StorageReviewListItem(
                 shape = RoundedCornerShape(14.dp),
             ) {
                 Icon(
-                    fileVisual(file.mimeType, file.name),
+                    FileVisuals.icon(file.mimeType, file.name),
                     contentDescription = null,
                     tint = accent,
                     modifier = Modifier.padding(10.dp).size(28.dp),
@@ -1838,61 +1738,6 @@ private fun ReviewCleanupFooter(
 }
 
 @Composable
-private fun StorageCleanupConfirmationDialog(
-    items: List<StorageReviewItem>,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    val bytes = items.sumOf { it.file.sizeBytes }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Outlined.DeleteSweep, contentDescription = null, tint = ElectricBlue) },
-        title = { Text(stringResource(R.string.storage_review_delete_title), fontWeight = FontWeight.Black) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                Text(
-                    pluralStringResource(
-                        R.plurals.storage_review_delete_body,
-                        items.size,
-                        items.size,
-                        ByteFormatter.format(bytes),
-                    ),
-                )
-                items.take(5).forEach { item ->
-                    Text(
-                        "• ${item.file.name}",
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                if (items.size > 5) {
-                    Text(
-                        pluralStringResource(R.plurals.smart_cleanup_more_items, items.size - 5, items.size - 5),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-                Text(
-                    stringResource(R.string.storage_review_delete_warning),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(stringResource(R.string.smart_cleanup_confirm_action))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
-            }
-        },
-    )
-}
-
-@Composable
 private fun DialogHeader(title: String, onBack: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp),
@@ -1930,12 +1775,7 @@ private fun FilePreviewDialog(
                         .background(Color(0xFF06132F)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    when {
-                        file.mimeType.startsWith("image/") -> ImageFilePreview(file)
-                        file.mimeType.startsWith("video/") -> VideoFilePreview(file)
-                        file.mimeType.startsWith("audio/") -> AudioFilePreview(file)
-                        else -> GenericFilePreview(file)
-                    }
+                    MediaPreviewContent(file.toMediaPreview())
                 }
 
                 Card(
@@ -2074,233 +1914,6 @@ private fun PreviewInfoPill(
     }
 }
 
-@Composable
-internal fun ImageFilePreview(file: SmartPreviewFile) {
-    val context = LocalContext.current
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = file.uri) {
-        value = loadDisplayBitmap(context, file)
-    }
-    if (bitmap == null) {
-        CircularProgressIndicator(color = Color.White)
-    } else {
-        Image(
-            bitmap = requireNotNull(bitmap),
-            contentDescription = file.name,
-            modifier = Modifier.fillMaxSize().padding(8.dp),
-            contentScale = ContentScale.Fit,
-        )
-    }
-}
-
-@Composable
-internal fun VideoFilePreview(file: SmartPreviewFile) {
-    val context = LocalContext.current
-    val player = remember(file.uri) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(file.uri))
-            prepare()
-        }
-    }
-    var prepared by remember(file.uri) { mutableStateOf(false) }
-    var playing by remember(file.uri) { mutableStateOf(false) }
-    var failed by remember(file.uri) { mutableStateOf(false) }
-    var noVideoTrack by remember(file.uri) { mutableStateOf(false) }
-
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_READY) {
-                    prepared = true
-                    failed = false
-                }
-            }
-
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                playing = isPlaying
-            }
-
-            override fun onTracksChanged(tracks: Tracks) {
-                if (tracks.groups.isEmpty()) return
-                val selectedVideo = tracks.groups.any { group ->
-                    group.type == C.TRACK_TYPE_VIDEO && group.isSelected
-                }
-                noVideoTrack = !selectedVideo
-                if (noVideoTrack) {
-                    playing = false
-                    player.pause()
-                }
-            }
-
-            override fun onPlayerError(error: PlaybackException) {
-                failed = true
-                prepared = false
-                playing = false
-            }
-        }
-        player.addListener(listener)
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize().background(Color.Black),
-        contentAlignment = Alignment.Center,
-    ) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { viewContext ->
-                (LayoutInflater.from(viewContext)
-                    .inflate(R.layout.smart_video_player, null, false) as PlayerView).apply {
-                    this.player = player
-                    useController = false
-                }
-            },
-            update = { view ->
-                if (view.player !== player) view.player = player
-            },
-        )
-
-        if (!prepared && !failed) {
-            CircularProgressIndicator(color = SmartCyan)
-        }
-
-        if (failed || noVideoTrack) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Icon(
-                    Icons.Outlined.VideoFile,
-                    contentDescription = null,
-                    tint = Color(0xFFFFB45B),
-                    modifier = Modifier.size(56.dp),
-                )
-                Text(
-                    stringResource(if (noVideoTrack) R.string.smart_video_no_picture else R.string.smart_video_preview_error),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        } else {
-            Surface(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(18.dp),
-                color = Color(0xE606132F),
-                shape = RoundedCornerShape(18.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .24f)),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .clickable(enabled = prepared && !noVideoTrack) {
-                            if (player.isPlaying) {
-                                player.pause()
-                            } else {
-                                player.play()
-                            }
-                        }
-                        .padding(horizontal = 18.dp, vertical = 11.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(9.dp),
-                ) {
-                    Text(if (playing) "Ⅱ" else "▶", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                    Text(
-                        stringResource(if (playing) R.string.smart_video_pause else R.string.smart_video_play),
-                        color = Color.White,
-                        fontWeight = FontWeight.Black,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun AudioFilePreview(file: SmartPreviewFile) {
-    val context = LocalContext.current
-    var player by remember(file.uri) { mutableStateOf<MediaPlayer?>(null) }
-    var playing by remember(file.uri) { mutableStateOf(false) }
-
-    DisposableEffect(file.uri) {
-        onDispose {
-            runCatching { player?.stop() }
-            runCatching { player?.release() }
-            player = null
-        }
-    }
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Icon(Icons.Outlined.MusicNote, contentDescription = null, tint = Color(0xFF65E8FF), modifier = Modifier.size(82.dp))
-        Text(file.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        Button(onClick = {
-            var active = player
-            if (active == null) {
-                active = runCatching { MediaPlayer.create(context, Uri.parse(file.uri)) }.getOrNull()
-                player = active
-                active?.setOnCompletionListener { playing = false }
-            }
-            active?.let { media ->
-                if (media.isPlaying) {
-                    media.pause()
-                    playing = false
-                } else {
-                    media.start()
-                    playing = true
-                }
-            }
-        }) {
-            Icon(if (playing) Icons.Outlined.MusicNote else Icons.Outlined.PlayCircle, contentDescription = null)
-            Spacer(Modifier.width(8.dp))
-            Text(stringResource(if (playing) R.string.smart_audio_pause else R.string.smart_audio_play))
-        }
-    }
-}
-
-@Composable
-internal fun GenericFilePreview(file: SmartPreviewFile) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Icon(fileVisual(file.mimeType, file.name), contentDescription = null, tint = Color(0xFF65E8FF), modifier = Modifier.size(86.dp))
-        Text(stringResource(R.string.smart_generic_preview_title), color = Color.White, fontWeight = FontWeight.Black)
-        Text(file.name, color = Color.White.copy(alpha = .82f), maxLines = 3, overflow = TextOverflow.Ellipsis)
-        Text(ByteFormatter.format(file.sizeBytes), color = Color(0xFFA2FFD0), fontWeight = FontWeight.Bold)
-    }
-}
-
-private suspend fun loadDisplayBitmap(
-    context: Context,
-    file: SmartPreviewFile,
-    maxSide: Int = 1600,
-): ImageBitmap? = withContext(Dispatchers.IO) {
-    runCatching {
-        val uri = Uri.parse(file.uri)
-        if (uri.scheme == "content") {
-            return@runCatching context.contentResolver.loadThumbnail(uri, Size(maxSide, maxSide), null).asImageBitmap()
-        }
-        loadSampledBitmap(file.uri)
-    }.getOrNull()
-}
-
-private suspend fun loadSampledBitmap(uriString: String): ImageBitmap? = withContext(Dispatchers.IO) {
-    runCatching {
-        val uri = Uri.parse(uriString)
-        val path = uri.path ?: return@runCatching null
-        val file = File(path)
-        if (!file.isFile) return@runCatching null
-
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeFile(file.absolutePath, bounds)
-        var sample = 1
-        val largest = max(bounds.outWidth, bounds.outHeight)
-        while (largest / sample > 1600) sample *= 2
-
-        val options = BitmapFactory.Options().apply { inSampleSize = sample }
-        BitmapFactory.decodeFile(file.absolutePath, options)?.asImageBitmap()
-    }.getOrNull()
-}
-
 private fun compactRelativePath(path: String): String {
     val clean = path.trim().trim('/')
     if (clean.isBlank()) return "—"
@@ -2366,19 +1979,6 @@ private fun storageTypeVisual(type: StorageFileType): ImageVector = when (type) 
     StorageFileType.ARCHIVES -> Icons.Outlined.Folder
     StorageFileType.APK -> Icons.Outlined.Android
     StorageFileType.OTHER -> Icons.Outlined.InsertDriveFile
-}
-
-private fun fileVisual(mimeType: String, name: String): ImageVector {
-    val extension = name.substringAfterLast('.', "").lowercase()
-    return when {
-        mimeType.startsWith("image/") -> Icons.Outlined.PhotoLibrary
-        mimeType.startsWith("video/") -> Icons.Outlined.VideoFile
-        mimeType.startsWith("audio/") -> Icons.Outlined.MusicNote
-        extension == "apk" -> Icons.Outlined.Android
-        extension in setOf("zip", "rar", "7z", "tar", "gz") -> Icons.Outlined.Folder
-        mimeType.startsWith("text/") || extension in setOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt") -> Icons.Outlined.Description
-        else -> Icons.Outlined.InsertDriveFile
-    }
 }
 
 private const val LIST_AD_AFTER_ITEMS = 12

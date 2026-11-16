@@ -1029,4 +1029,21 @@
         <item quantity="many">Это устройство не позволяет Smart Cleaner создать папку Корзины, поэтому файлов: %1$d — нельзя сохранить для отмены. Удалить их навсегда? Это действие нельзя отменить.</item>
         <item quantity="other">Это устройство не позволяет Smart Cleaner создать папку Корзины, поэтому файлов: %1$d — нельзя сохранить для отмены. Удалить их навсегда? Это действие нельзя отменить.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s будет удалено навсегда. Это действие нельзя отменить.</string>
+    <string name="delete_confirm_show_all">Показать все</string>
+    <string name="delete_confirm_show_less">Свернуть</string>
+    <string name="delete_confirm_action">Удалить</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">Удалить %1$d файл?</item>
+        <item quantity="few">Удалить %1$d файла?</item>
+        <item quantity="many">Удалить %1$d файлов?</item>
+        <item quantity="other">Удалить %1$d файла?</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
+        <item quantity="few">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
+        <item quantity="many">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
+        <item quantity="other">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
+    </plurals>
 </resources>

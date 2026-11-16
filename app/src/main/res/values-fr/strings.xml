@@ -977,4 +977,18 @@
         <item quantity="many">Cet appareil n’autorise pas Smart Cleaner à créer son dossier Corbeille : %1$d fichiers ne peuvent pas être conservés pour l’annulation. Les supprimer définitivement ? Cette action est irréversible.</item>
         <item quantity="other">Cet appareil n’autorise pas Smart Cleaner à créer son dossier Corbeille : %1$d fichiers ne peuvent pas être conservés pour l’annulation. Les supprimer définitivement ? Cette action est irréversible.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s sera supprimé définitivement. Cette action est irréversible.</string>
+    <string name="delete_confirm_show_all">Tout afficher</string>
+    <string name="delete_confirm_show_less">Afficher moins</string>
+    <string name="delete_confirm_action">Supprimer</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">Supprimer %1$d fichier ?</item>
+        <item quantity="many">Supprimer %1$d fichiers ?</item>
+        <item quantity="other">Supprimer %1$d fichiers ?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s va dans la Corbeille pendant %2$d jour. Vous pouvez le restaurer d’ici là.</item>
+        <item quantity="many">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
+        <item quantity="other">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
+    </plurals>
 </resources>

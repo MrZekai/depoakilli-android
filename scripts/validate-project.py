@@ -964,23 +964,39 @@ for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsap
 if "SelectedItemsPreviewSheet(" not in smart_results:
     errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
 for expected in (
-    "CleanupConfirmationDialog",
+    "DeleteConfirmDialog(",
     "StorageDetailPage",
-    "StorageCleanupConfirmationDialog",
     "FilePreviewDialog",
+    "MediaPreviewContent(",
     "LazyVerticalGrid(",
-    "ExoPlayer.Builder",
     "smartCategoryReview",
 ):
     if expected not in smart_results and expected not in view_model:
         errors.append(f"missing Smart Clean/review invariant: {expected}")
+
+# T2.3: one delete confirmation and one media preview/thumbnail path.
+delete_confirm_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt")
+for expected in ("delete_confirm_title", "delete_confirm_show_all", "delete_confirm_action", "R.string.cancel", "delete_confirm_trash", "delete_confirm_permanent"):
+    if expected not in delete_confirm_ui:
+        errors.append(f"missing shared delete confirmation invariant: {expected}")
+media_preview_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/FilePreviewDialog.kt")
+media_thumbnails = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/MediaThumbnails.kt")
+if "ExoPlayer.Builder" not in media_preview_ui or "MediaPlayer" in media_preview_ui:
+    errors.append("audio and video previews must share the ExoPlayer path")
+if "override fun sizeOf" not in media_thumbnails:
+    errors.append("thumbnail cache must be sized in bytes")
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    if kotlin_file.name not in {"MediaThumbnails.kt"} and ("LruCache<" in source or "BitmapFactory.decodeFile" in source):
+        errors.append(f"thumbnail decoding/caching must go through MediaThumbnails: {kotlin_file.relative_to(ROOT)}")
 
 whatsapp_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt")
 for expected in (
     "WhatsAppHeroCard",
     "WhatsAppGroupSection",
     "WhatsAppPreviewDialog",
-    "ExoPlayer.Builder",
+    "DeleteConfirmDialog(",
+    "MediaPreviewContent(",
 
 ):
     if expected not in whatsapp_ui:
@@ -989,9 +1005,8 @@ for expected in (
 premium_tools = read("app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt")
 for expected in (
     "PremiumCleanerToolScreen",
-    "PremiumCleanupConfirmationDialog",
-
-    "ExoPlayer.Builder",
+    "DeleteConfirmDialog(",
+    "MediaPreviewContent(",
 ):
     if expected not in premium_tools:
         errors.append(f"missing premium cleaner review invariant: {expected}")

@@ -6,8 +6,7 @@ import android.content.ComponentCallbacks2
 import com.mrzekai.depoakilli.ads.AdFreeWindowStore
 import com.mrzekai.depoakilli.data.TrashPurgeWorker
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
-import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
-import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
+import com.mrzekai.depoakilli.ui.media.MediaThumbnails
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,8 +25,7 @@ class DepoAkilliApplication : Application() {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
-            releaseWhatsAppThumbnailMemory()
-            releasePremiumToolThumbnailMemory()
+            MediaThumbnails.release()
         }
     }
 

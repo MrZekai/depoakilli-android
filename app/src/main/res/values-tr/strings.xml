@@ -940,4 +940,16 @@
         <item quantity="one">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
         <item quantity="other">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
+    <string name="delete_confirm_show_all">Tümünü göster</string>
+    <string name="delete_confirm_show_less">Daha az göster</string>
+    <string name="delete_confirm_action">Sil</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">%1$d dosya silinsin mi?</item>
+        <item quantity="other">%1$d dosya silinsin mi?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
+        <item quantity="other">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
+    </plurals>
 </resources>

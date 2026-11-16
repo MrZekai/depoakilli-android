@@ -949,4 +949,16 @@
         <item quantity="one">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivo não pode ser guardado para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
         <item quantity="other">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivos não podem ser guardados para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s será excluído permanentemente. Isso não pode ser desfeito.</string>
+    <string name="delete_confirm_show_all">Ver tudo</string>
+    <string name="delete_confirm_show_less">Ver menos</string>
+    <string name="delete_confirm_action">Excluir</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">Excluir %1$d arquivo?</item>
+        <item quantity="other">Excluir %1$d arquivos?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s vai para a Lixeira por %2$d dia. Você pode restaurar até lá.</item>
+        <item quantity="other">%1$s vai para a Lixeira por %2$d dias. Você pode restaurar até lá.</item>
+    </plurals>
 </resources>

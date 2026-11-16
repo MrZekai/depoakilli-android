@@ -878,4 +878,15 @@
     <plurals name="trash_folder_missing_body">
         <item quantity="other">Perangkat ini tidak mengizinkan Smart Cleaner membuat folder Sampah, jadi %1$d file tidak dapat disimpan untuk diurungkan. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
     </plurals>
+    <string name="delete_confirm_permanent">%1$s akan dihapus permanen. Tindakan ini tidak dapat diurungkan.</string>
+    <string name="delete_confirm_show_all">Tampilkan semua</string>
+    <string name="delete_confirm_show_less">Tampilkan lebih sedikit</string>
+    <string name="delete_confirm_action">Hapus</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="other">Hapus %1$d file?</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="delete_confirm_trash">
+        <item quantity="other">%1$s dipindahkan ke Sampah selama %2$d hari. Kamu bisa memulihkannya sampai saat itu.</item>
+    </plurals>
 </resources>
