@@ -872,4 +872,6 @@
         <item quantity="other">%1$d file tidak dapat dipindahkan ke Sampah; penyimpanan mungkin penuh. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
     </plurals>
     <string name="cache_none_found">Cache aplikasi tidak ditemukan</string>
+    <string name="access_not_granted">Akses tidak diberikan. Anda dapat mengizinkannya di Setelan.</string>
+    <string name="open_settings">Buka setelan</string>
 </resources>

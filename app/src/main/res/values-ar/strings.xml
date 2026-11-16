@@ -1119,4 +1119,6 @@
         <item quantity="other">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
     </plurals>
     <string name="cache_none_found">لم يتم العثور على ذاكرة تطبيقات مؤقتة</string>
+    <string name="access_not_granted">لم يتم منح الوصول. يمكنك السماح به من الإعدادات.</string>
+    <string name="open_settings">فتح الإعدادات</string>
 </resources>

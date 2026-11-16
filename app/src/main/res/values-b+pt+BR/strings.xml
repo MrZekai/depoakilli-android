@@ -943,4 +943,6 @@
         <item quantity="other">Não foi possível mover para a lixeira (arquivos: %1$d); o armazenamento pode estar cheio. Excluir permanentemente? Isso não pode ser desfeito.</item>
     </plurals>
     <string name="cache_none_found">Nenhum cache de app encontrado</string>
+    <string name="access_not_granted">O acesso não foi concedido. Você pode permitir nas Configurações.</string>
+    <string name="open_settings">Abrir configurações</string>
 </resources>

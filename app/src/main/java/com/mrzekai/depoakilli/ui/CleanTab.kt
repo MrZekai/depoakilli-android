@@ -46,13 +46,19 @@ internal fun CleanTab(
     state: CleanerUiState,
     onAllowAccess: () -> Unit,
     onCancelScan: () -> Unit,
+    accessDeniedOnce: Boolean = false,
+    onOpenSettings: () -> Unit = onAllowAccess,
     onOpenTrash: () -> Unit,
     modifier: Modifier = Modifier,
     plan: @Composable (displayState: CleanerUiState, header: LazyListScope.() -> Unit) -> Unit,
 ) {
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
     when {
-        !state.hasAllFilesAccess -> AccessCard(onAllowAccess = onAllowAccess, modifier = modifier)
+        !state.hasAllFilesAccess -> AccessCard(
+            onAllowAccess = if (accessDeniedOnce) onOpenSettings else onAllowAccess,
+            deniedOnce = accessDeniedOnce,
+            modifier = modifier,
+        )
         showingPlan -> {
             val updating = state.scanning
             val header: LazyListScope.() -> Unit = {
@@ -109,7 +115,7 @@ private fun UpdatingRow(onCancel: () -> Unit) {
 }
 
 @Composable
-private fun AccessCard(onAllowAccess: () -> Unit, modifier: Modifier) {
+private fun AccessCard(onAllowAccess: () -> Unit, deniedOnce: Boolean, modifier: Modifier) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -125,7 +131,10 @@ private fun AccessCard(onAllowAccess: () -> Unit, modifier: Modifier) {
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Black,
                 )
-                Text(stringResource(R.string.home_access_explainer), color = CleanTabSecondary)
+                Text(
+                    stringResource(if (deniedOnce) R.string.access_not_granted else R.string.home_access_explainer),
+                    color = CleanTabSecondary,
+                )
                 Button(
                     onClick = onAllowAccess,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
@@ -134,7 +143,10 @@ private fun AccessCard(onAllowAccess: () -> Unit, modifier: Modifier) {
                         contentColor = CleanTabButtonText,
                     ),
                 ) {
-                    Text(stringResource(R.string.home_allow_access), fontWeight = FontWeight.Black)
+                    Text(
+                        stringResource(if (deniedOnce) R.string.open_settings else R.string.home_allow_access),
+                        fontWeight = FontWeight.Black,
+                    )
                 }
             }
         }

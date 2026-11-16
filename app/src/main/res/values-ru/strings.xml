@@ -1020,4 +1020,6 @@
         <item quantity="other">Не удалось переместить в корзину (файлов: %1$d); возможно, память заполнена. Удалить навсегда? Это нельзя отменить.</item>
     </plurals>
     <string name="cache_none_found">Кэш приложений не найден</string>
+    <string name="access_not_granted">Доступ не предоставлен. Его можно разрешить в настройках.</string>
+    <string name="open_settings">Открыть настройки</string>
 </resources>

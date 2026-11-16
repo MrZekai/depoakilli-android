@@ -921,4 +921,6 @@
         <item quantity="other">Verschieben in den Papierkorb nicht möglich (Dateien: %1$d); der Speicher ist eventuell voll. Endgültig löschen? Dies kann nicht rückgängig gemacht werden.</item>
     </plurals>
     <string name="cache_none_found">Kein App-Cache gefunden</string>
+    <string name="access_not_granted">Zugriff wurde nicht gewährt. Sie können ihn in den Einstellungen erlauben.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
 </resources>

@@ -943,4 +943,6 @@
         <item quantity="other">No se pudieron mover a la papelera (archivos: %1$d); puede que el almacenamiento esté lleno. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
     </plurals>
     <string name="cache_none_found">No se encontró caché de apps</string>
+    <string name="access_not_granted">No se concedió el acceso. Puedes permitirlo en Ajustes.</string>
+    <string name="open_settings">Abrir ajustes</string>
 </resources>

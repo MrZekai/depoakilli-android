@@ -175,6 +175,9 @@ fun CleanerApp(
     var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var accessDisclosure by rememberSaveable { mutableStateOf<AccessDisclosure?>(null) }
+    // After the user returned from the system screen without granting access,
+    // the Clean tab shows one sentence and "Open settings" (T2.1).
+    var allFilesAskedOnce by rememberSaveable { mutableStateOf(false) }
     // Scan data lives in the ViewModel, not saved navigation state. After a
     // process restart the saved results route must not reopen without its data.
     LaunchedEffect(Unit) {
@@ -556,6 +559,8 @@ fun CleanerApp(
                         state = state,
                         onAllowAccess = ::requestAllFilesWithDisclosure,
                         onCancelScan = viewModel::cancelScan,
+                        accessDeniedOnce = allFilesAskedOnce,
+                        onOpenSettings = onRequestAllFilesAccess,
                         onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
                         modifier = Modifier.padding(padding),
                     ) { displayState, header ->
@@ -687,6 +692,7 @@ fun CleanerApp(
                     onClick = {
                         accessDisclosure = null
                         if (disclosure == AccessDisclosure.ALL_FILES) {
+                            allFilesAskedOnce = true
                             onRequestAllFilesAccess()
                         } else {
                             onRequestUsageAccess()

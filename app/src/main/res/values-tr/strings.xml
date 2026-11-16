@@ -934,4 +934,6 @@
         <item quantity="other">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
     </plurals>
     <string name="cache_none_found">Uygulama önbelleği bulunamadı</string>
+    <string name="access_not_granted">Erişim verilmedi. Ayarlar\'dan izin verebilirsiniz.</string>
+    <string name="open_settings">Ayarları aç</string>
 </resources>

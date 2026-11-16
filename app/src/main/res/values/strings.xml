@@ -934,4 +934,6 @@
         <item quantity="other">%1$d files couldn’t be moved to Trash, possibly because storage is full. Delete them permanently instead? This can’t be undone.</item>
     </plurals>
     <string name="cache_none_found">No app cache found</string>
+    <string name="access_not_granted">Access wasn’t granted. You can allow it in Settings.</string>
+    <string name="open_settings">Open settings</string>
 </resources>
