@@ -184,5 +184,6 @@ jobs:
       - name: Run all unit tests and lint
         run: |
           chmod +x gradlew
-          ./gradlew --stacktrace test -x validateReleaseAds -x validateClosedTestConfiguration
-          ./gradlew --stacktrace lint -x validateReleaseAds -x validateClosedTestConfiguration
+          # All four variants compile here; give the Kotlin compiler room (runner has 16 GB).
+          ./gradlew --stacktrace test "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateReleaseAds -x validateClosedTestConfiguration
+          ./gradlew --stacktrace lint "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateReleaseAds -x validateClosedTestConfiguration
