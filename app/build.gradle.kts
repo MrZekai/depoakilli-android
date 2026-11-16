@@ -25,11 +25,14 @@ val liveRewardedId = "ca-app-pub-1380972808968213/4039180256"
 val liveAppOpenId = "ca-app-pub-1380972808968213/1593948887"
 // In-list Native advanced unit created by the owner in AdMob (16 Nov 2026).
 val liveListNativeId = "ca-app-pub-1380972808968213/6870326296"
-// Optional production Native unit. Empty means use live MREC fallback.
+// Result-screen Native unit: an explicit ADMOB_RESULT_NATIVE_ID wins; otherwise
+// the owner's Native advanced unit is reused. MREC (banner unit, 300x250) stays
+// the fallback when no native ad fills.
 val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
     .orNull
     ?.trim()
     .orEmpty()
+    .ifBlank { "ca-app-pub-1380972808968213/6870326296" }
 val supportEmail = providers.environmentVariable("SUPPORT_EMAIL")
     .orNull
     ?.trim()
