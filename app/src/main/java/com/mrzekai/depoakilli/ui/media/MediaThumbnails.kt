@@ -115,7 +115,7 @@ internal fun thumbnailSampleSize(width: Int, height: Int, maxSide: Int): Int {
 @Composable
 internal fun rememberThumbnail(uri: String, mimeType: String): State<ImageBitmap?> {
     val context = LocalContext.current
-    return produceState(initialValue = MediaThumbnails.cached(uri), uri, mimeType) {
+    return produceState(MediaThumbnails.cached(uri), uri, mimeType) {
         if (value == null) value = MediaThumbnails.thumbnail(context, uri, mimeType)
     }
 }

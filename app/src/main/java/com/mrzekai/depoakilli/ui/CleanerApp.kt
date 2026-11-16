@@ -816,7 +816,7 @@ private fun CleanScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
     onOpenStorageReview: (com.mrzekai.depoakilli.model.StorageFileType, Boolean) -> Unit,
     onRequestUsageAccess: () -> Unit,
