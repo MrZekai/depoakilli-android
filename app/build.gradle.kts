@@ -213,6 +213,8 @@ android {
         abortOnError = true
         checkDependencies = true
         warningsAsErrors = false
+        // T3.2: unused strings, drawables and layouts fail the build.
+        error += "UnusedResources"
         textReport = true
         textOutput = file("build/reports/lint-results-debug.txt")
         htmlReport = true
@@ -233,7 +235,6 @@ dependencies {
     val composeBom = enforcedPlatform(libs.androidx.compose.bom)
 
     implementation(composeBom)
-    androidTestImplementation(composeBom)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -262,9 +263,6 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 }
 
 val validateReleaseAds by tasks.registering {

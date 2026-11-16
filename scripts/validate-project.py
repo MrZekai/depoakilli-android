@@ -754,11 +754,6 @@ for required_name in (
     "smart_cleanup_ad_notice",
 
 
-    "home_last_cleanup_title",
-    "home_last_cleanup_summary",
-    "home_smart_suggestions_title",
-    "home_different_tools_title",
-    "home_discover_title",
     "cache_modern_total_label",
     "cache_modern_individual_steps",
     "cache_modern_safety_note",
@@ -1062,8 +1057,6 @@ if "R.string.storage_analyzer_action_hint" in smart_results:
     errors.append("destructive storage review must not use the read-only Analyzer resource prefix")
 
 for required_copy in (
-    "sponsored ad panel",
-    "no full-screen ad follows for the same cleanup",
     "Find exact duplicates verified by content; one original is always kept",
     "Measure real Android-reported cache per app and verify the actual reduction after cleanup",
 ):
@@ -1071,8 +1064,6 @@ for required_copy in (
         errors.append(f"missing alpha9 English product-truth copy: {required_copy}")
 
 for required_copy in (
-    "sponsorlu reklam paneli",
-    "aynı temizlik için tam ekran reklam gösterilmez",
     "İçeriği doğrulanmış birebir kopyaları bul; her grupta bir orijinal her zaman korunur",
 ):
     if required_copy not in tr_strings:
