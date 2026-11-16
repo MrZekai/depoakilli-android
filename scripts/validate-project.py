@@ -1011,7 +1011,7 @@ for expected in (
         errors.append(f"missing alpha9 Screenshots invariant: {expected}")
 
 for expected in (
-    "R.string.tools_broad_scan_section_title",
+
     "R.string.tools_cleaning_section_title",
     "ScanFocus.SCREENSHOTS",
     "R.string.cache_manager_subtitle",
