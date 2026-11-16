@@ -562,10 +562,15 @@ class DeviceRepository(
         if (!fileSnapshotStillMatches(uriString, expectedSizeBytes, expectedModifiedAtMillis)) {
             return@runCatching Removal.Failed(FailureReason.CHANGED)
         }
+        // Path rules expect a path relative to the storage volume root
+        // (e.g. "WhatsApp/Databases"), not the absolute path.
+        val relativeDir = volumeRootOf(file)?.let { root ->
+            runCatching { file.parentFile?.relativeTo(root)?.invariantSeparatorsPath }.getOrNull()
+        } ?: return@runCatching Removal.Failed(FailureReason.PROTECTED)
         if (
             !isDeletableSharedStorageFile(file) ||
             StoragePathRules.isSystemMarkerFile(file.name) ||
-            StoragePathRules.isProtectedUserDataPath(file.parent.orEmpty(), file.name)
+            StoragePathRules.isProtectedUserDataPath(relativeDir, file.name)
         ) {
             return@runCatching Removal.Failed(FailureReason.PROTECTED)
         }
@@ -576,7 +581,7 @@ class DeviceRepository(
                 if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.DENIED)
             }
             DeleteMode.PERMANENT -> {
-                if (FileDeleter.deleteUnprotected(file, file.parent.orEmpty())) {
+                if (FileDeleter.deleteUnprotected(file, relativeDir)) {
                     removeDeletedPathFromMediaStore(file.absolutePath)
                     Removal.Deleted
                 } else {
