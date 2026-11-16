@@ -521,7 +521,7 @@ private fun ScanMetricCard(
             Icon(icon, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(22.dp))
             Column {
                 Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                Text(label, color = SmartTextSecondary, fontSize = 10.sp)
+                Text(label, color = SmartTextSecondary, fontSize = 12.sp)
             }
         }
     }
@@ -907,7 +907,7 @@ private fun UnusedAppsSectionCard(
             Text(
                 stringResource(R.string.smart_unused_apps_separate_note),
                 color = Color(0xFF8FA9BA),
-                fontSize = 10.sp,
+                fontSize = 12.sp,
             )
         }
     }
@@ -981,7 +981,7 @@ private fun UnusedAppsReviewDialog(
                                                 daysSinceLastUse(app.lastUsedMillis),
                                             ),
                                             color = SmartTextSecondary,
-                                            fontSize = 10.sp,
+                                            fontSize = 12.sp,
                                         )
                                         Text(ByteFormatter.format(app.totalBytes), color = Color(0xFF70E58E), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                     }
@@ -1360,19 +1360,19 @@ private fun CategoryGridItem(
                     color = Color(0xFF9FB4D7),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                 )
                 Text(
                     assessmentReason(item.assessment),
                     color = Color(0xFFBFD0EA),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 9.sp,
+                    fontSize = 12.sp,
                 )
                 Text(
                     stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
                     color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                 )
@@ -1704,12 +1704,12 @@ private fun StorageReviewGridItem(
                     color = Color(0xFF9FB4D7),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                 )
                 Text(
                     stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
                     color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                 )
             }
@@ -1802,7 +1802,7 @@ private fun ReviewCleanupFooter(
                 Text(
                     stringResource(R.string.smart_detail_selected_label),
                     color = SmartTextSecondary,
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                 )
                 Text(
                     "$selectedCount • ${ByteFormatter.format(selectedBytes)}",
@@ -1814,7 +1814,7 @@ private fun ReviewCleanupFooter(
                     Text(
                         stringResource(R.string.nothing_selected_hint),
                         color = SmartTextSecondary,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                     )
                 }
             }

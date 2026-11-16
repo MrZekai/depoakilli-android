@@ -401,7 +401,7 @@ private fun AnalyzerResults(
                     Text(
                         text = stringResource(R.string.storage_analyzer_truth_note),
                         color = Color(0xFF94A7C8),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         lineHeight = 14.sp,
                     )
                 }
@@ -521,7 +521,7 @@ private fun AnalyzerMetric(
                 Text(
                     text = label,
                     color = AnalyzerTextSecondary,
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                 )
             }
         }
@@ -616,7 +616,7 @@ private fun AnalyzerTypeCard(
                         Text(
                             text = stringResource(R.string.storage_analyzer_largest_examples),
                             color = accent,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                         )
 
@@ -629,7 +629,7 @@ private fun AnalyzerTypeCard(
                                     text = file.name,
                                     modifier = Modifier.weight(1f),
                                     color = Color(0xFFD9E2F5),
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
@@ -637,7 +637,7 @@ private fun AnalyzerTypeCard(
                                 Text(
                                     text = ByteFormatter.format(file.sizeBytes),
                                     color = AnalyzerTextSecondary,
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
                             }
