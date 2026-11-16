@@ -94,6 +94,8 @@ data class AiAssessment(
     @StringRes val reasonRes: Int,
     val reasonArgs: List<Any> = emptyList(),
     val recommended: Boolean,
+    val reasonPluralRes: Int? = null,
+    val reasonQuantity: Int = 0,
 )
 
 data class CleanableItem(

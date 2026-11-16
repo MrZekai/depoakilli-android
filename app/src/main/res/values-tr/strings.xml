@@ -155,12 +155,21 @@
     <string name="category_app_cache_description">Güvenli geçici uygulama dosyaları</string>
     <string name="category_whatsapp">WhatsApp medyası</string>
     <string name="category_whatsapp_description">Durumlar ve 30 günden eski gönderilen medya. Tüm WhatsApp medyası WhatsApp Temizleyici’de.</string>
-    <string name="reason_old_installer">%1$d günlük kurulum paketi</string>
+    <plurals name="reason_old_installer">
+        <item quantity="one">Kurulum paketi • Yaş (gün): %1$d</item>
+        <item quantity="other">Kurulum paketi • Yaş (gün): %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">İndirilen kurulum paketi</string>
-    <string name="reason_old_screenshot">%1$d günlük ekran görüntüsü</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="one">Ekran görüntüsü • Yaş (gün): %1$d</item>
+        <item quantity="other">Ekran görüntüsü • Yaş (gün): %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">Ekran görüntüsü • yalnızca inceleme</string>
     <string name="reason_large_video">%1$d günlük büyük video</string>
-    <string name="reason_old_download">%1$d gündür İndirilenler klasöründe</string>
+    <plurals name="reason_old_download">
+        <item quantity="one">İndirilenlerde geçen süre • Yaş (gün): %1$d</item>
+        <item quantity="other">İndirilenlerde geçen süre • Yaş (gün): %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">İçerik parmak izi birebir aynı</string>
     <string name="reason_sampled_duplicate">Muhtemel kopya: boyut ve örnekler eşleşiyor. Tam doğrulanmadı — silmeden önce karşılaştır.</string>
     <string name="reason_probable_duplicate">Boyut ve içerik örnekleri aynı</string>
@@ -170,7 +179,10 @@
     <string name="cache_item_path">Uygulama önbelleği</string>
     <string name="reason_safe_cache">Silinmesi güvenli geçici dosyalar</string>
     <string name="reason_whatsapp_status">Geçici WhatsApp durum dosyası</string>
-    <string name="reason_whatsapp_sent">%1$d gün önce gönderilmiş medya kopyası; silmeden önce inceleyin</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="one">Gönderilen medya kopyası; silmeden önce inceleyin • Yaş (gün): %1$d</item>
+        <item quantity="other">Gönderilen medya kopyası; silmeden önce inceleyin • Yaş (gün): %1$d</item>
+    </plurals>
     <string name="unnamed_file">Adsız dosya</string>
     <string name="back">Geri</string>
     <string name="cancel">İptal</string>
@@ -213,8 +225,8 @@
     <string name="whatsapp_delete_action">%1$s SİL</string>
     <string name="whatsapp_delete_confirm_title">Seçilen WhatsApp dosyaları silinsin mi?</string>
     <plurals name="whatsapp_delete_confirm_message">
-        <item quantity="one">%2$s kullanan %1$d dosya kalıcı olarak silinecek. Bu işlem geri alınamaz.</item>
-        <item quantity="other">%2$s kullanan %1$d dosya kalıcı olarak silinecek. Bu işlem geri alınamaz.</item>
+        <item quantity="one">Dosya sayısı: %1$d. Boyut: %2$s. Dosyalar kalıcı olarak silinecek.</item>
+        <item quantity="other">Dosya sayısı: %1$d. Boyut: %2$s. Dosyalar kalıcı olarak silinecek.</item>
     </plurals>
     <string name="device_center_title">Cihaz Merkezi</string>
     <string name="device_center_live_status">Canlı cihaz durumu</string>
@@ -312,9 +324,18 @@
     <string name="message_own_cache_cleared">%1$s Akıllı Temizleyici önbelleği kaldırıldı.</string>
     <string name="message_whatsapp_not_found">Paylaşılan depolamada desteklenen WhatsApp veya WhatsApp Business Medya klasörü bulunamadı.</string>
     <string name="privacy_policy_body_v050">Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Akıllı Temizleyici tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nAkıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Açıkça sildiğiniz dosyalar Android aracılığıyla kaldırılır ve Akıllı Temizleyici tarafından geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
-    <string name="reason_large_file">Büyük dosya • %1$d günlük</string>
-    <string name="reason_temporary_file">Geçici/yarım kalmış kalıntı • %1$d günlük</string>
-    <string name="reason_thumbnail_cache">Orijinal fotoğraf değil: yeniden oluşturulabilir küçük resim önbelleği • %1$d günlük</string>
+    <plurals name="reason_large_file">
+        <item quantity="one">Büyük dosya • Yaş (gün): %1$d</item>
+        <item quantity="other">Büyük dosya • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="one">Kalan geçici dosya • Yaş (gün): %1$d</item>
+        <item quantity="other">Kalan geçici dosya • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="one">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
+        <item quantity="other">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">WhatsApp paylaşılan medyası — silmeden önce incele</string>
     <string name="safe_ai_cleaning_description_v050">Akıllı Temizleyici erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
     <string name="scan_focus_downloads">İndirilenler</string>
@@ -394,7 +415,7 @@
         <item quantity="one">%1$s büyüklüğünde %2$d öğe seçtin. Devam etmeden önce aşağıdaki dökümü kontrol et.</item>
         <item quantity="other">%1$s büyüklüğünde %2$d öğe seçtin. Devam etmeden önce aşağıdaki dökümü kontrol et.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">Silme işlemi geri alınamaz. Korunan medya için Android ayrıca sistem onayı gösterebilir.</string>
+    <string name="smart_cleanup_confirm_warning">Silme işlemi geri alınamaz.</string>
     <string name="smart_cleanup_confirm_action">Seçilenleri temizle</string>
     <string name="smart_storage_preview_note">Bu kategoride bulunan en büyük dosyalardan en fazla %1$d tanesi gösteriliyor. Depolama analizi bu dosyaları otomatik olarak temizliğe seçmez.</string>
     <string name="smart_storage_preview_empty">Bu kategori için önizlenebilir dosya yakalanmadı.</string>
@@ -556,7 +577,10 @@
     <string name="smart_unused_apps_separate_note">Uygulama kaldırma, Temizle düğmesinin toplamından ayrıdır ve her zaman Android’in kaldırma ekranını kullanır.</string>
     <string name="smart_unused_apps_dialog_title">Kullanılmayan uygulamaları incele</string>
     <string name="smart_unused_apps_dialog_note">Yalnız son kullanım zamanı bilinen ve en az 60 gündür açılmamış uygulamalar gösterilir. Hiçbir şey otomatik kaldırılmaz.</string>
-    <string name="smart_unused_apps_last_used">Son kullanım %1$d gün önce</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="one">Son kullanım • Geçen gün: %1$d</item>
+        <item quantity="other">Son kullanım • Geçen gün: %1$d</item>
+    </plurals>
 
     <string name="premium_cleanup_confirm_title">Seçilen dosyalar silinsin mi?</string>
     <plurals name="premium_cleanup_confirm_body">
@@ -628,7 +652,10 @@
     <string name="home_last_cleanup_now">Az önce</string>
     <string name="home_last_cleanup_minutes">%1$d dk önce</string>
     <string name="home_last_cleanup_hours">%1$d sa önce</string>
-    <string name="home_last_cleanup_days">%1$d gün önce</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="one">Son temizlik • Geçen gün: %1$d</item>
+        <item quantity="other">Son temizlik • Geçen gün: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">Akıllı öneriler</string>
     <string name="home_different_tools_title">Diğer araçlar</string>
     <string name="home_suggestion_empty">Şu anda öncelikli öneri yok</string>

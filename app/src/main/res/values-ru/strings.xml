@@ -158,12 +158,27 @@
     <string name="category_app_cache_description">Безопасные временные файлы приложений</string>
     <string name="category_whatsapp">WhatsApp носитель</string>
     <string name="category_whatsapp_description">Статусы и отправленные медиа старше 30 дней. WhatsApp Cleaner отображает все носители WhatsApp.</string>
-    <string name="reason_old_installer">%1$d-дневной установочный пакет</string>
+    <plurals name="reason_old_installer">
+        <item quantity="one">Установочный пакет • Возраст (дней): %1$d</item>
+        <item quantity="few">Установочный пакет • Возраст (дней): %1$d</item>
+        <item quantity="many">Установочный пакет • Возраст (дней): %1$d</item>
+        <item quantity="other">Установочный пакет • Возраст (дней): %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">Скачанный установочный пакет</string>
-    <string name="reason_old_screenshot">%1$d скриншот дневной давности</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="one">Снимок экрана • Возраст (дней): %1$d</item>
+        <item quantity="few">Снимок экрана • Возраст (дней): %1$d</item>
+        <item quantity="many">Снимок экрана • Возраст (дней): %1$d</item>
+        <item quantity="other">Снимок экрана • Возраст (дней): %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">Снимок экрана • только просмотр</string>
     <string name="reason_large_video">%1$d большое видео однодневной давности</string>
-    <string name="reason_old_download">В загрузках за %1$d дней</string>
+    <plurals name="reason_old_download">
+        <item quantity="one">Время в загрузках • Возраст (дней): %1$d</item>
+        <item quantity="few">Время в загрузках • Возраст (дней): %1$d</item>
+        <item quantity="many">Время в загрузках • Возраст (дней): %1$d</item>
+        <item quantity="other">Время в загрузках • Возраст (дней): %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">Отпечаток контента точно совпадает</string>
     <string name="reason_sampled_duplicate">Вероятный дубликат: тот же размер и совпадающие образцы. Не полностью проверено — сравните перед удалением.</string>
     <string name="reason_probable_duplicate">Образцы размера и содержимого совпадают</string>
@@ -173,7 +188,12 @@
     <string name="cache_item_path">Кэш приложения</string>
     <string name="reason_safe_cache">Безопасные временные файлы</string>
     <string name="reason_whatsapp_status">Временный файл состояния WhatsApp</string>
-    <string name="reason_whatsapp_sent">Отправлена копия носителя от %1$d несколько дней назад; просмотрите перед удалением</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="one">Копия отправленного медиафайла; проверьте перед удалением • Возраст (дней): %1$d</item>
+        <item quantity="few">Копия отправленного медиафайла; проверьте перед удалением • Возраст (дней): %1$d</item>
+        <item quantity="many">Копия отправленного медиафайла; проверьте перед удалением • Возраст (дней): %1$d</item>
+        <item quantity="other">Копия отправленного медиафайла; проверьте перед удалением • Возраст (дней): %1$d</item>
+    </plurals>
     <string name="unnamed_file">Безымянный файл</string>
     <string name="back">Назад</string>
     <string name="cancel">Отмена</string>
@@ -323,9 +343,24 @@
     <string name="message_own_cache_cleared">%1$s из кеша Smart Cleaner был удален.</string>
     <string name="message_whatsapp_not_found">В общем хранилище не найдена поддерживаемая папка WhatsApp или WhatsApp Business Media.</string>
     <string name="privacy_policy_body_v050">Smart Cleaner анализирует доступные метаданные файлов общего хранилища и, при необходимости, для обнаружения дубликатов, «отпечатки пальцев» контента на устройстве. Эти отпечатки пальцев и личные файлы более чистого движка не загружаются Smart Cleaner.\n\nДоступ ко всем файлам запрашивается, поскольку управление файлами и их обслуживание являются основными функциями: сканирование и управление ненужными файлами, дубликатами, большими файлами, загрузками, установщиками APK и носителями WhatsApp в общем хранилище. Android продолжает блокировать защищенные каталоги личных данных других приложений.\n\nДоступ к использованию является необязательным и используется для чтения статистики хранилища/кэша приложений и временных меток последнего использования. App Cache Manager вызывает официальное действие системы очистки кэша Android, а Android контролирует необходимое подтверждение.\n\nGoogle Mobile Ads и платформа согласия могут обрабатывать рекламные идентификаторы, диагностику и варианты согласия в соответствии с политиками Google. Файлы удаляются только после выбора пользователя или подтверждения системы Android.\n\nSmart Cleaner не включает стороннюю службу отчетов о сбоях. Имена файлов, пути, содержимое файлов и дубликаты отпечатков пальцев не загружаются для отчетов о сбоях.\n\nSmart Cleaner сохраняет настройки и совокупную историю сканирования/очистки только в локальном хранилище приложений до тех пор, пока вы не очистите данные приложения или не удалите его. Файлы, которые вы удаляете явно, удаляются с помощью Android и не могут быть восстановлены с помощью Smart Cleaner. Google хранит данные, которые обрабатывает, в соответствии со своими опубликованными политиками.\n\nДля показа рекламы Google Mobile Ads SDK обрабатывает IP-адрес (для приблизительного определения местоположения), рекламный идентификатор или идентификатор набора приложений, взаимодействия с приложением и диагностические данные. Само приложение не отправляет имена и содержимое файлов или поисковые запросы за пределы устройства.</string>
-    <string name="reason_large_file">Большой файл • возраст: %1$d d</string>
-    <string name="reason_temporary_file">Временный/неполный артефакт • %1$d дней назад</string>
-    <string name="reason_thumbnail_cache">Не оригинальная фотография: восстанавливаемый кэш миниатюр • %1$d дней назад</string>
+    <plurals name="reason_large_file">
+        <item quantity="one">Большой файл • Возраст (дней): %1$d</item>
+        <item quantity="few">Большой файл • Возраст (дней): %1$d</item>
+        <item quantity="many">Большой файл • Возраст (дней): %1$d</item>
+        <item quantity="other">Большой файл • Возраст (дней): %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="one">Оставшийся временный файл • Возраст (дней): %1$d</item>
+        <item quantity="few">Оставшийся временный файл • Возраст (дней): %1$d</item>
+        <item quantity="many">Оставшийся временный файл • Возраст (дней): %1$d</item>
+        <item quantity="other">Оставшийся временный файл • Возраст (дней): %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="one">Не исходное фото: кэш предпросмотра • Возраст (дней): %1$d</item>
+        <item quantity="few">Не исходное фото: кэш предпросмотра • Возраст (дней): %1$d</item>
+        <item quantity="many">Не исходное фото: кэш предпросмотра • Возраст (дней): %1$d</item>
+        <item quantity="other">Не исходное фото: кэш предпросмотра • Возраст (дней): %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">WhatsApp поделился медиафайлом — просмотрите перед удалением</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner анализирует доступное общее хранилище на устройстве, применяет консервативные правила очистки, проверяет точные дубликаты по содержимому и оставляет созданные пользователем файлы невыбранными, если удаление не является явно безопасным.</string>
     <string name="scan_focus_downloads">Загрузки</string>
@@ -409,7 +444,7 @@
         <item quantity="many">Вы выбрали %1$s. Количество элементов: %2$d. Перед продолжением проверьте список ниже.</item>
         <item quantity="other">Вы выбрали %1$s. Количество элементов: %2$d. Перед продолжением проверьте список ниже.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">Вы выбираете файлы и подтверждаете удаление. Отменить удаление нельзя. Android может запросить дополнительное подтверждение для защищённых медиафайлов.</string>
+    <string name="smart_cleanup_confirm_warning">Вы выбираете файлы и подтверждаете удаление. Отменить удаление нельзя.</string>
     <string name="smart_cleanup_confirm_action">Очистить выбранное</string>
     <string name="smart_storage_preview_note">Отображаются до %1$d самых больших файлов, найденных в этой категории. Анализ хранилища не выбирает эти файлы для очистки автоматически.</string>
     <string name="smart_storage_preview_empty">Для этой категории не было сохранено ни одного файла для предварительного просмотра.</string>
@@ -573,7 +608,12 @@
     <string name="smart_unused_apps_separate_note">Удаление приложения осуществляется отдельно от кнопки «Очистить» и всегда использует экран удаления Android.</string>
     <string name="smart_unused_apps_dialog_title">Обзор неиспользованного приложения</string>
     <string name="smart_unused_apps_dialog_note">Показаны только приложения, время последнего использования которых известно не менее 60 дней. Ничего не удаляется автоматически.</string>
-    <string name="smart_unused_apps_last_used">Последний раз использовался %1$d дней назад.</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="one">Последнее использование • Прошло дней: %1$d</item>
+        <item quantity="few">Последнее использование • Прошло дней: %1$d</item>
+        <item quantity="many">Последнее использование • Прошло дней: %1$d</item>
+        <item quantity="other">Последнее использование • Прошло дней: %1$d</item>
+    </plurals>
     <string name="premium_cleanup_confirm_title">Удалить выбранные файлы?</string>
     <plurals name="premium_cleanup_confirm_body">
         <item quantity="one">Вы выбрали элементы в количестве %1$d, занимающие %2$s. Продолжайте, только если подтверждаете их удаление.</item>
@@ -650,7 +690,12 @@
     <string name="home_last_cleanup_now">только что</string>
     <string name="home_last_cleanup_minutes">%1$d мин. назад</string>
     <string name="home_last_cleanup_hours">%1$d ч. назад</string>
-    <string name="home_last_cleanup_days">%1$d дн назад</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="one">Последняя очистка • Прошло дней: %1$d</item>
+        <item quantity="few">Последняя очистка • Прошло дней: %1$d</item>
+        <item quantity="many">Последняя очистка • Прошло дней: %1$d</item>
+        <item quantity="other">Последняя очистка • Прошло дней: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">Умные предложения</string>
     <string name="home_different_tools_title">Дополнительные инструменты</string>
     <string name="home_suggestion_empty">Сейчас нет приоритетного предложения</string>

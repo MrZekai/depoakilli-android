@@ -155,12 +155,18 @@
     <string name="category_app_cache_description">File aplikasi sementara yang aman</string>
     <string name="category_whatsapp">media WhatsApp</string>
     <string name="category_whatsapp_description">Status dan media terkirim lebih lama dari 30 hari. WhatsApp Cleaner menampilkan semua media WhatsApp.</string>
-    <string name="reason_old_installer">Paket penginstal %1$d yang berumur satu hari</string>
+    <plurals name="reason_old_installer">
+        <item quantity="other">Paket penginstal • Usia dalam hari: %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">Paket penginstal yang diunduh</string>
-    <string name="reason_old_screenshot">Tangkapan layar %1$d yang berumur satu hari</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="other">Tangkapan layar • Usia dalam hari: %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">Tangkapan layar • ulasan saja</string>
     <string name="reason_large_video">Video besar %1$d berumur satu hari</string>
-    <string name="reason_old_download">Dalam Unduhan selama %1$d hari</string>
+    <plurals name="reason_old_download">
+        <item quantity="other">Waktu di Unduhan • Usia dalam hari: %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">Sidik jari konten sama persis</string>
     <string name="reason_sampled_duplicate">Kemungkinan duplikat: ukuran yang sama dan sampel yang cocok. Belum sepenuhnya terverifikasi — bandingkan sebelum menghapus.</string>
     <string name="reason_probable_duplicate">Sampel ukuran dan konten cocok</string>
@@ -170,7 +176,9 @@
     <string name="cache_item_path">Tembolok aplikasi</string>
     <string name="reason_safe_cache">File sementara yang aman</string>
     <string name="reason_whatsapp_status">File status WhatsApp sementara</string>
-    <string name="reason_whatsapp_sent">Salinan media terkirim dari %1$d beberapa hari yang lalu; meninjau sebelum menghapus</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="other">Salinan media terkirim; periksa sebelum menghapus • Usia dalam hari: %1$d</item>
+    </plurals>
     <string name="unnamed_file">File tanpa nama</string>
     <string name="back">Kembali</string>
     <string name="cancel">Batalkan</string>
@@ -211,7 +219,7 @@
     <string name="whatsapp_delete_action">HAPUS %1$s</string>
     <string name="whatsapp_delete_confirm_title">Hapus file WhatsApp yang dipilih?</string>
     <plurals name="whatsapp_delete_confirm_message">
-        <item quantity="other">File %1$d yang menggunakan %2$s akan dihapus secara permanen. Hal ini tidak dapat dibatalkan.</item>
+        <item quantity="other">File: %1$d. Ukuran: %2$s.</item>
     </plurals>
     <string name="device_center_title">Pusat Perangkat</string>
     <string name="device_center_live_status">Status perangkat langsung</string>
@@ -308,9 +316,15 @@
     <string name="message_own_cache_cleared">%1$s dari cache Smart Cleaner telah dihapus.</string>
     <string name="message_whatsapp_not_found">Tidak ditemukan folder Media WhatsApp atau WhatsApp Business yang didukung di penyimpanan bersama.</string>
     <string name="privacy_policy_body_v050">Smart Cleaner menganalisis metadata file penyimpanan bersama yang dapat diakses dan, bila diperlukan untuk deteksi duplikat, sidik jari konten pada perangkat. Sidik jari mesin yang lebih bersih dan file pribadi ini tidak diunggah oleh Smart Cleaner.\n\nASemua akses file diminta karena manajemen dan pemeliharaan file adalah fitur inti: memindai dan mengelola sampah, duplikat, file besar, unduhan, penginstal APK, dan media WhatsApp di seluruh penyimpanan bersama. Android terus memblokir direktori data pribadi aplikasi lain yang dilindungi. \n\nAkses Penggunaan bersifat opsional dan digunakan untuk membaca statistik penyimpanan/cache aplikasi dan stempel waktu yang terakhir digunakan. Pengelola Cache Aplikasi memanggil tindakan sistem pembersihan cache resmi Android dan Android mengontrol konfirmasi yang diperlukan. \n\nIklan Seluler Google dan platform izin dapat memproses pengidentifikasi iklan, diagnostik, dan pilihan izin berdasarkan kebijakan Google. File dihapus hanya setelah pemilihan pengguna atau konfirmasi sistem Android. \n\nSmart Cleaner tidak menyertakan layanan pelaporan kerusakan pihak ketiga. Nama file, jalur, konten file, dan sidik jari duplikat tidak diunggah untuk pelaporan kerusakan. \n\nSmart Cleaner menyimpan preferensi dan riwayat pemindaian/pembersihan agregat hanya di penyimpanan aplikasi lokal hingga Anda menghapus data aplikasi atau menghapus instalan aplikasi. File yang Anda hapus secara eksplisit akan dihapus melalui Android dan tidak dapat dipulihkan oleh Smart Cleaner. Google menyimpan data yang diprosesnya berdasarkan kebijakan yang dipublikasikan.\n\nSDK Google Mobile Ads memproses alamat IP (untuk memperkirakan lokasi), ID iklan atau ID set aplikasi, interaksi aplikasi, dan data diagnostik untuk menampilkan iklan. Aplikasi ini tidak mengirim nama atau isi file maupun istilah pencarian ke luar perangkat.</string>
-    <string name="reason_large_file">File besar • umur : %1$d d</string>
-    <string name="reason_temporary_file">Artefak sementara/tidak lengkap • %1$d berumur hari</string>
-    <string name="reason_thumbnail_cache">Bukan foto asli: cache thumbnail yang dapat dibuat ulang • %1$d berumur beberapa hari</string>
+    <plurals name="reason_large_file">
+        <item quantity="other">File besar • Usia dalam hari: %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="other">Sisa file sementara • Usia dalam hari: %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="other">Bukan foto asli: cache pratinjau • Usia dalam hari: %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">WhatsApp berbagi media — tinjau sebelum dihapus</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner menganalisis penyimpanan bersama yang dapat diakses di perangkat, menerapkan aturan pembersihan konservatif, memverifikasi duplikat yang tepat berdasarkan konten, dan membiarkan file buatan pengguna tidak dipilih kecuali penghapusan jelas aman.</string>
     <string name="scan_focus_downloads">Unduhan</string>
@@ -386,10 +400,10 @@
     </plurals>
     <string name="smart_cleanup_confirm_title">Bersihkan item yang dipilih?</string>
     <plurals name="smart_cleanup_confirm_body">
-        <item quantity="other">Anda memilih %1$s di item %2$d. Tinjau rincian di bawah sebelum melanjutkan.</item>
+        <item quantity="other">Ukuran: %1$s. Item: %2$d.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">Anda memilih file dan mengonfirmasi penghapusannya. Penghapusan tidak dapat dibatalkan. Android mungkin meminta konfirmasi tambahan untuk media yang dilindungi.</string>
-    <string name="smart_cleanup_confirm_action">Bersih dipilih</string>
+    <string name="smart_cleanup_confirm_warning">Anda memilih file dan mengonfirmasi penghapusannya. Penghapusan tidak dapat dibatalkan.</string>
+    <string name="smart_cleanup_confirm_action">Bersihkan yang dipilih</string>
     <string name="smart_storage_preview_note">Menampilkan hingga %1$d dari file terbesar yang ditemukan dalam kategori ini. Analisis penyimpanan tidak memilih file-file ini untuk dibersihkan secara otomatis.</string>
     <string name="smart_storage_preview_empty">Tidak ada file yang dapat dipratinjau yang diambil untuk kategori ini.</string>
     <string name="smart_included_in_cleanup">Termasuk dalam pembersihan</string>
@@ -450,7 +464,7 @@
     <string name="storage_review_limit_note">Kategori yang sangat besar mencapai batas tampilan keamanan. Perbaiki folder atau jalankan analisis lagi setelah dibersihkan.</string>
     <string name="storage_review_delete_title">Hapus file penyimpanan yang dipilih?</string>
     <plurals name="storage_review_delete_body">
-        <item quantity="other">Anda memilih file %1$d menggunakan %2$s. Tinjau contoh di bawah sebelum melanjutkan.</item>
+        <item quantity="other">File: %1$d. Ukuran: %2$s.</item>
     </plurals>
     <string name="storage_review_delete_warning">Ini adalah file pilihan pengguna, bukan sampah otomatis. Penghapusan tidak dapat dibatalkan.</string>
     <string name="whatsapp_scanning_short">Pemindaian media cerdas</string>
@@ -531,10 +545,12 @@
     <string name="smart_unused_apps_separate_note">Penghapusan aplikasi terpisah dari total tombol Bersihkan dan selalu menggunakan layar pencopotan pemasangan Android.</string>
     <string name="smart_unused_apps_dialog_title">Tinjauan aplikasi yang tidak digunakan</string>
     <string name="smart_unused_apps_dialog_note">Hanya aplikasi dengan waktu penggunaan terakhir yang diketahui minimal 60 hari yang ditampilkan. Tidak ada yang dihapus secara otomatis.</string>
-    <string name="smart_unused_apps_last_used">Terakhir digunakan %1$d beberapa hari yang lalu</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="other">Terakhir digunakan • Hari berlalu: %1$d</item>
+    </plurals>
     <string name="premium_cleanup_confirm_title">Hapus file yang dipilih?</string>
     <plurals name="premium_cleanup_confirm_body">
-        <item quantity="other">Anda memilih item %1$d menggunakan %2$s. Lanjutkan hanya jika Anda ingin file-file ini dihapus.</item>
+        <item quantity="other">File: %1$d. Ukuran: %2$s.</item>
     </plurals>
     <string name="premium_cleanup_irreversible">File yang dipilih akan dihapus secara permanen. Hal ini tidak dapat dibatalkan.</string>
     <string name="premium_cleanup_confirm_action">Ya, lanjutkan</string>
@@ -593,7 +609,9 @@
     <string name="home_last_cleanup_now">Baru saja</string>
     <string name="home_last_cleanup_minutes">%1$d menit yang lalu</string>
     <string name="home_last_cleanup_hours">%1$d jam yang lalu</string>
-    <string name="home_last_cleanup_days">%1$d hari yang lalu</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="other">Pembersihan terakhir • Hari berlalu: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">Saran cerdas</string>
     <string name="home_different_tools_title">Lebih banyak alat</string>
     <string name="home_suggestion_empty">Tidak ada saran prioritas saat ini</string>

@@ -156,12 +156,21 @@
     <string name="category_app_cache_description">Sichere temporäre App-Dateien</string>
     <string name="category_whatsapp">WhatsApp-Medien</string>
     <string name="category_whatsapp_description">Status und gesendete Medien, die älter als 30 Tage sind. WhatsApp Cleaner zeigt alle WhatsApp-Medien an.</string>
-    <string name="reason_old_installer">%1$d-Tage altes Installationspaket</string>
+    <plurals name="reason_old_installer">
+        <item quantity="one">Installationspaket • Alter in Tagen: %1$d</item>
+        <item quantity="other">Installationspaket • Alter in Tagen: %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">Heruntergeladenes Installationspaket</string>
-    <string name="reason_old_screenshot">%1$d-Tage alter Screenshot</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="one">Screenshot • Alter in Tagen: %1$d</item>
+        <item quantity="other">Screenshot • Alter in Tagen: %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">Screenshot • Nur Rezension</string>
     <string name="reason_large_video">%1$d-Tage altes großes Video</string>
-    <string name="reason_old_download">In Downloads für %1$d Tage</string>
+    <plurals name="reason_old_download">
+        <item quantity="one">Zeit in Downloads • Alter in Tagen: %1$d</item>
+        <item quantity="other">Zeit in Downloads • Alter in Tagen: %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">Der Fingerabdruck des Inhalts stimmt genau überein</string>
     <string name="reason_sampled_duplicate">Wahrscheinliches Duplikat: gleiche Größe und passende Proben. Nicht vollständig überprüft – vor dem Löschen vergleichen.</string>
     <string name="reason_probable_duplicate">Größe und Inhalt der Muster stimmen überein</string>
@@ -171,7 +180,10 @@
     <string name="cache_item_path">App-Cache</string>
     <string name="reason_safe_cache">Sichere temporäre Dateien</string>
     <string name="reason_whatsapp_status">Temporäre WhatsApp-Statusdatei</string>
-    <string name="reason_whatsapp_sent">Gesendete Medienkopie von %1$d vor Tagen; Vor dem Löschen überprüfen</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="one">Gesendete Medienkopie; vor dem Löschen prüfen • Alter in Tagen: %1$d</item>
+        <item quantity="other">Gesendete Medienkopie; vor dem Löschen prüfen • Alter in Tagen: %1$d</item>
+    </plurals>
     <string name="unnamed_file">Unbenannte Datei</string>
     <string name="back">Zurück</string>
     <string name="cancel">Abbrechen</string>
@@ -214,8 +226,8 @@
     <string name="whatsapp_delete_action">%1$s LÖSCHEN</string>
     <string name="whatsapp_delete_confirm_title">Ausgewählte WhatsApp-Dateien löschen?</string>
     <plurals name="whatsapp_delete_confirm_message">
-        <item quantity="one">Die %1$d-Datei mit %2$s wird dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.</item>
-        <item quantity="other">%1$d-Dateien, die %2$s verwenden, werden dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.</item>
+        <item quantity="one">Dateien: %1$d. Größe: %2$s.</item>
+        <item quantity="other">Dateien: %1$d. Größe: %2$s.</item>
     </plurals>
     <string name="device_center_title">Gerätecenter</string>
     <string name="device_center_live_status">Live-Gerätestatus</string>
@@ -313,9 +325,18 @@
     <string name="message_own_cache_cleared">%1$s des Smart Cleaner-Cache wurde entfernt.</string>
     <string name="message_whatsapp_not_found">Im freigegebenen Speicher wurde kein unterstützter WhatsApp- oder WhatsApp Business-Medienordner gefunden.</string>
     <string name="privacy_policy_body_v050">Smart Cleaner analysiert zugängliche Dateimetadaten im gemeinsam genutzten Speicher und, wenn für die Duplikaterkennung erforderlich, Fingerabdrücke von Inhalten auf dem Gerät. Diese Cleaner-Engine-Fingerabdrücke und persönlichen Dateien werden nicht von Smart Cleaner hochgeladen.\n\nDer Zugriff auf alle Dateien ist erforderlich, da Dateiverwaltung und -wartung Kernfunktionen sind: Scannen und Verwalten von Junk, Duplikaten, großen Dateien, Downloads, APK-Installationsprogrammen und WhatsApp-Medien im gemeinsam genutzten Speicher. Android blockiert weiterhin die geschützten privaten Datenverzeichnisse anderer Apps.\n\nDer Nutzungszugriff ist optional und wird zum Lesen von App-Speicher-/Cache-Statistiken und zuletzt verwendeten Zeitstempeln verwendet. App Cache Manager ruft die offizielle Aktion des Cache-Reinigungssystems von Android auf und Android steuert die erforderliche Bestätigung.\n\nGoogle Mobile Ads und die Einwilligungsplattform können Werbekennungen, Diagnosen und Einwilligungsoptionen gemäß den Google-Richtlinien verarbeiten. Dateien werden erst nach Auswahl durch den Benutzer oder einer Android-Systembestätigung entfernt.\n\nSmart Cleaner beinhaltet keinen Absturzmeldedienst eines Drittanbieters. Dateinamen, Pfade, Dateiinhalte und doppelte Fingerabdrücke werden nicht zur Absturzberichterstattung hochgeladen.\n\nSmart Cleaner speichert Einstellungen und den gesamten Scan-/Bereinigungsverlauf nur im lokalen App-Speicher, bis Sie App-Daten löschen oder die App deinstallieren. Dateien, die Sie explizit löschen, werden durch Android entfernt und können nicht durch Smart Cleaner wiederhergestellt werden. Google speichert Daten, die es gemäß seinen veröffentlichten Richtlinien verarbeitet.\n\nDas Google Mobile Ads SDK verarbeitet zur Anzeige von Werbung die IP-Adresse (zur Schätzung des ungefähren Standorts), die Werbe-ID oder App-Set-ID, App-Interaktionen und Diagnosedaten. Die App selbst sendet keine Dateinamen, Dateiinhalte oder Suchbegriffe vom Gerät.</string>
-    <string name="reason_large_file">Große Datei • Alter: %1$d d</string>
-    <string name="reason_temporary_file">Temporäres/unvollständiges Artefakt • %1$d Tage alt</string>
-    <string name="reason_thumbnail_cache">Nicht das Originalfoto: regenerierbarer Miniaturbild-Cache • %1$d Tage alt</string>
+    <plurals name="reason_large_file">
+        <item quantity="one">Große Datei • Alter in Tagen: %1$d</item>
+        <item quantity="other">Große Datei • Alter in Tagen: %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="one">Übrige temporäre Datei • Alter in Tagen: %1$d</item>
+        <item quantity="other">Übrige temporäre Datei • Alter in Tagen: %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="one">Nicht das Originalfoto: Vorschau-Cache • Alter in Tagen: %1$d</item>
+        <item quantity="other">Nicht das Originalfoto: Vorschau-Cache • Alter in Tagen: %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">Geteilte Medien WhatsApp – vor dem Löschen prüfen</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner analysiert den zugänglichen gemeinsamen Speicher auf dem Gerät, wendet konservative Bereinigungsregeln an, überprüft exakte Duplikate nach Inhalt und lässt vom Benutzer erstellte Dateien nicht ausgewählt, es sei denn, das Löschen ist eindeutig sicher.</string>
     <string name="scan_focus_downloads">Downloads</string>
@@ -392,11 +413,11 @@
     </plurals>
     <string name="smart_cleanup_confirm_title">Ausgewählte Elemente bereinigen?</string>
     <plurals name="smart_cleanup_confirm_body">
-        <item quantity="one">Sie haben %1$s im %2$d-Artikel ausgewählt. Sehen Sie sich die Aufschlüsselung unten an, bevor Sie fortfahren.</item>
-        <item quantity="other">Sie haben %1$s in den %2$d-Artikeln ausgewählt. Sehen Sie sich die Aufschlüsselung unten an, bevor Sie fortfahren.</item>
+        <item quantity="one">Größe: %1$s. Elemente: %2$d.</item>
+        <item quantity="other">Größe: %1$s. Elemente: %2$d.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">Sie wählen die Dateien aus und bestätigen das Löschen. Das Löschen kann nicht rückgängig gemacht werden. Android kann eine zusätzliche Bestätigung für geschützte Medien anzeigen.</string>
-    <string name="smart_cleanup_confirm_action">Sauber ausgewählt</string>
+    <string name="smart_cleanup_confirm_warning">Sie wählen die Dateien aus und bestätigen das Löschen. Das Löschen kann nicht rückgängig gemacht werden.</string>
+    <string name="smart_cleanup_confirm_action">Auswahl bereinigen</string>
     <string name="smart_storage_preview_note">Es werden bis zu %1$d der größten in dieser Kategorie gefundenen Dateien angezeigt. Die Speicheranalyse wählt diese Dateien nicht automatisch zur Bereinigung aus.</string>
     <string name="smart_storage_preview_empty">Für diese Kategorie wurden keine vorschaubaren Dateien erfasst.</string>
     <string name="smart_included_in_cleanup">In der Reinigung enthalten</string>
@@ -459,8 +480,8 @@
     <string name="storage_review_limit_note">Eine sehr große Kategorie erreichte die Sicherheitsanzeigegrenze. Verfeinern Sie den Ordner oder führen Sie die Analyse nach der Bereinigung erneut aus.</string>
     <string name="storage_review_delete_title">Ausgewählte Speicherdateien löschen?</string>
     <plurals name="storage_review_delete_body">
-        <item quantity="one">Sie haben die Datei %1$d mit %2$s ausgewählt. Lesen Sie es unten, bevor Sie fortfahren.</item>
-        <item quantity="other">Sie haben %1$d-Dateien mit %2$s ausgewählt. Sehen Sie sich die folgenden Beispiele an, bevor Sie fortfahren.</item>
+        <item quantity="one">Dateien: %1$d. Größe: %2$s.</item>
+        <item quantity="other">Dateien: %1$d. Größe: %2$s.</item>
     </plurals>
     <string name="storage_review_delete_warning">Dabei handelt es sich um vom Benutzer ausgewählte Dateien, nicht um automatischen Müll. Der Löschvorgang kann nicht rückgängig gemacht werden.</string>
     <string name="whatsapp_scanning_short">Intelligenter Medienscan</string>
@@ -545,11 +566,14 @@
     <string name="smart_unused_apps_separate_note">Das Entfernen der App ist unabhängig von der Schaltfläche „Reinigen“ und erfolgt immer über den Deinstallationsbildschirm von Android.</string>
     <string name="smart_unused_apps_dialog_title">Unbenutzte App-Rezension</string>
     <string name="smart_unused_apps_dialog_note">Es werden nur Apps angezeigt, deren letzte Nutzung seit mindestens 60 Tagen bekannt ist. Nichts wird automatisch entfernt.</string>
-    <string name="smart_unused_apps_last_used">Zuletzt verwendet %1$d vor Tagen</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="one">Zuletzt verwendet • Vergangene Tage: %1$d</item>
+        <item quantity="other">Zuletzt verwendet • Vergangene Tage: %1$d</item>
+    </plurals>
     <string name="premium_cleanup_confirm_title">Ausgewählte Dateien löschen?</string>
     <plurals name="premium_cleanup_confirm_body">
-        <item quantity="one">Sie haben den Artikel %1$d mit %2$s ausgewählt. Fahren Sie nur fort, wenn Sie möchten, dass diese Datei entfernt wird.</item>
-        <item quantity="other">Sie haben %1$d-Artikel mit %2$s ausgewählt. Fahren Sie nur fort, wenn Sie möchten, dass diese Dateien entfernt werden.</item>
+        <item quantity="one">Dateien: %1$d. Größe: %2$s.</item>
+        <item quantity="other">Dateien: %1$d. Größe: %2$s.</item>
     </plurals>
     <string name="premium_cleanup_irreversible">Ausgewählte Dateien werden dauerhaft entfernt. Dies kann nicht rückgängig gemacht werden.</string>
     <string name="premium_cleanup_confirm_action">Ja, weiter</string>
@@ -612,7 +636,10 @@
     <string name="home_last_cleanup_now">Gerade eben</string>
     <string name="home_last_cleanup_minutes">%1$d vor einer Minute</string>
     <string name="home_last_cleanup_hours">%1$d vor h</string>
-    <string name="home_last_cleanup_days">%1$d vor d</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="one">Letzte Bereinigung • Vergangene Tage: %1$d</item>
+        <item quantity="other">Letzte Bereinigung • Vergangene Tage: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">Intelligente Vorschläge</string>
     <string name="home_different_tools_title">Weitere Werkzeuge</string>
     <string name="home_suggestion_empty">Im Moment gibt es keinen vorrangigen Vorschlag</string>

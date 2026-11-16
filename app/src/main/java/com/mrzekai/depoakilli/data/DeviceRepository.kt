@@ -552,7 +552,9 @@ class DeviceRepository(
                 AiAssessment(
                     category = CleanCategory.LARGE_FILE,
                     safetyScore = 60,
-                    reasonRes = R.string.reason_large_file,
+                    reasonRes = 0,
+                    reasonPluralRes = R.plurals.reason_large_file,
+                    reasonQuantity = ageDays(file.modifiedAtMillis).coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                     reasonArgs = listOf(ageDays(file.modifiedAtMillis)),
                     recommended = false,
                 )

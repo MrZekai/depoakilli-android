@@ -564,7 +564,7 @@ private fun SmartResultsContent(
                 FilePreviewDialog(
                     file = item.toSmartPreview(),
                     selected = item.selected,
-                    reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    reason = assessmentReason(item.assessment),
                     onToggleSelection = { onToggleItem(item.id) },
                     onDismiss = { previewItemId = null },
                 )
@@ -819,7 +819,7 @@ private fun SmartResultsContent(
             FilePreviewDialog(
                 file = item.toSmartPreview(),
                 selected = item.selected,
-                reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                reason = assessmentReason(item.assessment),
                 onToggleSelection = { onToggleItem(item.id) },
                 onDismiss = { previewItemId = null },
             )
@@ -1187,8 +1187,9 @@ private fun UnusedAppsReviewDialog(
                                     Column(Modifier.weight(1f)) {
                                         Text(app.label, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(
-                                            stringResource(
-                                                R.string.smart_unused_apps_last_used,
+                                            pluralStringResource(
+                                                R.plurals.smart_unused_apps_last_used,
+                                                daysSinceLastUse(app.lastUsedMillis).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
                                                 daysSinceLastUse(app.lastUsedMillis),
                                             ),
                                             color = SmartTextSecondary,
@@ -2033,7 +2034,7 @@ private fun CategoryGridItem(
                     fontSize = 10.sp,
                 )
                 Text(
-                    stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    assessmentReason(item.assessment),
                     color = Color(0xFFBFD0EA),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

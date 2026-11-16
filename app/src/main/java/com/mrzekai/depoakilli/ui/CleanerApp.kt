@@ -938,7 +938,7 @@ private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    assessmentReason(item.assessment),
                     style = MaterialTheme.typography.labelSmall,
                     color = ElectricBlue,
                     maxLines = 2,
