@@ -933,4 +933,5 @@
         <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
         <item quantity="other">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
     </plurals>
+    <string name="cache_none_found">Uygulama önbelleği bulunamadı</string>
 </resources>

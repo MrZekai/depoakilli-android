@@ -969,4 +969,5 @@
         <item quantity="many">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
         <item quantity="other">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
     </plurals>
+    <string name="cache_none_found">Nessuna cache delle app trovata</string>
 </resources>

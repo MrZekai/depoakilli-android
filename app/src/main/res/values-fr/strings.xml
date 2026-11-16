@@ -969,4 +969,5 @@
         <item quantity="many">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
         <item quantity="other">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
     </plurals>
+    <string name="cache_none_found">Aucun cache d’appli trouvé</string>
 </resources>
