@@ -434,7 +434,7 @@ private fun ScanPill(icon: ImageVector, textRes: Int, modifier: Modifier) {
             Text(
                 stringResource(textRes),
                 color = Color.White,
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -812,7 +812,7 @@ private fun MoreItemsCard(
         ) {
             Text("+$remaining", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
             Spacer(Modifier.height(5.dp))
-            Text(stringResource(R.string.whatsapp_view_all), color = accent, fontSize = 10.sp)
+            Text(stringResource(R.string.whatsapp_view_all), color = accent, fontSize = 12.sp)
         }
     }
 }
@@ -887,7 +887,7 @@ private fun WhatsAppMediaCard(
                     Text(
                         ByteFormatter.format(item.sizeBytes),
                         color = Color.White,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp),
                     )
@@ -905,14 +905,14 @@ private fun WhatsAppMediaCard(
                 Text(
                     localDate(item.modifiedAtMillis),
                     color = WaTextSecondary,
-                    fontSize = 9.sp,
+                    fontSize = 12.sp,
                     maxLines = 1,
                 )
                 if (!compact) {
                     Text(
                         stringResource(if (item.selected) R.string.whatsapp_included else R.string.whatsapp_not_included),
                         color = if (item.selected) WhatsAppGreen else WaAmber,
-                        fontSize = 9.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                     )
@@ -1108,7 +1108,7 @@ private fun WhatsAppCleanupFooter(
                     Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = WhatsAppGreen, modifier = Modifier.size(25.dp))
                     Spacer(Modifier.width(7.dp))
                     Column {
-                        Text(stringResource(R.string.whatsapp_selected_size), color = WaTextSecondary, fontSize = 9.sp)
+                        Text(stringResource(R.string.whatsapp_selected_size), color = WaTextSecondary, fontSize = 12.sp)
                         Text(ByteFormatter.format(selectedBytes), color = WhatsAppGreen, fontWeight = FontWeight.Black, fontSize = 18.sp)
                         Text(
                             if (selectedCount > 0) {
@@ -1117,7 +1117,7 @@ private fun WhatsAppCleanupFooter(
                                 stringResource(R.string.nothing_selected_hint)
                             },
                             color = WaTextSecondary,
-                            fontSize = 9.sp,
+                            fontSize = 12.sp,
                         )
                     }
                 }
@@ -1143,16 +1143,17 @@ private fun WhatsAppCleanupFooter(
                         .padding(horizontal = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                    val actionContent = if (enabled) ContrastTokens.OnBrightAction else Color.White
+                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = actionContent, modifier = Modifier.size(24.dp))
                     Spacer(Modifier.width(8.dp))
                     Text(
                         stringResource(if (inProgress) R.string.whatsapp_cleanup_in_progress else R.string.whatsapp_review_and_clean),
-                        color = Color.White,
+                        color = actionContent,
                         fontWeight = FontWeight.Black,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(1f),
                     )
-                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Color.White)
+                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = actionContent)
                 }
             }
         }
@@ -1266,7 +1267,7 @@ private fun WhatsAppPreviewDialog(
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(ByteFormatter.format(item.sizeBytes), color = groupAccent(uiGroupOf(item)), fontWeight = FontWeight.Black)
-                                Text(localDate(item.modifiedAtMillis), color = WaTextSecondary, fontSize = 10.sp)
+                                Text(localDate(item.modifiedAtMillis), color = WaTextSecondary, fontSize = 12.sp)
                             }
                         }
 

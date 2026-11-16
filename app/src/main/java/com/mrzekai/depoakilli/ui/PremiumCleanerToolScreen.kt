@@ -679,7 +679,7 @@ private fun PremiumHeroStat(value: String, label: String, modifier: Modifier = M
     Surface(modifier = modifier, color = Color(0x55020A19), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(horizontal = 9.dp, vertical = 8.dp)) {
             Text(value, color = Color.White, fontWeight = FontWeight.Black)
-            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 9.sp)
+            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 12.sp)
         }
     }
 }
@@ -772,7 +772,7 @@ private fun PremiumToolSectionCard(
                             Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Text("+${section.items.size - 4}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
                                 Spacer(Modifier.height(5.dp))
-                                Text(stringResource(R.string.whatsapp_view_all), color = section.accent, fontSize = 10.sp)
+                                Text(stringResource(R.string.whatsapp_view_all), color = section.accent, fontSize = 12.sp)
                             }
                         }
                     }
@@ -823,12 +823,12 @@ private fun PremiumToolItemCard(
                     colors = CheckboxDefaults.colors(checkedColor = accent, uncheckedColor = Color.White, checkmarkColor = Color.White),
                 )
                 Surface(modifier = Modifier.align(Alignment.BottomStart).padding(6.dp), color = Color(0xCC020713), shape = RoundedCornerShape(9.dp)) {
-                    Text(ByteFormatter.format(item.sizeBytes), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp))
+                    Text(ByteFormatter.format(item.sizeBytes), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp))
                 }
             }
             Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
-                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 9.sp, maxLines = 1)
+                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 12.sp, maxLines = 1)
                 // This card is a removable extra copy. Name the protected
                 // original instead of a label that read as if this file were
                 // the original (QA v43 #07).
@@ -836,7 +836,7 @@ private fun PremiumToolItemCard(
                     Text(
                         stringResource(R.string.premium_duplicate_copy_of, original),
                         color = ToolGreen,
-                        fontSize = 9.sp,
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -939,7 +939,7 @@ private fun PremiumToolBottomAction(
                 border = BorderStroke(1.dp, accent.copy(alpha = .35f)),
             ) {
                 Column(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalArrangement = Arrangement.Center) {
-                    Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 10.sp)
+                    Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 12.sp)
                     Text(ByteFormatter.format(selectedBytes), color = accent, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     Text(
                         if (selectedCount > 0) {
@@ -948,7 +948,7 @@ private fun PremiumToolBottomAction(
                             stringResource(R.string.nothing_selected_hint)
                         },
                         color = ToolTextSecondary,
-                        fontSize = 9.sp,
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -965,14 +965,14 @@ private fun PremiumToolBottomAction(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (cleanupInProgress) {
-                            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.dp)
+                            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = ContrastTokens.OnBrightAction, strokeWidth = 2.dp)
                         } else {
-                            Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = Color.White)
+                            Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = ContrastTokens.OnBrightAction)
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.whatsapp_review_and_clean), color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                        Text(stringResource(R.string.whatsapp_review_and_clean), color = ContrastTokens.OnBrightAction, fontWeight = FontWeight.Black, fontSize = 17.sp)
                         Spacer(Modifier.width(8.dp))
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Color.White)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = ContrastTokens.OnBrightAction)
                     }
                 }
             }
@@ -1029,7 +1029,7 @@ private fun PremiumToolPreviewDialog(
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(ByteFormatter.format(item.sizeBytes), color = accent, fontWeight = FontWeight.Black)
-                                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 10.sp)
+                                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 12.sp)
                             }
                         }
 
