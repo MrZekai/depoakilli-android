@@ -1701,11 +1701,6 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(stringResource(R.string.smart_cleanup_confirm_warning), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
             }
         },
@@ -1753,11 +1748,6 @@ private fun CleanupItemsConfirmationDialog(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(
                     stringResource(R.string.smart_cleanup_confirm_warning),
                     style = MaterialTheme.typography.labelSmall,
@@ -2551,11 +2541,6 @@ private fun StorageCleanupConfirmationDialog(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(
                     stringResource(R.string.storage_review_delete_warning),
                     style = MaterialTheme.typography.labelSmall,

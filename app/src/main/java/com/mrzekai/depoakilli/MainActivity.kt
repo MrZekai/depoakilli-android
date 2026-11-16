@@ -212,11 +212,11 @@ class MainActivity : ComponentActivity() {
         val prefs = getSharedPreferences("review_prompt", MODE_PRIVATE)
         val now = System.currentTimeMillis()
         if (now - prefs.getLong("last_asked", 0L) < REVIEW_PROMPT_INTERVAL_MILLIS) return
-        prefs.edit().putLong("last_asked", now).apply()
         reviewPromptInFlight = true
         val manager = ReviewManagerFactory.create(this)
         manager.requestReviewFlow().addOnCompleteListener { request ->
             if (request.isSuccessful && !isFinishing && !isDestroyed) {
+                prefs.edit().putLong("last_asked", now).apply()
                 manager.launchReviewFlow(this, request.result)
                     .addOnCompleteListener { reviewPromptInFlight = false }
             } else {

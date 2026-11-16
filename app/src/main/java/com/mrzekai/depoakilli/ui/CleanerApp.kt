@@ -635,7 +635,7 @@ fun CleanerApp(
 
                     dismissResultAndReturn()
 
-                    if (eligibleForNaturalBreakAd) onCleanupSucceeded()
+                    if (eligibleForNaturalBreakAd && result.failedCount == 0) onCleanupSucceeded()
                     if (eligibleForNaturalBreakAd && !resultAdPresented) {
                         onCleanupResultDismissed()
                     }
