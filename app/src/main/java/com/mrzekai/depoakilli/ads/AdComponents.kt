@@ -193,6 +193,23 @@ class InterstitialAdController(
             loadedAtElapsed > 0L &&
             SystemClock.elapsedRealtime() - loadedAtElapsed < INTERSTITIAL_TTL_MILLIS
 
+    /** True only when a full-screen ad would really be shown now (policy, host and a fresh ad). */
+    fun canShowNow(
+        activity: Activity,
+        trigger: InterstitialTrigger,
+        dwellMillis: Long = Long.MAX_VALUE,
+    ): Boolean {
+        val host = resumedActivity
+        return adsAllowed &&
+            !isShowing &&
+            host != null &&
+            host === activity &&
+            !host.isFinishing &&
+            !host.isDestroyed &&
+            isFresh() &&
+            AdPolicy.canShowInterstitial(frequency.load(), System.currentTimeMillis(), trigger, dwellMillis)
+    }
+
     fun showAtNaturalBreak(
         activity: Activity,
         trigger: InterstitialTrigger = InterstitialTrigger.CLEANUP_DONE,

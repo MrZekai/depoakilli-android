@@ -196,7 +196,37 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /** Home/Recents pressed by the user; screens the app opens itself do not call this. */
+    // Every screen the app opens itself (system settings, permission pages,
+    // cache dialog, uninstall, share, email, Play review, ad activities) passes
+    // through one of these, so the return from it never shows an app open ad.
+    override fun startActivity(intent: android.content.Intent?, options: Bundle?) {
+        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
+        super.startActivity(intent, options)
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
+    override fun startActivityForResult(intent: android.content.Intent, requestCode: Int, options: Bundle?) {
+        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
+        super.startActivityForResult(intent, requestCode, options)
+    }
+
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
+    override fun startIntentSenderForResult(
+        intent: android.content.IntentSender,
+        requestCode: Int,
+        fillInIntent: android.content.Intent?,
+        flagsMask: Int,
+        flagsValues: Int,
+        extraFlags: Int,
+        options: Bundle?,
+    ) {
+        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
+        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
+    }
+
+    /** Home/Recents pressed by the user; ignored right after the app opened a screen itself. */
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         if (::appOpenAds.isInitialized) appOpenAds.onUserLeftApp()
@@ -271,6 +301,7 @@ class MainActivity : ComponentActivity() {
         manager.requestReviewFlow().addOnCompleteListener { request ->
             if (request.isSuccessful && !isFinishing && !isDestroyed) {
                 prefs.edit().putLong("last_asked", now).apply()
+                if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
                 manager.launchReviewFlow(this, request.result)
                     .addOnCompleteListener { reviewPromptInFlight = false }
             } else {
@@ -289,6 +320,12 @@ class MainActivity : ComponentActivity() {
             return
         }
         val app = application as DepoAkilliApplication
+        // Only cover the screen when an ad will really be shown; otherwise the
+        // banner and native ads stay as they are (no blink, no reload).
+        if (!interstitialAds.canShowNow(this, trigger, dwellMillis)) {
+            onFinished()
+            return
+        }
 
         // Short neutral settle surface prevents the cleanup-confirm tap from
         // carrying into a suddenly appearing full-screen ad.

@@ -84,8 +84,21 @@ class AppOpenAdController(
         poll()
     }
 
-    /** The user pressed Home or opened Recents (not a screen the app started). */
+    private var appStartedScreen = false
+
+    /**
+     * The app is about to open another screen itself (settings, permissions,
+     * cache dialog, uninstall, Play review, share, an ad). Android may still
+     * report a "user leave hint" for it, so the next return never shows an ad.
+     */
+    fun onAppStartingScreen() {
+        appStartedScreen = true
+        leftByUserAtElapsed = 0L
+    }
+
+    /** The user pressed Home or opened Recents. Ignored after the app opened a screen itself. */
     fun onUserLeftApp() {
+        if (appStartedScreen) return
         leftByUserAtElapsed = SystemClock.elapsedRealtime()
     }
 
@@ -93,6 +106,9 @@ class AppOpenAdController(
     fun onReturnedToForeground(activity: Activity, otherFullScreenActive: Boolean, blocked: Boolean) {
         val leftAt = leftByUserAtElapsed
         leftByUserAtElapsed = 0L
+        val fromAppScreen = appStartedScreen
+        appStartedScreen = false
+        if (fromAppScreen) return
         if (leftAt == 0L || coldStartPending || showing) return
         if (SystemClock.elapsedRealtime() - leftAt < MIN_BACKGROUND_MILLIS) return
         if (!adsAllowed || otherFullScreenActive || blocked) return

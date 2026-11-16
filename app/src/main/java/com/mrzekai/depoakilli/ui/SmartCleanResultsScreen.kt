@@ -39,6 +39,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.shape.CircleShape
@@ -264,6 +265,7 @@ internal fun SmartCleanResultsScreen(
             onOpenPlanGrid = onOpenPlanGrid,
             deepCheckRunning = state.deepCheckRunning,
             onDeepCheck = onDeepCheck,
+            listAd = listAd,
         )
     }
 }
@@ -617,6 +619,7 @@ private fun SmartResultsContent(
     onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit,
     deepCheckRunning: Boolean,
     onDeepCheck: () -> Unit,
+    listAd: @Composable () -> Unit,
 ) {
     var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
@@ -644,6 +647,7 @@ private fun SmartResultsContent(
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
             modifier = modifier,
+            gridAd = listAd,
         )
         previewItemId?.let { itemId ->
             summary.items.firstOrNull { it.id == itemId }?.let { item ->
@@ -1089,6 +1093,7 @@ private fun CategoryDetailPage(
     onPreview: (CleanableItem) -> Unit,
     onCleanSelected: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
+    gridAd: @Composable () -> Unit = {},
 ) {
     var confirmCleanup by remember { mutableStateOf(false) }
     val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
@@ -1194,7 +1199,21 @@ private fun CategoryDetailPage(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                gridItems(displayItems, key = CleanableItem::id) { item ->
+                val beforeAd = displayItems.take(LIST_AD_AFTER_ITEMS)
+                val afterAd = displayItems.drop(LIST_AD_AFTER_ITEMS)
+                gridItems(beforeAd, key = CleanableItem::id) { item ->
+                    CategoryGridItem(
+                        item = item,
+                        accent = accent,
+                        onPreview = { onPreview(item) },
+                        onToggle = { onToggleItem(item.id) },
+                    )
+                }
+                // One full-width native ad after the 12th file (T1B.4), only in longer grids.
+                if (afterAd.isNotEmpty()) {
+                    item(key = "category-list-native", span = { GridItemSpan(maxLineSpan) }) { gridAd() }
+                }
+                gridItems(afterAd, key = CleanableItem::id) { item ->
                     CategoryGridItem(
                         item = item,
                         accent = accent,
@@ -2360,3 +2379,5 @@ private fun fileVisual(mimeType: String, name: String): ImageVector {
         else -> Icons.Outlined.InsertDriveFile
     }
 }
+
+private const val LIST_AD_AFTER_ITEMS = 12

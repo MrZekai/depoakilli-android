@@ -126,6 +126,15 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
     ABOUT(R.string.about_app),
 }
 
+/** Screens whose use counts for the return-from-tool interstitial (T1B.3 b). */
+private val TOOL_SCREENS = setOf(
+    DetailScreen.CLEAN_RESULTS,
+    DetailScreen.WHATSAPP,
+    DetailScreen.APP_CACHE,
+    DetailScreen.APP_MANAGER,
+    DetailScreen.STORAGE_CHANGE,
+)
+
 private enum class AccessDisclosure {
     ALL_FILES,
     USAGE_ACCESS,
@@ -174,18 +183,20 @@ fun CleanerApp(
         }
     }
     val snackbarHostState = remember { SnackbarHostState() }
-    // Trigger (b): time spent on a tool/detail screen before returning to Clean.
+    // Trigger (b): time spent on a tool screen before returning to the Clean or
+    // Tools tab. Settings, privacy, terms and about pages never count.
     var detailEnteredAt by remember { mutableStateOf(0L) }
-    LaunchedEffect(detailScreen, selectedTabIndex) {
-        val onCleanTab = detailScreen == null && selectedTabIndex == AppTab.HOME.ordinal
-        if (detailScreen != null && detailEnteredAt == 0L) {
-            detailEnteredAt = android.os.SystemClock.elapsedRealtime()
-        } else if (onCleanTab && detailEnteredAt > 0L) {
-            val dwell = android.os.SystemClock.elapsedRealtime() - detailEnteredAt
-            detailEnteredAt = 0L
-            if (state.cleanupResult == null && !state.cleanupInProgress && !state.scanning) onReturnedToClean(dwell)
-        } else if (detailScreen == null) {
-            detailEnteredAt = 0L
+    LaunchedEffect(detailScreen) {
+        val toolScreen = detailScreen in TOOL_SCREENS
+        when {
+            toolScreen && detailEnteredAt == 0L ->
+                detailEnteredAt = android.os.SystemClock.elapsedRealtime()
+            detailScreen == null && detailEnteredAt > 0L -> {
+                val dwell = android.os.SystemClock.elapsedRealtime() - detailEnteredAt
+                detailEnteredAt = 0L
+                if (state.cleanupResult == null && !state.cleanupInProgress && !state.scanning) onReturnedToClean(dwell)
+            }
+            !toolScreen -> detailEnteredAt = 0L
         }
     }
 
@@ -352,7 +363,11 @@ fun CleanerApp(
                     accessDisclosure == null &&
                     !fullScreenAdActive &&
                     !appOpenCoverVisible &&
-                    !state.scanning &&
+                    // No banner next to the swipe-review break card (it has its own native ad).
+                    state.swipeReviewGroup?.let { state.swipeStates[it]?.breakPending } != true &&
+                    // Quick plan update on the Clean tab keeps the banner; other scans hide it.
+                    (!state.scanning ||
+                        (detailScreen == null && state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0)) &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
                     !state.cleanupInProgress &&

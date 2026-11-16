@@ -1,6 +1,8 @@
 package com.mrzekai.depoakilli.ui.review
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -95,67 +97,77 @@ internal fun SwipeReviewScreen(
             }
         }
 
-        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-            val currentItem = review.currentId?.let(byId::get)
-            when {
-                review.breakPending -> BreakCard(
+        if (review.breakPending) {
+            // Break card: scrollable so the ad is never clipped; no other
+            // buttons on screen while it is shown.
+            Column(
+                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+            ) {
+                BreakCard(
                     reviewed = review.reviewedCount,
                     markedBytes = review.markedBytes,
                     onContinue = onContinue,
                     adContent = breakCardContent,
                 )
-                currentItem != null -> SwipeCard(item = currentItem, onMark = onMark)
-                else -> Text(
-                    pluralStringResource(
-                        R.plurals.swipe_marked,
-                        marked.size,
-                        marked.size,
-                        ByteFormatter.format(review.markedBytes),
-                    ),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
             }
-        }
+        } else {
 
-        Text(
-            pluralStringResource(
-                R.plurals.swipe_marked,
-                marked.size,
-                marked.size,
-                ByteFormatter.format(review.markedBytes),
-            ),
-            color = SwipeSecondary,
-        )
-        if (review.currentId != null) {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button(
-                    onClick = { onMark(true) },
-                    modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = Color.White),
-                ) { Text(stringResource(R.string.swipe_delete), fontWeight = FontWeight.Black) }
-                Button(
-                    onClick = { onMark(false) },
-                    modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SwipeGreen, contentColor = SwipeButtonText),
-                ) { Text(stringResource(R.string.swipe_keep), fontWeight = FontWeight.Black) }
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                val currentItem = review.currentId?.let(byId::get)
+                when {
+                    currentItem != null -> SwipeCard(item = currentItem, onMark = onMark)
+                    else -> Text(
+                        pluralStringResource(
+                            R.plurals.swipe_marked,
+                            marked.size,
+                            marked.size,
+                            ByteFormatter.format(review.markedBytes),
+                        ),
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            OutlinedButton(
-                onClick = onUndo,
-                enabled = review.reviewedCount > 0,
-                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Text(stringResource(R.string.swipe_undo)) }
-            OutlinedButton(
-                onClick = {
-                    removedFromPreview = emptySet()
-                    showPreview = true
-                },
-                enabled = marked.isNotEmpty(),
-                modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Text(stringResource(R.string.swipe_finish)) }
+
+            Text(
+                pluralStringResource(
+                    R.plurals.swipe_marked,
+                    marked.size,
+                    marked.size,
+                    ByteFormatter.format(review.markedBytes),
+                ),
+                color = SwipeSecondary,
+            )
+            if (review.currentId != null) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Button(
+                        onClick = { onMark(true) },
+                        modifier = Modifier.weight(1f).heightIn(min = 56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = Color.White),
+                    ) { Text(stringResource(R.string.swipe_delete), fontWeight = FontWeight.Black) }
+                    Button(
+                        onClick = { onMark(false) },
+                        modifier = Modifier.weight(1f).heightIn(min = 56.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeGreen, contentColor = SwipeButtonText),
+                    ) { Text(stringResource(R.string.swipe_keep), fontWeight = FontWeight.Black) }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedButton(
+                    onClick = onUndo,
+                    enabled = review.reviewedCount > 0,
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                ) { Text(stringResource(R.string.swipe_undo)) }
+                OutlinedButton(
+                    onClick = {
+                        removedFromPreview = emptySet()
+                        showPreview = true
+                    },
+                    enabled = marked.isNotEmpty(),
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
+                ) { Text(stringResource(R.string.swipe_finish)) }
+            }
         }
     }
 

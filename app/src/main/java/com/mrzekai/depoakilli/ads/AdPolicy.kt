@@ -15,7 +15,8 @@ data class AdFrequencyState(
     val cleanupsCompleted: Int = 0,
 )
 
-enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN, SWIPE_FINISH }
+/** (a) result closed with Done (also after swipe review); (b) back from a tool screen. */
+enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN }
 
 /**
  * Every ad limit lives here (starting values; easy to tighten). Ads are only
