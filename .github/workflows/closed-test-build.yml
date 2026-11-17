@@ -15,6 +15,14 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v7
 
+      - name: Read app version from Gradle
+        run: |
+          code="$(grep -oP 'versionCode = \K\d+' app/build.gradle.kts)"
+          name="$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts | head -n 1)"
+          test -n "$code" && test -n "$name"
+          echo "VERSION_CODE=$code" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$name" >> "$GITHUB_ENV"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
@@ -91,8 +99,8 @@ jobs:
         run: |
           rm -rf closed-test-artifacts
           mkdir -p closed-test-artifacts/aab closed-test-artifacts/apk closed-test-artifacts/diagnostics/legal
-          cp app/build/outputs/bundle/closedTest/app-closedTest.aab closed-test-artifacts/aab/SmartCleaner-ClosedTest-v50.aab
-          cp app/build/outputs/apk/closedTest/app-closedTest.apk closed-test-artifacts/apk/SmartCleaner-ClosedTest-v50.apk
+          cp app/build/outputs/bundle/closedTest/app-closedTest.aab closed-test-artifacts/aab/SmartCleaner-ClosedTest-v${VERSION_CODE}.aab
+          cp app/build/outputs/apk/closedTest/app-closedTest.apk closed-test-artifacts/apk/SmartCleaner-ClosedTest-v${VERSION_CODE}.apk
           cp app/build/outputs/mapping/closedTest/mapping.txt closed-test-artifacts/diagnostics/mapping.txt
           cp -R app/build/reports/closed-test-binary-audit/. closed-test-artifacts/diagnostics/binary-audit/
           find app/build/reports -maxdepth 1 -type f -name 'lint-results-*' -exec cp {} closed-test-artifacts/diagnostics/ \;
@@ -107,23 +115,23 @@ jobs:
       - name: Upload Play closed-test AAB
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-PLAY-CLOSED-TEST-AAB-v50
-          path: closed-test-artifacts/aab/SmartCleaner-ClosedTest-v50.aab
+          name: SmartCleaner-PLAY-CLOSED-TEST-AAB-v${{ env.VERSION_CODE }}
+          path: closed-test-artifacts/aab/SmartCleaner-ClosedTest-v${{ env.VERSION_CODE }}.aab
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload closed-test install APK
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-CLOSED-TEST-APK-v50
-          path: closed-test-artifacts/apk/SmartCleaner-ClosedTest-v50.apk
+          name: SmartCleaner-CLOSED-TEST-APK-v${{ env.VERSION_CODE }}
+          path: closed-test-artifacts/apk/SmartCleaner-ClosedTest-v${{ env.VERSION_CODE }}.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Upload closed-test diagnostics
         uses: actions/upload-artifact@v6
         with:
-          name: SmartCleaner-ClosedTest-Diagnostics-v50
+          name: SmartCleaner-ClosedTest-Diagnostics-v${{ env.VERSION_CODE }}
           path: closed-test-artifacts/diagnostics/
           if-no-files-found: error
           retention-days: 30

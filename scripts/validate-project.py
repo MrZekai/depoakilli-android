@@ -176,13 +176,20 @@ for forbidden in (
 # Build / production-vs-QA AdMob contract.
 # ------------------------------------------------------------------
 build_file = read("app/build.gradle.kts")
+# T3.6: version constants come from Gradle, not from this script.
+_version_code = re.search(r"versionCode = (\d+)", build_file)
+_version_name = re.search(r'versionName = "([^"]+)"', build_file)
+if not _version_code or not _version_name:
+    errors.append("versionCode/versionName missing in app/build.gradle.kts")
+VERSION_CODE = _version_code.group(1) if _version_code else "?"
+VERSION_NAME = _version_name.group(1) if _version_name else "?"
 for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 50",
-    'versionName = "1.0.4"',
+    f"versionCode = {VERSION_CODE}",
+    f'versionName = "{VERSION_NAME}"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -1277,10 +1284,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v50",
-    "SmartCleaner-CLOSED-TEST-APK-v50",
-    "SmartCleaner-ClosedTest-Diagnostics-v50",
-    "SmartCleaner-ClosedTest-v50.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-CLOSED-TEST-APK-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-ClosedTest-Diagnostics-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-ClosedTest-v${{ env.VERSION_CODE }}.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1289,8 +1296,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "1.0.4",
-    "versionCode='50'",
+    "EXPECTED_VERSION_NAME",
+    "versionCode='$EXPECTED_VERSION_CODE'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1316,15 +1323,15 @@ for expected in (
     "lintRelease",
     "bundleRelease assembleRelease",
     "scripts/verify-release-aab.sh",
-    "SmartCleaner-PLAY-PRODUCTION-AAB-v50",
-    "SmartCleaner-PRODUCTION-APK-v50",
+    "SmartCleaner-PLAY-PRODUCTION-AAB-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-PRODUCTION-APK-v${{ env.VERSION_CODE }}",
 ):
     if expected not in release_workflow:
         errors.append(f"missing production workflow invariant: {expected}")
 
 release_verifier = read("scripts/verify-release-aab.sh")
 for expected in (
-    "versionCode='50'",
+    "versionCode='$EXPECTED_VERSION_CODE'",
     "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
     "ca-app-pub-1380972808968213~9043355268",
     "ca-app-pub-1380972808968213/2118175647",
@@ -1562,10 +1569,18 @@ for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
         if resource_name in default_plurals:
             errors.append(f"{resource_name} is a plural; use pluralStringResource in {kotlin_file.relative_to(ROOT)}")
 
+# T3.6: every workflow names its artifacts from the Gradle version.
+for workflow in (".github/workflows/android-ci.yml", ".github/workflows/closed-test-build.yml", ".github/workflows/release-aab.yml"):
+    workflow_text = read(workflow)
+    if "Read app version from Gradle" not in workflow_text or "-v50" in workflow_text:
+        errors.append(f"{workflow} must read the version from app/build.gradle.kts")
+if "validate-translations.py" not in read(".github/workflows/android-ci.yml"):
+    errors.append("android-ci.yml must run scripts/validate-translations.py")
+
 if errors:
     print("Project validation failed:", file=sys.stderr)
     for error in errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.4 (50) production + QA invariants are valid.")
+print(f"Smart Cleaner v{VERSION_NAME} ({VERSION_CODE}) production + QA invariants are valid.")
