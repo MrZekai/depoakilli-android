@@ -689,4 +689,6 @@
     <string name="plan_biggest_folders">Dossiers les plus volumineux</string>
     <string name="plan_largest_apps">Applis les plus volumineuses</string>
     <string name="plan_largest_apps_access">Autorisez l’accès aux données d’utilisation pour voir les applis qui prennent le plus de place</string>
+    <string name="result_next_group">Ensuite : %1$s · %2$s</string>
+    <string name="result_review_next">Vérifier</string>
 </resources>

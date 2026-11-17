@@ -659,4 +659,6 @@
     <string name="plan_biggest_folders">En büyük klasörler</string>
     <string name="plan_largest_apps">En büyük uygulamalar</string>
     <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
+    <string name="result_next_group">Sıradaki: %1$s · %2$s</string>
+    <string name="result_review_next">İncele</string>
 </resources>

@@ -689,4 +689,6 @@
     <string name="plan_biggest_folders">Cartelle più grandi</string>
     <string name="plan_largest_apps">App più grandi</string>
     <string name="plan_largest_apps_access">Consenti l’accesso all’utilizzo per vedere quali app occupano più spazio</string>
+    <string name="result_next_group">Prossimo: %1$s · %2$s</string>
+    <string name="result_review_next">Controlla</string>
 </resources>

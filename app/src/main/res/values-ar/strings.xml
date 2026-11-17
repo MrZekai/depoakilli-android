@@ -825,4 +825,6 @@
     <string name="plan_biggest_folders">أكبر المجلدات</string>
     <string name="plan_largest_apps">أكبر التطبيقات</string>
     <string name="plan_largest_apps_access">اسمح بالوصول إلى بيانات الاستخدام لمعرفة التطبيقات التي تستهلك أكبر مساحة</string>
+    <string name="result_next_group">التالي: %1$s · %2$s</string>
+    <string name="result_review_next">مراجعة</string>
 </resources>

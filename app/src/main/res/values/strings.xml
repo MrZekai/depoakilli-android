@@ -659,4 +659,6 @@
     <string name="plan_biggest_folders">Biggest folders</string>
     <string name="plan_largest_apps">Largest apps</string>
     <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
+    <string name="result_next_group">Next: %1$s · %2$s</string>
+    <string name="result_review_next">Review</string>
 </resources>

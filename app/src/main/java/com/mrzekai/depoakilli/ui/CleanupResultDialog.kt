@@ -48,6 +48,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.PlanGroup
 import com.mrzekai.depoakilli.ads.CleanupResultAdSurface
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
@@ -63,6 +64,8 @@ internal fun CleanupResultDialog(
     onDone: (resultAdPresented: Boolean) -> Unit,
     onUndo: () -> Unit = {},
     onEmptyTrash: () -> Unit = {},
+    nextReview: PlanGroup? = null,
+    onReviewNext: () -> Unit = {},
 ) {
     var resultAdPresented by remember(result) { mutableStateOf(false) }
     var confirmEmptyTrash by remember { mutableStateOf(false) }
@@ -292,6 +295,29 @@ internal fun CleanupResultDialog(
                         lineHeight = 15.sp,
                         textAlign = TextAlign.Center,
                     )
+
+                    // V9: the biggest group still left in the plan, above "Done".
+                    val nextGroup = nextReview?.group
+                    if (nextReview != null && nextGroup != null) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                stringResource(
+                                    R.string.result_next_group,
+                                    stringResource(nextGroup.titleRes),
+                                    ByteFormatter.format(nextReview.bytes),
+                                ),
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f),
+                            )
+                            OutlinedButton(onClick = onReviewNext, modifier = Modifier.heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.result_review_next))
+                            }
+                        }
+                    }
 
                     Button(
                         onClick = { onDone(resultAdPresented) },

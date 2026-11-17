@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd
 import com.mrzekai.depoakilli.ads.ListNativeAdCard
@@ -733,6 +734,24 @@ fun CleanerApp(
                 },
                 onUndo = viewModel::undoCleanup,
                 onEmptyTrash = { viewModel.emptyTrash(result.trashEntryIds) },
+                nextReview = if (result.kind == CleanupResultKind.FILES && state.scanFocus == ScanFocus.SMART) {
+                    state.summary.plan.review.firstOrNull { it.bytes >= CleaningThresholds.GROUP_MIN_BYTES }
+                } else {
+                    null
+                },
+                onReviewNext = {
+                    val next = state.summary.plan.review.firstOrNull()
+                    dismissResultAndReturn()
+                    val group = next?.group
+                    if (next != null && group != null) {
+                        if (group in com.mrzekai.depoakilli.ui.review.SwipeReviewState.SWIPE_GROUPS) {
+                            viewModel.openSwipeReview(group)
+                        } else {
+                            viewModel.openPlanGroupGrid(group, next.items)
+                        }
+                        detailScreen = DetailScreen.CLEAN_RESULTS
+                    }
+                },
                 onDone = { resultAdPresented ->
                     val eligibleForNaturalBreakAd =
                         result.operationSucceeded &&

@@ -607,4 +607,6 @@
     <string name="plan_biggest_folders">Folder terbesar</string>
     <string name="plan_largest_apps">Aplikasi terbesar</string>
     <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
+    <string name="result_next_group">Berikutnya: %1$s · %2$s</string>
+    <string name="result_review_next">Tinjau</string>
 </resources>

@@ -647,4 +647,6 @@
     <string name="plan_biggest_folders">Größte Ordner</string>
     <string name="plan_largest_apps">Größte Apps</string>
     <string name="plan_largest_apps_access">Erlauben Sie den Nutzungszugriff, um zu sehen, welche Apps am meisten Platz belegen</string>
+    <string name="result_next_group">Als Nächstes: %1$s · %2$s</string>
+    <string name="result_review_next">Prüfen</string>
 </resources>
