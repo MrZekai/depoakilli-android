@@ -197,8 +197,12 @@ fun CleanerApp(
 
     fun navigateBackInApp() {
         when {
-            detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null -> {
+                val fromFolder = state.storageReview.folder != null
                 viewModel.closeStorageReview()
+                // A folder opens from the Clean tab; going back returns there.
+                if (fromFolder && state.scanFocus == ScanFocus.SMART) detailScreen = null
+            }
             detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null -> {
                 viewModel.closeSwipeReview()
                 detailScreen = null
@@ -254,8 +258,10 @@ fun CleanerApp(
                                 scanFocusTitleRes(state.scanFocus)
                             else -> detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
                         }
+                        val folderTitle = state.storageReview.folder?.name
+                            ?.takeIf { detailScreen == DetailScreen.CLEAN_RESULTS }
                         Text(
-                            stringResource(titleRes),
+                            folderTitle ?: stringResource(titleRes),
                             fontWeight = FontWeight.Black,
                         )
                     },
@@ -555,6 +561,11 @@ fun CleanerApp(
                                 detailScreen = DetailScreen.CLEAN_RESULTS
                             },
                             onDeepCheck = onDeepDuplicateCheck,
+                            onOpenFolder = { folder ->
+                                viewModel.openFolderReview(folder)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onOpenAppInfo = onOpenAppInfo,
                             reviewAd = { index ->
                                 val plan = displayState.summary.plan
                                 val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +

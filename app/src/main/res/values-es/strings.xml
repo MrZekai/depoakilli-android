@@ -656,4 +656,7 @@
     <string name="plan_worth_a_look_amount">%1$s para revisar</string>
     <string name="plan_review_action">Revisar %1$s</string>
     <string name="plan_small_review">Grupos más pequeños para revisar</string>
+    <string name="plan_biggest_folders">Carpetas más grandes</string>
+    <string name="plan_largest_apps">Apps más grandes</string>
+    <string name="plan_largest_apps_access">Permite el acceso de uso para ver qué apps ocupan más espacio</string>
 </resources>

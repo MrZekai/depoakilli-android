@@ -604,4 +604,7 @@
     <string name="plan_worth_a_look_amount">%1$s layak dicek</string>
     <string name="plan_review_action">Tinjau %1$s</string>
     <string name="plan_small_review">Grup kecil untuk dicek</string>
+    <string name="plan_biggest_folders">Folder terbesar</string>
+    <string name="plan_largest_apps">Aplikasi terbesar</string>
+    <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
 </resources>

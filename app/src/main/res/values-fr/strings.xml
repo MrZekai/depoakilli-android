@@ -686,4 +686,7 @@
     <string name="plan_worth_a_look_amount">%1$s à vérifier</string>
     <string name="plan_review_action">Vérifier %1$s</string>
     <string name="plan_small_review">Petits groupes à vérifier</string>
+    <string name="plan_biggest_folders">Dossiers les plus volumineux</string>
+    <string name="plan_largest_apps">Applis les plus volumineuses</string>
+    <string name="plan_largest_apps_access">Autorisez l’accès aux données d’utilisation pour voir les applis qui prennent le plus de place</string>
 </resources>

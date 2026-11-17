@@ -656,4 +656,7 @@
     <string name="plan_worth_a_look_amount">%1$s göz atmaya değer</string>
     <string name="plan_review_action">%1$s incele</string>
     <string name="plan_small_review">Kontrol edilecek küçük gruplar</string>
+    <string name="plan_biggest_folders">En büyük klasörler</string>
+    <string name="plan_largest_apps">En büyük uygulamalar</string>
+    <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
 </resources>

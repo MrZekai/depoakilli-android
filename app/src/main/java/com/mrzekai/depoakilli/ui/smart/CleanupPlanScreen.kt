@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanupPlan
+import com.mrzekai.depoakilli.model.FolderSize
+import com.mrzekai.depoakilli.model.InstalledAppEntry
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.model.PlanGroup
 
 internal val PlanCard = Color(0xFF0A1C42)
@@ -82,6 +85,11 @@ internal fun LazyListScope.cleanupPlanItems(
     deepCheck: Pair<Int, Long> = 0 to 0L,
     deepCheckRunning: Boolean = false,
     onDeepCheck: () -> Unit = {},
+    biggestFolders: List<FolderSize> = emptyList(),
+    onOpenFolder: (FolderSize) -> Unit = {},
+    largestApps: List<InstalledAppEntry>? = null,
+    onOpenAppInfo: (String) -> Unit = {},
+    onRequestUsageAccess: () -> Unit = {},
 ) {
     item(key = "plan-card") {
         RecommendedCleanupCard(
@@ -107,6 +115,32 @@ internal fun LazyListScope.cleanupPlanItems(
             },
             onClick = onClearAppCaches,
         )
+    }
+    // V8: the biggest user apps; each row only opens Android's App info screen.
+    if (largestApps == null) {
+        item(key = "plan-system-largest-apps-access") {
+            SystemStepRow(
+                title = stringResource(R.string.plan_largest_apps),
+                detail = stringResource(R.string.plan_largest_apps_access),
+                onClick = onRequestUsageAccess,
+            )
+        }
+    } else if (largestApps.isNotEmpty()) {
+        item(key = "plan-system-largest-apps-title") {
+            Text(
+                stringResource(R.string.plan_largest_apps),
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp),
+            )
+        }
+        items(largestApps, key = { "largest-app-" + it.packageName }) { app ->
+            SystemStepRow(
+                title = app.label,
+                detail = ByteFormatter.format(app.totalBytes),
+                onClick = { onOpenAppInfo(app.packageName) },
+            )
+        }
     }
     if (unusedAppCount != null) {
         item(key = "plan-system-unused") {
@@ -139,6 +173,22 @@ internal fun LazyListScope.cleanupPlanItems(
                 pluralStringResource(R.plurals.plan_truncated, limit, limit),
                 color = Color(0xFFFFC46B),
                 fontSize = 13.sp,
+            )
+        }
+    }
+    // V7: where the space is, folder by folder (opens a review list, nothing selected).
+    if (biggestFolders.isNotEmpty()) {
+        item(key = "plan-folders-title") { PlanSectionTitle(stringResource(R.string.plan_biggest_folders)) }
+        items(biggestFolders, key = { "folder-" + it.volumeRoot + "/" + it.relativePath }) { folder ->
+            SystemStepRow(
+                title = folder.name,
+                detail = bidiWrap(folder.relativePath) + " • " + pluralStringResource(
+                    R.plurals.whatsapp_category_summary,
+                    folder.fileCount,
+                    folder.fileCount,
+                    ByteFormatter.format(folder.bytes),
+                ),
+                onClick = { onOpenFolder(folder) },
             )
         }
     }

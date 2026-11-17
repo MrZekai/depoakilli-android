@@ -133,8 +133,19 @@ data class StorageReviewItem(
     val id: String get() = file.uri
 }
 
+/** One of the biggest folders (V7); [relativePath] is relative to [volumeRoot]. */
+data class FolderSize(
+    val volumeRoot: String,
+    val relativePath: String,
+    val name: String,
+    val bytes: Long,
+    val fileCount: Int,
+)
+
 data class StorageReviewSummary(
     val type: StorageFileType? = null,
+    /** Set when the review shows one folder instead of one file type (V7). */
+    val folder: FolderSize? = null,
     val excludeWhatsAppMedia: Boolean = false,
     val items: List<StorageReviewItem> = emptyList(),
     val scannedFileCount: Int = 0,
@@ -284,6 +295,7 @@ data class ScanSummary(
     val storagePreviews: Map<StorageFileType, List<IndexedFile>> = emptyMap(),
     val smartMediaTypes: List<StorageTypeStat> = emptyList(),
     val truncated: Boolean = false,
+    val biggestFolders: List<FolderSize> = emptyList(),
 ) {
     /** Cleanup plan derived from [items]; always reflects the current selection. */
     val plan: CleanupPlan by lazy(LazyThreadSafetyMode.NONE) { buildPlan(items, truncated) }

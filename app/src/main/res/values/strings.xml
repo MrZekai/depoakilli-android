@@ -656,4 +656,7 @@
     <string name="plan_worth_a_look_amount">%1$s worth a look</string>
     <string name="plan_review_action">Review %1$s</string>
     <string name="plan_small_review">Smaller groups to check</string>
+    <string name="plan_biggest_folders">Biggest folders</string>
+    <string name="plan_largest_apps">Largest apps</string>
+    <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
 </resources>

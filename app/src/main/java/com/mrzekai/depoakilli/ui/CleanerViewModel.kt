@@ -16,6 +16,7 @@ import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
+import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanFocus
@@ -1019,6 +1020,58 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private fun isWhatsAppIndexedPath(relativePath: String): Boolean =
         StoragePathRules.isWhatsAppPath(relativePath)
 
+    /** Opens one of the biggest folders as a review list; nothing is selected (V7). */
+    fun openFolderReview(folder: FolderSize) {
+        if (!repository.hasAllFilesAccess()) {
+            _state.update {
+                it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
+            }
+            return
+        }
+        storageReviewJob?.cancel()
+        val reviewGeneration = ++storageReviewGeneration
+        _state.update {
+            it.copy(
+                storageReview = StorageReviewSummary(type = StorageFileType.OTHER, folder = folder, loading = true),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+                message = null,
+            )
+        }
+        storageReviewJob = viewModelScope.launch {
+            runSuspendCatching {
+                repository.scanFolderReview(folder) { directories, files ->
+                    _state.update { state ->
+                        if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                            state.copy(storageReviewProgressDirectories = directories, storageReviewProgressFiles = files)
+                        } else {
+                            state
+                        }
+                    }
+                }
+            }.onSuccess { review ->
+                _state.update { state ->
+                    if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                        state.copy(storageReview = review)
+                    } else {
+                        state
+                    }
+                }
+            }.onFailure {
+                _state.update { state ->
+                    if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                        state.copy(
+                            storageReview = state.storageReview.copy(loading = false),
+                            message = getApplication<Application>().getString(R.string.message_scan_failed),
+                        )
+                    } else {
+                        state
+                    }
+                }
+            }
+        }
+    }
+
     fun closeStorageReview() {
         storageReviewGeneration++
         storageReviewJob?.cancel()
@@ -1045,7 +1098,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun toggleAllStorageReviewItems() {
-        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES) return
+        // Personal media and whole folders are never selected all at once.
+        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES || _state.value.storageReview.folder != null) return
         _state.update { state ->
             val items = state.storageReview.items
             val select = items.any { !it.selected }
@@ -1461,7 +1515,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
             val deletedUris = deletedFiles.mapTo(hashSetOf()) { it.uri }
             val remainingSmartItems = state.summary.items.filterNot { it.uri in deletedUris }
-            val reviewType = state.storageReview.type
+            // A folder review mixes file types: type statistics are left as they are.
+            val reviewType = state.storageReview.type.takeIf { state.storageReview.folder == null }
+            val reviewFolder = state.storageReview.folder
             val deletedStorageBytes = deletedFiles.sumOf { it.sizeBytes }
             val deletedStorageCount = deletedFiles.size
             val updatedStorageTypes = state.summary.storageTypes.map { stat ->
@@ -1497,6 +1553,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     smartMediaTypes = updatedSmartMediaTypes,
                     storagePreviews = state.summary.storagePreviews.mapValues { (_, files) ->
                         files.filterNot { it.uri in deletedUris }
+                    },
+                    biggestFolders = state.summary.biggestFolders.map { folder ->
+                        if (folder == reviewFolder) {
+                            folder.copy(
+                                bytes = (folder.bytes - deletedStorageBytes).coerceAtLeast(0L),
+                                fileCount = (folder.fileCount - deletedStorageCount).coerceAtLeast(0),
+                            )
+                        } else {
+                            folder
+                        }
                     },
                 ),
                 dashboardCleanableBytes = remainingSmartItems

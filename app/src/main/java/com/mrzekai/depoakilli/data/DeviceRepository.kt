@@ -31,6 +31,7 @@ import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeleteMode
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
+import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
@@ -383,6 +384,46 @@ class DeviceRepository(
             storagePreviews = storageTypePreviews(indexed),
             smartMediaTypes = smartMediaTypeStats(indexed),
             truncated = truncated,
+            biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
+                FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
+            } else {
+                emptyList()
+            },
+        )
+    }
+
+    /**
+     * Every file in [folder] and below it (V7), largest first. Nothing is
+     * selected; hidden files are left out. The review uses the folder's most
+     * common file type only for its layout.
+     */
+    suspend fun scanFolderReview(
+        folder: FolderSize,
+        onProgress: (Int, Int) -> Unit = { _, _ -> },
+    ): StorageReviewSummary = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess()) return@withContext StorageReviewSummary(folder = folder)
+        val indexed = cachedSharedIndex()?.also { cached -> onProgress(0, cached.size) }
+            ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
+                onProgress(visitedDirectories, discoveredFiles)
+            }.also(::cacheSharedIndex)
+        val inFolder = indexed.filter { file ->
+            FolderSizes.contains(folder, file) && !StoragePathRules.isSystemMarkerFile(file.name)
+        }
+        val dominantType = inFolder.groupBy(::storageFileType)
+            .maxByOrNull { (_, files) -> files.sumOf(IndexedFile::sizeBytes) }
+            ?.key ?: StorageFileType.OTHER
+        val items = inFolder.asSequence()
+            .sortedByDescending(IndexedFile::sizeBytes)
+            .take(storageReviewItemLimit())
+            .map { StorageReviewItem(file = it, selected = false) }
+            .toList()
+        StorageReviewSummary(
+            type = dominantType,
+            folder = folder,
+            items = items,
+            scannedFileCount = inFolder.size,
+            scanLimitReached = inFolder.size > storageReviewItemLimit(),
+            loading = false,
         )
     }
 

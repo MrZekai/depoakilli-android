@@ -67,6 +67,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -99,6 +100,7 @@ import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.IndexedFile
+import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
@@ -184,6 +186,8 @@ internal fun SmartCleanResultsScreen(
     onSwipeFinished: () -> Unit = {},
     listAd: @Composable () -> Unit = {},
     onDeepCheck: () -> Unit = {},
+    onOpenFolder: (FolderSize) -> Unit = {},
+    onOpenAppInfo: (String) -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -248,6 +252,8 @@ internal fun SmartCleanResultsScreen(
             deepCheckRunning = state.deepCheckRunning,
             onDeepCheck = onDeepCheck,
             listAd = listAd,
+            onOpenFolder = onOpenFolder,
+            onOpenAppInfo = onOpenAppInfo,
         )
     }
 }
@@ -602,11 +608,18 @@ private fun SmartResultsContent(
     deepCheckRunning: Boolean,
     onDeepCheck: () -> Unit,
     listAd: @Composable () -> Unit,
+    onOpenFolder: (FolderSize) -> Unit,
+    onOpenAppInfo: (String) -> Unit,
 ) {
     var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
     var showUnusedAppsReview by remember { mutableStateOf(false) }
+
+    // V8: the largest-apps rows need the app list once Usage Access is on.
+    LaunchedEffect(hasUsageAccess) {
+        if (hasUsageAccess && installedApps.isEmpty() && !loadingApps) onRefreshInstalledApps()
+    }
 
     val unusedApps = remember(installedApps, hasUsageAccess) {
         unusedAppsForSmartReview(installedApps, hasUsageAccess)
@@ -721,6 +734,11 @@ private fun SmartResultsContent(
                 deepCheck = deepCheck,
                 deepCheckRunning = deepCheckRunning,
                 onDeepCheck = onDeepCheck,
+                biggestFolders = summary.biggestFolders,
+                onOpenFolder = onOpenFolder,
+                largestApps = if (hasUsageAccess) largestUserApps(installedApps) else null,
+                onOpenAppInfo = onOpenAppInfo,
+                onRequestUsageAccess = onRequestUsageAccess,
             )
         }
 
@@ -1386,7 +1404,7 @@ private fun StorageDetailPage(
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
-                } else if (review.items.isNotEmpty() && type !in PERSONAL_STORAGE_TYPES) {
+                } else if (review.items.isNotEmpty() && type !in PERSONAL_STORAGE_TYPES && review.folder == null) {
                     // Photos, videos and documents are personal: no "Select all" (T2.4).
                     Row(
                         modifier = Modifier
@@ -1983,3 +2001,12 @@ private fun storageTypeVisual(type: StorageFileType): ImageVector = when (type) 
 private const val LIST_AD_AFTER_ITEMS = 12
 
 internal val PERSONAL_STORAGE_TYPES = setOf(StorageFileType.IMAGES, StorageFileType.VIDEOS, StorageFileType.DOCUMENTS)
+
+/** V8: the five biggest apps the user installed (system apps left out). */
+internal fun largestUserApps(apps: List<InstalledAppEntry>, limit: Int = 5): List<InstalledAppEntry> =
+    apps.asSequence()
+        .filterNot(InstalledAppEntry::systemApp)
+        .filter { it.totalBytes > 0L }
+        .sortedByDescending(InstalledAppEntry::totalBytes)
+        .take(limit)
+        .toList()

@@ -732,4 +732,7 @@
     <string name="plan_worth_a_look_amount">%1$s стоит проверить</string>
     <string name="plan_review_action">Проверить %1$s</string>
     <string name="plan_small_review">Небольшие группы для проверки</string>
+    <string name="plan_biggest_folders">Самые большие папки</string>
+    <string name="plan_largest_apps">Самые большие приложения</string>
+    <string name="plan_largest_apps_access">Разрешите доступ к статистике, чтобы увидеть, какие приложения занимают больше всего места</string>
 </resources>

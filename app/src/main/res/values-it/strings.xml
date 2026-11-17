@@ -686,4 +686,7 @@
     <string name="plan_worth_a_look_amount">%1$s da controllare</string>
     <string name="plan_review_action">Controlla %1$s</string>
     <string name="plan_small_review">Gruppi più piccoli da controllare</string>
+    <string name="plan_biggest_folders">Cartelle più grandi</string>
+    <string name="plan_largest_apps">App più grandi</string>
+    <string name="plan_largest_apps_access">Consenti l’accesso all’utilizzo per vedere quali app occupano più spazio</string>
 </resources>

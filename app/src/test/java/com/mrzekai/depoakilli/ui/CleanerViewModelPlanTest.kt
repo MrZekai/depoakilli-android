@@ -116,6 +116,14 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `largest apps are the five biggest user apps`() {
+        val apps = (1..7).map { i ->
+            com.mrzekai.depoakilli.model.InstalledAppEntry("p$i", "App $i", appBytes = i * 100L, systemApp = i == 7)
+        }
+        assertEquals(listOf("p6", "p5", "p4", "p3", "p2"), largestUserApps(apps).map { it.packageName })
+    }
+
+    @Test
     fun `trash days left round up and never go negative`() {
         val day = 86_400_000L
         val entry = com.mrzekai.depoakilli.data.TrashEntry("id", "/a", "/t", 1L, 0L, deletedAtMillis = 0L, group = "")
