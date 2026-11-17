@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -14,6 +15,7 @@ import com.mrzekai.depoakilli.R
  * (weights 600–900). It has no Cyrillic or Arabic letters, so Russian and
  * Arabic use the system font with the same weights.
  */
+@OptIn(ExperimentalTextApi::class)
 private fun archivo(weight: Int) = Font(
     R.font.archivo_variable,
     weight = FontWeight(weight),
