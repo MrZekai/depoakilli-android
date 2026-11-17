@@ -32,6 +32,12 @@ class RawPairFinderTest {
     }
 
     @Test
+    fun `heif counts as a partner`() {
+        val pairs = RawPairFinder.find(listOf(file("IMG_7.dng"), file("IMG_7.HEIF")))
+        assertEquals("IMG_7.HEIF", pairs.values.single())
+    }
+
+    @Test
     fun `no partner means no candidate`() {
         assertTrue(RawPairFinder.find(listOf(file("IMG_9.dng"), file("IMG_9.png"))).isEmpty())
     }

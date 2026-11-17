@@ -4,12 +4,12 @@ import com.mrzekai.depoakilli.model.IndexedFile
 
 /**
  * RAW + JPEG pairs (V5): a .dng file whose photo also exists as .jpg/.jpeg/.heic
- * with the same base name in the same folder. Only the RAW file is offered;
+ * (or .heif) with the same base name in the same folder. Only the RAW file is offered;
  * an unpaired .dng is never a candidate.
  */
 object RawPairFinder {
     private val RAW_EXTENSIONS = setOf("dng")
-    private val PAIR_EXTENSIONS = setOf("jpg", "jpeg", "heic")
+    private val PAIR_EXTENSIONS = setOf("jpg", "jpeg", "heic", "heif")
 
     /** RAW file uri → name of its processed partner. */
     fun find(files: List<IndexedFile>): Map<String, String> {
