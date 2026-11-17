@@ -933,11 +933,16 @@ class DeviceRepository(
     @Suppress("DEPRECATION")
     private fun removeDeletedPathFromMediaStore(absolutePath: String) {
         runCatching {
-            resolver.delete(
-                MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
-                "${MediaStore.MediaColumns.DATA}=?",
-                arrayOf(absolutePath),
-            )
+            // B4: also match rows in Android's trash and pending rows, so a
+            // file deleted from "Already in Android's trash" leaves no ghost
+            // entry in the Gallery trash. Errors are ignored as before.
+            val extras = android.os.Bundle().apply {
+                putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION, "${MediaStore.MediaColumns.DATA}=?")
+                putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(absolutePath))
+                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
+            }
+            resolver.delete(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), extras)
         }
     }
 
