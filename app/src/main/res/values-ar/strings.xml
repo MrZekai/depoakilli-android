@@ -527,13 +527,11 @@
     <string name="result_empty_trash_confirm">هل تريد حذف %1$s نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
     <string name="trash_restore">استعادة</string>
     <string name="trash_delete_forever">حذف نهائي</string>
-    <string name="trash_empty">إفراغ المهملات</string>
     <string name="trash_empty_state">المهملات فارغة</string>
     <string name="scan_stage_exact_copies">جارٍ التحقق من النسخ المتطابقة…</string>
     <string name="tab_trash">المهملات</string>
     <string name="swipe_delete">حذف</string>
     <string name="swipe_keep">الاحتفاظ</string>
-    <string name="swipe_undo">تراجع</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">إنهاء</string>
     <string name="swipe_continue">متابعة</string>

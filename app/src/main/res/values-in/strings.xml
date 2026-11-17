@@ -425,13 +425,11 @@
     <string name="result_empty_trash_confirm">Hapus %1$s secara permanen? Tindakan ini tidak dapat diurungkan.</string>
     <string name="trash_restore">Pulihkan</string>
     <string name="trash_delete_forever">Hapus permanen</string>
-    <string name="trash_empty">Kosongkan Sampah</string>
     <string name="trash_empty_state">Sampah kosong</string>
     <string name="scan_stage_exact_copies">Memeriksa salinan persis…</string>
     <string name="tab_trash">Sampah</string>
     <string name="swipe_delete">HAPUS</string>
     <string name="swipe_keep">SIMPAN</string>
-    <string name="swipe_undo">Urungkan</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Selesai</string>
     <string name="swipe_continue">Lanjutkan</string>

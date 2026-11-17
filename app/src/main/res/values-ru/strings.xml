@@ -486,13 +486,11 @@
     <string name="result_empty_trash_confirm">Удалить %1$s навсегда? Это нельзя отменить.</string>
     <string name="trash_restore">Восстановить</string>
     <string name="trash_delete_forever">Удалить навсегда</string>
-    <string name="trash_empty">Очистить корзину</string>
     <string name="trash_empty_state">Корзина пуста</string>
     <string name="scan_stage_exact_copies">Проверка точных копий…</string>
     <string name="tab_trash">Корзина</string>
     <string name="swipe_delete">УДАЛИТЬ</string>
     <string name="swipe_keep">ОСТАВИТЬ</string>
-    <string name="swipe_undo">Отменить</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Готово</string>
     <string name="swipe_continue">Продолжить</string>

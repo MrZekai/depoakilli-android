@@ -462,13 +462,11 @@
     <string name="result_empty_trash_confirm">%1$s kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
     <string name="trash_restore">Geri yükle</string>
     <string name="trash_delete_forever">Kalıcı olarak sil</string>
-    <string name="trash_empty">Çöpü boşalt</string>
     <string name="trash_empty_state">Çöp boş.</string>
     <string name="scan_stage_exact_copies">Birebir kopyalar kontrol ediliyor…</string>
     <string name="tab_trash">Çöp</string>
     <string name="swipe_delete">SİL</string>
     <string name="swipe_keep">KALSIN</string>
-    <string name="swipe_undo">Geri al</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Bitir</string>
     <string name="swipe_continue">Devam et</string>

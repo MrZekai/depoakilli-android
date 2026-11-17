@@ -455,13 +455,11 @@
     <string name="result_empty_trash_confirm">Excluir %1$s permanentemente? Isso não pode ser desfeito.</string>
     <string name="trash_restore">Restaurar</string>
     <string name="trash_delete_forever">Excluir para sempre</string>
-    <string name="trash_empty">Esvaziar lixeira</string>
     <string name="trash_empty_state">A lixeira está vazia</string>
     <string name="scan_stage_exact_copies">Procurando cópias exatas…</string>
     <string name="tab_trash">Lixeira</string>
     <string name="swipe_delete">EXCLUIR</string>
     <string name="swipe_keep">MANTER</string>
-    <string name="swipe_undo">Desfazer</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Concluir</string>
     <string name="swipe_continue">Continuar</string>

@@ -462,13 +462,11 @@
     <string name="result_empty_trash_confirm">Delete %1$s permanently? This can’t be undone.</string>
     <string name="trash_restore">Restore</string>
     <string name="trash_delete_forever">Delete forever</string>
-    <string name="trash_empty">Empty Trash</string>
     <string name="trash_empty_state">Trash is empty.</string>
     <string name="scan_stage_exact_copies">Checking for exact copies…</string>
     <string name="tab_trash">Trash</string>
     <string name="swipe_delete">DELETE</string>
     <string name="swipe_keep">KEEP</string>
-    <string name="swipe_undo">Undo</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Finish</string>
     <string name="swipe_continue">Continue</string>

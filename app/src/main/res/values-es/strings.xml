@@ -455,13 +455,11 @@
     <string name="result_empty_trash_confirm">¿Eliminar %1$s de forma permanente? No se puede deshacer.</string>
     <string name="trash_restore">Restaurar</string>
     <string name="trash_delete_forever">Eliminar para siempre</string>
-    <string name="trash_empty">Vaciar papelera</string>
     <string name="trash_empty_state">La papelera está vacía</string>
     <string name="scan_stage_exact_copies">Buscando copias exactas…</string>
     <string name="tab_trash">Papelera</string>
     <string name="swipe_delete">ELIMINAR</string>
     <string name="swipe_keep">CONSERVAR</string>
-    <string name="swipe_undo">Deshacer</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Terminar</string>
     <string name="swipe_continue">Continuar</string>

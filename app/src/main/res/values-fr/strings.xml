@@ -465,13 +465,11 @@
     <string name="result_empty_trash_confirm">Supprimer définitivement %1$s ? Cette action est irréversible.</string>
     <string name="trash_restore">Restaurer</string>
     <string name="trash_delete_forever">Supprimer définitivement</string>
-    <string name="trash_empty">Vider la corbeille</string>
     <string name="trash_empty_state">La corbeille est vide</string>
     <string name="scan_stage_exact_copies">Recherche de copies exactes…</string>
     <string name="tab_trash">Corbeille</string>
     <string name="swipe_delete">SUPPRIMER</string>
     <string name="swipe_keep">GARDER</string>
-    <string name="swipe_undo">Annuler</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Terminer</string>
     <string name="swipe_continue">Continuer</string>
