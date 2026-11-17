@@ -60,6 +60,21 @@ internal object StoragePathRules {
     fun isSystemMarkerFile(name: String): Boolean =
         normalizeText(name.trim()).startsWith(".")
 
+    private val SYSTEM_TRASH_NAME = Regex("""^\.trashed-\d+-.+""")
+    private val STALE_PENDING_NAME = Regex("""^\.pending-\d+-.+""")
+
+    /** A file in Android's own MediaStore trash (deleted in Gallery/Files, kept ~30 days). */
+    fun isSystemTrashFile(name: String): Boolean = SYSTEM_TRASH_NAME.matches(name.trim())
+
+    /** A MediaStore write that never finished. */
+    fun isStalePendingFile(name: String): Boolean = STALE_PENDING_NAME.matches(name.trim())
+
+    /** The only hidden files that are indexed and may be deleted (V4). */
+    fun isIndexableHiddenFile(name: String): Boolean = isSystemTrashFile(name) || isStalePendingFile(name)
+
+    /** Hidden files that stay invisible: every dot-file except the two MediaStore patterns. */
+    fun isSkippedHiddenFile(name: String): Boolean = isSystemMarkerFile(name) && !isIndexableHiddenFile(name)
+
     fun isProtectedAppPrivatePath(path: String): Boolean {
         val normalized = normalizePath(path)
         return normalized == "/android/data/" ||

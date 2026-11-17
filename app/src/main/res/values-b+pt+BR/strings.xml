@@ -647,4 +647,6 @@
         <item quantity="other">Tem %1$d dias. Se você excluir, não abrirá na conversa.</item>
     </plurals>
     <string name="plan_group_old_video">Vídeos antigos</string>
+    <string name="plan_group_system_trash">Já na lixeira do Android</string>
+    <string name="reason_system_trash">Você excluiu isto na Galeria ou em Arquivos. O Android remove após cerca de 30 dias; excluir aqui libera o espaço agora.</string>
 </resources>

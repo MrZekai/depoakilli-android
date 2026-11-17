@@ -811,4 +811,7 @@
         <item quantity="other">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
     </plurals>
     <string name="plan_group_old_video">مقاطع فيديو أقدم</string>
+    <string name="plan_group_system_trash">موجودة بالفعل في سلة مهملات Android</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_system_trash">حذفت هذا في المعرض أو الملفات. يزيله Android بعد نحو 30 يومًا؛ حذفه هنا يحرر المساحة الآن.</string>
 </resources>

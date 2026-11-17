@@ -677,4 +677,6 @@
         <item quantity="other">Date de %1$d jours. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
     </plurals>
     <string name="plan_group_old_video">Anciennes vidéos</string>
+    <string name="plan_group_system_trash">Déjà dans la corbeille d’Android</string>
+    <string name="reason_system_trash">Vous l’avez supprimé dans Galerie ou Fichiers. Android l’efface après environ 30 jours ; le supprimer ici libère l’espace tout de suite.</string>
 </resources>

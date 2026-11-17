@@ -310,13 +310,16 @@ class DeviceRepository(
             focus == ScanFocus.DUPLICATES ||
             focus == ScanFocus.MEDIA
         ) {
+            // Files already in Android's trash or unfinished writes are never a
+            // duplicate or a "kept original".
+            val visible = indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) }
             val duplicateSource = if (focus == ScanFocus.MEDIA) {
-                indexed.filter {
+                visible.filter {
                     val mime = StoragePathRules.normalizeText(it.mimeType)
                     mime.startsWith("image/") || mime.startsWith("video/")
                 }
             } else {
-                indexed
+                visible
             }
             duplicateResult = findDuplicates(
                 duplicateSource,
@@ -573,7 +576,7 @@ class DeviceRepository(
         } ?: return@runCatching Removal.Failed(FailureReason.PROTECTED)
         if (
             !isDeletableSharedStorageFile(file) ||
-            StoragePathRules.isSystemMarkerFile(file.name) ||
+            StoragePathRules.isSkippedHiddenFile(file.name) ||
             StoragePathRules.isProtectedUserDataPath(relativeDir, file.name)
         ) {
             return@runCatching Removal.Failed(FailureReason.PROTECTED)
@@ -710,7 +713,8 @@ class DeviceRepository(
                         pending.addLast(root to child)
                     }
                 } else if (child.isFile) {
-                    if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    // Only Android's trash and unfinished-write files are indexed among dot-files (V4).
+                    if (StoragePathRules.isSkippedHiddenFile(child.name)) continue
                     val relative = runCatching { child.parentFile?.relativeTo(root.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
                     if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue

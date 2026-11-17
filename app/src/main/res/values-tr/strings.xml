@@ -647,4 +647,6 @@
         <item quantity="other">%1$d günlük. Silersen sohbette açılmaz.</item>
     </plurals>
     <string name="plan_group_old_video">Eski videolar</string>
+    <string name="plan_group_system_trash">Zaten Android çöpünde</string>
+    <string name="reason_system_trash">Bunu Galeri’de veya Dosyalar’da sildin. Android yaklaşık 30 gün sonra kaldırır; burada silmek yeri hemen açar.</string>
 </resources>

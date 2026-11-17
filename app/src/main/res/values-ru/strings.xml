@@ -722,4 +722,6 @@
         <item quantity="other">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
     </plurals>
     <string name="plan_group_old_video">Старые видео</string>
+    <string name="plan_group_system_trash">Уже в корзине Android</string>
+    <string name="reason_system_trash">Вы удалили это в Галерее или Файлах. Android сотрёт файл примерно через 30 дней; удаление здесь освобождает место сразу.</string>
 </resources>

@@ -635,4 +635,6 @@
         <item quantity="other">%1$d Tage alt. Wenn Sie es löschen, lässt es sich im Chat nicht mehr öffnen.</item>
     </plurals>
     <string name="plan_group_old_video">Ältere Videos</string>
+    <string name="plan_group_system_trash">Bereits im Android-Papierkorb</string>
+    <string name="reason_system_trash">Sie haben dies in Galerie oder Dateien gelöscht. Android entfernt es nach etwa 30 Tagen; hier löschen gibt den Speicher sofort frei.</string>
 </resources>

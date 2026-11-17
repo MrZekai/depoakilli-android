@@ -677,4 +677,6 @@
         <item quantity="other">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
     </plurals>
     <string name="plan_group_old_video">Video meno recenti</string>
+    <string name="plan_group_system_trash">Già nel cestino di Android</string>
+    <string name="reason_system_trash">L’hai eliminato in Galleria o File. Android lo rimuove dopo circa 30 giorni; eliminarlo qui libera subito lo spazio.</string>
 </resources>

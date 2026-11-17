@@ -34,6 +34,20 @@ class AiCleaningEngine(
         // 1. Protected user data is never a candidate.
         if (StoragePathRules.isProtectedUserDataPath(file.relativePath, file.name)) return null
 
+        // 1b. Already in Android's trash (V4): review only, deleted right away.
+        if (StoragePathRules.isSystemTrashFile(file.name)) {
+            return assessment(CleanupGroup.SYSTEM_TRASH, modifiedAgeDays(file))
+        }
+        // 1c. Unfinished MediaStore writes: old ones are temporary junk.
+        if (StoragePathRules.isStalePendingFile(file.name)) {
+            val age = modifiedAgeDays(file)
+            return if (age >= CleaningThresholds.TEMP_DAYS && !path.contains("/android/media/")) {
+                assessment(CleanupGroup.TEMP_FILES, age)
+            } else {
+                null
+            }
+        }
+
         // 2. WhatsApp: review only, never Auto. First match wins (V2).
         if (StoragePathRules.isWhatsAppPath(path)) {
             if (WHATSAPP_NEVER_FOLDERS.any(path::contains)) return null
@@ -343,6 +357,7 @@ class AiCleaningEngine(
 
         fun categoryOf(group: CleanupGroup): CleanCategory = when (group) {
             CleanupGroup.THUMBNAILS,
+            CleanupGroup.SYSTEM_TRASH,
             CleanupGroup.TEMP_FILES,
             CleanupGroup.PARTIAL_DOWNLOADS -> CleanCategory.JUNK
             CleanupGroup.APK_INSTALLED,

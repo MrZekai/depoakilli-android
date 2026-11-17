@@ -647,4 +647,6 @@
         <item quantity="other">Tiene %1$d días. Si lo eliminas, no se abrirá en el chat.</item>
     </plurals>
     <string name="plan_group_old_video">Vídeos antiguos</string>
+    <string name="plan_group_system_trash">Ya en la papelera de Android</string>
+    <string name="reason_system_trash">Lo eliminaste en Galería o Archivos. Android lo borra tras unos 30 días; eliminarlo aquí libera el espacio ahora.</string>
 </resources>

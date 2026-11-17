@@ -55,6 +55,16 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `android trash files are offered for review and old pending writes are junk`() {
+        val trashed = requireNotNull(engine.assess(file(".trashed-1767225600-IMG_1.jpg", "image/jpeg", 3, "DCIM/Camera/")))
+        assertEquals(CleanupGroup.SYSTEM_TRASH, trashed.group)
+        assertFalse(trashed.recommended)
+        assertEquals(com.mrzekai.depoakilli.model.DeleteMode.PERMANENT, CleanupGroup.SYSTEM_TRASH.deleteMode)
+        assertNull(group(file(".pending-1767225600-a.jpg", "image/jpeg", 6, "DCIM/Camera/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file(".pending-1767225600-a.jpg", "image/jpeg", 7, "DCIM/Camera/")))
+    }
+
+    @Test
     fun `older mid-size videos are offered after large old videos`() {
         val cam = "DCIM/Camera/"
         assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 200, cam, 40 * mb)))

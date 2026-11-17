@@ -37,6 +37,7 @@ enum class CleanupGroup(
     DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.PERMANENT),
     THUMBNAILS(R.string.plan_group_thumbnails, 0, R.plurals.reason_thumbnail_cache, true, DeleteMode.PERMANENT),
     TEMP_FILES(R.string.plan_group_temp_files, 0, R.plurals.reason_temporary_file, true, DeleteMode.PERMANENT),
+    SYSTEM_TRASH(R.string.plan_group_system_trash, R.string.reason_system_trash, null, false, DeleteMode.PERMANENT),
     PARTIAL_DOWNLOADS(R.string.plan_group_partial_downloads, 0, R.plurals.reason_partial_download, true, DeleteMode.TRASH),
     APK_OLD_VERSION(R.string.plan_group_apk_old_version, R.string.reason_apk_old_version, null, false, DeleteMode.TRASH),
     APK_OTHER(R.string.plan_group_apk_other, R.string.reason_downloaded_installer, null, false, DeleteMode.TRASH),

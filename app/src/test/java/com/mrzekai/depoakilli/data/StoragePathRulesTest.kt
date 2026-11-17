@@ -27,6 +27,20 @@ class StoragePathRulesTest {
         assertFalse(StoragePathRules.isSystemMarkerFile("IMG_0001.jpg"))
     }
 
+    @Test fun `only MediaStore trash and pending files are exempt from the dot-file rule`() {
+        assertTrue(StoragePathRules.isSystemTrashFile(".trashed-1767225600-IMG_1.jpg"))
+        assertTrue(StoragePathRules.isStalePendingFile(".pending-1767225600-VID_2.mp4"))
+        for (name in listOf(".trashed", ".trashed-abc-x", "trashed-1-x", ".trashed-1-", ".pending", ".pending-x-y")) {
+            assertFalse(name, StoragePathRules.isIndexableHiddenFile(name))
+        }
+        // The deletion gate and the indexer skip everything else that is hidden.
+        assertTrue(StoragePathRules.isSkippedHiddenFile(".nomedia"))
+        assertTrue(StoragePathRules.isSkippedHiddenFile(".thumbdata3--1967290299"))
+        assertTrue(StoragePathRules.isSkippedHiddenFile(".trashed-abc-x"))
+        assertFalse(StoragePathRules.isSkippedHiddenFile(".trashed-1767225600-IMG_1.jpg"))
+        assertFalse(StoragePathRules.isSkippedHiddenFile("IMG_1.jpg"))
+    }
+
     @Test fun `WhatsApp backups and encrypted databases are protected`() {
         assertTrue(StoragePathRules.isProtectedUserDataPath("Android/media/com.whatsapp/WhatsApp/Databases", "msgstore.db.crypt14"))
         assertTrue(StoragePathRules.isProtectedUserDataPath("WhatsApp/Backups", "backup.zip"))

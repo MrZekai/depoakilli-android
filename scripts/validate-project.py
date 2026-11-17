@@ -1419,8 +1419,12 @@ if build_file.count('applicationIdSuffix = ".qa"') != 1:
 # ------------------------------------------------------------------
 if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or 'normalizeText(name.trim()).startsWith(".")' not in storage_path_rules:
     errors.append("hidden dot-files must be recognised by StoragePathRules")
-if repository.count("StoragePathRules.isSystemMarkerFile(") < 3:
+# V4: only Android's trash (.trashed-…) and unfinished writes (.pending-…) are
+# exempt; every other dot-file is skipped by both indexers and refused at deletion.
+if repository.count("StoragePathRules.isSkippedHiddenFile(") < 2 or repository.count("StoragePathRules.isSystemMarkerFile(") < 1:
     errors.append("marker files must be skipped by both indexers and refused at deletion")
+if r'Regex("""^\.trashed-\d+-.+""")' not in storage_path_rules or r'Regex("""^\.pending-\d+-.+""")' not in storage_path_rules:
+    errors.append("only the MediaStore .trashed-/.pending- patterns may be exempt from the dot-file rule")
 if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" in ai_engine:
     errors.append("WhatsApp media and APK installers must never be preselected")
 if "isStillImage(" not in ai_engine:

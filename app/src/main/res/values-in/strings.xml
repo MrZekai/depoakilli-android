@@ -595,4 +595,6 @@
         <item quantity="other">Berusia %1$d hari. Jika dihapus, file tidak akan terbuka di chat.</item>
     </plurals>
     <string name="plan_group_old_video">Video lama</string>
+    <string name="plan_group_system_trash">Sudah di sampah Android</string>
+    <string name="reason_system_trash">Anda menghapus ini di Galeri atau File. Android menghapusnya setelah sekitar 30 hari; menghapusnya di sini mengosongkan ruang sekarang.</string>
 </resources>
