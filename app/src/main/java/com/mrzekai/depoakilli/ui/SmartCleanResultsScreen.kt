@@ -190,6 +190,9 @@ internal fun SmartCleanResultsScreen(
             onOpenFolder = onOpenFolder,
             onOpenAppInfo = onOpenAppInfo,
             onExcludeFolder = onExcludeFolder,
+            sharedFigures = state.planFigures(),
+            autoOpenSuggestion = autoOpenSuggestion,
+            onSuggestionOpened = onSuggestionOpened,
         )
     }
 }
@@ -233,6 +236,9 @@ internal fun SmartResultsContent(
     onOpenFolder: (FolderSize) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit,
+    sharedFigures: PlanFigures? = null,
+    autoOpenSuggestion: Boolean = false,
+    onSuggestionOpened: () -> Unit = {},
 ) {
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
@@ -328,7 +334,7 @@ internal fun SmartResultsContent(
     val deepCheck = remember(summary.items) { PlanSelection.deepCheckCandidates(summary.items) }
     val findingsApps = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps else null
     // C1: the same figures Home reads (no second calculation here).
-    val figures = state.planFigures() ?: PlanFigures.of(plan, findingsApps)
+    val figures = sharedFigures ?: PlanFigures.of(plan, findingsApps)
     // C2: "My pick" asks once through the shared confirmation, list visible on request.
     var suggestConfirm by rememberSaveable { mutableStateOf(false) }
     var suggestShowList by rememberSaveable { mutableStateOf(false) }
@@ -342,7 +348,7 @@ internal fun SmartResultsContent(
         val suggested = plan.suggestedItems
         DeleteConfirmDialog(
             items = suggested,
-            inProgress = state.cleanupInProgress,
+            inProgress = cleanupInProgress,
             initiallyShowAll = suggestShowList,
             onDismiss = {
                 suggestConfirm = false
