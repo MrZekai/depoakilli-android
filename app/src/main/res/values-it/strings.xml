@@ -681,4 +681,10 @@
     <string name="reason_system_trash">L’hai eliminato in Galleria o File. Android lo rimuove dopo circa 30 giorni; eliminarlo qui libera subito lo spazio.</string>
     <string name="plan_group_raw_copy">Copie RAW delle foto</string>
     <string name="reason_raw_copy">Hai questa foto anche come %1$s nella stessa cartella. Il file RAW serve solo per la modifica avanzata.</string>
+    <string name="plan_group_other_app_media">Media salvati da altre app</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Salvato da un’altra app %1$d giorno fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+        <item quantity="many">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+        <item quantity="other">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+    </plurals>
 </resources>

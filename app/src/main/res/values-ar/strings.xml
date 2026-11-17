@@ -817,4 +817,14 @@
     <string name="plan_group_raw_copy">نسخ RAW من الصور</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="reason_raw_copy">لديك هذه الصورة أيضًا باسم %1$s في المجلد نفسه. ملف RAW مطلوب فقط للتحرير المتقدم.</string>
+    <string name="plan_group_other_app_media">وسائط حفظتها تطبيقات أخرى</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="reason_other_app_media">
+        <item quantity="zero">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="one">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="two">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="few">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="many">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="other">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+    </plurals>
 </resources>

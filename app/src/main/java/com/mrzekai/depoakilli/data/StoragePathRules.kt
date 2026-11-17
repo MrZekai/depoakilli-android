@@ -53,6 +53,18 @@ internal object StoragePathRules {
             Regex(""".*\.crypt\d+$""").matches(name) || name.startsWith("msgstore")
     }
 
+    /**
+     * Media saved by another app (V6): Android/media/<package>/ except WhatsApp,
+     * or a Telegram folder at the volume root.
+     */
+    fun isOtherAppMediaPath(path: String): Boolean {
+        val normalized = normalizePath(path)
+        if (isWhatsAppPath(normalized)) return false
+        val segments = normalized.trim('/').split('/')
+        val inAndroidMedia = segments.size >= 3 && segments[0] == "android" && segments[1] == "media" && segments[2].isNotBlank()
+        return inAndroidMedia || normalized.startsWith("/telegram/")
+    }
+
     fun isHiddenDirectoryAllowed(name: String): Boolean =
         normalizeText(name) in setOf(".thumbnails", ".statuses")
 

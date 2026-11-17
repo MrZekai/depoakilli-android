@@ -75,6 +75,19 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `media saved by other apps is offered for review`() {
+        val tg = "Android/media/org.telegram.messenger/Telegram/Telegram Video/"
+        assertEquals(CleanupGroup.OTHER_APP_MEDIA, group(file("x.mp4", "video/mp4", 120, tg, 30 * mb)))
+        assertEquals(CleanupGroup.OTHER_APP_MEDIA, group(file("x.jpg", "image/jpeg", 90, "Telegram/Telegram Images/", 5 * mb)))
+        assertNull(group(file("x.jpg", "image/jpeg", 89, "Telegram/Telegram Images/", 5 * mb)))
+        assertNull(group(file("x.jpg", "image/jpeg", 200, "Telegram/Telegram Images/", 5 * mb - 1)))
+        assertFalse(CleanupGroup.OTHER_APP_MEDIA.auto)
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/com.whatsapp/WhatsApp/Media/"))
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/"))
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Pictures/Telegram/"))
+    }
+
+    @Test
     fun `older mid-size videos are offered after large old videos`() {
         val cam = "DCIM/Camera/"
         assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 200, cam, 40 * mb)))

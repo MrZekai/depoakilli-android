@@ -18,6 +18,8 @@ object CleaningThresholds {
     const val SCREEN_RECORDING_DAYS = 30L
     const val SCREENSHOT_DAYS = 30L
     const val DOWNLOAD_DAYS = 90L
+    const val OTHER_APP_MEDIA_BYTES = 5L * MB
+    const val OTHER_APP_MEDIA_DAYS = 90L
     const val WHATSAPP_SENT_DAYS = 30L
     const val WHATSAPP_VIDEO_BYTES = 25L * MB
     const val WHATSAPP_VOICE_DAYS = 180L

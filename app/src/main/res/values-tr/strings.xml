@@ -651,4 +651,9 @@
     <string name="reason_system_trash">Bunu Galeri’de veya Dosyalar’da sildin. Android yaklaşık 30 gün sonra kaldırır; burada silmek yeri hemen açar.</string>
     <string name="plan_group_raw_copy">Fotoğrafların RAW kopyaları</string>
     <string name="reason_raw_copy">Bu fotoğraf aynı klasörde %1$s olarak da var. RAW dosyası yalnız gelişmiş düzenleme için gerekir.</string>
+    <string name="plan_group_other_app_media">Diğer uygulamaların kaydettiği medya</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
+        <item quantity="other">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
+    </plurals>
 </resources>

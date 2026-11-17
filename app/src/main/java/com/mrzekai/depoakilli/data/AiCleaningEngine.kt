@@ -137,6 +137,15 @@ class AiCleaningEngine(
             return assessment(CleanupGroup.OLD_VIDEO, ageDays)
         }
 
+        // 9c. Media saved by other apps (Telegram and similar), V6.
+        if (
+            StoragePathRules.isOtherAppMediaPath(file.relativePath) &&
+            file.sizeBytes >= CleaningThresholds.OTHER_APP_MEDIA_BYTES &&
+            ageDays >= CleaningThresholds.OTHER_APP_MEDIA_DAYS
+        ) {
+            return assessment(CleanupGroup.OTHER_APP_MEDIA, ageDays)
+        }
+
         // 10. Old downloads.
         if (StoragePathRules.isDownloadPath(file.relativePath) && ageDays >= CleaningThresholds.DOWNLOAD_DAYS) {
             val extension = name.substringAfterLast('.', "")
@@ -373,6 +382,7 @@ class AiCleaningEngine(
             CleanupGroup.LARGE_VIDEO,
             CleanupGroup.OLD_VIDEO,
             CleanupGroup.RAW_COPY,
+            CleanupGroup.OTHER_APP_MEDIA,
             CleanupGroup.SCREEN_RECORDING,
             CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
             CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT

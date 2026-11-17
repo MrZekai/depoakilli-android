@@ -48,6 +48,7 @@ enum class CleanupGroup(
     OLD_VIDEO(R.string.plan_group_old_video, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
     SCREEN_RECORDING(R.string.plan_group_screen_recording, 0, R.plurals.reason_screen_recording, false, DeleteMode.TRASH),
     SCREENSHOT(R.string.plan_group_screenshot, 0, R.plurals.reason_old_screenshot, false, DeleteMode.TRASH),
+    OTHER_APP_MEDIA(R.string.plan_group_other_app_media, 0, R.plurals.reason_other_app_media, false, DeleteMode.TRASH),
     DOWNLOAD_FILE(R.string.plan_group_download_file, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
     DOWNLOAD_DOCUMENT(R.string.plan_group_download_document, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH, groupSelectable = false),
     LARGE_OTHER(R.string.plan_group_large_other, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
