@@ -114,7 +114,6 @@ data class IndexedFile(
     val modifiedAtMillis: Long,
     val relativePath: String,
     val volumeRoot: String = "",
-    val createdAtMillis: Long = 0,
 )
 
 

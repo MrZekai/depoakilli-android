@@ -55,22 +55,23 @@ class AiCleaningEngine(
             return assessment(CleanupGroup.THUMBNAILS, ageDays)
         }
 
-        // 4. Old unfinished downloads.
+        // 4. Old unfinished downloads (Auto: modification time only).
+        val modifiedAge = modifiedAgeDays(file)
         if (
             PARTIAL_DOWNLOAD_EXTENSIONS.any(name::endsWith) &&
             StoragePathRules.isDownloadPath(file.relativePath) &&
-            ageDays >= CleaningThresholds.PARTIAL_DOWNLOAD_DAYS
+            modifiedAge >= CleaningThresholds.PARTIAL_DOWNLOAD_DAYS
         ) {
-            return assessment(CleanupGroup.PARTIAL_DOWNLOADS, ageDays)
+            return assessment(CleanupGroup.PARTIAL_DOWNLOADS, modifiedAge)
         }
 
-        // 5. Old temporary files outside other apps' media folders.
+        // 5. Old temporary files outside other apps' media folders (Auto: modification time only).
         if (
             TEMP_EXTENSIONS.any(name::endsWith) &&
-            ageDays >= CleaningThresholds.TEMP_DAYS &&
+            modifiedAge >= CleaningThresholds.TEMP_DAYS &&
             !path.contains("/android/media/")
         ) {
-            return assessment(CleanupGroup.TEMP_FILES, ageDays)
+            return assessment(CleanupGroup.TEMP_FILES, modifiedAge)
         }
 
         // 6. Installers.
@@ -270,9 +271,19 @@ class AiCleaningEngine(
         if (uri.scheme != "file") null else uri.path
     }.getOrNull()
 
-    /** Age from the newer of creation and modification time. */
+    /**
+     * Age for review groups: the capture date in the file name when there is
+     * one (survives copying to a new phone), otherwise the modification time (V1).
+     */
     fun ageDays(file: IndexedFile): Long {
-        val reference = maxOf(file.createdAtMillis, file.modifiedAtMillis)
+        val reference = FileNameDate.parse(file.name, nowMillis()) ?: file.modifiedAtMillis
+        return daysSince(reference)
+    }
+
+    /** Age for Auto groups: modification time only, never the name. */
+    fun modifiedAgeDays(file: IndexedFile): Long = daysSince(file.modifiedAtMillis)
+
+    private fun daysSince(reference: Long): Long {
         if (reference <= 0L) return 0
         return TimeUnit.MILLISECONDS.toDays((nowMillis() - reference).coerceAtLeast(0))
     }

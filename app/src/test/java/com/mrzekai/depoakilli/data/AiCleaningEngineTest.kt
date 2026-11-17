@@ -216,9 +216,20 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `age uses the newer of creation and modification time`() {
-        val copied = file("a.zip", "application/zip", 400).copy(createdAtMillis = now - TimeUnit.DAYS.toMillis(5))
-        assertNull(engine.assess(copied))
+    fun `age comes from the date in the name before the modification time`() {
+        // Copied to a new phone yesterday, but filmed in 2023: the name decides.
+        val copied = file("VID_20230611_120000.mp4", "video/mp4", 1, "DCIM/Camera/", 150 * mb)
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(copied))
+        assertTrue(engine.ageDays(copied) > 365)
+        // No date in the name: the modification time is used.
+        assertEquals(1L, engine.ageDays(file("clip.mp4", "video/mp4", 1, "DCIM/Camera/")))
+    }
+
+    @Test
+    fun `auto groups ignore the date in the name`() {
+        // A temporary file named with an old date but modified yesterday stays out.
+        assertNull(group(file("cache_20200101.tmp", "application/octet-stream", 1, "Documents/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file("cache_20200101.tmp", "application/octet-stream", 7, "Documents/")))
     }
 
     @Test

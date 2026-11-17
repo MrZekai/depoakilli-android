@@ -47,7 +47,6 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
 import java.lang.ref.SoftReference
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -796,14 +795,8 @@ class DeviceRepository(
             modifiedAtMillis = file.lastModified().coerceAtLeast(0L),
             relativePath = parentPath,
             volumeRoot = canonicalPathOf(storageRoot),
-            createdAtMillis = creationTimeOf(file),
         )
     }
-
-
-    private fun creationTimeOf(file: File): Long = runCatching {
-        Files.readAttributes(file.toPath(), BasicFileAttributes::class.java).creationTime().toMillis()
-    }.getOrDefault(0L).coerceAtLeast(0L)
 
     fun invalidateStorageIndex() {
         sharedIndexCache = null
