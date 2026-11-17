@@ -1,6 +1,6 @@
 # Smart Cleaner Privacy Policy
 
-Last updated: August 27, 2026
+Last updated: November 17, 2026
 
 Smart Cleaner (`com.mrzekai.depoakilli`) is provided by MrZekai. Privacy and support contact: {{SUPPORT_EMAIL}}.
 
@@ -22,7 +22,7 @@ Data is transmitted to these providers using encrypted network connections. Thei
 
 ## File deletion and local retention
 
-Files are removed only after user selection or an Android-controlled confirmation where Android requires one. Files you delete may not be recoverable by Smart Cleaner.
+Files are removed only after user selection or an Android-controlled confirmation where Android requires one. Most files you clean first move to Smart Cleaner's Trash on this device (the hidden `.SmartCleanerTrash` folder) and can be restored there for 7 days; files deleted permanently, and Trash once it is emptied, cannot be restored. If you uninstall Smart Cleaner, delete the `.SmartCleanerTrash` folder with a file manager to free that space.
 
 Preferences and aggregate scan/cleanup history are stored only in local app storage until you clear Smart Cleaner's app data or uninstall it. Clearing app data or uninstalling removes that local app data. It does not restore files that you previously chose to delete.
 

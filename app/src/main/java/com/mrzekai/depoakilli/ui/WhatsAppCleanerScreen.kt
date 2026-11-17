@@ -83,6 +83,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmEntry
 import com.mrzekai.depoakilli.ui.common.FileVisuals
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
@@ -433,7 +434,7 @@ private fun WhatsAppResultsScreen(
     if (showDeleteConfirmation) {
         val selectedItems = summary.selectedItems
         DeleteConfirmDialog(
-            names = selectedItems.map(WhatsAppMediaItem::name),
+            entries = selectedItems.map { DeleteConfirmEntry(it.name, it.relativePath) },
             trashBytes = summary.selectedBytes,
             permanentBytes = 0L,
             onDismiss = { showDeleteConfirmation = false },

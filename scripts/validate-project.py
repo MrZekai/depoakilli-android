@@ -841,7 +841,9 @@ if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_s
 for expected in (
     'name="legal_contact"',
     "aggregate scan/cleanup history",
-    "cannot be restored by Smart Cleaner",
+    # The privacy text must describe the 7-day Trash truthfully.
+    "can be restored there for 7 days",
+    "cannot be restored.",
 ):
     if expected not in default_strings:
         errors.append(f"missing English privacy/contact invariant: {expected}")

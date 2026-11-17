@@ -89,6 +89,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmEntry
 import com.mrzekai.depoakilli.ui.common.FileVisuals
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
@@ -1509,7 +1510,7 @@ private fun StorageDetailPage(
 
     if (confirmCleanup) {
         DeleteConfirmDialog(
-            names = selectedItems.map { it.file.name },
+            entries = selectedItems.map { DeleteConfirmEntry(it.file.name, it.file.relativePath) },
             trashBytes = selectedItems.sumOf { it.file.sizeBytes },
             permanentBytes = 0L,
             onDismiss = { confirmCleanup = false },
