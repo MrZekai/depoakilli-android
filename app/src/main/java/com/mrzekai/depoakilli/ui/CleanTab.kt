@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -40,14 +39,12 @@ import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.ui.common.BigRow
-import com.mrzekai.depoakilli.ui.common.ConfirmGroups
 import com.mrzekai.depoakilli.ui.common.GiantButton
 import com.mrzekai.depoakilli.ui.common.GiantNumber
 import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.common.PageLabel
-import com.mrzekai.depoakilli.ui.common.TrashConfirmSheet
-import com.mrzekai.depoakilli.ui.common.deleteSafetyNotes
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.smart.ScanProgressBody
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
@@ -179,15 +176,10 @@ internal fun CleanTab(
 
     if (confirmSafe && mode == HomeMode.PLAN) {
         val items = plan.selectedItems
-        val permanent = items.filter {
-            it.assessment.group.deleteMode == com.mrzekai.depoakilli.model.DeleteMode.PERMANENT
-        }.sumOf(CleanableItem::sizeBytes)
-        TrashConfirmSheet(
-            totalBytes = items.sumOf(CleanableItem::sizeBytes),
-            count = items.size,
-            groupNames = ConfirmGroups.of(items).map { stringResource(it.titleRes) },
-            permanentBytes = permanent,
-            notes = deleteSafetyNotes(items),
+        // B1: the shared confirmation writes the real split (Trash vs permanent)
+        // of these files; "see all" opens the list where files can be removed.
+        DeleteConfirmDialog(
+            items = items,
             inProgress = state.cleanupInProgress,
             onSeeAll = {
                 confirmSafe = false

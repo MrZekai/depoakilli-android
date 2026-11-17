@@ -100,6 +100,8 @@ data class CleanerUiState(
      * "Found so far"); null until then. Exact duplicates arrive with the result.
      */
     val scanFoundByCategory: Map<CleanCategory, Long>? = null,
+    /** The last finished scan reused the cached index (no wait, so no natural break; B7). */
+    val lastScanFromCache: Boolean = false,
     /** The Smart plan, kept while a tool scan temporarily owns [summary]. */
     val planSummary: ScanSummary? = null,
     /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.ui.CleanerUiState
 import com.mrzekai.depoakilli.ui.common.BlackCard
 import com.mrzekai.depoakilli.ui.common.GiantNumber
@@ -48,6 +49,7 @@ import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.BlackChip
 import com.mrzekai.depoakilli.ui.theme.GiantScale
+import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
@@ -143,20 +145,55 @@ internal fun ScanProgressBody(
     val found = state.scanFoundByCategory
     val foundBytes = found?.values?.sum() ?: 0L
     val indexing = found == null
+    // B5: the category stages belong to the Smart (and Deep) scan only; a tool
+    // scan shows how many files are being checked and a progress bar.
+    val smartScan = state.scanFocus == ScanFocus.SMART || state.scanFocus == ScanFocus.DEEP
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(8.dp))
-        PageLabel(stringResource(R.string.home_scan_label), strong = true)
-        GiantNumber(ByteFormatter.format(foundBytes), scale, modifier = Modifier.fillMaxWidth())
-        PageLabel(
-            if (state.scanHashing) {
-                stringResource(R.string.scan_stage_exact_copies)
-            } else {
-                stringResource(
-                    R.string.home_scan_now,
-                    pluralStringResource(R.plurals.home_scan_files_count, state.scanProgressFiles, state.scanProgressFiles),
-                )
-            },
+        if (smartScan && foundBytes > 0L) {
+            PageLabel(stringResource(R.string.home_scan_label), strong = true)
+            GiantNumber(ByteFormatter.format(foundBytes), scale, modifier = Modifier.fillMaxWidth())
+            PageLabel(
+                if (state.scanHashing) {
+                    stringResource(R.string.scan_stage_exact_copies)
+                } else {
+                    stringResource(
+                        R.string.home_scan_now,
+                        pluralStringResource(R.plurals.home_scan_files_count, state.scanProgressFiles, state.scanProgressFiles),
+                    )
+                },
+            )
+        } else {
+            // Never a giant "0 B" (B5): until something is found, the files being checked are the news.
+            Text(
+                if (state.scanHashing) {
+                    stringResource(R.string.scan_stage_exact_copies)
+                } else {
+                    pluralStringResource(R.plurals.scan_files_checking, state.scanProgressFiles, state.scanProgressFiles)
+                },
+                color = Ink,
+                fontSize = 28.sp,
+                lineHeight = 34.sp,
+                fontWeight = AppWeights.Title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(16.dp))
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth().height(8.dp).clip(androidx.compose.foundation.shape.CircleShape),
+                color = Ink,
+                trackColor = InkSoft.copy(alpha = .25f),
+            )
+        }
+    }
+    if (!smartScan) {
+        Spacer(Modifier.height(24.dp))
+        PillButton(
+            text = stringResource(R.string.cancel),
+            onClick = onCancel,
+            style = PillStyle.INK_OUTLINE,
         )
+        return
     }
     Spacer(Modifier.height(18.dp))
     BlackCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {

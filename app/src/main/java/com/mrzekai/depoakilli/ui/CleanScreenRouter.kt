@@ -101,6 +101,8 @@ internal fun CleanScreen(
             onScan = onScan,
             onReviewType = { type -> onOpenStorageReview(type, false) },
             modifier = modifier,
+            onRefresh = { viewModel?.refreshToolScan() },
+            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         )
         return
     }
@@ -116,5 +118,6 @@ internal fun CleanScreen(
         modifier = modifier,
         listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         onCancelScan = { viewModel?.cancelScan() },
+        onRefresh = { viewModel?.refreshToolScan() },
     )
 }

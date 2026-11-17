@@ -24,6 +24,10 @@ enum class DeleteMode { PERMANENT, TRASH }
 /**
  * Rows of the cleanup plan. Auto groups are preselected; Review groups are
  * listed for the user to decide. Nothing is deleted without confirmation.
+ *
+ * Faz 5B: installers and exact copies go to Trash (restorable for 7 days);
+ * only what the system or apps recreate (thumbnails, temporary files) and
+ * files already in another app's trash are deleted for good.
  */
 enum class CleanupGroup(
     @StringRes val titleRes: Int,
@@ -33,8 +37,8 @@ enum class CleanupGroup(
     val deleteMode: DeleteMode,
     val groupSelectable: Boolean = true,
 ) {
-    APK_INSTALLED(R.string.plan_group_apk_installed, R.string.reason_apk_installed, null, true, DeleteMode.PERMANENT),
-    DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.PERMANENT),
+    APK_INSTALLED(R.string.plan_group_apk_installed, R.string.reason_apk_installed, null, true, DeleteMode.TRASH),
+    DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.TRASH),
     THUMBNAILS(R.string.plan_group_thumbnails, 0, R.plurals.reason_thumbnail_cache, true, DeleteMode.PERMANENT),
     TEMP_FILES(R.string.plan_group_temp_files, 0, R.plurals.reason_temporary_file, true, DeleteMode.PERMANENT),
     SYSTEM_TRASH(R.string.plan_group_system_trash, R.string.reason_system_trash, null, false, DeleteMode.PERMANENT),
@@ -298,6 +302,8 @@ data class ScanSummary(
     val biggestFolders: List<FolderSize> = emptyList(),
     /** Review files hidden because the user chose to keep them (V10). */
     val hiddenKeptCount: Int = 0,
+    /** The tool scan reused the cached storage index, so the user did not wait for it (B7). */
+    val fromCachedIndex: Boolean = false,
 ) {
     /** Cleanup plan derived from [items]; always reflects the current selection. */
     val plan: CleanupPlan by lazy(LazyThreadSafetyMode.NONE) { buildPlan(items, truncated) }

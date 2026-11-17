@@ -128,8 +128,6 @@
     <string name="all_files_access_clean_screen">يحتاج Smart Cleaner إلى الوصول إلى Android لجميع الملفات لفحص وحدة التخزين المشتركة بشكل شامل دون إجبارك على اختيار المجلدات واحدًا تلو الآخر.</string>
     <string name="all_files_access_description">مطلوب لمحرك إدارة الملفات والصيانة الأساسي: الملفات غير المرغوب فيها، والنسخ المكررة، والملفات الكبيرة، والتنزيلات، والوسائط المشتركة APKs وWhatsApp.</string>
     <string name="all_files_access_title">الوصول الكامل لإدارة التخزين</string>
-    <string name="app_manager_intro">قم بمراجعة التطبيقات القابلة للتشغيل واستخدام التخزين وذاكرة التخزين المؤقت في Smart Cleaner. تستخدم إزالة التطبيق دائمًا تأكيد إزالة التثبيت الرسمي لـ Android.</string>
-    <string name="app_manager_size_detail">إجمالي %1$s • ذاكرة التخزين المؤقت %2$s</string>
     <string name="app_manager_subtitle">قم بمراجعة التطبيقات القابلة للتشغيل وحجم التخزين وذاكرة التخزين المؤقت وخيارات إلغاء تثبيت Android</string>
     <string name="app_manager_title">مدير التطبيقات</string>
     <string name="app_manager_usage_description">يتيح الوصول إلى الاستخدام لـ Smart Cleaner عرض إجماليات تخزين التطبيق والمعلومات المستخدمة مؤخرًا. لا تتم قراءة محتوى التطبيق الشخصي.</string>
@@ -260,7 +258,8 @@
     <string name="storage_review_limit_note">فئة كبيرة جدًا وصلت إلى حد العرض الآمن. قم بتحسين المجلد أو قم بتشغيل التحليل مرة أخرى بعد التنظيف.</string>
     <string name="whatsapp_scanning_short">مسح الوسائط الذكية</string>
     <string name="whatsapp_local_processing_note">يتم تحليل الوسائط على هذا الجهاز.</string>
-    <string name="whatsapp_total_media">إجمالي وسائط WHATSAPP</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_total_media">وسائط WhatsApp</string>
     <string name="whatsapp_filter_incoming">وارد</string>
     <string name="whatsapp_filter_sent">تم الإرسال</string>
     <string name="whatsapp_filter_all">الكل</string>
@@ -269,8 +268,10 @@
     <string name="whatsapp_group_documents_more">وثائق والمزيد</string>
     <string name="whatsapp_view_all">عرض الكل</string>
     <string name="whatsapp_card_hint">اضغط على ملف لمعاينته • ضع علامة في المربع لإضافته إلى عملية التنظيف</string>
-    <string name="whatsapp_sort_largest">الأكبر أولاً</string>
-    <string name="whatsapp_sort_newest">الأحدث أولاً</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_largest">الأكبر</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_newest">الأحدث</string>
     <string name="whatsapp_no_files_for_filter">لا توجد ملفات تتطابق مع هذا الفلتر.</string>
     <string name="whatsapp_preview_title">معاينة</string>
     <string name="whatsapp_included">المدرجة في التنظيف</string>
@@ -280,10 +281,12 @@
     <string name="whatsapp_audio_preview_error">لا يمكن تشغيل هذا الملف الصوتي على هذا الجهاز.</string>
     <string name="premium_tool_nothing_found">لا شيء للمراجعة</string>
     <string name="premium_tool_nothing_found_detail">لم يتم العثور على ملفات مطابقة في مساحة التخزين المشتركة التي يمكن الوصول إليها.</string>
-    <string name="premium_tool_found_size">إجمالي حجم المراجعة</string>
-    <string name="premium_sort_largest">الأكبر أولاً</string>
-    <string name="premium_sort_newest">الأحدث أولاً</string>
-    <string name="premium_sort_selected">المحددة أولاً</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_largest">الأكبر</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_newest">الأحدث</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_selected">المحددة</string>
     <string name="premium_duplicates_subtitle">يتم تجميع مطابقات المحتوى التام حتى تتمكن من الاحتفاظ بالنسخة الأصلية وإزالة النسخ الإضافية فقط.</string>
     <string name="premium_large_subtitle">قم بمراجعة الملفات التي تستخدم أكبر مساحة تخزينية قبل تحديد ما يجب إزالته.</string>
     <string name="premium_apk_subtitle">قم بمراجعة حزم تثبيت Android التي تم تنزيلها دون التأثير على التطبيقات المثبتة.</string>
@@ -291,9 +294,9 @@
     <string name="premium_junk_subtitle">قم بمراجعة الملفات المؤقتة والعناصر المصغرة خارج التنزيلات. تنزيل بقايا الطعام يبقى في التنزيلات.</string>
     <string name="premium_downloads_subtitle">قم بمراجعة التنزيلات القديمة وعناصر التنزيل غير المكتملة دون تحديد الملفات الشخصية تلقائيًا.</string>
     <string name="premium_deep_subtitle">مراجعة شاملة لمرة واحدة عبر فئات التخزين الرئيسية. تبقى الملفات الشخصية ذات الثقة المنخفضة للمراجعة فقط.</string>
-    <string name="premium_duplicates_original_safe">لا يتم وضع الأصل المحمي مطلقًا في تحديد الحذف. يتم عرض النسخ الإضافية التي تم التحقق منها فقط هنا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_duplicates_original_safe">لا تُحدَّد النسخ الأصلية أبدًا.</string>
     <string name="premium_duplicate_unknown_original">الأصلي المحمي</string>
-    <string name="premium_duplicate_group_title">نسخ من %1$s</string>
     <string name="premium_apk_installer_note">يؤدي حذف APK هنا إلى إزالة ملف التثبيت فقط. ولا يؤدي إلى إلغاء تثبيت التطبيق المثبت بالفعل على هاتفك.</string>
     <string name="premium_apk_old">مثبّتات أقدم</string>
     <string name="premium_apk_recent">المثبتات الأخيرة</string>
@@ -425,7 +428,8 @@
     <string name="tools_storage_change_subtitle">راجع زيادات ونقصان التخزين المُقاس بين تحليلين حقيقيين</string>
     <string name="storage_analyzer_scanning_subtitle">تصنيف ملفات التخزين المشتركة التي يمكن الوصول إليها حسب النوع...</string>
     <string name="storage_analyzer_empty_subtitle">تعرف على كيفية استخدام الصور ومقاطع الفيديو والصوت والمستندات والمحفوظات وAPK والملفات الأخرى التي يمكن الوصول إليها للمساحة.</string>
-    <string name="storage_analyzer_indexed_label">الملفات المشتركة المفهرسة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="storage_analyzer_indexed_label">الملفات المفحوصة</string>
     <string name="storage_analyzer_indexed_summary">الملفات المفهرسة: %1$d • المساحة الفارغة: %2$s</string>
     <string name="storage_analyzer_types_title">أنواع الملفات</string>
     <plurals name="storage_analyzer_type_summary">
@@ -553,15 +557,6 @@
         <item quantity="many">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
         <item quantity="other">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_preview_summary">
-        <item quantity="zero">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-        <item quantity="one">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-        <item quantity="two">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-        <item quantity="few">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-        <item quantity="many">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-        <item quantity="other">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
-    </plurals>
     <plurals name="result_changed">
         <item quantity="zero">تغيّرت منذ الفحص: %1$d</item>
         <item quantity="one">تغيّرت منذ الفحص: %1$d</item>
@@ -650,7 +645,6 @@
         <item quantity="many">لا يسمح هذا الجهاز لـ Smart Cleaner بإنشاء مجلد سلة المهملات، لذا لا يمكن الاحتفاظ بالملفات (%1$d) للتراجع. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
         <item quantity="other">لا يسمح هذا الجهاز لـ Smart Cleaner بإنشاء مجلد سلة المهملات، لذا لا يمكن الاحتفاظ بالملفات (%1$d) للتراجع. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
     </plurals>
-    <string name="delete_confirm_permanent">سيتم حذف %1$s نهائيًا. لا يمكن التراجع عن ذلك.</string>
     <string name="plan_group_whatsapp_old_video">مقاطع فيديو WhatsApp أقدم</string>
     <string name="plan_group_whatsapp_old_image">صور WhatsApp أقدم</string>
     <string name="plan_group_whatsapp_old_audio">ملفات صوت WhatsApp أقدم</string>
@@ -735,7 +729,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_cta_hint_tap">بلمسة واحدة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_plan_split">%1$s من الملفات غير الضرورية تذهب إلى المهملات فورًا. وسأسألك عن الـ %2$s الباقية.</string>
+    <string name="home_plan_split">يُنظَّف %1$s من الملفات غير الضرورية فورًا. وسأسألك عن الـ %2$s الباقية.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_scan_label">ما وجدته حتى الآن</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -816,12 +810,12 @@
     <string name="confirm_permanent_body">لا يمكن نقل هذه الملفات إلى المهملات، لذا ستُحذف فورًا.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_trash_body">
-        <item quantity="zero">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
-        <item quantity="one">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
-        <item quantity="two">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
-        <item quantity="few">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
-        <item quantity="many">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
-        <item quantity="other">عدد الملفات %1$d: %2$s. يمكنك استعادتها خلال 7 أيام.</item>
+        <item quantity="zero">عدد الملفات %1$d: %2$s.</item>
+        <item quantity="one">عدد الملفات %1$d: %2$s.</item>
+        <item quantity="two">عدد الملفات %1$d: %2$s.</item>
+        <item quantity="few">عدد الملفات %1$d: %2$s.</item>
+        <item quantity="many">عدد الملفات %1$d: %2$s.</item>
+        <item quantity="other">عدد الملفات %1$d: %2$s.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_see_files">
@@ -853,4 +847,39 @@
     <string name="settings_kept_row">الملفات التي احتفظت بها</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="settings_excluded_row">مجلدات لا تُقترح</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_clean_title">هل تريد تنظيف %1$s؟</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_split_permanent">يُحذف %1$s من ذاكرة التخزين المؤقت والملفات المؤقتة نهائيًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="app_manager_cache_line">ذاكرة مؤقتة %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_xiaomi_warning">سيعرض هاتفك تحذيرًا وعدًّا تنازليًا قصيرًا. هذا طبيعي لهذا الإذن.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_split_trash">
+        <item quantity="zero">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+        <item quantity="one">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+        <item quantity="two">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+        <item quantity="few">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+        <item quantity="many">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+        <item quantity="other">يذهب %1$s إلى المهملات ويمكنك استعادته خلال %2$d يوم.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="scan_files_checking">
+        <item quantity="zero">جارٍ فحص %1$d ملف…</item>
+        <item quantity="one">جارٍ فحص %1$d ملف…</item>
+        <item quantity="two">جارٍ فحص %1$d ملف…</item>
+        <item quantity="few">جارٍ فحص %1$d ملف…</item>
+        <item quantity="many">جارٍ فحص %1$d ملف…</item>
+        <item quantity="other">جارٍ فحص %1$d ملف…</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="premium_duplicate_copies">
+        <item quantity="zero">%1$d نسخة · %2$s</item>
+        <item quantity="one">%1$d نسخة · %2$s</item>
+        <item quantity="two">%1$d نسخة · %2$s</item>
+        <item quantity="few">%1$d نسخة · %2$s</item>
+        <item quantity="many">%1$d نسخة · %2$s</item>
+        <item quantity="other">%1$d نسخة · %2$s</item>
+    </plurals>
 </resources>

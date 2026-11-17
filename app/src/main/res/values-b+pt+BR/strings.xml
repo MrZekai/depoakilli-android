@@ -110,8 +110,6 @@
     <string name="all_files_access_clean_screen">O Smart Cleaner precisa do acesso a todos os arquivos do Android para analisar o armazenamento compartilhado de forma completa sem que você precise escolher pastas uma por uma.</string>
     <string name="all_files_access_description">Necessário para o mecanismo principal de gerenciamento e manutenção de arquivos: arquivos temporários, duplicados, arquivos grandes, downloads, APKs e mídia compartilhada do WhatsApp.</string>
     <string name="all_files_access_title">Acesso completo de gerenciamento de armazenamento</string>
-    <string name="app_manager_intro">Revise os apps que podem ser abertos, o uso de armazenamento e o cache no Smart Cleaner. Remover um app sempre usa a confirmação oficial de desinstalação do Android.</string>
-    <string name="app_manager_size_detail">%1$s no total • %2$s de cache</string>
     <string name="app_manager_subtitle">Revise os apps que podem ser abertos, o tamanho de armazenamento, o cache e as opções de desinstalação do Android</string>
     <string name="app_manager_title">Gerenciador de apps</string>
     <string name="app_manager_usage_description">O acesso de uso permite que o Smart Cleaner mostre os totais de armazenamento dos apps e as informações de último uso. O conteúdo pessoal dos apps não é lido.</string>
@@ -224,7 +222,8 @@
     <string name="storage_review_limit_note">Uma categoria muito grande atingiu o limite de segurança de exibição. Refine a pasta ou execute a análise novamente após a limpeza.</string>
     <string name="whatsapp_scanning_short">Análise inteligente de mídia</string>
     <string name="whatsapp_local_processing_note">A mídia é analisada neste dispositivo.</string>
-    <string name="whatsapp_total_media">TOTAL DE MÍDIA DO WHATSAPP</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_total_media">Mídia do WhatsApp</string>
     <string name="whatsapp_filter_incoming">Recebidos</string>
     <string name="whatsapp_filter_sent">Enviados</string>
     <string name="whatsapp_filter_all">Todos</string>
@@ -233,8 +232,10 @@
     <string name="whatsapp_group_documents_more">Documentos e mais</string>
     <string name="whatsapp_view_all">Ver todos</string>
     <string name="whatsapp_card_hint">Toque em um arquivo para pré-visualizá-lo • marque a caixa para adicioná-lo à limpeza</string>
-    <string name="whatsapp_sort_largest">Maiores primeiro</string>
-    <string name="whatsapp_sort_newest">Mais recentes primeiro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_largest">Maiores</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_newest">Mais novos</string>
     <string name="whatsapp_no_files_for_filter">Nenhum arquivo corresponde a este filtro.</string>
     <string name="whatsapp_preview_title">Pré-visualização</string>
     <string name="whatsapp_included">Incluído na limpeza</string>
@@ -244,10 +245,12 @@
     <string name="whatsapp_audio_preview_error">Não foi possível reproduzir este arquivo de áudio neste dispositivo.</string>
     <string name="premium_tool_nothing_found">Nada para revisar</string>
     <string name="premium_tool_nothing_found_detail">Nenhum arquivo correspondente foi encontrado no armazenamento compartilhado acessível.</string>
-    <string name="premium_tool_found_size">Tamanho total para revisão</string>
-    <string name="premium_sort_largest">Maiores primeiro</string>
-    <string name="premium_sort_newest">Mais recentes primeiro</string>
-    <string name="premium_sort_selected">Selecionados primeiro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_largest">Maiores</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_newest">Mais novos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_selected">Escolhidos</string>
     <string name="premium_duplicates_subtitle">Correspondências exatas de conteúdo são agrupadas para que você possa manter o original e remover apenas as cópias extras.</string>
     <string name="premium_large_subtitle">Revise os arquivos que mais ocupam armazenamento antes de decidir o que deve ser removido.</string>
     <string name="premium_apk_subtitle">Revise os pacotes instaladores do Android baixados sem afetar os apps instalados.</string>
@@ -255,9 +258,9 @@
     <string name="premium_junk_subtitle">Revise arquivos temporários e miniaturas fora de Downloads. Os restos de downloads permanecem em Downloads.</string>
     <string name="premium_downloads_subtitle">Revise downloads antigos e restos de downloads incompletos sem selecionar automaticamente arquivos pessoais.</string>
     <string name="premium_deep_subtitle">Revisão ampla em uma única passagem pelas principais categorias de armazenamento. Arquivos pessoais de menor confiança permanecem apenas para revisão.</string>
-    <string name="premium_duplicates_original_safe">O original protegido nunca é colocado na seleção de exclusão. Aqui só são exibidas as cópias extras verificadas.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_duplicates_original_safe">Os originais nunca são selecionados.</string>
     <string name="premium_duplicate_unknown_original">original protegido</string>
-    <string name="premium_duplicate_group_title">Cópias de %1$s</string>
     <string name="premium_apk_installer_note">Excluir um APK aqui remove apenas o arquivo instalador. Isso não desinstala o app já instalado no seu celular.</string>
     <string name="premium_apk_old">Instaladores antigos</string>
     <string name="premium_apk_recent">Instaladores recentes</string>
@@ -373,7 +376,8 @@
     <string name="tools_storage_change_subtitle">Veja os aumentos e reduções de armazenamento medidos entre duas análises reais</string>
     <string name="storage_analyzer_scanning_subtitle">Classificando os arquivos do armazenamento compartilhado acessível por tipo…</string>
     <string name="storage_analyzer_empty_subtitle">Veja quanto espaço imagens, vídeos, áudio, documentos, arquivos compactados, APKs e outros arquivos acessíveis usam.</string>
-    <string name="storage_analyzer_indexed_label">ARQUIVOS COMPARTILHADOS INDEXADOS</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="storage_analyzer_indexed_label">Arquivos verificados</string>
     <string name="storage_analyzer_indexed_summary">Arquivos indexados: %1$d • Espaço livre: %2$s</string>
     <string name="storage_analyzer_types_title">Tipos de arquivo</string>
     <plurals name="storage_analyzer_type_summary">
@@ -473,11 +477,6 @@
         <item quantity="one">Mostrando os %1$d itens maiores. Verifique novamente após limpar para ver mais.</item>
         <item quantity="other">Mostrando os %1$d itens maiores. Verifique novamente após limpar para ver mais.</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_preview_summary">
-        <item quantity="one">%1$s excluídos agora · %2$s vão para a lixeira (dias: %3$d)</item>
-        <item quantity="other">%1$s excluídos agora · %2$s vão para a lixeira (dias: %3$d)</item>
-    </plurals>
     <plurals name="result_changed">
         <item quantity="one">Alterados desde a verificação: %1$d</item>
         <item quantity="other">Alterados desde a verificação: %1$d</item>
@@ -525,7 +524,6 @@
         <item quantity="one">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivo não pode ser guardado para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
         <item quantity="other">Este dispositivo não permite que o Smart Cleaner crie a pasta da Lixeira, então %1$d arquivos não podem ser guardados para desfazer. Excluir permanentemente? Isso não pode ser desfeito.</item>
     </plurals>
-    <string name="delete_confirm_permanent">%1$s será excluído permanentemente. Isso não pode ser desfeito.</string>
     <string name="plan_group_whatsapp_old_video">Vídeos antigos do WhatsApp</string>
     <string name="plan_group_whatsapp_old_image">Fotos antigas do WhatsApp</string>
     <string name="plan_group_whatsapp_old_audio">Áudios antigos do WhatsApp</string>
@@ -586,7 +584,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_cta_hint_tap">um toque</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_plan_split">%1$s de lixo vai para a lixeira agora. Sobre os outros %2$s eu te pergunto.</string>
+    <string name="home_plan_split">%1$s de lixo é limpo agora. Sobre os outros %2$s eu te pergunto.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_scan_label">Encontrado até agora</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -667,8 +665,8 @@
     <string name="confirm_permanent_body">Estes arquivos não podem ir para a lixeira, então seriam apagados na hora.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_trash_body">
-        <item quantity="one">%1$d arquivo: %2$s. Dá para restaurar por 7 dias.</item>
-        <item quantity="other">%1$d arquivos: %2$s. Dá para restaurar por 7 dias.</item>
+        <item quantity="one">%1$d arquivo: %2$s.</item>
+        <item quantity="other">%1$d arquivos: %2$s.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_see_files">
@@ -692,4 +690,27 @@
     <string name="settings_kept_row">Arquivos que mantive</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="settings_excluded_row">Pastas sem sugestões</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_clean_title">Limpar %1$s?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_split_permanent">%1$s de cache e arquivos temporários é apagado de vez.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="app_manager_cache_line">cache %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_xiaomi_warning">Seu celular vai mostrar um aviso e uma contagem regressiva curta. É normal para esta permissão.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_split_trash">
+        <item quantity="one">%1$s vai para a lixeira. Dá para restaurar por %2$d dia.</item>
+        <item quantity="other">%1$s vai para a lixeira. Dá para restaurar por %2$d dias.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="scan_files_checking">
+        <item quantity="one">Verificando %1$d arquivo…</item>
+        <item quantity="other">Verificando %1$d arquivos…</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="premium_duplicate_copies">
+        <item quantity="one">%1$d cópia · %2$s</item>
+        <item quantity="other">%1$d cópias · %2$s</item>
+    </plurals>
 </resources>

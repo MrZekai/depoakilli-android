@@ -1,4 +1,4 @@
-# Ad placements (Faz 5 "Make Room")
+# Ad placements (Faz 5 "Make Room", Faz 5B)
 
 All limits live in `app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt`
 and are unchanged in Faz 5. Every format requires UMP consent
@@ -18,7 +18,11 @@ units; release uses Smart Cleaner's own units (public AdMob identifiers in
 | Swipe review | Native break card | Every 8 cards (`SWIPE_BREAK_EVERY`); no banner. |
 | Swipe review finished → Result | Interstitial (`SWIPE_FINISHED`) | Same limits; skipped when the 60 s gap has not passed. |
 | Result | Large native (MREC 300×250 fallback) | Below the buttons, after a 24 dp gap; `ADMOB_RESULT_NATIVE_ID` if set, else the list native unit. |
-| Tool lists | Native in the list | After the 4th row when there are ≥6 rows (`NATIVE_LIST_AFTER_REVIEW_ROW`, `NATIVE_LIST_MIN_ROWS`); no banner (also WhatsApp, app cache, app manager). |
+| Tool scan finished → tool result | Interstitial (`TOOL_RESULT`) | Faz 5B. Same limits (120 s, 8/day, 60 s between full-screen ads, first-session rule). Also after a finished WhatsApp scan. Not when the result came straight from the cached storage index (the user did not wait), not after a cancelled scan, not after Smart/Deep scans (they have their own triggers). |
+| Tool lists | Native in the list | After the 4th row when there are ≥6 rows (`NATIVE_LIST_AFTER_REVIEW_ROW`, `NATIVE_LIST_MIN_ROWS`); no banner. |
+| App Manager, App Cache Manager | Native in the list | Faz 5B. After the 4th app row when there are ≥6 rows; no banner. |
+| WhatsApp categories | Native in the list | Faz 5B. After the 2nd category card (`NATIVE_GROUP_LIST_AFTER_CARD`) when a 3rd card follows and the list holds ≥6 files; no banner. |
+| Storage Analyzer | Native in the list | Faz 5B. After the 2nd type card when there are ≥6 type cards. |
 | Settings | Rewarded | 60 minutes without banner and full-screen ads. Also "Watch and verify" for the deep duplicate check, which runs even when no ad is ready. |
 
 Interstitials also keep their earlier triggers with the same limits: the

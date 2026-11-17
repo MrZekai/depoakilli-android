@@ -80,6 +80,7 @@ internal fun WhatsAppCleanerDetailScreen(
     onToggleCategory: (WhatsAppMediaCategory) -> Unit,
     onDeleteSelected: () -> Unit,
     modifier: Modifier = Modifier,
+    listAd: @Composable () -> Unit = {},
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = WaBackground, contentColor = Ink) {
         when {
@@ -106,6 +107,7 @@ internal fun WhatsAppCleanerDetailScreen(
                 onToggleItem = onToggleItem,
                 onToggleCategory = onToggleCategory,
                 onDeleteSelected = onDeleteSelected,
+                listAd = listAd,
             )
         }
     }

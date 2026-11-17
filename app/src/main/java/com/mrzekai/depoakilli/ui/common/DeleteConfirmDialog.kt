@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,6 +68,66 @@ internal object ConfirmGroups {
             .entries
             .sortedByDescending { (_, groupItems) -> groupItems.sumOf(CleanableItem::sizeBytes) }
             .map { it.key }
+}
+
+/**
+ * How a selection really leaves the phone (Faz 5B, B1): the Trash part can be
+ * restored for 7 days, the permanent part cannot. The confirmation shows the
+ * total in the title and each part on its own line, so one amount is never
+ * called both "restorable" and "can't be undone".
+ */
+internal data class DeleteSplit(val trashBytes: Long, val permanentBytes: Long) {
+    enum class Sheet { TRASH, MIXED, PERMANENT }
+
+    val totalBytes: Long get() = trashBytes + permanentBytes
+
+    /** Permanent-only selections get the permanent sheet with a big Cancel. */
+    val sheet: Sheet
+        get() = when {
+            trashBytes <= 0L && permanentBytes > 0L -> Sheet.PERMANENT
+            permanentBytes > 0L -> Sheet.MIXED
+            else -> Sheet.TRASH
+        }
+
+    /** "… goes to Trash, restorable for 7 days" is written for the Trash part only. */
+    val showsRestoreLine: Boolean get() = trashBytes > 0L
+
+    /** The Coral line appears only with a permanent amount. */
+    val showsPermanentLine: Boolean get() = permanentBytes > 0L
+
+    companion object {
+        fun of(items: List<CleanableItem>): DeleteSplit {
+            val (permanent, trash) = items.partition { it.assessment.group.deleteMode == DeleteMode.PERMANENT }
+            return DeleteSplit(
+                trashBytes = trash.sumOf(CleanableItem::sizeBytes),
+                permanentBytes = permanent.sumOf(CleanableItem::sizeBytes),
+            )
+        }
+    }
+}
+
+/** The two amounts of a [DeleteSplit]: Trash with its 7 days, then the permanent part in Coral. */
+@Composable
+internal fun DeleteSplitLines(split: DeleteSplit, restoreColor: Color = OnBlack) {
+    val days = CleaningThresholds.TRASH_RETENTION_DAYS
+    if (split.showsRestoreLine) {
+        Text(
+            pluralStringResource(R.plurals.confirm_split_trash, days, ByteFormatter.format(split.trashBytes), days),
+            color = restoreColor,
+            fontSize = 15.sp,
+            lineHeight = 21.sp,
+            fontWeight = AppWeights.Strong,
+        )
+    }
+    if (split.showsPermanentLine) {
+        Text(
+            stringResource(R.string.confirm_split_permanent, ByteFormatter.format(split.permanentBytes)),
+            color = Coral,
+            fontSize = 15.sp,
+            lineHeight = 21.sp,
+            fontWeight = AppWeights.Strong,
+        )
+    }
 }
 
 /** Black bottom sheet with 34 dp top corners (disclosures and confirmations). */
@@ -137,8 +198,16 @@ internal fun TrashConfirmSheet(
     notes: List<String> = emptyList(),
     extraContent: (@Composable () -> Unit)? = null,
 ) {
+    val split = DeleteSplit(trashBytes = (totalBytes - permanentBytes).coerceAtLeast(0L), permanentBytes = permanentBytes)
     AppSheet(onDismiss = onDismiss, dismissible = !inProgress) {
-        SheetTitle(stringResource(R.string.confirm_trash_title, ByteFormatter.format(totalBytes)))
+        // B1: "Move X to Trash?" only when everything really goes to Trash;
+        // a mixed selection is titled with the total ("Clean up X?").
+        SheetTitle(
+            stringResource(
+                if (split.sheet == DeleteSplit.Sheet.TRASH) R.string.confirm_trash_title else R.string.confirm_clean_title,
+                ByteFormatter.format(totalBytes),
+            ),
+        )
         SheetBody(
             pluralStringResource(
                 R.plurals.confirm_trash_body,
@@ -147,16 +216,7 @@ internal fun TrashConfirmSheet(
                 groupNames.joinToString(", "),
             ),
         )
-        if (permanentBytes > 0L) {
-            // Part of the selection cannot go to Trash (thumbnails, temporary files…).
-            Text(
-                deleteModeSentence(totalBytes - permanentBytes, permanentBytes, CleaningThresholds.TRASH_RETENTION_DAYS),
-                color = Coral,
-                fontSize = 14.sp,
-                lineHeight = 19.sp,
-                fontWeight = AppWeights.Strong,
-            )
-        }
+        DeleteSplitLines(split)
         notes.forEach { SheetBody(it, soft = true) }
         extraContent?.invoke()
         LinkButton(
@@ -284,13 +344,14 @@ internal fun DeleteConfirmDialog(
     onConfirm: () -> Unit,
     notes: List<String> = emptyList(),
     extraContent: (@Composable () -> Unit)? = null,
+    onSeeAll: (() -> Unit)? = null,
 ) {
     var showAll by rememberSaveable { mutableStateOf(false) }
     val fileList: @Composable () -> Unit = {
         extraContent?.invoke()
         if (showAll) ConfirmFileList(entries)
     }
-    if (trashBytes <= 0L && permanentBytes > 0L) {
+    if (DeleteSplit(trashBytes, permanentBytes).sheet == DeleteSplit.Sheet.PERMANENT) {
         PermanentDeleteSheet(
             bytes = permanentBytes,
             body = stringResource(R.string.confirm_permanent_body),
@@ -314,7 +375,7 @@ internal fun DeleteConfirmDialog(
             count = entries.size,
             groupNames = groupNames,
             permanentBytes = permanentBytes,
-            onSeeAll = { showAll = !showAll },
+            onSeeAll = onSeeAll ?: { showAll = !showAll },
             onDismiss = onDismiss,
             onConfirm = onConfirm,
             inProgress = inProgress,
@@ -322,18 +383,6 @@ internal fun DeleteConfirmDialog(
             extraContent = fileList,
         )
     }
-}
-
-@Composable
-private fun deleteModeSentence(trashBytes: Long, permanentBytes: Long, days: Int): String = when {
-    trashBytes > 0L && permanentBytes > 0L -> pluralStringResource(
-        R.plurals.plan_preview_summary,
-        days,
-        ByteFormatter.format(permanentBytes),
-        ByteFormatter.format(trashBytes),
-        days,
-    )
-    else -> stringResource(R.string.delete_confirm_permanent, ByteFormatter.format(permanentBytes))
 }
 
 /** Notes that must stay with a delete: WhatsApp chats lose the media, camera files are personal. */
@@ -356,8 +405,9 @@ internal fun DeleteConfirmDialog(
     inProgress: Boolean = false,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
+    onSeeAll: (() -> Unit)? = null,
 ) {
-    val (permanent, trash) = items.partition { it.assessment.group.deleteMode == DeleteMode.PERMANENT }
+    val split = DeleteSplit.of(items)
     DeleteConfirmDialog(
         entries = items.map { item ->
             DeleteConfirmEntry(
@@ -369,12 +419,13 @@ internal fun DeleteConfirmDialog(
                 },
             )
         },
-        trashBytes = trash.sumOf(CleanableItem::sizeBytes),
-        permanentBytes = permanent.sumOf(CleanableItem::sizeBytes),
+        trashBytes = split.trashBytes,
+        permanentBytes = split.permanentBytes,
         groupNames = ConfirmGroups.of(items).map { stringResource(it.titleRes) },
         inProgress = inProgress,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
         notes = deleteSafetyNotes(items),
+        onSeeAll = onSeeAll,
     )
 }

@@ -107,8 +107,6 @@
     <string name="all_files_access_clean_screen">Smart Cleaner needs Android All files access to scan shared storage comprehensively without making you pick folders one by one.</string>
     <string name="all_files_access_description">Required for the core file-management and maintenance engine: junk, duplicates, large files, downloads, APKs and WhatsApp shared media.</string>
     <string name="all_files_access_title">Full storage management access</string>
-    <string name="app_manager_intro">Review launchable apps, storage usage and cache in Smart Cleaner. Removing an app always uses Android’s official uninstall confirmation.</string>
-    <string name="app_manager_size_detail">%1$s total • %2$s cache</string>
     <string name="app_manager_subtitle">Review launchable apps, storage size, cache and Android uninstall options</string>
     <string name="app_manager_title">App Manager</string>
     <string name="app_manager_usage_description">Usage Access lets Smart Cleaner show app storage totals and last-used information. Personal app content is not read.</string>
@@ -227,7 +225,7 @@
     <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
     <string name="whatsapp_scanning_short">Smart media scan</string>
     <string name="whatsapp_local_processing_note">Media is analyzed on this device.</string>
-    <string name="whatsapp_total_media">TOTAL WHATSAPP MEDIA</string>
+    <string name="whatsapp_total_media">WhatsApp media</string>
     <string name="whatsapp_filter_incoming">Incoming</string>
     <string name="whatsapp_filter_sent">Sent</string>
     <string name="whatsapp_filter_all">All</string>
@@ -236,8 +234,8 @@
     <string name="whatsapp_group_documents_more">Documents &amp; More</string>
     <string name="whatsapp_view_all">View all</string>
     <string name="whatsapp_card_hint">Tap a file to preview • tick the box to add it to cleanup</string>
-    <string name="whatsapp_sort_largest">Largest first</string>
-    <string name="whatsapp_sort_newest">Newest first</string>
+    <string name="whatsapp_sort_largest">Largest</string>
+    <string name="whatsapp_sort_newest">Newest</string>
     <string name="whatsapp_no_files_for_filter">No files match this filter.</string>
     <string name="whatsapp_preview_title">Preview</string>
     <string name="whatsapp_included">Included in cleanup</string>
@@ -249,10 +247,9 @@
 
     <string name="premium_tool_nothing_found">Nothing to review</string>
     <string name="premium_tool_nothing_found_detail">No matching files were found in accessible shared storage.</string>
-    <string name="premium_tool_found_size">Total review size</string>
-    <string name="premium_sort_largest">Largest first</string>
-    <string name="premium_sort_newest">Newest first</string>
-    <string name="premium_sort_selected">Selected first</string>
+    <string name="premium_sort_largest">Largest</string>
+    <string name="premium_sort_newest">Newest</string>
+    <string name="premium_sort_selected">Selected</string>
     <string name="premium_duplicates_subtitle">Exact-content matches are grouped so you can keep the original and remove only extra copies.</string>
     <string name="premium_large_subtitle">Review the files using the most storage before deciding what should be removed.</string>
     <string name="premium_apk_subtitle">Review downloaded Android installer packages without affecting installed apps.</string>
@@ -260,9 +257,8 @@
     <string name="premium_junk_subtitle">Review temporary files and thumbnail artifacts outside Downloads. Download leftovers stay in Downloads.</string>
     <string name="premium_downloads_subtitle">Review older downloads and incomplete download artifacts without auto-selecting personal files.</string>
     <string name="premium_deep_subtitle">Broad one-pass review across the main storage categories. Lower-confidence personal files stay review-only.</string>
-    <string name="premium_duplicates_original_safe">The protected original is never placed in the delete selection. Only verified extra copies are shown here.</string>
+    <string name="premium_duplicates_original_safe">Originals are never selected.</string>
     <string name="premium_duplicate_unknown_original">protected original</string>
-    <string name="premium_duplicate_group_title">Copies of %1$s</string>
     <string name="premium_apk_installer_note">Deleting an APK here removes only the installer file. It does not uninstall the app already installed on your phone.</string>
     <string name="premium_apk_old">Older installers</string>
     <string name="premium_apk_recent">Recent installers</string>
@@ -382,7 +378,7 @@
     <string name="tools_storage_change_subtitle">See measured storage increases and decreases between two real analyses</string>
     <string name="storage_analyzer_scanning_subtitle">Classifying accessible shared-storage files by type…</string>
     <string name="storage_analyzer_empty_subtitle">See how images, videos, audio, documents, archives, APKs and other accessible files use space.</string>
-    <string name="storage_analyzer_indexed_label">INDEXED SHARED FILES</string>
+    <string name="storage_analyzer_indexed_label">Scanned files</string>
     <string name="storage_analyzer_indexed_summary">Files indexed: %1$d • Free storage: %2$s</string>
     <string name="storage_analyzer_types_title">File types</string>
     <plurals name="storage_analyzer_type_summary">
@@ -480,10 +476,6 @@
         <item quantity="one">Showing the largest %1$d items. Scan again after cleaning to see more.</item>
         <item quantity="other">Showing the largest %1$d items. Scan again after cleaning to see more.</item>
     </plurals>
-    <plurals name="plan_preview_summary">
-        <item quantity="one">%1$s deleted now · %2$s moved to Trash for %3$d day</item>
-        <item quantity="other">%1$s deleted now · %2$s moved to Trash for %3$d days</item>
-    </plurals>
     <plurals name="result_changed">
         <item quantity="one">%1$d changed since the scan</item>
         <item quantity="other">%1$d changed since the scan</item>
@@ -529,7 +521,6 @@
         <item quantity="one">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d file can’t be kept for undo. Delete it permanently instead? This can’t be undone.</item>
         <item quantity="other">This device doesn’t let Smart Cleaner create its Trash folder, so %1$d files can’t be kept for undo. Delete them permanently instead? This can’t be undone.</item>
     </plurals>
-    <string name="delete_confirm_permanent">%1$s will be deleted permanently. This can’t be undone.</string>
     <string name="plan_group_whatsapp_old_video">Older WhatsApp videos</string>
     <string name="plan_group_whatsapp_old_image">Older WhatsApp photos</string>
     <string name="plan_group_whatsapp_old_audio">Older WhatsApp audio</string>
@@ -580,7 +571,7 @@
     <string name="home_plan_sub">you can free</string>
     <string name="home_cta_clean">CLEAN UP</string>
     <string name="home_cta_hint_tap">one tap</string>
-    <string name="home_plan_split">%1$s of junk goes to Trash right away. I’ll ask you about the other %2$s.</string>
+    <string name="home_plan_split">%1$s of junk gets cleaned right away. I’ll ask you about the other %2$s.</string>
     <string name="home_scan_label">Found so far</string>
     <string name="home_scan_now">Checking %1$s…</string>
     <string name="home_hard_title">The easy part is done. Here’s what’s taking space:</string>
@@ -621,8 +612,8 @@
     <string name="result_freed_for_good">%1$s freed</string>
     <string name="confirm_permanent_body">These files can’t go to Trash, so they would be deleted right away.</string>
     <plurals name="confirm_trash_body">
-        <item quantity="one">%1$d file: %2$s. You can restore it for 7 days.</item>
-        <item quantity="other">%1$d files: %2$s. You can restore them for 7 days.</item>
+        <item quantity="one">%1$d file: %2$s.</item>
+        <item quantity="other">%1$d files: %2$s.</item>
     </plurals>
     <plurals name="confirm_see_files">
         <item quantity="one">See %1$d file</item>
@@ -638,4 +629,20 @@
     <string name="settings_privacy_terms">Privacy &amp; terms</string>
     <string name="settings_kept_row">Files I kept</string>
     <string name="settings_excluded_row">Folders not suggested</string>
+    <string name="confirm_clean_title">Clean up %1$s?</string>
+    <string name="confirm_split_permanent">%1$s of cache and temporary files is deleted for good.</string>
+    <string name="app_manager_cache_line">cache %1$s</string>
+    <string name="disclosure_xiaomi_warning">Your phone will show a warning and a short countdown. That\'s normal for this permission.</string>
+    <plurals name="confirm_split_trash">
+        <item quantity="one">%1$s goes to Trash. You can restore it for %2$d day.</item>
+        <item quantity="other">%1$s goes to Trash. You can restore it for %2$d days.</item>
+    </plurals>
+    <plurals name="scan_files_checking">
+        <item quantity="one">Checking %1$d file…</item>
+        <item quantity="other">Checking %1$d files…</item>
+    </plurals>
+    <plurals name="premium_duplicate_copies">
+        <item quantity="one">%1$d copy · %2$s</item>
+        <item quantity="other">%1$d copies · %2$s</item>
+    </plurals>
 </resources>

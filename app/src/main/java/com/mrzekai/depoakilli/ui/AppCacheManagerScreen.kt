@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,8 +27,6 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -51,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.pluralStringResource
@@ -60,8 +56,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.common.ActionCard
+import com.mrzekai.depoakilli.ui.common.listBottomPadding
 import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.BlackChip
@@ -87,6 +86,7 @@ internal fun AppCacheManagerScreen(
     onClearOwnCache: () -> Unit,
     onOpenAppDetails: (String) -> Unit,
     modifier: Modifier = Modifier,
+    listAd: @Composable () -> Unit = {},
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var sortMode by rememberSaveable { mutableStateOf(CacheSortMode.LARGEST) }
@@ -118,7 +118,7 @@ internal fun AppCacheManagerScreen(
             start = 18.dp,
             end = 18.dp,
             top = 16.dp,
-            bottom = 28.dp,
+            bottom = listBottomPadding(),
         ),
         verticalArrangement = Arrangement.spacedBy(13.dp),
     ) {
@@ -292,16 +292,19 @@ internal fun AppCacheManagerScreen(
                     }
                 }
             } else {
-                items(
-                    items = visibleEntries,
-                    key = AppCacheEntry::packageName,
-                    contentType = { "cache_app_row" },
-                ) { app ->
-                    CacheAppRow(
-                        app = app,
-                        maxCacheBytes = maxCacheBytes,
-                        onClick = { selectedApp = app },
-                    )
+                // B7: one list native after the 4th row, in lists of 6 rows or more.
+                val showAd = visibleEntries.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
+                visibleEntries.forEachIndexed { index, app ->
+                    item(key = app.packageName, contentType = "cache_app_row") {
+                        CacheAppRow(
+                            app = app,
+                            maxCacheBytes = maxCacheBytes,
+                            onClick = { selectedApp = app },
+                        )
+                    }
+                    if (showAd && index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1) {
+                        item(key = "app-cache-native") { listAd() }
+                    }
                 }
             }
         }
@@ -444,39 +447,15 @@ internal fun CacheHeroGraphic() {
 internal fun CachePermissionCard(
     onClick: () -> Unit,
 ) {
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Black),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                Icons.Outlined.Info,
-                contentDescription = null,
-                tint = AdLabel,
-            )
-            Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.cache_access_required),
-                    color = OnBlack,
-                    fontWeight = FontWeight.Black,
-                )
-                Text(
-                    text = stringResource(R.string.cache_access_explanation_v050),
-                    color = OnBlackSoft,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
-            TextButton(onClick = onClick) {
-                Text(stringResource(R.string.cache_grant_action))
-            }
-        }
-    }
+    // B2: the long "Allow cache scan" button sits under the text, never beside it.
+    ActionCard(
+        icon = Icons.Outlined.Info,
+        title = stringResource(R.string.cache_access_required),
+        body = stringResource(R.string.cache_access_explanation_v050),
+        action = stringResource(R.string.cache_grant_action),
+        onClick = onClick,
+        iconTint = AdLabel,
+    )
 }
 
 @Composable

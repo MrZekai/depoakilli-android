@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.ui
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import com.mrzekai.depoakilli.ui.common.PillButton
 import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.common.SheetBody
 import com.mrzekai.depoakilli.ui.common.SheetTitle
+import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.Lime
@@ -102,6 +104,17 @@ internal fun AccessDisclosureDialog(
             stringResource(if (allFiles) R.string.disclosure_note_v2 else R.string.disclosure_usage_body),
             soft = true,
         )
+        // P3: Xiaomi / Redmi / POCO show their own warning with a countdown for
+        // Usage access. The screen is the system's; we only say it is coming.
+        if (!allFiles && DeviceFamily.isXiaomi(Build.MANUFACTURER, Build.BRAND)) {
+            Text(
+                stringResource(R.string.disclosure_xiaomi_warning),
+                color = AdLabel,
+                fontSize = 14.sp,
+                lineHeight = 19.sp,
+                fontWeight = AppWeights.Strong,
+            )
+        }
         PillButton(
             text = stringResource(R.string.action_continue),
             onClick = onContinue,
@@ -150,4 +163,12 @@ internal fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
     ScanFocus.DOWNLOADS -> R.string.scan_focus_downloads
     ScanFocus.APKS -> R.string.scan_focus_apks
     ScanFocus.ANALYZE -> R.string.scan_focus_analyze
+}
+
+/** Phone makers whose system adds its own screens to permission flows (P3). */
+internal object DeviceFamily {
+    private val XIAOMI = setOf("xiaomi", "redmi", "poco")
+
+    fun isXiaomi(manufacturer: String?, brand: String?): Boolean =
+        manufacturer.orEmpty().lowercase() in XIAOMI || brand.orEmpty().lowercase() in XIAOMI
 }

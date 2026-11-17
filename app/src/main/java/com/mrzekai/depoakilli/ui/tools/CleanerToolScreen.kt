@@ -85,6 +85,7 @@ internal fun PremiumCleanerToolScreen(
     modifier: Modifier = Modifier,
     listAd: @Composable () -> Unit = {},
     onCancelScan: () -> Unit = {},
+    onRefresh: () -> Unit = onScan,
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = ToolBackground, contentColor = com.mrzekai.depoakilli.ui.theme.Ink) {
         when {
@@ -103,6 +104,7 @@ internal fun PremiumCleanerToolScreen(
                 onSetItemsSelected = onSetItemsSelected,
                 onClean = onClean,
                 listAd = listAd,
+                onRefresh = onRefresh,
             )
         }
     }

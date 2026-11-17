@@ -3,7 +3,9 @@ package com.mrzekai.depoakilli.ui
 import com.mrzekai.depoakilli.data.AiCleaningEngine
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
+import com.mrzekai.depoakilli.model.DeleteMode
 import com.mrzekai.depoakilli.ui.common.ConfirmGroups
+import com.mrzekai.depoakilli.ui.common.DeleteSplit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -73,5 +75,49 @@ class ConfirmAndResultTest {
 
         val nothing = ResultFigures.of(CleanupResult(deletedBytes = 0L, deletedCount = 0, failedCount = 2))
         assertEquals(ResultFigures.Headline.NOTHING, nothing.headline)
+    }
+
+    @Test
+    fun `installers and exact copies go to Trash, recreated junk is deleted for good`() {
+        assertEquals(DeleteMode.TRASH, CleanupGroup.APK_INSTALLED.deleteMode)
+        assertEquals(DeleteMode.TRASH, CleanupGroup.DUPLICATE_SAFE.deleteMode)
+        assertEquals(DeleteMode.PERMANENT, CleanupGroup.THUMBNAILS.deleteMode)
+        assertEquals(DeleteMode.PERMANENT, CleanupGroup.TEMP_FILES.deleteMode)
+    }
+
+    @Test
+    fun `a Trash-only selection promises restore and shows no permanent line`() {
+        val split = DeleteSplit.of(listOf(item("a", CleanupGroup.DUPLICATE_SAFE, 200), item("b", CleanupGroup.APK_INSTALLED, 36)))
+        assertEquals(DeleteSplit.Sheet.TRASH, split.sheet)
+        assertEquals(236L, split.trashBytes)
+        assertEquals(0L, split.permanentBytes)
+        assertTrue(split.showsRestoreLine)
+        assertFalse(split.showsPermanentLine)
+    }
+
+    @Test
+    fun `a permanent-only selection never promises restore`() {
+        val split = DeleteSplit.of(listOf(item("a", CleanupGroup.THUMBNAILS, 10), item("b", CleanupGroup.TEMP_FILES, 11)))
+        assertEquals(DeleteSplit.Sheet.PERMANENT, split.sheet)
+        assertFalse(split.showsRestoreLine)
+        assertTrue(split.showsPermanentLine)
+        assertEquals(21L, split.permanentBytes)
+    }
+
+    @Test
+    fun `a mixed selection shows the total in the title and each amount once`() {
+        val split = DeleteSplit.of(
+            listOf(
+                item("a", CleanupGroup.DUPLICATE_SAFE, 200),
+                item("b", CleanupGroup.APK_INSTALLED, 36),
+                item("c", CleanupGroup.THUMBNAILS, 15),
+                item("d", CleanupGroup.TEMP_FILES, 6),
+            ),
+        )
+        assertEquals(DeleteSplit.Sheet.MIXED, split.sheet)
+        assertEquals(257L, split.totalBytes)
+        assertEquals(236L, split.trashBytes)
+        assertEquals(21L, split.permanentBytes)
+        assertTrue(split.showsRestoreLine && split.showsPermanentLine)
     }
 }

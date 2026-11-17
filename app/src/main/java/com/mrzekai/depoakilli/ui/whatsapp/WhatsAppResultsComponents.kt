@@ -35,10 +35,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
@@ -79,6 +80,7 @@ internal fun WhatsAppResultsScreen(
     onToggleItem: (String) -> Unit,
     onToggleCategory: (WhatsAppMediaCategory) -> Unit,
     onDeleteSelected: () -> Unit,
+    listAd: @Composable () -> Unit = {},
 ) {
     var directionName by rememberSaveable { mutableStateOf(WhatsAppDirectionFilter.ALL.name) }
     var detailGroupName by rememberSaveable { mutableStateOf<String?>(null) }
@@ -168,21 +170,28 @@ internal fun WhatsAppResultsScreen(
                     }
                 }
             } else {
-                WhatsAppUiGroup.entries.forEach { group ->
-                    val groupItems = filterWhatsAppItems(summary.items, group, direction)
-                    if (groupItems.isNotEmpty()) {
-                        item(key = "wa-group-${group.name}") {
-                            WhatsAppGroupSection(
-                                group = group,
-                                items = groupItems,
-                                onToggleItem = onToggleItem,
-                                onToggleGroup = {
-                                    toggleUiGroup(summary, group, direction, onToggleCategory, onToggleItem)
-                                },
-                                onViewAll = { detailGroupName = group.name },
-                                onPreview = { previewItemId = it.id },
-                            )
-                        }
+                val visibleGroups = WhatsAppUiGroup.entries
+                    .map { group -> group to filterWhatsAppItems(summary.items, group, direction) }
+                    .filter { (_, groupItems) -> groupItems.isNotEmpty() }
+                // B7: one list native after the 2nd category card when a 3rd card
+                // follows and the list holds at least 6 files.
+                val showAd = visibleGroups.size > AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD &&
+                    visibleGroups.sumOf { (_, groupItems) -> groupItems.size } >= AdPolicy.NATIVE_LIST_MIN_ROWS
+                visibleGroups.forEachIndexed { index, (group, groupItems) ->
+                    item(key = "wa-group-${group.name}") {
+                        WhatsAppGroupSection(
+                            group = group,
+                            items = groupItems,
+                            onToggleItem = onToggleItem,
+                            onToggleGroup = {
+                                toggleUiGroup(summary, group, direction, onToggleCategory, onToggleItem)
+                            },
+                            onViewAll = { detailGroupName = group.name },
+                            onPreview = { previewItemId = it.id },
+                        )
+                    }
+                    if (showAd && index == AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD - 1) {
+                        item(key = "wa-list-native") { listAd() }
                     }
                 }
             }
@@ -364,7 +373,16 @@ internal fun WhatsAppGroupSection(
                 }
                 Spacer(Modifier.width(9.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(stringResource(groupTitleRes(group)), color = OnBlack, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                    Text(
+                        stringResource(groupTitleRes(group)),
+                        color = OnBlack,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    // B6: "662 files • 111 MB" stays on one line; "View all" is an
+                    // arrow button so it no longer squeezes this column.
                     Text(
                         pluralStringResource(
                             R.plurals.whatsapp_category_summary,
@@ -373,12 +391,18 @@ internal fun WhatsAppGroupSection(
                             ByteFormatter.format(items.sumOf(WhatsAppMediaItem::sizeBytes)),
                         ),
                         color = WaTextSecondary,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
-                TextButton(onClick = onViewAll) {
-                    Text(stringResource(R.string.whatsapp_view_all), color = Lime, fontWeight = FontWeight.Bold)
-                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Lime, modifier = Modifier.size(18.dp))
+                IconButton(onClick = onViewAll) {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowForward,
+                        contentDescription = stringResource(R.string.whatsapp_view_all),
+                        tint = Lime,
+                    )
                 }
                 TriStateCheckbox(
                     state = selectionState,

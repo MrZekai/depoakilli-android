@@ -22,7 +22,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +29,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.data.CleaningThresholds
+import com.mrzekai.depoakilli.ui.common.DeleteSplit
+import com.mrzekai.depoakilli.ui.common.DeleteSplitLines
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -63,7 +63,6 @@ internal fun SelectedItemsPreviewSheet(
     val trashBytes = items.filter { it.assessment.group.deleteMode == DeleteMode.TRASH }
         .sumOf(CleanableItem::sizeBytes)
     val hasWhatsApp = items.any { StoragePathRules.isWhatsAppPath(it.relativePath) }
-    val days = CleaningThresholds.TRASH_RETENTION_DAYS
     val groups = items.groupBy { it.assessment.group }.entries.sortedByDescending { (_, list) ->
         list.sumOf(CleanableItem::sizeBytes)
     }
@@ -150,17 +149,8 @@ internal fun SelectedItemsPreviewSheet(
                 }
             }
             HorizontalDivider(color = BlackLine)
-            Text(
-                pluralStringResource(
-                    R.plurals.plan_preview_summary,
-                    days,
-                    ByteFormatter.format(permanentBytes),
-                    ByteFormatter.format(trashBytes),
-                    days,
-                ),
-                color = OnBlack,
-                fontWeight = FontWeight.Bold,
-            )
+            // B1: only the parts that exist, each with its own promise.
+            DeleteSplitLines(DeleteSplit(trashBytes = trashBytes, permanentBytes = permanentBytes))
             if (hasWhatsApp) {
                 Text(stringResource(R.string.plan_preview_whatsapp), color = AdLabel, fontSize = 13.sp)
             }

@@ -107,8 +107,6 @@
     <string name="all_files_access_clean_screen">Akıllı Temizleyici, klasörleri tek tek seçtirmeden paylaşılan depolamayı kapsamlı taramak için Android Tüm dosyalara erişim iznine ihtiyaç duyar.</string>
     <string name="all_files_access_description">Temel dosya yönetimi ve bakım motoru için gereklidir: çöp, kopyalar, büyük dosyalar, indirilenler, APK’lar ve WhatsApp paylaşılan medyası.</string>
     <string name="all_files_access_title">Tam depolama yönetimi erişimi</string>
-    <string name="app_manager_intro">Açılabilir uygulamaları, depolama kullanımını ve önbelleği Akıllı Temizleyici içinde incele. Uygulama kaldırma her zaman Android’in resmî kaldırma onayını kullanır.</string>
-    <string name="app_manager_size_detail">Toplam %1$s • önbellek %2$s</string>
     <string name="app_manager_subtitle">Açılabilir uygulamaları, boyutlarını, önbelleklerini ve Android kaldırma seçeneklerini incele</string>
     <string name="app_manager_title">Uygulama Yöneticisi</string>
     <string name="app_manager_usage_description">Kullanım Erişimi uygulama depolama toplamlarını ve son kullanım bilgisini göstermemizi sağlar. Kişisel uygulama içeriği okunmaz.</string>
@@ -227,17 +225,17 @@
     <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
     <string name="whatsapp_scanning_short">Akıllı medya taraması</string>
     <string name="whatsapp_local_processing_note">Medya bu cihazda analiz edilir.</string>
-    <string name="whatsapp_total_media">TOPLAM WHATSAPP MEDYASI</string>
-    <string name="whatsapp_filter_incoming">Gelenler</string>
-    <string name="whatsapp_filter_sent">Gönderilenler</string>
+    <string name="whatsapp_total_media">WhatsApp medyası</string>
+    <string name="whatsapp_filter_incoming">Gelen</string>
+    <string name="whatsapp_filter_sent">Giden</string>
     <string name="whatsapp_filter_all">Hepsi</string>
     <string name="whatsapp_group_images">Görseller</string>
     <string name="whatsapp_group_videos">Videolar</string>
     <string name="whatsapp_group_documents_more">Belgeler ve Diğer</string>
     <string name="whatsapp_view_all">Tümünü Gör</string>
     <string name="whatsapp_card_hint">Dosyaya dokun: önizle • Kutuyu işaretle: temizliğe ekle</string>
-    <string name="whatsapp_sort_largest">En büyükler</string>
-    <string name="whatsapp_sort_newest">En yeniler</string>
+    <string name="whatsapp_sort_largest">En büyük</string>
+    <string name="whatsapp_sort_newest">En yeni</string>
     <string name="whatsapp_no_files_for_filter">Bu filtreye uyan dosya yok.</string>
     <string name="whatsapp_preview_title">Önizleme</string>
     <string name="whatsapp_included">Temizliğe dahil</string>
@@ -249,10 +247,9 @@
 
     <string name="premium_tool_nothing_found">İncelenecek öğe bulunamadı</string>
     <string name="premium_tool_nothing_found_detail">Erişilebilir paylaşılan depolamada bu araca uygun dosya bulunamadı.</string>
-    <string name="premium_tool_found_size">Toplam inceleme alanı</string>
-    <string name="premium_sort_largest">En büyükler</string>
-    <string name="premium_sort_newest">En yeniler</string>
-    <string name="premium_sort_selected">Seçilenler önce</string>
+    <string name="premium_sort_largest">En büyük</string>
+    <string name="premium_sort_newest">En yeni</string>
+    <string name="premium_sort_selected">Seçili</string>
     <string name="premium_duplicates_subtitle">Aynı içeriğe sahip kopyalar gruplanır; orijinali koruyup yalnız fazladan kopyaları silebilirsin.</string>
     <string name="premium_large_subtitle">Silmeden önce depolamada en çok yer kullanan dosyaları görsel olarak incele.</string>
     <string name="premium_apk_subtitle">Yüklü uygulamalara dokunmadan indirilen Android kurulum paketlerini incele.</string>
@@ -260,9 +257,8 @@
     <string name="premium_junk_subtitle">İndirilenler dışındaki geçici dosya ve küçük resim kalıntılarını incele. İndirme kalıntıları İndirilenler’de kalır.</string>
     <string name="premium_downloads_subtitle">Kişisel dosyaları otomatik seçmeden eski indirmeleri ve yarım kalmış indirme kalıntılarını incele.</string>
     <string name="premium_deep_subtitle">Ana depolama kategorilerini tek geçişte geniş kapsamlı incele. Düşük güvenli kişisel dosyalar yalnız inceleme olarak kalır.</string>
-    <string name="premium_duplicates_original_safe">Korunan orijinal silme seçimine hiçbir zaman eklenmez. Burada yalnız doğrulanmış fazladan kopyalar gösterilir.</string>
+    <string name="premium_duplicates_original_safe">Orijinaller hiçbir zaman seçilmez.</string>
     <string name="premium_duplicate_unknown_original">korunan orijinal</string>
-    <string name="premium_duplicate_group_title">%1$s kopyaları</string>
     <string name="premium_apk_installer_note">Buradaki APK’yı silmek yalnız kurulum dosyasını kaldırır. Telefonda yüklü uygulamayı kaldırmaz.</string>
     <string name="premium_apk_old">Eski kurulum paketleri</string>
     <string name="premium_apk_recent">Yeni kurulum paketleri</string>
@@ -382,7 +378,7 @@
     <string name="tools_storage_change_subtitle">İki gerçek analiz arasındaki ölçülen depolama artış ve azalışlarını gör</string>
     <string name="storage_analyzer_scanning_subtitle">Erişilebilir paylaşılan dosyalar türlerine ayrılıyor…</string>
     <string name="storage_analyzer_empty_subtitle">Görsel, video, ses, belge, arşiv, APK ve diğer erişilebilir dosyaların alan kullanımını gör.</string>
-    <string name="storage_analyzer_indexed_label">İNDEKSLENEN PAYLAŞILAN DOSYALAR</string>
+    <string name="storage_analyzer_indexed_label">Taranan dosyalar</string>
     <string name="storage_analyzer_indexed_summary">Dizine eklenen dosya: %1$d • Boş alan: %2$s</string>
     <string name="storage_analyzer_types_title">Dosya türleri</string>
     <plurals name="storage_analyzer_type_summary">
@@ -480,10 +476,6 @@
         <item quantity="one">En büyük %1$d öğe gösteriliyor. Daha fazlasını görmek için temizlikten sonra yeniden tarayın.</item>
         <item quantity="other">En büyük %1$d öğe gösteriliyor. Daha fazlasını görmek için temizlikten sonra yeniden tarayın.</item>
     </plurals>
-    <plurals name="plan_preview_summary">
-        <item quantity="one">%1$s şimdi silinir · %2$s %3$d gün çöpte kalır</item>
-        <item quantity="other">%1$s şimdi silinir · %2$s %3$d gün çöpte kalır</item>
-    </plurals>
     <plurals name="result_changed">
         <item quantity="one">%1$d öğe taramadan sonra değişti</item>
         <item quantity="other">%1$d öğe taramadan sonra değişti</item>
@@ -529,7 +521,6 @@
         <item quantity="one">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
         <item quantity="other">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
     </plurals>
-    <string name="delete_confirm_permanent">%1$s kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
     <string name="plan_group_whatsapp_old_video">Eski WhatsApp videoları</string>
     <string name="plan_group_whatsapp_old_image">Eski WhatsApp fotoğrafları</string>
     <string name="plan_group_whatsapp_old_audio">Eski WhatsApp sesleri</string>
@@ -580,7 +571,7 @@
     <string name="home_plan_sub">yer açabilirim</string>
     <string name="home_cta_clean">TEMİZLE</string>
     <string name="home_cta_hint_tap">tek dokunuş</string>
-    <string name="home_plan_split">%1$s gereksiz dosya hemen çöpe gider. Kalan %2$s için sana tek tek sorarım.</string>
+    <string name="home_plan_split">%1$s gereksiz dosya hemen temizlenir. Kalan %2$s için sana tek tek sorarım.</string>
     <string name="home_scan_label">Şu ana kadar buldum</string>
     <string name="home_scan_now">%1$s inceleniyor…</string>
     <string name="home_hard_title">Kolay kısım bitti. Yeri asıl bunlar tutuyor:</string>
@@ -621,8 +612,8 @@
     <string name="result_freed_for_good">%1$s yer açıldı</string>
     <string name="confirm_permanent_body">Bu dosyalar çöpe taşınamıyor; silinirse hemen ve kalıcı olarak silinir.</string>
     <plurals name="confirm_trash_body">
-        <item quantity="one">%1$d dosya: %2$s. 7 gün içinde geri alabilirsin.</item>
-        <item quantity="other">%1$d dosya: %2$s. 7 gün içinde geri alabilirsin.</item>
+        <item quantity="one">%1$d dosya: %2$s.</item>
+        <item quantity="other">%1$d dosya: %2$s.</item>
     </plurals>
     <plurals name="confirm_see_files">
         <item quantity="one">%1$d dosyayı gör</item>
@@ -638,4 +629,20 @@
     <string name="settings_privacy_terms">Gizlilik ve koşullar</string>
     <string name="settings_kept_row">Sakladığım dosyalar</string>
     <string name="settings_excluded_row">Önerilmeyen klasörler</string>
+    <string name="confirm_clean_title">%1$s temizlensin mi?</string>
+    <string name="confirm_split_permanent">%1$s önbellek ve geçici dosya kalıcı silinir.</string>
+    <string name="app_manager_cache_line">önbellek %1$s</string>
+    <string name="disclosure_xiaomi_warning">Telefonun bir uyarı ve kısa bir geri sayım gösterecek. Bu izin için normaldir.</string>
+    <plurals name="confirm_split_trash">
+        <item quantity="one">%1$s çöpe gider, %2$d gün içinde geri alınır.</item>
+        <item quantity="other">%1$s çöpe gider, %2$d gün içinde geri alınır.</item>
+    </plurals>
+    <plurals name="scan_files_checking">
+        <item quantity="one">%1$d dosya inceleniyor…</item>
+        <item quantity="other">%1$d dosya inceleniyor…</item>
+    </plurals>
+    <plurals name="premium_duplicate_copies">
+        <item quantity="one">%1$d kopya · %2$s</item>
+        <item quantity="other">%1$d kopya · %2$s</item>
+    </plurals>
 </resources>

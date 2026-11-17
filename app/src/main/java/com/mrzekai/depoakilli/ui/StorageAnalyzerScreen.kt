@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.StorageFileType
@@ -80,6 +80,8 @@ internal fun StorageAnalyzerScreen(
     onScan: () -> Unit,
     onReviewType: (StorageFileType) -> Unit,
     modifier: Modifier = Modifier,
+    onRefresh: () -> Unit = onScan,
+    listAd: @Composable () -> Unit = {},
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -99,8 +101,9 @@ internal fun StorageAnalyzerScreen(
 
             else -> AnalyzerResults(
                 state = state,
-                onScan = onScan,
+                onScan = onRefresh,
                 onReviewType = onReviewType,
+                listAd = listAd,
             )
         }
     }
@@ -309,6 +312,7 @@ private fun AnalyzerResults(
     state: CleanerUiState,
     onScan: () -> Unit,
     onReviewType: (StorageFileType) -> Unit,
+    listAd: @Composable () -> Unit = {},
 ) {
     val summary = state.summary
     val totalIndexedBytes = summary.scannedBytes.coerceAtLeast(0L)
@@ -334,7 +338,7 @@ private fun AnalyzerResults(
         item {
             Text(
                 text = stringResource(R.string.storage_analyzer_types_title),
-                color = OnBlack,
+                color = Ink,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
             )
@@ -356,17 +360,20 @@ private fun AnalyzerResults(
                 }
             }
         } else {
-            items(
-                items = summary.storageTypes,
-                key = { it.type.name },
-                contentType = { "storage_analyzer_type" },
-            ) { stat ->
-                AnalyzerTypeCard(
-                    stat = stat,
-                    totalIndexedBytes = totalIndexedBytes,
-                    previews = summary.storagePreviews[stat.type].orEmpty().take(3),
-                    onReview = { onReviewType(stat.type) },
-                )
+            // B7: one list native after the 2nd type card, in lists of 6 cards or more.
+            val showAd = summary.storageTypes.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
+            summary.storageTypes.forEachIndexed { index, stat ->
+                item(key = stat.type.name, contentType = "storage_analyzer_type") {
+                    AnalyzerTypeCard(
+                        stat = stat,
+                        totalIndexedBytes = totalIndexedBytes,
+                        previews = summary.storagePreviews[stat.type].orEmpty().take(3),
+                        onReview = { onReviewType(stat.type) },
+                    )
+                }
+                if (showAd && index == AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD - 1) {
+                    item(key = "analyzer-list-native") { listAd() }
+                }
             }
         }
 
@@ -419,7 +426,7 @@ private fun AnalyzerResults(
                     contentDescription = null,
                 )
                 Spacer(Modifier.width(7.dp))
-                Text(stringResource(R.string.scan_again))
+                Text(stringResource(R.string.cache_refresh))
             }
         }
     }

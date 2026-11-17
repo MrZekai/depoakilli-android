@@ -118,6 +118,16 @@ abstract class CleanerScanLayer(
         }
     }
 
+    /**
+     * "Refresh" on a tool screen (B4): drops the cached storage index so the
+     * same tool scans the storage again.
+     */
+    fun refreshToolScan() {
+        if (_state.value.scanning) return
+        repository.invalidateStorageIndex()
+        scan(_state.value.scanFocus)
+    }
+
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
         if (!repository.hasAllFilesAccess()) {
@@ -217,6 +227,7 @@ abstract class CleanerScanLayer(
 
                 _state.update {
                     it.copy(
+                        lastScanFromCache = summary.fromCachedIndex,
                         summary = if (focus == ScanFocus.ANALYZE) {
                             it.summary.copy(
                                 scannedFileCount = summary.scannedFileCount,

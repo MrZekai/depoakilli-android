@@ -11,13 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Android
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,16 +33,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.InstalledAppEntry
-import com.mrzekai.depoakilli.ui.common.IconChip
 import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.listBottomPadding
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.Ink
-import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 @Composable
 internal fun AppManagerScreen(
@@ -51,16 +54,14 @@ internal fun AppManagerScreen(
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     modifier: Modifier = Modifier,
+    listAd: @Composable () -> Unit = {},
 ) {
     PageFrame(modifier = modifier) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = listBottomPadding()),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        item {
-            Text(stringResource(R.string.app_manager_intro), color = InkSoft, fontWeight = AppWeights.Strong)
-        }
         if (!state.hasUsageAccess) {
             item {
                 PermissionToolCard(
@@ -82,8 +83,13 @@ internal fun AppManagerScreen(
                 LinkButton(stringResource(R.string.cache_refresh), onClick = onRefresh)
             }
         }
-        items(state.installedApps, key = InstalledAppEntry::packageName) { app ->
-            AppManagerRow(app, onUninstallApp, onOpenAppInfo)
+        // B7: one list native after the 4th row, in lists of 6 rows or more.
+        val showAd = state.installedApps.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
+        state.installedApps.forEachIndexed { index, app ->
+            item(key = app.packageName) { AppManagerRow(app, onUninstallApp, onOpenAppInfo) }
+            if (showAd && index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1) {
+                item(key = "app-manager-native") { listAd() }
+            }
         }
     }
     }
@@ -95,22 +101,30 @@ internal fun AppManagerRow(
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
 ) {
+    // B6: the real app icon, no package name, the total big in Lime and the
+    // cache as a second line. Inline actions stay one word ("Uninstall"); the
+    // App info page of system apps is an icon button, so the name keeps its width.
     Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Black, contentColor = OnBlack)) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconChip(Icons.Outlined.Android)
+            AsyncAppIcon(packageName = app.packageName, modifier = Modifier.size(44.dp))
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
-                Text(app.label, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(app.packageName, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+                Text(app.label, color = OnBlack, fontWeight = AppWeights.Title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (app.totalBytes > 0L) {
                     Text(
-                        stringResource(
-                            R.string.app_manager_size_detail,
-                            ByteFormatter.format(app.totalBytes),
-                            ByteFormatter.format(app.cacheBytes),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ByteFormatter.format(app.totalBytes),
+                        color = Lime,
+                        fontSize = 20.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = AppWeights.Giant,
+                        maxLines = 1,
+                    )
+                    Text(
+                        stringResource(R.string.app_manager_cache_line, ByteFormatter.format(app.cacheBytes)),
+                        color = OnBlackSoft,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -118,9 +132,16 @@ internal fun AppManagerRow(
             // Offer Android's App info page instead, where Android shows what
             // is actually allowed (disable, clear storage) (QA v43 #08).
             if (app.systemApp) {
-                TextButton(onClick = { onOpenAppInfo(app.packageName) }) { Text(stringResource(R.string.app_info)) }
+                IconButton(onClick = { onOpenAppInfo(app.packageName) }) {
+                    Icon(Icons.Outlined.Info, contentDescription = stringResource(R.string.app_info), tint = Lime)
+                }
             } else {
-                TextButton(onClick = { onUninstallApp(app.packageName) }) { Text(stringResource(R.string.uninstall)) }
+                TextButton(
+                    onClick = { onUninstallApp(app.packageName) },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Lime),
+                ) {
+                    Text(stringResource(R.string.uninstall), fontWeight = AppWeights.Strong, maxLines = 1)
+                }
             }
         }
     }

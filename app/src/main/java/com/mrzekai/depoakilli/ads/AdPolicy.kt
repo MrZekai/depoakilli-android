@@ -21,7 +21,7 @@ data class AdFrequencyState(
  * shows while the files move, before the result). Every trigger uses the
  * same limits below.
  */
-enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN, OPEN_FINDINGS, SWIPE_FINISHED }
+enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN, OPEN_FINDINGS, SWIPE_FINISHED, TOOL_RESULT }
 
 /**
  * Every ad limit lives here (starting values; easy to tighten). Ads are only
@@ -44,6 +44,9 @@ object AdPolicy {
     const val NATIVE_FINDINGS_AFTER_ROW = 2
     const val NATIVE_FINDINGS_MIN_ROWS = 4
     const val SWIPE_BREAK_EVERY = 8
+
+    /** Faz 5B: card lists (WhatsApp categories, Storage Analyzer types) get the native after the 2nd card. */
+    const val NATIVE_GROUP_LIST_AFTER_CARD = 2
     const val RETURN_TO_CLEAN_MIN_DWELL_SEC = 20L
 
     fun dayOf(nowMillis: Long, zone: TimeZone = TimeZone.getDefault()): Long =

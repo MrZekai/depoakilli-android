@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -51,6 +50,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.common.ActionCard
 import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.BlackChip
@@ -126,14 +126,6 @@ internal fun CacheAppRow(
                             ),
                     )
                 }
-                Spacer(Modifier.height(5.dp))
-                Text(
-                    text = app.packageName,
-                    color = OnBlackSoft,
-                    fontSize = 12.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
             }
             Spacer(Modifier.width(8.dp))
             Surface(
@@ -206,54 +198,15 @@ internal fun OwnCacheCard(
     ownCacheBytes: Long,
     onClearOwnCache: () -> Unit,
 ) {
-    Surface(
-        color = Black,
-        shape = RoundedCornerShape(20.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.size(42.dp),
-                color = BlackChip,
-                shape = RoundedCornerShape(14.dp),
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Outlined.CleaningServices,
-                        contentDescription = null,
-                        tint = Lime,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-            }
-            Spacer(Modifier.width(11.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.cache_own_app),
-                    color = OnBlack,
-                    fontWeight = FontWeight.Black,
-                )
-                Text(
-                    text = stringResource(
-                        R.string.cache_own_app_subtitle,
-                        ByteFormatter.format(ownCacheBytes),
-                    ),
-                    color = OnBlackSoft,
-                    fontSize = 12.sp,
-                )
-            }
-            Button(
-                onClick = onClearOwnCache,
-                enabled = ownCacheBytes > 0L,
-            ) {
-                Text(stringResource(R.string.cache_modern_clean_now))
-            }
-        }
-    }
+    // B2: "Clean now" goes under the text; disabled it is a dark chip (B3).
+    ActionCard(
+        icon = Icons.Outlined.CleaningServices,
+        title = stringResource(R.string.cache_own_app),
+        body = stringResource(R.string.cache_own_app_subtitle, ByteFormatter.format(ownCacheBytes)),
+        action = stringResource(R.string.cache_modern_clean_now),
+        onClick = onClearOwnCache,
+        enabled = ownCacheBytes > 0L,
+    )
 }
 
 @Composable

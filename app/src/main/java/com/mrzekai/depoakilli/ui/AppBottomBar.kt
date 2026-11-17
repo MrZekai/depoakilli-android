@@ -3,9 +3,9 @@ package com.mrzekai.depoakilli.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,7 +19,6 @@ import com.mrzekai.depoakilli.ads.BannerAd
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.BlackChip
-import com.mrzekai.depoakilli.ui.theme.BlackLine
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
@@ -39,33 +38,38 @@ internal fun AppBottomBar(
     if (!detailScreenOpen) {
         // Faz 5: black bottom menu; the banner sits above it (at least 24 dp
         // from any action) and the selected tab is a dark pill with Lime.
-        Column(
-            modifier = Modifier
-                .background(Black)
-                .navigationBarsPadding(),
-        ) {
+        Column {
             if (bannerAllowed) {
-                Spacer(Modifier.height(24.dp))
-                BannerAd(canRequestAds = true)
-                Spacer(Modifier.height(12.dp))
-                HorizontalDivider(color = BlackLine)
+                // The 24 dp gap from the page's actions is page colour (Lime), so
+                // no empty black strip shows above the banner; the banner then
+                // sits right on the menu (Faz 5B, P3).
+                Spacer(Modifier.fillMaxWidth().height(24.dp).background(Lime))
             }
-            NavigationBar(containerColor = Black, contentColor = OnBlack, tonalElevation = 0.dp) {
-                AppTab.entries.forEachIndexed { index, tab ->
-                    val title = stringResource(tab.titleRes)
-                    NavigationBarItem(
-                        selected = selectedTabIndex == index,
-                        onClick = { onSelectTab(index) },
-                        icon = { Icon(tab.icon, contentDescription = title) },
-                        label = { Text(title, fontWeight = AppWeights.Strong) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Lime,
-                            selectedTextColor = Lime,
-                            unselectedIconColor = OnBlackSoft,
-                            unselectedTextColor = OnBlackSoft,
-                            indicatorColor = BlackChip,
-                        ),
-                    )
+            Column(
+                modifier = Modifier
+                    .background(Black)
+                    .navigationBarsPadding(),
+            ) {
+                if (bannerAllowed) {
+                    BannerAd(canRequestAds = true)
+                }
+                NavigationBar(containerColor = Black, contentColor = OnBlack, tonalElevation = 0.dp) {
+                    AppTab.entries.forEachIndexed { index, tab ->
+                        val title = stringResource(tab.titleRes)
+                        NavigationBarItem(
+                            selected = selectedTabIndex == index,
+                            onClick = { onSelectTab(index) },
+                            icon = { Icon(tab.icon, contentDescription = title) },
+                            label = { Text(title, fontWeight = AppWeights.Strong) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = Lime,
+                                selectedTextColor = Lime,
+                                unselectedIconColor = OnBlackSoft,
+                                unselectedTextColor = OnBlackSoft,
+                                indicatorColor = BlackChip,
+                            ),
+                        )
+                    }
                 }
             }
         }

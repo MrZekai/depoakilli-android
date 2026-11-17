@@ -116,9 +116,11 @@ class DeviceRepository(
             return@withContext ScanSummary(limitedAccess = true)
         }
 
-        // Smart and Deep always re-index; tool scans reuse a fresh (90 s) index.
+        // Smart and Deep always re-index; tool scans reuse a fresh (10 min) index
+        // that any delete, move to Trash, restore or "Refresh" drops (B4).
         val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
-        val indexed = (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
+        val cachedIndex = if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null
+        val indexed = cachedIndex
             ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
                 onProgress(visitedDirectories, discoveredFiles)
             }.also(::cacheSharedIndex)
@@ -239,6 +241,7 @@ class DeviceRepository(
             smartMediaTypes = smartMediaTypeStats(storageListFiles),
             truncated = truncated,
             hiddenKeptCount = userChoices.hiddenKept,
+            fromCachedIndex = cachedIndex != null,
             biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
                 FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
             } else {
@@ -653,7 +656,7 @@ class DeviceRepository(
         private const val MAX_INDEXED_FILES = 200_000
         private const val LOW_MEMORY_INDEXED_FILES = 50_000
         private const val MEDIUM_MEMORY_INDEXED_FILES = 100_000
-        private const val SHARED_INDEX_CACHE_TTL_MILLIS = 90L * 1000L
+        private const val SHARED_INDEX_CACHE_TTL_MILLIS = 10L * 60L * 1000L
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
         // A review list is rebuilt when a checkbox is toggled. Keep the

@@ -967,7 +967,7 @@ clean_tab_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt")
 for expected in ("fun findingsRows(", "plan-start-biggest", "plan-system-cache", "plan-kept-note"):
     if expected not in cleanup_plan_ui:
         errors.append(f"missing cleanup plan invariant: {expected}")
-for expected in ("plan.isAlreadyTidy", "HomeLogic.mode(", "TrashConfirmSheet("):
+for expected in ("plan.isAlreadyTidy", "HomeLogic.mode(", "DeleteConfirmDialog("):
     if expected not in clean_tab_ui:
         errors.append(f"missing Home plan invariant: {expected}")
 for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
@@ -988,7 +988,7 @@ for expected in (
 
 # T2.3: one delete confirmation and one media preview/thumbnail path.
 delete_confirm_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt")
-for expected in ("confirm_trash_title", "confirm_see_files", "confirm_yes_clean", "R.string.cancel", "confirm_trash_body", "delete_confirm_permanent", "confirm_permanent_action", "PillStyle.WHITE"):
+for expected in ("confirm_trash_title", "confirm_see_files", "confirm_yes_clean", "R.string.cancel", "confirm_trash_body", "confirm_split_permanent", "confirm_split_trash", "confirm_permanent_action", "PillStyle.WHITE"):
     if expected not in delete_confirm_ui:
         errors.append(f"missing shared delete confirmation invariant: {expected}")
 media_preview_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/FilePreviewDialog.kt")

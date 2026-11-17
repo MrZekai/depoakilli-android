@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -95,6 +96,7 @@ internal fun PremiumToolResults(
     onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
     listAd: @Composable () -> Unit = {},
+    onRefresh: () -> Unit = onScan,
 ) {
     val config = toolConfig(focus)
     var sortName by rememberSaveable(focus.name) { mutableStateOf(ToolSortMode.LARGEST.name) }
@@ -161,8 +163,20 @@ internal fun PremiumToolResults(
                         Modifier.fillMaxWidth().padding(bottom = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        GiantNumber(ByteFormatter.format(summary.totalSuggestedBytes), scale, modifier = Modifier.fillMaxWidth())
-                        PageLabel(stringResource(R.string.premium_tool_found_size), strong = true)
+                        // B6: the giant total and the file count under it; no "Total review size"
+                        // label and never a giant "0 B" (the empty card says it instead).
+                        if (summary.totalSuggestedBytes > 0L) {
+                            GiantNumber(ByteFormatter.format(summary.totalSuggestedBytes), scale, modifier = Modifier.fillMaxWidth())
+                            PageLabel(
+                                pluralStringResource(R.plurals.home_scan_files_count, summary.items.size, summary.items.size),
+                                strong = true,
+                            )
+                        }
+                        // B4: the index is reused for 10 minutes; Refresh scans the storage again.
+                        LinkButton(
+                            stringResource(R.string.cache_refresh),
+                            onClick = onRefresh,
+                        )
                         if (focus == ScanFocus.DUPLICATES) {
                             PageLabel(stringResource(R.string.premium_duplicates_original_safe))
                         }
@@ -233,7 +247,7 @@ internal fun PremiumToolResults(
                 item(key = "tool-scan-again") {
                     LinkButton(
                         stringResource(R.string.scan_again),
-                        onClick = onScan,
+                        onClick = onRefresh,
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     )
                 }
@@ -320,8 +334,16 @@ internal fun ToolSectionHeader(section: ToolSection, onToggleAll: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(section.title, color = Ink, fontWeight = AppWeights.Giant, fontSize = 17.sp, lineHeight = 22.sp)
-            Text(section.subtitle, color = InkSoft, fontSize = 13.sp, fontWeight = AppWeights.Strong)
+            Text(
+                section.title,
+                color = Ink,
+                fontWeight = AppWeights.Giant,
+                fontSize = 17.sp,
+                lineHeight = 22.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(section.subtitle, color = InkSoft, fontSize = 13.sp, fontWeight = AppWeights.Strong, maxLines = 1)
         }
         TriStateCheckbox(
             state = selectionState,

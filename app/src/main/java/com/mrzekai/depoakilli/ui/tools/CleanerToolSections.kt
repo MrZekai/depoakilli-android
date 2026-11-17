@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
@@ -34,10 +35,16 @@ import java.util.concurrent.TimeUnit
 @Composable
 internal fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolSection> {
     val items = summary.items
-    fun section(key: String, title: String, list: List<CleanableItem>, accent: Color): ToolSection = ToolSection(
+    fun section(
+        key: String,
+        title: String,
+        list: List<CleanableItem>,
+        accent: Color,
+        subtitle: String = "${list.size} • ${ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes))}",
+    ): ToolSection = ToolSection(
         key = key,
         title = title,
-        subtitle = "${list.size} • ${ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes))}",
+        subtitle = subtitle,
         accent = accent,
         items = list,
     )
@@ -53,11 +60,19 @@ internal fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolS
                 .sortedByDescending { list -> list.sumOf(CleanableItem::sizeBytes) }
             val visibleGroups = grouped.take(5).mapIndexed { index, list ->
                 val kept = list.first().protectedDuplicateName ?: unknownOriginal
+                // P3: the original's name on one line (ellipsized by the header),
+                // "1 copy · 192 MB" under it.
                 section(
                     key = "duplicate-$index-$kept",
-                    title = stringResource(R.string.premium_duplicate_group_title, kept),
+                    title = kept,
                     list = list,
                     accent = if (index % 2 == 0) ToolPurple else ToolCyan,
+                    subtitle = pluralStringResource(
+                        R.plurals.premium_duplicate_copies,
+                        list.size,
+                        list.size,
+                        ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes)),
+                    ),
                 )
             }
             val remaining = grouped.drop(5).flatten()

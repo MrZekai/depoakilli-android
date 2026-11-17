@@ -103,8 +103,6 @@
     <string name="all_files_access_clean_screen">Smart Cleaner membutuhkan Android Semua akses file untuk memindai penyimpanan bersama secara komprehensif tanpa membuat Anda memilih folder satu per satu.</string>
     <string name="all_files_access_description">Diperlukan untuk manajemen file inti dan mesin pemeliharaan: sampah, duplikat, file besar, unduhan, media bersama APK dan WhatsApp.</string>
     <string name="all_files_access_title">Akses manajemen penyimpanan penuh</string>
-    <string name="app_manager_intro">Tinjau aplikasi yang dapat diluncurkan, penggunaan penyimpanan, dan cache di Smart Cleaner. Menghapus aplikasi selalu menggunakan konfirmasi pencopotan pemasangan resmi Android.</string>
-    <string name="app_manager_size_detail">Jumlah %1$s • cache %2$s</string>
     <string name="app_manager_subtitle">Tinjau aplikasi yang dapat diluncurkan, ukuran penyimpanan, cache, dan opsi pencopotan pemasangan Android</string>
     <string name="app_manager_title">Manajer Aplikasi</string>
     <string name="app_manager_usage_description">Akses Penggunaan memungkinkan Smart Cleaner menampilkan total penyimpanan aplikasi dan informasi yang terakhir digunakan. Konten aplikasi pribadi tidak dibaca.</string>
@@ -210,7 +208,8 @@
     <string name="storage_review_limit_note">Kategori yang sangat besar mencapai batas tampilan keamanan. Perbaiki folder atau jalankan analisis lagi setelah dibersihkan.</string>
     <string name="whatsapp_scanning_short">Pemindaian media cerdas</string>
     <string name="whatsapp_local_processing_note">Media dianalisis di perangkat ini.</string>
-    <string name="whatsapp_total_media">TOTAL MEDIA WHATSAPP</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_total_media">Media WhatsApp</string>
     <string name="whatsapp_filter_incoming">Masuk</string>
     <string name="whatsapp_filter_sent">Terkirim</string>
     <string name="whatsapp_filter_all">Semua</string>
@@ -219,8 +218,10 @@
     <string name="whatsapp_group_documents_more">Dokumen &amp; Lainnya</string>
     <string name="whatsapp_view_all">Lihat semuanya</string>
     <string name="whatsapp_card_hint">Ketuk file untuk dipratinjau • centang kotak untuk menambahkannya ke pembersihan</string>
-    <string name="whatsapp_sort_largest">Terbesar dulu</string>
-    <string name="whatsapp_sort_newest">Terbaru dulu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_largest">Terbesar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_newest">Terbaru</string>
     <string name="whatsapp_no_files_for_filter">Tidak ada file yang cocok dengan filter ini.</string>
     <string name="whatsapp_preview_title">Pratinjau</string>
     <string name="whatsapp_included">Termasuk dalam pembersihan</string>
@@ -230,10 +231,12 @@
     <string name="whatsapp_audio_preview_error">File audio ini tidak dapat diputar di perangkat ini.</string>
     <string name="premium_tool_nothing_found">Tidak ada yang perlu ditinjau</string>
     <string name="premium_tool_nothing_found_detail">Tidak ditemukan file yang cocok di penyimpanan bersama yang dapat diakses.</string>
-    <string name="premium_tool_found_size">Total ukuran untuk ditinjau</string>
-    <string name="premium_sort_largest">Terbesar dulu</string>
-    <string name="premium_sort_newest">Terbaru dulu</string>
-    <string name="premium_sort_selected">Yang dipilih dulu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_largest">Terbesar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_newest">Terbaru</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_selected">Dipilih</string>
     <string name="premium_duplicates_subtitle">Konten yang sama persis dikelompokkan sehingga Anda dapat menyimpan yang asli dan hanya menghapus salinan tambahan.</string>
     <string name="premium_large_subtitle">Tinjau file yang menggunakan penyimpanan paling banyak sebelum memutuskan apa yang harus dihapus.</string>
     <string name="premium_apk_subtitle">Tinjau paket penginstal Android yang diunduh tanpa memengaruhi aplikasi yang diinstal.</string>
@@ -241,9 +244,9 @@
     <string name="premium_junk_subtitle">Tinjau file sementara dan artefak thumbnail di luar Unduhan. Sisa unduhan tetap berada di Unduhan.</string>
     <string name="premium_downloads_subtitle">Tinjau unduhan lama dan artefak unduhan yang tidak lengkap tanpa memilih file pribadi secara otomatis.</string>
     <string name="premium_deep_subtitle">Tinjauan sekali jalan yang luas di seluruh kategori penyimpanan utama. File pribadi dengan tingkat kepercayaan lebih rendah tetap hanya untuk ditinjau.</string>
-    <string name="premium_duplicates_original_safe">Dokumen asli yang dilindungi tidak pernah ditempatkan dalam pilihan hapus. Hanya salinan tambahan terverifikasi yang ditampilkan di sini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_duplicates_original_safe">File asli tidak pernah dipilih.</string>
     <string name="premium_duplicate_unknown_original">asli dilindungi</string>
-    <string name="premium_duplicate_group_title">Salinan %1$s</string>
     <string name="premium_apk_installer_note">Menghapus APK di sini hanya akan menghapus file penginstal. Itu tidak menghapus instalasi aplikasi yang sudah terpasang di ponsel Anda.</string>
     <string name="premium_apk_old">Pemasang yang lebih lama</string>
     <string name="premium_apk_recent">Pemasang terbaru</string>
@@ -350,7 +353,8 @@
     <string name="tools_storage_change_subtitle">Lihat peningkatan dan penurunan penyimpanan terukur antara dua analisis nyata</string>
     <string name="storage_analyzer_scanning_subtitle">Mengklasifikasikan file penyimpanan bersama yang dapat diakses berdasarkan jenis…</string>
     <string name="storage_analyzer_empty_subtitle">Lihat bagaimana gambar, video, audio, dokumen, arsip, APK, dan file lain yang dapat diakses menggunakan ruang.</string>
-    <string name="storage_analyzer_indexed_label">FILE BERBAGI YANG DIINDEKSKAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="storage_analyzer_indexed_label">File yang dipindai</string>
     <string name="storage_analyzer_indexed_summary">File diindeks: %1$d • Ruang kosong: %2$s</string>
     <string name="storage_analyzer_types_title">Jenis berkas</string>
     <plurals name="storage_analyzer_type_summary">
@@ -441,10 +445,6 @@
     <plurals name="plan_truncated">
         <item quantity="other">Menampilkan %1$d item terbesar. Pindai lagi setelah membersihkan untuk melihat lebih banyak.</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_preview_summary">
-        <item quantity="other">%1$s dihapus sekarang · %2$s ke Sampah selama %3$d hari</item>
-    </plurals>
     <plurals name="result_changed">
         <item quantity="other">%1$d berubah sejak pemindaian</item>
     </plurals>
@@ -483,7 +483,6 @@
     <plurals name="trash_folder_missing_body">
         <item quantity="other">Perangkat ini tidak mengizinkan Smart Cleaner membuat folder Sampah, jadi %1$d file tidak dapat disimpan untuk diurungkan. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
     </plurals>
-    <string name="delete_confirm_permanent">%1$s akan dihapus permanen. Tindakan ini tidak dapat diurungkan.</string>
     <string name="plan_group_whatsapp_old_video">Video WhatsApp lama</string>
     <string name="plan_group_whatsapp_old_image">Foto WhatsApp lama</string>
     <string name="plan_group_whatsapp_old_audio">Audio WhatsApp lama</string>
@@ -540,7 +539,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_cta_hint_tap">sekali ketuk</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_plan_split">%1$s sampah langsung masuk Sampah. Untuk %2$s sisanya aku tanya dulu.</string>
+    <string name="home_plan_split">%1$s sampah langsung dibersihkan. Untuk %2$s sisanya aku tanya dulu.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_scan_label">Ditemukan sejauh ini</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -621,7 +620,7 @@
     <string name="confirm_permanent_body">File ini tak bisa masuk Sampah, jadi akan langsung dihapus.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_trash_body">
-        <item quantity="other">%1$d file: %2$s. Bisa dipulihkan selama 7 hari.</item>
+        <item quantity="other">%1$d file: %2$s.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_see_files">
@@ -643,4 +642,24 @@
     <string name="settings_kept_row">File yang kusimpan</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="settings_excluded_row">Folder yang tidak disarankan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_clean_title">Bersihkan %1$s?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_split_permanent">%1$s cache dan file sementara dihapus permanen.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="app_manager_cache_line">cache %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_xiaomi_warning">Ponselmu akan menampilkan peringatan dan hitung mundur singkat. Itu normal untuk izin ini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_split_trash">
+        <item quantity="other">%1$s masuk Sampah dan bisa dipulihkan selama %2$d hari.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="scan_files_checking">
+        <item quantity="other">Memeriksa %1$d file…</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="premium_duplicate_copies">
+        <item quantity="other">%1$d salinan · %2$s</item>
+    </plurals>
 </resources>

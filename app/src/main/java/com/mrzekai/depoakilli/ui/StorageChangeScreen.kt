@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
@@ -168,6 +169,11 @@ internal fun StorageChangeScreen(
                     onClick = onAnalyze,
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !refreshing,
+                    // B3: disabled is a dark chip with soft text, readable on Lime.
+                    colors = ButtonDefaults.buttonColors(
+                        disabledContainerColor = BlackChip,
+                        disabledContentColor = OnBlackSoft,
+                    ),
                 ) {
                     Icon(Icons.Outlined.Refresh, contentDescription = null)
                     Spacer(Modifier.size(8.dp))

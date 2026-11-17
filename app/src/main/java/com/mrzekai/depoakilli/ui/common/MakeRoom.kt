@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -370,7 +373,10 @@ fun PillButton(
     busy: Boolean = false,
     icon: ImageVector? = null,
 ) {
-    val (container, content, border) = when (style) {
+    // B3: a disabled button is a dark chip with soft text on every page, so it
+    // never turns into faded green-on-Lime or faded white-on-Lime.
+    val disabledLook = !enabled && !busy
+    val (container, content, border) = if (disabledLook) Triple(BlackChip, OnBlackSoft, null) else when (style) {
         PillStyle.LIME -> Triple(Lime, Ink, null)
         PillStyle.BLACK -> Triple(Black, OnBlack, null)
         PillStyle.WHITE -> Triple(OnBlack, Black, null)
@@ -403,7 +409,7 @@ fun PillButton(
                 }
                 Text(
                     text,
-                    color = if (enabled) content else content.copy(alpha = .5f),
+                    color = content,
                     fontWeight = AppWeights.Giant,
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
@@ -411,6 +417,41 @@ fun PillButton(
                 )
             }
         }
+    }
+}
+
+/** Bottom padding for a scrolling list: the navigation bar plus 24 dp, so the last row is never cut (B2). */
+@Composable
+fun listBottomPadding(): Dp =
+    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 24.dp
+
+/**
+ * Icon and text on top at full width, the action below on its own line (B2).
+ * Used for permission and action cards whose button text is longer than one
+ * word, so the text column is never squeezed letter by letter.
+ */
+@Composable
+fun ActionCard(
+    icon: ImageVector,
+    title: String,
+    body: String,
+    action: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    style: PillStyle = PillStyle.LIME,
+    iconTint: Color = Lime,
+) {
+    BlackCard(modifier = modifier, contentPadding = PaddingValues(16.dp)) {
+        Row(verticalAlignment = Alignment.Top) {
+            Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(24.dp))
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, color = OnBlack, fontWeight = AppWeights.Title, fontSize = 17.sp, lineHeight = 22.sp)
+                Text(body, color = OnBlackSoft, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+        }
+        PillButton(text = action, onClick = onClick, style = style, enabled = enabled, modifier = Modifier.padding(top = 12.dp))
     }
 }
 

@@ -53,3 +53,14 @@ class HomeLogicTest {
         assertEquals(HomeLogic.CleanAction.SCAN, HomeLogic.cleanAction(hasLiveItems = false, selectedBytes = 10L))
     }
 }
+
+/** P3: the Xiaomi warning line appears only on Xiaomi, Redmi and POCO phones. */
+class DeviceFamilyTest {
+    @Test
+    fun `Xiaomi family is recognised by maker or brand`() {
+        org.junit.Assert.assertTrue(DeviceFamily.isXiaomi("Xiaomi", "Redmi"))
+        org.junit.Assert.assertTrue(DeviceFamily.isXiaomi("unknown", "POCO"))
+        org.junit.Assert.assertFalse(DeviceFamily.isXiaomi("samsung", "samsung"))
+        org.junit.Assert.assertFalse(DeviceFamily.isXiaomi(null, null))
+    }
+}

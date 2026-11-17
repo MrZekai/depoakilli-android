@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.InterstitialTrigger
+import com.mrzekai.depoakilli.ads.ListNativeAdCard
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.ui.common.SystemBarIcons
@@ -146,6 +147,26 @@ fun CleanerApp(
             }
             !toolScreen -> detailEnteredAt = 0L
         }
+    }
+
+    // B7: a finished tool scan is a natural break before its results list.
+    // Not after a Smart or Deep scan (those have their own triggers), not when
+    // the result came straight from the cached index (the user did not wait),
+    // and not after a cancelled scan. AdPolicy limits still decide.
+    var toolScanWasRunning by remember { mutableStateOf(false) }
+    val toolScanRunning = state.scanning && isToolScanFocus(state.scanFocus)
+    LaunchedEffect(toolScanRunning) {
+        if (toolScanWasRunning && !toolScanRunning && state.lastScanCompleted && !state.lastScanFromCache) {
+            onNaturalBreak(InterstitialTrigger.TOOL_RESULT)
+        }
+        toolScanWasRunning = toolScanRunning
+    }
+    var whatsAppScanWasRunning by remember { mutableStateOf(false) }
+    LaunchedEffect(state.whatsAppScanning) {
+        if (whatsAppScanWasRunning && !state.whatsAppScanning && state.whatsAppLastScanCompleted) {
+            onNaturalBreak(InterstitialTrigger.TOOL_RESULT)
+        }
+        whatsAppScanWasRunning = state.whatsAppScanning
     }
 
     LaunchedEffect(state.message) {
@@ -411,6 +432,7 @@ fun CleanerApp(
                     }
                 },
                 modifier = Modifier.padding(padding),
+                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
             )
 
             DetailScreen.APP_CACHE -> AppCacheManagerScreen(
@@ -421,6 +443,7 @@ fun CleanerApp(
                 onClearOwnCache = viewModel::clearOwnAppCache,
                 onOpenAppDetails = onOpenAppDetails,
                 modifier = Modifier.padding(padding),
+                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
             )
 
             DetailScreen.APP_MANAGER -> AppManagerScreen(
@@ -430,6 +453,7 @@ fun CleanerApp(
                 onUninstallApp = onUninstallApp,
                 onOpenAppInfo = onOpenAppInfo,
                 modifier = Modifier.padding(padding),
+                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
             )
 
             DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
@@ -705,3 +729,6 @@ private fun trashFallbackBytes(state: CleanerUiState, fallback: TrashFallback): 
         TrashFallback.Source.STORAGE_REVIEW -> state.storageReview.items.filter { it.id in ids }.sumOf { it.file.sizeBytes }
     }
 }
+
+/** Tool scans (everything but the Smart and Deep scans) end in a tool result list (B7). */
+private fun isToolScanFocus(focus: ScanFocus): Boolean = focus != ScanFocus.SMART && focus != ScanFocus.DEEP

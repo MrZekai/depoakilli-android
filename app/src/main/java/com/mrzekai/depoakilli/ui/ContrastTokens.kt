@@ -3,6 +3,7 @@ package com.mrzekai.depoakilli.ui
 import androidx.compose.ui.graphics.Color
 import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
 import com.mrzekai.depoakilli.ui.theme.Coral
 import com.mrzekai.depoakilli.ui.theme.CoralInk
 import com.mrzekai.depoakilli.ui.theme.Ink
@@ -33,6 +34,16 @@ internal object ContrastTokens {
         Lime to Black,
         CoralInk to Coral,
     )
+
+    /** A disabled action (B3): soft text on a dark chip, on any page. */
+    val DisabledPair: Pair<Color, Color> = OnBlackSoft to BlackChip
+
+    /**
+     * Pairs the design never uses (B3): white text on Lime is unreadable, so
+     * text placed straight on a Lime page is Ink. ContrastTest checks the
+     * sources for it.
+     */
+    val ForbiddenPairs: List<Pair<Color, Color>> = listOf(OnBlack to Lime)
 
     /** WCAG 2.x relative-luminance contrast ratio. */
     fun contrastRatio(a: Color, b: Color): Double {
