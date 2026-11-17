@@ -679,4 +679,6 @@
     <string name="plan_group_old_video">Video meno recenti</string>
     <string name="plan_group_system_trash">Già nel cestino di Android</string>
     <string name="reason_system_trash">L’hai eliminato in Galleria o File. Android lo rimuove dopo circa 30 giorni; eliminarlo qui libera subito lo spazio.</string>
+    <string name="plan_group_raw_copy">Copie RAW delle foto</string>
+    <string name="reason_raw_copy">Hai questa foto anche come %1$s nella stessa cartella. Il file RAW serve solo per la modifica avanzata.</string>
 </resources>

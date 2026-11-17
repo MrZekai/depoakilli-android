@@ -649,4 +649,6 @@
     <string name="plan_group_old_video">Vídeos antiguos</string>
     <string name="plan_group_system_trash">Ya en la papelera de Android</string>
     <string name="reason_system_trash">Lo eliminaste en Galería o Archivos. Android lo borra tras unos 30 días; eliminarlo aquí libera el espacio ahora.</string>
+    <string name="plan_group_raw_copy">Copias RAW de fotos</string>
+    <string name="reason_raw_copy">También tienes esta foto como %1$s en la misma carpeta. El archivo RAW solo hace falta para edición avanzada.</string>
 </resources>

@@ -255,6 +255,10 @@ class AiCleaningEngine(
         ageDays = 0,
     )
 
+    /** RAW file whose processed photo [partnerName] sits next to it (V5). Review only. */
+    fun rawCopyAssessment(file: IndexedFile, partnerName: String): AiAssessment =
+        assessment(CleanupGroup.RAW_COPY, ageDays(file)).copy(reasonArgs = listOf(partnerName))
+
     /** Same size and matching samples only; never selectable as a group. */
     fun sampledDuplicateAssessment(): AiAssessment = assessment(CleanupGroup.DUPLICATE_UNVERIFIED, ageDays = 0)
 
@@ -368,6 +372,7 @@ class AiCleaningEngine(
             CleanupGroup.DUPLICATE_UNVERIFIED -> CleanCategory.DUPLICATE
             CleanupGroup.LARGE_VIDEO,
             CleanupGroup.OLD_VIDEO,
+            CleanupGroup.RAW_COPY,
             CleanupGroup.SCREEN_RECORDING,
             CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
             CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT

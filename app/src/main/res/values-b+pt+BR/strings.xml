@@ -649,4 +649,6 @@
     <string name="plan_group_old_video">Vídeos antigos</string>
     <string name="plan_group_system_trash">Já na lixeira do Android</string>
     <string name="reason_system_trash">Você excluiu isto na Galeria ou em Arquivos. O Android remove após cerca de 30 dias; excluir aqui libera o espaço agora.</string>
+    <string name="plan_group_raw_copy">Cópias RAW de fotos</string>
+    <string name="reason_raw_copy">Você também tem esta foto como %1$s na mesma pasta. O arquivo RAW só é necessário para edição avançada.</string>
 </resources>

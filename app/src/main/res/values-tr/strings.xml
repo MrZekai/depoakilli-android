@@ -649,4 +649,6 @@
     <string name="plan_group_old_video">Eski videolar</string>
     <string name="plan_group_system_trash">Zaten Android çöpünde</string>
     <string name="reason_system_trash">Bunu Galeri’de veya Dosyalar’da sildin. Android yaklaşık 30 gün sonra kaldırır; burada silmek yeri hemen açar.</string>
+    <string name="plan_group_raw_copy">Fotoğrafların RAW kopyaları</string>
+    <string name="reason_raw_copy">Bu fotoğraf aynı klasörde %1$s olarak da var. RAW dosyası yalnız gelişmiş düzenleme için gerekir.</string>
 </resources>

@@ -649,4 +649,6 @@
     <string name="plan_group_old_video">Older videos</string>
     <string name="plan_group_system_trash">Already in Android’s trash</string>
     <string name="reason_system_trash">You deleted this in Gallery or Files. Android removes it after about 30 days; deleting it here frees the space now.</string>
+    <string name="plan_group_raw_copy">RAW copies of photos</string>
+    <string name="reason_raw_copy">You also have this photo as %1$s in the same folder. The RAW file is only needed for advanced editing.</string>
 </resources>

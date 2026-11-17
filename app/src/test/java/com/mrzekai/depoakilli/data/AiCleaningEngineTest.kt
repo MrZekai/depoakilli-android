@@ -65,6 +65,16 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `raw copies are review only and name their partner`() {
+        val raw = file("IMG_1.dng", "image/x-adobe-dng", 30, "DCIM/Camera/", 25 * mb)
+        assertNull(engine.assess(raw))
+        val assessment = engine.rawCopyAssessment(raw, "IMG_1.jpg")
+        assertEquals(CleanupGroup.RAW_COPY, assessment.group)
+        assertFalse(assessment.recommended)
+        assertEquals(listOf<Any>("IMG_1.jpg"), assessment.reasonArgs)
+    }
+
+    @Test
     fun `older mid-size videos are offered after large old videos`() {
         val cam = "DCIM/Camera/"
         assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 200, cam, 40 * mb)))

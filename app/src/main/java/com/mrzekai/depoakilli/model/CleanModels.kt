@@ -44,6 +44,7 @@ enum class CleanupGroup(
     DUPLICATE_PERSONAL(R.string.plan_group_duplicate_personal, R.string.reason_exact_duplicate, null, false, DeleteMode.TRASH),
     DUPLICATE_UNVERIFIED(R.string.plan_group_duplicate_unverified, R.string.reason_sampled_duplicate, null, false, DeleteMode.TRASH, groupSelectable = false),
     LARGE_VIDEO(R.string.plan_group_large_video, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
+    RAW_COPY(R.string.plan_group_raw_copy, R.string.reason_raw_copy, null, false, DeleteMode.TRASH),
     OLD_VIDEO(R.string.plan_group_old_video, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
     SCREEN_RECORDING(R.string.plan_group_screen_recording, 0, R.plurals.reason_screen_recording, false, DeleteMode.TRASH),
     SCREENSHOT(R.string.plan_group_screenshot, 0, R.plurals.reason_old_screenshot, false, DeleteMode.TRASH),

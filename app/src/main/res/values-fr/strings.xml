@@ -679,4 +679,6 @@
     <string name="plan_group_old_video">Anciennes vidéos</string>
     <string name="plan_group_system_trash">Déjà dans la corbeille d’Android</string>
     <string name="reason_system_trash">Vous l’avez supprimé dans Galerie ou Fichiers. Android l’efface après environ 30 jours ; le supprimer ici libère l’espace tout de suite.</string>
+    <string name="plan_group_raw_copy">Copies RAW des photos</string>
+    <string name="reason_raw_copy">Vous avez aussi cette photo en %1$s dans le même dossier. Le fichier RAW ne sert qu’à la retouche avancée.</string>
 </resources>

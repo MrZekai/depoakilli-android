@@ -299,7 +299,22 @@ class DeviceRepository(
                 assessments += file.toCleanable(assessment)
             }
         }
-        val assessed = aiEngine.markOlderApkVersions(assessments)
+        val apkAssessed = aiEngine.markOlderApkVersions(assessments)
+        // V5: a RAW file with a JPEG/HEIC partner in the same folder replaces
+        // any broader classification of that RAW file.
+        val rawPairs = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP || focus == ScanFocus.MEDIA) {
+            RawPairFinder.find(indexed)
+        } else {
+            emptyMap()
+        }
+        val assessed = if (rawPairs.isEmpty()) {
+            apkAssessed
+        } else {
+            val byUri = indexed.associateBy(IndexedFile::uri)
+            apkAssessed.filterNot { it.uri in rawPairs } + rawPairs.mapNotNull { (uri, partner) ->
+                byUri[uri]?.let { raw -> raw.toCleanable(aiEngine.rawCopyAssessment(raw, partner)) }
+            }
+        }
 
         // Smart Clean promises duplicates too, but must stay fast: it verifies
         // files up to QUICK_FULL_HASH_BYTES byte for byte and lists larger

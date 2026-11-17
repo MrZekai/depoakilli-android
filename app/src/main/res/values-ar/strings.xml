@@ -814,4 +814,7 @@
     <string name="plan_group_system_trash">موجودة بالفعل في سلة مهملات Android</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="reason_system_trash">حذفت هذا في المعرض أو الملفات. يزيله Android بعد نحو 30 يومًا؛ حذفه هنا يحرر المساحة الآن.</string>
+    <string name="plan_group_raw_copy">نسخ RAW من الصور</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_raw_copy">لديك هذه الصورة أيضًا باسم %1$s في المجلد نفسه. ملف RAW مطلوب فقط للتحرير المتقدم.</string>
 </resources>
