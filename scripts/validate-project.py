@@ -18,6 +18,9 @@ J = "app/src/main/java/com/mrzekai/depoakilli/"
 SPLIT_SOURCES = {
     J + "ui/WhatsAppCleanerScreen.kt": [J + "ui/whatsapp/"],
     J + "ui/PremiumCleanerToolScreen.kt": [J + "ui/tools/"],
+    J + "ui/AppCacheManagerScreen.kt": [J + "ui/AppCacheComponents.kt"],
+    J + "ui/DeviceCenterScreen.kt": [J + "ui/SettingsScreen.kt", J + "ui/AppManagerScreen.kt"],
+    J + "ui/CleanerApp.kt": [J + "ui/AppBottomBar.kt", J + "ui/CleanScreenRouter.kt", J + "ui/AppDialogs.kt"],
     J + "ui/SmartCleanResultsScreen.kt": [
         J + "ui/smart/SmartScanStates.kt",
         J + "ui/smart/UnusedAppsSection.kt",
