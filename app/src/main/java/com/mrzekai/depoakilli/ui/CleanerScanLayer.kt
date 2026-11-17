@@ -68,14 +68,7 @@ abstract class CleanerScanLayer(
     fun cancelScan() {
         scanJob?.cancel()
         scanJob = null
-        _state.update {
-            it.copy(
-                scanning = false,
-                dashboardRefreshing = false,
-                scanHashing = false,
-                message = null,
-            )
-        }
+        _state.update(CleanerStateReducers::scanCancelled)
     }
 
     /**
@@ -84,21 +77,25 @@ abstract class CleanerScanLayer(
      * than [QUICK_SCAN_MAX_AGE_HOURS]. Nothing is ever deleted automatically.
      */
     fun onAppOpened() {
-        val current = _state.value
-        val hasPlan = current.planSummary != null ||
-            (current.scanFocus == ScanFocus.SMART && current.lastScanCompleted)
-        if (
-            AutoScanPolicy.shouldScan(
-                hasAccess = repository.hasAllFilesAccess(),
-                scanning = current.scanning,
-                hasPlan = hasPlan,
-                planScannedAtElapsed = current.planScannedAtElapsed,
-                nowElapsed = SystemClock.elapsedRealtime(),
-                savedSummaryAtMillis = current.dashboardSnapshotAtMillis,
-                nowMillis = System.currentTimeMillis(),
-            )
-        ) {
-            scan(ScanFocus.SMART)
+        viewModelScope.launch {
+            // Wait for the saved dashboard so a fresh summary is not rescanned.
+            restoreJob?.join()
+            val current = _state.value
+            val hasPlan = current.planSummary != null ||
+                (current.scanFocus == ScanFocus.SMART && current.lastScanCompleted)
+            if (
+                AutoScanPolicy.shouldScan(
+                    hasAccess = repository.hasAllFilesAccess(),
+                    scanning = current.scanning,
+                    hasPlan = hasPlan,
+                    planScannedAtElapsed = current.planScannedAtElapsed,
+                    nowElapsed = SystemClock.elapsedRealtime(),
+                    savedSummaryAtMillis = current.dashboardSnapshotAtMillis,
+                    nowMillis = System.currentTimeMillis(),
+                )
+            ) {
+                scan(ScanFocus.SMART)
+            }
         }
     }
 
@@ -168,7 +165,7 @@ abstract class CleanerScanLayer(
             )
         }
         scanJob = viewModelScope.launch {
-            runCatching {
+            runSuspendCatching {
                 repository.scan(
                     focus = focus,
                     onProgress = { directories, files ->
@@ -283,7 +280,10 @@ abstract class CleanerScanLayer(
                     persistDashboardSnapshot()
                 }
 
-                if (recordsStorageChange && repository.hasUsageAccess()) {
+                if (
+                    recordsStorageChange &&
+                    withContext(Dispatchers.Default) { repository.hasUsageAccess() }
+                ) {
                     // Enrich the real storage snapshot asynchronously with
                     // Android-reported per-app cache values.
                     captureAppCacheForStorageChange = true

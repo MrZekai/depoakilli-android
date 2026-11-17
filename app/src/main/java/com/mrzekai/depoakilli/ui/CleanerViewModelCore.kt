@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -67,8 +68,19 @@ abstract class CleanerViewModelCore(
     internal suspend fun ioMemorySnapshot(): MemorySnapshot =
         withContext(Dispatchers.Default) { repository.memorySnapshot() }
 
-    internal fun restoreDashboardSnapshot() {
-        val snapshot = dashboardSnapshotStore.load() ?: return
+    /** Saved-state load, kept off the main thread (T3.5). onAppOpened waits for it. */
+    internal var restoreJob: Job? = null
+
+    internal fun restoreSavedState() {
+        restoreJob = viewModelScope.launch {
+            restoreDashboardSnapshot()
+            restoreCleanupHistory()
+            restoreStorageChange()
+        }
+    }
+
+    internal suspend fun restoreDashboardSnapshot() {
+        val snapshot = withContext(Dispatchers.IO) { dashboardSnapshotStore.load() } ?: return
         _state.update {
             it.copy(
                 dashboardCleanableBytes = snapshot.cleanableBytes,
@@ -84,7 +96,7 @@ abstract class CleanerViewModelCore(
     internal fun persistDashboardSnapshot() {
         val state = _state.value
         if (state.dashboardSnapshotAtMillis <= 0L) return
-        dashboardSnapshotStore.save(
+        val snapshot =
             DashboardSnapshot(
                 cleanableBytes = state.dashboardCleanableBytes,
                 reviewBytes = state.dashboardReviewBytes,
@@ -92,20 +104,18 @@ abstract class CleanerViewModelCore(
                 scannedFileCount = state.dashboardScannedFileCount,
                 scannedBytes = state.dashboardScannedBytes,
                 analyzedAtMillis = state.dashboardSnapshotAtMillis,
-            ),
-        )
+            )
+        viewModelScope.launch(Dispatchers.IO) { dashboardSnapshotStore.save(snapshot) }
     }
 
-    internal fun restoreCleanupHistory() {
-        _state.update {
-            it.copy(cleanupHistory = cleanupHistoryStore.load())
-        }
+    internal suspend fun restoreCleanupHistory() {
+        val history = withContext(Dispatchers.IO) { cleanupHistoryStore.load() }
+        _state.update { it.copy(cleanupHistory = history) }
     }
 
-    internal fun restoreStorageChange() {
-        _state.update {
-            it.copy(storageChange = storageChangeStore.load())
-        }
+    internal suspend fun restoreStorageChange() {
+        val report = withContext(Dispatchers.IO) { storageChangeStore.load() }
+        _state.update { it.copy(storageChange = report) }
     }
 
     internal fun recordCleanupHistory(result: CleanupResult) {
@@ -120,12 +130,14 @@ abstract class CleanerViewModelCore(
             ),
         )
         if (result.deletedCount <= 0) return
-        val updated = cleanupHistoryStore.record(
-            deletedBytes = result.deletedBytes,
-            deletedCount = result.deletedCount,
-        )
-        _state.update {
-            it.copy(cleanupHistory = updated)
+        viewModelScope.launch {
+            val updated = withContext(Dispatchers.IO) {
+                cleanupHistoryStore.record(
+                    deletedBytes = result.deletedBytes,
+                    deletedCount = result.deletedCount,
+                )
+            }
+            _state.update { it.copy(cleanupHistory = updated) }
         }
     }
 

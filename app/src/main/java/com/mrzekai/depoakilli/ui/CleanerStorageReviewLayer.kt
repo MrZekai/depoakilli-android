@@ -84,7 +84,7 @@ abstract class CleanerStorageReviewLayer(
         }
 
         storageReviewJob = viewModelScope.launch {
-            runCatching {
+            runSuspendCatching {
                 repository.scanStorageReview(type, excludeWhatsAppMedia) { directories, files ->
                     _state.update { state ->
                         if (
@@ -135,8 +135,9 @@ abstract class CleanerStorageReviewLayer(
                     ) {
                         // Keep the immediately visible Smart Scan items usable even if
                         // the silent background expansion fails.
-                        state.copy(
-                            message = getApplication<Application>().getString(R.string.message_scan_failed),
+                        CleanerStateReducers.storageReviewFailed(
+                            state,
+                            getApplication<Application>().getString(R.string.message_scan_failed),
                         )
                     } else {
                         state

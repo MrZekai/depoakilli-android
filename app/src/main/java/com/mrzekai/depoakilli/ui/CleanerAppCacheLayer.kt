@@ -5,8 +5,10 @@ import android.os.SystemClock
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Layer of [CleanerViewModel] (T3.5): AppCache state and actions.
@@ -25,7 +27,7 @@ abstract class CleanerAppCacheLayer(
         }
         _state.update { it.copy(scanningAppCaches = true) }
         appCacheRefreshJob = viewModelScope.launch {
-            runCatching { repository.appCacheSnapshot() }
+            runSuspendCatching { repository.appCacheSnapshot() }
                 .onSuccess { snapshot ->
                     lastAppCacheRefreshAt = SystemClock.elapsedRealtime()
 
@@ -37,11 +39,12 @@ abstract class CleanerAppCacheLayer(
                             null
                         }
 
+                    val usageAccess = withContext(Dispatchers.Default) { repository.hasUsageAccess() }
                     _state.update { current ->
                         current.copy(
                             appCache = snapshot,
                             scanningAppCaches = false,
-                            hasUsageAccess = repository.hasUsageAccess(),
+                            hasUsageAccess = usageAccess,
                             storageChange = storageChangeReport ?: current.storageChange,
                         )
                     }
@@ -76,8 +79,8 @@ abstract class CleanerAppCacheLayer(
         _state.update { it.copy(scanningAppCaches = true, message = null) }
 
         viewModelScope.launch {
-            val afterCache = runCatching { repository.appCacheSnapshot() }.getOrNull()
-            val storageAfter = runCatching { ioStorageSnapshot() }
+            val afterCache = runSuspendCatching { repository.appCacheSnapshot() }.getOrNull()
+            val storageAfter = runSuspendCatching { ioStorageSnapshot() }
                 .getOrElse { _state.value.storage }
 
             val measuredCacheReduction =
@@ -149,11 +152,11 @@ abstract class CleanerAppCacheLayer(
         _state.update { it.copy(scanningAppCaches = true) }
 
         viewModelScope.launch {
-            val afterCache = runCatching {
+            val afterCache = runSuspendCatching {
                 repository.appCacheSnapshot()
             }.getOrNull()
 
-            val storageAfter = runCatching {
+            val storageAfter = runSuspendCatching {
                 ioStorageSnapshot()
             }.getOrElse {
                 _state.value.storage

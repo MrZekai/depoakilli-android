@@ -25,9 +25,7 @@ class CleanerViewModel internal constructor(
     constructor(application: Application) : this(application, DeviceRepository(application))
 
     init {
-        restoreDashboardSnapshot()
-        restoreCleanupHistory()
-        restoreStorageChange()
+        restoreSavedState()
         refreshDeviceState()
         refreshAppCaches()
         purgeExpiredTrash()
@@ -354,35 +352,14 @@ class CleanerViewModel internal constructor(
             changedCount = changedCount,
         )
         _state.update { state ->
-            val deletedItems = items.filter { it.id in deletedIds }
-            val deletedByCategory = deletedItems
-                .groupBy { it.assessment.category }
-                .mapValues { (_, categoryItems) -> categoryItems.sumOf(CleanableItem::sizeBytes) }
-            val deletedAutoSelectedBytes = deletedItems
-                .asSequence()
-                .filter { it.assessment.recommended }
-                .sumOf(CleanableItem::sizeBytes)
-            val deletedReviewBytes = deletedItems
-                .asSequence()
-                .filterNot { it.assessment.recommended }
-                .sumOf(CleanableItem::sizeBytes)
-            val removedUris = deletedItems.mapTo(hashSetOf(), CleanableItem::uri)
-            state.copy(
-                summary = state.summary.copy(items = state.summary.items.filterNot { it.id in deletedIds }),
-                planSummary = state.planSummary?.let { plan ->
-                    plan.copy(items = plan.items.filterNot { it.uri in removedUris })
-                },
-                dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedAutoSelectedBytes).coerceAtLeast(0L),
-                dashboardReviewBytes = (state.dashboardReviewBytes - deletedReviewBytes).coerceAtLeast(0L),
-                dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
-                    (bytes - (deletedByCategory[category] ?: 0L)).coerceAtLeast(0L)
-                },
-                storage = storageAfter,
-                memory = memoryAfter,
-                ownCacheBytes = ownCacheAfter,
-                cleanupInProgress = false,
-                cleanupResult = measuredResult,
-                message = null,
+            CleanerStateReducers.afterCleanup(
+                state = state,
+                items = items,
+                deletedIds = deletedIds,
+                storageAfter = storageAfter,
+                memoryAfter = memoryAfter,
+                ownCacheAfter = ownCacheAfter,
+                result = measuredResult,
             )
         }
         persistDashboardSnapshot()

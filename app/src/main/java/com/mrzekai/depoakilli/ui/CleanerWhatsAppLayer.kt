@@ -8,9 +8,11 @@ import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Layer of [CleanerViewModel] (T3.5): WhatsApp state and actions.
@@ -29,15 +31,8 @@ abstract class CleanerWhatsAppLayer(
             }
             return
         }
-        if (!repository.hasWhatsAppAccess()) {
-            _state.update {
-                it.copy(message = getApplication<Application>().getString(R.string.message_whatsapp_not_found))
-            }
-            return
-        }
         _state.update {
             it.copy(
-                hasWhatsAppAccess = true,
                 whatsAppScanning = true,
                 whatsAppScanProgress = 0,
                 whatsAppLastScanCompleted = false,
@@ -45,7 +40,21 @@ abstract class CleanerWhatsAppLayer(
             )
         }
         viewModelScope.launch {
-            runCatching {
+            // hasWhatsAppAccess() stats the WhatsApp media roots on disk (T3.5).
+            val whatsAppFound = runSuspendCatching {
+                withContext(Dispatchers.IO) { repository.hasWhatsAppAccess() }
+            }.getOrDefault(false)
+            if (!whatsAppFound) {
+                _state.update {
+                    it.copy(
+                        whatsAppScanning = false,
+                        message = getApplication<Application>().getString(R.string.message_whatsapp_not_found),
+                    )
+                }
+                return@launch
+            }
+            _state.update { it.copy(hasWhatsAppAccess = true) }
+            runSuspendCatching {
                 repository.scanWhatsAppLibrary { progress ->
                     _state.update { current ->
                         current.copy(whatsAppScanProgress = progress.coerceIn(0, 100))

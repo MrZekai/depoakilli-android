@@ -9,6 +9,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Layer of [CleanerViewModel] (T3.5): DeviceState state and actions.
@@ -33,7 +34,7 @@ abstract class CleanerDeviceLayer(
         if (force) deviceRefreshJob?.cancel()
 
         deviceRefreshJob = viewModelScope.launch {
-            runCatching {
+            runSuspendCatching {
                 coroutineScope {
                     val storage = async(Dispatchers.Default) { repository.storageSnapshot() }
                     val memory = async(Dispatchers.Default) { repository.memorySnapshot() }
@@ -74,13 +75,14 @@ abstract class CleanerDeviceLayer(
         if (_state.value.loadingApps) return
         _state.update { it.copy(loadingApps = true) }
         installedAppsRefreshJob = viewModelScope.launch {
-            runCatching { repository.installedAppsSnapshot() }
+            runSuspendCatching { repository.installedAppsSnapshot() }
                 .onSuccess { apps ->
+                    val usageAccess = withContext(Dispatchers.Default) { repository.hasUsageAccess() }
                     _state.update {
                         it.copy(
                             installedApps = apps,
                             loadingApps = false,
-                            hasUsageAccess = repository.hasUsageAccess(),
+                            hasUsageAccess = usageAccess,
                         )
                     }
                 }

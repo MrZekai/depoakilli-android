@@ -21,14 +21,14 @@ abstract class CleanerTrashLayer(
     /** Deletes trash entries older than the retention period, then refreshes the trash list. */
     fun purgeExpiredTrash() {
         viewModelScope.launch {
-            runCatching { repository.purgeExpiredTrash() }
+            runSuspendCatching { repository.purgeExpiredTrash() }
             refreshTrash()
         }
     }
 
     fun refreshTrash() {
         viewModelScope.launch {
-            val entries = runCatching { withContext(Dispatchers.IO) { repository.trashEntries() } }
+            val entries = runSuspendCatching { withContext(Dispatchers.IO) { repository.trashEntries() } }
                 .getOrDefault(emptyList())
             _state.update { it.copy(trashEntries = entries) }
         }
@@ -56,7 +56,7 @@ abstract class CleanerTrashLayer(
     fun restoreTrash(ids: Collection<String>, onDone: (RestoreResult) -> Unit = {}) {
         if (ids.isEmpty()) return
         viewModelScope.launch {
-            val result = runCatching { repository.restoreFromTrash(ids) }.getOrNull() ?: return@launch
+            val result = runSuspendCatching { repository.restoreFromTrash(ids) }.getOrNull() ?: return@launch
             val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
             _state.update { it.copy(trashEntries = entries) }
             onDone(result)
@@ -67,7 +67,7 @@ abstract class CleanerTrashLayer(
     fun emptyTrash(ids: Collection<String>? = null, onDone: (Long) -> Unit = {}) {
         viewModelScope.launch {
             val before = ioAvailableBytes()
-            val freed = runCatching { repository.emptyTrash(ids) }.getOrDefault(0L)
+            val freed = runSuspendCatching { repository.emptyTrash(ids) }.getOrDefault(0L)
             val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
             val storageAfter = ioStorageSnapshot()
             _state.update { state ->

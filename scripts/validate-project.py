@@ -28,6 +28,14 @@ SPLIT_SOURCES = {
         J + "ui/smart/StorageDetailPage.kt",
         J + "ui/smart/SmartFilePreview.kt",
     ],
+    J + "data/DeviceRepository.kt": [
+        J + "data/StorageIndexer.kt",
+        J + "data/SharedStorageRemover.kt",
+        J + "data/ScanFocusRules.kt",
+        J + "data/StorageTypeStats.kt",
+        J + "data/AppStatsSource.kt",
+        J + "data/DeviceInfoSource.kt",
+    ],
     J + "ui/CleanerViewModel.kt": [
         J + "ui/CleanerUiState.kt",
         J + "ui/CleanerViewModelCore.kt",
@@ -37,6 +45,7 @@ SPLIT_SOURCES = {
         J + "ui/CleanerScanLayer.kt",
         J + "ui/CleanerWhatsAppLayer.kt",
         J + "ui/CleanerStorageReviewLayer.kt",
+        J + "ui/CleanerStateReducers.kt",
     ],
 }
 
@@ -487,7 +496,7 @@ for forbidden in (
     if forbidden in storage_analyzer:
         errors.append(f"Storage Analyzer must remain read-only: {forbidden}")
 
-download_block_start = repository.find("private val DOWNLOAD_TOOL_GROUPS")
+download_block_start = repository.find("val DOWNLOAD_TOOL_GROUPS = setOf(")
 if download_block_start < 0:
     errors.append("DOWNLOAD_TOOL_GROUPS missing")
 else:
@@ -1025,7 +1034,7 @@ for expected in (
 junk_start = repository.find("ScanFocus.JUNK -> {")
 junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
 downloads_start = repository.find("ScanFocus.DOWNLOADS -> {")
-downloads_end = repository.find("private suspend fun indexSharedStorage", downloads_start)
+downloads_end = repository.find("fun ageDays(", downloads_start)
 if junk_start < 0 or junk_end <= junk_start or downloads_start < 0 or downloads_end <= downloads_start:
     errors.append("unable to inspect alpha10 Junk/Downloads partition")
 else:
@@ -1042,7 +1051,8 @@ if "ScanFocus.SCREENSHOTS -> aiEngine.assessFocusedScreenshot(file)" not in repo
 for expected in (
     "val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE",
     "if (recordsStorageChange)",
-    "recordsStorageChange && repository.hasUsageAccess()",
+    "withContext(Dispatchers.Default) { repository.hasUsageAccess() }",
+    "                    recordsStorageChange &&\n",
 ):
     if expected not in view_model:
         errors.append(f"ANALYZE must create a real Storage Change snapshot: {expected}")
@@ -1424,12 +1434,12 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing v41 storage-safety invariant: {expected}")
 
-delete_start = repository.find("private fun removeFile(")
+delete_start = repository.find("    fun removeFile(")
 if delete_start < 0:
     errors.append("removeFile is missing")
 else:
     delete_section = repository[delete_start:delete_start + 1400]
-    if "isDeletableSharedStorageFile(file)" not in delete_section:
+    if "isDeletableSharedStorageFile(file, roots)" not in delete_section:
         errors.append("direct file deletion must be confined to shared storage roots")
 
 for expected in (
