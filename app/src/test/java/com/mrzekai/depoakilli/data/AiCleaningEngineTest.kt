@@ -65,6 +65,17 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `android trash files stay out of the screenshots tool and storage lists`() {
+        val trashed = file(".trashed-1767225600-Screenshot_1.png", "image/png", 40, "Pictures/Screenshots/")
+        assertNull(engine.assessFocusedScreenshot(trashed))
+        val visible = StoragePathRules.visibleInStorageLists(
+            listOf(trashed, file("Screenshot_2.png", "image/png", 40, "Pictures/Screenshots/"), file(".pending-1-a.jpg", "image/jpeg", 1, "DCIM/")),
+            IndexedFile::name,
+        )
+        assertEquals(listOf("Screenshot_2.png"), visible.map(IndexedFile::name))
+    }
+
+    @Test
     fun `raw copies are review only and name their partner`() {
         val raw = file("IMG_1.dng", "image/x-adobe-dng", 30, "DCIM/Camera/", 25 * mb)
         assertNull(engine.assess(raw))

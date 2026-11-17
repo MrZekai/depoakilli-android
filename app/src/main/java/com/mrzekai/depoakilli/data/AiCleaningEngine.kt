@@ -240,6 +240,8 @@ class AiCleaningEngine(
      * Screenshots are user-created content, so nothing is ever preselected.
      */
     fun assessFocusedScreenshot(file: IndexedFile): AiAssessment? {
+        // Android's trash and unfinished writes belong to the plan only (B1).
+        if (StoragePathRules.isSystemMarkerFile(file.name)) return null
         val ageDays = ageDays(file)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)

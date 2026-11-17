@@ -84,6 +84,13 @@ internal object StoragePathRules {
     /** The only hidden files that are indexed and may be deleted (V4). */
     fun isIndexableHiddenFile(name: String): Boolean = isSystemTrashFile(name) || isStalePendingFile(name)
 
+    /**
+     * Files for the storage lists (Storage Analysis, type totals, folder lists):
+     * Android's trash and unfinished writes appear only in the cleanup plan (B1).
+     */
+    fun <T> visibleInStorageLists(files: List<T>, name: (T) -> String): List<T> =
+        files.filterNot { isSystemMarkerFile(name(it)) }
+
     /** Hidden files that stay invisible: every dot-file except the two MediaStore patterns. */
     fun isSkippedHiddenFile(name: String): Boolean = isSystemMarkerFile(name) && !isIndexableHiddenFile(name)
 

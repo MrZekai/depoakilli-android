@@ -372,6 +372,7 @@ class DeviceRepository(
             .sortedByDescending(CleanableItem::sizeBytes)
             .toList()
         val truncated = ranked.size > CleaningThresholds.MAX_RESULT_ITEMS
+        val storageListFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)
         val focusedItems = ranked.take(CleaningThresholds.MAX_RESULT_ITEMS)
 
         ScanSummary(
@@ -380,9 +381,9 @@ class DeviceRepository(
             scannedBytes = indexed.sumOf(IndexedFile::sizeBytes),
             limitedAccess = false,
             scanLimitReached = indexed.size >= indexedFileLimit(),
-            storageTypes = storageTypeStats(indexed),
-            storagePreviews = storageTypePreviews(indexed),
-            smartMediaTypes = smartMediaTypeStats(indexed),
+            storageTypes = storageTypeStats(storageListFiles),
+            storagePreviews = storageTypePreviews(storageListFiles),
+            smartMediaTypes = smartMediaTypeStats(storageListFiles),
             truncated = truncated,
             biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
                 FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
@@ -445,7 +446,7 @@ class DeviceRepository(
             onProgress(visitedDirectories, discoveredFiles)
         }.also(::cacheSharedIndex)
 
-        val typedFiles = indexed
+        val typedFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)
             .asSequence()
             .filter { storageFileType(it) == type }
             .filter { !excludeWhatsAppMedia || !isWhatsAppSharedMedia(it) }
