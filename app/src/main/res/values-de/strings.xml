@@ -634,7 +634,7 @@
     <string name="reason_system_trash">Sie haben dies in Galerie oder Dateien gelöscht. Android entfernt es nach etwa 30 Tagen; hier löschen gibt den Speicher sofort frei.</string>
     <string name="plan_group_raw_copy">RAW-Kopien von Fotos</string>
     <string name="reason_raw_copy">Dieses Foto liegt auch als %1$s im selben Ordner. Die RAW-Datei brauchen Sie nur für die erweiterte Bearbeitung.</string>
-    <string name="plan_group_other_app_media">Von anderen Apps gespeicherte Medien</string>
+    <string name="plan_group_other_app_media">Von anderen Apps gespeicherte Fotos und Videos</string>
     <plurals name="reason_other_app_media">
         <item quantity="one">Vor %1$d Tag von einer anderen App gespeichert. Die App zeigt es nach dem Löschen eventuell als fehlend an.</item>
         <item quantity="other">Vor %1$d Tagen von einer anderen App gespeichert. Die App zeigt es nach dem Löschen eventuell als fehlend an.</item>

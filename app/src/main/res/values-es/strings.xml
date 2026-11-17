@@ -646,7 +646,7 @@
     <string name="reason_system_trash">Lo eliminaste en Galería o Archivos. Android lo borra tras unos 30 días; eliminarlo aquí libera el espacio ahora.</string>
     <string name="plan_group_raw_copy">Copias RAW de fotos</string>
     <string name="reason_raw_copy">También tienes esta foto como %1$s en la misma carpeta. El archivo RAW solo hace falta para edición avanzada.</string>
-    <string name="plan_group_other_app_media">Contenido guardado por otras apps</string>
+    <string name="plan_group_other_app_media">Fotos y vídeos guardados por otras apps</string>
     <plurals name="reason_other_app_media">
         <item quantity="one">Guardado por otra app hace %1$d día. Esa app puede mostrarlo como no disponible si lo eliminas.</item>
         <item quantity="other">Guardado por otra app hace %1$d días. Esa app puede mostrarlo como no disponible si lo eliminas.</item>

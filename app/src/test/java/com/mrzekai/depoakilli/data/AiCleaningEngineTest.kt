@@ -93,6 +93,11 @@ class AiCleaningEngineTest {
         assertNull(group(file("x.jpg", "image/jpeg", 89, "Telegram/Telegram Images/", 5 * mb)))
         assertNull(group(file("x.jpg", "image/jpeg", 200, "Telegram/Telegram Images/", 5 * mb - 1)))
         assertFalse(CleanupGroup.OTHER_APP_MEDIA.auto)
+        assertFalse(CleanupGroup.OTHER_APP_MEDIA.groupSelectable)
+        val app = "Android/media/net.osmand/files/"
+        assertNull(group(file("tr.obf", "application/octet-stream", 200, app, 300 * mb)).takeIf { it == CleanupGroup.OTHER_APP_MEDIA })
+        assertNull(group(file("song.mp3", "audio/mpeg", 200, app, 8 * mb)))
+        assertNull(group(file("save.db", "application/octet-stream", 200, app, 8 * mb)))
         assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/com.whatsapp/WhatsApp/Media/"))
         assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/"))
         assertFalse(StoragePathRules.isOtherAppMediaPath("Pictures/Telegram/"))

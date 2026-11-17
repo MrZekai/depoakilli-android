@@ -595,7 +595,7 @@
     <string name="reason_system_trash">Anda menghapus ini di Galeri atau File. Android menghapusnya setelah sekitar 30 hari; menghapusnya di sini mengosongkan ruang sekarang.</string>
     <string name="plan_group_raw_copy">Salinan RAW foto</string>
     <string name="reason_raw_copy">Foto ini juga ada sebagai %1$s di folder yang sama. File RAW hanya diperlukan untuk pengeditan lanjutan.</string>
-    <string name="plan_group_other_app_media">Media yang disimpan aplikasi lain</string>
+    <string name="plan_group_other_app_media">Foto dan video yang disimpan aplikasi lain</string>
     <plurals name="reason_other_app_media">
         <item quantity="other">Disimpan oleh aplikasi lain %1$d hari lalu. Aplikasi itu mungkin menampilkannya sebagai hilang jika dihapus.</item>
     </plurals>

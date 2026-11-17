@@ -675,7 +675,7 @@
     <string name="reason_system_trash">Vous l’avez supprimé dans Galerie ou Fichiers. Android l’efface après environ 30 jours ; le supprimer ici libère l’espace tout de suite.</string>
     <string name="plan_group_raw_copy">Copies RAW des photos</string>
     <string name="reason_raw_copy">Vous avez aussi cette photo en %1$s dans le même dossier. Le fichier RAW ne sert qu’à la retouche avancée.</string>
-    <string name="plan_group_other_app_media">Médias enregistrés par d’autres applis</string>
+    <string name="plan_group_other_app_media">Photos et vidéos enregistrées par d’autres applis</string>
     <plurals name="reason_other_app_media">
         <item quantity="one">Enregistré par une autre appli il y a %1$d jour. L’appli peut l’indiquer comme manquant si vous le supprimez.</item>
         <item quantity="many">Enregistré par une autre appli il y a %1$d jours. L’appli peut l’indiquer comme manquant si vous le supprimez.</item>

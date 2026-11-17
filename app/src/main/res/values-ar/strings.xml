@@ -807,7 +807,7 @@
     <string name="plan_group_raw_copy">نسخ RAW من الصور</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="reason_raw_copy">لديك هذه الصورة أيضًا باسم %1$s في المجلد نفسه. ملف RAW مطلوب فقط للتحرير المتقدم.</string>
-    <string name="plan_group_other_app_media">وسائط حفظتها تطبيقات أخرى</string>
+    <string name="plan_group_other_app_media">صور ومقاطع فيديو حفظتها تطبيقات أخرى</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="reason_other_app_media">
         <item quantity="zero">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>

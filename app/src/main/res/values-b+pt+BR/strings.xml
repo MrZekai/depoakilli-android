@@ -646,7 +646,7 @@
     <string name="reason_system_trash">Você excluiu isto na Galeria ou em Arquivos. O Android remove após cerca de 30 dias; excluir aqui libera o espaço agora.</string>
     <string name="plan_group_raw_copy">Cópias RAW de fotos</string>
     <string name="reason_raw_copy">Você também tem esta foto como %1$s na mesma pasta. O arquivo RAW só é necessário para edição avançada.</string>
-    <string name="plan_group_other_app_media">Mídia salva por outros apps</string>
+    <string name="plan_group_other_app_media">Fotos e vídeos salvos por outros apps</string>
     <plurals name="reason_other_app_media">
         <item quantity="one">Salvo por outro app há %1$d dia. O app pode mostrá-lo como ausente se você excluir.</item>
         <item quantity="other">Salvo por outro app há %1$d dias. O app pode mostrá-lo como ausente se você excluir.</item>

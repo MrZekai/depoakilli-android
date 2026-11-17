@@ -137,8 +137,10 @@ class AiCleaningEngine(
             return assessment(CleanupGroup.OLD_VIDEO, ageDays)
         }
 
-        // 9c. Media saved by other apps (Telegram and similar), V6.
+        // 9c. Photos and videos saved by other apps (Telegram and similar), V6.
+        // Only image/* and video/*: offline maps, music and game data stay out (B2).
         if (
+            (isVideo || mime.startsWith("image/")) &&
             StoragePathRules.isOtherAppMediaPath(file.relativePath) &&
             file.sizeBytes >= CleaningThresholds.OTHER_APP_MEDIA_BYTES &&
             ageDays >= CleaningThresholds.OTHER_APP_MEDIA_DAYS

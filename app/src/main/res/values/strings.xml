@@ -646,7 +646,7 @@
     <string name="reason_system_trash">You deleted this in Gallery or Files. Android removes it after about 30 days; deleting it here frees the space now.</string>
     <string name="plan_group_raw_copy">RAW copies of photos</string>
     <string name="reason_raw_copy">You also have this photo as %1$s in the same folder. The RAW file is only needed for advanced editing.</string>
-    <string name="plan_group_other_app_media">Media saved by other apps</string>
+    <string name="plan_group_other_app_media">Photos and videos saved by other apps</string>
     <plurals name="reason_other_app_media">
         <item quantity="one">Saved by another app %1$d day ago. The app may show it as missing if you delete it.</item>
         <item quantity="other">Saved by another app %1$d days ago. The app may show it as missing if you delete it.</item>
