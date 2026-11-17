@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.whatsapp.WhatsAppCleanerDetailScreen
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd

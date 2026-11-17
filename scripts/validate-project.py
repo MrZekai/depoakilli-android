@@ -12,14 +12,37 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
 
+# T3.4: large UI files were split into packages. A check written against the
+# old file reads every file that now holds its code, so no check is lost.
+J = "app/src/main/java/com/mrzekai/depoakilli/"
+SPLIT_SOURCES = {
+    J + "ui/WhatsAppCleanerScreen.kt": [J + "ui/whatsapp/"],
+}
+
+
+def split_files(relative: str) -> list[pathlib.Path]:
+    files: list[pathlib.Path] = []
+    for part in SPLIT_SOURCES.get(relative, []):
+        target = ROOT / part
+        files += sorted(target.rglob("*.kt")) if target.is_dir() else [target]
+    if (ROOT / relative).is_file():
+        files.insert(0, ROOT / relative)
+    return files
+
+
 def require(relative: str) -> pathlib.Path:
     path = ROOT / relative
-    if not path.is_file():
+    if not path.is_file() and not (relative in SPLIT_SOURCES and split_files(relative)):
         errors.append(f"missing required file: {relative}")
     return path
 
 
 def read(relative: str) -> str:
+    if relative in SPLIT_SOURCES:
+        files = split_files(relative)
+        if not files:
+            errors.append(f"missing required file: {relative}")
+        return "\n".join(f.read_text(encoding="utf-8") for f in files)
     path = require(relative)
     if not path.is_file():
         return ""
