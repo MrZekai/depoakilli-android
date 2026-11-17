@@ -1,30 +1,18 @@
-# Feature matrix - v0.5.18 closed-test candidate
+# Feature matrix
 
-| Feature | v0.5.1 behavior |
+| Feature | Behavior |
 |---|---|
-| Smart / Deep Scan | Recursive shared-storage engine |
-| Junk Cleaner | Temp/incomplete/thumbnail artifacts + review candidates |
-| Duplicate Cleaner | Any accessible file type; sample + full SHA-256 |
-| Large Files | Any accessible file over 100 MB |
-| Media Cleaner | Old screenshots and storage-heavy photo/video review |
-| Downloads & APK | Old downloads, installers, incomplete artifacts |
-| WhatsApp Cleaner | In-app scan of WhatsApp / Business shared Media |
-| Deep App Cache | StorageStats measurement + Android official cache-clean action |
-| App Manager | In-app launchable-app list, storage/cache stats, uninstall handoff |
-| Storage Analyzer | File-type totals from the same shared-storage index |
-| Device status | Not presented as a cleaner tool |
+| Clean tab (Home) | Cleanup plan: "Up to X", Auto rows, system steps, "Worth a look", biggest folders/apps; quick scan at launch when the plan is older than 6 h |
+| Swipe review | One file at a time: Delete marks, Keep is remembered; nothing is deleted before the preview sheet is confirmed |
+| Trash tab | Restore, delete forever, empty; 7-day retention |
+| Junk | Temporary files, unfinished downloads, preview caches, Android's trash |
+| Duplicates | Any file type; sample + full SHA-256; one original always kept; optional rewarded deep check for large look-alikes |
+| Large files | Files ≥ 100 MB |
+| Media | Screenshots, large media and media duplicates; nothing preselected because it is a screenshot |
+| Downloads & APK | Old downloads, installers, unfinished downloads |
+| WhatsApp | In-app review of WhatsApp / Business shared media |
+| App cache | StorageStats measurement + Android `ACTION_CLEAR_APP_CACHE` |
+| App manager | Launchable apps, storage/cache, uninstall through Android |
+| Storage analysis / change | File-type totals and folder review; storage change since the last scan |
 
-
-## v0.5.1 focused cleaner actions
-
-| Home action | Real implementation |
-|---|---|
-| Smart Clean | Standard on-device assessment across shared storage + exact duplicates |
-| Deep Clean | Broader review across accessible storage; lower-confidence personal files remain review-only |
-| WhatsApp Cleaner | Direct shared-media indexing under supported WhatsApp / WhatsApp Business media roots |
-| Duplicate Files | Sample fingerprint followed by full streaming SHA-256 |
-| Large Files | Shared-storage files >= 100 MB |
-| APK Cleaner | APK installer packages only |
-| Media Cleaner | Accessible screenshot / large media review + exact media duplicates; nothing is preselected merely for being a screenshot |
-| Deep App Cache | StorageStats measurement + Android `ACTION_CLEAR_APP_CACHE` |
-| Storage Analyzer | File-type totals without presenting files as junk |
+Every delete uses one confirmation (`ui/common/DeleteConfirmDialog`) that lists names, folders, kept originals and where the files go.
