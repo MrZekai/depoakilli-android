@@ -1477,7 +1477,7 @@ if "unicodeWrap" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/common
 
 for rules_name in ("backup_rules.xml", "data_extraction_rules.xml"):
     rules = read(f"app/src/main/res/xml/{rules_name}")
-    for excluded in ("dashboard_snapshot_v1.xml", "storage_change_v1.xml", "cleanup_history_v1.xml", "trash_index.json"):
+    for excluded in ("dashboard_snapshot_v1.xml", "storage_change_v1.xml", "cleanup_history_v1.xml", "trash_index.json", "kept_items_v1.xml", "excluded_folders_v1.xml"):
         if f'path="{excluded}"' not in rules:
             errors.append(f"{rules_name} must exclude device-specific state: {excluded}")
 

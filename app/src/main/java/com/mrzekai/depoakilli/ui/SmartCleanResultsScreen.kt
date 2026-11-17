@@ -188,6 +188,7 @@ internal fun SmartCleanResultsScreen(
     onDeepCheck: () -> Unit = {},
     onOpenFolder: (FolderSize) -> Unit = {},
     onOpenAppInfo: (String) -> Unit = {},
+    onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit = { _, _ -> },
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -254,6 +255,7 @@ internal fun SmartCleanResultsScreen(
             listAd = listAd,
             onOpenFolder = onOpenFolder,
             onOpenAppInfo = onOpenAppInfo,
+            onExcludeFolder = onExcludeFolder,
         )
     }
 }
@@ -610,6 +612,7 @@ private fun SmartResultsContent(
     listAd: @Composable () -> Unit,
     onOpenFolder: (FolderSize) -> Unit,
     onOpenAppInfo: (String) -> Unit,
+    onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit,
 ) {
     var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
@@ -652,6 +655,14 @@ private fun SmartResultsContent(
                     reason = assessmentReason(item.assessment),
                     onToggleSelection = { onToggleItem(item.id) },
                     onDismiss = { previewItemId = null },
+                    onExcludeFolder = if (item.assessment.group.auto) {
+                        null
+                    } else {
+                        {
+                            previewItemId = null
+                            onExcludeFolder(item.volumeRoot, item.relativePath)
+                        }
+                    },
                 )
             }
         }
@@ -680,6 +691,10 @@ private fun SmartResultsContent(
                     reason = stringResource(R.string.storage_review_manual_reason),
                     onToggleSelection = { onToggleStorageReviewItem(item.id) },
                     onDismiss = { previewStorageItemId = null },
+                    onExcludeFolder = {
+                        previewStorageItemId = null
+                        onExcludeFolder(item.file.volumeRoot, item.file.relativePath)
+                    },
                 )
             }
         }
@@ -735,6 +750,7 @@ private fun SmartResultsContent(
                 deepCheckRunning = deepCheckRunning,
                 onDeepCheck = onDeepCheck,
                 biggestFolders = summary.biggestFolders,
+                hiddenKeptCount = summary.hiddenKeptCount,
                 onOpenFolder = onOpenFolder,
                 largestApps = if (hasUsageAccess) largestUserApps(installedApps) else null,
                 onOpenAppInfo = onOpenAppInfo,
@@ -770,6 +786,14 @@ private fun SmartResultsContent(
                 reason = assessmentReason(item.assessment),
                 onToggleSelection = { onToggleItem(item.id) },
                 onDismiss = { previewItemId = null },
+                onExcludeFolder = if (item.assessment.group.auto) {
+                    null
+                } else {
+                    {
+                        previewItemId = null
+                        onExcludeFolder(item.volumeRoot, item.relativePath)
+                    }
+                },
             )
         }
     }
@@ -1777,6 +1801,7 @@ private fun FilePreviewDialog(
     reason: String?,
     onToggleSelection: (() -> Unit)?,
     onDismiss: () -> Unit,
+    onExcludeFolder: (() -> Unit)? = null,
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         Surface(
@@ -1901,6 +1926,13 @@ private fun FilePreviewDialog(
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
+                            }
+                        }
+
+                        // V11: "this is my archive" for the file's folder.
+                        if (onExcludeFolder != null) {
+                            TextButton(onClick = onExcludeFolder, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.exclude_folder_action))
                             }
                         }
                     }

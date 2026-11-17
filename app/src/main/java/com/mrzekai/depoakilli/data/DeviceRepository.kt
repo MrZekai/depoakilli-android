@@ -70,6 +70,8 @@ class DeviceRepository(
     ),
 ) {
     private val duplicateFinder = DuplicateFinder(aiEngine, ::openUriInput)
+    private val keptItems = KeptItemsStore.create(context)
+    private val excludedFolders = ExcludedFoldersStore.create(context)
     private val trashStore = TrashStore(
         indexFile = File(context.filesDir, TRASH_INDEX_FILE),
         trashRoots = { sharedStorageRoots() },
@@ -371,9 +373,17 @@ class DeviceRepository(
             .distinctBy(CleanableItem::uri)
             .sortedByDescending(CleanableItem::sizeBytes)
             .toList()
-        val truncated = ranked.size > CleaningThresholds.MAX_RESULT_ITEMS
+        // V10/V11: the user's "keep" decisions and excluded folders apply to
+        // review groups only; records of files that are gone are dropped.
+        val keptKeys = keptItems.keys()
+        if (keptKeys.isNotEmpty() && (focus == ScanFocus.SMART || focus == ScanFocus.DEEP)) {
+            keptItems.retainOnly(indexed.asSequence().map(KeptItemsStore::keyOf).filter(keptKeys::contains).toHashSet())
+        }
+        val userChoices = UserChoiceFilter.apply(ranked, keptItems.keys(), excludedFolders.folders())
+        val chosen = userChoices.items
+        val truncated = chosen.size > CleaningThresholds.MAX_RESULT_ITEMS
         val storageListFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)
-        val focusedItems = ranked.take(CleaningThresholds.MAX_RESULT_ITEMS)
+        val focusedItems = chosen.take(CleaningThresholds.MAX_RESULT_ITEMS)
 
         ScanSummary(
             items = focusedItems,
@@ -385,6 +395,7 @@ class DeviceRepository(
             storagePreviews = storageTypePreviews(storageListFiles),
             smartMediaTypes = smartMediaTypeStats(storageListFiles),
             truncated = truncated,
+            hiddenKeptCount = userChoices.hiddenKept,
             biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
                 FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
             } else {
@@ -595,6 +606,22 @@ class DeviceRepository(
         }
         outcome.toDirectResult(directItems.mapTo(hashSetOf(), CleanableItem::id))
     }
+
+    // V10: files kept in the swipe review.
+    fun keepItem(item: CleanableItem) = keptItems.add(KeptItemsStore.keyOf(item))
+
+    fun unkeepItem(item: CleanableItem) = keptItems.remove(KeptItemsStore.keyOf(item))
+
+    fun keptItemCount(): Int = keptItems.count()
+
+    fun clearKeptItems() = keptItems.clear()
+
+    // V11: folders the user does not want suggestions from.
+    fun excludedFolderList(): List<ExcludedFolder> = excludedFolders.folders()
+
+    fun excludeFolder(folder: ExcludedFolder): Boolean = excludedFolders.add(folder)
+
+    fun includeFolder(folder: ExcludedFolder) = excludedFolders.remove(folder)
 
     fun trashEntries(): List<TrashEntry> = trashStore.entries()
 

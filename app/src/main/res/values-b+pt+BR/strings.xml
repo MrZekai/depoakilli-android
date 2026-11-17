@@ -669,4 +669,13 @@
         <item quantity="one">%1$d arquivo é da sua câmera. O backup na nuvem não é verificado.</item>
         <item quantity="other">%1$d arquivos são da sua câmera. O backup na nuvem não é verificado.</item>
     </plurals>
+    <string name="settings_kept_files">Arquivos que você decidiu manter: %1$d</string>
+    <string name="settings_kept_reset">Sugerir novamente</string>
+    <string name="settings_kept_reset_confirm">Sugerir de novo na próxima verificação todos os arquivos que você manteve?</string>
+    <string name="settings_excluded_title">Pastas que nunca são sugeridas</string>
+    <string name="settings_excluded_remove">Remover</string>
+    <string name="exclude_folder_action">Não sugerir arquivos desta pasta</string>
+    <string name="message_folder_excluded">Arquivos de %1$s não serão sugeridos.</string>
+    <string name="message_excluded_folders_full">Você pode excluir até 50 pastas. Remova uma em Configurações primeiro.</string>
+    <string name="plan_kept_hidden">Arquivos mantidos ocultos neste plano: %1$d</string>
 </resources>

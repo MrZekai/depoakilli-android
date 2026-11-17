@@ -657,4 +657,13 @@
         <item quantity="one">%1$d Datei stammt von Ihrer Kamera. Cloud-Sicherungen werden nicht geprüft.</item>
         <item quantity="other">%1$d Dateien stammen von Ihrer Kamera. Cloud-Sicherungen werden nicht geprüft.</item>
     </plurals>
+    <string name="settings_kept_files">Dateien, die Sie behalten: %1$d</string>
+    <string name="settings_kept_reset">Wieder vorschlagen</string>
+    <string name="settings_kept_reset_confirm">Alle behaltenen Dateien beim nächsten Scan wieder vorschlagen?</string>
+    <string name="settings_excluded_title">Ordner, die nie vorgeschlagen werden</string>
+    <string name="settings_excluded_remove">Entfernen</string>
+    <string name="exclude_folder_action">Keine Dateien aus diesem Ordner vorschlagen</string>
+    <string name="message_folder_excluded">Dateien aus %1$s werden nicht mehr vorgeschlagen.</string>
+    <string name="message_excluded_folders_full">Sie können bis zu 50 Ordner ausschließen. Entfernen Sie zuerst einen in den Einstellungen.</string>
+    <string name="plan_kept_hidden">Behaltene Dateien, die hier ausgeblendet sind: %1$d</string>
 </resources>

@@ -669,4 +669,13 @@
         <item quantity="one">%1$d archivo es de tu cámara. No se comprueba la copia en la nube.</item>
         <item quantity="other">%1$d archivos son de tu cámara. No se comprueba la copia en la nube.</item>
     </plurals>
+    <string name="settings_kept_files">Archivos que decidiste conservar: %1$d</string>
+    <string name="settings_kept_reset">Volver a sugerirlos</string>
+    <string name="settings_kept_reset_confirm">¿Volver a sugerir en el próximo análisis todos los archivos que conservaste?</string>
+    <string name="settings_excluded_title">Carpetas que nunca se sugieren</string>
+    <string name="settings_excluded_remove">Quitar</string>
+    <string name="exclude_folder_action">No sugerir archivos de esta carpeta</string>
+    <string name="message_folder_excluded">No se sugerirán archivos de %1$s.</string>
+    <string name="message_excluded_folders_full">Puedes excluir hasta 50 carpetas. Quita una en Ajustes primero.</string>
+    <string name="plan_kept_hidden">Archivos conservados ocultos en este plan: %1$d</string>
 </resources>

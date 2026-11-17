@@ -669,4 +669,13 @@
         <item quantity="one">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
         <item quantity="other">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
     </plurals>
+    <string name="settings_kept_files">Tutmayı seçtiğin dosyalar: %1$d</string>
+    <string name="settings_kept_reset">Yeniden öner</string>
+    <string name="settings_kept_reset_confirm">Tuttuğun tüm dosyalar bir sonraki taramada yeniden önerilsin mi?</string>
+    <string name="settings_excluded_title">Hiç önerilmeyen klasörler</string>
+    <string name="settings_excluded_remove">Kaldır</string>
+    <string name="exclude_folder_action">Bu klasörden dosya önerme</string>
+    <string name="message_folder_excluded">%1$s klasöründeki dosyalar artık önerilmeyecek.</string>
+    <string name="message_excluded_folders_full">En fazla 50 klasör hariç tutulabilir. Önce Ayarlar’dan birini kaldır.</string>
+    <string name="plan_kept_hidden">Bu plandan gizlenen tutulan dosyalar: %1$d</string>
 </resources>

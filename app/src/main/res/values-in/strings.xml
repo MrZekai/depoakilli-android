@@ -615,4 +615,13 @@
     <plurals name="plan_preview_camera">
         <item quantity="other">%1$d file berasal dari kamera Anda. Cadangan cloud tidak diperiksa.</item>
     </plurals>
+    <string name="settings_kept_files">File yang Anda pilih untuk disimpan: %1$d</string>
+    <string name="settings_kept_reset">Sarankan lagi</string>
+    <string name="settings_kept_reset_confirm">Sarankan lagi semua file yang Anda simpan pada pemindaian berikutnya?</string>
+    <string name="settings_excluded_title">Folder yang tidak pernah disarankan</string>
+    <string name="settings_excluded_remove">Hapus</string>
+    <string name="exclude_folder_action">Jangan sarankan file dari folder ini</string>
+    <string name="message_folder_excluded">File dari %1$s tidak akan disarankan.</string>
+    <string name="message_excluded_folders_full">Anda dapat mengecualikan hingga 50 folder. Hapus satu di Pengaturan terlebih dahulu.</string>
+    <string name="plan_kept_hidden">File yang disimpan dan disembunyikan dari rencana ini: %1$d</string>
 </resources>

@@ -11,6 +11,7 @@ import com.mrzekai.depoakilli.data.RestoreResult
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
+import com.mrzekai.depoakilli.data.ExcludedFolder
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -137,6 +138,10 @@ data class CleanerUiState(
     val deepCheckRunning: Boolean = false,
     /** Items that could not go to Trash; the user may delete them permanently. */
     val trashFallback: TrashFallback? = null,
+    /** Files kept in the swipe review (V10). */
+    val keptItemCount: Int = 0,
+    /** Folders the user does not want suggestions from (V11). */
+    val excludedFolders: List<ExcludedFolder> = emptyList(),
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -200,6 +205,58 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         refreshDeviceState()
         refreshAppCaches()
         purgeExpiredTrash()
+        refreshUserChoices()
+    }
+
+    /** Loads the counts behind V10/V11 for Settings and the plan note. */
+    fun refreshUserChoices() {
+        viewModelScope.launch {
+            val (kept, folders) = withContext(Dispatchers.IO) {
+                repository.keptItemCount() to repository.excludedFolderList()
+            }
+            _state.update { it.copy(keptItemCount = kept, excludedFolders = folders) }
+        }
+    }
+
+    /** "Suggest them again": forget every keep decision; the next scan shows them again. */
+    fun clearKeptItems() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repository.clearKeptItems() }
+            refreshUserChoices()
+        }
+    }
+
+    /**
+     * "Don't suggest files from this folder" (V11): stored, and the folder's
+     * review items leave the current plan right away.
+     */
+    fun excludeFolder(volumeRoot: String, relativePath: String) {
+        val folder = ExcludedFolder(volumeRoot, ExcludedFolder.normalize(relativePath))
+        viewModelScope.launch {
+            val added = withContext(Dispatchers.IO) { repository.excludeFolder(folder) }
+            if (!added) {
+                _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_excluded_folders_full)) }
+                return@launch
+            }
+            _state.update { state ->
+                val keep: (CleanableItem) -> Boolean = { item ->
+                    item.assessment.group.auto || !folder.contains(item.volumeRoot, item.relativePath)
+                }
+                state.copy(
+                    summary = state.summary.copy(items = state.summary.items.filter(keep)),
+                    planSummary = state.planSummary?.let { plan -> plan.copy(items = plan.items.filter(keep)) },
+                    message = getApplication<Application>().getString(R.string.message_folder_excluded, folder.name),
+                )
+            }
+            refreshUserChoices()
+        }
+    }
+
+    fun includeFolder(folder: ExcludedFolder) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repository.includeFolder(folder) }
+            refreshUserChoices()
+        }
     }
 
     /** Deletes trash entries older than the retention period, then refreshes the trash list. */
@@ -1258,9 +1315,33 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun swipeMark(delete: Boolean) = updateSwipe { it.mark(delete) }
+    /** "Keep" is also remembered across scans (V10); "Delete" only marks. */
+    fun swipeMark(delete: Boolean) {
+        val state = _state.value
+        val currentId = state.swipeReviewGroup?.let(state.swipeStates::get)?.currentId
+        updateSwipe { it.mark(delete) }
+        if (!delete && currentId != null) {
+            val item = state.summary.items.firstOrNull { it.id == currentId } ?: return
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) { repository.keepItem(item) }
+                refreshUserChoices()
+            }
+        }
+    }
 
-    fun swipeUndo() = updateSwipe { it.undo() }
+    /** Undoing a "Keep" also forgets it (V10). */
+    fun swipeUndo() {
+        val state = _state.value
+        val last = state.swipeReviewGroup?.let(state.swipeStates::get)?.decisions?.lastOrNull()
+        updateSwipe { it.undo() }
+        if (last != null && !last.delete) {
+            val item = state.summary.items.firstOrNull { it.id == last.id } ?: return
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) { repository.unkeepItem(item) }
+                refreshUserChoices()
+            }
+        }
+    }
 
     fun swipeContinue() = updateSwipe { it.continueAfterBreak() }
 

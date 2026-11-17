@@ -6,6 +6,8 @@
         <exclude domain="sharedpref" path="dashboard_snapshot_v1.xml" />
         <exclude domain="sharedpref" path="storage_change_v1.xml" />
         <exclude domain="sharedpref" path="cleanup_history_v1.xml" />
+        <exclude domain="sharedpref" path="kept_items_v1.xml" />
+        <exclude domain="sharedpref" path="excluded_folders_v1.xml" />
         <exclude domain="file" path="trash_index.json" />
         <exclude domain="file" path="trash_index.json.bak" />
     </cloud-backup>
@@ -14,6 +16,8 @@
         <exclude domain="sharedpref" path="dashboard_snapshot_v1.xml" />
         <exclude domain="sharedpref" path="storage_change_v1.xml" />
         <exclude domain="sharedpref" path="cleanup_history_v1.xml" />
+        <exclude domain="sharedpref" path="kept_items_v1.xml" />
+        <exclude domain="sharedpref" path="excluded_folders_v1.xml" />
         <exclude domain="file" path="trash_index.json" />
         <exclude domain="file" path="trash_index.json.bak" />
     </device-transfer>

@@ -701,4 +701,13 @@
         <item quantity="many">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
         <item quantity="other">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
     </plurals>
+    <string name="settings_kept_files">File che hai deciso di tenere: %1$d</string>
+    <string name="settings_kept_reset">Suggeriscili di nuovo</string>
+    <string name="settings_kept_reset_confirm">Suggerire di nuovo alla prossima scansione tutti i file che hai tenuto?</string>
+    <string name="settings_excluded_title">Cartelle mai suggerite</string>
+    <string name="settings_excluded_remove">Rimuovi</string>
+    <string name="exclude_folder_action">Non suggerire file da questa cartella</string>
+    <string name="message_folder_excluded">I file di %1$s non verranno suggeriti.</string>
+    <string name="message_excluded_folders_full">Puoi escludere fino a 50 cartelle. Rimuovine prima una nelle Impostazioni.</string>
+    <string name="plan_kept_hidden">File tenuti nascosti da questo piano: %1$d</string>
 </resources>

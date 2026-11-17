@@ -296,6 +296,8 @@ data class ScanSummary(
     val smartMediaTypes: List<StorageTypeStat> = emptyList(),
     val truncated: Boolean = false,
     val biggestFolders: List<FolderSize> = emptyList(),
+    /** Review files hidden because the user chose to keep them (V10). */
+    val hiddenKeptCount: Int = 0,
 ) {
     /** Cleanup plan derived from [items]; always reflects the current selection. */
     val plan: CleanupPlan by lazy(LazyThreadSafetyMode.NONE) { buildPlan(items, truncated) }

@@ -3,7 +3,7 @@ package com.mrzekai.depoakilli.data
 import com.mrzekai.depoakilli.model.IndexedFile
 
 /**
- * RAW + JPEG pairs (V5): a .dng file whose photo also exists as .jpg/.jpeg/.heic
+ * RAW + JPEG pairs (V5): a .dng file whose photo also exists as .jpg/.jpeg/.heic/.heif
  * (or .heif) with the same base name in the same folder. Only the RAW file is offered;
  * an unpaired .dng is never a candidate.
  */

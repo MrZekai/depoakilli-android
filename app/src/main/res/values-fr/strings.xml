@@ -701,4 +701,13 @@
         <item quantity="many">%1$d fichiers viennent de votre appareil photo. La sauvegarde cloud n’est pas vérifiée.</item>
         <item quantity="other">%1$d fichiers viennent de votre appareil photo. La sauvegarde cloud n’est pas vérifiée.</item>
     </plurals>
+    <string name="settings_kept_files">Fichiers que vous avez choisi de garder : %1$d</string>
+    <string name="settings_kept_reset">Les suggérer à nouveau</string>
+    <string name="settings_kept_reset_confirm">Suggérer à nouveau tous les fichiers gardés lors de la prochaine analyse ?</string>
+    <string name="settings_excluded_title">Dossiers jamais suggérés</string>
+    <string name="settings_excluded_remove">Retirer</string>
+    <string name="exclude_folder_action">Ne plus suggérer de fichiers de ce dossier</string>
+    <string name="message_folder_excluded">Les fichiers de %1$s ne seront plus suggérés.</string>
+    <string name="message_excluded_folders_full">Vous pouvez exclure jusqu’à 50 dossiers. Retirez-en d’abord un dans les Paramètres.</string>
+    <string name="plan_kept_hidden">Fichiers gardés masqués dans ce plan : %1$d</string>
 </resources>

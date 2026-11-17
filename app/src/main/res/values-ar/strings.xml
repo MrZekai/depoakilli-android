@@ -845,4 +845,15 @@
         <item quantity="many">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
         <item quantity="other">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
     </plurals>
+    <string name="settings_kept_files">الملفات التي اخترت الاحتفاظ بها: %1$d</string>
+    <string name="settings_kept_reset">اقترحها مجددًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_kept_reset_confirm">هل تريد اقتراح كل الملفات التي احتفظت بها مجددًا في الفحص التالي؟</string>
+    <string name="settings_excluded_title">مجلدات لا يتم اقتراحها أبدًا</string>
+    <string name="settings_excluded_remove">إزالة</string>
+    <string name="exclude_folder_action">لا تقترح ملفات من هذا المجلد</string>
+    <string name="message_folder_excluded">لن يتم اقتراح الملفات من %1$s.</string>
+    <string name="message_excluded_folders_full">يمكنك استبعاد 50 مجلدًا كحد أقصى. أزل مجلدًا من الإعدادات أولًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_kept_hidden">الملفات المحتفظ بها والمخفية من هذه الخطة: %1$d</string>
 </resources>

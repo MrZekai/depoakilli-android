@@ -476,6 +476,10 @@ fun CleanerApp(
                 onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                 onOpenLegalPage = ::openLegalPage,
                 modifier = Modifier.padding(padding),
+                keptItemCount = state.keptItemCount,
+                onClearKeptItems = viewModel::clearKeptItems,
+                excludedFolders = state.excludedFolders,
+                onIncludeFolder = viewModel::includeFolder,
             )
 
             DetailScreen.ACCESS -> SecurityCenterScreen(
@@ -567,6 +571,7 @@ fun CleanerApp(
                                 detailScreen = DetailScreen.CLEAN_RESULTS
                             },
                             onOpenAppInfo = onOpenAppInfo,
+                            onExcludeFolder = viewModel::excludeFolder,
                             reviewAd = { index ->
                                 val plan = displayState.summary.plan
                                 val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +

@@ -86,6 +86,7 @@ internal fun LazyListScope.cleanupPlanItems(
     deepCheckRunning: Boolean = false,
     onDeepCheck: () -> Unit = {},
     biggestFolders: List<FolderSize> = emptyList(),
+    hiddenKeptCount: Int = 0,
     onOpenFolder: (FolderSize) -> Unit = {},
     largestApps: List<InstalledAppEntry>? = null,
     onOpenAppInfo: (String) -> Unit = {},
@@ -189,6 +190,16 @@ internal fun LazyListScope.cleanupPlanItems(
                     ByteFormatter.format(folder.bytes),
                 ),
                 onClick = { onOpenFolder(folder) },
+            )
+        }
+    }
+    if (hiddenKeptCount > 0) {
+        item(key = "plan-kept-note") {
+            Text(
+                stringResource(R.string.plan_kept_hidden, hiddenKeptCount),
+                color = PlanTextSecondary,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 4.dp),
             )
         }
     }

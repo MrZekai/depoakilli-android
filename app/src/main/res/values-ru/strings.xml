@@ -750,4 +750,13 @@
         <item quantity="many">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
         <item quantity="other">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
     </plurals>
+    <string name="settings_kept_files">Файлы, которые вы решили оставить: %1$d</string>
+    <string name="settings_kept_reset">Предлагать снова</string>
+    <string name="settings_kept_reset_confirm">Снова предлагать все оставленные файлы при следующем сканировании?</string>
+    <string name="settings_excluded_title">Папки, которые не предлагаются</string>
+    <string name="settings_excluded_remove">Убрать</string>
+    <string name="exclude_folder_action">Не предлагать файлы из этой папки</string>
+    <string name="message_folder_excluded">Файлы из %1$s больше не будут предлагаться.</string>
+    <string name="message_excluded_folders_full">Можно исключить до 50 папок. Сначала уберите одну в Настройках.</string>
+    <string name="plan_kept_hidden">Оставленные файлы, скрытые из плана: %1$d</string>
 </resources>
