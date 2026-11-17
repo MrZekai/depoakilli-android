@@ -691,4 +691,14 @@
     <string name="plan_largest_apps_access">Autorisez l’accès aux données d’utilisation pour voir les applis qui prennent le plus de place</string>
     <string name="result_next_group">Ensuite : %1$s · %2$s</string>
     <string name="result_review_next">Vérifier</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d fichier de votre appareil photo est à vérifier un par un</item>
+        <item quantity="many">%1$d fichiers de votre appareil photo sont à vérifier un par un</item>
+        <item quantity="other">%1$d fichiers de votre appareil photo sont à vérifier un par un</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d fichier vient de votre appareil photo. La sauvegarde cloud n’est pas vérifiée.</item>
+        <item quantity="many">%1$d fichiers viennent de votre appareil photo. La sauvegarde cloud n’est pas vérifiée.</item>
+        <item quantity="other">%1$d fichiers viennent de votre appareil photo. La sauvegarde cloud n’est pas vérifiée.</item>
+    </plurals>
 </resources>

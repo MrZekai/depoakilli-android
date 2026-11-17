@@ -54,6 +54,17 @@ internal object StoragePathRules {
     }
 
     /**
+     * The user's own camera folder (B3): DCIM/… except screenshots and hidden
+     * caches such as DCIM/.thumbnails.
+     */
+    fun isCameraPath(relativePath: String): Boolean {
+        val normalized = normalizePath(relativePath)
+        return normalized.startsWith("/dcim/") &&
+            !normalized.startsWith("/dcim/.") &&
+            !normalized.contains("/screenshots/")
+    }
+
+    /**
      * Media saved by another app (V6): Android/media/<package>/ except WhatsApp,
      * or a Telegram folder at the volume root.
      */

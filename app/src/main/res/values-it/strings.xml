@@ -691,4 +691,14 @@
     <string name="plan_largest_apps_access">Consenti l’accesso all’utilizzo per vedere quali app occupano più spazio</string>
     <string name="result_next_group">Prossimo: %1$s · %2$s</string>
     <string name="result_review_next">Controlla</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d file della fotocamera va controllato uno per uno</item>
+        <item quantity="many">%1$d file della fotocamera vanno controllati uno per uno</item>
+        <item quantity="other">%1$d file della fotocamera vanno controllati uno per uno</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d file proviene dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+        <item quantity="many">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+        <item quantity="other">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+    </plurals>
 </resources>

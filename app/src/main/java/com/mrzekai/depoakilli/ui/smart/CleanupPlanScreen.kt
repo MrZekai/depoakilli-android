@@ -336,7 +336,7 @@ internal fun PlanRow(row: PlanGroup, onToggle: () -> Unit, onOpen: () -> Unit) {
         ) {
             if (row.groupSelectable) {
                 Checkbox(
-                    checked = row.allSelected,
+                    checked = row.allBulkSelected,
                     onCheckedChange = { onToggle() },
                     colors = CheckboxDefaults.colors(checkedColor = PlanAccent, checkmarkColor = PlanButtonText),
                 )
@@ -361,6 +361,15 @@ internal fun PlanRow(row: PlanGroup, onToggle: () -> Unit, onOpen: () -> Unit) {
                     color = PlanTextSecondary,
                     fontSize = 13.sp,
                 )
+                // B3: the checkbox never selects the user's own camera files.
+                val oneByOne = row.oneByOneCount
+                if (row.groupSelectable && oneByOne > 0) {
+                    Text(
+                        pluralStringResource(R.plurals.plan_camera_one_by_one, oneByOne, oneByOne),
+                        color = Color(0xFFFFC46B),
+                        fontSize = 13.sp,
+                    )
+                }
             }
             IconButtonArrow(onOpen)
         }

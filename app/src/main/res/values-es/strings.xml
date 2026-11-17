@@ -661,4 +661,12 @@
     <string name="plan_largest_apps_access">Permite el acceso de uso para ver qué apps ocupan más espacio</string>
     <string name="result_next_group">Siguiente: %1$s · %2$s</string>
     <string name="result_review_next">Revisar</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d archivo de tu cámara se revisa uno por uno</item>
+        <item quantity="other">%1$d archivos de tu cámara se revisan uno por uno</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d archivo es de tu cámara. No se comprueba la copia en la nube.</item>
+        <item quantity="other">%1$d archivos son de tu cámara. No se comprueba la copia en la nube.</item>
+    </plurals>
 </resources>

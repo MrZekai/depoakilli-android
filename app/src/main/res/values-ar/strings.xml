@@ -827,4 +827,22 @@
     <string name="plan_largest_apps_access">اسمح بالوصول إلى بيانات الاستخدام لمعرفة التطبيقات التي تستهلك أكبر مساحة</string>
     <string name="result_next_group">التالي: %1$s · %2$s</string>
     <string name="result_review_next">مراجعة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="zero">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="one">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="two">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="few">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="many">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="other">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_camera">
+        <item quantity="zero">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="one">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="two">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="few">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="many">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="other">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+    </plurals>
 </resources>

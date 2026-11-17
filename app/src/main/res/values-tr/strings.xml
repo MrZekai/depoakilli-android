@@ -661,4 +661,12 @@
     <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
     <string name="result_next_group">Sıradaki: %1$s · %2$s</string>
     <string name="result_review_next">İncele</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
+        <item quantity="other">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
+        <item quantity="other">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
+    </plurals>
 </resources>

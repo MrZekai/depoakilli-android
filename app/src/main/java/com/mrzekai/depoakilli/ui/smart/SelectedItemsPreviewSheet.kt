@@ -157,6 +157,15 @@ internal fun SelectedItemsPreviewSheet(
             if (hasWhatsApp) {
                 Text(stringResource(R.string.plan_preview_whatsapp), color = Color(0xFFFFC46B), fontSize = 13.sp)
             }
+            val cameraCount = items.count { StoragePathRules.isCameraPath(it.relativePath) }
+            if (cameraCount > 0) {
+                Text(
+                    pluralStringResource(R.plurals.plan_preview_camera, cameraCount, cameraCount),
+                    color = Color(0xFFFFC46B),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
             Text(stringResource(R.string.plan_preview_cloud), color = PlanTextSecondary, fontSize = 13.sp)
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),

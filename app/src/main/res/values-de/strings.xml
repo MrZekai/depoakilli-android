@@ -649,4 +649,12 @@
     <string name="plan_largest_apps_access">Erlauben Sie den Nutzungszugriff, um zu sehen, welche Apps am meisten Platz belegen</string>
     <string name="result_next_group">Als Nächstes: %1$s · %2$s</string>
     <string name="result_review_next">Prüfen</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d Kameradatei bitte einzeln prüfen</item>
+        <item quantity="other">%1$d Kameradateien bitte einzeln prüfen</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d Datei stammt von Ihrer Kamera. Cloud-Sicherungen werden nicht geprüft.</item>
+        <item quantity="other">%1$d Dateien stammen von Ihrer Kamera. Cloud-Sicherungen werden nicht geprüft.</item>
+    </plurals>
 </resources>

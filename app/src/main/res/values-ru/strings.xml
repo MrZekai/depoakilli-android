@@ -737,4 +737,17 @@
     <string name="plan_largest_apps_access">Разрешите доступ к статистике, чтобы увидеть, какие приложения занимают больше всего места</string>
     <string name="result_next_group">Далее: %1$s · %2$s</string>
     <string name="result_review_next">Проверить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">Файлы с камеры (%1$d) нужно проверить по одному</item>
+        <item quantity="few">Файлы с камеры (%1$d) нужно проверить по одному</item>
+        <item quantity="many">Файлы с камеры (%1$d) нужно проверить по одному</item>
+        <item quantity="other">Файлы с камеры (%1$d) нужно проверить по одному</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
+        <item quantity="few">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
+        <item quantity="many">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
+        <item quantity="other">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
+    </plurals>
 </resources>

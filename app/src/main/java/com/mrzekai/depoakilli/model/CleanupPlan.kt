@@ -1,8 +1,18 @@
 package com.mrzekai.depoakilli.model
 
 import com.mrzekai.depoakilli.data.CleaningThresholds
+import com.mrzekai.depoakilli.data.StoragePathRules
 
 /** One row of the cleanup plan. [group] is null only for the merged small Auto row. */
+/**
+ * Whether "select all" style actions may select [this] (T2.4, B3): never items
+ * of groups that are not group-selectable, and never review items from the
+ * camera folder; those are chosen one by one or in the swipe review.
+ */
+fun CleanableItem.isBulkSelectable(): Boolean =
+    assessment.group.groupSelectable &&
+        (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath))
+
 data class PlanGroup(
     val group: CleanupGroup?,
     val items: List<CleanableItem>,
@@ -16,6 +26,14 @@ data class PlanGroup(
 ) {
     val selectedCount: Int get() = items.count(CleanableItem::selected)
     val allSelected: Boolean get() = items.isNotEmpty() && items.all(CleanableItem::selected)
+
+    /** Camera items a group checkbox leaves out (B3). */
+    val oneByOneCount: Int get() = if (auto) 0 else items.count { StoragePathRules.isCameraPath(it.relativePath) }
+
+    /** Checkbox state: every item the group checkbox can select is selected. */
+    val allBulkSelected: Boolean get() = items.filter(CleanableItem::isBulkSelectable).let { bulk ->
+        bulk.isNotEmpty() && bulk.all(CleanableItem::selected)
+    }
 }
 
 data class CleanupPlan(

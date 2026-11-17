@@ -661,4 +661,12 @@
     <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
     <string name="result_next_group">Next: %1$s · %2$s</string>
     <string name="result_review_next">Review</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d file from your camera needs a one-by-one look</item>
+        <item quantity="other">%1$d files from your camera need a one-by-one look</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d file is from your camera. Cloud backup isn’t checked.</item>
+        <item quantity="other">%1$d files are from your camera. Cloud backup isn’t checked.</item>
+    </plurals>
 </resources>

@@ -609,4 +609,10 @@
     <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
     <string name="result_next_group">Berikutnya: %1$s · %2$s</string>
     <string name="result_review_next">Tinjau</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="other">%1$d file dari kamera perlu dicek satu per satu</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="other">%1$d file berasal dari kamera Anda. Cadangan cloud tidak diperiksa.</item>
+    </plurals>
 </resources>

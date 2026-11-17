@@ -714,7 +714,7 @@ private fun SmartResultsContent(
                     if (group != null) {
                         onToggleGroup(group)
                     } else {
-                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allSelected, true)
+                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allBulkSelected, true)
                     }
                 },
                 onOpenRow = { row ->
