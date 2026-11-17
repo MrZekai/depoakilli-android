@@ -52,6 +52,10 @@ enum class CleanupGroup(
     WHATSAPP_VIDEO(R.string.plan_group_whatsapp_video, R.string.reason_whatsapp_video, null, false, DeleteMode.TRASH),
     WHATSAPP_VOICE(R.string.plan_group_whatsapp_voice, 0, R.plurals.reason_whatsapp_voice, false, DeleteMode.TRASH),
     WHATSAPP_STATUS(R.string.plan_group_whatsapp_status, R.string.reason_whatsapp_status, null, false, DeleteMode.TRASH),
+    WHATSAPP_OLD_VIDEO(R.string.plan_group_whatsapp_old_video, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH),
+    WHATSAPP_OLD_IMAGE(R.string.plan_group_whatsapp_old_image, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH),
+    WHATSAPP_OLD_AUDIO(R.string.plan_group_whatsapp_old_audio, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH),
+    WHATSAPP_DOCUMENT(R.string.plan_group_whatsapp_document, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH, groupSelectable = false),
     ;
 
     companion object {

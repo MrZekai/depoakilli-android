@@ -638,4 +638,12 @@
         <item quantity="one">%1$d saat önce kontrol edildi</item>
         <item quantity="other">%1$d saat önce kontrol edildi</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Eski WhatsApp videoları</string>
+    <string name="plan_group_whatsapp_old_image">Eski WhatsApp fotoğrafları</string>
+    <string name="plan_group_whatsapp_old_audio">Eski WhatsApp sesleri</string>
+    <string name="plan_group_whatsapp_document">WhatsApp belgeleri</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">%1$d günlük. Silersen sohbette açılmaz.</item>
+        <item quantity="other">%1$d günlük. Silersen sohbette açılmaz.</item>
+    </plurals>
 </resources>

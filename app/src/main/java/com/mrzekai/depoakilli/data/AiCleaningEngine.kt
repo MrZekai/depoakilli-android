@@ -34,8 +34,9 @@ class AiCleaningEngine(
         // 1. Protected user data is never a candidate.
         if (StoragePathRules.isProtectedUserDataPath(file.relativePath, file.name)) return null
 
-        // 2. WhatsApp: review only, never Auto.
+        // 2. WhatsApp: review only, never Auto. First match wins (V2).
         if (StoragePathRules.isWhatsAppPath(path)) {
+            if (WHATSAPP_NEVER_FOLDERS.any(path::contains)) return null
             return when {
                 path.contains("/.statuses/") && ageDays >= CleaningThresholds.WHATSAPP_STATUS_DAYS ->
                     assessment(CleanupGroup.WHATSAPP_STATUS, ageDays)
@@ -46,6 +47,14 @@ class AiCleaningEngine(
                 (path.contains("voice notes/") || name.startsWith("ptt-")) &&
                     ageDays >= CleaningThresholds.WHATSAPP_VOICE_DAYS ->
                     assessment(CleanupGroup.WHATSAPP_VOICE, ageDays)
+                isVideo && ageDays >= CleaningThresholds.WHATSAPP_OLD_VIDEO_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_VIDEO, ageDays)
+                mime.startsWith("image/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_IMAGE_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_IMAGE, ageDays)
+                path.contains("/whatsapp documents/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_DOCUMENT_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_DOCUMENT, ageDays)
+                mime.startsWith("audio/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_AUDIO_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_AUDIO, ageDays)
                 else -> null
             }
         }
@@ -301,6 +310,15 @@ class AiCleaningEngine(
         )
         private val PARTIAL_DOWNLOAD_EXTENSIONS = listOf(".crdownload", ".part", ".download")
         private val TEMP_EXTENSIONS = listOf(".tmp", ".temp")
+
+        /** WhatsApp folders that are never offered: stickers, profile photos, chat data. */
+        private val WHATSAPP_NEVER_FOLDERS = listOf(
+            "/whatsapp stickers/",
+            "/whatsapp profile photos/",
+            "/whatsapp business profile photos/",
+            "/databases/",
+            "/backups/",
+        )
         private val SCREEN_RECORDING_FOLDERS = listOf(
             "/screenrecord",
             "/screen recordings/",
@@ -333,7 +351,11 @@ class AiCleaningEngine(
             CleanupGroup.WHATSAPP_SENT,
             CleanupGroup.WHATSAPP_VIDEO,
             CleanupGroup.WHATSAPP_VOICE,
-            CleanupGroup.WHATSAPP_STATUS -> CleanCategory.WHATSAPP_MEDIA
+            CleanupGroup.WHATSAPP_STATUS,
+            CleanupGroup.WHATSAPP_OLD_VIDEO,
+            CleanupGroup.WHATSAPP_OLD_IMAGE,
+            CleanupGroup.WHATSAPP_OLD_AUDIO,
+            CleanupGroup.WHATSAPP_DOCUMENT -> CleanCategory.WHATSAPP_MEDIA
         }
     }
 }

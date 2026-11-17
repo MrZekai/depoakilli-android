@@ -55,8 +55,33 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `older whatsapp media groups use their age thresholds`() {
+        val wa = "Android/media/com.whatsapp/WhatsApp/Media/"
+        assertNull(group(file("v.mp4", "video/mp4", 89, wa + "WhatsApp Video/", 5 * mb)))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_VIDEO, group(file("v.mp4", "video/mp4", 90, wa + "WhatsApp Video/", 5 * mb)))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_VIDEO, group(file("v.mp4", "video/mp4", 100, wa + "WhatsApp Video/", 5 * mb)))
+        assertNull(group(file("p.jpg", "image/jpeg", 179, wa + "WhatsApp Images/")))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_IMAGE, group(file("p.jpg", "image/jpeg", 180, wa + "WhatsApp Images/")))
+        assertNull(group(file("d.pdf", "application/pdf", 89, wa + "WhatsApp Documents/")))
+        assertEquals(CleanupGroup.WHATSAPP_DOCUMENT, group(file("d.pdf", "application/pdf", 90, wa + "WhatsApp Documents/")))
+        assertNull(group(file("a.mp3", "audio/mpeg", 179, wa + "WhatsApp Audio/")))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_AUDIO, group(file("a.mp3", "audio/mpeg", 180, wa + "WhatsApp Audio/")))
+        // Priority: an old video in Sent stays a sent item.
+        assertEquals(CleanupGroup.WHATSAPP_SENT, group(file("v.mp4", "video/mp4", 200, wa + "WhatsApp Video/Sent/", 5 * mb)))
+        // Stickers, profile photos and chat data are never offered.
+        assertNull(group(file("s.webp", "image/webp", 900, wa + "WhatsApp Stickers/")))
+        assertNull(group(file("p.jpg", "image/jpeg", 900, wa + "WhatsApp Profile Photos/")))
+        assertNull(group(file("msgstore.db.crypt14", "application/octet-stream", 900, "Android/media/com.whatsapp/WhatsApp/Databases/")))
+        assertNull(group(file("backup.crypt14", "application/octet-stream", 900, "Android/media/com.whatsapp/WhatsApp/Backups/")))
+        for (g in listOf(CleanupGroup.WHATSAPP_OLD_VIDEO, CleanupGroup.WHATSAPP_OLD_IMAGE, CleanupGroup.WHATSAPP_OLD_AUDIO, CleanupGroup.WHATSAPP_DOCUMENT)) {
+            assertFalse(g.auto)
+        }
+        assertFalse(CleanupGroup.WHATSAPP_DOCUMENT.groupSelectable)
+    }
+
+    @Test
     fun `other whatsapp media is never a candidate and nothing in whatsapp is auto`() {
-        assertNull(group(file("photo.jpg", "image/jpeg", 900, "WhatsApp/Media/WhatsApp Images/")))
+        assertNull(group(file("photo.jpg", "image/jpeg", 179, "WhatsApp/Media/WhatsApp Images/")))
         val all = listOf(
             file("s.jpg", "image/jpeg", 5, "WhatsApp/Media/.Statuses/"),
             file("a.jpg", "image/jpeg", 50, "WhatsApp/Media/WhatsApp Images/Sent/"),

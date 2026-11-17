@@ -626,4 +626,12 @@
         <item quantity="one">Vor %1$d Stunde geprüft</item>
         <item quantity="other">Vor %1$d Stunden geprüft</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Ältere WhatsApp-Videos</string>
+    <string name="plan_group_whatsapp_old_image">Ältere WhatsApp-Fotos</string>
+    <string name="plan_group_whatsapp_old_audio">Ältere WhatsApp-Audios</string>
+    <string name="plan_group_whatsapp_document">WhatsApp-Dokumente</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">%1$d Tag alt. Wenn Sie es löschen, lässt es sich im Chat nicht mehr öffnen.</item>
+        <item quantity="other">%1$d Tage alt. Wenn Sie es löschen, lässt es sich im Chat nicht mehr öffnen.</item>
+    </plurals>
 </resources>

@@ -667,4 +667,13 @@
         <item quantity="many">Controllato %1$d ore fa</item>
         <item quantity="other">Controllato %1$d ore fa</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Video WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_old_image">Foto WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_old_audio">Audio WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_document">Documenti WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Di %1$d giorno fa. Se lo elimini, non si aprirà nella chat.</item>
+        <item quantity="many">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
+        <item quantity="other">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
+    </plurals>
 </resources>

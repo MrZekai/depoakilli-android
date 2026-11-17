@@ -667,4 +667,13 @@
         <item quantity="many">Vérifié il y a %1$d heures</item>
         <item quantity="other">Vérifié il y a %1$d heures</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Anciennes vidéos WhatsApp</string>
+    <string name="plan_group_whatsapp_old_image">Anciennes photos WhatsApp</string>
+    <string name="plan_group_whatsapp_old_audio">Anciens audios WhatsApp</string>
+    <string name="plan_group_whatsapp_document">Documents WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Date de %1$d jour. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
+        <item quantity="many">Date de %1$d jours. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
+        <item quantity="other">Date de %1$d jours. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
+    </plurals>
 </resources>

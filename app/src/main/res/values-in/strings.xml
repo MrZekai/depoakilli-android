@@ -587,4 +587,11 @@
     <plurals name="home_saved_checked_hours">
         <item quantity="other">Dicek %1$d jam lalu</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Video WhatsApp lama</string>
+    <string name="plan_group_whatsapp_old_image">Foto WhatsApp lama</string>
+    <string name="plan_group_whatsapp_old_audio">Audio WhatsApp lama</string>
+    <string name="plan_group_whatsapp_document">Dokumen WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="other">Berusia %1$d hari. Jika dihapus, file tidak akan terbuka di chat.</item>
+    </plurals>
 </resources>

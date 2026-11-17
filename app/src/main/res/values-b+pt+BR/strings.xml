@@ -638,4 +638,12 @@
         <item quantity="one">Verificado há %1$d hora</item>
         <item quantity="other">Verificado há %1$d horas</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Vídeos antigos do WhatsApp</string>
+    <string name="plan_group_whatsapp_old_image">Fotos antigas do WhatsApp</string>
+    <string name="plan_group_whatsapp_old_audio">Áudios antigos do WhatsApp</string>
+    <string name="plan_group_whatsapp_document">Documentos do WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Tem %1$d dia. Se você excluir, não abrirá na conversa.</item>
+        <item quantity="other">Tem %1$d dias. Se você excluir, não abrirá na conversa.</item>
+    </plurals>
 </resources>

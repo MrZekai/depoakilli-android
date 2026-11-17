@@ -20,6 +20,10 @@ object CleaningThresholds {
     const val WHATSAPP_VIDEO_BYTES = 25L * MB
     const val WHATSAPP_VOICE_DAYS = 180L
     const val WHATSAPP_STATUS_DAYS = 2L
+    const val WHATSAPP_OLD_VIDEO_DAYS = 90L
+    const val WHATSAPP_OLD_IMAGE_DAYS = 180L
+    const val WHATSAPP_OLD_DOCUMENT_DAYS = 90L
+    const val WHATSAPP_OLD_AUDIO_DAYS = 180L
     const val TEMP_DAYS = 7L
     const val PARTIAL_DOWNLOAD_DAYS = 14L
     const val UNUSED_APP_DAYS = 60L

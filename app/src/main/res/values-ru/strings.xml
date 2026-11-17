@@ -711,4 +711,14 @@
         <item quantity="many">Проверено %1$d часов назад</item>
         <item quantity="other">Проверено %1$d часа назад</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Старые видео WhatsApp</string>
+    <string name="plan_group_whatsapp_old_image">Старые фото WhatsApp</string>
+    <string name="plan_group_whatsapp_old_audio">Старые аудио WhatsApp</string>
+    <string name="plan_group_whatsapp_document">Документы WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
+        <item quantity="few">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
+        <item quantity="many">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
+        <item quantity="other">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
+    </plurals>
 </resources>

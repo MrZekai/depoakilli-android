@@ -55,6 +55,8 @@ data class SwipeReviewState(
             CleanupGroup.SCREENSHOT,
             CleanupGroup.WHATSAPP_VIDEO,
             CleanupGroup.WHATSAPP_SENT,
+            CleanupGroup.WHATSAPP_OLD_VIDEO,
+            CleanupGroup.WHATSAPP_OLD_IMAGE,
             CleanupGroup.DOWNLOAD_FILE,
         )
 

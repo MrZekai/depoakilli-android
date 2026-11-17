@@ -797,4 +797,17 @@
         <item quantity="many">تم الفحص قبل %1$d ساعة</item>
         <item quantity="other">تم الفحص قبل %1$d ساعة</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">مقاطع فيديو WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_old_image">صور WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_old_audio">ملفات صوت WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_document">مستندات WhatsApp</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="reason_whatsapp_old">
+        <item quantity="zero">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="one">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="two">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="few">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="many">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="other">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+    </plurals>
 </resources>

@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.CleaningThresholds
+import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.DeleteMode
@@ -172,5 +173,11 @@ internal fun DeleteConfirmDialog(
         inProgress = inProgress,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
+        // WhatsApp media deleted here no longer opens in the chat (V2 risk).
+        extraContent = if (items.any { StoragePathRules.isWhatsAppPath(it.relativePath) }) {
+            { Text(stringResource(R.string.plan_preview_whatsapp), style = MaterialTheme.typography.bodySmall) }
+        } else {
+            null
+        },
     )
 }
