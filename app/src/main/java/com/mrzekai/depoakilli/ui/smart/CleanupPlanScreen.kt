@@ -54,11 +54,14 @@ internal val PlanCyan = Color(0xFF16C7FF)
 internal val PlanButtonText = Color(0xFF03122B)
 
 /** Stable key of a plan row; the merged small row has no group. */
-internal fun PlanGroup.rowKey(): String = group?.name ?: "SMALL_ITEMS"
+internal fun PlanGroup.rowKey(): String = group?.name ?: if (smallReview) "SMALL_REVIEW" else "SMALL_ITEMS"
 
 @Composable
-internal fun PlanGroup.title(): String =
-    group?.let { stringResource(it.titleRes) } ?: stringResource(R.string.plan_small_items)
+internal fun PlanGroup.title(): String = when {
+    group != null -> stringResource(group.titleRes)
+    smallReview -> stringResource(R.string.plan_small_review)
+    else -> stringResource(R.string.plan_small_items)
+}
 
 /**
  * Rows of the cleanup plan (T1.7): recommendation card, included rows,
@@ -114,9 +117,10 @@ internal fun LazyListScope.cleanupPlanItems(
             )
         }
     }
-    if (plan.review.isNotEmpty()) {
+    val reviewRows = plan.review + listOfNotNull(plan.smallReview)
+    if (reviewRows.isNotEmpty()) {
         item(key = "plan-review-title") { PlanSectionTitle(stringResource(R.string.plan_section_review)) }
-        plan.review.forEachIndexed { index, row ->
+        reviewRows.forEachIndexed { index, row ->
             item(key = "review-" + row.rowKey()) {
                 PlanRow(row = row, onToggle = { onToggleRow(row) }, onOpen = { onOpenRow(row) })
             }
@@ -203,20 +207,32 @@ internal fun RecommendedCleanupCard(
                     }
                 }
             } else {
-                val groups = plan.selectedGroupCount
+                // V7: the headline is everything listed below; the button only ever
+                // shows what is selected.
                 Text(
-                    pluralStringResource(
-                        R.plurals.plan_recommended_summary,
-                        groups,
-                        groups,
-                        ByteFormatter.format(plan.selectedBytes),
-                    ),
+                    stringResource(R.string.plan_up_to_freed, ByteFormatter.format(plan.potentialBytes)),
+                    color = Color.White,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    stringResource(R.string.plan_selected_safely, ByteFormatter.format(plan.recommendedBytes)),
+                    color = PlanAccent,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    stringResource(R.string.plan_worth_a_look_amount, ByteFormatter.format(plan.reviewBytes)),
                     color = PlanTextSecondary,
                     fontSize = 15.sp,
                 )
+                val reviewFirst = plan.selectedBytes <= 0L && plan.firstReviewRow != null
                 Button(
-                    onClick = onClean,
-                    enabled = plan.selectedBytes > 0L && !cleanupInProgress,
+                    onClick = {
+                        val first = plan.firstReviewRow
+                        if (reviewFirst && first != null) onOpenRow(first) else onClean()
+                    },
+                    enabled = (plan.selectedBytes > 0L || reviewFirst) && !cleanupInProgress,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PlanAccent,
@@ -225,6 +241,11 @@ internal fun RecommendedCleanupCard(
                 ) {
                     if (cleanupInProgress) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanButtonText)
+                    } else if (reviewFirst) {
+                        Text(
+                            stringResource(R.string.plan_review_action, ByteFormatter.format(plan.firstReviewRow?.bytes ?: 0L)),
+                            fontWeight = FontWeight.Black,
+                        )
                     } else {
                         Text(
                             stringResource(R.string.plan_clean_action, ByteFormatter.format(plan.selectedBytes)),

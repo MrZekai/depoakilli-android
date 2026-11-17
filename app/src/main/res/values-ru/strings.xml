@@ -578,12 +578,6 @@
     <string name="swipe_grid_view">Сетка</string>
     <string name="swipe_review_view">Просмотр свайпами</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Элементов: %1$d · %2$s</item>
-        <item quantity="few">Элементов: %1$d · %2$s</item>
-        <item quantity="many">Элементов: %1$d · %2$s</item>
-        <item quantity="other">Элементов: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Неиспользуемые приложения (%1$d)</item>
         <item quantity="few">Неиспользуемые приложения (%1$d)</item>
@@ -702,7 +696,6 @@
         <item quantity="many">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
         <item quantity="other">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s можно очистить · %2$s стоит проверить</string>
     <string name="home_saved_checked_recently">Проверено меньше часа назад</string>
     <string name="home_saved_details">Подробнее</string>
     <plurals name="home_saved_checked_hours">
@@ -734,4 +727,9 @@
         <item quantity="many">Сохранено другим приложением (дней назад: %1$d). После удаления приложение может показать файл как отсутствующий.</item>
         <item quantity="other">Сохранено другим приложением (дней назад: %1$d). После удаления приложение может показать файл как отсутствующий.</item>
     </plurals>
+    <string name="plan_up_to_freed">Можно освободить до %1$s</string>
+    <string name="plan_selected_safely">%1$s выбрано безопасно</string>
+    <string name="plan_worth_a_look_amount">%1$s стоит проверить</string>
+    <string name="plan_review_action">Проверить %1$s</string>
+    <string name="plan_small_review">Небольшие группы для проверки</string>
 </resources>

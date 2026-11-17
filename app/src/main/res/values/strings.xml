@@ -549,10 +549,6 @@
     <string name="swipe_grid_view">Grid view</string>
     <string name="swipe_review_view">Swipe review</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">%1$d item · %2$s</item>
-        <item quantity="other">%1$d items · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Unused apps (%1$d)</item>
         <item quantity="other">Unused apps (%1$d)</item>
@@ -631,7 +627,6 @@
         <item quantity="one">%1$s goes to Trash for %2$d day. You can restore it until then.</item>
         <item quantity="other">%1$s goes to Trash for %2$d days. You can restore it until then.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s ready to clean · %2$s worth a look</string>
     <string name="home_saved_checked_recently">Checked less than an hour ago</string>
     <string name="home_saved_details">Show details</string>
     <plurals name="home_saved_checked_hours">
@@ -656,4 +651,9 @@
         <item quantity="one">Saved by another app %1$d day ago. The app may show it as missing if you delete it.</item>
         <item quantity="other">Saved by another app %1$d days ago. The app may show it as missing if you delete it.</item>
     </plurals>
+    <string name="plan_up_to_freed">Up to %1$s can be freed</string>
+    <string name="plan_selected_safely">%1$s selected safely</string>
+    <string name="plan_worth_a_look_amount">%1$s worth a look</string>
+    <string name="plan_review_action">Review %1$s</string>
+    <string name="plan_small_review">Smaller groups to check</string>
 </resources>

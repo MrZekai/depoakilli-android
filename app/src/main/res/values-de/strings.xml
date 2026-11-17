@@ -533,10 +533,6 @@
     <string name="swipe_grid_view">Rasteransicht</string>
     <string name="swipe_review_view">Wischen zum Prüfen</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Elemente: %1$d · %2$s</item>
-        <item quantity="other">Elemente: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Nicht genutzte Apps (%1$d)</item>
         <item quantity="other">Nicht genutzte Apps (%1$d)</item>
@@ -619,7 +615,6 @@
         <item quantity="one">%1$s kommt für %2$d Tag in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
         <item quantity="other">%1$s kommt für %2$d Tage in den Papierkorb. Bis dahin kannst du es wiederherstellen.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s bereit zum Bereinigen · %2$s zum Ansehen</string>
     <string name="home_saved_checked_recently">Vor weniger als einer Stunde geprüft</string>
     <string name="home_saved_details">Details anzeigen</string>
     <plurals name="home_saved_checked_hours">
@@ -644,4 +639,9 @@
         <item quantity="one">Vor %1$d Tag von einer anderen App gespeichert. Die App zeigt es nach dem Löschen eventuell als fehlend an.</item>
         <item quantity="other">Vor %1$d Tagen von einer anderen App gespeichert. Die App zeigt es nach dem Löschen eventuell als fehlend an.</item>
     </plurals>
+    <string name="plan_up_to_freed">Bis zu %1$s können freigegeben werden</string>
+    <string name="plan_selected_safely">%1$s sicher ausgewählt</string>
+    <string name="plan_worth_a_look_amount">%1$s einen Blick wert</string>
+    <string name="plan_review_action">%1$s prüfen</string>
+    <string name="plan_small_review">Kleinere Gruppen zum Prüfen</string>
 </resources>

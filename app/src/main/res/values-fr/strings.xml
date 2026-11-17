@@ -555,11 +555,6 @@
     <string name="swipe_grid_view">Vue en grille</string>
     <string name="swipe_review_view">Revue par balayage</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Éléments : %1$d · %2$s</item>
-        <item quantity="many">Éléments : %1$d · %2$s</item>
-        <item quantity="other">Éléments : %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Applis inutilisées (%1$d)</item>
         <item quantity="many">Applis inutilisées (%1$d)</item>
@@ -659,7 +654,6 @@
         <item quantity="many">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
         <item quantity="other">%1$s va dans la Corbeille pendant %2$d jours. Vous pouvez le restaurer d’ici là.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s prêts à nettoyer · %2$s à vérifier</string>
     <string name="home_saved_checked_recently">Vérifié il y a moins d’une heure</string>
     <string name="home_saved_details">Voir les détails</string>
     <plurals name="home_saved_checked_hours">
@@ -687,4 +681,9 @@
         <item quantity="many">Enregistré par une autre appli il y a %1$d jours. L’appli peut l’indiquer comme manquant si vous le supprimez.</item>
         <item quantity="other">Enregistré par une autre appli il y a %1$d jours. L’appli peut l’indiquer comme manquant si vous le supprimez.</item>
     </plurals>
+    <string name="plan_up_to_freed">Jusqu’à %1$s peuvent être libérés</string>
+    <string name="plan_selected_safely">%1$s sélectionnés sans risque</string>
+    <string name="plan_worth_a_look_amount">%1$s à vérifier</string>
+    <string name="plan_review_action">Vérifier %1$s</string>
+    <string name="plan_small_review">Petits groupes à vérifier</string>
 </resources>

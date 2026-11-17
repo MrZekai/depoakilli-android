@@ -623,14 +623,6 @@
     <string name="swipe_grid_view">عرض الشبكة</string>
     <string name="swipe_review_view">المراجعة بالسحب</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="zero">العناصر: %1$d · %2$s</item>
-        <item quantity="one">العناصر: %1$d · %2$s</item>
-        <item quantity="two">العناصر: %1$d · %2$s</item>
-        <item quantity="few">العناصر: %1$d · %2$s</item>
-        <item quantity="many">العناصر: %1$d · %2$s</item>
-        <item quantity="other">العناصر: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="zero">تطبيقات غير مستخدمة (%1$d)</item>
         <item quantity="one">تطبيقات غير مستخدمة (%1$d)</item>
@@ -784,8 +776,6 @@
         <item quantity="many">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
         <item quantity="other">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_saved_totals">%1$s جاهزة للتنظيف · %2$s تستحق المراجعة</string>
     <string name="home_saved_checked_recently">تم الفحص قبل أقل من ساعة</string>
     <string name="home_saved_details">عرض التفاصيل</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -827,4 +817,9 @@
         <item quantity="many">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
         <item quantity="other">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
     </plurals>
+    <string name="plan_up_to_freed">يمكن تحرير ما يصل إلى %1$s</string>
+    <string name="plan_selected_safely">%1$s محددة بأمان</string>
+    <string name="plan_worth_a_look_amount">%1$s تستحق المراجعة</string>
+    <string name="plan_review_action">مراجعة %1$s</string>
+    <string name="plan_small_review">مجموعات أصغر للمراجعة</string>
 </resources>

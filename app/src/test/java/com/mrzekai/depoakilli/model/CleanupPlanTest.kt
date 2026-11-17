@@ -31,7 +31,7 @@ class CleanupPlanTest {
     }
 
     @Test
-    fun `small auto groups merge and small review groups are hidden`() {
+    fun `small auto groups merge and small review groups merge into their own row`() {
         val plan = buildPlan(
             listOf(
                 item(CleanupGroup.TEMP_FILES, 10 * mb),
@@ -45,11 +45,56 @@ class CleanupPlanTest {
         assertNull(small.group)
         assertEquals(30 * mb, small.bytes)
         assertEquals(listOf(20 * mb, 10 * mb), small.items.map { it.sizeBytes })
+        val smallReview = plan.smallReview!!
+        assertTrue(smallReview.smallReview)
+        assertFalse(smallReview.groupSelectable)
+        assertEquals(10 * mb, smallReview.bytes)
+    }
+
+    @Test
+    fun `card totals equal the rows and app cache is not part of them`() {
+        val plan = buildPlan(
+            listOf(
+                item(CleanupGroup.TEMP_FILES, 60 * mb),
+                item(CleanupGroup.THUMBNAILS, 10 * mb),
+                item(CleanupGroup.LARGE_VIDEO, 300 * mb),
+                item(CleanupGroup.SCREENSHOT, 20 * mb),
+                item(CleanupGroup.WHATSAPP_OLD_IMAGE, 15 * mb),
+            ),
+        )
+        val rows = plan.included + listOfNotNull(plan.smallItems, plan.smallReview) + plan.review
+        assertEquals(rows.sumOf(PlanGroup::bytes), plan.potentialBytes)
+        assertEquals(70 * mb, plan.recommendedBytes)
+        assertEquals(335 * mb, plan.reviewBytes)
+        assertEquals(405 * mb, plan.potentialBytes)
+        assertEquals(CleanupGroup.LARGE_VIDEO, plan.firstReviewRow?.group)
+    }
+
+    @Test
+    fun `a big review part keeps the card even when the auto part is small`() {
+        val plan = buildPlan(listOf(item(CleanupGroup.TEMP_FILES, 5 * mb), item(CleanupGroup.OLD_VIDEO, 400 * mb)))
+        assertFalse(plan.isAlreadyTidy)
+        assertEquals(0L, plan.selectedBytes - 5 * mb)
+    }
+
+    @Test
+    fun `no new group is preselected`() {
+        assertEquals(
+            setOf(
+                CleanupGroup.APK_INSTALLED,
+                CleanupGroup.DUPLICATE_SAFE,
+                CleanupGroup.THUMBNAILS,
+                CleanupGroup.TEMP_FILES,
+                CleanupGroup.PARTIAL_DOWNLOADS,
+            ),
+            CleanupGroup.entries.filter { it.auto }.toSet(),
+        )
     }
 
     @Test
     fun `already tidy below the plan minimum`() {
         assertTrue(buildPlan(listOf(item(CleanupGroup.TEMP_FILES, 99 * mb))).isAlreadyTidy)
+        assertTrue(buildPlan(listOf(item(CleanupGroup.TEMP_FILES, 49 * mb), item(CleanupGroup.SCREENSHOT, 50 * mb))).isAlreadyTidy)
         assertFalse(buildPlan(listOf(item(CleanupGroup.TEMP_FILES, 100 * mb))).isAlreadyTidy)
         assertTrue(buildPlan(emptyList()).isAlreadyTidy)
     }

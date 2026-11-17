@@ -511,9 +511,6 @@
     <string name="swipe_grid_view">Tampilan petak</string>
     <string name="swipe_review_view">Tinjau dengan geser</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="other">%1$d item · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="other">Aplikasi tak terpakai (%1$d)</item>
     </plurals>
@@ -581,7 +578,6 @@
     <plurals name="delete_confirm_trash">
         <item quantity="other">%1$s dipindahkan ke Sampah selama %2$d hari. Kamu bisa memulihkannya sampai saat itu.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s siap dibersihkan · %2$s layak dicek</string>
     <string name="home_saved_checked_recently">Dicek kurang dari satu jam lalu</string>
     <string name="home_saved_details">Lihat detail</string>
     <plurals name="home_saved_checked_hours">
@@ -603,4 +599,9 @@
     <plurals name="reason_other_app_media">
         <item quantity="other">Disimpan oleh aplikasi lain %1$d hari lalu. Aplikasi itu mungkin menampilkannya sebagai hilang jika dihapus.</item>
     </plurals>
+    <string name="plan_up_to_freed">Hingga %1$s dapat dikosongkan</string>
+    <string name="plan_selected_safely">%1$s dipilih dengan aman</string>
+    <string name="plan_worth_a_look_amount">%1$s layak dicek</string>
+    <string name="plan_review_action">Tinjau %1$s</string>
+    <string name="plan_small_review">Grup kecil untuk dicek</string>
 </resources>

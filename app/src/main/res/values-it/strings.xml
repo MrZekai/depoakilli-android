@@ -555,11 +555,6 @@
     <string name="swipe_grid_view">Vista a griglia</string>
     <string name="swipe_review_view">Revisione a scorrimento</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Elementi: %1$d · %2$s</item>
-        <item quantity="many">Elementi: %1$d · %2$s</item>
-        <item quantity="other">Elementi: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">App inutilizzate (%1$d)</item>
         <item quantity="many">App inutilizzate (%1$d)</item>
@@ -659,7 +654,6 @@
         <item quantity="many">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
         <item quantity="other">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s pronti da pulire · %2$s da controllare</string>
     <string name="home_saved_checked_recently">Controllato meno di un’ora fa</string>
     <string name="home_saved_details">Mostra dettagli</string>
     <plurals name="home_saved_checked_hours">
@@ -687,4 +681,9 @@
         <item quantity="many">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
         <item quantity="other">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
     </plurals>
+    <string name="plan_up_to_freed">Si possono liberare fino a %1$s</string>
+    <string name="plan_selected_safely">%1$s selezionati in sicurezza</string>
+    <string name="plan_worth_a_look_amount">%1$s da controllare</string>
+    <string name="plan_review_action">Controlla %1$s</string>
+    <string name="plan_small_review">Gruppi più piccoli da controllare</string>
 </resources>

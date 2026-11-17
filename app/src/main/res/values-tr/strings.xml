@@ -549,10 +549,6 @@
     <string name="swipe_grid_view">Izgara görünümü</string>
     <string name="swipe_review_view">Kaydırarak inceleme</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">%1$d öğe · %2$s</item>
-        <item quantity="other">%1$d öğe · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Kullanılmayan uygulamalar (%1$d)</item>
         <item quantity="other">Kullanılmayan uygulamalar (%1$d)</item>
@@ -631,7 +627,6 @@
         <item quantity="one">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
         <item quantity="other">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s temizlenmeye hazır · %2$s göz atmaya değer</string>
     <string name="home_saved_checked_recently">Bir saatten kısa süre önce kontrol edildi</string>
     <string name="home_saved_details">Ayrıntıları göster</string>
     <plurals name="home_saved_checked_hours">
@@ -656,4 +651,9 @@
         <item quantity="one">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
         <item quantity="other">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
     </plurals>
+    <string name="plan_up_to_freed">En fazla %1$s boşaltılabilir</string>
+    <string name="plan_selected_safely">%1$s güvenle seçildi</string>
+    <string name="plan_worth_a_look_amount">%1$s göz atmaya değer</string>
+    <string name="plan_review_action">%1$s incele</string>
+    <string name="plan_small_review">Kontrol edilecek küçük gruplar</string>
 </resources>
