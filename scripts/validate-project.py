@@ -432,7 +432,8 @@ for expected in (
 for expected in (
     "STORAGE_CHANGE(R.string.storage_change_title)",
     "StorageChangeScreen(",
-    "onOpenStorageChange",
+    # Faz 5C (C4): storage change is the second tab of the Storage tool.
+    "detailScreen = DetailScreen.STORAGE_CHANGE",
     "DetailScreen.STORAGE_CHANGE -> true",
 ):
     if expected not in cleaner_app:
@@ -461,16 +462,21 @@ for expected in (
 # ------------------------------------------------------------------
 # Alpha8 Tools audit: distinct tools, truthful copy, read-only analyzer.
 # ------------------------------------------------------------------
+# Faz 5C (C4): six tiles. APK packages live in Downloads; app cache and
+# storage change are the second tabs of Apps and Storage (HubTabs).
 for expected in (
-    "onOpenStorageChange",
-    "ScanFocus.APKS",
-    "R.string.tool_app_cache",
+    "ScanFocus.DOWNLOADS",
     "ScanFocus.LARGE_FILES",
     "ScanFocus.ANALYZE",
     "onOpenAppManager",
+    "onOpenWhatsApp",
+    "ToolSuggestion.suggestedBytes",
 ):
     if expected not in device_center:
         errors.append(f"missing alpha8 Tools invariant: {expected}")
+for expected in ("HubKind.APPS", "HubKind.STORAGE", "DetailScreen.APP_CACHE", "DetailScreen.STORAGE_CHANGE"):
+    if expected not in cleaner_app:
+        errors.append(f"missing Faz 5C tool tab invariant: {expected}")
 
 for forbidden in (
     "R.string.downloads_apk_title",
@@ -594,7 +600,8 @@ for expected in (
 for expected in (
     "CleanupResultKind.APP_CACHE",
     "cleanup_result_app_cache_title",
-    "cleanup_result_app_cache_note",
+    # Faz 5C (C6): cache results drop the explanatory paragraph; the headline says it.
+    "R.string.result_cache_cleared",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha6 app-cache dialog invariant: {expected}")
@@ -818,11 +825,9 @@ for required_name in (
     "cache_modern_individual_steps",
     "cache_modern_safety_note",
     "cleanup_result_system_cache_title",
-    "cleanup_result_system_cache_reduced",
+    "result_cache_cleared",
     "cleanup_result_system_cache_unmeasured",
-    "cleanup_result_system_cache_note",
     "cleanup_result_app_cache_title",
-    "cleanup_result_app_cache_note",
     "message_individual_cache_no_change",
 ):
     if f'name="{required_name}"' not in default_strings:
@@ -967,7 +972,7 @@ clean_tab_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt")
 for expected in ("fun findingsRows(", "plan-start-biggest", "plan-system-cache", "plan-kept-note"):
     if expected not in cleanup_plan_ui:
         errors.append(f"missing cleanup plan invariant: {expected}")
-for expected in ("plan.isAlreadyTidy", "HomeLogic.mode(", "DeleteConfirmDialog("):
+for expected in ("state.planFigures()", "HomeLogic.mode(", "DeleteConfirmDialog("):
     if expected not in clean_tab_ui:
         errors.append(f"missing Home plan invariant: {expected}")
 for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
@@ -1040,8 +1045,7 @@ for expected in (
 for expected in (
 
     "ScanFocus.DUPLICATES",
-    "ScanFocus.SCREENSHOTS",
-    "onOpenCache",
+    "SuggestionTool.DUPLICATES",
 ):
     if expected not in device_center:
         errors.append(f"missing alpha9 Tools UX invariant: {expected}")

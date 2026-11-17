@@ -18,7 +18,8 @@
     <string name="cache_own_app_subtitle">يمكن إزالة %1$s بشكل مباشر وآمن</string>
     <string name="scan_focus_smart">نتيجة التنظيف الذكي</string>
     <string name="scan_focus_junk">تنظيف الملفات غير المرغوب فيها</string>
-    <string name="scan_focus_duplicates">تنظيف الملفات المكررة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="scan_focus_duplicates">النسخ المكررة</string>
     <string name="scan_focus_large">ملفات كبيرة</string>
     <string name="language_settings">لغة التطبيق</string>
     <string name="ad_privacy_preferences">تفضيلات خصوصية الإعلان</string>
@@ -27,7 +28,8 @@
     <string name="message_cache_already_empty">ذاكرة التخزين المؤقت للتطبيق فارغة بالفعل.</string>
     <string name="message_whatsapp_scan_failed">تعذر إنهاء فحص WhatsApp. أعد توصيل مجلد الوسائط وحاول مرة أخرى.</string>
     <string name="message_screen_unavailable">لا يمكن فتح هذه الشاشة على جهازك.</string>
-    <string name="category_duplicates">التكرارات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="category_duplicates">النسخ المكررة</string>
     <string name="category_duplicates_description">نسخ غير ضرورية ذات محتوى متطابق</string>
     <string name="category_screenshots">لقطات الشاشة</string>
     <string name="category_screenshots_description">مراجعة لقطات الشاشة</string>
@@ -383,11 +385,8 @@
     <string name="cache_modern_clean_now">تنظيف الآن</string>
     <string name="cache_modern_safety_note">يقيس Smart Cleaner ذاكرة التخزين المؤقت التي أبلغ عنها Android. ولا يحذف الملفات الخاصة لتطبيق آخر بصمت؛ اكتمال التنظيف الفردي من شاشة التطبيق الرسمية لـ Android.</string>
     <string name="cleanup_result_system_cache_title">تم الانتهاء من تنظيف ذاكرة التخزين المؤقت Android</string>
-    <string name="cleanup_result_system_cache_reduced">انخفاض مُقاس في ذاكرة التخزين المؤقت</string>
     <string name="cleanup_result_system_cache_unmeasured">أكمل Android عملية تنظيف ذاكرة التخزين المؤقت. لم يكن تقليل البايت الموثوق به متاحًا على هذا الجهاز.</string>
-    <string name="cleanup_result_system_cache_note">يتم قياس تقليل ذاكرة التخزين المؤقت من خلال إحصائيات تخزين Android قبل وبعد تنظيف النظام. إذا لم يكشف Android عن دلتا موثوقة، فلن يتم اختراع رقم المساحة المستصلحة.</string>
     <string name="cleanup_result_app_cache_title">تم تنظيف ذاكرة التخزين المؤقت %1$s</string>
-    <string name="cleanup_result_app_cache_note">يعتمد التخفيض المعروض على ذاكرة التخزين المؤقت التي تم مسحها أو قياسها بالفعل قبل وبعد إجراء ذاكرة التخزين المؤقت Android.</string>
     <string name="message_individual_cache_no_change">لم يتم اكتشاف أي انخفاض قابل للقياس في ذاكرة التخزين المؤقت بعد العودة من إعدادات Android.</string>
     <string name="permissions_review_status">مراجعة</string>
     <string name="permissions_manage_android">الإدارة في Android</string>
@@ -471,15 +470,18 @@
     <string name="feedback_open_email">افتح تطبيق البريد الإلكتروني</string>
     <string name="feedback_address_copied">تم نسخ العنوان</string>
     <string name="plan_group_apk_installed">مثبّتات لتطبيقات مثبّتة بالفعل</string>
-    <string name="plan_group_duplicate_safe">نسخ إضافية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_safe">النسخ المكررة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="plan_group_thumbnails">ذاكرة المعاينات المؤقتة</string>
     <string name="plan_group_temp_files">ملفات مؤقتة متبقية</string>
     <string name="plan_group_partial_downloads">تنزيلات غير مكتملة</string>
     <string name="plan_group_apk_old_version">إصدارات أقدم من المثبّتات</string>
     <string name="plan_group_apk_other">مثبّتات أخرى</string>
-    <string name="plan_group_duplicate_personal">نسخ من ملفاتك</string>
-    <string name="plan_group_duplicate_unverified">ملفات تبدو متطابقة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_personal">النسخ المكررة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">نسخ مكررة محتملة</string>
     <string name="plan_group_large_video">مقاطع فيديو قديمة كبيرة</string>
     <string name="plan_group_screen_recording">تسجيلات الشاشة</string>
     <string name="plan_group_screenshot">لقطات شاشة قديمة</string>
@@ -614,7 +616,8 @@
         <item quantity="other">تمت مراجعة: %1$d · المحدد: %2$s</item>
     </plurals>
     <string name="deep_check_action">شاهد وتحقق</string>
-    <string name="deep_check_running">جارٍ التحقق من الملفات الكبيرة المتشابهة…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_running">جارٍ فحص النسخ المكررة المحتملة…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
         <item quantity="zero">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
@@ -681,15 +684,6 @@
     <string name="plan_largest_apps_access">اسمح بالوصول إلى بيانات الاستخدام لمعرفة التطبيقات التي تستهلك أكبر مساحة</string>
     <string name="result_next_group">التالي: %1$s · %2$s</string>
     <string name="result_review_next">مراجعة</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="zero">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-        <item quantity="one">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-        <item quantity="two">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-        <item quantity="few">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-        <item quantity="many">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-        <item quantity="other">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="plan_preview_camera">
         <item quantity="zero">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
@@ -881,5 +875,54 @@
         <item quantity="few">%1$d نسخة · %2$s</item>
         <item quantity="many">%1$d نسخة · %2$s</item>
         <item quantity="other">%1$d نسخة · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_title">اقتراحي: على الأرجح لا تحتاج إلى هذه</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_action">انقل %1$s إلى المهملات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_see">عرض الملفات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_title">سأسألك عن هذه</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_select_suggested">اختر اقتراحاتي</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_other_header">ملفات أخرى · %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_total_note">من أصل %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_no_suggestion">لا يوجد هنا ما أنصح بحذفه.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_hint">ما تحذفه يبقى هنا لمدة 7 أيام.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_storage">التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_cache_cleared">من ذاكرة التخزين المؤقت تم تنظيفها</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tool_suggest_header">
+        <item quantity="zero">اقتراحي · %1$d ملف · %2$s</item>
+        <item quantity="one">اقتراحي · %1$d ملف · %2$s</item>
+        <item quantity="two">اقتراحي · %1$d ملف · %2$s</item>
+        <item quantity="few">اقتراحي · %1$d ملف · %2$s</item>
+        <item quantity="many">اقتراحي · %1$d ملف · %2$s</item>
+        <item quantity="other">اقتراحي · %1$d ملف · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_videos">
+        <item quantity="zero">%1$d فيديو · من الكاميرا</item>
+        <item quantity="one">%1$d فيديو · من الكاميرا</item>
+        <item quantity="two">%1$d فيديو · من الكاميرا</item>
+        <item quantity="few">%1$d فيديو · من الكاميرا</item>
+        <item quantity="many">%1$d فيديو · من الكاميرا</item>
+        <item quantity="other">%1$d فيديو · من الكاميرا</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_files">
+        <item quantity="zero">%1$d ملف · من الكاميرا</item>
+        <item quantity="one">%1$d ملف · من الكاميرا</item>
+        <item quantity="two">%1$d ملف · من الكاميرا</item>
+        <item quantity="few">%1$d ملف · من الكاميرا</item>
+        <item quantity="many">%1$d ملف · من الكاميرا</item>
+        <item quantity="other">%1$d ملف · من الكاميرا</item>
     </plurals>
 </resources>

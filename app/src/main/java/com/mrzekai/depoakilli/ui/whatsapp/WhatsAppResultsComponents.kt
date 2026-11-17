@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,8 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -36,13 +38,13 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
@@ -66,6 +69,8 @@ import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmEntry
 import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.media.rememberThumbnail
 import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.Lime
@@ -81,7 +86,15 @@ internal fun WhatsAppResultsScreen(
     onToggleCategory: (WhatsAppMediaCategory) -> Unit,
     onDeleteSelected: () -> Unit,
     listAd: @Composable () -> Unit = {},
+    suggested: List<CleanableItem> = emptyList(),
 ) {
+    // C3: "My pick" (sent media and statuses the Smart scan suggests), then the
+    // other files, closed until opened.
+    val suggestedUris = remember(suggested) { suggested.mapTo(HashSet(), CleanableItem::uri) }
+    val pickItems = summary.items.filter { it.uri in suggestedUris }
+    val otherItems = summary.items.filterNot { it.uri in suggestedUris }
+    val suggestedBytes = suggested.sumOf(CleanableItem::sizeBytes)
+    var othersOpen by rememberSaveable { mutableStateOf(false) }
     var directionName by rememberSaveable { mutableStateOf(WhatsAppDirectionFilter.ALL.name) }
     var detailGroupName by rememberSaveable { mutableStateOf<String?>(null) }
     var previewItemId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -145,7 +158,47 @@ internal fun WhatsAppResultsScreen(
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item { WhatsAppHeroCard(summary) }
+            item { WhatsAppHeroCard(summary, suggestedBytes) }
+            if (pickItems.isNotEmpty()) {
+                item(key = "wa-pick") {
+                    WhatsAppPickCard(
+                        items = pickItems,
+                        onSelectAll = {
+                            pickItems.filterNot(WhatsAppMediaItem::selected).forEach { onToggleItem(it.id) }
+                        },
+                        onToggleItem = onToggleItem,
+                        onPreview = { previewItemId = it.id },
+                    )
+                }
+                item(key = "wa-others-toggle") {
+                    Surface(
+                        onClick = { othersOpen = !othersOpen },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = WaBackground,
+                        contentColor = Ink,
+                        shape = RoundedCornerShape(999.dp),
+                        border = androidx.compose.foundation.BorderStroke(2.dp, Ink),
+                    ) {
+                        Row(
+                            Modifier.heightIn(min = 52.dp).padding(horizontal = 18.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                stringResource(R.string.tool_other_header, otherItems.size),
+                                color = Ink,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 16.sp,
+                                modifier = Modifier.weight(1f),
+                            )
+                            Icon(
+                                if (othersOpen) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                                contentDescription = null,
+                                tint = Ink,
+                            )
+                        }
+                    }
+                }
+            }
             item {
                 WhatsAppDirectionTabs(
                     selected = direction,
@@ -170,9 +223,13 @@ internal fun WhatsAppResultsScreen(
                     }
                 }
             } else {
-                val visibleGroups = WhatsAppUiGroup.entries
-                    .map { group -> group to filterWhatsAppItems(summary.items, group, direction) }
-                    .filter { (_, groupItems) -> groupItems.isNotEmpty() }
+                val visibleGroups = if (pickItems.isEmpty() || othersOpen) {
+                    WhatsAppUiGroup.entries
+                        .map { group -> group to filterWhatsAppItems(otherItems, group, direction) }
+                        .filter { (_, groupItems) -> groupItems.isNotEmpty() }
+                } else {
+                    emptyList()
+                }
                 // B7: one list native after the 2nd category card when a 3rd card
                 // follows and the list holds at least 6 files.
                 val showAd = visibleGroups.size > AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD &&
@@ -215,57 +272,112 @@ internal fun WhatsAppResultsScreen(
     }
 }
 
+/**
+ * C1/C3: the big figure is the suggested amount (the same number as the Tools
+ * tile); the total of all WhatsApp media is small text under it.
+ */
 @Composable
-internal fun WhatsAppHeroCard(summary: WhatsAppLibrarySummary) {
+internal fun WhatsAppHeroCard(summary: WhatsAppLibrarySummary, suggestedBytes: Long = 0L) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = WaCard),
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Surface(
-                color = WaCardSecondary,
-                shape = CircleShape,
-            ) {
-                Box(Modifier.padding(18.dp), contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Outlined.AutoAwesome,
-                        contentDescription = null,
-                        tint = Lime,
-                        modifier = Modifier.size(42.dp),
-                    )
-                }
-            }
-            Spacer(Modifier.width(16.dp))
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            if (suggestedBytes > 0L) {
                 Text(
-                    stringResource(R.string.whatsapp_total_media),
-                    color = OnBlack.copy(alpha = .84f),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
+                    ByteFormatter.format(suggestedBytes),
+                    color = Lime,
+                    fontSize = 40.sp,
+                    lineHeight = 46.sp,
+                    fontWeight = FontWeight.Black,
+                    maxLines = 1,
                 )
                 Text(
-                    ByteFormatter.format(summary.totalBytes),
-                    color = Lime,
-                    fontSize = 38.sp,
+                    stringResource(R.string.tool_total_note, ByteFormatter.format(summary.totalBytes)),
+                    color = WaTextSecondary,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            } else {
+                Text(
+                    stringResource(R.string.tool_no_suggestion),
+                    color = OnBlack,
+                    fontSize = 20.sp,
+                    lineHeight = 26.sp,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
-                    pluralStringResource(R.plurals.whatsapp_scan_stats, summary.scannedFileCount, summary.scannedFileCount),
-                    color = OnBlack,
+                    stringResource(R.string.whatsapp_total_media) + " · " + ByteFormatter.format(summary.totalBytes),
+                    color = WaTextSecondary,
                     fontWeight = FontWeight.SemiBold,
                 )
-                Text(
-                    stringResource(R.string.whatsapp_selection_safe),
-                    color = OnBlack.copy(alpha = .78f),
-                    style = MaterialTheme.typography.bodySmall,
-                )
             }
+            Text(
+                pluralStringResource(R.plurals.whatsapp_scan_stats, summary.scannedFileCount, summary.scannedFileCount),
+                color = WaTextSecondary,
+                fontSize = 13.sp,
+            )
+            Text(
+                stringResource(R.string.whatsapp_selection_safe),
+                color = WaTextSecondary,
+                fontSize = 13.sp,
+            )
+        }
+    }
+}
+
+/** "My pick" on WhatsApp (C3): count and size, "Select my picks" and the first files. */
+@Composable
+internal fun WhatsAppPickCard(
+    items: List<WhatsAppMediaItem>,
+    onSelectAll: () -> Unit,
+    onToggleItem: (String) -> Unit,
+    onPreview: (WhatsAppMediaItem) -> Unit,
+) {
+    Card(
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = WaCard),
+    ) {
+        Column(Modifier.fillMaxWidth().padding(vertical = 14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                pluralStringResource(
+                    R.plurals.tool_suggest_header,
+                    items.size,
+                    items.size,
+                    ByteFormatter.format(items.sumOf(WhatsAppMediaItem::sizeBytes)),
+                ),
+                color = OnBlack,
+                fontWeight = FontWeight.Black,
+                fontSize = 17.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 14.dp),
+            )
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(9.dp),
+            ) {
+                items(items.sortedByDescending(WhatsAppMediaItem::sizeBytes).take(8), key = WhatsAppMediaItem::id) { item ->
+                    WhatsAppMediaCard(
+                        item = item,
+                        group = uiGroupOf(item),
+                        compact = true,
+                        onPreview = { onPreview(item) },
+                        onToggle = { onToggleItem(item.id) },
+                    )
+                }
+            }
+            PillButton(
+                text = stringResource(R.string.tool_select_suggested),
+                onClick = onSelectAll,
+                style = PillStyle.LIME,
+                modifier = Modifier.padding(horizontal = 14.dp),
+            )
         }
     }
 }

@@ -88,21 +88,20 @@ internal fun CleanTab(
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
     val savedSummary = !showingPlan && state.dashboardSnapshotAtMillis > 0L
     val plan = state.summary.plan
+    // C1: "up to X" is tier 1 plus the findings list (unused apps included),
+    // from the same PlanFigures the findings screen and the Tools tiles read.
+    val figures = state.planFigures()
     val potentialBytes = when {
-        showingPlan -> plan.potentialBytes
+        figures != null -> figures.homeMaxBytes
         savedSummary -> state.dashboardCleanableBytes + state.dashboardReviewBytes
         else -> 0L
     }
     val safeBytes = when {
-        showingPlan -> plan.selectedBytes
+        figures != null -> figures.safeBytes
         savedSummary -> state.dashboardCleanableBytes
         else -> 0L
     }
-    val planIsTidy = if (showingPlan) {
-        plan.isAlreadyTidy
-    } else {
-        potentialBytes < com.mrzekai.depoakilli.data.CleaningThresholds.PLAN_MIN_BYTES
-    }
+    val planIsTidy = potentialBytes < com.mrzekai.depoakilli.data.CleaningThresholds.PLAN_MIN_BYTES
     val usedPercent = HomeLogic.usedPercent(state.storage.totalBytes, state.storage.availableBytes)
     val mode = HomeLogic.mode(
         hasAccess = state.hasAllFilesAccess,

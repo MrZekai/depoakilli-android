@@ -345,8 +345,9 @@ internal fun DeleteConfirmDialog(
     notes: List<String> = emptyList(),
     extraContent: (@Composable () -> Unit)? = null,
     onSeeAll: (() -> Unit)? = null,
+    initiallyShowAll: Boolean = false,
 ) {
-    var showAll by rememberSaveable { mutableStateOf(false) }
+    var showAll by rememberSaveable { mutableStateOf(initiallyShowAll) }
     val fileList: @Composable () -> Unit = {
         extraContent?.invoke()
         if (showAll) ConfirmFileList(entries)
@@ -406,6 +407,7 @@ internal fun DeleteConfirmDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
     onSeeAll: (() -> Unit)? = null,
+    initiallyShowAll: Boolean = false,
 ) {
     val split = DeleteSplit.of(items)
     DeleteConfirmDialog(
@@ -427,5 +429,6 @@ internal fun DeleteConfirmDialog(
         onConfirm = onConfirm,
         notes = deleteSafetyNotes(items),
         onSeeAll = onSeeAll,
+        initiallyShowAll = initiallyShowAll,
     )
 }

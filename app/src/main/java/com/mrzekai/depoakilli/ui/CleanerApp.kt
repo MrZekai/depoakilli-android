@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Handyman
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +48,9 @@ import com.mrzekai.depoakilli.ads.InterstitialTrigger
 import com.mrzekai.depoakilli.ads.ListNativeAdCard
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.model.ToolSuggestion
+import com.mrzekai.depoakilli.model.SuggestionTool
+import com.mrzekai.depoakilli.ui.common.HubTabs
 import com.mrzekai.depoakilli.ui.common.SystemBarIcons
 import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.Lime
@@ -124,6 +129,8 @@ fun CleanerApp(
     // After the user returned from the system screen without granting access,
     // the Clean tab shows one sentence and "Open settings" (T2.1).
     var allFilesAskedOnce by rememberSaveable { mutableStateOf(false) }
+    // C2: the result screen's "My pick" line opens the findings list with its confirmation.
+    var openSuggestionRequested by rememberSaveable { mutableStateOf(false) }
     // Scan data lives in the ViewModel, not saved navigation state. After a
     // process restart the saved results route must not reopen without its data.
     LaunchedEffect(Unit) {
@@ -201,6 +208,28 @@ fun CleanerApp(
         viewModel.showPlan()
         detailScreen = DetailScreen.CLEAN_RESULTS
         onNaturalBreak(InterstitialTrigger.OPEN_FINDINGS)
+    }
+
+    /** C4: switches between the two tabs of the Apps or Storage tool. */
+    fun openHubTab(hub: HubSpec, index: Int) {
+        when (hub.kind) {
+            HubKind.APPS -> if (index == 0) {
+                detailScreen = DetailScreen.APP_MANAGER
+                viewModel.refreshInstalledApps()
+            } else {
+                detailScreen = DetailScreen.APP_CACHE
+                viewModel.refreshAppCaches()
+            }
+            HubKind.STORAGE -> if (index == 0) {
+                if (state.scanFocus == ScanFocus.ANALYZE && (state.lastScanCompleted || state.scanning)) {
+                    detailScreen = DetailScreen.CLEAN_RESULTS
+                } else {
+                    launchScan(ScanFocus.ANALYZE)
+                }
+            } else {
+                detailScreen = DetailScreen.STORAGE_CHANGE
+            }
+        }
     }
 
     fun openLegalPage(page: LegalPage) {
@@ -284,8 +313,14 @@ fun CleanerApp(
                         }
                         val folderTitle = state.storageReview.folder?.name
                             ?.takeIf { detailScreen == DetailScreen.CLEAN_RESULTS }
-                        // Tabs carry their own large title or giant figure (Faz 5).
-                        if (detailScreen != null) {
+                        // Tabs carry their own large title or giant figure (Faz 5). The
+                        // findings list has only the back arrow (C5): its giant figure is the title.
+                        val findingsList = detailScreen == DetailScreen.CLEAN_RESULTS &&
+                            state.scanFocus == ScanFocus.SMART &&
+                            storageReviewTitle == null &&
+                            categoryReviewTitle == null &&
+                            folderTitle == null
+                        if (detailScreen != null && !findingsList) {
                             Text(
                                 folderTitle ?: stringResource(titleRes),
                                 fontWeight = FontWeight.Black,
@@ -306,6 +341,20 @@ fun CleanerApp(
                         }
                     },
                     actions = {
+                        // C6: a tool's "Refresh" sits at the right of the top bar.
+                        if (
+                            detailScreen == DetailScreen.CLEAN_RESULTS &&
+                            state.scanFocus != ScanFocus.SMART &&
+                            state.scanFocus != ScanFocus.DEEP &&
+                            state.lastScanCompleted &&
+                            !state.scanning &&
+                            state.storageReview.type == null &&
+                            state.smartCategoryReview == null
+                        ) {
+                            IconButton(onClick = { viewModel.refreshToolScan() }) {
+                                Icon(Icons.Outlined.Refresh, contentDescription = stringResource(R.string.cache_refresh))
+                            }
+                        }
                         val gridGroup = state.smartCategoryReviewGroup
                         if (
                             detailScreen == DetailScreen.CLEAN_RESULTS &&
@@ -384,223 +433,238 @@ fun CleanerApp(
 
             AppBottomBar(
                 detailScreenOpen = detailScreen != null,
+                // C6: the black swipe screen keeps a black navigation bar.
+                darkNavigationArea = swipeVisible,
                 bannerAllowed = bannerAllowed,
                 selectedTabIndex = selectedTabIndex,
                 onSelectTab = { selectedTabIndex = it },
             )
         },
     ) { padding ->
-        when (detailScreen) {
-            DetailScreen.CLEAN_RESULTS -> CleanScreen(
-                state = state,
-                onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
-                onScan = { viewModel.scan(state.scanFocus) },
-                onToggleItem = viewModel::toggleItem,
-                onToggleCategory = viewModel::toggleCategory,
-                onSetItemsSelected = viewModel::setItemsSelected,
-                onOpenCategoryReview = viewModel::openSmartCategoryReview,
-                onOpenStorageReview = viewModel::openStorageReview,
-                onRequestUsageAccess = ::requestUsageWithDisclosure,
-                onRefreshInstalledApps = viewModel::refreshInstalledApps,
-                onUninstallApp = onUninstallApp,
-                onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
-                onToggleAllStorageReviewItems = viewModel::toggleAllStorageReviewItems,
-                onClean = onPrepareCleanup,
-                onCleanStorage = onPrepareStorageCleanup,
-                modifier = Modifier.padding(padding),
-                onToggleGroup = viewModel::toggleGroup,
-                onClearAppCaches = onClearAllAppCaches,
-                viewModel = viewModel,
-                canRequestAds = canRequestAds,
-                onDeepCheck = onDeepDuplicateCheck,
-                onOpenAppInfo = onOpenAppInfo,
-                onSwipeConfirmed = { onNaturalBreak(InterstitialTrigger.SWIPE_FINISHED) },
-                onCloseSwipe = ::navigateBackInApp,
-            )
-
-            DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
-                state = state,
-                onBack = ::navigateBackInApp,
-                onRequestAccess = ::requestAllFilesWithDisclosure,
-                onScan = viewModel::scanWhatsAppLibrary,
-                onToggleItem = viewModel::toggleWhatsAppItem,
-                onToggleCategory = viewModel::toggleWhatsAppCategory,
-                onDeleteSelected = {
-                    onPrepareWhatsAppCleanup { _ ->
-                        // Keep the WhatsApp tool as the return surface.
-                        // The measured result dialog owns the navigation break.
-                    }
-                },
-                modifier = Modifier.padding(padding),
-                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
-            )
-
-            DetailScreen.APP_CACHE -> AppCacheManagerScreen(
-                state = state,
-                onRequestUsageAccess = ::requestUsageWithDisclosure,
-                onRefresh = { viewModel.refreshAppCaches(force = true) },
-                onClearAllAppCaches = onClearAllAppCaches,
-                onClearOwnCache = viewModel::clearOwnAppCache,
-                onOpenAppDetails = onOpenAppDetails,
-                modifier = Modifier.padding(padding),
-                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
-            )
-
-            DetailScreen.APP_MANAGER -> AppManagerScreen(
-                state = state,
-                onRequestUsageAccess = ::requestUsageWithDisclosure,
-                onRefresh = viewModel::refreshInstalledApps,
-                onUninstallApp = onUninstallApp,
-                onOpenAppInfo = onOpenAppInfo,
-                modifier = Modifier.padding(padding),
-                listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
-            )
-
-            DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
-                report = state.storageChange,
-                refreshing = state.scanning && state.scanFocus == ScanFocus.ANALYZE,
-                progressFiles = state.scanProgressFiles,
-                progressDirectories = state.scanProgressDirectories,
-                onAnalyze = {
-                    if (!state.hasAllFilesAccess) {
-                        viewModel.queueScanAfterPermission(ScanFocus.ANALYZE)
-                        requestAllFilesWithDisclosure()
-                    } else {
-                        viewModel.scan(ScanFocus.ANALYZE)
-                    }
-                },
-                modifier = Modifier.padding(padding),
-            )
-
-            DetailScreen.SETTINGS -> SettingsDetailScreen(
-                privacyOptionsRequired = privacyOptionsRequired,
-                canRequestAds = canRequestAds,
-                adFreeRemainingMillis = adFreeRemainingMillis,
-                rewardedAdReady = rewardedAdReady,
-                onOpenLanguageSettings = onOpenLanguageSettings,
-                onRateApp = onRateApp,
-                onSendFeedback = onSendFeedback,
-                onShareApp = onShareApp,
-                onShowPrivacyOptions = onShowPrivacyOptions,
-                onShowRewardedAd = onShowRewardedAd,
-                onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
-                onOpenLegalPage = ::openLegalPage,
-                modifier = Modifier.padding(padding),
-                keptItemCount = state.keptItemCount,
-                onClearKeptItems = viewModel::clearKeptItems,
-                excludedFolders = state.excludedFolders,
-                onIncludeFolder = viewModel::includeFolder,
-                hasAllFilesAccess = state.hasAllFilesAccess,
-                hasUsageAccess = state.hasUsageAccess,
-            )
-
-            DetailScreen.ACCESS -> SecurityCenterScreen(
-                state = state,
-                onManageAllFilesAccess = {
-                    if (state.hasAllFilesAccess) {
-                        onRequestAllFilesAccess()
-                    } else {
-                        requestAllFilesWithDisclosure()
-                    }
-                },
-                onManageUsageAccess = {
-                    if (state.hasUsageAccess) {
-                        onRequestUsageAccess()
-                    } else {
-                        requestUsageWithDisclosure()
-                    }
-                },
-                onOpenPrivacy = {
-                    legalReturnScreen = DetailScreen.ACCESS
-                    detailScreen = DetailScreen.PRIVACY
-                },
-                modifier = Modifier.padding(padding),
-            )
-
-            DetailScreen.PRIVACY,
-            DetailScreen.TERMS,
-            DetailScreen.ABOUT -> LegalDetailScreen(
-                page = when (detailScreen) {
-                    DetailScreen.PRIVACY -> LegalPage.PRIVACY
-                    DetailScreen.TERMS -> LegalPage.TERMS
-                    else -> LegalPage.ABOUT
-                },
-                info = state.deviceInfo,
-                modifier = Modifier.padding(padding),
-            )
-
-            null -> when (AppTab.entries[selectedTabIndex]) {
-                AppTab.HOME -> {
-                    LaunchedEffect(Unit) {
-                        viewModel.showPlan()
-                        viewModel.onAppOpened()
-                    }
-                    CleanTab(
+        // C4: Apps (apps + app cache) and Storage (analyzer + storage change)
+        // are one tool each, with two tabs on top.
+        val hub = hubOf(detailScreen, state)
+        Column(Modifier.padding(padding)) {
+            if (hub != null) {
+                HubTabs(
+                    titles = hub.titleRes.map { stringResource(it) },
+                    selected = hub.selected,
+                    onSelect = { index -> openHubTab(hub, index) },
+                )
+            }
+            Box(Modifier.weight(1f)) {
+                when (detailScreen) {
+                    DetailScreen.CLEAN_RESULTS -> CleanScreen(
                         state = state,
-                        onAllowAccess = ::requestAllFilesWithDisclosure,
-                        onCancelScan = viewModel::cancelScan,
-                        onStartScan = {
-                            if (!state.hasAllFilesAccess) {
-                                requestAllFilesWithDisclosure()
-                            } else {
-                                viewModel.scan(ScanFocus.SMART)
+                        onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+                        onScan = { viewModel.scan(state.scanFocus) },
+                        onToggleItem = viewModel::toggleItem,
+                        onToggleCategory = viewModel::toggleCategory,
+                        onSetItemsSelected = viewModel::setItemsSelected,
+                        onOpenCategoryReview = viewModel::openSmartCategoryReview,
+                        onOpenStorageReview = viewModel::openStorageReview,
+                        onRequestUsageAccess = ::requestUsageWithDisclosure,
+                        onRefreshInstalledApps = viewModel::refreshInstalledApps,
+                        onUninstallApp = onUninstallApp,
+                        onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
+                        onToggleAllStorageReviewItems = viewModel::toggleAllStorageReviewItems,
+                        onClean = onPrepareCleanup,
+                        onCleanStorage = onPrepareStorageCleanup,
+                        modifier = Modifier,
+                        onToggleGroup = viewModel::toggleGroup,
+                        onClearAppCaches = onClearAllAppCaches,
+                        viewModel = viewModel,
+                        canRequestAds = canRequestAds,
+                        onDeepCheck = onDeepDuplicateCheck,
+                        onOpenAppInfo = onOpenAppInfo,
+                        onSwipeConfirmed = { onNaturalBreak(InterstitialTrigger.SWIPE_FINISHED) },
+                        onCloseSwipe = ::navigateBackInApp,
+                        autoOpenSuggestion = openSuggestionRequested,
+                        onSuggestionOpened = { openSuggestionRequested = false },
+                    )
+
+                    DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
+                        state = state,
+                        onBack = ::navigateBackInApp,
+                        onRequestAccess = ::requestAllFilesWithDisclosure,
+                        onScan = viewModel::scanWhatsAppLibrary,
+                        onToggleItem = viewModel::toggleWhatsAppItem,
+                        onToggleCategory = viewModel::toggleWhatsAppCategory,
+                        onDeleteSelected = {
+                            onPrepareWhatsAppCleanup { _ ->
+                                // Keep the WhatsApp tool as the return surface.
+                                // The measured result dialog owns the navigation break.
                             }
                         },
-                        onClean = { ids -> onPrepareCleanup(ids) },
-                        onToggleItem = viewModel::toggleItem,
-                        onOpenFindings = ::openFindings,
-                        onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
-                        hardActions = HomeHardActions(
-                            onOpenMedia = { launchScan(ScanFocus.MEDIA) },
-                            onOpenApps = {
+                        modifier = Modifier,
+                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
+                        // C1/C3: the same ToolSuggestion call as the Tools tile.
+                        suggested = state.smartSummary()?.plan
+                            ?.let { ToolSuggestion.suggestedFor(SuggestionTool.WHATSAPP, it) }
+                            .orEmpty(),
+                    )
+
+                    DetailScreen.APP_CACHE -> AppCacheManagerScreen(
+                        state = state,
+                        onRequestUsageAccess = ::requestUsageWithDisclosure,
+                        onRefresh = { viewModel.refreshAppCaches(force = true) },
+                        onClearAllAppCaches = onClearAllAppCaches,
+                        onClearOwnCache = viewModel::clearOwnAppCache,
+                        onOpenAppDetails = onOpenAppDetails,
+                        modifier = Modifier,
+                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
+                    )
+
+                    DetailScreen.APP_MANAGER -> AppManagerScreen(
+                        state = state,
+                        onRequestUsageAccess = ::requestUsageWithDisclosure,
+                        onRefresh = viewModel::refreshInstalledApps,
+                        onUninstallApp = onUninstallApp,
+                        onOpenAppInfo = onOpenAppInfo,
+                        modifier = Modifier,
+                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
+                    )
+
+                    DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
+                        report = state.storageChange,
+                        refreshing = state.scanning && state.scanFocus == ScanFocus.ANALYZE,
+                        progressFiles = state.scanProgressFiles,
+                        progressDirectories = state.scanProgressDirectories,
+                        onAnalyze = {
+                            if (!state.hasAllFilesAccess) {
+                                viewModel.queueScanAfterPermission(ScanFocus.ANALYZE)
+                                requestAllFilesWithDisclosure()
+                            } else {
+                                viewModel.scan(ScanFocus.ANALYZE)
+                            }
+                        },
+                        modifier = Modifier,
+                    )
+
+                    DetailScreen.SETTINGS -> SettingsDetailScreen(
+                        privacyOptionsRequired = privacyOptionsRequired,
+                        canRequestAds = canRequestAds,
+                        adFreeRemainingMillis = adFreeRemainingMillis,
+                        rewardedAdReady = rewardedAdReady,
+                        onOpenLanguageSettings = onOpenLanguageSettings,
+                        onRateApp = onRateApp,
+                        onSendFeedback = onSendFeedback,
+                        onShareApp = onShareApp,
+                        onShowPrivacyOptions = onShowPrivacyOptions,
+                        onShowRewardedAd = onShowRewardedAd,
+                        onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
+                        onOpenLegalPage = ::openLegalPage,
+                        modifier = Modifier,
+                        keptItemCount = state.keptItemCount,
+                        onClearKeptItems = viewModel::clearKeptItems,
+                        excludedFolders = state.excludedFolders,
+                        onIncludeFolder = viewModel::includeFolder,
+                        hasAllFilesAccess = state.hasAllFilesAccess,
+                        hasUsageAccess = state.hasUsageAccess,
+                    )
+
+                    DetailScreen.ACCESS -> SecurityCenterScreen(
+                        state = state,
+                        onManageAllFilesAccess = {
+                            if (state.hasAllFilesAccess) {
+                                onRequestAllFilesAccess()
+                            } else {
+                                requestAllFilesWithDisclosure()
+                            }
+                        },
+                        onManageUsageAccess = {
+                            if (state.hasUsageAccess) {
+                                onRequestUsageAccess()
+                            } else {
+                                requestUsageWithDisclosure()
+                            }
+                        },
+                        onOpenPrivacy = {
+                            legalReturnScreen = DetailScreen.ACCESS
+                            detailScreen = DetailScreen.PRIVACY
+                        },
+                        modifier = Modifier,
+                    )
+
+                    DetailScreen.PRIVACY,
+                    DetailScreen.TERMS,
+                    DetailScreen.ABOUT -> LegalDetailScreen(
+                        page = when (detailScreen) {
+                            DetailScreen.PRIVACY -> LegalPage.PRIVACY
+                            DetailScreen.TERMS -> LegalPage.TERMS
+                            else -> LegalPage.ABOUT
+                        },
+                        info = state.deviceInfo,
+                        modifier = Modifier,
+                    )
+
+                    null -> when (AppTab.entries[selectedTabIndex]) {
+                        AppTab.HOME -> {
+                            LaunchedEffect(Unit) {
+                                viewModel.showPlan()
+                                viewModel.onAppOpened()
+                            }
+                            CleanTab(
+                                state = state,
+                                onAllowAccess = ::requestAllFilesWithDisclosure,
+                                onCancelScan = viewModel::cancelScan,
+                                onStartScan = {
+                                    if (!state.hasAllFilesAccess) {
+                                        requestAllFilesWithDisclosure()
+                                    } else {
+                                        viewModel.scan(ScanFocus.SMART)
+                                    }
+                                },
+                                onClean = { ids -> onPrepareCleanup(ids) },
+                                onToggleItem = viewModel::toggleItem,
+                                onOpenFindings = ::openFindings,
+                                onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
+                                hardActions = HomeHardActions(
+                                    onOpenMedia = { launchScan(ScanFocus.MEDIA) },
+                                    onOpenApps = {
+                                        detailScreen = DetailScreen.APP_MANAGER
+                                        viewModel.refreshInstalledApps()
+                                    },
+                                    onOpenFolder = { folder ->
+                                        if (folder != null) {
+                                            viewModel.openFolderReview(folder)
+                                            detailScreen = DetailScreen.CLEAN_RESULTS
+                                        } else {
+                                            openFindings()
+                                        }
+                                    },
+                                    onOpenDuplicates = { launchScan(ScanFocus.DUPLICATES) },
+                                ),
+                                accessDeniedOnce = allFilesAskedOnce,
+                                onOpenSettings = onRequestAllFilesAccess,
+                                modifier = Modifier,
+                            )
+                        }
+
+                        AppTab.TOOLS -> DeviceCenterScreen(
+                            state = state,
+                            onScan = ::launchScan,
+                            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+                            onOpenWhatsApp = {
+                                detailScreen = DetailScreen.WHATSAPP
+                                if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
+                            },
+                            onOpenAppManager = {
                                 detailScreen = DetailScreen.APP_MANAGER
                                 viewModel.refreshInstalledApps()
                             },
-                            onOpenFolder = { folder ->
-                                if (folder != null) {
-                                    viewModel.openFolderReview(folder)
-                                    detailScreen = DetailScreen.CLEAN_RESULTS
-                                } else {
-                                    openFindings()
-                                }
-                            },
-                            onOpenDuplicates = { launchScan(ScanFocus.DUPLICATES) },
-                        ),
-                        accessDeniedOnce = allFilesAskedOnce,
-                        onOpenSettings = onRequestAllFilesAccess,
-                        modifier = Modifier.padding(padding),
-                    )
+                            modifier = Modifier,
+                        )
+
+                        AppTab.TRASH -> TrashScreen(
+                            entries = state.trashEntries,
+                            onRefresh = viewModel::refreshTrash,
+                            onRestore = { ids -> viewModel.restoreTrash(ids) },
+                            onDeleteForever = { ids -> viewModel.emptyTrash(ids) },
+                            modifier = Modifier,
+                        )
+                    }
                 }
-
-                AppTab.TOOLS -> DeviceCenterScreen(
-                    state = state,
-                    onScan = ::launchScan,
-                    onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
-                    onOpenWhatsApp = {
-                        detailScreen = DetailScreen.WHATSAPP
-                        if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
-                    },
-                    onOpenCache = {
-                        detailScreen = DetailScreen.APP_CACHE
-                        viewModel.refreshAppCaches()
-                    },
-                    onOpenAppManager = {
-                        detailScreen = DetailScreen.APP_MANAGER
-                        viewModel.refreshInstalledApps()
-                    },
-                    onOpenStorageChange = {
-                        detailScreen = DetailScreen.STORAGE_CHANGE
-                    },
-                    modifier = Modifier.padding(padding),
-                )
-
-                AppTab.TRASH -> TrashScreen(
-                    entries = state.trashEntries,
-                    onRefresh = viewModel::refreshTrash,
-                    onRestore = { ids -> viewModel.restoreTrash(ids) },
-                    onDeleteForever = { ids -> viewModel.emptyTrash(ids) },
-                    modifier = Modifier.padding(padding),
-                )
             }
         }
     }
@@ -677,12 +741,27 @@ fun CleanerApp(
                 onUndo = viewModel::undoCleanup,
                 onEmptyTrash = { viewModel.emptyTrash(result.trashEntryIds) },
                 nextReview = if (result.kind == CleanupResultKind.FILES && state.scanFocus == ScanFocus.SMART) {
-                    state.summary.plan.review.firstOrNull { it.bytes >= CleaningThresholds.GROUP_MIN_BYTES }
+                    state.summary.plan.askRows.firstOrNull { it.bytes >= CleaningThresholds.GROUP_MIN_BYTES }
                 } else {
                     null
                 },
+                // C2: once tier 1 is done, "next" is the "My pick" card.
+                nextSuggestedBytes = state.planFigures()
+                    ?.takeIf {
+                        result.kind == CleanupResultKind.FILES &&
+                            state.scanFocus == ScanFocus.SMART &&
+                            it.showsSuggestion &&
+                            it.safeBytes < CleaningThresholds.PLAN_MIN_BYTES
+                    }
+                    ?.suggestedBytes ?: 0L,
+                onOpenSuggested = {
+                    dismissResultAndReturn()
+                    legalReturnScreen = null
+                    detailScreen = DetailScreen.CLEAN_RESULTS
+                    openSuggestionRequested = true
+                },
                 onReviewNext = {
-                    val next = state.summary.plan.review.firstOrNull()
+                    val next = state.summary.plan.askRows.firstOrNull()
                     dismissResultAndReturn()
                     val group = next?.group
                     if (next != null && group != null) {
@@ -732,3 +811,23 @@ private fun trashFallbackBytes(state: CleanerUiState, fallback: TrashFallback): 
 
 /** Tool scans (everything but the Smart and Deep scans) end in a tool result list (B7). */
 private fun isToolScanFocus(focus: ScanFocus): Boolean = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
+
+/** The two-tab tools of C4. */
+internal enum class HubKind { APPS, STORAGE }
+
+internal data class HubSpec(val kind: HubKind, val titleRes: List<Int>, val selected: Int)
+
+/** Which two-tab tool (if any) the open detail screen belongs to. */
+internal fun hubOf(detailScreen: DetailScreen?, state: CleanerUiState): HubSpec? = when {
+    detailScreen == DetailScreen.APP_MANAGER ->
+        HubSpec(HubKind.APPS, listOf(R.string.home_hard_apps, R.string.tool_app_cache), 0)
+    detailScreen == DetailScreen.APP_CACHE ->
+        HubSpec(HubKind.APPS, listOf(R.string.home_hard_apps, R.string.tool_app_cache), 1)
+    detailScreen == DetailScreen.CLEAN_RESULTS &&
+        state.scanFocus == ScanFocus.ANALYZE &&
+        state.storageReview.type == null ->
+        HubSpec(HubKind.STORAGE, listOf(R.string.storage_analyzer_title, R.string.storage_change_title), 0)
+    detailScreen == DetailScreen.STORAGE_CHANGE ->
+        HubSpec(HubKind.STORAGE, listOf(R.string.storage_analyzer_title, R.string.storage_change_title), 1)
+    else -> null
+}

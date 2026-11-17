@@ -39,6 +39,8 @@ internal fun CleanScreen(
     onOpenAppInfo: (String) -> Unit = {},
     onSwipeConfirmed: () -> Unit = {},
     onCloseSwipe: () -> Unit = {},
+    autoOpenSuggestion: Boolean = false,
+    onSuggestionOpened: () -> Unit = {},
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -82,10 +84,12 @@ internal fun CleanScreen(
             },
             onOpenAppInfo = onOpenAppInfo,
             onCloseSwipe = onCloseSwipe,
+            autoOpenSuggestion = autoOpenSuggestion,
+            onSuggestionOpened = onSuggestionOpened,
             onExcludeFolder = { root, path -> viewModel?.excludeFolder(root, path) },
             reviewAd = { index ->
-                // Faz 5: the list native follows the 2nd findings row when there are at least 4 rows.
-                val rows = state.summary.plan.review.size + (if (state.summary.plan.smallReview != null) 1 else 0)
+                // C5: the small list native follows the 3rd findings row when there are at least 4 rows.
+                val rows = state.summary.plan.askRows.size
                 if (index == AdPolicy.NATIVE_FINDINGS_AFTER_ROW - 1 && rows >= AdPolicy.NATIVE_FINDINGS_MIN_ROWS) {
                     item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
                 }

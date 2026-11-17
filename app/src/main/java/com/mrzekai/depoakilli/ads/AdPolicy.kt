@@ -37,11 +37,17 @@ object AdPolicy {
     const val INTERSTITIAL_MAX_PER_DAY = 8
     const val FULLSCREEN_GAP_SEC = 60L
     const val NATIVE_LIST_MIN_ROWS = 6
-    /** Clean tab: the list native ad follows the 4th "Worth a look" row. */
-    const val NATIVE_LIST_AFTER_REVIEW_ROW = 4
+    /**
+     * Faz 5C (C5): every list native is the small, row-sized card and follows
+     * the 3rd row; the large native with media stays on the result screen.
+     */
+    const val NATIVE_LIST_AFTER_ROW = 3
 
-    /** Findings list (Faz 5 T5.4): the list native follows the 2nd row when there are at least 4 rows. */
-    const val NATIVE_FINDINGS_AFTER_ROW = 2
+    /** Tool, app and cache lists (lists of [NATIVE_LIST_MIN_ROWS] rows or more). */
+    const val NATIVE_LIST_AFTER_REVIEW_ROW = NATIVE_LIST_AFTER_ROW
+
+    /** Findings list: after the 3rd row when there are at least 4 rows. */
+    const val NATIVE_FINDINGS_AFTER_ROW = NATIVE_LIST_AFTER_ROW
     const val NATIVE_FINDINGS_MIN_ROWS = 4
     const val SWIPE_BREAK_EVERY = 8
 

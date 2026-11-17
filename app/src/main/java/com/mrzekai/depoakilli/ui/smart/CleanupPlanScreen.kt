@@ -38,6 +38,7 @@ import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.CleanupPlan
+import com.mrzekai.depoakilli.model.PlanFigures
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.PlanGroup
@@ -53,6 +54,9 @@ import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
+import com.mrzekai.depoakilli.ui.common.LinkButton
+import androidx.compose.ui.text.style.TextOverflow
 
 /** Stable key of a plan row; the merged small row has no group. */
 internal fun PlanGroup.rowKey(): String = group?.name ?: if (smallReview) "SMALL_REVIEW" else "SMALL_ITEMS"
@@ -107,9 +111,13 @@ internal sealed interface FindingsRow {
     data class UnusedApps(val count: Int, override val bytes: Long) : FindingsRow
 }
 
-/** Findings rows, biggest first (T5.4). Unused apps join only with Usage Access. */
+/**
+ * Tier 3 findings rows ("I'll ask you", C2), biggest first (T5.4). The "My
+ * pick" files sit in their own card above. Unused apps join only with Usage
+ * Access.
+ */
 internal fun findingsRows(plan: CleanupPlan, unusedApps: List<InstalledAppEntry>?): List<FindingsRow> {
-    val groups = (plan.review + listOfNotNull(plan.smallReview)).map { FindingsRow.Group(it) }
+    val groups = plan.askRows.map { FindingsRow.Group(it) }
     val apps = unusedApps?.takeIf { it.isNotEmpty() }?.let { list ->
         FindingsRow.UnusedApps(list.size, list.sumOf(InstalledAppEntry::totalBytes))
     }
@@ -135,6 +143,9 @@ private fun SectionTitle(text: String) {
  */
 internal fun LazyListScope.cleanupPlanItems(
     plan: CleanupPlan,
+    figures: PlanFigures,
+    onConfirmSuggested: () -> Unit,
+    onSeeSuggested: () -> Unit,
     appCacheBytes: Long?,
     unusedApps: List<InstalledAppEntry>?,
     onOpenRow: (PlanGroup) -> Unit,
@@ -165,7 +176,8 @@ internal fun LazyListScope.cleanupPlanItems(
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            GiantNumber(ByteFormatter.format(rows.sumOf(FindingsRow::bytes)), scale, modifier = Modifier.fillMaxWidth())
+            // C1: the same figure Home subtracts from its "up to X".
+            GiantNumber(ByteFormatter.format(figures.findingsBytes), scale, modifier = Modifier.fillMaxWidth())
             Text(
                 stringResource(R.string.plan_found_title),
                 color = Ink,
@@ -175,6 +187,20 @@ internal fun LazyListScope.cleanupPlanItems(
             )
         }
     }
+    // C2 tier 2: one card, one button, one confirmation; everything to Trash.
+    if (figures.showsSuggestion) {
+        item(key = "plan-suggest") {
+            SuggestionCard(
+                plan = plan,
+                bytes = figures.suggestedBytes,
+                onConfirm = onConfirmSuggested,
+                onSee = onSeeSuggested,
+            )
+        }
+    }
+    if (rows.isNotEmpty()) {
+        item(key = "plan-ask-title") { SectionTitle(stringResource(R.string.plan_ask_title)) }
+    }
     rows.forEachIndexed { index, row ->
         item(key = "review-" + when (row) {
             is FindingsRow.Group -> row.row.rowKey()
@@ -183,13 +209,18 @@ internal fun LazyListScope.cleanupPlanItems(
             when (row) {
                 is FindingsRow.Group -> {
                     val count = row.row.items.size
-                    // B3: camera files are never bulk-selected; say they are chosen one by one.
+                    // B3/C5: camera files are chosen one by one; say so briefly ("156 videos · from Camera").
                     val oneByOne = row.row.oneByOneCount
                     BigRow(
                         icon = planGroupIcon(row.row.group),
                         title = row.row.title(),
-                        detail = if (row.row.groupSelectable && oneByOne > 0) {
-                            pluralStringResource(R.plurals.plan_camera_one_by_one, oneByOne, oneByOne)
+                        detail = if (oneByOne > 0) {
+                            val videos = row.row.items.all { it.mimeType.startsWith("video/") }
+                            pluralStringResource(
+                                if (videos) R.plurals.plan_camera_videos else R.plurals.plan_camera_files,
+                                oneByOne,
+                                oneByOne,
+                            )
                         } else {
                             pluralStringResource(R.plurals.home_scan_files_count, count, count)
                         },
@@ -298,6 +329,57 @@ internal fun LazyListScope.cleanupPlanItems(
             onClick = onScanAgain,
             style = PillStyle.INK_OUTLINE,
             modifier = Modifier.padding(top = 8.dp),
+        )
+    }
+}
+
+/**
+ * "My pick" (C2): the suggested total, the group names on one line, a Lime
+ * "Move X to Trash" and "See files". Nothing is preselected; the button opens
+ * the shared confirmation with the file list.
+ */
+@Composable
+private fun SuggestionCard(plan: CleanupPlan, bytes: Long, onConfirm: () -> Unit, onSee: () -> Unit) {
+    val groupNames = plan.suggestedItems
+        .groupBy { it.assessment.group }
+        .entries
+        .sortedByDescending { (_, items) -> items.sumOf(com.mrzekai.depoakilli.model.CleanableItem::sizeBytes) }
+        .map { (group, _) -> stringResource(group.titleRes) }
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Text(
+            stringResource(R.string.plan_suggest_title),
+            color = OnBlack,
+            fontSize = 17.sp,
+            lineHeight = 22.sp,
+            fontWeight = AppWeights.Title,
+        )
+        Text(
+            ByteFormatter.format(bytes),
+            color = Lime,
+            fontSize = 40.sp,
+            lineHeight = 46.sp,
+            fontWeight = AppWeights.Giant,
+            maxLines = 1,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            groupNames.joinToString(" · "),
+            color = OnBlackSoft,
+            fontSize = 14.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        PillButton(
+            text = stringResource(R.string.plan_suggest_action, ByteFormatter.format(bytes)),
+            onClick = onConfirm,
+            style = PillStyle.LIME,
+            modifier = Modifier.padding(top = 14.dp),
+        )
+        LinkButton(
+            text = stringResource(R.string.plan_suggest_see),
+            onClick = onSee,
+            color = OnBlack,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

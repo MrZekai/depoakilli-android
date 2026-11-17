@@ -66,7 +66,28 @@ enum class CleanupGroup(
     WHATSAPP_DOCUMENT(R.string.plan_group_whatsapp_document, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH, groupSelectable = false),
     ;
 
+    /** Tier 2 ("My pick", Faz 5C); see [SUGGESTED]. */
+    val suggested: Boolean get() = this in SUGGESTED
+
     companion object {
+        /**
+         * Faz 5C tier 2 ("My pick"): groups that are very likely not needed and
+         * are not personal memories. Their files are suggested together, with
+         * one confirmation, and always go to Trash. Camera files never join.
+         */
+        val SUGGESTED: Set<CleanupGroup> by lazy {
+            setOf(
+                DOWNLOAD_FILE,
+                DOWNLOAD_DOCUMENT,
+                APK_OLD_VERSION,
+                APK_OTHER,
+                WHATSAPP_SENT,
+                WHATSAPP_STATUS,
+                SCREENSHOT,
+                DUPLICATE_PERSONAL,
+            )
+        }
+
         /** Fallback used by tool screens that build assessments without the plan engine. */
         fun fromCategory(category: CleanCategory): CleanupGroup = when (category) {
             CleanCategory.JUNK -> TEMP_FILES

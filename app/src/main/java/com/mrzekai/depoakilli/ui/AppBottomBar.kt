@@ -32,6 +32,7 @@ import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 internal fun AppBottomBar(
     detailScreenOpen: Boolean,
     bannerAllowed: Boolean,
+    darkNavigationArea: Boolean = false,
     selectedTabIndex: Int,
     onSelectTab: (Int) -> Unit,
 ) {
@@ -76,7 +77,7 @@ internal fun AppBottomBar(
     } else {
         Column(
             modifier = Modifier
-                .background(Lime)
+                .background(if (darkNavigationArea) Black else Lime)
                 .navigationBarsPadding(),
         ) {
             if (bannerAllowed) {

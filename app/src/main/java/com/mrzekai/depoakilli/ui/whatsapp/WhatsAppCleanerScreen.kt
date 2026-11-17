@@ -81,6 +81,7 @@ internal fun WhatsAppCleanerDetailScreen(
     onDeleteSelected: () -> Unit,
     modifier: Modifier = Modifier,
     listAd: @Composable () -> Unit = {},
+    suggested: List<com.mrzekai.depoakilli.model.CleanableItem> = emptyList(),
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = WaBackground, contentColor = Ink) {
         when {
@@ -108,6 +109,7 @@ internal fun WhatsAppCleanerDetailScreen(
                 onToggleCategory = onToggleCategory,
                 onDeleteSelected = onDeleteSelected,
                 listAd = listAd,
+                suggested = suggested,
             )
         }
     }

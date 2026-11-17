@@ -86,9 +86,7 @@ private fun ToolsPreview() {
             onScan = {},
             onRequestAllFilesAccess = {},
             onOpenWhatsApp = {},
-            onOpenCache = {},
             onOpenAppManager = {},
-            onOpenStorageChange = {},
         )
     }
 }

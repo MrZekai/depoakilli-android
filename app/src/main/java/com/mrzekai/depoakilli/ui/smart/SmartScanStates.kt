@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
@@ -20,12 +19,10 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -41,13 +38,13 @@ import com.mrzekai.depoakilli.ui.common.BlackCard
 import com.mrzekai.depoakilli.ui.common.GiantNumber
 import com.mrzekai.depoakilli.ui.common.IconChip
 import com.mrzekai.depoakilli.ui.common.LimeProgressBar
+import com.mrzekai.depoakilli.ui.common.indexingProgress
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.common.PageLabel
 import com.mrzekai.depoakilli.ui.common.PillButton
 import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.theme.AppWeights
-import com.mrzekai.depoakilli.ui.theme.BlackChip
 import com.mrzekai.depoakilli.ui.theme.GiantScale
 import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
@@ -179,8 +176,8 @@ internal fun ScanProgressBody(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(16.dp))
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth().height(8.dp).clip(androidx.compose.foundation.shape.CircleShape),
+            LimeProgressBar(
+                progress = indexingProgress(state.scanProgressFiles, ceiling = 0.9f),
                 color = Ink,
                 trackColor = InkSoft.copy(alpha = .25f),
             )
@@ -227,11 +224,7 @@ internal fun ScanProgressBody(
             )
             val hashTotal = state.scanHashTotalBytes
             when {
-                indexing -> LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth().clip(androidx.compose.foundation.shape.CircleShape),
-                    color = Lime,
-                    trackColor = BlackChip,
-                )
+                indexing -> LimeProgressBar(progress = indexingProgress(state.scanProgressFiles))
                 state.scanHashing && hashTotal > 0L -> LimeProgressBar(
                     progress = 0.5f + 0.5f * (state.scanHashDoneBytes.toFloat() / hashTotal.toFloat()),
                 )

@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -300,7 +301,8 @@ fun BigRow(
                         color = OnBlackSoft,
                         fontSize = 13.sp,
                         lineHeight = 17.sp,
-                        maxLines = 1,
+                        // C5: room for two short lines instead of a cut first one.
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -360,7 +362,7 @@ fun CardDivider() {
 }
 
 /** Look of a full-width pill button. */
-enum class PillStyle { LIME, BLACK, WHITE, CORAL_OUTLINE, INK_OUTLINE, LIME_OUTLINE }
+enum class PillStyle { LIME, BLACK, BLACK_LIME, WHITE, CORAL_OUTLINE, INK_OUTLINE, LIME_OUTLINE }
 
 /** Fully rounded 56 dp button in one of the design's styles. */
 @Composable
@@ -379,6 +381,7 @@ fun PillButton(
     val (container, content, border) = if (disabledLook) Triple(BlackChip, OnBlackSoft, null) else when (style) {
         PillStyle.LIME -> Triple(Lime, Ink, null)
         PillStyle.BLACK -> Triple(Black, OnBlack, null)
+        PillStyle.BLACK_LIME -> Triple(Black, Lime, null)
         PillStyle.WHITE -> Triple(OnBlack, Black, null)
         PillStyle.CORAL_OUTLINE -> Triple(Color.Transparent, Coral, BorderStroke(2.dp, Coral))
         PillStyle.INK_OUTLINE -> Triple(Color.Transparent, Ink, BorderStroke(2.dp, Ink))
@@ -415,6 +418,44 @@ fun PillButton(
                     lineHeight = 20.sp,
                     textAlign = TextAlign.Center,
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Two (or more) tabs on top of a tool that holds two lists (C4): the selected
+ * tab is a black pill with Lime text, the others are Ink-outlined.
+ */
+@Composable
+fun HubTabs(titles: List<String>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Lime)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        titles.forEachIndexed { index, title ->
+            val isSelected = index == selected
+            Surface(
+                onClick = { if (!isSelected) onSelect(index) },
+                modifier = Modifier.weight(1f).heightIn(min = 44.dp),
+                shape = MakeRoomShapes.Pill,
+                color = if (isSelected) Black else Lime,
+                contentColor = if (isSelected) Lime else Ink,
+                border = if (isSelected) null else BorderStroke(2.dp, Ink),
+            ) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+                    Text(
+                        title,
+                        color = if (isSelected) Lime else Ink,
+                        fontWeight = AppWeights.Title,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
@@ -499,23 +540,40 @@ fun AdTag(modifier: Modifier = Modifier) {
 
 /** Thin progress bar on black (Lime fill). [progress] is 0..1. */
 @Composable
-fun LimeProgressBar(progress: Float, modifier: Modifier = Modifier) {
+fun LimeProgressBar(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    color: Color = Lime,
+    trackColor: Color = BlackChip,
+) {
+    // One continuous bar (C6), animated between steps; never a segmented indicator.
+    val animated by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = progress.coerceIn(0f, 1f),
+        label = "progress",
+    )
     Box(
         modifier
             .fillMaxWidth()
             .heightIn(min = 8.dp, max = 8.dp)
             .clip(CircleShape)
-            .background(BlackChip),
+            .background(trackColor),
     ) {
         Box(
             Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                .fillMaxWidth(animated)
                 .clip(CircleShape)
-                .background(Lime),
+                .background(color),
         )
     }
 }
+
+/**
+ * Progress of a scan whose total is unknown while files are being indexed:
+ * it rises with the files found and slows down, staying under [ceiling].
+ */
+fun indexingProgress(files: Int, ceiling: Float = 0.5f): Float =
+    0.05f + (ceiling - 0.05f) * (files / (files + 20_000f))
 
 /** Outline around a Lime-page section when it must stand out (rarely needed). */
 fun Modifier.inkOutline(): Modifier = this.border(2.dp, Ink, MakeRoomShapes.Card)

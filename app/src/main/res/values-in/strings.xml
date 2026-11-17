@@ -18,7 +18,8 @@
     <string name="cache_own_app_subtitle">%1$s dapat dilepas secara langsung dan aman</string>
     <string name="scan_focus_smart">Hasil pembersihan cerdas</string>
     <string name="scan_focus_junk">Pembersih File Sampah</string>
-    <string name="scan_focus_duplicates">Pembersih Duplikat</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="scan_focus_duplicates">Duplikat</string>
     <string name="scan_focus_large">File Besar</string>
     <string name="language_settings">Bahasa aplikasi</string>
     <string name="ad_privacy_preferences">Preferensi privasi iklan</string>
@@ -27,6 +28,7 @@
     <string name="message_cache_already_empty">Cache aplikasi sudah kosong.</string>
     <string name="message_whatsapp_scan_failed">Pemindaian WhatsApp tidak dapat diselesaikan. Sambungkan kembali folder Media dan coba lagi.</string>
     <string name="message_screen_unavailable">Layar ini tidak dapat dibuka di perangkat Anda.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="category_duplicates">Duplikat</string>
     <string name="category_duplicates_description">Salinan yang tidak diperlukan dengan konten yang sama</string>
     <string name="category_screenshots">Tangkapan layar</string>
@@ -308,11 +310,8 @@
     <string name="cache_modern_clean_now">Bersihkan sekarang</string>
     <string name="cache_modern_safety_note">Smart Cleaner mengukur cache yang dilaporkan oleh Android. Itu tidak secara diam-diam menghapus file pribadi aplikasi lain; pembersihan individu selesai dari layar aplikasi resmi Android.</string>
     <string name="cleanup_result_system_cache_title">Pembersihan cache Android selesai</string>
-    <string name="cleanup_result_system_cache_reduced">pengurangan cache terukur</string>
     <string name="cleanup_result_system_cache_unmeasured">Android menyelesaikan pembersihan cache. Pengurangan byte yang andal tidak tersedia pada perangkat ini.</string>
-    <string name="cleanup_result_system_cache_note">Pengurangan cache diukur dari statistik penyimpanan Android sebelum dan sesudah pembersihan sistem. Jika Android tidak memperlihatkan delta yang andal, tidak ada nomor ruang reklamasi yang ditemukan.</string>
     <string name="cleanup_result_app_cache_title">Cache %1$s dibersihkan</string>
-    <string name="cleanup_result_app_cache_note">Pengurangan yang ditampilkan didasarkan pada cache yang sebenarnya dibersihkan atau diukur sebelum dan sesudah tindakan cache Android.</string>
     <string name="message_individual_cache_no_change">Tidak ada pengurangan cache terukur yang terdeteksi setelah kembali dari pengaturan Android.</string>
     <string name="permissions_review_status">Tinjau</string>
     <string name="permissions_manage_android">Kelola di Android</string>
@@ -386,14 +385,17 @@
     <string name="feedback_open_email">Buka aplikasi email</string>
     <string name="feedback_address_copied">Alamat disalin</string>
     <string name="plan_group_apk_installed">Penginstal aplikasi yang sudah terpasang</string>
-    <string name="plan_group_duplicate_safe">Salinan tambahan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_safe">Duplikat</string>
     <string name="plan_group_thumbnails">Cache pratinjau</string>
     <string name="plan_group_temp_files">Sisa file sementara</string>
     <string name="plan_group_partial_downloads">Unduhan yang belum selesai</string>
     <string name="plan_group_apk_old_version">Versi penginstal lama</string>
     <string name="plan_group_apk_other">Penginstal lainnya</string>
-    <string name="plan_group_duplicate_personal">Salinan file Anda</string>
-    <string name="plan_group_duplicate_unverified">File yang tampak identik</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_personal">Duplikat</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">Kemungkinan duplikat</string>
     <string name="plan_group_large_video">Video lama berukuran besar</string>
     <string name="plan_group_screen_recording">Rekaman layar</string>
     <string name="plan_group_screenshot">Tangkapan layar lama</string>
@@ -467,7 +469,8 @@
         <item quantity="other">%1$d ditinjau · %2$s ditandai</item>
     </plurals>
     <string name="deep_check_action">Tonton dan verifikasi</string>
-    <string name="deep_check_running">Memeriksa file besar yang tampak identik…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_running">Memeriksa kemungkinan duplikat…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
         <item quantity="other">File besar yang tampak identik: %1$d · hingga %2$s. Tonton video singkat untuk memverifikasinya.</item>
@@ -505,9 +508,6 @@
     <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
     <string name="result_next_group">Berikutnya: %1$s · %2$s</string>
     <string name="result_review_next">Tinjau</string>
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="other">%1$d file dari kamera perlu dicek satu per satu</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="other">%1$d file berasal dari kamera Anda. Cadangan cloud tidak diperiksa.</item>
     </plurals>
@@ -661,5 +661,39 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="premium_duplicate_copies">
         <item quantity="other">%1$d salinan · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_title">Saranku: kemungkinan besar kamu tidak butuh ini</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_action">Pindahkan %1$s ke Sampah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_see">Lihat file</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_title">Untuk yang ini aku akan bertanya</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_select_suggested">Pilih saranku</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_other_header">File lain · %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_total_note">dari %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_no_suggestion">Tidak ada yang kusarankan dihapus di sini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_hint">File yang kamu hapus menunggu di sini selama 7 hari.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_storage">Penyimpanan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_cache_cleared">cache dibersihkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tool_suggest_header">
+        <item quantity="other">Saranku · %1$d file · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_videos">
+        <item quantity="other">%1$d video · dari Kamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_files">
+        <item quantity="other">%1$d file · dari Kamera</item>
     </plurals>
 </resources>

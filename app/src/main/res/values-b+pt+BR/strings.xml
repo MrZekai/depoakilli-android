@@ -18,7 +18,8 @@
     <string name="cache_own_app_subtitle">%1$s podem ser removidos de forma direta e segura</string>
     <string name="scan_focus_smart">Resultado da limpeza inteligente</string>
     <string name="scan_focus_junk">Limpador de arquivos temporários</string>
-    <string name="scan_focus_duplicates">Limpador de duplicados</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="scan_focus_duplicates">Duplicados</string>
     <string name="scan_focus_large">Arquivos grandes</string>
     <string name="language_settings">Idioma do app</string>
     <string name="ad_privacy_preferences">Preferências de privacidade de anúncios</string>
@@ -27,6 +28,7 @@
     <string name="message_cache_already_empty">O cache do app já está vazio.</string>
     <string name="message_whatsapp_scan_failed">Não foi possível concluir a análise do WhatsApp. Reconecte a pasta de mídia e tente novamente.</string>
     <string name="message_screen_unavailable">Não foi possível abrir esta tela no seu dispositivo.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="category_duplicates">Duplicados</string>
     <string name="category_duplicates_description">Cópias desnecessárias com conteúdo idêntico</string>
     <string name="category_screenshots">Capturas de tela</string>
@@ -331,11 +333,8 @@
     <string name="cache_modern_clean_now">Limpar agora</string>
     <string name="cache_modern_safety_note">O Smart Cleaner mede o cache reportado pelo Android. Ele não exclui silenciosamente os arquivos privados de outro app; a limpeza individual é concluída na tela oficial do app no Android.</string>
     <string name="cleanup_result_system_cache_title">Limpeza de cache do Android concluída</string>
-    <string name="cleanup_result_system_cache_reduced">redução de cache medida</string>
     <string name="cleanup_result_system_cache_unmeasured">O Android concluiu a limpeza de cache. Não foi possível obter uma redução confiável em bytes neste dispositivo.</string>
-    <string name="cleanup_result_system_cache_note">A redução de cache é medida a partir das estatísticas de armazenamento do Android antes e depois da limpeza do sistema. Se o Android não fornecer uma diferença confiável, nenhum número de espaço recuperado é inventado.</string>
     <string name="cleanup_result_app_cache_title">Cache de %1$s limpo</string>
-    <string name="cleanup_result_app_cache_note">A redução exibida se baseia no cache realmente limpo ou medido antes e depois da ação de cache do Android.</string>
     <string name="message_individual_cache_no_change">Nenhuma redução mensurável de cache foi detectada após voltar das configurações do Android.</string>
     <string name="permissions_review_status">Revisar</string>
     <string name="permissions_manage_android">Gerenciar no Android</string>
@@ -413,14 +412,17 @@
     <string name="feedback_open_email">Abrir app de e-mail</string>
     <string name="feedback_address_copied">Endereço copiado</string>
     <string name="plan_group_apk_installed">Instaladores de apps que você já tem</string>
-    <string name="plan_group_duplicate_safe">Cópias extras</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_safe">Duplicados</string>
     <string name="plan_group_thumbnails">Cache de pré-visualização</string>
     <string name="plan_group_temp_files">Arquivos temporários restantes</string>
     <string name="plan_group_partial_downloads">Downloads incompletos</string>
     <string name="plan_group_apk_old_version">Versões antigas de instaladores</string>
     <string name="plan_group_apk_other">Outros instaladores</string>
-    <string name="plan_group_duplicate_personal">Cópias dos seus arquivos</string>
-    <string name="plan_group_duplicate_unverified">Arquivos que parecem idênticos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_personal">Duplicados</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">Possíveis duplicados</string>
     <string name="plan_group_large_video">Vídeos antigos grandes</string>
     <string name="plan_group_screen_recording">Gravações de tela</string>
     <string name="plan_group_screenshot">Capturas de tela antigas</string>
@@ -506,7 +508,8 @@
         <item quantity="other">Revisados: %1$d · marcados: %2$s</item>
     </plurals>
     <string name="deep_check_action">Assistir e verificar</string>
-    <string name="deep_check_running">Verificando arquivos grandes que parecem idênticos…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_running">Verificando possíveis duplicados…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
         <item quantity="one">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
@@ -548,10 +551,6 @@
     <string name="plan_largest_apps_access">Permita o acesso de uso para ver quais apps ocupam mais espaço</string>
     <string name="result_next_group">Próximo: %1$s · %2$s</string>
     <string name="result_review_next">Revisar</string>
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="one">%1$d arquivo da sua câmera precisa ser revisado um a um</item>
-        <item quantity="other">%1$d arquivos da sua câmera precisam ser revisados um a um</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="one">%1$d arquivo é da sua câmera. O backup na nuvem não é verificado.</item>
         <item quantity="other">%1$d arquivos são da sua câmera. O backup na nuvem não é verificado.</item>
@@ -712,5 +711,42 @@
     <plurals name="premium_duplicate_copies">
         <item quantity="one">%1$d cópia · %2$s</item>
         <item quantity="other">%1$d cópias · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_title">Minha sugestão: você provavelmente não precisa destes</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_action">Mover %1$s para a lixeira</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_see">Ver arquivos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_title">Sobre estes eu vou te perguntar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_select_suggested">Selecionar sugestões</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_other_header">Outros arquivos · %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_total_note">de %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_no_suggestion">Aqui não há nada que eu sugira apagar.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_hint">O que você apaga fica aqui por 7 dias.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_storage">Armazenamento</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_cache_cleared">de cache limpo</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tool_suggest_header">
+        <item quantity="one">Minha sugestão · %1$d arquivo · %2$s</item>
+        <item quantity="other">Minha sugestão · %1$d arquivos · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_videos">
+        <item quantity="one">%1$d vídeo · da câmera</item>
+        <item quantity="other">%1$d vídeos · da câmera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_files">
+        <item quantity="one">%1$d arquivo · da câmera</item>
+        <item quantity="other">%1$d arquivos · da câmera</item>
     </plurals>
 </resources>

@@ -23,6 +23,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandLess
+import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -33,6 +35,7 @@ import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
+import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.ScanFocus
@@ -62,6 +66,8 @@ import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.MakeRoomShapes
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.common.PageLabel
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.common.SelectionBar
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
@@ -97,6 +103,7 @@ internal fun PremiumToolResults(
     onClean: (Set<String>?) -> Unit,
     listAd: @Composable () -> Unit = {},
     onRefresh: () -> Unit = onScan,
+    suggested: List<CleanableItem> = emptyList(),
 ) {
     val config = toolConfig(focus)
     var sortName by rememberSaveable(focus.name) { mutableStateOf(ToolSortMode.LARGEST.name) }
@@ -106,7 +113,30 @@ internal fun PremiumToolResults(
     val sortMode = ToolSortMode.valueOf(sortName)
     val scale = rememberGiantScale()
 
-    val sections = premiumSections(focus, summary)
+    // C3: "My pick" first — the Smart scan's suggestion for this tool, matched to
+    // these results by file — then the other files, closed until opened.
+    val suggestedUris = remember(suggested) { suggested.mapTo(HashSet(), CleanableItem::uri) }
+    val pickItems = summary.items.filter { it.uri in suggestedUris }
+    val otherItems = summary.items.filterNot { it.uri in suggestedUris }
+    val suggestedBytes = suggested.sumOf(CleanableItem::sizeBytes)
+    var othersOpen by rememberSaveable(focus.name) { mutableStateOf(false) }
+    val showOthers = pickItems.isEmpty() || othersOpen
+    val pickSection = pickItems.takeIf { it.isNotEmpty() }?.let { items ->
+        ToolSection(
+            key = "suggested",
+            title = pluralStringResource(
+                R.plurals.tool_suggest_header,
+                items.size,
+                items.size,
+                ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes)),
+            ),
+            subtitle = "",
+            accent = config.accent,
+            items = items,
+        )
+    }
+    val otherSections = premiumSections(focus, summary.copy(items = otherItems))
+    val sections = listOfNotNull(pickSection) + otherSections
     val activeDetail = sections.firstOrNull { it.key == detailKey }
     val previewItem = summary.items.firstOrNull { it.id == previewId }
 
@@ -163,20 +193,29 @@ internal fun PremiumToolResults(
                         Modifier.fillMaxWidth().padding(bottom = 10.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        // B6: the giant total and the file count under it; no "Total review size"
-                        // label and never a giant "0 B" (the empty card says it instead).
-                        if (summary.totalSuggestedBytes > 0L) {
-                            GiantNumber(ByteFormatter.format(summary.totalSuggestedBytes), scale, modifier = Modifier.fillMaxWidth())
+                        // C1/C3: the giant figure is the suggested amount (the same number as
+                        // the Tools tile); the total of every listed file is small text under it.
+                        if (suggestedBytes > 0L) {
+                            GiantNumber(ByteFormatter.format(suggestedBytes), scale, modifier = Modifier.fillMaxWidth())
                             PageLabel(
-                                pluralStringResource(R.plurals.home_scan_files_count, summary.items.size, summary.items.size),
+                                stringResource(R.string.tool_total_note, ByteFormatter.format(summary.totalSuggestedBytes)),
                                 strong = true,
                             )
+                        } else if (summary.items.isNotEmpty()) {
+                            Text(
+                                stringResource(R.string.tool_no_suggestion),
+                                color = Ink,
+                                fontSize = 24.sp,
+                                lineHeight = 30.sp,
+                                fontWeight = AppWeights.Title,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            )
+                            PageLabel(
+                                pluralStringResource(R.plurals.home_scan_files_count, summary.items.size, summary.items.size) +
+                                    " · " + ByteFormatter.format(summary.totalSuggestedBytes),
+                            )
                         }
-                        // B4: the index is reused for 10 minutes; Refresh scans the storage again.
-                        LinkButton(
-                            stringResource(R.string.cache_refresh),
-                            onClick = onRefresh,
-                        )
                         if (focus == ScanFocus.DUPLICATES) {
                             PageLabel(stringResource(R.string.premium_duplicates_original_safe))
                         }
@@ -209,27 +248,90 @@ internal fun PremiumToolResults(
                         }
                     }
                 } else {
-                    val totalRows = sections.sumOf { minOf(it.items.size, TOOL_ROWS_PER_SECTION) }
+                    val shownSections = listOfNotNull(pickSection) + if (showOthers) otherSections else emptyList()
+                    val totalRows = shownSections.sumOf { minOf(it.items.size, TOOL_ROWS_PER_SECTION) }
                     var rowIndex = 0
-                    sections.forEach { section ->
-                        val rows = sortItems(section.items, sortMode)
+                    // C5: one small (row-sized) native after the 3rd row, in lists of 6 rows or more.
+                    val adAfterRow = if (totalRows >= AdPolicy.NATIVE_LIST_MIN_ROWS) AdPolicy.NATIVE_LIST_AFTER_ROW else -1
+                    if (pickSection != null) {
+                        val rows = sortItems(pickSection.items, sortMode)
                         toolSection(
-                            section = section,
+                            section = pickSection,
                             rows = rows.take(TOOL_ROWS_PER_SECTION),
                             hiddenCount = (rows.size - TOOL_ROWS_PER_SECTION).coerceAtLeast(0),
                             firstRowIndex = rowIndex,
-                            adAfterRow = if (totalRows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
-                                AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW
-                            } else {
-                                -1
-                            },
+                            adAfterRow = adAfterRow,
                             listAd = listAd,
-                            onViewAll = { detailKey = section.key },
+                            onViewAll = { detailKey = pickSection.key },
                             onPreview = { previewId = it.id },
                             onToggleItem = onToggleItem,
-                            onToggleAll = { setSectionSelection(section.items, onSetItemsSelected) },
+                            onToggleAll = { setSectionSelection(pickSection.items, onSetItemsSelected) },
+                            headerAction = {
+                                PillButton(
+                                    text = stringResource(R.string.tool_select_suggested),
+                                    onClick = {
+                                        // Camera files are never part of a pick (C2); select the rest at once.
+                                        onSetItemsSelected(
+                                            pickSection.items.filterNot { StoragePathRules.isCameraPath(it.relativePath) }
+                                                .mapTo(linkedSetOf(), CleanableItem::id),
+                                            true,
+                                            false,
+                                        )
+                                    },
+                                    style = PillStyle.BLACK,
+                                    modifier = Modifier.padding(bottom = 10.dp),
+                                )
+                            },
                         )
-                        rowIndex += minOf(section.items.size, TOOL_ROWS_PER_SECTION)
+                        rowIndex += minOf(pickSection.items.size, TOOL_ROWS_PER_SECTION)
+                        if (otherItems.isNotEmpty()) {
+                            item(key = "tool-others-toggle") {
+                                Surface(
+                                    onClick = { othersOpen = !othersOpen },
+                                    modifier = Modifier.fillMaxWidth().padding(top = 18.dp),
+                                    color = Lime,
+                                    contentColor = Ink,
+                                    shape = MakeRoomShapes.Pill,
+                                    border = androidx.compose.foundation.BorderStroke(2.dp, Ink),
+                                ) {
+                                    Row(
+                                        Modifier.heightIn(min = 52.dp).padding(horizontal = 18.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            stringResource(R.string.tool_other_header, otherItems.size),
+                                            color = Ink,
+                                            fontWeight = AppWeights.Title,
+                                            fontSize = 16.sp,
+                                            modifier = Modifier.weight(1f),
+                                        )
+                                        Icon(
+                                            if (othersOpen) Icons.Outlined.ExpandLess else Icons.Outlined.ExpandMore,
+                                            contentDescription = null,
+                                            tint = Ink,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (showOthers) {
+                        otherSections.forEach { section ->
+                            val rows = sortItems(section.items, sortMode)
+                            toolSection(
+                                section = section,
+                                rows = rows.take(TOOL_ROWS_PER_SECTION),
+                                hiddenCount = (rows.size - TOOL_ROWS_PER_SECTION).coerceAtLeast(0),
+                                firstRowIndex = rowIndex,
+                                adAfterRow = adAfterRow,
+                                listAd = listAd,
+                                onViewAll = { detailKey = section.key },
+                                onPreview = { previewId = it.id },
+                                onToggleItem = onToggleItem,
+                                onToggleAll = { setSectionSelection(section.items, onSetItemsSelected) },
+                            )
+                            rowIndex += minOf(section.items.size, TOOL_ROWS_PER_SECTION)
+                        }
                     }
                 }
 
@@ -284,9 +386,13 @@ internal fun LazyListScope.toolSection(
     onPreview: (CleanableItem) -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleAll: () -> Unit,
+    headerAction: (@Composable () -> Unit)? = null,
 ) {
     item(key = "section-head-" + section.key) {
         ToolSectionHeader(section = section, onToggleAll = onToggleAll)
+    }
+    if (headerAction != null) {
+        item(key = "section-action-" + section.key) { headerAction() }
     }
     val cardRows = rows.size + if (hiddenCount > 0) 1 else 0
     rows.forEachIndexed { index, item ->
@@ -343,7 +449,9 @@ internal fun ToolSectionHeader(section: ToolSection, onToggleAll: () -> Unit) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            Text(section.subtitle, color = InkSoft, fontSize = 13.sp, fontWeight = AppWeights.Strong, maxLines = 1)
+            if (section.subtitle.isNotBlank()) {
+                Text(section.subtitle, color = InkSoft, fontSize = 13.sp, fontWeight = AppWeights.Strong, maxLines = 1)
+            }
         }
         TriStateCheckbox(
             state = selectionState,

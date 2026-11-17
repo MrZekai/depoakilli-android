@@ -361,6 +361,98 @@ internal fun createNativeAdView(context: android.content.Context, showBadge: Boo
     return nativeAdView
 }
 
+/**
+ * Small list native (Faz 5C, C5): one row about as tall as a list card
+ * (≈ 96 dp) — icon, "Ad" label and headline, one line of text, and the call
+ * to action. No media view; the large native with media stays on the result
+ * screen. Same ad unit.
+ */
+internal fun createSmallNativeAdView(context: android.content.Context): NativeAdView {
+    val nativeAdView = NativeAdView(context)
+    val row = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(dp(context, 12), dp(context, 10), dp(context, 12), dp(context, 10))
+        background = GradientDrawable().apply {
+            setColor(AndroidColor.rgb(0x07, 0x09, 0x0C))
+            cornerRadius = dp(context, 24).toFloat()
+            setStroke(dp(context, 1), AndroidColor.rgb(0x1B, 0x20, 0x26))
+        }
+    }
+    val icon = ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
+    row.addView(icon, LinearLayout.LayoutParams(dp(context, 44), dp(context, 44)))
+
+    val texts = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+    val titleRow = LinearLayout(context).apply {
+        orientation = LinearLayout.HORIZONTAL
+        gravity = Gravity.CENTER_VERTICAL
+    }
+    val adBadge = TextView(context).apply {
+        text = context.getString(R.string.ad_label)
+        textSize = 12f
+        setTextColor(AndroidColor.rgb(0x04, 0x21, 0x0F))
+        setTypeface(typeface, Typeface.BOLD)
+        setPadding(dp(context, 6), dp(context, 1), dp(context, 6), dp(context, 1))
+        background = GradientDrawable().apply {
+            setColor(AndroidColor.rgb(0xFF, 0xB2, 0x1A))
+            cornerRadius = dp(context, 6).toFloat()
+        }
+    }
+    titleRow.addView(adBadge, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+    val headline = TextView(context).apply {
+        textSize = 15f
+        setTextColor(AndroidColor.rgb(0xF7, 0xF9, 0xFF))
+        setTypeface(typeface, Typeface.BOLD)
+        maxLines = 1
+        ellipsize = android.text.TextUtils.TruncateAt.END
+        setPadding(dp(context, 8), 0, 0, 0)
+    }
+    titleRow.addView(headline, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+    texts.addView(titleRow, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+    val body = TextView(context).apply {
+        textSize = 12f
+        setTextColor(AndroidColor.rgb(0x9A, 0xA3, 0xB2))
+        maxLines = 1
+        ellipsize = android.text.TextUtils.TruncateAt.END
+    }
+    texts.addView(
+        body,
+        LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            topMargin = dp(context, 3)
+        },
+    )
+    row.addView(
+        texts,
+        LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+            marginStart = dp(context, 10)
+            marginEnd = dp(context, 8)
+        },
+    )
+    val callToAction = Button(context).apply {
+        isAllCaps = false
+        textSize = 13f
+        minHeight = 0
+        minWidth = 0
+        maxLines = 1
+        setPadding(dp(context, 14), dp(context, 8), dp(context, 14), dp(context, 8))
+        setTextColor(AndroidColor.rgb(0x04, 0x21, 0x0F))
+        background = GradientDrawable().apply {
+            setColor(AndroidColor.rgb(0x2B, 0xE8, 0x78))
+            cornerRadius = dp(context, 22).toFloat()
+        }
+    }
+    row.addView(callToAction, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+    nativeAdView.addView(
+        row,
+        FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT),
+    )
+    nativeAdView.headlineView = headline
+    nativeAdView.bodyView = body
+    nativeAdView.iconView = icon
+    nativeAdView.callToActionView = callToAction
+    return nativeAdView
+}
+
 internal fun bindNativeAd(
     view: NativeAdView,
     nativeAd: NativeAd,

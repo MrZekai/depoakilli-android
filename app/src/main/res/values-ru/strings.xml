@@ -18,7 +18,8 @@
     <string name="cache_own_app_subtitle">%1$s можно удалить напрямую и безопасно.</string>
     <string name="scan_focus_smart">Результат умной очистки</string>
     <string name="scan_focus_junk">Очистка мусора</string>
-    <string name="scan_focus_duplicates">Очистка дубликатов</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="scan_focus_duplicates">Дубликаты</string>
     <string name="scan_focus_large">Большие файлы</string>
     <string name="language_settings">Язык приложения</string>
     <string name="ad_privacy_preferences">Настройки конфиденциальности рекламы</string>
@@ -27,6 +28,7 @@
     <string name="message_cache_already_empty">Кэш приложения уже пуст.</string>
     <string name="message_whatsapp_scan_failed">Сканирование WhatsApp не удалось завершить. Подключите папку Media и повторите попытку.</string>
     <string name="message_screen_unavailable">Этот экран не удалось открыть на вашем устройстве.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="category_duplicates">Дубликаты</string>
     <string name="category_duplicates_description">Ненужные копии с идентичным содержанием</string>
     <string name="category_screenshots">Скриншоты</string>
@@ -353,11 +355,8 @@
     <string name="cache_modern_clean_now">Очистить сейчас</string>
     <string name="cache_modern_safety_note">Smart Cleaner измеряет кэш, о котором сообщает Android. Он не удаляет автоматически личные файлы другого приложения; Индивидуальная очистка выполняется с официального экрана приложения Android.</string>
     <string name="cleanup_result_system_cache_title">Очистка кэша Android завершена</string>
-    <string name="cleanup_result_system_cache_reduced">измеренное уменьшение кэша</string>
     <string name="cleanup_result_system_cache_unmeasured">Android завершил очистку кэша. На этом устройстве не было надежного сокращения байтов.</string>
-    <string name="cleanup_result_system_cache_note">Уменьшение кэша измеряется на основе статистики хранилища Android до и после очистки системы. Если Android не предоставляет надежную дельту, номер освобожденного пространства не придумывается.</string>
     <string name="cleanup_result_app_cache_title">Кэш %1$s очищен.</string>
-    <string name="cleanup_result_app_cache_note">Отображаемое сокращение основано на фактически очищенном или измеренном кэше до и после действия кэша Android.</string>
     <string name="message_individual_cache_no_change">После возврата из настроек Android не было обнаружено заметного уменьшения кэша.</string>
     <string name="permissions_review_status">Проверить</string>
     <string name="permissions_manage_android">Управление в Android</string>
@@ -437,15 +436,17 @@
     <string name="feedback_open_email">Открыть почтовое приложение</string>
     <string name="feedback_address_copied">Адрес скопирован</string>
     <string name="plan_group_apk_installed">Установщики уже установленных приложений</string>
-    <string name="plan_group_duplicate_safe">Лишние копии</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_safe">Дубликаты</string>
     <string name="plan_group_thumbnails">Кэш миниатюр</string>
     <string name="plan_group_temp_files">Оставшиеся временные файлы</string>
     <string name="plan_group_partial_downloads">Незавершённые загрузки</string>
     <string name="plan_group_apk_old_version">Старые версии установщиков</string>
     <string name="plan_group_apk_other">Другие установщики</string>
-    <string name="plan_group_duplicate_personal">Копии ваших файлов</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_group_duplicate_unverified">Файлы, похожие на одинаковые</string>
+    <string name="plan_group_duplicate_personal">Дубликаты</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">Возможные дубликаты</string>
     <string name="plan_group_large_video">Большие старые видео</string>
     <string name="plan_group_screen_recording">Записи экрана</string>
     <string name="plan_group_screenshot">Старые снимки экрана</string>
@@ -555,7 +556,8 @@
         <item quantity="other">Просмотрено: %1$d · отмечено: %2$s</item>
     </plurals>
     <string name="deep_check_action">Смотреть и проверить</string>
-    <string name="deep_check_running">Проверка больших похожих файлов…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_running">Проверка возможных дубликатов…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
         <item quantity="one">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
@@ -609,13 +611,6 @@
     <string name="plan_largest_apps_access">Разрешите доступ к статистике, чтобы увидеть, какие приложения занимают больше всего места</string>
     <string name="result_next_group">Далее: %1$s · %2$s</string>
     <string name="result_review_next">Проверить</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="one">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="few">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="many">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="other">Файлы с камеры (%1$d) нужно проверить по одному</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="one">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
         <item quantity="few">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
@@ -790,5 +785,48 @@
         <item quantity="few">%1$d копии · %2$s</item>
         <item quantity="many">%1$d копий · %2$s</item>
         <item quantity="other">%1$d копий · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_title">Мой выбор: скорее всего, это вам не нужно</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_action">Переместить %1$s в корзину</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_see">Показать файлы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_title">Об этих я спрошу вас</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_select_suggested">Выбрать рекомендованные</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_other_header">Другие файлы · %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_total_note">из %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_no_suggestion">Здесь нечего советовать удалить.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_hint">Удалённое хранится здесь 7 дней.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_storage">Хранилище</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_cache_cleared">кеша очищено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tool_suggest_header">
+        <item quantity="one">Мой выбор · %1$d файл · %2$s</item>
+        <item quantity="few">Мой выбор · %1$d файла · %2$s</item>
+        <item quantity="many">Мой выбор · %1$d файлов · %2$s</item>
+        <item quantity="other">Мой выбор · %1$d файлов · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_videos">
+        <item quantity="one">%1$d видео · с камеры</item>
+        <item quantity="few">%1$d видео · с камеры</item>
+        <item quantity="many">%1$d видео · с камеры</item>
+        <item quantity="other">%1$d видео · с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_files">
+        <item quantity="one">%1$d файл · с камеры</item>
+        <item quantity="few">%1$d файла · с камеры</item>
+        <item quantity="many">%1$d файлов · с камеры</item>
+        <item quantity="other">%1$d файлов · с камеры</item>
     </plurals>
 </resources>

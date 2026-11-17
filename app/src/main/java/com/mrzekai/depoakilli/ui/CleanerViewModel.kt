@@ -10,6 +10,7 @@ import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.isBulkSelectable
+import com.mrzekai.depoakilli.model.swipeItemsFor
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -177,7 +178,7 @@ class CleanerViewModel internal constructor(
     /** Opens the swipe review for a plan group, keeping earlier marks for the same files. */
     fun openSwipeReview(group: CleanupGroup) {
         _state.update { state ->
-            val items = state.summary.items.filter { it.assessment.group == group }
+            val items = swipeItemsFor(group, state.summary.items)
             val fresh = SwipeReviewState.start(items)
             val previous = state.swipeStates[group]
             val review = if (previous != null && previous.itemIds == fresh.itemIds) previous else fresh

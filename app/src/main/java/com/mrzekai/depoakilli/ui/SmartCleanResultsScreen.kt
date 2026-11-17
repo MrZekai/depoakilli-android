@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,9 +24,12 @@ import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
+import com.mrzekai.depoakilli.model.PlanFigures
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewSummary
+import com.mrzekai.depoakilli.model.swipeItemsFor
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
 import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
@@ -115,13 +119,15 @@ internal fun SmartCleanResultsScreen(
     onOpenAppInfo: (String) -> Unit = {},
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit = { _, _ -> },
     onCloseSwipe: () -> Unit = {},
+    autoOpenSuggestion: Boolean = false,
+    onSuggestionOpened: () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
     if (swipe != null && state.hasAllFilesAccess && !state.scanning) {
         SwipeReviewScreen(
             review = swipe,
-            items = state.summary.items.filter { it.assessment.group == swipeGroup },
+            items = swipeItemsFor(swipeGroup, state.summary.items),
             onMark = onSwipeMark,
             onUndo = onSwipeUndo,
             onContinue = onSwipeContinue,
@@ -320,6 +326,37 @@ internal fun SmartResultsContent(
 
     val plan = summary.plan
     val deepCheck = remember(summary.items) { PlanSelection.deepCheckCandidates(summary.items) }
+    val findingsApps = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps else null
+    // C1: the same figures Home reads (no second calculation here).
+    val figures = state.planFigures() ?: PlanFigures.of(plan, findingsApps)
+    // C2: "My pick" asks once through the shared confirmation, list visible on request.
+    var suggestConfirm by rememberSaveable { mutableStateOf(false) }
+    var suggestShowList by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(autoOpenSuggestion) {
+        if (autoOpenSuggestion) {
+            if (figures.showsSuggestion) suggestConfirm = true
+            onSuggestionOpened()
+        }
+    }
+    if (suggestConfirm) {
+        val suggested = plan.suggestedItems
+        DeleteConfirmDialog(
+            items = suggested,
+            inProgress = state.cleanupInProgress,
+            initiallyShowAll = suggestShowList,
+            onDismiss = {
+                suggestConfirm = false
+                suggestShowList = false
+            },
+            onConfirm = {
+                suggestConfirm = false
+                suggestShowList = false
+                val ids = suggested.mapTo(linkedSetOf(), CleanableItem::id)
+                onSetItemsSelected(ids, true, false)
+                onClean(ids)
+            },
+        )
+    }
     PageFrame(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -329,8 +366,14 @@ internal fun SmartResultsContent(
             planHeader(this)
             cleanupPlanItems(
                 plan = plan,
+                figures = figures,
+                onConfirmSuggested = { suggestConfirm = true },
+                onSeeSuggested = {
+                    suggestShowList = true
+                    suggestConfirm = true
+                },
                 appCacheBytes = appCacheBytes,
-                unusedApps = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps else null,
+                unusedApps = findingsApps,
                 onOpenRow = { row ->
                     val group = row.group
                     if (group != null && group in SwipeReviewState.SWIPE_GROUPS) {

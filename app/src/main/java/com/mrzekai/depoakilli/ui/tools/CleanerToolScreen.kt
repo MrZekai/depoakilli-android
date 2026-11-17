@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.model.ToolSuggestion
+import com.mrzekai.depoakilli.ui.smartSummary
 import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 
@@ -105,6 +107,11 @@ internal fun PremiumCleanerToolScreen(
                 onClean = onClean,
                 listAd = listAd,
                 onRefresh = onRefresh,
+                // C1/C3: the same ToolSuggestion call as the Tools tile, on the Smart
+                // scan's plan (this tool's own result only when no Smart scan exists).
+                suggested = ToolSuggestion.toolOf(state.scanFocus)?.let { tool ->
+                    ToolSuggestion.suggestedFor(tool, (state.smartSummary() ?: state.summary).plan)
+                }.orEmpty(),
             )
         }
     }

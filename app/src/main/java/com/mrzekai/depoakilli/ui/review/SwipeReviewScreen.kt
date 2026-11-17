@@ -54,6 +54,7 @@ import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.PillButton
 import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.common.SystemBarIcons
+import com.mrzekai.depoakilli.ui.common.RelativeAge
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
@@ -69,7 +70,6 @@ import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import com.mrzekai.depoakilli.ui.toMediaPreview
 import com.mrzekai.depoakilli.ui.toSmartPreview
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 /**
@@ -322,18 +322,16 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
                 MediaPreviewContent(preview.toMediaPreview(), allowAudio = false, muted = true)
             }
         }
-        val days = if (item.modifiedAtMillis > 0L) {
-            TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis() - item.modifiedAtMillis).coerceAtLeast(0L)).toInt()
-        } else {
-            0
-        }
+        // C6: "10 months ago", not "Age (days): 297".
+        val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+        val age = remember(item.modifiedAtMillis, locale) { RelativeAge.format(item.modifiedAtMillis, locale) }
         Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(
                     stringResource(
                         R.string.swipe_age_days,
                         bidiWrap(item.relativePath.ifBlank { "/" }),
-                        pluralStringResource(R.plurals.reason_large_file, days, days).substringAfter("• "),
+                        age,
                     ),
                     color = OnBlackSoft,
                     fontSize = 13.sp,

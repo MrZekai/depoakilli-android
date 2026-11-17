@@ -74,6 +74,8 @@ internal fun CleanupResultDialog(
     onEmptyTrash: () -> Unit = {},
     nextReview: PlanGroup? = null,
     onReviewNext: () -> Unit = {},
+    nextSuggestedBytes: Long = 0L,
+    onOpenSuggested: () -> Unit = {},
 ) {
     var resultAdPresented by remember(result) { mutableStateOf(false) }
     var confirmEmptyTrash by remember { mutableStateOf(false) }
@@ -144,7 +146,8 @@ internal fun CleanupResultDialog(
                         PageLabel(
                             stringResource(
                                 if (result.kind != CleanupResultKind.FILES) {
-                                    R.string.cleanup_result_system_cache_reduced
+                                    // C6: "of cache cleared", no paragraph under it.
+                                    R.string.result_cache_cleared
                                 } else {
                                     R.string.cleanup_result_space_reclaimed
                                 },
@@ -165,15 +168,33 @@ internal fun CleanupResultDialog(
                         )
                     }
                 }
-                if (figures.headline != ResultFigures.Headline.NOTHING && result.kind != CleanupResultKind.FILES) {
+                if (figures.headline != ResultFigures.Headline.NOTHING && result.kind == CleanupResultKind.APP_CACHE) {
                     PageLabel(resultTitle(result, partial))
                 }
 
                 ResultDetails(result)
 
+                // C2: after tier 1, the next step is the "My pick" card.
+                if (nextSuggestedBytes > 0L) {
+                    BlackCard(contentPadding = PaddingValues(18.dp)) {
+                        Text(
+                            stringResource(R.string.plan_suggest_title),
+                            color = OnBlack,
+                            fontSize = 16.sp,
+                            lineHeight = 21.sp,
+                            fontWeight = AppWeights.Title,
+                        )
+                        PillButton(
+                            text = stringResource(R.string.plan_suggest_action, ByteFormatter.format(nextSuggestedBytes)),
+                            onClick = onOpenSuggested,
+                            style = PillStyle.LIME,
+                            modifier = Modifier.padding(top = 12.dp),
+                        )
+                    }
+                }
                 // V9: the biggest group still left in the plan, one line above "Done".
                 val nextGroup = nextReview?.group
-                if (nextReview != null && nextGroup != null) {
+                if (nextSuggestedBytes <= 0L && nextReview != null && nextGroup != null) {
                     LinkButton(
                         text = stringResource(
                             R.string.result_next_group,
@@ -188,7 +209,7 @@ internal fun CleanupResultDialog(
                 PillButton(
                     text = stringResource(R.string.result_done),
                     onClick = { onDone(resultAdPresented) },
-                    style = PillStyle.BLACK,
+                    style = PillStyle.BLACK_LIME,
                 )
                 if (figures.canEmptyTrash) {
                     PillButton(
@@ -203,19 +224,16 @@ internal fun CleanupResultDialog(
                     )
                 }
 
-                Text(
-                    stringResource(
-                        when (result.kind) {
-                            CleanupResultKind.SYSTEM_CACHE -> R.string.cleanup_result_system_cache_note
-                            CleanupResultKind.APP_CACHE -> R.string.cleanup_result_app_cache_note
-                            CleanupResultKind.FILES -> R.string.cleanup_result_note
-                        },
-                    ),
-                    color = InkSoft,
-                    fontSize = 13.sp,
-                    lineHeight = 17.sp,
-                    textAlign = TextAlign.Center,
-                )
+                // C6: cache results carry no explanatory paragraph.
+                if (result.kind == CleanupResultKind.FILES) {
+                    Text(
+                        stringResource(R.string.cleanup_result_note),
+                        color = InkSoft,
+                        fontSize = 13.sp,
+                        lineHeight = 17.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
                 if (canRequestAds) {
                     // At least 24 dp between the buttons and the ad; the ad carries its label above it.

@@ -17,7 +17,7 @@
     <string name="cache_own_app_subtitle">%1$s doğrudan ve güvenle silinebilir</string>
     <string name="scan_focus_smart">Akıllı temizlik sonucu</string>
     <string name="scan_focus_junk">Çöp Temizliği</string>
-    <string name="scan_focus_duplicates">Kopyaları Sil</string>
+    <string name="scan_focus_duplicates">Kopyalar</string>
     <string name="scan_focus_large">Büyük Dosyalar</string>
     <string name="language_settings">Uygulama dili</string>
     <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
@@ -26,7 +26,7 @@
     <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
     <string name="message_whatsapp_scan_failed">WhatsApp taraması tamamlanamadı. Medya klasörünü yeniden bağlayıp tekrar deneyin.</string>
     <string name="message_screen_unavailable">Bu ekran cihazınızda açılamadı.</string>
-    <string name="category_duplicates">Yinelenenler</string>
+    <string name="category_duplicates">Kopyalar</string>
     <string name="category_duplicates_description">Aynı içeriğin gereksiz kopyaları</string>
     <string name="category_screenshots">Ekran görüntüleri</string>
     <string name="category_screenshots_description">Ekran görüntülerini incele</string>
@@ -332,12 +332,9 @@
     <string name="cache_modern_safety_note">Akıllı Temizleyici Android’in bildirdiği önbelleği ölçer. Başka uygulamaların özel dosyalarını sessizce silmez; tek tek temizlik Android’in resmî uygulama ekranından tamamlanır.</string>
 
     <string name="cleanup_result_system_cache_title">Android önbellek temizliği tamamlandı</string>
-    <string name="cleanup_result_system_cache_reduced">ölçülen önbellek azalması</string>
     <string name="cleanup_result_system_cache_unmeasured">Android önbellek temizliğini tamamladı. Bu cihazda güvenilir bir byte azalması ölçülemedi.</string>
-    <string name="cleanup_result_system_cache_note">Önbellek azalması Android depolama istatistiklerinden işlem öncesi ve sonrası ölçülür. Android güvenilir bir fark sunmazsa geri kazanılan alan için rakam uydurulmaz.</string>
 
     <string name="cleanup_result_app_cache_title">%1$s önbelleği temizlendi</string>
-    <string name="cleanup_result_app_cache_note">Gösterilen azalma, gerçekten temizlenen veya Android önbellek işlemi öncesi ve sonrası ölçülen önbelleğe dayanır.</string>
     <string name="message_individual_cache_no_change">Android ayarlarından döndükten sonra ölçülebilir bir önbellek azalması algılanmadı.</string>
     <string name="permissions_review_status">İncele</string>
     <string name="permissions_manage_android">Android ayarlarında yönet</string>
@@ -412,14 +409,14 @@
     <string name="feedback_open_email">E-posta uygulamasını aç</string>
     <string name="feedback_address_copied">Adres kopyalandı</string>
     <string name="plan_group_apk_installed">Yüklü uygulamaların kurulum dosyaları</string>
-    <string name="plan_group_duplicate_safe">Fazla kopyalar</string>
+    <string name="plan_group_duplicate_safe">Kopyalar</string>
     <string name="plan_group_thumbnails">Önizleme önbelleği</string>
     <string name="plan_group_temp_files">Artık geçici dosyalar</string>
     <string name="plan_group_partial_downloads">Yarım kalmış indirmeler</string>
     <string name="plan_group_apk_old_version">Eski kurulum dosyası sürümleri</string>
     <string name="plan_group_apk_other">Diğer kurulum dosyaları</string>
-    <string name="plan_group_duplicate_personal">Dosyalarınızın kopyaları</string>
-    <string name="plan_group_duplicate_unverified">Aynı görünen dosyalar</string>
+    <string name="plan_group_duplicate_personal">Kopyalar</string>
+    <string name="plan_group_duplicate_unverified">Olası kopyalar</string>
     <string name="plan_group_large_video">Büyük eski videolar</string>
     <string name="plan_group_screen_recording">Ekran kayıtları</string>
     <string name="plan_group_screenshot">Eski ekran görüntüleri</string>
@@ -505,10 +502,10 @@
         <item quantity="other">%1$d incelendi · %2$s işaretli</item>
     </plurals>
     <string name="deep_check_action">İzle ve doğrula</string>
-    <string name="deep_check_running">Aynı görünen büyük dosyalar kontrol ediliyor…</string>
+    <string name="deep_check_running">Olası kopyalar kontrol ediliyor…</string>
     <plurals name="deep_check_row">
-        <item quantity="one">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
-        <item quantity="other">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
+        <item quantity="one">Olası kopyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izle.</item>
+        <item quantity="other">Olası kopyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izle.</item>
     </plurals>
     <plurals name="trash_full_body">
         <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
@@ -545,10 +542,6 @@
     <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
     <string name="result_next_group">Sıradaki: %1$s · %2$s</string>
     <string name="result_review_next">İncele</string>
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="one">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
-        <item quantity="other">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="one">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
         <item quantity="other">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
@@ -644,5 +637,28 @@
     <plurals name="premium_duplicate_copies">
         <item quantity="one">%1$d kopya · %2$s</item>
         <item quantity="other">%1$d kopya · %2$s</item>
+    </plurals>
+    <string name="plan_suggest_title">Önerim: bunlara büyük ihtimalle ihtiyacın yok</string>
+    <string name="plan_suggest_action">%1$s çöpe taşı</string>
+    <string name="plan_suggest_see">Dosyaları gör</string>
+    <string name="plan_ask_title">Bunları sana soracağım</string>
+    <string name="tool_select_suggested">Önerilenleri seç</string>
+    <string name="tool_other_header">Diğer dosyalar · %1$d</string>
+    <string name="tool_total_note">%1$s içinden</string>
+    <string name="tool_no_suggestion">Burada silmeni önereceğim bir şey yok.</string>
+    <string name="trash_empty_hint">Sildiklerin 7 gün burada bekler.</string>
+    <string name="tool_storage">Depolama</string>
+    <string name="result_cache_cleared">önbellek temizlendi</string>
+    <plurals name="tool_suggest_header">
+        <item quantity="one">Önerim · %1$d dosya · %2$s</item>
+        <item quantity="other">Önerim · %1$d dosya · %2$s</item>
+    </plurals>
+    <plurals name="plan_camera_videos">
+        <item quantity="one">%1$d video · kameradan</item>
+        <item quantity="other">%1$d video · kameradan</item>
+    </plurals>
+    <plurals name="plan_camera_files">
+        <item quantity="one">%1$d dosya · kameradan</item>
+        <item quantity="other">%1$d dosya · kameradan</item>
     </plurals>
 </resources>

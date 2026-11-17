@@ -17,7 +17,7 @@
     <string name="cache_own_app_subtitle">%1$s can be removed directly and safely</string>
     <string name="scan_focus_smart">Smart clean result</string>
     <string name="scan_focus_junk">Junk Cleaner</string>
-    <string name="scan_focus_duplicates">Duplicate Cleaner</string>
+    <string name="scan_focus_duplicates">Duplicates</string>
     <string name="scan_focus_large">Large Files</string>
     <string name="language_settings">App language</string>
     <string name="ad_privacy_preferences">Ad privacy preferences</string>
@@ -332,12 +332,9 @@
     <string name="cache_modern_safety_note">Smart Cleaner measures cache reported by Android. It does not silently delete another app’s private files; individual cleanup is completed from Android’s official app screen.</string>
 
     <string name="cleanup_result_system_cache_title">Android cache cleanup completed</string>
-    <string name="cleanup_result_system_cache_reduced">measured cache reduction</string>
     <string name="cleanup_result_system_cache_unmeasured">Android completed the cache cleanup. A reliable byte reduction was not available on this device.</string>
-    <string name="cleanup_result_system_cache_note">Cache reduction is measured from Android storage statistics before and after the system cleanup. If Android does not expose a reliable delta, no reclaimed-space number is invented.</string>
 
     <string name="cleanup_result_app_cache_title">%1$s cache cleaned</string>
-    <string name="cleanup_result_app_cache_note">The displayed reduction is based on cache actually cleared or measured before and after the Android cache action.</string>
     <string name="message_individual_cache_no_change">No measurable cache reduction was detected after returning from Android settings.</string>
     <string name="permissions_review_status">Review</string>
     <string name="permissions_manage_android">Manage in Android</string>
@@ -412,14 +409,14 @@
     <string name="feedback_open_email">Open email app</string>
     <string name="feedback_address_copied">Address copied</string>
     <string name="plan_group_apk_installed">Installers for apps you already have</string>
-    <string name="plan_group_duplicate_safe">Extra copies</string>
+    <string name="plan_group_duplicate_safe">Duplicates</string>
     <string name="plan_group_thumbnails">Preview cache</string>
     <string name="plan_group_temp_files">Leftover temporary files</string>
     <string name="plan_group_partial_downloads">Unfinished downloads</string>
     <string name="plan_group_apk_old_version">Older installer versions</string>
     <string name="plan_group_apk_other">Other installers</string>
-    <string name="plan_group_duplicate_personal">Copies of your files</string>
-    <string name="plan_group_duplicate_unverified">Files that look identical</string>
+    <string name="plan_group_duplicate_personal">Duplicates</string>
+    <string name="plan_group_duplicate_unverified">Possible duplicates</string>
     <string name="plan_group_large_video">Large old videos</string>
     <string name="plan_group_screen_recording">Screen recordings</string>
     <string name="plan_group_screenshot">Old screenshots</string>
@@ -505,10 +502,10 @@
         <item quantity="other">%1$d reviewed · %2$s marked</item>
     </plurals>
     <string name="deep_check_action">Watch and verify</string>
-    <string name="deep_check_running">Checking large look-alike files…</string>
+    <string name="deep_check_running">Checking possible duplicates…</string>
     <plurals name="deep_check_row">
-        <item quantity="one">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
-        <item quantity="other">Large files that look identical: %1$d · up to %2$s. Watch a short video to verify them.</item>
+        <item quantity="one">Possible duplicates: %1$d · up to %2$s. Watch a short video to verify them.</item>
+        <item quantity="other">Possible duplicates: %1$d · up to %2$s. Watch a short video to verify them.</item>
     </plurals>
     <plurals name="trash_full_body">
         <item quantity="one">%1$d file couldn’t be moved to Trash, possibly because storage is full. Delete it permanently instead? This can’t be undone.</item>
@@ -545,10 +542,6 @@
     <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
     <string name="result_next_group">Next: %1$s · %2$s</string>
     <string name="result_review_next">Review</string>
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="one">%1$d file from your camera needs a one-by-one look</item>
-        <item quantity="other">%1$d files from your camera need a one-by-one look</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="one">%1$d file is from your camera. Cloud backup isn’t checked.</item>
         <item quantity="other">%1$d files are from your camera. Cloud backup isn’t checked.</item>
@@ -644,5 +637,28 @@
     <plurals name="premium_duplicate_copies">
         <item quantity="one">%1$d copy · %2$s</item>
         <item quantity="other">%1$d copies · %2$s</item>
+    </plurals>
+    <string name="plan_suggest_title">My pick: you likely don\'t need these</string>
+    <string name="plan_suggest_action">Move %1$s to Trash</string>
+    <string name="plan_suggest_see">See files</string>
+    <string name="plan_ask_title">I\'ll ask you about these</string>
+    <string name="tool_select_suggested">Select my picks</string>
+    <string name="tool_other_header">Other files · %1$d</string>
+    <string name="tool_total_note">out of %1$s</string>
+    <string name="tool_no_suggestion">Nothing I\'d delete here.</string>
+    <string name="trash_empty_hint">Deleted files wait here for 7 days.</string>
+    <string name="tool_storage">Storage</string>
+    <string name="result_cache_cleared">of cache cleared</string>
+    <plurals name="tool_suggest_header">
+        <item quantity="one">My pick · %1$d file · %2$s</item>
+        <item quantity="other">My pick · %1$d files · %2$s</item>
+    </plurals>
+    <plurals name="plan_camera_videos">
+        <item quantity="one">%1$d video · from Camera</item>
+        <item quantity="other">%1$d videos · from Camera</item>
+    </plurals>
+    <plurals name="plan_camera_files">
+        <item quantity="one">%1$d file · from Camera</item>
+        <item quantity="other">%1$d files · from Camera</item>
     </plurals>
 </resources>

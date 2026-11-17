@@ -15,16 +15,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Screenshot
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
-import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -42,8 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
-import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.model.ToolSuggestion
+import com.mrzekai.depoakilli.model.SuggestionTool
 import com.mrzekai.depoakilli.ui.common.BlackCard
 import com.mrzekai.depoakilli.ui.common.IconChip
 import com.mrzekai.depoakilli.ui.common.PageFrame
@@ -73,9 +70,10 @@ private data class ToolTile(
 )
 
 /**
- * Tools (T5.7) on Lime: the 44 sp title and a two-column grid of 92 dp black
- * tiles — Lime icon top left, Lime size top right when it is known (never a
- * made-up "0"), the name below. No subtitles or section descriptions.
+ * Tools (T5.7, Faz 5C C4) on Lime: the 44 sp title and six black tiles in a
+ * 3 × 2 grid. A tile's Lime number is the suggested amount from
+ * [ToolSuggestion] — the same call the tool screen makes (C1). Totals that are
+ * not suggestions (apps, storage) are not shown as a Lime number.
  */
 @Composable
 internal fun DeviceCenterScreen(
@@ -83,55 +81,35 @@ internal fun DeviceCenterScreen(
     onScan: (ScanFocus) -> Unit,
     onRequestAllFilesAccess: () -> Unit,
     onOpenWhatsApp: () -> Unit,
-    onOpenCache: () -> Unit,
     onOpenAppManager: () -> Unit,
-    onOpenStorageChange: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val known = state.dashboardSnapshotAtMillis > 0L
-    fun category(category: CleanCategory): Long? =
-        if (known) state.dashboardCategoryBytes[category]?.takeIf { it > 0L } else null
-    val usedBytes = (state.storage.totalBytes - state.storage.availableBytes).takeIf { state.storage.totalBytes > 0L }
+    val smartPlan = state.smartSummary()?.plan
+    fun suggested(tool: SuggestionTool): Long? =
+        smartPlan?.let { ToolSuggestion.suggestedBytes(tool, it) }?.takeIf { it > 0L }
     val tiles = listOf(
-        ToolTile(stringResource(R.string.category_large_files), Icons.Outlined.VideoFile, category(CleanCategory.LARGE_FILE), stringResource(R.string.large_files_tool_subtitle_v050)) {
+        ToolTile(stringResource(R.string.category_large_files), Icons.Outlined.VideoFile, suggested(SuggestionTool.LARGE_FILES), stringResource(R.string.large_files_tool_subtitle_v050)) {
             onScan(ScanFocus.LARGE_FILES)
         },
-        ToolTile(stringResource(R.string.category_whatsapp), Icons.Outlined.Chat, category(CleanCategory.WHATSAPP_MEDIA), stringResource(R.string.whatsapp_cleaner_subtitle_v050), onOpenWhatsApp),
-        ToolTile(stringResource(R.string.scan_focus_downloads), Icons.Outlined.Download, category(CleanCategory.OLD_DOWNLOAD), stringResource(R.string.tools_downloads_subtitle)) {
+        ToolTile(stringResource(R.string.scan_focus_downloads), Icons.Outlined.Download, suggested(SuggestionTool.DOWNLOADS), stringResource(R.string.tools_downloads_subtitle) + " " + stringResource(R.string.tools_apk_subtitle)) {
             onScan(ScanFocus.DOWNLOADS)
         },
-        ToolTile(
-            stringResource(R.string.tool_app_cache),
-            Icons.Outlined.CleaningServices,
-            state.appCache.totalCacheBytes.takeIf { state.appCache.accessGranted && it > 0L },
-            stringResource(R.string.cache_manager_subtitle),
-            onOpenCache,
-        ),
-        ToolTile(stringResource(R.string.category_screenshots), Icons.Outlined.Screenshot, category(CleanCategory.SCREENSHOT), stringResource(R.string.screenshots_tool_subtitle)) {
-            onScan(ScanFocus.SCREENSHOTS)
-        },
-        ToolTile(stringResource(R.string.category_duplicates), Icons.Outlined.ContentCopy, category(CleanCategory.DUPLICATE), stringResource(R.string.duplicates_tool_subtitle_v050)) {
+        ToolTile(stringResource(R.string.category_whatsapp), Icons.Outlined.Chat, suggested(SuggestionTool.WHATSAPP), stringResource(R.string.whatsapp_cleaner_subtitle_v050), onOpenWhatsApp),
+        ToolTile(stringResource(R.string.category_duplicates), Icons.Outlined.ContentCopy, suggested(SuggestionTool.DUPLICATES), stringResource(R.string.duplicates_tool_subtitle_v050)) {
             onScan(ScanFocus.DUPLICATES)
         },
-        ToolTile(stringResource(R.string.category_apk_packages), Icons.Outlined.Android, category(CleanCategory.APK_PACKAGE), stringResource(R.string.tools_apk_subtitle)) {
-            onScan(ScanFocus.APKS)
-        },
-        ToolTile(
-            stringResource(R.string.home_hard_apps),
-            Icons.Outlined.Apps,
-            state.installedApps.filterNot { it.systemApp }.sumOf { it.totalBytes }.takeIf { state.hasUsageAccess && it > 0L },
-            stringResource(R.string.app_manager_subtitle),
-            onOpenAppManager,
-        ),
-        ToolTile(stringResource(R.string.storage_analyzer_title), Icons.Outlined.Storage, usedBytes, stringResource(R.string.storage_analyzer_subtitle)) {
+        // Apps and app cache share one screen with two tabs (C4).
+        ToolTile(stringResource(R.string.home_hard_apps), Icons.Outlined.Apps, null, stringResource(R.string.app_manager_subtitle) + " " + stringResource(R.string.cache_manager_subtitle), onOpenAppManager),
+        // Storage Analyzer and Storage change share one screen with two tabs (C4).
+        ToolTile(stringResource(R.string.tool_storage), Icons.Outlined.Storage, null, stringResource(R.string.storage_analyzer_subtitle) + " " + stringResource(R.string.tools_storage_change_subtitle)) {
             onScan(ScanFocus.ANALYZE)
         },
-        ToolTile(stringResource(R.string.storage_change_title), Icons.Outlined.Timeline, null, stringResource(R.string.tools_storage_change_subtitle), onOpenStorageChange),
     )
     PageFrame(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 20.dp),
+            // C4: the last row ends above the banner and the menu, never under them.
+            contentPadding = PaddingValues(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             item(key = "tools-title") {

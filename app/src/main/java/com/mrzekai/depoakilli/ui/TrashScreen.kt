@@ -48,6 +48,7 @@ import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
@@ -90,14 +91,26 @@ internal fun TrashScreen(
     PageFrame(modifier = modifier) {
         if (entries.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-                Text(
-                    stringResource(R.string.trash_empty_state),
-                    color = Ink,
-                    fontSize = 26.sp,
-                    lineHeight = 32.sp,
-                    fontWeight = AppWeights.Giant,
-                    textAlign = TextAlign.Center,
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        stringResource(R.string.trash_empty_state),
+                        color = Ink,
+                        fontSize = 26.sp,
+                        lineHeight = 32.sp,
+                        fontWeight = AppWeights.Giant,
+                        textAlign = TextAlign.Center,
+                    )
+                    // C6: one line on what Trash is for.
+                    Text(
+                        stringResource(R.string.trash_empty_hint),
+                        color = InkSoft,
+                        fontSize = 15.sp,
+                        lineHeight = 21.sp,
+                        fontWeight = AppWeights.Strong,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
             }
             return@PageFrame
         }

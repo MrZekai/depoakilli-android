@@ -13,6 +13,31 @@ fun CleanableItem.isBulkSelectable(): Boolean =
     assessment.group.groupSelectable &&
         (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath))
 
+/**
+ * Faz 5C tier 2 ("My pick"): a review file of a suggested group that is not
+ * in the camera folder. Kept files and excluded folders never reach the plan
+ * (UserChoiceFilter), so they are never suggested either.
+ */
+fun CleanableItem.isSuggestedPick(): Boolean =
+    !assessment.group.auto &&
+        assessment.group.suggested &&
+        !StoragePathRules.isCameraPath(relativePath)
+
+/** Tier 3 ("I'll ask you"): a review file the user decides on one by one. */
+fun CleanableItem.isAskTier(): Boolean = !assessment.group.auto && !isSuggestedPick()
+
+/** Files of a findings row in the swipe review: tier 3 only, biggest first (C2, C5). */
+fun swipeItemsFor(group: CleanupGroup, items: List<CleanableItem>): List<CleanableItem> =
+    items.filter { it.assessment.group.rowGroup == group && it.isAskTier() }
+        .sortedByDescending(CleanableItem::sizeBytes)
+
+/**
+ * The findings row a group is listed under (C5): "Old videos" and "Large old
+ * videos" are one row; the swipe review shows both, biggest first.
+ */
+val CleanupGroup.rowGroup: CleanupGroup
+    get() = if (this == CleanupGroup.LARGE_VIDEO) CleanupGroup.OLD_VIDEO else this
+
 data class PlanGroup(
     val group: CleanupGroup?,
     val items: List<CleanableItem>,
@@ -66,6 +91,39 @@ data class CleanupPlan(
     val selectedGroupCount: Int get() = allRows.count { it.selectedBytes > 0L || it.selectedCount > 0 }
     val selectedItems: List<CleanableItem> get() = allRows.flatMap { row -> row.items.filter(CleanableItem::selected) }
     val isAlreadyTidy: Boolean get() = potentialBytes < CleaningThresholds.PLAN_MIN_BYTES
+
+    /** Tier 1 files (preselected Auto groups), listed or not. */
+    val autoItems: List<CleanableItem> get() = autoRows.flatMap(PlanGroup::items)
+
+    /** Tier 2 ("My pick", C2): suggested together, confirmed once, always to Trash. */
+    val suggestedItems: List<CleanableItem>
+        get() = reviewRows.flatMap(PlanGroup::items).filter(CleanableItem::isSuggestedPick)
+    val suggestedBytes: Long get() = suggestedItems.sumOf(CleanableItem::sizeBytes)
+
+    /**
+     * Tier 3 ("I'll ask you", C2): the review rows without the suggested files,
+     * with "Old videos" and "Large old videos" in one row (C5), biggest first.
+     */
+    val askRows: List<PlanGroup>
+        get() {
+            val groupRows = reviewRows.filterNot(PlanGroup::smallReview)
+                .flatMap(PlanGroup::items)
+                .filter(CleanableItem::isAskTier)
+                .groupBy { it.assessment.group.rowGroup }
+                .map { (group, items) -> planGroup(group, items) }
+            val small = smallReview?.let { row ->
+                row.items.filter(CleanableItem::isAskTier).takeIf { it.isNotEmpty() }?.let { items ->
+                    val sorted = items.sortedByDescending(CleanableItem::sizeBytes)
+                    row.copy(
+                        items = sorted,
+                        bytes = sorted.sumOf(CleanableItem::sizeBytes),
+                        selectedBytes = sorted.filter(CleanableItem::selected).sumOf(CleanableItem::sizeBytes),
+                    )
+                }
+            }
+            return (groupRows + listOfNotNull(small)).sortedByDescending(PlanGroup::bytes)
+        }
+    val askBytes: Long get() = askRows.sumOf(PlanGroup::bytes)
 }
 
 /**
@@ -116,7 +174,7 @@ fun buildPlan(items: List<CleanableItem>, truncated: Boolean = false): CleanupPl
     )
 }
 
-private fun planGroup(group: CleanupGroup, items: List<CleanableItem>): PlanGroup {
+internal fun planGroup(group: CleanupGroup, items: List<CleanableItem>): PlanGroup {
     val sorted = items.sortedByDescending(CleanableItem::sizeBytes)
     return PlanGroup(
         group = group,
