@@ -375,11 +375,21 @@ class DeviceRepository(
             .toList()
         // V10/V11: the user's "keep" decisions and excluded folders apply to
         // review groups only; records of files that are gone are dropped.
+        // Tool screens list everything without a "hidden" note, so the filter
+        // applies to the Smart/Deep plan only.
+        val planScan = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
         val keptKeys = keptItems.keys()
-        if (keptKeys.isNotEmpty() && (focus == ScanFocus.SMART || focus == ScanFocus.DEEP)) {
-            keptItems.retainOnly(indexed.asSequence().map(KeptItemsStore::keyOf).filter(keptKeys::contains).toHashSet())
+        if (keptKeys.isNotEmpty() && planScan) {
+            keptItems.retainOnly(
+                existing = indexed.asSequence().map(KeptItemsStore::keyOf).filter(keptKeys::contains).toHashSet(),
+                scannedVolumes = indexed.mapTo(hashSetOf(), IndexedFile::volumeRoot),
+            )
         }
-        val userChoices = UserChoiceFilter.apply(ranked, keptItems.keys(), excludedFolders.folders())
+        val userChoices = if (planScan) {
+            UserChoiceFilter.apply(ranked, keptItems.keys(), excludedFolders.folders())
+        } else {
+            UserChoiceFilter.Result(ranked, 0, 0)
+        }
         val chosen = userChoices.items
         val truncated = chosen.size > CleaningThresholds.MAX_RESULT_ITEMS
         val storageListFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)

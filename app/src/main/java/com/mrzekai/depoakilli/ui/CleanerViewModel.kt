@@ -232,6 +232,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
      */
     fun excludeFolder(volumeRoot: String, relativePath: String) {
         val folder = ExcludedFolder(volumeRoot, ExcludedFolder.normalize(relativePath))
+        // A file at the volume root has no folder to exclude; the button is hidden there too.
+        if (!folder.isValid) return
         viewModelScope.launch {
             val added = withContext(Dispatchers.IO) { repository.excludeFolder(folder) }
             if (!added) {

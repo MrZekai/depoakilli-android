@@ -6,11 +6,14 @@ import android.content.Context
 data class ExcludedFolder(val volumeRoot: String, val relativePath: String) {
     val name: String get() = relativePath.substringAfterLast('/').ifBlank { "/" }
 
+    /** A volume root is never a valid exclusion: it would hide every suggestion. */
+    val isValid: Boolean get() = normalize(relativePath).isNotEmpty()
+
     /** True for files in this folder or below it, on the same volume. */
     fun contains(fileVolumeRoot: String, fileRelativePath: String): Boolean {
-        if (fileVolumeRoot != volumeRoot) return false
+        if (!isValid || fileVolumeRoot != volumeRoot) return false
         val path = normalize(fileRelativePath)
-        return relativePath.isEmpty() || path == relativePath || path.startsWith("$relativePath/")
+        return path == relativePath || path.startsWith("$relativePath/")
     }
 
     companion object {
@@ -31,9 +34,10 @@ class ExcludedFoldersStore(
 
     fun folders(): List<ExcludedFolder> = synchronized(lock) { read() }
 
-    /** False when the list is full. */
+    /** False when the list is full or the folder is a volume root. */
     fun add(folder: ExcludedFolder): Boolean = synchronized(lock) {
         val clean = folder.copy(relativePath = ExcludedFolder.normalize(folder.relativePath))
+        if (!clean.isValid) return@synchronized false
         val list = read()
         if (clean in list) return@synchronized true
         if (list.size >= MAX_FOLDERS) return@synchronized false
@@ -49,6 +53,7 @@ class ExcludedFoldersStore(
             val tab = line.indexOf('\t')
             if (tab < 0) null else ExcludedFolder(line.substring(0, tab), line.substring(tab + 1))
         }
+        .filter(ExcludedFolder::isValid)
         .distinct()
         .toList()
 

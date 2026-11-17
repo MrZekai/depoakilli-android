@@ -20,6 +20,17 @@ class ExcludedFoldersStoreTest {
     }
 
     @Test
+    fun `a volume root is never stored and never matches`() {
+        assertFalse(store.add(ExcludedFolder("/v", "")))
+        assertFalse(store.add(ExcludedFolder("/v", "/")))
+        assertTrue(store.folders().isEmpty())
+        assertFalse(ExcludedFolder("/v", "").contains("/v", "DCIM/Camera"))
+        // A damaged record with an empty path is ignored on read.
+        stored = "/v\t\n/v\tPictures"
+        assertTrue(store.folders() == listOf(ExcludedFolder("/v", "Pictures")))
+    }
+
+    @Test
     fun `add remove duplicates and the fifty folder limit`() {
         assertTrue(store.add(ExcludedFolder("/v", "/A/")))
         assertTrue(store.add(ExcludedFolder("/v", "A")))

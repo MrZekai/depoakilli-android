@@ -36,8 +36,12 @@ class KeptItemsStoreTest {
         val after = KeptItemsStore.keyOf("/v", "DCIM/Camera", "a.mp4", 100, 6)
         store.add(before)
         assertFalse(after in store.keys())
-        store.add("gone")
-        store.retainOnly(setOf(before))
-        assertEquals(setOf(before), store.keys())
+        val gone = KeptItemsStore.keyOf("/v", "Movies", "gone.mp4", 1, 1)
+        val sdCard = KeptItemsStore.keyOf("/sd", "Movies", "card.mp4", 1, 1)
+        store.add(gone)
+        store.add(sdCard)
+        // The SD card was not inserted during this scan: its decision stays.
+        store.retainOnly(setOf(before), scannedVolumes = setOf("/v"))
+        assertEquals(setOf(before, sdCard), store.keys())
     }
 }

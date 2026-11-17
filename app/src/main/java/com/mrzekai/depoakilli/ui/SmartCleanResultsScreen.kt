@@ -655,7 +655,7 @@ private fun SmartResultsContent(
                     reason = assessmentReason(item.assessment),
                     onToggleSelection = { onToggleItem(item.id) },
                     onDismiss = { previewItemId = null },
-                    onExcludeFolder = if (item.assessment.group.auto) {
+                    onExcludeFolder = if (item.assessment.group.auto || !canExcludeFolder(item.relativePath)) {
                         null
                     } else {
                         {
@@ -691,9 +691,13 @@ private fun SmartResultsContent(
                     reason = stringResource(R.string.storage_review_manual_reason),
                     onToggleSelection = { onToggleStorageReviewItem(item.id) },
                     onDismiss = { previewStorageItemId = null },
-                    onExcludeFolder = {
-                        previewStorageItemId = null
-                        onExcludeFolder(item.file.volumeRoot, item.file.relativePath)
+                    onExcludeFolder = if (canExcludeFolder(item.file.relativePath)) {
+                        {
+                            previewStorageItemId = null
+                            onExcludeFolder(item.file.volumeRoot, item.file.relativePath)
+                        }
+                    } else {
+                        null
                     },
                 )
             }
@@ -786,7 +790,7 @@ private fun SmartResultsContent(
                 reason = assessmentReason(item.assessment),
                 onToggleSelection = { onToggleItem(item.id) },
                 onDismiss = { previewItemId = null },
-                onExcludeFolder = if (item.assessment.group.auto) {
+                onExcludeFolder = if (item.assessment.group.auto || !canExcludeFolder(item.relativePath)) {
                     null
                 } else {
                     {
@@ -2042,3 +2046,7 @@ internal fun largestUserApps(apps: List<InstalledAppEntry>, limit: Int = 5): Lis
         .sortedByDescending(InstalledAppEntry::totalBytes)
         .take(limit)
         .toList()
+
+/** Files at the volume root have no folder to exclude (V11). */
+private fun canExcludeFolder(relativePath: String): Boolean =
+    com.mrzekai.depoakilli.data.ExcludedFolder.normalize(relativePath).isNotEmpty()

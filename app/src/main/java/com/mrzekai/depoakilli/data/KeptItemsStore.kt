@@ -38,10 +38,17 @@ class KeptItemsStore(
 
     fun clear() = synchronized(lock) { write(LinkedHashMap()) }
 
-    /** Drops records of files that are no longer on disk (or changed). */
-    fun retainOnly(existing: Set<String>) = synchronized(lock) {
+    /**
+     * Drops records of files that are no longer on disk (or changed), but only
+     * on the volumes this scan saw: decisions on an SD card that is not
+     * inserted right now are kept.
+     */
+    fun retainOnly(existing: Set<String>, scannedVolumes: Set<String>) = synchronized(lock) {
         val entries = read()
-        if (entries.keys.retainAll(existing)) write(entries)
+        val removed = entries.keys.removeAll { key ->
+            key !in existing && key.substringBefore('|') in scannedVolumes
+        }
+        if (removed) write(entries)
     }
 
     private fun read(): LinkedHashMap<String, Long> {
