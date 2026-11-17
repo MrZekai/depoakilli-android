@@ -17,6 +17,14 @@ errors: list[str] = []
 J = "app/src/main/java/com/mrzekai/depoakilli/"
 SPLIT_SOURCES = {
     J + "ui/WhatsAppCleanerScreen.kt": [J + "ui/whatsapp/"],
+    J + "ui/PremiumCleanerToolScreen.kt": [J + "ui/tools/"],
+    J + "ui/SmartCleanResultsScreen.kt": [
+        J + "ui/smart/SmartScanStates.kt",
+        J + "ui/smart/UnusedAppsSection.kt",
+        J + "ui/smart/CategoryDetailPage.kt",
+        J + "ui/smart/StorageDetailPage.kt",
+        J + "ui/smart/SmartFilePreview.kt",
+    ],
 }
 
 
