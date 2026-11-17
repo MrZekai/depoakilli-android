@@ -676,4 +676,5 @@
         <item quantity="many">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
         <item quantity="other">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
     </plurals>
+    <string name="plan_group_old_video">Video meno recenti</string>
 </resources>

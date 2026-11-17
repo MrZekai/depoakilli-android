@@ -13,6 +13,8 @@ object CleaningThresholds {
     const val PLAN_MIN_BYTES = 100L * MB
     const val LARGE_BYTES = 100L * MB
     const val LARGE_VIDEO_DAYS = 90L
+    const val OLD_VIDEO_BYTES = 20L * MB
+    const val OLD_VIDEO_DAYS = 180L
     const val SCREEN_RECORDING_DAYS = 30L
     const val SCREENSHOT_DAYS = 30L
     const val DOWNLOAD_DAYS = 90L

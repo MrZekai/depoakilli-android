@@ -114,6 +114,15 @@ class AiCleaningEngine(
             return assessment(CleanupGroup.LARGE_VIDEO, ageDays)
         }
 
+        // 9b. Older mid-size videos (V3); WhatsApp returned above.
+        if (
+            isVideo &&
+            file.sizeBytes >= CleaningThresholds.OLD_VIDEO_BYTES &&
+            ageDays >= CleaningThresholds.OLD_VIDEO_DAYS
+        ) {
+            return assessment(CleanupGroup.OLD_VIDEO, ageDays)
+        }
+
         // 10. Old downloads.
         if (StoragePathRules.isDownloadPath(file.relativePath) && ageDays >= CleaningThresholds.DOWNLOAD_DAYS) {
             val extension = name.substringAfterLast('.', "")
@@ -343,6 +352,7 @@ class AiCleaningEngine(
             CleanupGroup.DUPLICATE_PERSONAL,
             CleanupGroup.DUPLICATE_UNVERIFIED -> CleanCategory.DUPLICATE
             CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.OLD_VIDEO,
             CleanupGroup.SCREEN_RECORDING,
             CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
             CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT

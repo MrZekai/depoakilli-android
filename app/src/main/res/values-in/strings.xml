@@ -594,4 +594,5 @@
     <plurals name="reason_whatsapp_old">
         <item quantity="other">Berusia %1$d hari. Jika dihapus, file tidak akan terbuka di chat.</item>
     </plurals>
+    <string name="plan_group_old_video">Video lama</string>
 </resources>

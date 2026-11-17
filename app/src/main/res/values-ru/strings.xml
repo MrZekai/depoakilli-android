@@ -721,4 +721,5 @@
         <item quantity="many">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
         <item quantity="other">Возраст (дней): %1$d. Если удалить файл, он не откроется в чате.</item>
     </plurals>
+    <string name="plan_group_old_video">Старые видео</string>
 </resources>

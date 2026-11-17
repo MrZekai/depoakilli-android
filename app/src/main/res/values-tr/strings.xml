@@ -646,4 +646,5 @@
         <item quantity="one">%1$d günlük. Silersen sohbette açılmaz.</item>
         <item quantity="other">%1$d günlük. Silersen sohbette açılmaz.</item>
     </plurals>
+    <string name="plan_group_old_video">Eski videolar</string>
 </resources>

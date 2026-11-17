@@ -55,6 +55,17 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `older mid-size videos are offered after large old videos`() {
+        val cam = "DCIM/Camera/"
+        assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 200, cam, 40 * mb)))
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(file("v.mp4", "video/mp4", 100, cam, 150 * mb)))
+        assertNull(group(file("v.mp4", "video/mp4", 179, cam, 40 * mb)))
+        assertNull(group(file("v.mp4", "video/mp4", 200, cam, 20 * mb - 1)))
+        assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 180, cam, 20 * mb)))
+        assertFalse(CleanupGroup.OLD_VIDEO.auto)
+    }
+
+    @Test
     fun `older whatsapp media groups use their age thresholds`() {
         val wa = "Android/media/com.whatsapp/WhatsApp/Media/"
         assertNull(group(file("v.mp4", "video/mp4", 89, wa + "WhatsApp Video/", 5 * mb)))

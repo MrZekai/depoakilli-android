@@ -646,4 +646,5 @@
         <item quantity="one">%1$d day old. If you delete it, it won’t open in the chat.</item>
         <item quantity="other">%1$d days old. If you delete it, it won’t open in the chat.</item>
     </plurals>
+    <string name="plan_group_old_video">Older videos</string>
 </resources>

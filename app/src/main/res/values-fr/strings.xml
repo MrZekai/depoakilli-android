@@ -676,4 +676,5 @@
         <item quantity="many">Date de %1$d jours. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
         <item quantity="other">Date de %1$d jours. Si vous le supprimez, il ne s’ouvrira plus dans la discussion.</item>
     </plurals>
+    <string name="plan_group_old_video">Anciennes vidéos</string>
 </resources>

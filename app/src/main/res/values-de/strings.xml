@@ -634,4 +634,5 @@
         <item quantity="one">%1$d Tag alt. Wenn Sie es löschen, lässt es sich im Chat nicht mehr öffnen.</item>
         <item quantity="other">%1$d Tage alt. Wenn Sie es löschen, lässt es sich im Chat nicht mehr öffnen.</item>
     </plurals>
+    <string name="plan_group_old_video">Ältere Videos</string>
 </resources>

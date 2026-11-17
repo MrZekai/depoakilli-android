@@ -1171,6 +1171,7 @@ class DeviceRepository(
             CleanupGroup.PARTIAL_DOWNLOADS,
             CleanupGroup.TEMP_FILES,
             CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.OLD_VIDEO,
             CleanupGroup.LARGE_OTHER,
         )
         private val ARCHIVE_EXTENSIONS = setOf("zip", "rar", "7z", "tar", "gz", "bz2", "xz")

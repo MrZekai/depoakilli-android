@@ -810,4 +810,5 @@
         <item quantity="many">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
         <item quantity="other">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
     </plurals>
+    <string name="plan_group_old_video">مقاطع فيديو أقدم</string>
 </resources>

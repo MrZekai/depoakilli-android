@@ -646,4 +646,5 @@
         <item quantity="one">Tiene %1$d día. Si lo eliminas, no se abrirá en el chat.</item>
         <item quantity="other">Tiene %1$d días. Si lo eliminas, no se abrirá en el chat.</item>
     </plurals>
+    <string name="plan_group_old_video">Vídeos antiguos</string>
 </resources>
