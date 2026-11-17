@@ -5,7 +5,15 @@ import org.junit.Test
 
 class ContrastTest {
     @Test
-    fun `dark text on every bright and destructive action background meets WCAG AA`() {
+    fun `every Faz 5 text and background pair meets WCAG AA`() {
+        ContrastTokens.DesignPairs.forEach { (text, background) ->
+            val ratio = ContrastTokens.contrastRatio(text, background)
+            assertTrue("ratio $ratio for $text on $background", ratio >= 4.5)
+        }
+    }
+
+    @Test
+    fun `dark text on every bright action background meets WCAG AA`() {
         ContrastTokens.BrightActionBackgrounds.forEach { background ->
             val ratio = ContrastTokens.contrastRatio(ContrastTokens.OnBrightAction, background)
             assertTrue("ratio $ratio for $background", ratio >= 4.5)
@@ -13,11 +21,7 @@ class ContrastTest {
     }
 
     @Test
-    fun `white text on the dark app background meets WCAG AA`() {
-        val ratio = ContrastTokens.contrastRatio(
-            androidx.compose.ui.graphics.Color.White,
-            androidx.compose.ui.graphics.Color(0xFF030A1D),
-        )
-        assertTrue(ratio >= 4.5)
+    fun `the six pairs of the design are all checked`() {
+        assertTrue(ContrastTokens.DesignPairs.size == 6)
     }
 }

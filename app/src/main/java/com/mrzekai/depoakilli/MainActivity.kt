@@ -89,10 +89,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // The UI is always dark, so both system bars use light icons on a
-        // transparent bar regardless of the device's light/dark setting.
-        val darkBars = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-        enableEdgeToEdge(statusBarStyle = darkBars, navigationBarStyle = darkBars)
+        // Faz 5: one theme regardless of the device's light/dark setting.
+        // Lime screens use dark status-bar icons; the black bottom menu uses
+        // light navigation icons. Screens adjust them with SystemBarIcons.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+        )
         // Phones stay portrait; tablets, foldables and desktop windows are
         // free to rotate and resize (Play large-screen quality guideline).
         if (resources.configuration.smallestScreenWidthDp < 600) {
@@ -155,6 +158,7 @@ class MainActivity : ComponentActivity() {
                         onCleanupResultDismissed = ::onCleanupResultDismissed,
                         onCleanupSucceeded = ::onCleanupSucceeded,
                         onReturnedToClean = ::onReturnedToClean,
+                        onNaturalBreak = ::onNaturalBreak,
                         onDeepDuplicateCheck = ::runDeepDuplicateCheck,
                         onUninstallApp = ::uninstallApp,
                         onOpenAppInfo = ::openAppInfo,
@@ -282,6 +286,12 @@ class MainActivity : ComponentActivity() {
     private fun onReturnedToClean(dwellMillis: Long) {
         if (reviewPromptInFlight) return
         showPostTaskInterstitial(trigger = InterstitialTrigger.RETURN_TO_CLEAN, dwellMillis = dwellMillis)
+    }
+
+    /** Faz 5 triggers: findings opened after a scan, swipe review confirmed. Same AdPolicy limits. */
+    private fun onNaturalBreak(trigger: InterstitialTrigger) {
+        if (reviewPromptInFlight) return
+        showPostTaskInterstitial(trigger = trigger)
     }
 
     private fun maybeAskForReview() {

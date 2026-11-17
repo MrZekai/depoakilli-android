@@ -1,11 +1,8 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -16,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,20 +26,20 @@ import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewSummary
+import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
 import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import com.mrzekai.depoakilli.ui.smart.*
-import com.mrzekai.depoakilli.ui.smart.PlanBottomBar
-import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
 
-internal val SmartBackground = Color(0xFF030B20)
-internal val SmartCard = Color(0xFF0A1C42)
-internal val SmartCardAlt = Color(0xFF0D2450)
-internal val SmartTextSecondary = Color(0xFFB4C4DF)
-internal val SmartCyan = Color(0xFF16C7FF)
-internal val SmartGreen = Color(0xFF28E58A)
+/** Faz 5 palette for the smart screens: Lime page, black cards, Lime accent. */
+internal val SmartBackground = com.mrzekai.depoakilli.ui.theme.Lime
+internal val SmartCard = com.mrzekai.depoakilli.ui.theme.Black
+internal val SmartCardAlt = com.mrzekai.depoakilli.ui.theme.BlackChip
+internal val SmartTextSecondary = com.mrzekai.depoakilli.ui.theme.OnBlackSoft
+internal val SmartCyan = com.mrzekai.depoakilli.ui.theme.Lime
+internal val SmartGreen = com.mrzekai.depoakilli.ui.theme.Lime
 
 internal data class SmartPreviewFile(
     val uri: String,
@@ -118,6 +114,7 @@ internal fun SmartCleanResultsScreen(
     onOpenFolder: (FolderSize) -> Unit = {},
     onOpenAppInfo: (String) -> Unit = {},
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit = { _, _ -> },
+    onCloseSwipe: () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -135,6 +132,8 @@ internal fun SmartCleanResultsScreen(
                 onSwipeFinished()
             },
             modifier = modifier,
+            groupTitle = stringResource(swipeGroup.titleRes),
+            onClose = onCloseSwipe,
             breakCardContent = listAd,
         )
         return
@@ -229,7 +228,6 @@ internal fun SmartResultsContent(
     onOpenAppInfo: (String) -> Unit,
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit,
 ) {
-    var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
     var showUnusedAppsReview by remember { mutableStateOf(false) }
@@ -322,35 +320,17 @@ internal fun SmartResultsContent(
 
     val plan = summary.plan
     val deepCheck = remember(summary.items) { PlanSelection.deepCheckCandidates(summary.items) }
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF02081A), Color(0xFF05142E), Color(0xFF030A1E)),
-                ),
-            ),
-    ) {
+    PageFrame(modifier = modifier) {
         LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(start = 14.dp, top = 14.dp, end = 14.dp, bottom = 18.dp),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             planHeader(this)
             cleanupPlanItems(
                 plan = plan,
                 appCacheBytes = appCacheBytes,
-                unusedAppCount = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps.size else null,
-                cleanupInProgress = cleanupInProgress,
-                onCleanRecommended = { if (!cleanupInProgress) showPreviewSheet = true },
-                onToggleRow = { row ->
-                    val group = row.group
-                    if (group != null) {
-                        onToggleGroup(group)
-                    } else {
-                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allBulkSelected, true)
-                    }
-                },
+                unusedApps = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps else null,
                 onOpenRow = { row ->
                     val group = row.group
                     if (group != null && group in SwipeReviewState.SWIPE_GROUPS) {
@@ -376,25 +356,6 @@ internal fun SmartResultsContent(
                 onRequestUsageAccess = onRequestUsageAccess,
             )
         }
-
-        PlanBottomBar(
-            selectedBytes = plan.selectedBytes,
-            enabled = plan.selectedItems.isNotEmpty(),
-            inProgress = cleanupInProgress,
-            onReview = { if (!cleanupInProgress) showPreviewSheet = true },
-        )
-    }
-
-    if (showPreviewSheet) {
-        SelectedItemsPreviewSheet(
-            items = plan.selectedItems,
-            onRemoveItem = onToggleItem,
-            onDismiss = { showPreviewSheet = false },
-            onConfirm = { ids ->
-                showPreviewSheet = false
-                onClean(ids)
-            },
-        )
     }
 
     previewItemId?.let { itemId ->

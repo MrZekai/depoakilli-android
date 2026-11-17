@@ -150,6 +150,7 @@ abstract class CleanerScanLayer(
                 scanHashing = false,
                 scanHashDoneBytes = 0L,
                 scanHashTotalBytes = 0L,
+                scanFoundByCategory = null,
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
                 storageReview = StorageReviewSummary(),
@@ -180,6 +181,9 @@ abstract class CleanerScanLayer(
                         _state.update { current ->
                             current.copy(scanHashing = true, scanHashDoneBytes = done, scanHashTotalBytes = total)
                         }
+                    },
+                    onClassified = { found ->
+                        _state.update { current -> current.copy(scanFoundByCategory = found) }
                     },
                 )
             }.onSuccess { summary ->

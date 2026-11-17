@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Storage
@@ -24,13 +23,11 @@ import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.theme.AdLabel
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 
@@ -57,15 +62,7 @@ internal fun StorageChangeScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF071A50),
-                        Color(0xFF06122F),
-                        Color(0xFF030816),
-                    ),
-                ),
-            ),
+            .background(Lime),
         contentPadding = PaddingValues(
             start = 18.dp,
             end = 18.dp,
@@ -86,8 +83,8 @@ internal fun StorageChangeScreen(
                 ) {
                     LinearProgressIndicator(
                         modifier = Modifier.fillMaxWidth(),
-                        color = HomeVisualTokens.Teal,
-                        trackColor = Color.White.copy(alpha = .08f),
+                        color = Ink,
+                        trackColor = InkSoft.copy(alpha = .25f),
                     )
                     Text(
                         text = stringResource(
@@ -95,8 +92,8 @@ internal fun StorageChangeScreen(
                             progressFiles,
                             progressDirectories,
                         ),
-                        color = Color(0xFF93A5C8),
-                        fontSize = 12.sp,
+                        color = InkSoft,
+                        fontSize = 13.sp,
                     )
                 }
             }
@@ -186,9 +183,9 @@ internal fun StorageChangeScreen(
                 }
                 Text(
                     text = stringResource(R.string.storage_change_analysis_scope),
-                    color = Color(0xFF93A5C8),
-                    fontSize = 12.sp,
-                    lineHeight = 14.sp,
+                    color = InkSoft,
+                    fontSize = 13.sp,
+                    lineHeight = 17.sp,
                 )
             }
         }
@@ -206,21 +203,11 @@ private fun StorageChangeHero(report: StorageChangeReport) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color.Transparent,
-        shape = RoundedCornerShape(28.dp),
+        color = Black,
+        shape = RoundedCornerShape(24.dp),
     ) {
         Row(
             modifier = Modifier
-                .background(
-                    Brush.linearGradient(
-                        listOf(
-                            Color(0xFF1745C5),
-                            Color(0xFF3B1F8E),
-                            Color(0xFF087B73),
-                        ),
-                    ),
-                    RoundedCornerShape(28.dp),
-                )
                 .padding(horizontal = 18.dp, vertical = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -230,7 +217,7 @@ private fun StorageChangeHero(report: StorageChangeReport) {
             ) {
                 Text(
                     text = stringResource(R.string.storage_change_hero_label),
-                    color = Color(0xFFD5DDF7),
+                    color = OnBlackSoft,
                     fontWeight = FontWeight.Bold,
                 )
 
@@ -240,7 +227,7 @@ private fun StorageChangeHero(report: StorageChangeReport) {
                         report.hasComparison -> formatSignedBytes(delta)
                         else -> ByteFormatter.format(current?.usedBytes ?: 0L)
                     },
-                    color = Color.White,
+                    color = Lime,
                     fontSize = 34.sp,
                     lineHeight = 38.sp,
                     fontWeight = FontWeight.Black,
@@ -267,7 +254,7 @@ private fun StorageChangeHero(report: StorageChangeReport) {
                         else ->
                             stringResource(R.string.storage_change_hero_no_change)
                     },
-                    color = Color(0xFFB9C8E7),
+                    color = OnBlackSoft,
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                 )
@@ -278,7 +265,7 @@ private fun StorageChangeHero(report: StorageChangeReport) {
                             R.string.storage_change_last_analysis,
                             storageChangeRelativeLabel(it.analyzedAtMillis),
                         ),
-                        color = Color(0xFF8EE8D0),
+                        color = Lime,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -287,14 +274,14 @@ private fun StorageChangeHero(report: StorageChangeReport) {
 
             Surface(
                 modifier = Modifier.size(82.dp),
-                color = Color.White.copy(alpha = .10f),
+                color = BlackChip,
                 shape = CircleShape,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Outlined.Timeline,
                         contentDescription = null,
-                        tint = Color(0xFF76F1D2),
+                        tint = Lime,
                         modifier = Modifier.size(42.dp),
                     )
                 }
@@ -310,7 +297,7 @@ private fun StorageChangeSummaryCard(report: StorageChangeReport) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0D1934),
+        color = Black,
         shape = RoundedCornerShape(20.dp),
     ) {
         Column(
@@ -319,7 +306,7 @@ private fun StorageChangeSummaryCard(report: StorageChangeReport) {
         ) {
             Text(
                 text = stringResource(R.string.storage_change_device_title),
-                color = Color.White,
+                color = OnBlack,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Black,
             )
@@ -345,7 +332,7 @@ private fun StorageChangeSummaryCard(report: StorageChangeReport) {
 private fun StorageChangeValueLine(
     label: String,
     value: String,
-    accent: Color = Color.White,
+    accent: Color = OnBlack,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -354,7 +341,7 @@ private fun StorageChangeValueLine(
     ) {
         Text(
             text = label,
-            color = Color(0xFFAEB9D4),
+            color = OnBlackSoft,
             fontSize = 12.sp,
         )
         Text(
@@ -370,7 +357,7 @@ private fun StorageChangeValueLine(
 private fun SectionTitle(text: String) {
     Text(
         text = text,
-        color = Color.White,
+        color = Ink,
         fontSize = 20.sp,
         fontWeight = FontWeight.Black,
     )
@@ -382,7 +369,7 @@ private fun StorageTypeChangeRow(change: StorageTypeChange) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0D1934),
+        color = Black,
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(
@@ -409,7 +396,7 @@ private fun StorageTypeChangeRow(change: StorageTypeChange) {
             Column(Modifier.weight(1f)) {
                 Text(
                     text = stringResource(change.type.titleRes),
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
@@ -417,7 +404,7 @@ private fun StorageTypeChangeRow(change: StorageTypeChange) {
                         R.string.storage_change_current_amount,
                         ByteFormatter.format(change.currentBytes),
                     ),
-                    color = Color(0xFFAEB9D4),
+                    color = OnBlackSoft,
                     fontSize = 12.sp,
                 )
             }
@@ -438,7 +425,7 @@ private fun AppCacheChangeRow(change: AppCacheChange) {
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0D1934),
+        color = Black,
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(
@@ -455,7 +442,7 @@ private fun AppCacheChangeRow(change: AppCacheChange) {
             Column(Modifier.weight(1f)) {
                 Text(
                     text = change.label,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -465,7 +452,7 @@ private fun AppCacheChangeRow(change: AppCacheChange) {
                         R.string.storage_change_app_cache_current,
                         ByteFormatter.format(change.currentBytes),
                     ),
-                    color = Color(0xFFAEB9D4),
+                    color = OnBlackSoft,
                     fontSize = 12.sp,
                 )
             }
@@ -487,7 +474,7 @@ private fun EmptyChangeCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0D1934),
+        color = Black,
         shape = RoundedCornerShape(20.dp),
     ) {
         Column(
@@ -496,12 +483,12 @@ private fun EmptyChangeCard(
         ) {
             Text(
                 text = title,
-                color = Color.White,
+                color = OnBlack,
                 fontWeight = FontWeight.Black,
             )
             Text(
                 text = subtitle,
-                color = Color(0xFFAEB9D4),
+                color = OnBlackSoft,
                 fontSize = 12.sp,
                 lineHeight = 17.sp,
             )
@@ -513,7 +500,7 @@ private fun EmptyChangeCard(
 private fun StorageChangeTruthNote() {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF09152D),
+        color = Black,
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(
@@ -523,13 +510,13 @@ private fun StorageChangeTruthNote() {
             Icon(
                 Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Color(0xFF53C9F4),
+                tint = Lime,
                 modifier = Modifier.size(20.dp),
             )
             Spacer(Modifier.size(9.dp))
             Text(
                 text = stringResource(R.string.storage_change_truth_note),
-                color = Color(0xFF93A5C8),
+                color = OnBlackSoft,
                 fontSize = 12.sp,
                 lineHeight = 14.sp,
             )
@@ -565,9 +552,9 @@ private fun formatSignedBytes(delta: Long): String = when {
 }
 
 private fun deltaColor(delta: Long): Color = when {
-    delta > 0L -> Color(0xFFFFB74D)
-    delta < 0L -> Color(0xFF54E2B5)
-    else -> Color(0xFF9FB0D0)
+    delta > 0L -> AdLabel
+    delta < 0L -> Lime
+    else -> OnBlackSoft
 }
 
 private fun absSafe(value: Long): Long =

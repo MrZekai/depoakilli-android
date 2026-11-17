@@ -40,14 +40,18 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.ui.*
-import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
-internal val WaBackground = Color(0xFF030A1D)
-internal val WaCard = Color(0xFF081A38)
-internal val WaCardSecondary = Color(0xFF0B2146)
-internal val WaTextSecondary = Color(0xFF9FB1D0)
-internal val WaCyan = Color(0xFF19DCCB)
-internal val WaAmber = Color(0xFFFFB21A)
+// Faz 5 palette for the WhatsApp screens (same as every other screen).
+internal val WaBackground = com.mrzekai.depoakilli.ui.theme.Lime
+internal val WaCard = com.mrzekai.depoakilli.ui.theme.Black
+internal val WaCardSecondary = com.mrzekai.depoakilli.ui.theme.BlackChip
+internal val WaTextSecondary = com.mrzekai.depoakilli.ui.theme.OnBlackSoft
+internal val WaCyan = com.mrzekai.depoakilli.ui.theme.Lime
+internal val WaAmber = com.mrzekai.depoakilli.ui.theme.AdLabel
 
 internal enum class WhatsAppDirectionFilter {
     ALL,
@@ -77,7 +81,7 @@ internal fun WhatsAppCleanerDetailScreen(
     onDeleteSelected: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(modifier = modifier.fillMaxSize(), color = WaBackground) {
+    Surface(modifier = modifier.fillMaxSize(), color = WaBackground, contentColor = Ink) {
         when {
             !state.hasWhatsAppAccess -> WhatsAppAccessScreen(
                 onBack = onBack,
@@ -119,31 +123,25 @@ internal fun WhatsAppHeader(
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Surface(
-            color = Color(0xFF07152D),
-            shape = RoundedCornerShape(18.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .08f)),
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
-                )
-            }
+        IconButton(onClick = onBack) {
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = Ink,
+            )
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 stringResource(R.string.whatsapp_cleaner_title),
-                color = Color.White,
-                fontSize = 24.sp,
+                color = Ink,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Black,
             )
             if (!subtitle.isNullOrBlank()) {
                 Text(
                     subtitle,
-                    color = WhatsAppGreen,
+                    color = InkSoft,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp,
                 )
@@ -165,24 +163,24 @@ internal fun WhatsAppAccessScreen(
             Card(
                 colors = CardDefaults.cardColors(containerColor = WaCard),
                 shape = RoundedCornerShape(28.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, WhatsAppGreen.copy(alpha = .25f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Lime.copy(alpha = .25f)),
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    Surface(color = WhatsAppGreen.copy(alpha = .14f), shape = CircleShape) {
+                    Surface(color = Lime.copy(alpha = .14f), shape = CircleShape) {
                         Icon(
                             Icons.Outlined.Folder,
                             contentDescription = null,
-                            tint = WhatsAppGreen,
+                            tint = Lime,
                             modifier = Modifier.padding(20.dp).size(46.dp),
                         )
                     }
                     Text(
                         stringResource(R.string.whatsapp_access_title),
-                        color = Color.White,
+                        color = OnBlack,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Black,
                     )
@@ -221,17 +219,17 @@ internal fun WhatsAppReadyScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
-                    Surface(color = WhatsAppGreen.copy(alpha = .14f), shape = CircleShape) {
+                    Surface(color = Lime.copy(alpha = .14f), shape = CircleShape) {
                         Icon(
                             Icons.Outlined.AutoAwesome,
                             contentDescription = null,
-                            tint = WhatsAppGreen,
+                            tint = Lime,
                             modifier = Modifier.padding(24.dp).size(50.dp),
                         )
                     }
                     Text(
                         stringResource(R.string.whatsapp_ready_title),
-                        color = Color.White,
+                        color = OnBlack,
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Black,
                     )

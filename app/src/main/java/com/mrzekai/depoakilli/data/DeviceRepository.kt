@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.os.storage.StorageManager
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
+import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeleteMode
@@ -109,6 +110,7 @@ class DeviceRepository(
         focus: ScanFocus = ScanFocus.SMART,
         onProgress: (Int, Int) -> Unit = { _, _ -> },
         onHashProgress: HashProgress = { _, _ -> },
+        onClassified: (Map<CleanCategory, Long>) -> Unit = {},
     ): ScanSummary = withContext(Dispatchers.IO) {
         if (!hasAllFilesAccess()) {
             return@withContext ScanSummary(limitedAccess = true)
@@ -145,6 +147,23 @@ class DeviceRepository(
                 byUri[uri]?.let { raw -> raw.toCleanable(aiEngine.rawCopyAssessment(raw, partner)) }
             }
         }
+
+        // Progress report only (Faz 5 Home): what the classified files add up
+        // to before exact copies are verified, with the same focus, de-dup and
+        // user-choice filters as the result. The result itself is unchanged.
+        val planScanForReport = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
+        val reportItems = assessed
+            .filter { item -> ScanFocusRules.matchesFocus(item, focus) }
+            .distinctBy(CleanableItem::uri)
+        val reportChosen = if (planScanForReport) {
+            UserChoiceFilter.apply(reportItems, keptItems.keys(), excludedFolders.folders()).items
+        } else {
+            reportItems
+        }
+        onClassified(
+            reportChosen.groupBy { it.assessment.category }
+                .mapValues { (_, categoryItems) -> categoryItems.sumOf(CleanableItem::sizeBytes) },
+        )
 
         // Smart Clean promises duplicates too, but must stay fast: it verifies
         // files up to QUICK_FULL_HASH_BYTES byte for byte and lists larger

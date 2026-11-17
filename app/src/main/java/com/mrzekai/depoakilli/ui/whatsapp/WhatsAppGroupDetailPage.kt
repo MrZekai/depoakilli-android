@@ -6,15 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -27,10 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -50,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
@@ -67,10 +59,14 @@ import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.ui.*
+import com.mrzekai.depoakilli.ui.common.SelectionBar
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
-import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
 @Composable
 internal fun WhatsAppGroupDetailPage(
@@ -109,7 +105,7 @@ internal fun WhatsAppGroupDetailPage(
                     }
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(groupTitleRes(group)), color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                        Text(stringResource(groupTitleRes(group)), color = OnBlack, fontWeight = FontWeight.Black, fontSize = 20.sp)
                         Text(
                             pluralStringResource(
                                 R.plurals.whatsapp_category_summary,
@@ -125,8 +121,8 @@ internal fun WhatsAppGroupDetailPage(
                         onClick = onToggleGroup,
                         colors = CheckboxDefaults.colors(
                             checkedColor = groupAccent(group),
-                            uncheckedColor = Color(0xFFB9C7DE),
-                            checkmarkColor = Color.White,
+                            uncheckedColor = WaTextSecondary,
+                            checkmarkColor = Ink,
                         ),
                     )
                 }
@@ -165,7 +161,7 @@ internal fun WhatsAppGroupDetailPage(
 
         if (displayItems.isEmpty()) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.whatsapp_no_files_for_filter), color = WaTextSecondary)
+                Text(stringResource(R.string.whatsapp_no_files_for_filter), color = InkSoft)
             }
         } else {
             LazyVerticalGrid(
@@ -207,11 +203,11 @@ internal fun SortTab(
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onClick),
-        color = if (selected) Color(0xFF0B3150) else Color(0xFF07152D),
+        color = if (selected) WaCard else WaBackground,
         shape = RoundedCornerShape(14.dp),
         border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            if (selected) WaCyan.copy(alpha = .55f) else Color.White.copy(alpha = .08f),
+            if (selected) 0.dp else 2.dp,
+            if (selected) WaCard else Ink,
         ),
     ) {
         Row(
@@ -219,13 +215,14 @@ internal fun SortTab(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(icon, contentDescription = null, tint = if (selected) WaCyan else WaTextSecondary, modifier = Modifier.size(17.dp))
+            Icon(icon, contentDescription = null, tint = if (selected) Lime else Ink, modifier = Modifier.size(17.dp))
             Spacer(Modifier.width(6.dp))
-            Text(title, color = if (selected) Color.White else WaTextSecondary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            Text(title, color = if (selected) Lime else Ink, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
     }
 }
 
+/** Sticky black bar: the selection and "Move to Trash" (T5.8). */
 @Composable
 internal fun WhatsAppCleanupFooter(
     selectedCount: Int,
@@ -234,80 +231,13 @@ internal fun WhatsAppCleanupFooter(
     inProgress: Boolean,
     onClick: () -> Unit,
 ) {
-    Surface(color = Color(0xFF020817), shadowElevation = 18.dp) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            // Flexible height: the fixed 64 dp card clipped the "0 items"
-            // line (QA v43 polish).
-            Card(
-                modifier = Modifier.weight(.38f).fillMaxHeight().heightIn(min = 64.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF091B39)),
-                shape = RoundedCornerShape(18.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, WhatsAppGreen.copy(alpha = .20f)),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = WhatsAppGreen, modifier = Modifier.size(25.dp))
-                    Spacer(Modifier.width(7.dp))
-                    Column {
-                        Text(stringResource(R.string.whatsapp_selected_size), color = WaTextSecondary, fontSize = 12.sp)
-                        Text(ByteFormatter.format(selectedBytes), color = WhatsAppGreen, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                        Text(
-                            if (selectedCount > 0) {
-                                pluralStringResource(R.plurals.whatsapp_selected_items_short, selectedCount, selectedCount)
-                            } else {
-                                stringResource(R.string.nothing_selected_hint)
-                            },
-                            color = WaTextSecondary,
-                            fontSize = 12.sp,
-                        )
-                    }
-                }
-            }
-
-            Card(
-                onClick = onClick,
-                enabled = enabled,
-                modifier = Modifier.weight(.62f).fillMaxHeight().heightIn(min = 64.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent, disabledContainerColor = Color(0xFF19304F)),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            if (enabled) {
-                                Brush.horizontalGradient(listOf(Color(0xFF0DCB72), WaCyan, Color(0xFF16D86A)))
-                            } else {
-                                Brush.horizontalGradient(listOf(Color(0xFF19304F), Color(0xFF203957)))
-                            },
-                        )
-                        .padding(horizontal = 14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val actionContent = if (enabled) ContrastTokens.OnBrightAction else Color.White
-                    Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = actionContent, modifier = Modifier.size(24.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        stringResource(if (inProgress) R.string.whatsapp_cleanup_in_progress else R.string.whatsapp_review_and_clean),
-                        color = actionContent,
-                        fontWeight = FontWeight.Black,
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = actionContent)
-                }
-            }
-        }
-    }
+    SelectionBar(
+        selectedCount = selectedCount,
+        selectedBytes = selectedBytes,
+        enabled = enabled,
+        busy = inProgress,
+        onMoveToTrash = onClick,
+    )
 }
 
 @Composable
@@ -325,11 +255,11 @@ internal fun WhatsAppPreviewDialog(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Ink)
                     }
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.whatsapp_preview_title), color = WhatsAppGreen, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+                        Text(stringResource(R.string.whatsapp_preview_title), color = InkSoft, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(item.name, color = Ink, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
                     }
                 }
 
@@ -339,7 +269,7 @@ internal fun WhatsAppPreviewDialog(
                         .fillMaxWidth()
                         .padding(horizontal = 14.dp)
                         .clip(RoundedCornerShape(22.dp))
-                        .background(Color(0xFF020713)),
+                        .background(WaCard),
                     contentAlignment = Alignment.Center,
                 ) {
                     MediaPreviewContent(
@@ -350,7 +280,7 @@ internal fun WhatsAppPreviewDialog(
                             sizeBytes = item.sizeBytes,
                             voiceNote = item.category == WhatsAppMediaCategory.VOICE_NOTES,
                         ),
-                        accent = WhatsAppGreen,
+                        accent = Lime,
                     )
                 }
 
@@ -366,7 +296,7 @@ internal fun WhatsAppPreviewDialog(
                             }
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                Text(item.name, color = OnBlack, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                 Text(bidiWrap(compactPath(item.relativePath)), color = WaTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Column(horizontalAlignment = Alignment.End) {
@@ -379,10 +309,10 @@ internal fun WhatsAppPreviewDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(16.dp))
-                                .background(if (selected) Color(0xFF0C4936) else Color(0xFF10284C))
+                                .background(WaCardSecondary)
                                 .border(
                                     1.dp,
-                                    if (selected) WhatsAppGreen.copy(alpha = .70f) else Color(0xFF5D7498),
+                                    if (selected) Lime else com.mrzekai.depoakilli.ui.theme.BlackLine,
                                     RoundedCornerShape(16.dp),
                                 )
                                 .clickable(onClick = onToggleSelection)
@@ -393,21 +323,21 @@ internal fun WhatsAppPreviewDialog(
                                 checked = selected,
                                 onCheckedChange = { onToggleSelection() },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = WhatsAppGreen,
-                                    uncheckedColor = Color(0xFFB9C7DE),
-                                    checkmarkColor = Color(0xFF03130D),
+                                    checkedColor = Lime,
+                                    uncheckedColor = WaTextSecondary,
+                                    checkmarkColor = Ink,
                                 ),
                             )
                             Spacer(Modifier.width(8.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(
                                     stringResource(if (selected) R.string.whatsapp_included else R.string.whatsapp_not_included),
-                                    color = Color.White,
+                                    color = OnBlack,
                                     fontWeight = FontWeight.Black,
                                 )
                                 Text(
                                     stringResource(if (selected) R.string.whatsapp_remove_from_cleanup else R.string.whatsapp_add_to_cleanup),
-                                    color = Color(0xFFC1CEE2),
+                                    color = WaTextSecondary,
                                     style = MaterialTheme.typography.bodySmall,
                                 )
                             }

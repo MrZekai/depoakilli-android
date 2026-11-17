@@ -95,6 +95,11 @@ data class CleanerUiState(
     val scanHashing: Boolean = false,
     val scanHashDoneBytes: Long = 0L,
     val scanHashTotalBytes: Long = 0L,
+    /**
+     * Measured bytes per category once the files are classified (Faz 5 Home
+     * "Found so far"); null until then. Exact duplicates arrive with the result.
+     */
+    val scanFoundByCategory: Map<CleanCategory, Long>? = null,
     /** The Smart plan, kept while a tool scan temporarily owns [summary]. */
     val planSummary: ScanSummary? = null,
     /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */

@@ -27,14 +27,17 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -48,7 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -60,6 +62,14 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.theme.AdLabel
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import java.util.Locale
 
 internal enum class CacheSortMode {
@@ -103,15 +113,7 @@ internal fun AppCacheManagerScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF071A50),
-                        Color(0xFF06122F),
-                        Color(0xFF030816),
-                    ),
-                ),
-            ),
+            .background(Lime),
         contentPadding = PaddingValues(
             start = 18.dp,
             end = 18.dp,
@@ -146,8 +148,8 @@ internal fun AppCacheManagerScreen(
             item {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth(),
-                    color = Color(0xFF31E2BB),
-                    trackColor = Color.White.copy(alpha = .08f),
+                    color = Ink,
+                    trackColor = InkSoft.copy(alpha = .25f),
                 )
             }
         }
@@ -162,13 +164,14 @@ internal fun AppCacheManagerScreen(
                         Text(
                             text = stringResource(R.string.cache_modern_list_title),
                             modifier = Modifier.weight(1f),
-                            color = Color.White,
+                            color = Ink,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Black,
                         )
                         TextButton(
                             onClick = onRefresh,
                             enabled = !state.scanningAppCaches,
+                            colors = ButtonDefaults.textButtonColors(contentColor = Ink),
                         ) {
                             Icon(
                                 Icons.Outlined.Refresh,
@@ -192,6 +195,19 @@ internal fun AppCacheManagerScreen(
                             Text(stringResource(R.string.cache_modern_search_hint))
                         },
                         shape = RoundedCornerShape(18.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Black,
+                            unfocusedContainerColor = Black,
+                            focusedTextColor = OnBlack,
+                            unfocusedTextColor = OnBlack,
+                            focusedBorderColor = Lime,
+                            unfocusedBorderColor = Black,
+                            focusedLeadingIconColor = Lime,
+                            unfocusedLeadingIconColor = OnBlackSoft,
+                            focusedPlaceholderColor = OnBlackSoft,
+                            unfocusedPlaceholderColor = OnBlackSoft,
+                            cursorColor = Lime,
+                        ),
                     )
 
                     Row(
@@ -208,6 +224,18 @@ internal fun AppCacheManagerScreen(
                                 )
                             },
                             modifier = Modifier.weight(1f),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Lime,
+                                labelColor = Ink,
+                                selectedContainerColor = Black,
+                                selectedLabelColor = Lime,
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = sortMode == CacheSortMode.LARGEST,
+                                borderColor = Ink,
+                                selectedBorderColor = Black,
+                            ),
                         )
                         FilterChip(
                             selected = sortMode == CacheSortMode.A_TO_Z,
@@ -219,6 +247,18 @@ internal fun AppCacheManagerScreen(
                                 )
                             },
                             modifier = Modifier.weight(1f),
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = Lime,
+                                labelColor = Ink,
+                                selectedContainerColor = Black,
+                                selectedLabelColor = Lime,
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = sortMode == CacheSortMode.A_TO_Z,
+                                borderColor = Ink,
+                                selectedBorderColor = Black,
+                            ),
                         )
                     }
                 }
@@ -227,7 +267,7 @@ internal fun AppCacheManagerScreen(
             if (visibleEntries.isEmpty()) {
                 item {
                     Surface(
-                        color = Color(0xFF0D1934),
+                        color = Black,
                         shape = RoundedCornerShape(20.dp),
                     ) {
                         Column(
@@ -240,12 +280,12 @@ internal fun AppCacheManagerScreen(
                                 text = stringResource(
                                     if (query.isBlank()) R.string.cache_none_found else R.string.cache_modern_no_result,
                                 ),
-                                color = Color.White,
+                                color = OnBlack,
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
                                 text = stringResource(R.string.cache_modern_no_result_subtitle),
-                                color = Color(0xFFAEB9D4),
+                                color = OnBlackSoft,
                                 style = MaterialTheme.typography.bodySmall,
                             )
                         }
@@ -299,16 +339,7 @@ internal fun CacheManagerHero(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        Color(0xFF113FB7),
-                        Color(0xFF251A6A),
-                        Color(0xFF0A445A),
-                    ),
-                ),
-                shape,
-            )
+            .background(Black, shape)
             .padding(horizontal = 19.dp, vertical = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -319,14 +350,14 @@ internal fun CacheManagerHero(
         ) {
             Text(
                 text = stringResource(R.string.cache_modern_total_label),
-                color = Color(0xFFD2DAF5),
+                color = OnBlackSoft,
                 fontWeight = FontWeight.Bold,
             )
             // Unmeasured is not zero: without Usage Access Android reports
             // nothing, so no figure is shown (QA v43 #03).
             Text(
                 text = if (measured) ByteFormatter.format(totalCacheBytes) else "—",
-                color = Color.White,
+                color = Lime,
                 fontSize = 38.sp,
                 lineHeight = 40.sp,
                 fontWeight = FontWeight.Black,
@@ -339,22 +370,22 @@ internal fun CacheManagerHero(
                         scannedAppCount,
                         scannedAppCount,
                     ),
-                    color = Color(0xFFB8C6E6),
+                    color = OnBlackSoft,
                     style = MaterialTheme.typography.bodySmall,
                 )
             } else if (usageAccessMissing) {
                 Text(
                     text = stringResource(R.string.cache_modern_not_measured),
-                    color = Color(0xFFFFD580),
+                    color = AdLabel,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
                 )
             }
             Text(
                 text = stringResource(R.string.cache_modern_hero_helper),
-                color = Color(0xFF8EE8D0),
+                color = OnBlackSoft,
                 fontSize = 12.sp,
-                lineHeight = 15.sp,
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.Bold,
             )
         }
@@ -373,7 +404,7 @@ internal fun CacheHeroGraphic() {
             val ring = Size(size.width - stroke, size.height - stroke)
             val topLeft = Offset(stroke / 2f, stroke / 2f)
             drawArc(
-                color = Color.White.copy(alpha = .10f),
+                color = BlackChip,
                 startAngle = -120f,
                 sweepAngle = 300f,
                 useCenter = false,
@@ -382,13 +413,7 @@ internal fun CacheHeroGraphic() {
                 style = Stroke(stroke, cap = StrokeCap.Round),
             )
             drawArc(
-                brush = Brush.sweepGradient(
-                    listOf(
-                        Color(0xFF1FA6FF),
-                        Color(0xFF2DE5B4),
-                        Color(0xFF1FA6FF),
-                    ),
-                ),
+                color = Lime,
                 startAngle = -120f,
                 sweepAngle = 225f,
                 useCenter = false,
@@ -400,14 +425,14 @@ internal fun CacheHeroGraphic() {
 
         Surface(
             modifier = Modifier.size(62.dp),
-            color = Color(0xFF102C67),
+            color = BlackChip,
             shape = CircleShape,
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Outlined.Storage,
                     contentDescription = null,
-                    tint = Color(0xFF47B7FF),
+                    tint = Lime,
                     modifier = Modifier.size(31.dp),
                 )
             }
@@ -421,7 +446,7 @@ internal fun CachePermissionCard(
 ) {
     Card(
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2B2412)),
+        colors = CardDefaults.cardColors(containerColor = Black),
     ) {
         Row(
             modifier = Modifier
@@ -432,18 +457,18 @@ internal fun CachePermissionCard(
             Icon(
                 Icons.Outlined.Info,
                 contentDescription = null,
-                tint = Color(0xFFFFBE45),
+                tint = AdLabel,
             )
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.cache_access_required),
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     text = stringResource(R.string.cache_access_explanation_v050),
-                    color = Color(0xFFD5C9A8),
+                    color = OnBlackSoft,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -463,30 +488,21 @@ internal fun CacheSystemActionCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.horizontalGradient(
-                    listOf(
-                        Color(0xFF0A805F),
-                        Color(0xFF10A875),
-                        Color(0xFF14B98A),
-                    ),
-                ),
-                shape,
-            )
+            .background(Lime, shape)
             .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Surface(
             modifier = Modifier.size(48.dp),
-            color = Color.White.copy(alpha = .13f),
+            color = Ink.copy(alpha = .12f),
             shape = CircleShape,
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     Icons.Outlined.CleaningServices,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = Ink,
                     modifier = Modifier.size(27.dp),
                 )
             }
@@ -495,21 +511,21 @@ internal fun CacheSystemActionCard(
         Column(Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.cache_modern_system_action),
-                color = Color.White,
+                color = Ink,
                 fontWeight = FontWeight.Black,
                 fontSize = 17.sp,
             )
             Text(
                 text = stringResource(R.string.cache_modern_system_action_subtitle),
-                color = Color.White.copy(alpha = .82f),
-                fontSize = 12.sp,
-                lineHeight = 15.sp,
+                color = InkSoft,
+                fontSize = 13.sp,
+                lineHeight = 17.sp,
             )
         }
         Icon(
             Icons.AutoMirrored.Outlined.ArrowForward,
             contentDescription = null,
-            tint = Color.White,
+            tint = Ink,
         )
     }
 }

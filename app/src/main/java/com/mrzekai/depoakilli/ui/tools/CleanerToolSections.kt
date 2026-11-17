@@ -137,7 +137,7 @@ internal fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {
     ScanFocus.LARGE_FILES -> ToolVisualConfig(R.string.scan_focus_large, R.string.premium_large_subtitle, Icons.Outlined.VideoFile, ToolAmber, ToolCyan)
     ScanFocus.APKS -> ToolVisualConfig(R.string.scan_focus_apks, R.string.premium_apk_subtitle, Icons.Outlined.Android, ToolGreen, ToolCyan)
     ScanFocus.MEDIA -> ToolVisualConfig(R.string.scan_focus_media, R.string.premium_media_subtitle, Icons.Outlined.PhotoLibrary, ToolCyan, ToolPurple)
-    ScanFocus.SCREENSHOTS -> ToolVisualConfig(R.string.category_screenshots, R.string.screenshots_tool_subtitle, Icons.Outlined.PhotoLibrary, Color(0xFFDA57FF), ToolCyan)
+    ScanFocus.SCREENSHOTS -> ToolVisualConfig(R.string.category_screenshots, R.string.screenshots_tool_subtitle, Icons.Outlined.PhotoLibrary, ToolCyan, ToolCyan)
     ScanFocus.JUNK -> ToolVisualConfig(R.string.scan_focus_junk, R.string.premium_junk_subtitle, Icons.Outlined.DeleteSweep, ToolCyan, ToolGreen)
     ScanFocus.DOWNLOADS -> ToolVisualConfig(R.string.scan_focus_downloads, R.string.premium_downloads_subtitle, Icons.Outlined.Download, ToolAmber, ToolCyan)
     ScanFocus.DEEP -> ToolVisualConfig(R.string.scan_focus_deep, R.string.premium_deep_subtitle, Icons.Outlined.AutoAwesome, ToolGreen, ToolPurple)
@@ -157,12 +157,12 @@ internal fun sectionIcon(focus: ScanFocus, section: ToolSection): ImageVector = 
 internal fun categoryAccent(category: CleanCategory): Color = when (category) {
     CleanCategory.JUNK -> ToolCyan
     CleanCategory.DUPLICATE -> ToolPurple
-    CleanCategory.SCREENSHOT -> Color(0xFFDA57FF)
+    CleanCategory.SCREENSHOT -> ToolCyan
     CleanCategory.LARGE_FILE -> ToolAmber
-    CleanCategory.OLD_DOWNLOAD -> Color(0xFFFF8746)
+    CleanCategory.OLD_DOWNLOAD -> ToolAmber
     CleanCategory.APK_PACKAGE -> ToolGreen
-    CleanCategory.APP_CACHE -> Color(0xFF18D0CF)
-    CleanCategory.WHATSAPP_MEDIA -> Color(0xFF22C96C)
+    CleanCategory.APP_CACHE -> ToolCyan
+    CleanCategory.WHATSAPP_MEDIA -> ToolGreen
 }
 
 internal fun ageDays(modifiedAtMillis: Long, nowMillis: Long = System.currentTimeMillis()): Long {

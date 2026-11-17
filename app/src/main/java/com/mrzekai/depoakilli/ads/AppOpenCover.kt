@@ -30,7 +30,7 @@ fun AppOpenCover() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF030A1D))
+            .background(com.mrzekai.depoakilli.ui.theme.Lime)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -44,11 +44,11 @@ fun AppOpenCover() {
         ) {
             Text(
                 stringResource(R.string.app_name),
-                color = Color.White,
+                color = com.mrzekai.depoakilli.ui.theme.Ink,
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Black,
             )
-            CircularProgressIndicator(modifier = Modifier.size(32.dp), color = Color(0xFF28E58A))
+            CircularProgressIndicator(modifier = Modifier.size(32.dp), color = com.mrzekai.depoakilli.ui.theme.Ink)
         }
     }
 }

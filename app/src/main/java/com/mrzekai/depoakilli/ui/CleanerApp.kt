@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -38,12 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.ads.ListNativeAdCard
+import com.mrzekai.depoakilli.ads.InterstitialTrigger
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.ui.common.SystemBarIcons
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.whatsapp.WhatsAppCleanerDetailScreen
 
 /** Three tabs (T1.10): Clean (the plan), Tools and Trash. Settings live behind the gear icon. */
@@ -100,6 +104,7 @@ fun CleanerApp(
     onCleanupResultDismissed: () -> Unit,
     onCleanupSucceeded: () -> Unit,
     onReturnedToClean: (dwellMillis: Long) -> Unit = {},
+    onNaturalBreak: (InterstitialTrigger) -> Unit = {},
     onDeepDuplicateCheck: () -> Unit = {},
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
@@ -169,6 +174,14 @@ fun CleanerApp(
         }
     }
 
+    /** Findings list (T5.4); the interstitial follows a finished scan (AdPolicy limits apply). */
+    fun openFindings() {
+        legalReturnScreen = null
+        viewModel.showPlan()
+        detailScreen = DetailScreen.CLEAN_RESULTS
+        onNaturalBreak(InterstitialTrigger.OPEN_FINDINGS)
+    }
+
     fun openLegalPage(page: LegalPage) {
         legalReturnScreen = detailScreen
         detailScreen = when (page) {
@@ -181,19 +194,15 @@ fun CleanerApp(
     fun navigateBackInApp() {
         when {
             detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null -> {
-                val fromFolder = state.storageReview.folder != null
+                // Folders and groups open from the findings list (T5.4); going
+                // back returns there.
                 viewModel.closeStorageReview()
-                // A folder opens from the Clean tab; going back returns there.
-                if (fromFolder && state.scanFocus == ScanFocus.SMART) detailScreen = null
             }
             detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null -> {
                 viewModel.closeSwipeReview()
-                detailScreen = null
             }
             detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null -> {
                 viewModel.closeSmartCategoryReview()
-                // Plan rows open from the Clean tab; going back returns there.
-                if (state.scanFocus == ScanFocus.SMART) detailScreen = null
             }
             detailScreen in setOf(DetailScreen.PRIVACY, DetailScreen.TERMS, DetailScreen.ABOUT) &&
                 legalReturnScreen != null -> {
@@ -219,13 +228,24 @@ fun CleanerApp(
         navigateBackInApp()
     }
 
+    // Lime screens: dark status icons. The black bottom menu and the black
+    // swipe review: light icons (Faz 5).
+    val swipeVisible = detailScreen == DetailScreen.CLEAN_RESULTS &&
+        state.swipeReviewGroup?.let(state.swipeStates::get) != null
+    SystemBarIcons(
+        darkStatusIcons = !swipeVisible,
+        darkNavigationIcons = detailScreen != null && !swipeVisible,
+    )
+
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            if (detailScreen != DetailScreen.WHATSAPP) {
+            val swipeOpen = detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null &&
+                state.swipeReviewGroup?.let(state.swipeStates::get) != null
+            if (detailScreen != DetailScreen.WHATSAPP && !swipeOpen) {
                 TopAppBar(
                     title = {
                         val storageReviewTitle = state.storageReview.type?.titleRes
@@ -243,10 +263,16 @@ fun CleanerApp(
                         }
                         val folderTitle = state.storageReview.folder?.name
                             ?.takeIf { detailScreen == DetailScreen.CLEAN_RESULTS }
-                        Text(
-                            folderTitle ?: stringResource(titleRes),
-                            fontWeight = FontWeight.Black,
-                        )
+                        // Tabs carry their own large title or giant figure (Faz 5).
+                        if (detailScreen != null) {
+                            Text(
+                                folderTitle ?: stringResource(titleRes),
+                                fontWeight = FontWeight.Black,
+                                fontSize = 20.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     },
                     navigationIcon = {
                         if (detailScreen != null) {
@@ -282,22 +308,35 @@ fun CleanerApp(
                             }
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Lime,
+                        scrolledContainerColor = Lime,
+                        titleContentColor = Ink,
+                        navigationIconContentColor = Ink,
+                        actionIconContentColor = Ink,
+                    ),
                 )
             }
         },
         bottomBar = {
+            // Faz 5 ad table: banner on Home, Tools and Trash (above the menu)
+            // and on the findings list; tool lists carry an in-list native
+            // instead, and the swipe review has its own break card.
+            val findingsListOpen = state.scanFocus == ScanFocus.SMART &&
+                state.smartCategoryReview == null &&
+                state.storageReview.type == null &&
+                state.swipeReviewGroup == null
             val screenAllowsBanner = when (detailScreen) {
                 null -> when (AppTab.entries[selectedTabIndex]) {
                     AppTab.HOME,
-                    AppTab.TOOLS -> true
-                    // Trash actions sit at the bottom of the screen; no ad next to them.
-                    AppTab.TRASH -> false
+                    AppTab.TOOLS,
+                    AppTab.TRASH -> true
                 }
-                DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
-                DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
+                DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess &&
+                    (findingsListOpen || state.scanFocus == ScanFocus.ANALYZE)
+                DetailScreen.WHATSAPP,
                 DetailScreen.APP_CACHE,
-                DetailScreen.APP_MANAGER,
+                DetailScreen.APP_MANAGER -> false
                 DetailScreen.STORAGE_CHANGE -> true
                 DetailScreen.SETTINGS,
                 DetailScreen.ACCESS,
@@ -314,9 +353,8 @@ fun CleanerApp(
                     !appOpenCoverVisible &&
                     // No banner next to the swipe-review break card (it has its own native ad).
                     state.swipeReviewGroup?.let { state.swipeStates[it]?.breakPending } != true &&
-                    // Quick plan update on the Clean tab keeps the banner; other scans hide it.
-                    (!state.scanning ||
-                        (detailScreen == null && state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0)) &&
+                    // No ad while a scan runs (Faz 5 ad table: "Taranıyor: yok").
+                    !state.scanning &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
                     !state.cleanupInProgress &&
@@ -353,6 +391,10 @@ fun CleanerApp(
                 onClearAppCaches = onClearAllAppCaches,
                 viewModel = viewModel,
                 canRequestAds = canRequestAds,
+                onDeepCheck = onDeepDuplicateCheck,
+                onOpenAppInfo = onOpenAppInfo,
+                onSwipeConfirmed = { onNaturalBreak(InterstitialTrigger.SWIPE_FINISHED) },
+                onCloseSwipe = ::navigateBackInApp,
             )
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -424,6 +466,8 @@ fun CleanerApp(
                 onClearKeptItems = viewModel::clearKeptItems,
                 excludedFolders = state.excludedFolders,
                 onIncludeFolder = viewModel::includeFolder,
+                hasAllFilesAccess = state.hasAllFilesAccess,
+                hasUsageAccess = state.hasUsageAccess,
             )
 
             DetailScreen.ACCESS -> SecurityCenterScreen(
@@ -471,61 +515,37 @@ fun CleanerApp(
                         state = state,
                         onAllowAccess = ::requestAllFilesWithDisclosure,
                         onCancelScan = viewModel::cancelScan,
-                        accessDeniedOnce = allFilesAskedOnce,
-                        onOpenSettings = onRequestAllFilesAccess,
+                        onStartScan = {
+                            if (!state.hasAllFilesAccess) {
+                                requestAllFilesWithDisclosure()
+                            } else {
+                                viewModel.scan(ScanFocus.SMART)
+                            }
+                        },
+                        onClean = { ids -> onPrepareCleanup(ids) },
+                        onToggleItem = viewModel::toggleItem,
+                        onOpenFindings = ::openFindings,
                         onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
-                        modifier = Modifier.padding(padding),
-                        onShowDetails = { viewModel.scan(ScanFocus.SMART) },
-                    ) { displayState, header ->
-                        SmartCleanResultsScreen(
-                            state = displayState,
-                            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
-                            onScan = { viewModel.scan(ScanFocus.SMART) },
-                            onToggleItem = viewModel::toggleItem,
-                            onToggleCategory = viewModel::toggleCategory,
-                            onSetItemsSelected = viewModel::setItemsSelected,
-                            onOpenCategoryReview = { category, ids ->
-                                viewModel.openSmartCategoryReview(category, ids)
-                                detailScreen = DetailScreen.CLEAN_RESULTS
+                        hardActions = HomeHardActions(
+                            onOpenMedia = { launchScan(ScanFocus.MEDIA) },
+                            onOpenApps = {
+                                detailScreen = DetailScreen.APP_MANAGER
+                                viewModel.refreshInstalledApps()
                             },
-                            onOpenStorageReview = viewModel::openStorageReview,
-                            onRequestUsageAccess = ::requestUsageWithDisclosure,
-                            onRefreshInstalledApps = viewModel::refreshInstalledApps,
-                            onUninstallApp = onUninstallApp,
-                            onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
-                            onToggleAllStorageReviewItems = viewModel::toggleAllStorageReviewItems,
-                            onClean = onPrepareCleanup,
-                            onCleanStorage = onPrepareStorageCleanup,
-                            onToggleGroup = viewModel::toggleGroup,
-                            onClearAppCaches = onClearAllAppCaches,
-                            modifier = Modifier.padding(padding),
-                            planHeader = header,
-                            onCancelScan = viewModel::cancelScan,
-                            onOpenSwipeReview = { group ->
-                                viewModel.openSwipeReview(group)
-                                detailScreen = DetailScreen.CLEAN_RESULTS
-                            },
-                            onOpenPlanGrid = { group, items ->
-                                viewModel.openPlanGroupGrid(group, items)
-                                detailScreen = DetailScreen.CLEAN_RESULTS
-                            },
-                            onDeepCheck = onDeepDuplicateCheck,
                             onOpenFolder = { folder ->
-                                viewModel.openFolderReview(folder)
-                                detailScreen = DetailScreen.CLEAN_RESULTS
-                            },
-                            onOpenAppInfo = onOpenAppInfo,
-                            onExcludeFolder = viewModel::excludeFolder,
-                            reviewAd = { index ->
-                                val plan = displayState.summary.plan
-                                val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +
-                                    plan.review.size + 1
-                                if (index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1 && rows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
-                                    item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
+                                if (folder != null) {
+                                    viewModel.openFolderReview(folder)
+                                    detailScreen = DetailScreen.CLEAN_RESULTS
+                                } else {
+                                    openFindings()
                                 }
                             },
-                        )
-                    }
+                            onOpenDuplicates = { launchScan(ScanFocus.DUPLICATES) },
+                        ),
+                        accessDeniedOnce = allFilesAskedOnce,
+                        onOpenSettings = onRequestAllFilesAccess,
+                        modifier = Modifier.padding(padding),
+                    )
                 }
 
                 AppTab.TOOLS -> DeviceCenterScreen(
@@ -548,8 +568,6 @@ fun CleanerApp(
                         detailScreen = DetailScreen.STORAGE_CHANGE
                     },
                     modifier = Modifier.padding(padding),
-                    onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
-                    listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                 )
 
                 AppTab.TRASH -> TrashScreen(
@@ -567,6 +585,7 @@ fun CleanerApp(
     if (trashFallback != null && state.cleanupResult == null && !state.cleanupInProgress) {
         TrashFallbackDialog(
             fallback = trashFallback,
+            bytes = trashFallbackBytes(state, trashFallback),
             onDeletePermanently = viewModel::deleteTrashFallbackPermanently,
             onDismiss = viewModel::dismissTrashFallback,
         )
@@ -674,5 +693,15 @@ fun CleanerApp(
     }
 
         if (fullScreenAdActive) FullScreenAdCover()
+    }
+}
+
+/** Size of the files that could not go to Trash, for the permanent-delete title. */
+private fun trashFallbackBytes(state: CleanerUiState, fallback: TrashFallback): Long {
+    val ids = fallback.ids
+    return when (fallback.source) {
+        TrashFallback.Source.PLAN -> state.summary.items.filter { it.id in ids }.sumOf { it.sizeBytes }
+        TrashFallback.Source.WHATSAPP -> state.whatsAppSummary.items.filter { it.id in ids }.sumOf { it.sizeBytes }
+        TrashFallback.Source.STORAGE_REVIEW -> state.storageReview.items.filter { it.id in ids }.sumOf { it.file.sizeBytes }
     }
 }

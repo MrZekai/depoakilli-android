@@ -1,60 +1,58 @@
 package com.mrzekai.depoakilli.ui.smart
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.AudioFile
+import androidx.compose.material.icons.outlined.Cached
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.FolderZip
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Screenshot
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.CleanupPlan
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
-import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.model.PlanGroup
-
-internal val PlanCard = Color(0xFF0A1C42)
-internal val PlanCardAlt = Color(0xFF0D2450)
-internal val PlanTextSecondary = Color(0xFFB4C4DF)
-internal val PlanAccent = Color(0xFF28E58A)
-internal val PlanCyan = Color(0xFF16C7FF)
-internal val PlanButtonText = Color(0xFF03122B)
+import com.mrzekai.depoakilli.ui.common.BigRow
+import com.mrzekai.depoakilli.ui.common.BlackCard
+import com.mrzekai.depoakilli.ui.common.GiantNumber
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.bidiWrap
+import com.mrzekai.depoakilli.ui.common.rememberGiantScale
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
 /** Stable key of a plan row; the merged small row has no group. */
 internal fun PlanGroup.rowKey(): String = group?.name ?: if (smallReview) "SMALL_REVIEW" else "SMALL_ITEMS"
@@ -66,17 +64,79 @@ internal fun PlanGroup.title(): String = when {
     else -> stringResource(R.string.plan_small_items)
 }
 
+/** Line icon of a findings row. */
+internal fun planGroupIcon(group: CleanupGroup?): ImageVector = when (group) {
+    null -> Icons.Outlined.InsertDriveFile
+    CleanupGroup.DUPLICATE_SAFE,
+    CleanupGroup.DUPLICATE_PERSONAL,
+    CleanupGroup.DUPLICATE_UNVERIFIED -> Icons.Outlined.ContentCopy
+    CleanupGroup.LARGE_VIDEO,
+    CleanupGroup.OLD_VIDEO,
+    CleanupGroup.WHATSAPP_VIDEO,
+    CleanupGroup.WHATSAPP_OLD_VIDEO -> Icons.Outlined.Movie
+    CleanupGroup.SCREEN_RECORDING -> Icons.Outlined.Videocam
+    CleanupGroup.SCREENSHOT -> Icons.Outlined.Screenshot
+    CleanupGroup.RAW_COPY -> Icons.Outlined.CameraAlt
+    CleanupGroup.OTHER_APP_MEDIA,
+    CleanupGroup.WHATSAPP_SENT,
+    CleanupGroup.WHATSAPP_STATUS,
+    CleanupGroup.WHATSAPP_OLD_IMAGE -> Icons.Outlined.Image
+    CleanupGroup.WHATSAPP_VOICE,
+    CleanupGroup.WHATSAPP_OLD_AUDIO -> Icons.Outlined.AudioFile
+    CleanupGroup.DOWNLOAD_FILE,
+    CleanupGroup.PARTIAL_DOWNLOADS -> Icons.Outlined.Download
+    CleanupGroup.DOWNLOAD_DOCUMENT,
+    CleanupGroup.WHATSAPP_DOCUMENT -> Icons.Outlined.Description
+    CleanupGroup.APK_INSTALLED,
+    CleanupGroup.APK_OLD_VERSION,
+    CleanupGroup.APK_OTHER -> Icons.Outlined.Apps
+    CleanupGroup.THUMBNAILS,
+    CleanupGroup.TEMP_FILES,
+    CleanupGroup.SYSTEM_TRASH -> Icons.Outlined.Cached
+    CleanupGroup.LARGE_OTHER -> Icons.Outlined.FolderZip
+}
+
+/** One findings row: a review group or the unused-apps group (V8). */
+internal sealed interface FindingsRow {
+    val bytes: Long
+
+    data class Group(val row: PlanGroup) : FindingsRow {
+        override val bytes: Long get() = row.bytes
+    }
+
+    data class UnusedApps(val count: Int, override val bytes: Long) : FindingsRow
+}
+
+/** Findings rows, biggest first (T5.4). Unused apps join only with Usage Access. */
+internal fun findingsRows(plan: CleanupPlan, unusedApps: List<InstalledAppEntry>?): List<FindingsRow> {
+    val groups = (plan.review + listOfNotNull(plan.smallReview)).map { FindingsRow.Group(it) }
+    val apps = unusedApps?.takeIf { it.isNotEmpty() }?.let { list ->
+        FindingsRow.UnusedApps(list.size, list.sumOf(InstalledAppEntry::totalBytes))
+    }
+    return (groups + listOfNotNull(apps)).sortedByDescending(FindingsRow::bytes)
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text,
+        color = Ink,
+        fontSize = 18.sp,
+        fontWeight = AppWeights.Giant,
+        modifier = Modifier.padding(top = 14.dp, start = 4.dp),
+    )
+}
+
 /**
- * Rows of the cleanup plan (T1.7): recommendation card, included rows,
- * system steps, worth-a-look rows, truncation note and "Scan again".
+ * The findings list (T5.4) on Lime: the giant review total, one black row per
+ * group (biggest first, unused apps included), the in-list native after the
+ * 2nd row, "Start with the biggest", then the other places space can come
+ * from (app caches, largest apps, biggest folders, look-alike check).
  */
 internal fun LazyListScope.cleanupPlanItems(
     plan: CleanupPlan,
     appCacheBytes: Long?,
-    unusedAppCount: Int?,
-    cleanupInProgress: Boolean,
-    onCleanRecommended: () -> Unit,
-    onToggleRow: (PlanGroup) -> Unit,
+    unusedApps: List<InstalledAppEntry>?,
     onOpenRow: (PlanGroup) -> Unit,
     onClearAppCaches: () -> Unit,
     onOpenUnusedApps: () -> Unit,
@@ -92,24 +152,100 @@ internal fun LazyListScope.cleanupPlanItems(
     onOpenAppInfo: (String) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
 ) {
-    item(key = "plan-card") {
-        RecommendedCleanupCard(
-            plan = plan,
-            cleanupInProgress = cleanupInProgress,
-            onClean = onCleanRecommended,
-            onOpenRow = onOpenRow,
-        )
-    }
-    val includedRows = plan.included + listOfNotNull(plan.smallItems)
-    if (includedRows.isNotEmpty()) {
-        item(key = "plan-included-title") { PlanSectionTitle(stringResource(R.string.plan_section_included)) }
-        items(includedRows, key = { "included-" + it.rowKey() }) { row ->
-            PlanRow(row = row, onToggle = { onToggleRow(row) }, onOpen = { onOpenRow(row) })
+    val rows = findingsRows(plan, unusedApps)
+    val openFindingsRow: (FindingsRow) -> Unit = { row ->
+        when (row) {
+            is FindingsRow.Group -> onOpenRow(row.row)
+            is FindingsRow.UnusedApps -> onOpenUnusedApps()
         }
     }
-    item(key = "plan-system-title") { PlanSectionTitle(stringResource(R.string.plan_section_system)) }
+    item(key = "plan-card") {
+        val scale = rememberGiantScale()
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            GiantNumber(ByteFormatter.format(rows.sumOf(FindingsRow::bytes)), scale, modifier = Modifier.fillMaxWidth())
+            Text(
+                stringResource(R.string.plan_found_title),
+                color = Ink,
+                fontSize = 18.sp,
+                lineHeight = 24.sp,
+                fontWeight = AppWeights.Title,
+            )
+        }
+    }
+    rows.forEachIndexed { index, row ->
+        item(key = "review-" + when (row) {
+            is FindingsRow.Group -> row.row.rowKey()
+            is FindingsRow.UnusedApps -> "UNUSED_APPS"
+        }) {
+            when (row) {
+                is FindingsRow.Group -> {
+                    val count = row.row.items.size
+                    // B3: camera files are never bulk-selected; say they are chosen one by one.
+                    val oneByOne = row.row.oneByOneCount
+                    BigRow(
+                        icon = planGroupIcon(row.row.group),
+                        title = row.row.title(),
+                        detail = if (row.row.groupSelectable && oneByOne > 0) {
+                            pluralStringResource(R.plurals.plan_camera_one_by_one, oneByOne, oneByOne)
+                        } else {
+                            pluralStringResource(R.plurals.home_scan_files_count, count, count)
+                        },
+                        value = ByteFormatter.format(row.row.bytes),
+                        onClick = { onOpenRow(row.row) },
+                    )
+                }
+                is FindingsRow.UnusedApps -> BigRow(
+                    icon = Icons.Outlined.Apps,
+                    title = pluralStringResource(R.plurals.plan_unused_apps, row.count, row.count),
+                    value = ByteFormatter.format(row.bytes),
+                    onClick = onOpenUnusedApps,
+                )
+            }
+        }
+        afterReviewRow(this, index)
+    }
+    if (rows.isNotEmpty()) {
+        item(key = "plan-start-biggest") {
+            PillButton(
+                text = stringResource(R.string.plan_start_biggest),
+                onClick = { openFindingsRow(rows.first()) },
+                style = PillStyle.BLACK,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+        }
+    }
+    // V10/V11: files the user kept and folders not suggested stay hidden; say so.
+    if (hiddenKeptCount > 0) {
+        item(key = "plan-kept-note") {
+            Text(
+                stringResource(R.string.plan_kept_hidden, hiddenKeptCount),
+                color = InkSoft,
+                fontSize = 14.sp,
+                fontWeight = AppWeights.Strong,
+                modifier = Modifier.padding(horizontal = 4.dp),
+            )
+        }
+    }
+    if (plan.truncated) {
+        item(key = "plan-truncated") {
+            val limit = com.mrzekai.depoakilli.data.CleaningThresholds.MAX_RESULT_ITEMS
+            Text(
+                pluralStringResource(R.plurals.plan_truncated, limit, limit),
+                color = Ink,
+                fontSize = 14.sp,
+                fontWeight = AppWeights.Strong,
+                modifier = Modifier.padding(horizontal = 4.dp),
+            )
+        }
+    }
+
+    item(key = "plan-system-title") { SectionTitle(stringResource(R.string.plan_section_system)) }
     item(key = "plan-system-cache") {
-        SystemStepRow(
+        BigRow(
+            icon = Icons.Outlined.Cached,
             title = stringResource(R.string.plan_clear_app_caches),
             detail = appCacheBytes?.takeIf { it > 0L }?.let {
                 stringResource(R.string.plan_cache_about, ByteFormatter.format(it))
@@ -120,46 +256,22 @@ internal fun LazyListScope.cleanupPlanItems(
     // V8: the biggest user apps; each row only opens Android's App info screen.
     if (largestApps == null) {
         item(key = "plan-system-largest-apps-access") {
-            SystemStepRow(
+            BigRow(
+                icon = Icons.Outlined.Apps,
                 title = stringResource(R.string.plan_largest_apps),
                 detail = stringResource(R.string.plan_largest_apps_access),
                 onClick = onRequestUsageAccess,
             )
         }
     } else if (largestApps.isNotEmpty()) {
-        item(key = "plan-system-largest-apps-title") {
-            Text(
-                stringResource(R.string.plan_largest_apps),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 4.dp, top = 4.dp),
-            )
-        }
+        item(key = "plan-system-largest-apps-title") { SectionTitle(stringResource(R.string.plan_largest_apps)) }
         items(largestApps, key = { "largest-app-" + it.packageName }) { app ->
-            SystemStepRow(
+            BigRow(
+                icon = Icons.Outlined.Apps,
                 title = app.label,
-                detail = ByteFormatter.format(app.totalBytes),
+                value = ByteFormatter.format(app.totalBytes),
                 onClick = { onOpenAppInfo(app.packageName) },
             )
-        }
-    }
-    if (unusedAppCount != null) {
-        item(key = "plan-system-unused") {
-            SystemStepRow(
-                title = pluralStringResource(R.plurals.plan_unused_apps, unusedAppCount, unusedAppCount),
-                detail = null,
-                onClick = onOpenUnusedApps,
-            )
-        }
-    }
-    val reviewRows = plan.review + listOfNotNull(plan.smallReview)
-    if (reviewRows.isNotEmpty()) {
-        item(key = "plan-review-title") { PlanSectionTitle(stringResource(R.string.plan_section_review)) }
-        reviewRows.forEachIndexed { index, row ->
-            item(key = "review-" + row.rowKey()) {
-                PlanRow(row = row, onToggle = { onToggleRow(row) }, onOpen = { onOpenRow(row) })
-            }
-            afterReviewRow(this, index)
         }
     }
     if (deepCheck.first > 0 || deepCheckRunning) {
@@ -167,340 +279,50 @@ internal fun LazyListScope.cleanupPlanItems(
             DeepCheckRow(groups = deepCheck.first, bytes = deepCheck.second, running = deepCheckRunning, onClick = onDeepCheck)
         }
     }
-    if (plan.truncated) {
-        item(key = "plan-truncated") {
-            val limit = com.mrzekai.depoakilli.data.CleaningThresholds.MAX_RESULT_ITEMS
-            Text(
-                pluralStringResource(R.plurals.plan_truncated, limit, limit),
-                color = Color(0xFFFFC46B),
-                fontSize = 13.sp,
-            )
-        }
-    }
     // V7: where the space is, folder by folder (opens a review list, nothing selected).
     if (biggestFolders.isNotEmpty()) {
-        item(key = "plan-folders-title") { PlanSectionTitle(stringResource(R.string.plan_biggest_folders)) }
+        item(key = "plan-folders-title") { SectionTitle(stringResource(R.string.plan_biggest_folders)) }
         items(biggestFolders, key = { "folder-" + it.volumeRoot + "/" + it.relativePath }) { folder ->
-            SystemStepRow(
+            BigRow(
+                icon = Icons.Outlined.Folder,
                 title = folder.name,
-                detail = bidiWrap(folder.relativePath) + " • " + pluralStringResource(
-                    R.plurals.whatsapp_category_summary,
-                    folder.fileCount,
-                    folder.fileCount,
-                    ByteFormatter.format(folder.bytes),
-                ),
+                detail = bidiWrap(folder.relativePath),
+                value = ByteFormatter.format(folder.bytes),
                 onClick = { onOpenFolder(folder) },
             )
         }
     }
-    if (hiddenKeptCount > 0) {
-        item(key = "plan-kept-note") {
-            Text(
-                stringResource(R.string.plan_kept_hidden, hiddenKeptCount),
-                color = PlanTextSecondary,
-                fontSize = 13.sp,
-                modifier = Modifier.padding(horizontal = 4.dp),
-            )
-        }
-    }
     item(key = "plan-scan-again") {
-        OutlinedButton(onClick = onScanAgain, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-            Text(stringResource(R.string.scan_again))
-        }
-    }
-}
-
-@Composable
-internal fun RecommendedCleanupCard(
-    plan: CleanupPlan,
-    cleanupInProgress: Boolean,
-    onClean: () -> Unit,
-    onOpenRow: (PlanGroup) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = PlanCard,
-        shape = RoundedCornerShape(24.dp),
-    ) {
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                stringResource(R.string.plan_recommended_title),
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Black,
-            )
-            if (plan.isAlreadyTidy) {
-                Text(
-                    stringResource(R.string.plan_nothing_big),
-                    color = PlanTextSecondary,
-                    fontSize = 15.sp,
-                )
-                val biggest = plan.review.take(3)
-                if (biggest.isNotEmpty()) {
-                    Text(
-                        stringResource(R.string.plan_biggest_space_in),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    biggest.forEach { row ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 48.dp)
-                                .clickable { onOpenRow(row) },
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                row.title(),
-                                color = Color.White,
-                                modifier = Modifier.weight(1f),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(ByteFormatter.format(row.bytes), color = PlanTextSecondary)
-                            Icon(
-                                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                                contentDescription = null,
-                                tint = PlanTextSecondary,
-                            )
-                        }
-                    }
-                }
-            } else {
-                // V7: the headline is everything listed below; the button only ever
-                // shows what is selected.
-                Text(
-                    stringResource(R.string.plan_up_to_freed, ByteFormatter.format(plan.potentialBytes)),
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Black,
-                )
-                Text(
-                    stringResource(R.string.plan_selected_safely, ByteFormatter.format(plan.recommendedBytes)),
-                    color = PlanAccent,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    stringResource(R.string.plan_worth_a_look_amount, ByteFormatter.format(plan.reviewBytes)),
-                    color = PlanTextSecondary,
-                    fontSize = 15.sp,
-                )
-                val reviewFirst = plan.selectedBytes <= 0L && plan.firstReviewRow != null
-                Button(
-                    onClick = {
-                        val first = plan.firstReviewRow
-                        if (reviewFirst && first != null) onOpenRow(first) else onClean()
-                    },
-                    enabled = (plan.selectedBytes > 0L || reviewFirst) && !cleanupInProgress,
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PlanAccent,
-                        contentColor = PlanButtonText,
-                    ),
-                ) {
-                    if (cleanupInProgress) {
-                        CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanButtonText)
-                    } else if (reviewFirst) {
-                        Text(
-                            stringResource(R.string.plan_review_action, ByteFormatter.format(plan.firstReviewRow?.bytes ?: 0L)),
-                            fontWeight = FontWeight.Black,
-                        )
-                    } else {
-                        Text(
-                            stringResource(R.string.plan_clean_action, ByteFormatter.format(plan.selectedBytes)),
-                            fontWeight = FontWeight.Black,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun PlanSectionTitle(text: String) {
-    Text(
-        text.uppercase(),
-        color = PlanTextSecondary,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Black,
-        modifier = Modifier.padding(top = 8.dp, start = 4.dp),
-    )
-}
-
-@Composable
-internal fun PlanRow(row: PlanGroup, onToggle: () -> Unit, onOpen: () -> Unit) {
-    val count = row.items.size
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = PlanCardAlt,
-        shape = RoundedCornerShape(18.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            if (row.groupSelectable) {
-                Checkbox(
-                    checked = row.allBulkSelected,
-                    onCheckedChange = { onToggle() },
-                    colors = CheckboxDefaults.colors(checkedColor = PlanAccent, checkmarkColor = PlanButtonText),
-                )
-            } else {
-                Spacer(Modifier.width(12.dp))
-            }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .clickable(role = Role.Button, onClick = onOpen)
-                    .padding(vertical = 6.dp),
-            ) {
-                Text(
-                    row.title(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    pluralStringResource(R.plurals.whatsapp_category_summary, count, count, ByteFormatter.format(row.bytes)),
-                    color = PlanTextSecondary,
-                    fontSize = 13.sp,
-                )
-                // B3: the checkbox never selects the user's own camera files.
-                val oneByOne = row.oneByOneCount
-                if (row.groupSelectable && oneByOne > 0) {
-                    Text(
-                        pluralStringResource(R.plurals.plan_camera_one_by_one, oneByOne, oneByOne),
-                        color = Color(0xFFFFC46B),
-                        fontSize = 13.sp,
-                    )
-                }
-            }
-            IconButtonArrow(onOpen)
-        }
-    }
-}
-
-@Composable
-private fun IconButtonArrow(onClick: () -> Unit) {
-    androidx.compose.material3.IconButton(onClick = onClick) {
-        Icon(
-            Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-            contentDescription = null,
-            tint = PlanTextSecondary,
+        PillButton(
+            text = stringResource(R.string.scan_again),
+            onClick = onScanAgain,
+            style = PillStyle.INK_OUTLINE,
+            modifier = Modifier.padding(top = 8.dp),
         )
     }
-}
-
-@Composable
-internal fun SystemStepRow(title: String, detail: String?, onClick: () -> Unit) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = PlanCard,
-        shape = RoundedCornerShape(18.dp),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .clickable(role = Role.Button, onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(title, color = Color.White, fontWeight = FontWeight.Bold)
-                if (detail != null) Text(detail, color = PlanTextSecondary, fontSize = 13.sp)
-            }
-            Icon(
-                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
-                contentDescription = null,
-                tint = PlanTextSecondary,
-            )
-        }
-    }
-}
-
-/** Bottom bar of the plan: "Selected: X" and "Review & clean". */
-@Composable
-internal fun PlanBottomBar(
-    selectedBytes: Long,
-    enabled: Boolean,
-    inProgress: Boolean,
-    onReview: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color(0xFF06112A))
-            .border(width = 1.dp, color = Color.White.copy(alpha = .06f))
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            stringResource(R.string.plan_selected, ByteFormatter.format(selectedBytes)),
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f),
-        )
-        Button(
-            onClick = onReview,
-            enabled = enabled && !inProgress,
-            modifier = Modifier.heightIn(min = 48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PlanAccent, contentColor = PlanButtonText),
-        ) {
-            if (inProgress) {
-                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanButtonText)
-            } else {
-                Text(stringResource(R.string.smart_review_and_clean), fontWeight = FontWeight.Black)
-            }
-        }
-    }
-}
-
-@Composable
-internal fun PlanListContainer(
-    modifier: Modifier = Modifier,
-    content: LazyListScope.() -> Unit,
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 14.dp, top = 14.dp, end = 14.dp, bottom = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        content = content,
-    )
-}
-
-@Composable
-internal fun PlanTextButton(text: String, onClick: () -> Unit) {
-    TextButton(onClick = onClick, modifier = Modifier.heightIn(min = 48.dp)) { Text(text) }
 }
 
 /** Optional rewarded feature: verify large look-alike files (T1B.6). */
 @Composable
 internal fun DeepCheckRow(groups: Int, bytes: Long, running: Boolean, onClick: () -> Unit) {
-    Surface(modifier = Modifier.fillMaxWidth(), color = PlanCard, shape = RoundedCornerShape(18.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            if (running) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanCyan)
-                    Text(stringResource(R.string.deep_check_running), color = Color.White)
-                }
-            } else {
-                Text(
-                    pluralStringResource(R.plurals.deep_check_row, groups, groups, ByteFormatter.format(bytes)),
-                    color = Color.White,
-                )
-                OutlinedButton(onClick = onClick, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.deep_check_action))
-                }
+    BlackCard(contentPadding = PaddingValues(16.dp)) {
+        if (running) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = Lime)
+                Text(stringResource(R.string.deep_check_running), color = OnBlack)
             }
+        } else {
+            Text(
+                pluralStringResource(R.plurals.deep_check_row, groups, groups, ByteFormatter.format(bytes)),
+                color = OnBlack,
+                fontWeight = AppWeights.Strong,
+            )
+            PillButton(
+                text = stringResource(R.string.deep_check_action),
+                onClick = onClick,
+                style = PillStyle.LIME_OUTLINE,
+                modifier = Modifier.padding(top = 10.dp),
+            )
         }
     }
 }

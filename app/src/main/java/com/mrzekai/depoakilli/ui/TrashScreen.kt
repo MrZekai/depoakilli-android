@@ -1,6 +1,5 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,15 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,25 +24,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.ui.common.CardDivider
+import com.mrzekai.depoakilli.ui.common.GiantNumber
+import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.MakeRoomShapes
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.common.PageLabel
+import com.mrzekai.depoakilli.ui.common.PermanentDeleteSheet
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.bidiWrap
+import com.mrzekai.depoakilli.ui.common.rememberGiantScale
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import java.io.File
 import java.util.concurrent.TimeUnit
-
-private val TrashBackground = Color(0xFF030A1D)
-private val TrashCard = Color(0xFF0A1C42)
-private val TrashTextSecondary = Color(0xFFB4C4DF)
-private val TrashRed = Color(0xFFFF5D68)
 
 /** Whole days until an entry is deleted, rounded up, never negative. */
 internal fun trashDaysLeft(entry: TrashEntry, nowMillis: Long): Int {
@@ -55,7 +61,13 @@ internal fun trashDaysLeft(entry: TrashEntry, nowMillis: Long): Int {
     return ((left + TimeUnit.DAYS.toMillis(1) - 1) / TimeUnit.DAYS.toMillis(1)).toInt()
 }
 
-/** Trash tab (T1.8): restore, delete forever or empty the in-app trash. */
+/**
+ * Trash tab (T1.8, Faz 5 T5.9) on Lime: the giant amount waiting in Trash and
+ * that it is freed only when Trash is emptied; the files in one black card
+ * (days left in Lime); a big black "Restore all" (or the selected files) and
+ * "Empty Trash and free X" behind the permanent-delete sheet. An empty Trash
+ * is one sentence without buttons.
+ */
 @Composable
 internal fun TrashScreen(
     entries: List<TrashEntry>,
@@ -70,124 +82,104 @@ internal fun TrashScreen(
     val now = System.currentTimeMillis()
     val visibleIds = entries.mapTo(hashSetOf(), TrashEntry::id)
     val activeSelection = selected intersect visibleIds
+    val totalBytes = entries.sumOf(TrashEntry::sizeBytes)
+    val scale = rememberGiantScale()
 
     LaunchedEffect(Unit) { onRefresh() }
 
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(TrashBackground),
-    ) {
+    PageFrame(modifier = modifier) {
         if (entries.isEmpty()) {
-            Box(Modifier.weight(1f).fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.trash_empty_state), color = TrashTextSecondary, fontSize = 16.sp)
+            Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+                Text(
+                    stringResource(R.string.trash_empty_state),
+                    color = Ink,
+                    fontSize = 26.sp,
+                    lineHeight = 32.sp,
+                    fontWeight = AppWeights.Giant,
+                    textAlign = TextAlign.Center,
+                )
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                contentPadding = PaddingValues(14.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(entries.sortedBy { it.deletedAtMillis }, key = TrashEntry::id) { entry ->
-                    val isSelected = entry.id in activeSelection
-                    Surface(color = TrashCard, shape = RoundedCornerShape(16.dp)) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 64.dp)
-                                .toggleable(
-                                    value = isSelected,
-                                    role = Role.Checkbox,
-                                    onValueChange = { checked ->
-                                        selected = if (checked) selected + entry.id else selected - entry.id
-                                    },
-                                )
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Checkbox(checked = isSelected, onCheckedChange = null)
-                            Column(Modifier.weight(1f)) {
-                                val original = File(entry.originalPath)
-                                Text(
-                                    original.name,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    original.parent.orEmpty(),
-                                    color = TrashTextSecondary,
-                                    fontSize = 12.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                val days = trashDaysLeft(entry, now)
-                                Text(
-                                    stringResource(
-                                        R.string.swipe_age_days,
-                                        ByteFormatter.format(entry.sizeBytes),
-                                        pluralStringResource(R.plurals.trash_days_left, days, days),
-                                    ),
-                                    color = TrashTextSecondary,
-                                    fontSize = 12.sp,
-                                )
-                            }
-                        }
-                    }
-                }
-                item(key = "trash-footer") {
-                    val retention = CleaningThresholds.TRASH_RETENTION_DAYS
-                    Text(
-                        pluralStringResource(R.plurals.trash_footer, retention, retention),
-                        color = TrashTextSecondary,
-                        fontSize = 13.sp,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFF06112A))
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
-                        onClick = {
-                            onRestore(activeSelection)
-                            selected = emptySet()
-                        },
-                        enabled = activeSelection.isNotEmpty(),
-                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                    ) {
-                        Text(stringResource(R.string.trash_restore))
-                    }
-                    OutlinedButton(
-                        onClick = { confirmDelete = activeSelection },
-                        enabled = activeSelection.isNotEmpty(),
-                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                    ) {
-                        Text(stringResource(R.string.trash_delete_forever))
-                    }
-                }
-                Button(
-                    onClick = { confirmEmptyAll = true },
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TrashRed, contentColor = ContrastTokens.OnBrightAction),
+            return@PageFrame
+        }
+        val sorted = entries.sortedBy { it.deletedAtMillis }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(start = 16.dp, top = 12.dp, end = 16.dp, bottom = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
+        ) {
+            item(key = "trash-head") {
+                Column(
+                    Modifier.fillMaxWidth().padding(bottom = 14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(stringResource(R.string.trash_empty), fontWeight = FontWeight.Bold)
+                    GiantNumber(ByteFormatter.format(totalBytes), scale, modifier = Modifier.fillMaxWidth())
+                    PageLabel(stringResource(R.string.trash_waiting), strong = true)
+                    PageLabel(stringResource(R.string.trash_note_v2))
+                }
+            }
+            itemsIndexed(sorted, key = { _, entry -> entry.id }) { index, entry ->
+                val shape = when {
+                    sorted.size == 1 -> MakeRoomShapes.Card
+                    index == 0 -> androidx.compose.foundation.shape.RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                    index == sorted.lastIndex -> androidx.compose.foundation.shape.RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                    else -> androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
+                }
+                androidx.compose.material3.Surface(color = Black, contentColor = OnBlack, shape = shape) {
+                    Column {
+                        TrashRow(
+                            entry = entry,
+                            selected = entry.id in activeSelection,
+                            daysLeft = trashDaysLeft(entry, now),
+                            onToggle = { checked ->
+                                selected = if (checked) selected + entry.id else selected - entry.id
+                            },
+                        )
+                        if (index != sorted.lastIndex) CardDivider()
+                    }
+                }
+            }
+            item(key = "trash-actions") {
+                Column(
+                    Modifier.fillMaxWidth().padding(top = 18.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    if (activeSelection.isEmpty()) {
+                        PillButton(
+                            text = stringResource(R.string.trash_restore_all),
+                            onClick = { onRestore(visibleIds) },
+                            style = PillStyle.BLACK,
+                        )
+                        LinkButton(
+                            text = stringResource(R.string.trash_empty_v2, ByteFormatter.format(totalBytes)),
+                            onClick = { confirmEmptyAll = true },
+                        )
+                    } else {
+                        PillButton(
+                            text = stringResource(R.string.trash_restore),
+                            onClick = {
+                                onRestore(activeSelection)
+                                selected = emptySet()
+                            },
+                            style = PillStyle.BLACK,
+                        )
+                        LinkButton(
+                            text = stringResource(R.string.trash_delete_forever),
+                            onClick = { confirmDelete = activeSelection },
+                        )
+                    }
                 }
             }
         }
     }
 
     confirmDelete?.let { ids ->
-        EmptyTrashConfirmDialog(
-            bytes = entries.filter { it.id in ids }.sumOf(TrashEntry::sizeBytes),
+        val bytes = entries.filter { it.id in ids }.sumOf(TrashEntry::sizeBytes)
+        PermanentDeleteSheet(
+            bytes = bytes,
+            body = stringResource(R.string.result_empty_trash_confirm, ByteFormatter.format(bytes)),
             onDismiss = { confirmDelete = null },
-            onConfirm = {
+            onDeletePermanently = {
                 confirmDelete = null
                 onDeleteForever(ids)
                 selected = selected - ids
@@ -195,10 +187,11 @@ internal fun TrashScreen(
         )
     }
     if (confirmEmptyAll) {
-        EmptyTrashConfirmDialog(
-            bytes = entries.sumOf(TrashEntry::sizeBytes),
+        PermanentDeleteSheet(
+            bytes = totalBytes,
+            body = stringResource(R.string.result_empty_trash_confirm, ByteFormatter.format(totalBytes)),
             onDismiss = { confirmEmptyAll = false },
-            onConfirm = {
+            onDeletePermanently = {
                 confirmEmptyAll = false
                 onDeleteForever(null)
                 selected = emptySet()
@@ -207,27 +200,52 @@ internal fun TrashScreen(
     }
 }
 
-/** One line for the Clean tab when the trash holds files (T1.8). */
 @Composable
-internal fun TrashSummaryLine(entries: List<TrashEntry>, onOpen: () -> Unit) {
-    if (entries.isEmpty()) return
-    val now = System.currentTimeMillis()
-    val days = entries.minOf { trashDaysLeft(it, now) }
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = TrashCard,
-        shape = RoundedCornerShape(16.dp),
-        onClick = onOpen,
+private fun TrashRow(entry: TrashEntry, selected: Boolean, daysLeft: Int, onToggle: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            .toggleable(value = selected, role = Role.Checkbox, onValueChange = onToggle)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        Checkbox(
+            checked = selected,
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(checkedColor = Lime, checkmarkColor = Ink, uncheckedColor = OnBlackSoft),
+            modifier = Modifier.padding(horizontal = 8.dp),
+        )
+        Column(Modifier.weight(1f)) {
+            val original = File(entry.originalPath)
+            Text(
+                original.name,
+                color = OnBlack,
+                fontWeight = AppWeights.Strong,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                bidiWrap(original.parent.orEmpty()),
+                color = OnBlackSoft,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                ByteFormatter.format(entry.sizeBytes),
+                color = OnBlackSoft,
+                fontSize = 13.sp,
+            )
+        }
         Text(
-            pluralStringResource(
-                R.plurals.trash_home_line,
-                days,
-                ByteFormatter.format(entries.sumOf(TrashEntry::sizeBytes)),
-                days,
-            ),
-            color = Color.White,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            pluralStringResource(R.plurals.trash_days_left, daysLeft, daysLeft),
+            color = Lime,
+            fontWeight = AppWeights.Title,
+            fontSize = 14.sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
         )
     }
 }

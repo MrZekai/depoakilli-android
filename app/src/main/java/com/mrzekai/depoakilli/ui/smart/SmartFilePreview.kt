@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -57,8 +55,16 @@ import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.ui.*
+import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.BlackLine
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 @Composable
 internal fun DialogHeader(title: String, onBack: () -> Unit) {
@@ -69,7 +75,15 @@ internal fun DialogHeader(title: String, onBack: () -> Unit) {
         IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back))
         }
-        Text(title, color = Color.White, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black, modifier = Modifier.weight(1f))
+        Text(
+            title,
+            color = Ink,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Black,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -96,7 +110,7 @@ internal fun FilePreviewDialog(
                         .weight(1f)
                         .padding(horizontal = 14.dp)
                         .clip(RoundedCornerShape(22.dp))
-                        .background(Color(0xFF06132F)),
+                        .background(Black),
                     contentAlignment = Alignment.Center,
                 ) {
                     MediaPreviewContent(file.toMediaPreview())
@@ -113,7 +127,7 @@ internal fun FilePreviewDialog(
                     ) {
                         Text(
                             file.name,
-                            color = Color.White,
+                            color = OnBlack,
                             fontWeight = FontWeight.Black,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -130,13 +144,13 @@ internal fun FilePreviewDialog(
                             )
                             PreviewInfoPill(
                                 text = previewKindLabel(file),
-                                accent = Color(0xFF9A63FF),
+                                accent = Lime,
                                 modifier = Modifier.weight(1f),
                             )
                         }
                         Text(
                             file.relativePath.ifBlank { stringResource(R.string.smart_path_unknown) }.let(::bidiWrap),
-                            color = Color(0xFFA9B9D5),
+                            color = OnBlackSoft,
                             style = MaterialTheme.typography.bodySmall,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -144,7 +158,7 @@ internal fun FilePreviewDialog(
 
                         if (!reason.isNullOrBlank()) {
                             Surface(
-                                color = Color(0xFF102850),
+                                color = BlackChip,
                                 shape = RoundedCornerShape(14.dp),
                                 border = androidx.compose.foundation.BorderStroke(1.dp, SmartCyan.copy(alpha = .26f)),
                             ) {
@@ -160,7 +174,7 @@ internal fun FilePreviewDialog(
                                     )
                                     Text(
                                         reason,
-                                        color = Color.White,
+                                        color = OnBlack,
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
@@ -168,7 +182,7 @@ internal fun FilePreviewDialog(
                         }
 
                         if (selected != null && onToggleSelection != null) {
-                            val selectionColor = if (selected) Color(0xFF0F4938) else Color(0xFF152C52)
+                            val selectionColor = BlackChip
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -176,7 +190,7 @@ internal fun FilePreviewDialog(
                                     .background(selectionColor)
                                     .border(
                                         width = 1.dp,
-                                        color = if (selected) SmartGreen.copy(alpha = .72f) else Color(0xFF6B85AD),
+                                        color = if (selected) Lime else BlackLine,
                                         shape = RoundedCornerShape(18.dp),
                                     )
                                     .clickable(onClick = onToggleSelection)
@@ -188,20 +202,20 @@ internal fun FilePreviewDialog(
                                     onCheckedChange = { onToggleSelection() },
                                     colors = CheckboxDefaults.colors(
                                         checkedColor = SmartGreen,
-                                        uncheckedColor = Color(0xFFB7C6DE),
-                                        checkmarkColor = Color(0xFF03120D),
+                                        uncheckedColor = OnBlackSoft,
+                                        checkmarkColor = Ink,
                                     ),
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text(
                                         stringResource(if (selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
-                                        color = Color.White,
+                                        color = OnBlack,
                                         fontWeight = FontWeight.Black,
                                     )
                                     Text(
                                         stringResource(if (selected) R.string.smart_selection_remove_hint else R.string.smart_selection_add_hint),
-                                        color = Color(0xFFC0CEE4),
+                                        color = OnBlackSoft,
                                         style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
@@ -210,9 +224,12 @@ internal fun FilePreviewDialog(
 
                         // V11: "this is my archive" for the file's folder.
                         if (onExcludeFolder != null) {
-                            TextButton(onClick = onExcludeFolder, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                Text(stringResource(R.string.exclude_folder_action))
-                            }
+                            LinkButton(
+                                stringResource(R.string.exclude_folder_action),
+                                onClick = onExcludeFolder,
+                                color = Lime,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                 }
@@ -235,7 +252,7 @@ internal fun PreviewInfoPill(
     ) {
         Text(
             text,
-            color = Color.White,
+            color = OnBlack,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 9.dp, vertical = 7.dp),
@@ -267,16 +284,9 @@ internal fun previewKindLabel(file: SmartPreviewFile): String {
     }
 }
 
-internal fun categoryAccent(category: CleanCategory): Color = when (category) {
-    CleanCategory.JUNK -> Color(0xFF0B84FF)
-    CleanCategory.DUPLICATE -> Color(0xFF8A48F5)
-    CleanCategory.SCREENSHOT -> Color(0xFFEB4CC4)
-    CleanCategory.LARGE_FILE -> Color(0xFFFFA31A)
-    CleanCategory.OLD_DOWNLOAD -> Color(0xFF16A8D8)
-    CleanCategory.APK_PACKAGE -> Color(0xFF5ECA45)
-    CleanCategory.APP_CACHE -> Color(0xFF15B9C8)
-    CleanCategory.WHATSAPP_MEDIA -> Color(0xFF19B968)
-}
+/** One accent in the Faz 5 design: every category uses Lime on black. */
+@Suppress("UNUSED_PARAMETER")
+internal fun categoryAccent(category: CleanCategory): Color = Lime
 
 internal fun categoryVisual(category: CleanCategory): ImageVector = when (category) {
     CleanCategory.JUNK -> Icons.Outlined.DeleteSweep
@@ -289,15 +299,9 @@ internal fun categoryVisual(category: CleanCategory): ImageVector = when (catego
     CleanCategory.WHATSAPP_MEDIA -> Icons.Outlined.Chat
 }
 
-internal fun storageAccent(type: StorageFileType): Color = when (type) {
-    StorageFileType.IMAGES -> Color(0xFFDA4DD7)
-    StorageFileType.VIDEOS -> Color(0xFF2078F5)
-    StorageFileType.AUDIO -> Color(0xFF16B7B7)
-    StorageFileType.DOCUMENTS -> Color(0xFF7B55E8)
-    StorageFileType.ARCHIVES -> Color(0xFFE78B19)
-    StorageFileType.APK -> Color(0xFF5BBE35)
-    StorageFileType.OTHER -> Color(0xFF72809B)
-}
+/** Lime on black for the storage review lists; chart colours live in StorageAnalyzerScreen. */
+@Suppress("UNUSED_PARAMETER")
+internal fun storageAccent(type: StorageFileType): Color = Lime
 
 internal fun storageTypeVisual(type: StorageFileType): ImageVector = when (type) {
     StorageFileType.IMAGES -> Icons.Outlined.PhotoLibrary

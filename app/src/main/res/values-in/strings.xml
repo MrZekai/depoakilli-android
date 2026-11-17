@@ -4,9 +4,7 @@
     <string name="tab_clean">Bersihkan</string>
     <string name="tab_tools">Alat</string>
     <string name="home_storage_percent">%1$d%%</string>
-    <string name="junk_cleaner_title">Pembersih File Sampah</string>
     <string name="whatsapp_cleaner_title">Pembersih WhatsApp</string>
-    <string name="large_files_tool_title">File Besar</string>
     <string name="grant_access">Izinkan</string>
     <string name="scan_private">Konten Anda tidak pernah keluar dari perangkat</string>
     <string name="start_scan">Mulai pemindaian</string>
@@ -24,8 +22,6 @@
     <string name="scan_focus_large">File Besar</string>
     <string name="language_settings">Bahasa aplikasi</string>
     <string name="ad_privacy_preferences">Preferensi privasi iklan</string>
-    <string name="ad_privacy_preferences_subtitle">Mengubah pilihan persetujuan dan personalisasi</string>
-    <string name="sponsored">Iklan</string>
     <string name="message_scan_failed">Pemindaian tidak dapat diselesaikan. Periksa izin media dan coba lagi.</string>
     <string name="message_select_item">Pilih setidaknya satu item untuk dibersihkan.</string>
     <string name="message_cache_already_empty">Cache aplikasi sudah kosong.</string>
@@ -94,26 +90,16 @@
     </plurals>
     <string name="settings_title">Pengaturan</string>
     <string name="rate_us">Nilai kami</string>
-    <string name="rate_us_subtitle">Buka halaman Google Play Smart Cleaner</string>
     <string name="send_feedback">Kirim masukan</string>
-    <string name="send_feedback_subtitle">Laporkan masalah atau bagikan saran</string>
     <string name="share_app">Bagikan Smart Cleaner</string>
-    <string name="share_app_subtitle">Rekomendasikan aplikasi tersebut kepada seseorang</string>
     <string name="privacy_policy">Kebijakan Privasi</string>
-    <string name="privacy_policy_subtitle">Baca cara data perangkat dan iklan ditangani</string>
     <string name="terms_of_service">Ketentuan Layanan</string>
-    <string name="terms_of_service_subtitle">Baca ketentuan penggunaan dan penghapusan yang aman</string>
     <string name="about_app">Tentang</string>
     <string name="legal_contact">Pengembang: MrZekai\nKontak privasi dan dukungan: %1$s</string>
-    <string name="about_app_subtitle">Versi, prinsip produk, dan kemampuan</string>
     <string name="feedback_subject">Umpan balik Smart Cleaner</string>
     <string name="feedback_template">Perangkat: %1$s %2$s\nAndroid: %3$s\n\nUmpan Balik: \n</string>
     <string name="share_app_message">Smart Cleaner menganalisis penyimpanan dengan aman di perangkat Anda: %1$s</string>
     <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner adalah aplikasi manajemen penyimpanan dan pemeliharaan. Ini memindai penyimpanan bersama di perangkat untuk mencari sampah, duplikat persis, file besar, unduhan lama, penginstal APK, item ulasan media, dan media WhatsApp. App Cache Manager menggunakan aliran pembersihan cache sistem resmi Android; Android mungkin memerlukan konfirmasi sistem.\n\nPaket: com.mrzekai.depoakilli</string>
-    <string name="access_files_missing">Akses file diperlukan</string>
-    <string name="access_files_ready">File sudah siap</string>
-    <string name="access_usage_optional">Akses penggunaan opsional</string>
-    <string name="access_usage_ready">Statistik aplikasi sudah siap</string>
     <string name="all_files_access_clean_screen">Smart Cleaner membutuhkan Android Semua akses file untuk memindai penyimpanan bersama secara komprehensif tanpa membuat Anda memilih folder satu per satu.</string>
     <string name="all_files_access_description">Diperlukan untuk manajemen file inti dan mesin pemeliharaan: sampah, duplikat, file besar, unduhan, media bersama APK dan WhatsApp.</string>
     <string name="all_files_access_title">Akses manajemen penyimpanan penuh</string>
@@ -131,14 +117,8 @@
     <string name="category_junk_description">Artefak unduhan temporer, thumbnail, dan tidak lengkap yang lama</string>
     <string name="category_large_files">File besar</string>
     <string name="category_large_files_description">File lebih dari 100 MB di seluruh penyimpanan bersama yang dapat diakses</string>
-    <string name="deep_cleaner_subtitle">Tinjauan sekali jalan yang luas di seluruh kategori penyimpanan utama; file pribadi dengan tingkat kepercayaan lebih rendah tetap hanya untuk ditinjau</string>
-    <string name="deep_cleaner_title">Pembersih Mendalam</string>
     <string name="duplicates_tool_subtitle_v050">Temukan duplikat persis yang diverifikasi berdasarkan konten; satu yang asli selalu disimpan</string>
-    <string name="junk_cleaner_subtitle_v050">Tinjau file sementara dan artefak thumbnail di luar Unduhan; sisa unduhan tetap di Unduhan</string>
-    <string name="language_settings_subtitle_v050">Gunakan pengaturan bahasa aplikasi Android. Bahasa yang tidak didukung akan kembali ke bahasa Inggris dengan aman.</string>
     <string name="large_files_tool_subtitle_v050">Temukan file lebih dari 100 MB — video, arsip, APK, audio, dokumen, dan lainnya</string>
-    <string name="media_cleaner_subtitle">Tinjau duplikat media yang sebenarnya, tangkapan layar lama, dan foto/video berukuran besar</string>
-    <string name="media_cleaner_title">Pembersih Media</string>
     <string name="message_all_files_granted">Akses manajemen penyimpanan penuh sudah siap.</string>
     <string name="message_all_files_required">Aktifkan akses Semua file sehingga Smart Cleaner dapat melakukan pemindaian penyimpanan perangkat secara penuh.</string>
     <string name="message_all_files_required_for_cache">Pembersihan cache mendalam memerlukan Android Semua file diakses terlebih dahulu.</string>
@@ -168,13 +148,10 @@
     <string name="storage_type_other">File lainnya</string>
     <string name="storage_type_videos">Video</string>
     <string name="terms_of_service_body_v050">Smart Cleaner menyediakan analisis penyimpanan pada perangkat dan alat manajemen file. Hasil pemindaian adalah rekomendasi, bukan cadangan. Tinjau file pengguna yang dipilih sebelum menghapusnya.\n\nSmart Cleaner dapat mengelola file penyimpanan bersama yang dapat diakses setelah Android memberikan akses Semua file. Android tetap melindungi data internal pribadi aplikasi lain. Manajer Cache Aplikasi menggunakan tindakan sistem resmi Android dan mungkin menampilkan konfirmasi Android yang diperlukan. \n\nSmart Cleaner tidak menjanjikan perubahan pada aplikasi pihak ketiga yang dilindungi, RAM sistem, atau suhu CPU, maupun hasil kinerja yang dibuat-buat. Ketersediaan bergantung pada versi Android dan produsen perangkat.\n\nAnda bertanggung jawab untuk meninjau pilihan sebelum penghapusan. File yang terhapus mungkin tidak dapat dipulihkan. Iklan disediakan oleh layanan pihak ketiga berdasarkan syarat dan kebijakan masing-masing.</string>
-    <string name="tools_rebuilt_status">%1$s tersedia • Cache aplikasi %2$s dilaporkan</string>
-    <string name="tools_rebuilt_title">Alat pembersih &amp; penyimpanan</string>
     <string name="uninstall">Copot pemasangan</string>
     <string name="whatsapp_category_statuses">Status</string>
     <string name="whatsapp_category_statuses_description">Media status WhatsApp sementara disimpan di penyimpanan bersama</string>
     <string name="whatsapp_cleaner_subtitle_v050">Pindai WhatsApp dan WhatsApp Business Media bersama langsung di dalam Smart Cleaner</string>
-    <string name="cleaner_engine_badge">SMART CLEANER</string>
     <string name="security_center_title">Izin &amp; privasi</string>
     <string name="security_center_subtitle">Kelola akses Android dan lihat kegunaan Smart Cleaner.</string>
     <string name="security_storage_access">Akses penyimpanan</string>
@@ -190,9 +167,6 @@
     <string name="clean_results_title">Hasil pembersihan</string>
     <string name="smart_clean_results_title">Hasil Smart Clean</string>
     <string name="smart_clean_results_empty_intro">Jalankan Smart Clean untuk melihat saran pembersihan yang dapat ditinjau dan rincian penyimpanan yang dapat disadap.</string>
-    <string name="smart_scan_progress_title">Pemindaian Smart Clean sedang berlangsung</string>
-    <string name="smart_scan_progress_subtitle">Menganalisis sampah, duplikat, file besar, APK, dan media yang dapat diakses untuk membuat rencana pembersihan yang aman.</string>
-    <string name="smart_review_and_clean">Tinjau &amp; bersihkan</string>
     <string name="smart_storage_preview_empty">Tidak ada file yang dapat dipratinjau yang diambil untuk kategori ini.</string>
     <string name="smart_included_in_cleanup">Termasuk dalam pembersihan</string>
     <string name="smart_not_included_in_cleanup">Tidak termasuk dalam pembersihan</string>
@@ -200,13 +174,9 @@
     <string name="smart_audio_pause">Jeda audio</string>
     <string name="smart_generic_preview_title">Detail berkas</string>
     <string name="smart_reason_title">Mengapa hal ini disarankan?</string>
-    <string name="smart_cleanup_in_progress">Membersihkan…</string>
     <string name="message_cleanup_failed">Pembersihan tidak dapat diselesaikan. Tidak ada hal lain yang diubah.</string>
-    <string name="smart_scan_live_title">Pemindaian langsung</string>
     <string name="smart_scan_files_label">File ditemukan</string>
     <string name="smart_scan_folders_label">Folder diperiksa</string>
-    <string name="smart_scan_checking_title">Sekarang memeriksa</string>
-    <string name="smart_scan_media_stage">Media &amp; unduhan</string>
     <string name="smart_detail_selected_summary">%1$d dari %2$d dipilih • %3$s</string>
     <string name="smart_detail_grid_hint">Ketuk kartu untuk mempratinjaunya. Gunakan kotak centang hanya untuk menyertakan atau mengecualikannya dari pembersihan.</string>
     <string name="smart_detail_select_all">Pilih semua</string>
@@ -252,29 +222,15 @@
     <string name="whatsapp_sort_largest">Terbesar dulu</string>
     <string name="whatsapp_sort_newest">Terbaru dulu</string>
     <string name="whatsapp_no_files_for_filter">Tidak ada file yang cocok dengan filter ini.</string>
-    <string name="whatsapp_selected_size">Dipilih</string>
-    <plurals name="whatsapp_selected_items_short">
-        <item quantity="other">Barang %1$d</item>
-    </plurals>
-    <string name="whatsapp_review_and_clean">Tinjau &amp; bersihkan</string>
-    <string name="whatsapp_cleanup_in_progress">Membersihkan…</string>
     <string name="whatsapp_preview_title">Pratinjau</string>
     <string name="whatsapp_included">Termasuk dalam pembersihan</string>
     <string name="whatsapp_not_included">Tidak termasuk</string>
     <string name="whatsapp_remove_from_cleanup">Ketuk untuk melindungi file ini dari pembersihan.</string>
     <string name="whatsapp_add_to_cleanup">Ketuk untuk menyertakan file ini dalam pembersihan.</string>
     <string name="whatsapp_audio_preview_error">File audio ini tidak dapat diputar di perangkat ini.</string>
-    <string name="premium_tool_scanning">Memindai alat ini di perangkat Anda…</string>
-    <string name="premium_tool_on_device_title">Analisis pada perangkat</string>
     <string name="premium_tool_nothing_found">Tidak ada yang perlu ditinjau</string>
     <string name="premium_tool_nothing_found_detail">Tidak ditemukan file yang cocok di penyimpanan bersama yang dapat diakses.</string>
     <string name="premium_tool_found_size">Total ukuran untuk ditinjau</string>
-    <string name="premium_tool_candidates">Kandidat</string>
-    <string name="premium_tool_selected">Dipilih</string>
-    <string name="premium_tool_scanned">Dipindai</string>
-    <plurals name="premium_tool_selected_count">
-        <item quantity="other">Barang %1$d</item>
-    </plurals>
     <string name="premium_sort_largest">Terbesar dulu</string>
     <string name="premium_sort_newest">Terbaru dulu</string>
     <string name="premium_sort_selected">Yang dipilih dulu</string>
@@ -322,14 +278,9 @@
     </plurals>
     <string name="cleanup_result_zero">Tidak ada ruang tambahan yang direklamasi.</string>
     <string name="cleanup_result_note">Nilai ini dihitung dari file Smart Cleaner yang sebenarnya dihapus di perangkat ini.</string>
-    <string name="cleanup_result_done">Selesai</string>
     <string name="cleanup_result_storage_snapshot">Cuplikan ruang bebas: %1$s → %2$s</string>
-    <string name="disclosure_all_files_title">Mengapa akses penyimpanan penuh?</string>
-    <string name="disclosure_all_files_body">Smart Cleaner menggunakan akses Semua file Android hanya untuk fitur manajemen file intinya: memindai penyimpanan bersama untuk mencari kandidat sampah, duplikat persis, file besar, unduhan, penginstal APK, dan media perpesanan bersama. File tetap ada di perangkat Anda. Anda meninjau apa yang akan dihapus. Android tetap melindungi data pribadi aplikasi lain.</string>
     <string name="disclosure_usage_title">Mengapa Akses Penggunaan?</string>
     <string name="disclosure_usage_body">Akses Penggunaan bersifat opsional. Ini memungkinkan Smart Cleaner membaca total penyimpanan/cache aplikasi yang dilaporkan Android dan waktu terakhir digunakan sehingga Anda dapat meninjau aplikasi besar atau yang tidak digunakan. Itu tidak membaca konten pribadi di dalam aplikasi tersebut dan tidak menghapus data yang dilindungi secara diam-diam.</string>
-    <string name="disclosure_continue">Lanjutkan</string>
-    <string name="disclosure_not_now">Tidak sekarang</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="smart_cleanup_ad_notice">Smart Cleaner gratis dan menampilkan iklan: banner, satu iklan native berlabel di beberapa daftar, panel iklan pada hasil pembersihan, sesekali iklan layar penuh setelah pembersihan atau saat kembali ke tab Bersihkan, dan iklan pembuka saat aplikasi dimuat. Iklan tidak pernah muncul di langkah izin atau konfirmasi; video singkat menghapus banner dan iklan layar penuh selama 60 menit.</string>
     <string name="cache_modern_total_label">Total cache aplikasi</string>
@@ -394,12 +345,6 @@
     <string name="storage_change_time_minutes">%1$d menit yang lalu</string>
     <string name="storage_change_time_hours">%1$d jam yang lalu</string>
     <string name="storage_change_time_days">%1$d hari yang lalu</string>
-    <string name="tools_cleaning_section_title">Alat yang ditargetkan</string>
-    <string name="tools_cleaning_section_subtitle">Pilih satu kategori ketika Anda tahu persis apa yang ingin Anda ulas</string>
-    <string name="tools_storage_section_title">Penyimpanan &amp; analisis</string>
-    <string name="tools_storage_section_subtitle">Periksa unduhan, penginstal APK, cache, dan perubahan penyimpanan secara terpisah</string>
-    <string name="tools_apps_section_title">Aplikasi</string>
-    <string name="tools_apps_section_subtitle">Tinjau opsi penyimpanan dan manajemen aplikasi Android</string>
     <string name="tools_downloads_subtitle">Tinjau unduhan lama dan artefak unduhan yang tidak lengkap di Unduhan</string>
     <string name="tools_apk_subtitle">Tinjau paket penginstal APK di seluruh penyimpanan bersama yang dapat diakses</string>
     <string name="tools_storage_change_subtitle">Lihat peningkatan dan penurunan penyimpanan terukur antara dua analisis nyata</string>
@@ -430,7 +375,6 @@
     </plurals>
     <string name="nothing_selected_hint">Pilih file yang akan dibersihkan</string>
     <string name="premium_duplicate_copy_of">Salinan %1$s</string>
-    <string name="tools_rebuilt_status_cache_unmeasured">%1$s tersedia • Cache aplikasi tidak diukur – izinkan Akses Penggunaan</string>
     <string name="cache_modern_not_measured">Tidak diukur – izinkan Akses Penggunaan</string>
     <string name="app_info">Informasi aplikasi</string>
     <string name="feedback_dialog_body">Kirimkan surat kepada kami di alamat di bawah ini. Anda dapat menyalinnya atau membuka aplikasi email.</string>
@@ -468,47 +412,29 @@
     <plurals name="reason_whatsapp_voice">
         <item quantity="other">Pesan suara • Usia dalam hari: %1$d</item>
     </plurals>
-    <string name="plan_recommended_title">Pembersihan yang disarankan</string>
-    <string name="plan_clean_action">Bersihkan %1$s</string>
-    <string name="plan_nothing_big">Tidak ada yang besar untuk dibersihkan otomatis</string>
-    <string name="plan_biggest_space_in">Ruang terbesar ada di:</string>
-    <string name="plan_section_included">Termasuk</string>
     <string name="plan_section_system">Langkah sistem</string>
-    <string name="plan_section_review">Layak dilihat</string>
     <string name="plan_small_items">Item kecil</string>
     <string name="plan_clear_app_caches">Hapus cache aplikasi</string>
     <string name="plan_cache_about">sekitar %1$s</string>
-    <string name="plan_selected">Dipilih: %1$s</string>
     <string name="plan_preview_title">Tinjau sebelum membersihkan</string>
     <string name="plan_preview_whatsapp">Media WhatsApp yang dihapus tidak akan terbuka di chat.</string>
     <string name="plan_preview_cloud">Cadangan cloud tidak diperiksa.</string>
     <string name="plan_preview_clean">Bersihkan</string>
     <string name="plan_preview_remove">Hapus dari pilihan</string>
-    <string name="result_freed_now">Dikosongkan sekarang: %1$s</string>
     <string name="result_undo">Urungkan</string>
-    <string name="result_empty_trash_now">Kosongkan Sampah sekarang</string>
     <string name="result_empty_trash_confirm">Hapus %1$s secara permanen? Tindakan ini tidak dapat diurungkan.</string>
-    <string name="result_delete_permanently">Hapus</string>
-    <string name="trash_title">Sampah</string>
-    <string name="trash_description">Pulihkan atau hapus file yang dibersihkan</string>
     <string name="trash_restore">Pulihkan</string>
     <string name="trash_delete_forever">Hapus permanen</string>
     <string name="trash_empty">Kosongkan Sampah</string>
     <string name="trash_empty_state">Sampah kosong</string>
     <string name="scan_stage_exact_copies">Memeriksa salinan persis…</string>
     <string name="tab_trash">Sampah</string>
-    <string name="home_updating">Memperbarui…</string>
-    <string name="home_allow_access">Izinkan akses</string>
-    <string name="home_access_explainer">Smart Cleaner memerlukan akses ke semua file untuk menemukan yang dapat dibersihkan. Tidak ada yang dihapus tanpa konfirmasi Anda.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_storage_line">%1$d%% terpakai · %2$s kosong</string>
-    <string name="swipe_delete">Hapus</string>
-    <string name="swipe_keep">Simpan</string>
+    <string name="swipe_delete">HAPUS</string>
+    <string name="swipe_keep">SIMPAN</string>
     <string name="swipe_undo">Urungkan</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Selesai</string>
     <string name="swipe_continue">Lanjutkan</string>
-    <string name="swipe_grid_view">Tampilan petak</string>
     <string name="swipe_review_view">Tinjau dengan geser</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -520,9 +446,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="plan_preview_summary">
         <item quantity="other">%1$s dihapus sekarang · %2$s ke Sampah selama %3$d hari</item>
-    </plurals>
-    <plurals name="result_in_trash">
-        <item quantity="other">Di Sampah: %1$s — kosong dalam %2$d hari</item>
     </plurals>
     <plurals name="result_changed">
         <item quantity="other">%1$d berubah sejak pemindaian</item>
@@ -539,10 +462,6 @@
     <plurals name="trash_days_left">
         <item quantity="other">%1$d hari lagi</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="trash_footer">
-        <item quantity="other">File disimpan di sini selama %1$d hari, lalu dihapus. Sampah tetap memakai penyimpanan sampai dikosongkan. Jika Anda mencopot Smart Cleaner, hapus folder .SmartCleanerTrash dengan pengelola file.</item>
-    </plurals>
     <plurals name="swipe_marked">
         <item quantity="other">Ditandai: %1$d file · %2$s</item>
     </plurals>
@@ -555,7 +474,6 @@
     <plurals name="deep_check_row">
         <item quantity="other">File besar yang tampak identik: %1$d · hingga %2$s. Tonton video singkat untuk memverifikasinya.</item>
     </plurals>
-    <string name="trash_full_title">Tidak dapat dipindahkan ke Sampah</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
         <item quantity="other">%1$d file tidak dapat dipindahkan ke Sampah; penyimpanan mungkin penuh. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
@@ -568,21 +486,6 @@
         <item quantity="other">Perangkat ini tidak mengizinkan Smart Cleaner membuat folder Sampah, jadi %1$d file tidak dapat disimpan untuk diurungkan. Hapus permanen? Tindakan ini tidak dapat diurungkan.</item>
     </plurals>
     <string name="delete_confirm_permanent">%1$s akan dihapus permanen. Tindakan ini tidak dapat diurungkan.</string>
-    <string name="delete_confirm_show_all">Tampilkan semua</string>
-    <string name="delete_confirm_show_less">Tampilkan lebih sedikit</string>
-    <string name="delete_confirm_action">Hapus</string>
-    <plurals name="delete_confirm_title">
-        <item quantity="other">Hapus %1$d file?</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="delete_confirm_trash">
-        <item quantity="other">%1$s dipindahkan ke Sampah selama %2$d hari. Kamu bisa memulihkannya sampai saat itu.</item>
-    </plurals>
-    <string name="home_saved_checked_recently">Dicek kurang dari satu jam lalu</string>
-    <string name="home_saved_details">Lihat detail</string>
-    <plurals name="home_saved_checked_hours">
-        <item quantity="other">Dicek %1$d jam lalu</item>
-    </plurals>
     <string name="plan_group_whatsapp_old_video">Video WhatsApp lama</string>
     <string name="plan_group_whatsapp_old_image">Foto WhatsApp lama</string>
     <string name="plan_group_whatsapp_old_audio">Audio WhatsApp lama</string>
@@ -599,10 +502,6 @@
     <plurals name="reason_other_app_media">
         <item quantity="other">Disimpan oleh aplikasi lain %1$d hari lalu. Aplikasi itu mungkin menampilkannya sebagai hilang jika dihapus.</item>
     </plurals>
-    <string name="plan_up_to_freed">Hingga %1$s dapat dikosongkan</string>
-    <string name="plan_selected_safely">%1$s dipilih dengan aman</string>
-    <string name="plan_worth_a_look_amount">%1$s layak dicek</string>
-    <string name="plan_review_action">Tinjau %1$s</string>
     <string name="plan_small_review">Grup kecil untuk dicek</string>
     <string name="plan_biggest_folders">Folder terbesar</string>
     <string name="plan_largest_apps">Aplikasi terbesar</string>
@@ -624,4 +523,126 @@
     <string name="message_folder_excluded">File dari %1$s tidak akan disarankan.</string>
     <string name="message_excluded_folders_full">Anda dapat mengecualikan hingga 50 folder. Hapus satu di Pengaturan terlebih dahulu.</string>
     <string name="plan_kept_hidden">File yang disimpan dan disembunyikan dari rencana ini: %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_first_label">Ponselmu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_first_sub">penuh · sisa %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_make_room">KOSONGKAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_hint_find">biar kucari berapa</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trust_line">Tanpa akun. Tanpa langganan. Tak ada yang keluar dari ponselmu.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_label">Hingga</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub">bisa dikosongkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_clean">BERSIHKAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_hint_tap">sekali ketuk</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_split">%1$s sampah langsung masuk Sampah. Untuk %2$s sisanya aku tanya dulu.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_scan_label">Ditemukan sejauh ini</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_scan_now">Memeriksa %1$s…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_title">Bagian mudah sudah beres. Ini yang makan tempat:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_sub">Ponselmu masih penuh %1$d%%.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_tidy_title">Saat ini tak ada yang perlu dihapus.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_check_again">Periksa lagi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_title_v2">Untuk mengosongkan ruang, perlu akses penyimpanan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_1">File-mu tak pernah diunggah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_2">Tanpa akun atau pendaftaran</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_3">Tak ada yang dihapus tanpa persetujuanmu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_note_v2">Berikutnya Android akan meminta “Akses semua file”. Akses ini hanya untuk menemukan file besar, lama, dan duplikat.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="action_continue">Lanjutkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="action_not_now">Nanti saja</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_trash_title">Pindahkan %1$s ke Sampah?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_yes_clean">Ya, bersihkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_flag">Tidak bisa dibatalkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_title">Hapus %1$s selamanya?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_action">Hapus permanen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_found_title">lagi yang bisa kukosongkan. Ini temuanku:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_start_biggest">Mulai dari yang terbesar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_title">Simpan yang ini?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_undo_last">Urungkan pilihan terakhir</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_selected_note">%1$s dipilih · konfirmasi di akhir</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_list">Daftar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_moved_to_trash">dipindahkan ke Sampah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_space_note">Ruang kosong setelah Sampah dikosongkan: otomatis dalam 7 hari, atau sekarang.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_done">Selesai</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now">Kosongkan ruang sekarang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_waiting">menunggu di Sampah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_note_v2">Ruang ini baru kosong setelah Sampah dikosongkan. File bisa dipulihkan selama 7 hari.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_restore_all">Pulihkan semua</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_v2">Kosongkan Sampah dan bebaskan %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_move_to_trash">Pindahkan ke Sampah</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_label">Iklan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_review_rest">Lihat temuan lainnya</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_photos">Foto &amp; video</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_apps">Aplikasi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed_for_good">%1$s dikosongkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_body">File ini tak bisa masuk Sampah, jadi akan langsung dihapus.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_trash_body">
+        <item quantity="other">%1$d file: %2$s. Bisa dipulihkan selama 7 hari.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_see_files">
+        <item quantity="other">Lihat semua %1$d file</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="home_scan_files_count">
+        <item quantity="other">%1$d file</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_app_cache">Cache aplikasi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_status_on">Aktif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_status_off">Nonaktif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_privacy_terms">Privasi &amp; ketentuan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_kept_row">File yang kusimpan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_excluded_row">Folder yang tidak disarankan</string>
 </resources>

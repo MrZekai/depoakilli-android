@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,10 +30,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.InstalledAppEntry
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
+import com.mrzekai.depoakilli.ui.common.IconChip
+import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
 @Composable
 internal fun AppManagerScreen(
@@ -46,13 +52,14 @@ internal fun AppManagerScreen(
     onOpenAppInfo: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    PageFrame(modifier = modifier) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(18.dp),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            Text(stringResource(R.string.app_manager_intro), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.app_manager_intro), color = InkSoft, fontWeight = AppWeights.Strong)
         }
         if (!state.hasUsageAccess) {
             item {
@@ -66,13 +73,19 @@ internal fun AppManagerScreen(
         }
         item {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(pluralStringResource(R.plurals.apps_found, state.installedApps.size, state.installedApps.size), fontWeight = FontWeight.Black)
-                TextButton(onClick = onRefresh) { Text(stringResource(R.string.cache_refresh)) }
+                Text(
+                    pluralStringResource(R.plurals.apps_found, state.installedApps.size, state.installedApps.size),
+                    color = Ink,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 18.sp,
+                )
+                LinkButton(stringResource(R.string.cache_refresh), onClick = onRefresh)
             }
         }
         items(state.installedApps, key = InstalledAppEntry::packageName) { app ->
             AppManagerRow(app, onUninstallApp, onOpenAppInfo)
         }
+    }
     }
 }
 
@@ -82,11 +95,9 @@ internal fun AppManagerRow(
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
 ) {
-    Card(shape = RoundedCornerShape(18.dp)) {
+    Card(shape = RoundedCornerShape(24.dp), colors = CardDefaults.cardColors(containerColor = Black, contentColor = OnBlack)) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = ElectricBlue.copy(alpha = .12f), shape = CircleShape) {
-                Icon(Icons.Outlined.Android, contentDescription = null, tint = ElectricBlue, modifier = Modifier.padding(10.dp))
-            }
+            IconChip(Icons.Outlined.Android)
             Spacer(Modifier.width(11.dp))
             Column(Modifier.weight(1f)) {
                 Text(app.label, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)

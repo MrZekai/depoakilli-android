@@ -124,7 +124,7 @@ private fun NativeResultAd(
 
     AndroidView(
         factory = {
-            createNativeAdView(context).also { view ->
+            createNativeAdView(context, showBadge = false).also { view ->
                 bindNativeAd(view, nativeAd)
             }
         },
@@ -184,16 +184,21 @@ private fun ResultMrecAd(
     }
 }
 
-internal fun createNativeAdView(context: android.content.Context): NativeAdView {
+/**
+ * [showBadge]: the "Ad" label inside the card. The result screen draws the
+ * label above its ad slot (it may hold the MREC fallback), so it passes false.
+ */
+internal fun createNativeAdView(context: android.content.Context, showBadge: Boolean = true): NativeAdView {
     val nativeAdView = NativeAdView(context)
 
     val container = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         setPadding(dp(context, 12), dp(context, 10), dp(context, 12), dp(context, 12))
+        // Faz 5: black card (24 dp corners) like every other card of the app.
         background = GradientDrawable().apply {
-            setColor(AndroidColor.rgb(10, 24, 50))
-            cornerRadius = dp(context, 18).toFloat()
-            setStroke(dp(context, 1), AndroidColor.rgb(40, 69, 112))
+            setColor(AndroidColor.rgb(0x07, 0x09, 0x0C))
+            cornerRadius = dp(context, 24).toFloat()
+            setStroke(dp(context, 1), AndroidColor.rgb(0x1B, 0x20, 0x26))
         }
     }
 
@@ -203,26 +208,27 @@ internal fun createNativeAdView(context: android.content.Context): NativeAdView 
     }
 
     val adBadge = TextView(context).apply {
-        text = context.getString(R.string.sponsored)
-        textSize = 10f
-        setTextColor(AndroidColor.WHITE)
+        // The visible "Ad" label (AdLabel ground, Ink text).
+        text = context.getString(R.string.ad_label)
+        textSize = 12f
+        setTextColor(AndroidColor.rgb(0x04, 0x21, 0x0F))
         setTypeface(typeface, Typeface.BOLD)
         gravity = Gravity.CENTER
         setPadding(dp(context, 7), dp(context, 3), dp(context, 7), dp(context, 3))
         background = GradientDrawable().apply {
-            setColor(AndroidColor.rgb(31, 107, 202))
-            cornerRadius = dp(context, 8).toFloat()
+            setColor(AndroidColor.rgb(0xFF, 0xB2, 0x1A))
+            cornerRadius = dp(context, 6).toFloat()
         }
     }
 
     val advertiser = TextView(context).apply {
-        textSize = 11f
-        setTextColor(AndroidColor.rgb(176, 192, 222))
+        textSize = 12f
+        setTextColor(AndroidColor.rgb(0x9A, 0xA3, 0xB2))
         maxLines = 1
-        setPadding(dp(context, 8), 0, 0, 0)
+        setPadding(if (showBadge) dp(context, 8) else 0, 0, 0, 0)
     }
 
-    topRow.addView(
+    if (showBadge) topRow.addView(
         adBadge,
         LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -246,7 +252,7 @@ internal fun createNativeAdView(context: android.content.Context): NativeAdView 
     )
 
     val media = MediaView(context).apply {
-        setBackgroundColor(AndroidColor.rgb(5, 15, 33))
+        setBackgroundColor(AndroidColor.rgb(0x1F, 0x2A, 0x22))
     }
     container.addView(
         media,
@@ -260,7 +266,7 @@ internal fun createNativeAdView(context: android.content.Context): NativeAdView 
 
     val headline = TextView(context).apply {
         textSize = 16f
-        setTextColor(AndroidColor.WHITE)
+        setTextColor(AndroidColor.rgb(0xF7, 0xF9, 0xFF))
         setTypeface(typeface, Typeface.BOLD)
         maxLines = 2
     }
@@ -275,8 +281,8 @@ internal fun createNativeAdView(context: android.content.Context): NativeAdView 
     )
 
     val body = TextView(context).apply {
-        textSize = 11f
-        setTextColor(AndroidColor.rgb(184, 197, 220))
+        textSize = 12f
+        setTextColor(AndroidColor.rgb(0x9A, 0xA3, 0xB2))
         maxLines = 2
     }
     container.addView(
@@ -300,9 +306,14 @@ internal fun createNativeAdView(context: android.content.Context): NativeAdView 
 
     val callToAction = Button(context).apply {
         isAllCaps = false
-        textSize = 12f
+        textSize = 13f
         minHeight = 0
         minWidth = 0
+        setTextColor(AndroidColor.rgb(0x04, 0x21, 0x0F))
+        background = GradientDrawable().apply {
+            setColor(AndroidColor.rgb(0x2B, 0xE8, 0x78))
+            cornerRadius = dp(context, 22).toFloat()
+        }
     }
 
     actionRow.addView(
