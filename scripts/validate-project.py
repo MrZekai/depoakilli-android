@@ -28,6 +28,16 @@ SPLIT_SOURCES = {
         J + "ui/smart/StorageDetailPage.kt",
         J + "ui/smart/SmartFilePreview.kt",
     ],
+    J + "ui/CleanerViewModel.kt": [
+        J + "ui/CleanerUiState.kt",
+        J + "ui/CleanerViewModelCore.kt",
+        J + "ui/CleanerTrashLayer.kt",
+        J + "ui/CleanerDeviceLayer.kt",
+        J + "ui/CleanerAppCacheLayer.kt",
+        J + "ui/CleanerScanLayer.kt",
+        J + "ui/CleanerWhatsAppLayer.kt",
+        J + "ui/CleanerStorageReviewLayer.kt",
+    ],
 }
 
 
