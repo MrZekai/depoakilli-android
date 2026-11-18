@@ -31,12 +31,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build QA APK
-        run: ./gradlew --stacktrace assembleQa
+        run: ./gradlew --stacktrace assembleQa "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
       # A second, different app (the debug build) that the scenario fills with
       # 700 MB of data. Built separately: compiling both at once runs out of memory.
       - name: Build debug APK (stand-in big app)
-        run: ./gradlew --stacktrace assembleDebug
+        run: ./gradlew --stacktrace assembleDebug "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
       - name: Enable KVM
         run: |

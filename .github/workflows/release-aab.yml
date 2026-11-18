@@ -59,7 +59,10 @@ jobs:
           ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: |
           chmod +x gradlew
-          ./gradlew --stacktrace testDebugUnitTest lintRelease
+          # CI-only heap, as android-ci.yml full-checks: the 768 MB Kotlin daemon
+          # from gradle.properties (sized for 16 GB Windows machines) runs out here.
+          ./gradlew --stacktrace testDebugUnitTest "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
+          ./gradlew --stacktrace lintRelease "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
       - name: Build signed production AAB and APK
         env:
@@ -69,7 +72,7 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
           ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
-        run: ./gradlew --stacktrace bundleRelease assembleRelease
+        run: ./gradlew --stacktrace bundleRelease assembleRelease "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
       - name: Verify production binaries, live ads and existing upload certificate
         env:
