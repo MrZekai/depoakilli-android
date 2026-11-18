@@ -636,7 +636,7 @@
     <string name="disclosure_usage_body">Kullanım Erişimi isteğe bağlıdır. Android’in bildirdiği uygulama depolama/önbellek toplamlarını ve son kullanım zamanlarını okuyarak büyük veya uzun süredir kullanılmayan uygulamaları incelemeni sağlar. Uygulamaların özel içeriğini okumaz ve korunan verilerini sessizce silmez.</string>
     <string name="disclosure_continue">Devam et</string>
     <string name="disclosure_not_now">Şimdi değil</string>
-    <string name="smart_cleanup_ad_notice">Temizlik önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
+    <string name="smart_cleanup_ad_notice">Smart Cleaner ücretsizdir ve reklam gösterir: banner, bazı listelerde \"Reklam\" etiketli tek bir yerel reklam, temizlik sonucunda bir reklam paneli, temizlikten sonra ya da Temizle sekmesine dönerken zaman zaman tam ekran reklam ve uygulama açılırken bir açılış reklamı. İzin ve onay adımlarında reklam çıkmaz; kısa bir video izleyerek banner ve tam ekran reklamları 60 dakika kaldırabilirsiniz.</string>
     <string name="whatsapp_cleanup_ad_notice">WhatsApp temizliği önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
     <string name="premium_cleanup_ad_notice">Temizlik önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
 
@@ -792,4 +792,145 @@
     <string name="feedback_copy_address">Adresi kopyala</string>
     <string name="feedback_open_email">E-posta uygulamasını aç</string>
     <string name="feedback_address_copied">Adres kopyalandı</string>
+    <string name="plan_group_apk_installed">Yüklü uygulamaların kurulum dosyaları</string>
+    <string name="plan_group_duplicate_safe">Fazla kopyalar</string>
+    <string name="plan_group_thumbnails">Önizleme önbelleği</string>
+    <string name="plan_group_temp_files">Artık geçici dosyalar</string>
+    <string name="plan_group_partial_downloads">Yarım kalmış indirmeler</string>
+    <string name="plan_group_apk_old_version">Eski kurulum dosyası sürümleri</string>
+    <string name="plan_group_apk_other">Diğer kurulum dosyaları</string>
+    <string name="plan_group_duplicate_personal">Dosyalarınızın kopyaları</string>
+    <string name="plan_group_duplicate_unverified">Aynı görünen dosyalar</string>
+    <string name="plan_group_large_video">Büyük eski videolar</string>
+    <string name="plan_group_screen_recording">Ekran kayıtları</string>
+    <string name="plan_group_screenshot">Eski ekran görüntüleri</string>
+    <string name="plan_group_download_file">Eski indirmeler</string>
+    <string name="plan_group_download_document">Eski indirilen belgeler ve fotoğraflar</string>
+    <string name="plan_group_large_other">Büyük dosyalar</string>
+    <string name="plan_group_whatsapp_sent">WhatsApp\'ta gönderdiğiniz medya</string>
+    <string name="plan_group_whatsapp_video">Büyük WhatsApp videoları</string>
+    <string name="plan_group_whatsapp_voice">Eski WhatsApp sesli mesajları</string>
+    <string name="plan_group_whatsapp_status">Eski WhatsApp durumları</string>
+    <string name="reason_apk_installed">Bu uygulama bu sürüm veya daha yenisiyle zaten yüklü</string>
+    <string name="reason_apk_old_version">Bu uygulamanın daha yeni bir kurulum dosyası da cihazınızda</string>
+    <string name="reason_whatsapp_video">Büyük WhatsApp videosu</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Yarım kalmış indirme • Yaş (gün): %1$d</item>
+        <item quantity="other">Yarım kalmış indirme • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Ekran kaydı • Yaş (gün): %1$d</item>
+        <item quantity="other">Ekran kaydı • Yaş (gün): %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Sesli mesaj • Yaş (gün): %1$d</item>
+        <item quantity="other">Sesli mesaj • Yaş (gün): %1$d</item>
+    </plurals>
+    <string name="plan_recommended_title">Önerilen temizlik</string>
+    <string name="plan_clean_action">%1$s temizle</string>
+    <string name="plan_nothing_big">Otomatik temizlenecek büyük bir şey yok</string>
+    <string name="plan_biggest_space_in">En çok yer kaplayanlar:</string>
+    <string name="plan_section_included">Dahil</string>
+    <string name="plan_section_system">Sistem adımları</string>
+    <string name="plan_section_review">Göz atmaya değer</string>
+    <string name="plan_small_items">Küçük öğeler</string>
+    <string name="plan_clear_app_caches">Uygulama önbelleklerini temizle</string>
+    <string name="plan_cache_about">yaklaşık %1$s</string>
+    <string name="plan_selected">Seçili: %1$s</string>
+    <string name="plan_preview_title">Temizlemeden önce gözden geçir</string>
+    <string name="plan_preview_whatsapp">Silinen WhatsApp medyası sohbetlerde açılmaz.</string>
+    <string name="plan_preview_cloud">Bulut yedeği kontrol edilmez.</string>
+    <string name="plan_preview_clean">Temizle</string>
+    <string name="plan_preview_remove">Seçimden çıkar</string>
+    <string name="plan_verify">Doğrula</string>
+    <string name="result_freed_now">Şimdi açılan alan: %1$s</string>
+    <string name="result_undo">Geri al</string>
+    <string name="result_empty_trash_now">Çöpü şimdi boşalt</string>
+    <string name="result_empty_trash_confirm">%1$s kalıcı olarak silinsin mi? Bu geri alınamaz.</string>
+    <string name="result_delete_permanently">Sil</string>
+    <string name="trash_title">Çöp kutusu</string>
+    <string name="trash_description">Temizlediğiniz dosyaları geri yükleyin veya silin</string>
+    <string name="trash_restore">Geri yükle</string>
+    <string name="trash_delete_forever">Kalıcı olarak sil</string>
+    <string name="trash_empty">Çöpü boşalt</string>
+    <string name="trash_empty_state">Çöp kutusu boş</string>
+    <string name="scan_stage_exact_copies">Birebir kopyalar kontrol ediliyor…</string>
+    <string name="tab_trash">Çöp</string>
+    <string name="home_checking_storage">Depolama alanınız kontrol ediliyor…</string>
+    <string name="home_updating">Güncelleniyor…</string>
+    <string name="home_allow_access">Erişime izin ver</string>
+    <string name="home_access_explainer">Smart Cleaner, temizlenebilecekleri bulmak için tüm dosyalara erişim ister. Onayınız olmadan hiçbir şey silinmez.</string>
+    <string name="home_storage_line">%%%1$d dolu · %2$s boş</string>
+    <string name="swipe_delete">Sil</string>
+    <string name="swipe_keep">Sakla</string>
+    <string name="swipe_undo">Geri al</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Bitir</string>
+    <string name="swipe_continue">Devam et</string>
+    <string name="swipe_grid_view">Izgara görünümü</string>
+    <string name="swipe_review_view">Kaydırarak inceleme</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">%1$d öğe · %2$s</item>
+        <item quantity="other">%1$d öğe · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Kullanılmayan uygulamalar (%1$d)</item>
+        <item quantity="other">Kullanılmayan uygulamalar (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">En büyük %1$d öğe gösteriliyor. Daha fazlasını görmek için temizlikten sonra yeniden tarayın.</item>
+        <item quantity="other">En büyük %1$d öğe gösteriliyor. Daha fazlasını görmek için temizlikten sonra yeniden tarayın.</item>
+    </plurals>
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s şimdi silinir · %2$s %3$d gün çöpte kalır</item>
+        <item quantity="other">%1$s şimdi silinir · %2$s %3$d gün çöpte kalır</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">Çöpte: %1$s — %2$d gün sonra boşalır</item>
+        <item quantity="other">Çöpte: %1$s — %2$d gün sonra boşalır</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">%1$d öğe taramadan sonra değişti</item>
+        <item quantity="other">%1$d öğe taramadan sonra değişti</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">%1$d öğe silinemedi</item>
+        <item quantity="other">%1$d öğe silinemedi</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">%1$d dosya geri yüklendi</item>
+        <item quantity="other">%1$d dosya geri yüklendi</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Çöp: %1$s — %2$d gün içinde boşalır</item>
+        <item quantity="other">Çöp: %1$s — %2$d gün içinde boşalır</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">%1$d gün kaldı</item>
+        <item quantity="other">%1$d gün kaldı</item>
+    </plurals>
+    <plurals name="trash_footer">
+        <item quantity="one">Dosyalar burada %1$d gün kalır, sonra silinir. Çöp boşaltılana kadar depolama alanı kullanır. Smart Cleaner\'ı kaldırırsanız .SmartCleanerTrash klasörünü bir dosya yöneticisiyle silin.</item>
+        <item quantity="other">Dosyalar burada %1$d gün kalır, sonra silinir. Çöp boşaltılana kadar depolama alanı kullanır. Smart Cleaner\'ı kaldırırsanız .SmartCleanerTrash klasörünü bir dosya yöneticisiyle silin.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">İşaretli: %1$d dosya · %2$s</item>
+        <item quantity="other">İşaretli: %1$d dosya · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">%1$d incelendi · %2$s işaretli</item>
+        <item quantity="other">%1$d incelendi · %2$s işaretli</item>
+    </plurals>
+    <string name="deep_check_action">İzle ve doğrula</string>
+    <string name="deep_check_running">Aynı görünen büyük dosyalar kontrol ediliyor…</string>
+    <plurals name="deep_check_row">
+        <item quantity="one">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
+        <item quantity="other">Aynı görünen büyük dosyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izleyin.</item>
+    </plurals>
+    <string name="trash_full_title">Çöpe taşınamadı</string>
+    <plurals name="trash_full_body">
+        <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
+        <item quantity="other">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
+    </plurals>
 </resources>

@@ -31,8 +31,8 @@ Run the manual `Play Closed Test AAB + APK` workflow. It must show:
 - package `com.mrzekai.depoakilli`, version `0.5.18-closedtest1` / `39`,
 - AAB and APK signed by the same existing Play upload certificate,
 - non-debuggable R8/resource-shrunk binaries,
-- Google sample Banner, Interstitial and Native IDs,
-- no production AdMob publisher ID or App Open ID,
+- Google sample Banner, Interstitial, Native and App Open IDs,
+- no production AdMob publisher ID,
 - no `FOREGROUND_SERVICE`, WorkManager `SystemForegroundService`, or debug `PreviewActivity`.
 
 Upload only `SmartCleaner-ClosedTest-v39.aab` from `SmartCleaner-PLAY-CLOSED-TEST-AAB-v39`. The APK and diagnostics artifacts are not Play uploads.

@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.CleanupResultAdSurface
 import com.mrzekai.depoakilli.model.ByteFormatter
@@ -58,8 +61,11 @@ internal fun CleanupResultDialog(
     onShowRewardedAd: () -> Unit,
     onSystemDismiss: () -> Unit,
     onDone: (resultAdPresented: Boolean) -> Unit,
+    onUndo: () -> Unit = {},
+    onEmptyTrash: () -> Unit = {},
 ) {
     var resultAdPresented by remember(result) { mutableStateOf(false) }
+    var confirmEmptyTrash by remember { mutableStateOf(false) }
     val configuration = LocalConfiguration.current
     val partial = result.failedCount > 0 || result.cancelledCount > 0
     val accent = if (partial) Color(0xFFFFB74D) else Lime400
@@ -73,6 +79,17 @@ internal fun CleanupResultDialog(
             stringResource(R.string.cleanup_result_system_cache_title)
         partial -> stringResource(R.string.cleanup_result_partial_title)
         else -> stringResource(R.string.cleanup_result_title)
+    }
+
+    if (confirmEmptyTrash) {
+        EmptyTrashConfirmDialog(
+            bytes = result.trashedBytes,
+            onDismiss = { confirmEmptyTrash = false },
+            onConfirm = {
+                confirmEmptyTrash = false
+                onEmptyTrash()
+            },
+        )
     }
 
     Dialog(
@@ -137,6 +154,14 @@ internal fun CleanupResultDialog(
                         textAlign = TextAlign.Center,
                     )
 
+                    if (result.kind == CleanupResultKind.FILES) {
+                        Text(
+                            stringResource(R.string.result_freed_now, ByteFormatter.format(result.deletedBytes)),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
                     if (result.deletedBytes > 0L) {
                         Text(
                             ByteFormatter.format(result.deletedBytes),
@@ -199,14 +224,35 @@ internal fun CleanupResultDialog(
                                     accent = ElectricBlue,
                                 )
                             }
-                            if (result.failedCount > 0) {
+                            if (result.changedCount > 0) {
                                 CleanupResultLine(
                                     text = pluralStringResource(
-                                        R.plurals.cleanup_result_failed,
-                                        result.failedCount,
-                                        result.failedCount,
+                                        R.plurals.result_changed,
+                                        result.changedCount,
+                                        result.changedCount,
+                                    ),
+                                    accent = Color(0xFFFFC46B),
+                                )
+                            }
+                            val notDeleted = (result.failedCount - result.changedCount).coerceAtLeast(0)
+                            if (notDeleted > 0) {
+                                CleanupResultLine(
+                                    text = pluralStringResource(
+                                        R.plurals.result_not_deleted,
+                                        notDeleted,
+                                        notDeleted,
                                     ),
                                     accent = Color(0xFFFF8A80),
+                                )
+                            }
+                            if (result.restoredCount > 0) {
+                                CleanupResultLine(
+                                    text = pluralStringResource(
+                                        R.plurals.result_restored,
+                                        result.restoredCount,
+                                        result.restoredCount,
+                                    ),
+                                    accent = ElectricBlue,
                                 )
                             }
                             if (result.cancelledCount > 0) {
@@ -220,6 +266,14 @@ internal fun CleanupResultDialog(
                                 )
                             }
                         }
+                    }
+
+                    if (result.kind == CleanupResultKind.FILES) {
+                        CleanupTrashSection(
+                            result = result,
+                            onUndo = onUndo,
+                            onEmptyTrash = { confirmEmptyTrash = true },
+                        )
                     }
 
                     Text(
@@ -270,6 +324,58 @@ internal fun CleanupResultDialog(
             }
         }
     }
+}
+
+@Composable
+private fun CleanupTrashSection(
+    result: CleanupResult,
+    onUndo: () -> Unit,
+    onEmptyTrash: () -> Unit,
+) {
+    if (result.trashedBytes <= 0L || result.trashEntryIds.isEmpty()) return
+    val days = CleaningThresholds.TRASH_RETENTION_DAYS
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = Color.White.copy(alpha = .06f),
+        shape = RoundedCornerShape(18.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Text(
+                pluralStringResource(R.plurals.result_in_trash, days, ByteFormatter.format(result.trashedBytes), days),
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedButton(onClick = onUndo, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text(stringResource(R.string.result_undo))
+                }
+                OutlinedButton(onClick = onEmptyTrash, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
+                    Text(stringResource(R.string.result_empty_trash_now), textAlign = TextAlign.Center)
+                }
+            }
+        }
+    }
+}
+
+/** Second confirmation before permanently deleting files from the trash. */
+@Composable
+internal fun EmptyTrashConfirmDialog(bytes: Long, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = { Text(stringResource(R.string.result_empty_trash_confirm, ByteFormatter.format(bytes))) },
+        confirmButton = {
+            TextButton(onClick = onConfirm) { Text(stringResource(R.string.result_delete_permanently)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        },
+    )
 }
 
 @Composable

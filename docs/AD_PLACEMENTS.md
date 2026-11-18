@@ -1,19 +1,19 @@
-# Ad placements — closed-test candidate
+# Ad placements (Faz 1B)
 
-- Home and cleaner surfaces use Google anchored adaptive Banner ads.
-- Cleanup results may use the official Native media surface; when no Native unit is available, the configured result fallback is used.
-- A cleanup result is always shown before any optional full-screen monetization.
-- Back/system dismissal of the result never requests an Interstitial.
-- Only an explicit Done action may hand off to an eligible, already-loaded Interstitial.
-- If the result itself displayed an ad, no Interstitial is shown for that same cleanup.
-- If no Interstitial is ready or eligible, navigation continues immediately; ads never block cleanup or app entry.
-- Returning to the foreground never triggers a full-screen advertisement.
-- No ad may imitate a cleaner action, delete button, permission button, result card, or Android confirmation.
+All limits live in `app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt`.
+Every format requires UMP consent (`canRequestAds`) and is off during the
+60-minute ad-free window earned with a rewarded video. Debug, QA and
+closed-test builds use Google's official sample units; release uses
+Smart Cleaner's own units (public AdMob identifiers in `app/build.gradle.kts`).
 
-## Rewarded ad: ad-free window
+| Format | Unit | Where | Limits |
+|---|---|---|---|
+| Banner (anchored adaptive) | existing banner unit | Clean and Tools tabs, detail screens | ≥24 dp from any action; not on Trash, settings, legal or permission screens; hidden during scans, cleanup and results |
+| App open | `ca-app-pub-1380972808968213/1593948887` | loading cover on cold start; return after the user left via Home/Recents for ≥30 s | from the first launch (after consent); waits ≤3 s then content opens; every 2 h, ≤4/day; no cover when offline; never after Android settings, permissions, cache dialog, uninstall, Play review or share |
+| Interstitial | existing interstitial unit | (a) result closed with Done; (b) back on Clean after ≥20 s on a tool/detail screen | ≥120 s apart, ≤8/day, never before the first cleanup of the first session, never during scans, confirmation, preview or review flows |
+| Native (list) | `ca-app-pub-1380972808968213/6870326296` | Clean: after the 4th "Worth a look" row (≥6 rows); Tools: before the 2nd group; swipe review break card | at most 1 per screen; "Sponsored" badge, own card style; no gap when not filled |
+| Native (result) | `ADMOB_RESULT_NATIVE_ID` if set, else the list native unit | cleanup result, below Done after a divider and 24 dp | — |
+| MREC 300x250 (result fallback) | existing banner unit at `AdSize.MEDIUM_RECTANGLE` | cleanup result when native does not fill | — |
+| Rewarded | existing rewarded unit | (1) 60 minutes without banner/full-screen ads; (2) "Watch and verify" deep duplicate check | the check also runs when no ad is ready; closing the ad early does not start it |
 
-- The rewarded placement is strictly opt-in and never unlocks, limits or delays a cleaning, scan, deletion or permission flow.
-- The disclosed reward is a single, non-stackable 60-minute ad-free window: banners and post-cleanup Interstitials are suppressed while it is active.
-- The reward is granted only from Google Mobile Ads' `onUserEarnedReward` callback. Dismissing a video early grants nothing.
-- Entry points are Settings and the completed-cleanup result, and are hidden when consent does not permit ads or an ad-free window is already active.
-- A rewarded video never triggers a follow-up Interstitial. No expiration pop-up or notification is shown.
+Any two full-screen ads (app open, interstitial, rewarded) are at least 60 s apart.

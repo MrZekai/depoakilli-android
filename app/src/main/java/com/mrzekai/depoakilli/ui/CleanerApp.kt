@@ -36,11 +36,13 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Handyman
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -91,7 +93,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd
+import com.mrzekai.depoakilli.ads.ListNativeAdCard
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
@@ -102,10 +106,11 @@ import com.mrzekai.depoakilli.ui.theme.ElectricBlue
 import com.mrzekai.depoakilli.ui.theme.Lime400
 import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 
+/** Three tabs (T1.10): Clean (the plan), Tools and Trash. Settings live behind the gear icon. */
 private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
-    HOME(R.string.tab_home, Icons.Outlined.Home),
-    TOOLS(R.string.tab_tools, Icons.Outlined.CleaningServices),
-    ME(R.string.tab_profile, Icons.Outlined.Android),
+    HOME(R.string.tab_clean, Icons.Outlined.CleaningServices),
+    TOOLS(R.string.tab_tools, Icons.Outlined.Handyman),
+    TRASH(R.string.tab_trash, Icons.Outlined.Delete),
 }
 
 private enum class DetailScreen(@StringRes val titleRes: Int) {
@@ -121,6 +126,15 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
     ABOUT(R.string.about_app),
 }
 
+/** Screens whose use counts for the return-from-tool interstitial (T1B.3 b). */
+private val TOOL_SCREENS = setOf(
+    DetailScreen.CLEAN_RESULTS,
+    DetailScreen.WHATSAPP,
+    DetailScreen.APP_CACHE,
+    DetailScreen.APP_MANAGER,
+    DetailScreen.STORAGE_CHANGE,
+)
+
 private enum class AccessDisclosure {
     ALL_FILES,
     USAGE_ACCESS,
@@ -132,6 +146,7 @@ fun CleanerApp(
     viewModel: CleanerViewModel,
     canRequestAds: Boolean,
     fullScreenAdActive: Boolean,
+    appOpenCoverVisible: Boolean = false,
     privacyOptionsRequired: Boolean,
     adFreeRemainingMillis: Long,
     rewardedAdReady: Boolean,
@@ -144,6 +159,8 @@ fun CleanerApp(
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onCleanupResultDismissed: () -> Unit,
     onCleanupSucceeded: () -> Unit,
+    onReturnedToClean: (dwellMillis: Long) -> Unit = {},
+    onDeepDuplicateCheck: () -> Unit = {},
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
@@ -166,9 +183,22 @@ fun CleanerApp(
         }
     }
     val snackbarHostState = remember { SnackbarHostState() }
-    // Hoisted so the Me list keeps its scroll position while a sub-page such
-    // as Privacy Policy is open (QA v43 polish).
-    val meListState = rememberLazyListState()
+    // Trigger (b): time spent on a tool screen before returning to the Clean or
+    // Tools tab. Settings, privacy, terms and about pages never count.
+    var detailEnteredAt by remember { mutableStateOf(0L) }
+    LaunchedEffect(detailScreen) {
+        val toolScreen = detailScreen in TOOL_SCREENS
+        when {
+            toolScreen && detailEnteredAt == 0L ->
+                detailEnteredAt = android.os.SystemClock.elapsedRealtime()
+            detailScreen == null && detailEnteredAt > 0L -> {
+                val dwell = android.os.SystemClock.elapsedRealtime() - detailEnteredAt
+                detailEnteredAt = 0L
+                if (state.cleanupResult == null && !state.cleanupInProgress && !state.scanning) onReturnedToClean(dwell)
+            }
+            !toolScreen -> detailEnteredAt = 0L
+        }
+    }
 
     LaunchedEffect(state.message) {
         state.message?.let {
@@ -209,8 +239,15 @@ fun CleanerApp(
         when {
             detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
                 viewModel.closeStorageReview()
-            detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null ->
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null -> {
+                viewModel.closeSwipeReview()
+                detailScreen = null
+            }
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.smartCategoryReview != null -> {
                 viewModel.closeSmartCategoryReview()
+                // Plan rows open from the Clean tab; going back returns there.
+                if (state.scanFocus == ScanFocus.SMART) detailScreen = null
+            }
             detailScreen in setOf(DetailScreen.PRIVACY, DetailScreen.TERMS, DetailScreen.ABOUT) &&
                 legalReturnScreen != null -> {
                 detailScreen = legalReturnScreen
@@ -241,7 +278,7 @@ fun CleanerApp(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            if (detailScreen != DetailScreen.WHATSAPP && (detailScreen != null || AppTab.entries[selectedTabIndex] != AppTab.HOME)) {
+            if (detailScreen != DetailScreen.WHATSAPP) {
                 TopAppBar(
                     title = {
                         val storageReviewTitle = state.storageReview.type?.titleRes
@@ -272,6 +309,30 @@ fun CleanerApp(
                             }
                         }
                     },
+                    actions = {
+                        val gridGroup = state.smartCategoryReviewGroup
+                        if (
+                            detailScreen == DetailScreen.CLEAN_RESULTS &&
+                            state.smartCategoryReview != null &&
+                            gridGroup != null &&
+                            gridGroup in com.mrzekai.depoakilli.ui.review.SwipeReviewState.SWIPE_GROUPS
+                        ) {
+                            IconButton(onClick = { viewModel.openSwipeReview(gridGroup) }) {
+                                Icon(
+                                    Icons.Outlined.SwipeLeft,
+                                    contentDescription = stringResource(R.string.swipe_review_view),
+                                )
+                            }
+                        }
+                        if (detailScreen == null) {
+                            IconButton(onClick = { detailScreen = DetailScreen.SETTINGS }) {
+                                Icon(
+                                    Icons.Outlined.Settings,
+                                    contentDescription = stringResource(R.string.settings_title),
+                                )
+                            }
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 )
             }
@@ -281,7 +342,8 @@ fun CleanerApp(
                 null -> when (AppTab.entries[selectedTabIndex]) {
                     AppTab.HOME,
                     AppTab.TOOLS -> true
-                    AppTab.ME -> false
+                    // Trash actions sit at the bottom of the screen; no ad next to them.
+                    AppTab.TRASH -> false
                 }
                 DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess
                 DetailScreen.WHATSAPP -> state.hasWhatsAppAccess
@@ -300,7 +362,12 @@ fun CleanerApp(
                     screenAllowsBanner &&
                     accessDisclosure == null &&
                     !fullScreenAdActive &&
-                    !state.scanning &&
+                    !appOpenCoverVisible &&
+                    // No banner next to the swipe-review break card (it has its own native ad).
+                    state.swipeReviewGroup?.let { state.swipeStates[it]?.breakPending } != true &&
+                    // Quick plan update on the Clean tab keeps the banner; other scans hide it.
+                    (!state.scanning ||
+                        (detailScreen == null && state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0)) &&
                     !state.dashboardRefreshing &&
                     !state.whatsAppScanning &&
                     !state.cleanupInProgress &&
@@ -314,6 +381,9 @@ fun CleanerApp(
                         .navigationBarsPadding(),
                 ) {
                     if (bannerAllowed) {
+                        // At least 24 dp between the banner and any action above or below it.
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
+                        Spacer(Modifier.height(24.dp))
                         BannerAd(canRequestAds = true)
                         Spacer(Modifier.height(24.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
@@ -343,7 +413,7 @@ fun CleanerApp(
                 ) {
                     if (bannerAllowed) {
                         HorizontalDivider(color = Color.White.copy(alpha = .10f))
-                        Spacer(Modifier.height(6.dp))
+                        Spacer(Modifier.height(24.dp))
                         BannerAd(canRequestAds = true)
                     }
                 }
@@ -368,6 +438,10 @@ fun CleanerApp(
                 onClean = onPrepareCleanup,
                 onCleanStorage = onPrepareStorageCleanup,
                 modifier = Modifier.padding(padding),
+                onToggleGroup = viewModel::toggleGroup,
+                onClearAppCaches = onClearAllAppCaches,
+                viewModel = viewModel,
+                canRequestAds = canRequestAds,
             )
 
             DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -473,25 +547,62 @@ fun CleanerApp(
             )
 
             null -> when (AppTab.entries[selectedTabIndex]) {
-                AppTab.HOME -> NeonDashboardScreen(
-                    state = state,
-                    onSmartClean = { launchScan(ScanFocus.SMART) },
-                    onOpenWhatsApp = {
-                        detailScreen = DetailScreen.WHATSAPP
-                        if (state.hasWhatsAppAccess) viewModel.scanWhatsAppLibrary()
-                    },
-                    onLargeFiles = { launchScan(ScanFocus.LARGE_FILES) },
-                    onApks = { launchScan(ScanFocus.APKS) },
-                    onOpenAppCache = {
-                        detailScreen = DetailScreen.APP_CACHE
-                        viewModel.refreshAppCaches()
-                    },
-                    onOpenStorageChange = { detailScreen = DetailScreen.STORAGE_CHANGE },
-                    onDownloads = { launchScan(ScanFocus.DOWNLOADS) },
-                    onOpenTools = { selectedTabIndex = AppTab.TOOLS.ordinal },
-                    onRefresh = viewModel::refreshDashboard,
-                    modifier = Modifier.padding(padding),
-                )
+                AppTab.HOME -> {
+                    LaunchedEffect(Unit) {
+                        viewModel.showPlan()
+                        viewModel.onAppOpened()
+                    }
+                    CleanTab(
+                        state = state,
+                        onAllowAccess = ::requestAllFilesWithDisclosure,
+                        onCancelScan = viewModel::cancelScan,
+                        onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
+                        modifier = Modifier.padding(padding),
+                    ) { displayState, header ->
+                        SmartCleanResultsScreen(
+                            state = displayState,
+                            onRequestAllFilesAccess = ::requestAllFilesWithDisclosure,
+                            onScan = { viewModel.scan(ScanFocus.SMART) },
+                            onToggleItem = viewModel::toggleItem,
+                            onToggleCategory = viewModel::toggleCategory,
+                            onSetItemsSelected = viewModel::setItemsSelected,
+                            onOpenCategoryReview = { category, ids ->
+                                viewModel.openSmartCategoryReview(category, ids)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onOpenStorageReview = viewModel::openStorageReview,
+                            onRequestUsageAccess = ::requestUsageWithDisclosure,
+                            onRefreshInstalledApps = viewModel::refreshInstalledApps,
+                            onUninstallApp = onUninstallApp,
+                            onToggleStorageReviewItem = viewModel::toggleStorageReviewItem,
+                            onToggleAllStorageReviewItems = viewModel::toggleAllStorageReviewItems,
+                            onClean = onPrepareCleanup,
+                            onCleanStorage = onPrepareStorageCleanup,
+                            onToggleGroup = viewModel::toggleGroup,
+                            onClearAppCaches = onClearAllAppCaches,
+                            modifier = Modifier.padding(padding),
+                            planHeader = header,
+                            onCancelScan = viewModel::cancelScan,
+                            onOpenSwipeReview = { group ->
+                                viewModel.openSwipeReview(group)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onOpenPlanGrid = { group, items ->
+                                viewModel.openPlanGroupGrid(group, items)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onDeepCheck = onDeepDuplicateCheck,
+                            reviewAd = { index ->
+                                val plan = displayState.summary.plan
+                                val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +
+                                    plan.review.size + 1
+                                if (index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1 && rows >= AdPolicy.NATIVE_LIST_MIN_ROWS) {
+                                    item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
+                                }
+                            },
+                        )
+                    }
+                }
 
                 AppTab.TOOLS -> DeviceCenterScreen(
                     state = state,
@@ -513,26 +624,36 @@ fun CleanerApp(
                         detailScreen = DetailScreen.STORAGE_CHANGE
                     },
                     modifier = Modifier.padding(padding),
+                    onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
+                    listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                 )
 
-                AppTab.ME -> SettingsDetailScreen(
-                    listState = meListState,
-                    privacyOptionsRequired = privacyOptionsRequired,
-                    canRequestAds = canRequestAds,
-                    adFreeRemainingMillis = adFreeRemainingMillis,
-                    rewardedAdReady = rewardedAdReady,
-                    onOpenLanguageSettings = onOpenLanguageSettings,
-                    onRateApp = onRateApp,
-                    onSendFeedback = onSendFeedback,
-                    onShareApp = onShareApp,
-                    onShowPrivacyOptions = onShowPrivacyOptions,
-                    onShowRewardedAd = onShowRewardedAd,
-                    onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
-                    onOpenLegalPage = ::openLegalPage,
+                AppTab.TRASH -> TrashScreen(
+                    entries = state.trashEntries,
+                    onRefresh = viewModel::refreshTrash,
+                    onRestore = { ids -> viewModel.restoreTrash(ids) },
+                    onDeleteForever = { ids -> viewModel.emptyTrash(ids) },
                     modifier = Modifier.padding(padding),
                 )
             }
         }
+    }
+
+    if (state.trashFallbackIds.isNotEmpty() && state.cleanupResult == null && !state.cleanupInProgress) {
+        val count = state.trashFallbackIds.size
+        AlertDialog(
+            onDismissRequest = viewModel::dismissTrashFallback,
+            title = { Text(stringResource(R.string.trash_full_title), fontWeight = FontWeight.Black) },
+            text = { Text(pluralStringResource(R.plurals.trash_full_body, count, count)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::deleteTrashFallbackPermanently) {
+                    Text(stringResource(R.string.trash_delete_forever))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissTrashFallback) { Text(stringResource(R.string.cancel)) }
+            },
+        )
     }
 
     accessDisclosure?.let { disclosure ->
@@ -590,6 +711,8 @@ fun CleanerApp(
                 val returnTabIndex = selectedTabIndex
 
                 viewModel.dismissCleanupResult()
+                // Done already gives the post-cleanup break; no second one on return.
+                detailEnteredAt = 0L
                 legalReturnScreen = null
                 // Done returns to the tool's main screen with refreshed
                 // totals, not to the sub-list the cleanup was started from,
@@ -624,6 +747,8 @@ fun CleanerApp(
                 onSystemDismiss = {
                     dismissResultAndReturn()
                 },
+                onUndo = viewModel::undoCleanup,
+                onEmptyTrash = { viewModel.emptyTrash(result.trashEntryIds) },
                 onDone = { resultAdPresented ->
                     val eligibleForNaturalBreakAd =
                         result.operationSucceeded &&
@@ -636,7 +761,9 @@ fun CleanerApp(
                     dismissResultAndReturn()
 
                     if (eligibleForNaturalBreakAd && result.failedCount == 0) onCleanupSucceeded()
-                    if (eligibleForNaturalBreakAd && !resultAdPresented) {
+                    // Trigger (a): Done closes the result, also when the result
+                    // panel already showed an ad; AdPolicy limits frequency.
+                    if (eligibleForNaturalBreakAd) {
                         onCleanupResultDismissed()
                     }
                 },
@@ -685,6 +812,10 @@ private fun CleanScreen(
     onClean: (Set<String>?) -> Unit,
     onCleanStorage: () -> Unit,
     modifier: Modifier = Modifier,
+    onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
+    onClearAppCaches: () -> Unit = {},
+    viewModel: CleanerViewModel? = null,
+    canRequestAds: Boolean = false,
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -707,6 +838,16 @@ private fun CleanScreen(
             onClean = onClean,
             onCleanStorage = onCleanStorage,
             modifier = modifier,
+            onToggleGroup = onToggleGroup,
+            onClearAppCaches = onClearAppCaches,
+            onOpenSwipeReview = { group -> viewModel?.openSwipeReview(group) },
+            onOpenPlanGrid = { group, items -> viewModel?.openPlanGroupGrid(group, items) },
+            onSwipeMark = { delete -> viewModel?.swipeMark(delete) },
+            onSwipeUndo = { viewModel?.swipeUndo() },
+            onSwipeContinue = { viewModel?.swipeContinue() },
+            onSwipeGrid = { viewModel?.switchSwipeToGrid() },
+            onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
+            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         )
         return
     }

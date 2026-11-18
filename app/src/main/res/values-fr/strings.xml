@@ -647,7 +647,8 @@
     <string name="disclosure_usage_body">L\'accès à l\'utilisation est facultatif. Il permet à Smart Cleaner de lire les totaux de stockage/cache des applications signalés par Android et les heures de dernière utilisation afin que vous puissiez examiner les applications volumineuses ou inutilisées. Il ne lit pas le contenu privé de ces applications et ne supprime pas silencieusement leurs données protégées.</string>
     <string name="disclosure_continue">Continuer</string>
     <string name="disclosure_not_now">Pas maintenant</string>
-    <string name="smart_cleanup_ad_notice">Le nettoyage s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner est gratuit et affiche des annonces : une bannière, une annonce native identifiée dans certaines listes, un encart publicitaire sur le résultat du nettoyage, parfois une annonce plein écran après un nettoyage ou au retour dans l’onglet Nettoyer, et une annonce à l’ouverture pendant le chargement. Aucune annonce n’apparaît pendant les étapes d’autorisation ou de confirmation ; une courte vidéo supprime la bannière et les annonces plein écran pendant 60 minutes.</string>
     <string name="whatsapp_cleanup_ad_notice">Le nettoyage WhatsApp s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
     <string name="premium_cleanup_ad_notice">Le nettoyage s\'exécute en premier et le résultat mesuré est affiché en premier. L\'écran de résultats peut inclure un panneau publicitaire sponsorisé. Si ce panneau est affiché, aucune publicité plein écran ne suit pour le même nettoyage. Si elle n\'est pas affichée, une annonce plein écran éligible peut apparaître après la fermeture des résultats.</string>
     <string name="home_smart_clean_subtitle">Examinez les vrais candidats au nettoyage</string>
@@ -804,4 +805,168 @@
     <string name="feedback_copy_address">Copier l\'adresse</string>
     <string name="feedback_open_email">Ouvrir l\'application de messagerie</string>
     <string name="feedback_address_copied">Adresse copiée</string>
+    <string name="plan_group_apk_installed">Installateurs d’applis déjà installées</string>
+    <string name="plan_group_duplicate_safe">Copies en trop</string>
+    <string name="plan_group_thumbnails">Cache des aperçus</string>
+    <string name="plan_group_temp_files">Fichiers temporaires restants</string>
+    <string name="plan_group_partial_downloads">Téléchargements inachevés</string>
+    <string name="plan_group_apk_old_version">Anciennes versions d’installateurs</string>
+    <string name="plan_group_apk_other">Autres installateurs</string>
+    <string name="plan_group_duplicate_personal">Copies de vos fichiers</string>
+    <string name="plan_group_duplicate_unverified">Fichiers qui semblent identiques</string>
+    <string name="plan_group_large_video">Grandes vidéos anciennes</string>
+    <string name="plan_group_screen_recording">Enregistrements d’écran</string>
+    <string name="plan_group_screenshot">Anciennes captures d’écran</string>
+    <string name="plan_group_download_file">Anciens téléchargements</string>
+    <string name="plan_group_download_document">Anciens documents et photos téléchargés</string>
+    <string name="plan_group_large_other">Fichiers volumineux</string>
+    <string name="plan_group_whatsapp_sent">Médias WhatsApp que vous avez envoyés</string>
+    <string name="plan_group_whatsapp_video">Grandes vidéos WhatsApp</string>
+    <string name="plan_group_whatsapp_voice">Anciens messages vocaux WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Anciens statuts WhatsApp</string>
+    <string name="reason_apk_installed">Cette appli est déjà installée dans cette version ou une plus récente</string>
+    <string name="reason_apk_old_version">Un installateur plus récent de cette appli est aussi sur l’appareil</string>
+    <string name="reason_whatsapp_video">Grande vidéo WhatsApp</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Téléchargement inachevé • Âge en jours : %1$d</item>
+        <item quantity="many">Téléchargement inachevé • Âge en jours : %1$d</item>
+        <item quantity="other">Téléchargement inachevé • Âge en jours : %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Enregistrement d’écran • Âge en jours : %1$d</item>
+        <item quantity="many">Enregistrement d’écran • Âge en jours : %1$d</item>
+        <item quantity="other">Enregistrement d’écran • Âge en jours : %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Message vocal • Âge en jours : %1$d</item>
+        <item quantity="many">Message vocal • Âge en jours : %1$d</item>
+        <item quantity="other">Message vocal • Âge en jours : %1$d</item>
+    </plurals>
+    <string name="plan_recommended_title">Nettoyage recommandé</string>
+    <string name="plan_clean_action">Nettoyer %1$s</string>
+    <string name="plan_nothing_big">Rien d’important à nettoyer automatiquement</string>
+    <string name="plan_biggest_space_in">Le plus d’espace se trouve dans :</string>
+    <string name="plan_section_included">Inclus</string>
+    <string name="plan_section_system">Étapes système</string>
+    <string name="plan_section_review">À vérifier</string>
+    <string name="plan_small_items">Petits éléments</string>
+    <string name="plan_clear_app_caches">Vider le cache des applis</string>
+    <string name="plan_cache_about">environ %1$s</string>
+    <string name="plan_selected">Sélection : %1$s</string>
+    <string name="plan_preview_title">Vérifiez avant de nettoyer</string>
+    <string name="plan_preview_whatsapp">Les médias WhatsApp supprimés ne s’ouvriront plus dans les discussions.</string>
+    <string name="plan_preview_cloud">La sauvegarde cloud n’est pas vérifiée.</string>
+    <string name="plan_preview_clean">Nettoyer</string>
+    <string name="plan_preview_remove">Retirer de la sélection</string>
+    <string name="plan_verify">Vérifier</string>
+    <string name="result_freed_now">Libéré maintenant : %1$s</string>
+    <string name="result_undo">Annuler</string>
+    <string name="result_empty_trash_now">Vider la corbeille maintenant</string>
+    <string name="result_empty_trash_confirm">Supprimer définitivement %1$s ? Cette action est irréversible.</string>
+    <string name="result_delete_permanently">Supprimer</string>
+    <string name="trash_title">Corbeille</string>
+    <string name="trash_description">Restaurez ou supprimez les fichiers nettoyés</string>
+    <string name="trash_restore">Restaurer</string>
+    <string name="trash_delete_forever">Supprimer définitivement</string>
+    <string name="trash_empty">Vider la corbeille</string>
+    <string name="trash_empty_state">La corbeille est vide</string>
+    <string name="scan_stage_exact_copies">Recherche de copies exactes…</string>
+    <string name="tab_trash">Corbeille</string>
+    <string name="home_checking_storage">Analyse de votre stockage…</string>
+    <string name="home_updating">Mise à jour…</string>
+    <string name="home_allow_access">Autoriser l’accès</string>
+    <string name="home_access_explainer">Smart Cleaner a besoin d’accéder à tous les fichiers pour trouver ce qui peut être nettoyé. Rien n’est supprimé sans votre confirmation.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d %% utilisé · %2$s libre</string>
+    <string name="swipe_delete">Supprimer</string>
+    <string name="swipe_keep">Garder</string>
+    <string name="swipe_undo">Annuler</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Terminer</string>
+    <string name="swipe_continue">Continuer</string>
+    <string name="swipe_grid_view">Vue en grille</string>
+    <string name="swipe_review_view">Revue par balayage</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Éléments : %1$d · %2$s</item>
+        <item quantity="many">Éléments : %1$d · %2$s</item>
+        <item quantity="other">Éléments : %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Applis inutilisées (%1$d)</item>
+        <item quantity="many">Applis inutilisées (%1$d)</item>
+        <item quantity="other">Applis inutilisées (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+        <item quantity="many">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+        <item quantity="other">Affichage des %1$d éléments les plus volumineux. Relancez l’analyse après le nettoyage pour en voir plus.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+        <item quantity="many">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+        <item quantity="other">%1$s supprimés maintenant · %2$s dans la corbeille (jours : %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+        <item quantity="many">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+        <item quantity="other">Dans la corbeille : %1$s — libéré dans (jours) : %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Modifiés depuis l’analyse : %1$d</item>
+        <item quantity="many">Modifiés depuis l’analyse : %1$d</item>
+        <item quantity="other">Modifiés depuis l’analyse : %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">Impossible de supprimer : %1$d</item>
+        <item quantity="many">Impossible de supprimer : %1$d</item>
+        <item quantity="other">Impossible de supprimer : %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">Fichiers restaurés : %1$d</item>
+        <item quantity="many">Fichiers restaurés : %1$d</item>
+        <item quantity="other">Fichiers restaurés : %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+        <item quantity="many">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+        <item quantity="other">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Jours restants : %1$d</item>
+        <item quantity="many">Jours restants : %1$d</item>
+        <item quantity="other">Jours restants : %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+        <item quantity="many">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+        <item quantity="other">Les fichiers restent ici (jours : %1$d), puis sont supprimés. La corbeille occupe de l’espace tant qu’elle n’est pas vidée. Si vous désinstallez Smart Cleaner, supprimez le dossier .SmartCleanerTrash avec un gestionnaire de fichiers.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Marqués : %1$d · %2$s</item>
+        <item quantity="many">Marqués : %1$d · %2$s</item>
+        <item quantity="other">Marqués : %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Examinés : %1$d · marqués : %2$s</item>
+        <item quantity="many">Examinés : %1$d · marqués : %2$s</item>
+        <item quantity="other">Examinés : %1$d · marqués : %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Regarder et vérifier</string>
+    <string name="deep_check_running">Vérification des gros fichiers qui semblent identiques…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
+        <item quantity="many">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
+        <item quantity="other">Gros fichiers qui semblent identiques : %1$d · jusqu’à %2$s. Regardez une courte vidéo pour les vérifier.</item>
+    </plurals>
+    <string name="trash_full_title">Impossible de déplacer dans la corbeille</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+        <item quantity="many">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+        <item quantity="other">Impossible de déplacer dans la corbeille (fichiers : %1$d) ; le stockage est peut-être plein. Les supprimer définitivement ? Action irréversible.</item>
+    </plurals>
 </resources>

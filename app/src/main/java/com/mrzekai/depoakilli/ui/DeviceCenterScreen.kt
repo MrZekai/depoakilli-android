@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
@@ -90,6 +91,8 @@ internal fun DeviceCenterScreen(
     onOpenAppManager: () -> Unit,
     onOpenStorageChange: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenTrash: () -> Unit = {},
+    listAd: @Composable () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -125,6 +128,9 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.DEEP) },
             )
         }
+
+        // At most one in-list native ad, before the second group (T1B.4).
+        item(key = "tools-list-native") { listAd() }
 
         item {
             ToolsSectionHeader(
@@ -238,6 +244,15 @@ internal fun DeviceCenterScreen(
                 icon = Icons.Outlined.Timeline,
                 accent = Color(0xFF0E9A8A),
                 onClick = onOpenStorageChange,
+            )
+        }
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.trash_title),
+                subtitle = stringResource(R.string.trash_description),
+                icon = Icons.Outlined.Delete,
+                accent = Color(0xFFB0475A),
+                onClick = onOpenTrash,
             )
         }
 

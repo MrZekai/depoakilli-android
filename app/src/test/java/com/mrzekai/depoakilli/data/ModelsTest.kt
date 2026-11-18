@@ -137,7 +137,9 @@ class ModelsTest {
         modifiedAtMillis = 1L,
         relativePath = "Download/",
         assessment = AiAssessment(
-            category = CleanCategory.JUNK,
+            // Plan groups decide what is recommended: JUNK maps to an Auto group,
+            // LARGE_FILE to a Review group.
+            category = if (recommended) CleanCategory.JUNK else CleanCategory.LARGE_FILE,
             safetyScore = 90,
             reasonRes = 0,
             recommended = recommended,

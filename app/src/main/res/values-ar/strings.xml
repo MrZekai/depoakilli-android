@@ -725,7 +725,8 @@
     <string name="disclosure_usage_body">الوصول إلى الاستخدام اختياري. فهو يتيح لـ Smart Cleaner قراءة إجماليات تخزين/ذاكرة التخزين المؤقت للتطبيقات التي أبلغ عنها Android وأوقات الاستخدام الأخيرة حتى تتمكن من مراجعة التطبيقات الكبيرة أو غير المستخدمة. ولا يقرأ المحتوى الخاص داخل تلك التطبيقات ولا يحذف بياناتها المحمية بصمت.</string>
     <string name="disclosure_continue">متابعة</string>
     <string name="disclosure_not_now">ليس الآن</string>
-    <string name="smart_cleanup_ad_notice">يتم تشغيل عملية التنظيف أولاً وتظهر النتيجة المقاسة أولاً. قد تتضمن شاشة النتائج لوحة إعلانية واحدة مدعومة. إذا تم عرض تلك اللوحة، فلن يتبع ذلك إعلان بملء الشاشة لنفس عملية التنظيف. إذا لم يتم عرضه، فقد يظهر إعلان مؤهل بملء الشاشة بعد إغلاق النتيجة.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner مجاني ويعرض إعلانات: شريط إعلاني، وإعلان مدمج واحد مميز في بعض القوائم، ولوحة إعلانية في نتيجة التنظيف، وأحيانًا إعلان بملء الشاشة بعد التنظيف أو عند العودة إلى علامة التنظيف، وإعلان عند فتح التطبيق أثناء التحميل. لا تظهر الإعلانات أبدًا في خطوات الأذونات أو التأكيد، ويزيل فيديو قصير الشريط والإعلانات بملء الشاشة لمدة 60 دقيقة.</string>
     <string name="whatsapp_cleanup_ad_notice">يتم تشغيل عملية التنظيف WhatsApp أولاً وتظهر النتيجة المقاسة أولاً. قد تتضمن شاشة النتائج لوحة إعلانية واحدة مدعومة. إذا تم عرض تلك اللوحة، فلن يتبع ذلك إعلان بملء الشاشة لنفس عملية التنظيف. إذا لم يتم عرضه، فقد يظهر إعلان مؤهل بملء الشاشة بعد إغلاق النتيجة.</string>
     <string name="premium_cleanup_ad_notice">يتم تشغيل عملية التنظيف أولاً وتظهر النتيجة المقاسة أولاً. قد تتضمن شاشة النتائج لوحة إعلانية واحدة مدعومة. إذا تم عرض تلك اللوحة، فلن يتبع ذلك إعلان بملء الشاشة لنفس عملية التنظيف. إذا لم يتم عرضه، فقد يظهر إعلان مؤهل بملء الشاشة بعد إغلاق النتيجة.</string>
     <string name="home_smart_clean_subtitle">مراجعة مرشحي التنظيف الحقيقيين</string>
@@ -897,4 +898,224 @@
     <string name="feedback_copy_address">انسخ العنوان</string>
     <string name="feedback_open_email">افتح تطبيق البريد الإلكتروني</string>
     <string name="feedback_address_copied">تم نسخ العنوان</string>
+    <string name="plan_group_apk_installed">مثبّتات لتطبيقات مثبّتة بالفعل</string>
+    <string name="plan_group_duplicate_safe">نسخ إضافية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_thumbnails">ذاكرة المعاينات المؤقتة</string>
+    <string name="plan_group_temp_files">ملفات مؤقتة متبقية</string>
+    <string name="plan_group_partial_downloads">تنزيلات غير مكتملة</string>
+    <string name="plan_group_apk_old_version">إصدارات أقدم من المثبّتات</string>
+    <string name="plan_group_apk_other">مثبّتات أخرى</string>
+    <string name="plan_group_duplicate_personal">نسخ من ملفاتك</string>
+    <string name="plan_group_duplicate_unverified">ملفات تبدو متطابقة</string>
+    <string name="plan_group_large_video">مقاطع فيديو قديمة كبيرة</string>
+    <string name="plan_group_screen_recording">تسجيلات الشاشة</string>
+    <string name="plan_group_screenshot">لقطات شاشة قديمة</string>
+    <string name="plan_group_download_file">تنزيلات قديمة</string>
+    <string name="plan_group_download_document">مستندات وصور قديمة تم تنزيلها</string>
+    <string name="plan_group_large_other">ملفات كبيرة</string>
+    <string name="plan_group_whatsapp_sent">وسائط WhatsApp التي أرسلتها</string>
+    <string name="plan_group_whatsapp_video">مقاطع فيديو WhatsApp كبيرة</string>
+    <string name="plan_group_whatsapp_voice">رسائل WhatsApp الصوتية القديمة</string>
+    <string name="plan_group_whatsapp_status">حالات WhatsApp القديمة</string>
+    <string name="reason_apk_installed">هذا التطبيق مثبّت بالفعل بهذا الإصدار أو بإصدار أحدث</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_apk_old_version">يوجد أيضًا مثبّت أحدث لهذا التطبيق على جهازك</string>
+    <string name="reason_whatsapp_video">مقطع فيديو WhatsApp كبير</string>
+    <plurals name="reason_partial_download">
+        <item quantity="zero">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="one">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="two">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="few">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="many">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+        <item quantity="other">تنزيل غير مكتمل • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="zero">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="one">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="two">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="few">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="many">تسجيل شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="other">تسجيل شاشة • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="zero">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="one">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="two">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="few">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="many">رسالة صوتية • العمر بالأيام: %1$d</item>
+        <item quantity="other">رسالة صوتية • العمر بالأيام: %1$d</item>
+    </plurals>
+    <string name="plan_recommended_title">التنظيف المقترح</string>
+    <string name="plan_clean_action">تنظيف %1$s</string>
+    <string name="plan_nothing_big">لا يوجد شيء كبير للتنظيف تلقائيًا</string>
+    <string name="plan_biggest_space_in">أكبر مساحة في:</string>
+    <string name="plan_section_included">مضمّن</string>
+    <string name="plan_section_system">خطوات النظام</string>
+    <string name="plan_section_review">يستحق النظر</string>
+    <string name="plan_small_items">عناصر صغيرة</string>
+    <string name="plan_clear_app_caches">مسح ذاكرة التطبيقات المؤقتة</string>
+    <string name="plan_cache_about">حوالي %1$s</string>
+    <string name="plan_selected">المحدد: %1$s</string>
+    <string name="plan_preview_title">راجع قبل التنظيف</string>
+    <string name="plan_preview_whatsapp">لن تُفتح وسائط WhatsApp المحذوفة في المحادثات.</string>
+    <string name="plan_preview_cloud">لا يتم التحقق من النسخ الاحتياطي السحابي.</string>
+    <string name="plan_preview_clean">تنظيف</string>
+    <string name="plan_preview_remove">إزالة من التحديد</string>
+    <string name="plan_verify">تحقق</string>
+    <string name="result_freed_now">تم تحريره الآن: %1$s</string>
+    <string name="result_undo">تراجع</string>
+    <string name="result_empty_trash_now">إفراغ المهملات الآن</string>
+    <string name="result_empty_trash_confirm">هل تريد حذف %1$s نهائيًا؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="result_delete_permanently">حذف</string>
+    <string name="trash_title">المهملات</string>
+    <string name="trash_description">استعادة الملفات التي نظفتها أو إزالتها</string>
+    <string name="trash_restore">استعادة</string>
+    <string name="trash_delete_forever">حذف نهائي</string>
+    <string name="trash_empty">إفراغ المهملات</string>
+    <string name="trash_empty_state">المهملات فارغة</string>
+    <string name="scan_stage_exact_copies">جارٍ التحقق من النسخ المتطابقة…</string>
+    <string name="tab_trash">المهملات</string>
+    <string name="home_checking_storage">جارٍ فحص مساحة التخزين…</string>
+    <string name="home_updating">جارٍ التحديث…</string>
+    <string name="home_allow_access">السماح بالوصول</string>
+    <string name="home_access_explainer">يحتاج Smart Cleaner إلى الوصول إلى جميع الملفات لإيجاد ما يمكن تنظيفه. لا يُحذف أي شيء دون تأكيدك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">مستخدم %1$d%% · متاح %2$s</string>
+    <string name="swipe_delete">حذف</string>
+    <string name="swipe_keep">الاحتفاظ</string>
+    <string name="swipe_undo">تراجع</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">إنهاء</string>
+    <string name="swipe_continue">متابعة</string>
+    <string name="swipe_grid_view">عرض الشبكة</string>
+    <string name="swipe_review_view">المراجعة بالسحب</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="zero">العناصر: %1$d · %2$s</item>
+        <item quantity="one">العناصر: %1$d · %2$s</item>
+        <item quantity="two">العناصر: %1$d · %2$s</item>
+        <item quantity="few">العناصر: %1$d · %2$s</item>
+        <item quantity="many">العناصر: %1$d · %2$s</item>
+        <item quantity="other">العناصر: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="zero">تطبيقات غير مستخدمة (%1$d)</item>
+        <item quantity="one">تطبيقات غير مستخدمة (%1$d)</item>
+        <item quantity="two">تطبيقات غير مستخدمة (%1$d)</item>
+        <item quantity="few">تطبيقات غير مستخدمة (%1$d)</item>
+        <item quantity="many">تطبيقات غير مستخدمة (%1$d)</item>
+        <item quantity="other">تطبيقات غير مستخدمة (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="zero">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+        <item quantity="one">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+        <item quantity="two">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+        <item quantity="few">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+        <item quantity="many">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+        <item quantity="other">يتم عرض أكبر العناصر: %1$d. أعد الفحص بعد التنظيف لرؤية المزيد.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="zero">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+        <item quantity="one">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+        <item quantity="two">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+        <item quantity="few">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+        <item quantity="many">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+        <item quantity="other">%1$s يُحذف الآن · %2$s إلى المهملات (الأيام: %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="zero">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+        <item quantity="one">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+        <item quantity="two">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+        <item quantity="few">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+        <item quantity="many">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+        <item quantity="other">في المهملات: %1$s — يتحرر بعد أيام: %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="zero">تغيّرت منذ الفحص: %1$d</item>
+        <item quantity="one">تغيّرت منذ الفحص: %1$d</item>
+        <item quantity="two">تغيّرت منذ الفحص: %1$d</item>
+        <item quantity="few">تغيّرت منذ الفحص: %1$d</item>
+        <item quantity="many">تغيّرت منذ الفحص: %1$d</item>
+        <item quantity="other">تغيّرت منذ الفحص: %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="zero">تعذّر حذفها: %1$d</item>
+        <item quantity="one">تعذّر حذفها: %1$d</item>
+        <item quantity="two">تعذّر حذفها: %1$d</item>
+        <item quantity="few">تعذّر حذفها: %1$d</item>
+        <item quantity="many">تعذّر حذفها: %1$d</item>
+        <item quantity="other">تعذّر حذفها: %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="zero">الملفات المستعادة: %1$d</item>
+        <item quantity="one">الملفات المستعادة: %1$d</item>
+        <item quantity="two">الملفات المستعادة: %1$d</item>
+        <item quantity="few">الملفات المستعادة: %1$d</item>
+        <item quantity="many">الملفات المستعادة: %1$d</item>
+        <item quantity="other">الملفات المستعادة: %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="zero">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+        <item quantity="one">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+        <item quantity="two">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+        <item quantity="few">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+        <item quantity="many">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+        <item quantity="other">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="zero">الأيام المتبقية: %1$d</item>
+        <item quantity="one">الأيام المتبقية: %1$d</item>
+        <item quantity="two">الأيام المتبقية: %1$d</item>
+        <item quantity="few">الأيام المتبقية: %1$d</item>
+        <item quantity="many">الأيام المتبقية: %1$d</item>
+        <item quantity="other">الأيام المتبقية: %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="zero">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+        <item quantity="one">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+        <item quantity="two">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+        <item quantity="few">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+        <item quantity="many">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+        <item quantity="other">تبقى الملفات هنا (الأيام: %1$d) ثم تُحذف. تشغل المهملات مساحة حتى يتم إفراغها. إذا ألغيت تثبيت Smart Cleaner، فاحذف مجلد .SmartCleanerTrash باستخدام مدير الملفات.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="zero">المحدد: %1$d · %2$s</item>
+        <item quantity="one">المحدد: %1$d · %2$s</item>
+        <item quantity="two">المحدد: %1$d · %2$s</item>
+        <item quantity="few">المحدد: %1$d · %2$s</item>
+        <item quantity="many">المحدد: %1$d · %2$s</item>
+        <item quantity="other">المحدد: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="zero">تمت مراجعة: %1$d · المحدد: %2$s</item>
+        <item quantity="one">تمت مراجعة: %1$d · المحدد: %2$s</item>
+        <item quantity="two">تمت مراجعة: %1$d · المحدد: %2$s</item>
+        <item quantity="few">تمت مراجعة: %1$d · المحدد: %2$s</item>
+        <item quantity="many">تمت مراجعة: %1$d · المحدد: %2$s</item>
+        <item quantity="other">تمت مراجعة: %1$d · المحدد: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">شاهد وتحقق</string>
+    <string name="deep_check_running">جارٍ التحقق من الملفات الكبيرة المتشابهة…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="zero">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="one">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="two">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="few">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="many">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="other">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+    </plurals>
+    <string name="trash_full_title">تعذّر النقل إلى المهملات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="zero">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+        <item quantity="one">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+        <item quantity="two">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+        <item quantity="few">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+        <item quantity="many">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+        <item quantity="other">تعذّر نقل الملفات إلى المهملات (العدد: %1$d)؛ قد تكون مساحة التخزين ممتلئة. هل تريد حذفها نهائيًا؟ لا يمكن التراجع عن ذلك.</item>
+    </plurals>
 </resources>

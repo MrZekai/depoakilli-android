@@ -11,6 +11,8 @@ val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
 val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
 val sampleRewardedId = "ca-app-pub-3940256099942544/5224354917"
 val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
+val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
+val sampleListNativeId = "ca-app-pub-3940256099942544/2247696110"
 
 // AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
 // Keep QA/debug on Google's official sample IDs and bind production only
@@ -19,8 +21,20 @@ val liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"
 val liveBannerId = "ca-app-pub-1380972808968213/2118175647"
 val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
 val liveRewardedId = "ca-app-pub-1380972808968213/4039180256"
-// Optional production Native unit. Empty means use live MREC fallback.
+// App open unit created by the owner in AdMob (16 Nov 2026).
+val liveAppOpenId = "ca-app-pub-1380972808968213/1593948887"
+// In-list Native advanced unit created by the owner in AdMob (16 Nov 2026).
+val liveListNativeId = "ca-app-pub-1380972808968213/6870326296"
+// Result-screen Native unit: an explicit ADMOB_RESULT_NATIVE_ID wins; otherwise
+// the owner's Native advanced unit is reused. MREC (banner unit, 300x250) stays
+// the fallback when no native ad fills.
 val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
+    .orNull
+    ?.trim()
+    .orEmpty()
+    .ifBlank { "ca-app-pub-1380972808968213/6870326296" }
+// Result-screen MREC (300x250) unit; empty means the existing banner unit at MREC size.
+val liveResultMrecId = providers.environmentVariable("ADMOB_RESULT_MREC_ID")
     .orNull
     ?.trim()
     .orEmpty()
@@ -58,6 +72,9 @@ android {
         buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
         buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
         buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
         buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
 
@@ -125,6 +142,9 @@ android {
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
         }
@@ -135,6 +155,9 @@ android {
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$liveInterstitialId\"")
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$liveRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"${liveResultMrecId.ifBlank { liveBannerId }}\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$liveListNativeId\"")
 
             isMinifyEnabled = true
             isShrinkResources = true
@@ -160,6 +183,9 @@ android {
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
             buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
             buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
+            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
+            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.findByName("release")
             matchingFallbacks += listOf("release")
         }
@@ -228,6 +254,8 @@ dependencies {
     implementation(libs.google.play.review)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    // Explicit (already present through Google Mobile Ads) for the daily trash purge.
+    implementation(libs.androidx.work.runtime)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
@@ -248,6 +276,8 @@ val validateReleaseAds by tasks.registering {
             liveBannerId,
             liveInterstitialId,
             liveRewardedId,
+            liveAppOpenId,
+            liveListNativeId,
         )
         check(values.none { it.contains("3940256099942544") }) {
             "Release blocked: Google sample AdMob IDs cannot be used in production."
@@ -291,6 +321,8 @@ val validateClosedTestConfiguration by tasks.registering {
             sampleInterstitialId,
             sampleRewardedId,
             sampleResultNativeVideoId,
+            sampleAppOpenId,
+            sampleListNativeId,
         )
         check(sampleIds.all { it.contains("3940256099942544") }) {
             "Closed test blocked: every ad format must use an official Google sample ID."

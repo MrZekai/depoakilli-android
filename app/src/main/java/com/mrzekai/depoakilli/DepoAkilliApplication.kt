@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
 import com.mrzekai.depoakilli.ads.AdFreeWindowStore
+import com.mrzekai.depoakilli.data.TrashPurgeWorker
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.releasePremiumToolThumbnailMemory
 import com.mrzekai.depoakilli.ui.releaseWhatsAppThumbnailMemory
@@ -19,6 +20,7 @@ class DepoAkilliApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         AppDiagnostics.initialize(this)
+        TrashPurgeWorker.schedule(this)
     }
 
     override fun onTrimMemory(level: Int) {

@@ -160,8 +160,6 @@ for expected in (
     "Environment.isExternalStorageManager()",
     "indexSharedStorage",
     "indexWhatsAppFiles",
-    "sampleFingerprint",
-    "fingerprint(file",
     "MAX_INDEXED_FILES = 200_000",
     "MAX_WHATSAPP_FILES = 100_000",
     "scanStorageReview",
@@ -173,6 +171,10 @@ for expected in (
 ):
     if expected not in repository:
         errors.append(f"missing storage engine invariant: {expected}")
+duplicate_finder = read("app/src/main/java/com/mrzekai/depoakilli/data/DuplicateFinder.kt")
+for expected in ("sampleFingerprint", "fingerprint(file", "ensureActive()"):
+    if expected not in duplicate_finder:
+        errors.append(f"missing duplicate finder invariant: {expected}")
 for forbidden in (
     "MAX_HASH_BYTES",
     "MAX_DUPLICATE_GROUP",
@@ -251,8 +253,9 @@ for expected in (
 ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
 result_ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt")
 for expected in (
-    "INTERSTITIAL/SHOW_SKIP session-cap",
-    "MIN_INTERVAL_MILLIS = 5L * 60L * 1000L",
+    "INTERSTITIAL/SHOW_SKIP policy",
+    "AdPolicy.canShowInterstitial(",
+    "AdPolicy.recordInterstitial(",
     "getCurrentOrientationAnchoredAdaptiveBannerAdSize",
     "Lifecycle.Event.ON_RESUME -> adView.resume()",
     "Lifecycle.Event.ON_PAUSE -> adView.pause()",
@@ -261,8 +264,17 @@ for expected in (
 ):
     if expected not in ads:
         errors.append(f"missing closed-test ad invariant: {expected}")
-if ads.count("private var shownThisProcess = false") != 1:
-    errors.append("exactly one process-session cap is required for the Interstitial controller")
+ad_policy = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt")
+for expected in (
+    "INTERSTITIAL_MIN_INTERVAL_SEC = 120L",
+    "INTERSTITIAL_MAX_PER_DAY = 8",
+    "FULLSCREEN_GAP_SEC = 60L",
+    "s.cleanupsCompleted == 0 && s.launchCount <= 1",
+):
+    if expected not in ad_policy:
+        errors.append(f"missing full-screen ad limit: {expected}")
+if "shownThisProcess" in ads:
+    errors.append("the per-process interstitial cap is replaced by AdPolicy limits")
 if "AdSize.BANNER" in ads:
     errors.append("fixed 320x50 banner must not return; use anchored adaptive banner")
 if "setImmersiveMode(true)" in ads:
@@ -278,26 +290,24 @@ for expected in (
     if expected not in application:
         errors.append(f"missing app lifecycle/ad invariant: {expected}")
 
-removed_foreground_tokens = (
-    "App" + "OpenAd",
-    "APP" + "_OPEN",
-    "app" + "_open",
-    "ADMOB_" + "APP_" + "OPEN_ID",
-    "sample" + "App" + "OpenId",
-    "live" + "App" + "OpenId",
-    "set" + "App" + "OpenAdsAllowed",
-    "suppressNext" + "App" + "OpenAd",
-    "on" + "App" + "Backgrounded",
-)
-for surface_name, surface in (
-    ("build.gradle.kts", build_file),
-    ("AdComponents.kt", ads),
-    ("DepoAkilliApplication.kt", application),
-    ("MainActivity.kt", main_activity),
+# App open ad (T1B.2): allowed only behind the loading cover, never after a
+# return from a screen the app opened itself (settings, permissions, cache,
+# uninstall, review, share).
+app_open = read("app/src/main/java/com/mrzekai/depoakilli/ads/AppOpenAdController.kt")
+for expected in (
+    "AdPolicy.canShowAppOpen(",
+    "AdPolicy.APP_OPEN_MAX_WAIT_MS",
+    "MIN_BACKGROUND_MILLIS",
+    "MAX_AD_AGE_MILLIS",
+    "adUnitId.isNotBlank()",
 ):
-    for forbidden in removed_foreground_tokens:
-        if forbidden in surface:
-            errors.append(f"removed foreground-return ad implementation remains in {surface_name}")
+    if expected not in app_open:
+        errors.append(f"missing app open safety invariant: {expected}")
+for expected in ("override fun onUserLeaveHint()", "appOpenAds.onUserLeftApp()", "AppOpenCover()"):
+    if expected not in main_activity:
+        errors.append(f"app open must only follow a user-initiated absence: {expected}")
+if 'sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"' not in build_file:
+    errors.append("debug/QA/closed-test builds must use Google's sample app open unit")
 
 if "releaseForMemoryOptimization" in application:
     errors.append("obsolete RAM-optimizer-named ad release API remains in Application")
@@ -439,12 +449,12 @@ for forbidden in (
     if forbidden in storage_analyzer:
         errors.append(f"Storage Analyzer must remain read-only: {forbidden}")
 
-download_block_start = repository.find("private val DOWNLOAD_CATEGORIES")
+download_block_start = repository.find("private val DOWNLOAD_TOOL_GROUPS")
 if download_block_start < 0:
-    errors.append("DOWNLOAD_CATEGORIES missing")
+    errors.append("DOWNLOAD_TOOL_GROUPS missing")
 else:
-    download_block = repository[download_block_start:download_block_start + 220]
-    if "CleanCategory.APK_PACKAGE" in download_block:
+    download_block = repository[download_block_start:repository.find(")", download_block_start)]
+    if "CleanupGroup.APK_" in download_block:
         errors.append("Downloads tool must not overlap the dedicated APK tool")
 
 # ------------------------------------------------------------------
@@ -495,8 +505,8 @@ for expected in (
 if "state.cleanupResult == null" not in cleaner_app:
     errors.append("normal bottom banner must be disabled while cleanup result is visible")
 
-if "eligibleForNaturalBreakAd && !resultAdPresented" not in cleaner_app:
-    errors.append("Interstitial must be fallback-only when result ad was not presented")
+if "if (eligibleForNaturalBreakAd) {\n                        onCleanupResultDismissed()" not in cleaner_app:
+    errors.append("Interstitial follows result Done for successful cleanups (frequency limited by AdPolicy)")
 
 # ------------------------------------------------------------------
 # Alpha6 measurable cache results + readable Home tool cards.
@@ -602,7 +612,6 @@ for expected in (
     "onCleanupResultDismissed()",
     "eligibleForNaturalBreakAd",
     "resultAdPresented",
-    "!resultAdPresented",
     "state.cleanupResult == null",
     "CleanupResultKind.SYSTEM_CACHE",
     "selectedTabIndex = AppTab.HOME.ordinal",
@@ -616,7 +625,7 @@ for expected in (
 for expected in (
     "AppTab.HOME,",
     "AppTab.TOOLS -> true",
-    "AppTab.ME -> false",
+    "AppTab.TRASH -> false",
     "DetailScreen.ACCESS,",
     "DetailScreen.SETTINGS,",
 ):
@@ -633,7 +642,9 @@ for forbidden in (
         errors.append(f"obsolete four-tab/dead-home architecture remains: {forbidden}")
 
 for expected in (
-    "AppTab.ME -> SettingsDetailScreen(",
+    "DetailScreen.SETTINGS -> SettingsDetailScreen(",
+    "AppTab.TRASH -> TrashScreen(",
+    "Icons.Outlined.Settings",
     "DetailScreen.ACCESS -> SecurityCenterScreen(",
 ):
     if expected not in cleaner_app and expected not in device_center:
@@ -793,8 +804,8 @@ for required_name in (
     "terms_of_service_body_v050",
     "about_app_body_v050",
     "smart_cleanup_ad_notice",
-    "whatsapp_cleanup_ad_notice",
-    "premium_cleanup_ad_notice",
+
+
     "home_last_cleanup_title",
     "home_last_cleanup_summary",
     "home_smart_suggestions_title",
@@ -873,14 +884,15 @@ for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
                 f"stale/misleading copy remains in {strings_path.relative_to(ROOT)}: {stale_copy}"
             )
 
-if default_strings.count("sponsored ad panel") != 3:
-    errors.append("all three English cleanup notices must disclose the result-screen sponsored panel")
-if tr_strings.count("sponsorlu reklam paneli") != 3:
-    errors.append("all three Turkish cleanup notices must disclose the result-screen sponsored panel")
-if default_strings.count("no full-screen ad follows for the same cleanup") != 3:
-    errors.append("English cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
-if tr_strings.count("aynı temizlik için tam ekran reklam gösterilmez") != 3:
-    errors.append("Turkish cleanup notices must explain result-ad vs fullscreen-ad exclusivity")
+# Ad disclosure lives on the About screen, not inside deletion confirmations,
+# and names every format in use (T0.6, T1B.7).
+for name, body in (("English", default_strings), ("Turkish", tr_strings)):
+    notice = re.search(r'<string name="smart_cleanup_ad_notice">(.*?)</string>', body, re.S)
+    text = notice.group(1) if notice else ""
+    for token in (("app open", "native", "full-screen", "60 minutes") if name == "English"
+                  else ("açılış reklamı", "yerel reklam", "tam ekran", "60 dakika")):
+        if token not in text:
+            errors.append(f"{name} ad disclosure must mention: {token}")
 if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
     errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
 for expected in (
@@ -941,8 +953,17 @@ for resource_name in sorted(set(kotlin_refs) - default_names):
 # Existing key feature UI must remain intact.
 # ------------------------------------------------------------------
 smart_results = read("app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt")
+cleanup_plan_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt")
+preview_sheet_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/SelectedItemsPreviewSheet.kt")
+for expected in ("RecommendedCleanupCard", "PlanBottomBar", "SystemStepRow", "plan.isAlreadyTidy"):
+    if expected not in cleanup_plan_ui:
+        errors.append(f"missing cleanup plan invariant: {expected}")
+for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
+    if expected not in preview_sheet_ui:
+        errors.append(f"missing single-confirmation preview invariant: {expected}")
+if "SelectedItemsPreviewSheet(" not in smart_results:
+    errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
 for expected in (
-    "SmartCleanHero",
     "CleanupConfirmationDialog",
     "StorageDetailPage",
     "StorageCleanupConfirmationDialog",
@@ -960,7 +981,7 @@ for expected in (
     "WhatsAppGroupSection",
     "WhatsAppPreviewDialog",
     "ExoPlayer.Builder",
-    "whatsapp_cleanup_ad_notice",
+
 ):
     if expected not in whatsapp_ui:
         errors.append(f"missing WhatsApp review invariant: {expected}")
@@ -969,7 +990,7 @@ premium_tools = read("app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleaner
 for expected in (
     "PremiumCleanerToolScreen",
     "PremiumCleanupConfirmationDialog",
-    "premium_cleanup_ad_notice",
+
     "ExoPlayer.Builder",
 ):
     if expected not in premium_tools:
@@ -1075,8 +1096,6 @@ for expected in (
 
 if "R.string.storage_analyzer_action_hint" in smart_results:
     errors.append("destructive storage review must not use the read-only Analyzer resource prefix")
-if "R.string.storage_review_action_hint" not in smart_results:
-    errors.append("manual storage review must use storage_review_action_hint")
 
 for required_copy in (
     "sponsored ad panel",
@@ -1405,11 +1424,11 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing v41 storage-safety invariant: {expected}")
 
-delete_start = repository.find("private fun deleteUriDirectly(")
+delete_start = repository.find("private fun removeFile(")
 if delete_start < 0:
-    errors.append("deleteUriDirectly is missing")
+    errors.append("removeFile is missing")
 else:
-    delete_section = repository[delete_start:delete_start + 900]
+    delete_section = repository[delete_start:delete_start + 1400]
     if "isDeletableSharedStorageFile(file)" not in delete_section:
         errors.append("direct file deletion must be confined to shared storage roots")
 
@@ -1449,8 +1468,8 @@ if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" i
     errors.append("WhatsApp media and APK installers must never be preselected")
 if "isStillImage(" not in ai_engine:
     errors.append("screen recordings must not be classified as screenshots")
-if "summary.safeSuggestedBytes" not in smart_results:
-    errors.append("Smart Clean headline must lead with the safe amount")
+if "summary.plan" not in smart_results or "plan.recommendedBytes" not in read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt"):
+    errors.append("Smart Clean headline must lead with the measured plan amount")
 if "Modifier.width(92.dp)" in smart_results:
     errors.append("hero stats must use weighted columns (large-font overlap)")
 if "premium_duplicates_kept_short" in premium_tools:

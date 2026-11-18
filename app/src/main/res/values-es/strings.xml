@@ -639,7 +639,8 @@
     <string name="disclosure_usage_body">El acceso de uso es opcional. Permite que Smart Cleaner lea los totales de almacenamiento/caché de apps reportados por Android y las horas de último uso para que puedas revisar apps grandes o sin usar. No lee el contenido privado dentro de esas apps ni elimina en silencio sus datos protegidos.</string>
     <string name="disclosure_continue">Continuar</string>
     <string name="disclosure_not_now">Ahora no</string>
-    <string name="smart_cleanup_ad_notice">La limpieza se ejecuta primero y el resultado medido se muestra primero. La pantalla de resultados puede incluir un panel de anuncio patrocinado. Si se muestra ese panel, no aparece ningún anuncio de pantalla completa para la misma limpieza. Si no se muestra, puede aparecer un anuncio de pantalla completa elegible después de cerrar el resultado.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner es gratis y muestra anuncios: un banner, un anuncio nativo etiquetado en algunas listas, un panel publicitario en el resultado de la limpieza, a veces un anuncio a pantalla completa tras una limpieza o al volver a la pestaña Limpiar, y un anuncio de apertura mientras la app carga. Nunca aparecen anuncios en pasos de permisos o confirmación; un vídeo corto quita el banner y los anuncios a pantalla completa durante 60 minutos.</string>
     <string name="whatsapp_cleanup_ad_notice">La limpieza de WhatsApp se ejecuta primero y el resultado medido se muestra primero. La pantalla de resultados puede incluir un panel de anuncio patrocinado. Si se muestra ese panel, no aparece ningún anuncio de pantalla completa para la misma limpieza. Si no se muestra, puede aparecer un anuncio de pantalla completa elegible después de cerrar el resultado.</string>
     <string name="premium_cleanup_ad_notice">La limpieza se ejecuta primero y el resultado medido se muestra primero. La pantalla de resultados puede incluir un panel de anuncio patrocinado. Si se muestra ese panel, no aparece ningún anuncio de pantalla completa para la misma limpieza. Si no se muestra, puede aparecer un anuncio de pantalla completa elegible después de cerrar el resultado.</string>
     <string name="home_smart_clean_subtitle">Revisa candidatos de limpieza reales</string>
@@ -795,4 +796,150 @@
     <string name="feedback_copy_address">Copiar dirección</string>
     <string name="feedback_open_email">Abrir app de correo</string>
     <string name="feedback_address_copied">Dirección copiada</string>
+    <string name="plan_group_apk_installed">Instaladores de apps que ya tienes</string>
+    <string name="plan_group_duplicate_safe">Copias adicionales</string>
+    <string name="plan_group_thumbnails">Caché de vistas previas</string>
+    <string name="plan_group_temp_files">Archivos temporales sobrantes</string>
+    <string name="plan_group_partial_downloads">Descargas sin terminar</string>
+    <string name="plan_group_apk_old_version">Versiones antiguas de instaladores</string>
+    <string name="plan_group_apk_other">Otros instaladores</string>
+    <string name="plan_group_duplicate_personal">Copias de tus archivos</string>
+    <string name="plan_group_duplicate_unverified">Archivos que parecen idénticos</string>
+    <string name="plan_group_large_video">Videos antiguos grandes</string>
+    <string name="plan_group_screen_recording">Grabaciones de pantalla</string>
+    <string name="plan_group_screenshot">Capturas de pantalla antiguas</string>
+    <string name="plan_group_download_file">Descargas antiguas</string>
+    <string name="plan_group_download_document">Documentos y fotos descargados antiguos</string>
+    <string name="plan_group_large_other">Archivos grandes</string>
+    <string name="plan_group_whatsapp_sent">Archivos de WhatsApp que enviaste</string>
+    <string name="plan_group_whatsapp_video">Videos grandes de WhatsApp</string>
+    <string name="plan_group_whatsapp_voice">Notas de voz antiguas de WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Estados antiguos de WhatsApp</string>
+    <string name="reason_apk_installed">Esta app ya está instalada con esta versión o una más reciente</string>
+    <string name="reason_apk_old_version">También tienes un instalador más reciente de esta app</string>
+    <string name="reason_whatsapp_video">Video grande de WhatsApp</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Descarga sin terminar • Antigüedad en días: %1$d</item>
+        <item quantity="other">Descarga sin terminar • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Grabación de pantalla • Antigüedad en días: %1$d</item>
+        <item quantity="other">Grabación de pantalla • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Nota de voz • Antigüedad en días: %1$d</item>
+        <item quantity="other">Nota de voz • Antigüedad en días: %1$d</item>
+    </plurals>
+    <string name="plan_recommended_title">Limpieza recomendada</string>
+    <string name="plan_clean_action">Limpiar %1$s</string>
+    <string name="plan_nothing_big">No hay nada grande que limpiar automáticamente</string>
+    <string name="plan_biggest_space_in">Lo que más espacio ocupa:</string>
+    <string name="plan_section_included">Incluido</string>
+    <string name="plan_section_system">Pasos del sistema</string>
+    <string name="plan_section_review">Vale la pena revisar</string>
+    <string name="plan_small_items">Elementos pequeños</string>
+    <string name="plan_clear_app_caches">Borrar la caché de apps</string>
+    <string name="plan_cache_about">aprox. %1$s</string>
+    <string name="plan_selected">Seleccionado: %1$s</string>
+    <string name="plan_preview_title">Revisa antes de limpiar</string>
+    <string name="plan_preview_whatsapp">Los archivos de WhatsApp eliminados no se abrirán en los chats.</string>
+    <string name="plan_preview_cloud">No se comprueba la copia en la nube.</string>
+    <string name="plan_preview_clean">Limpiar</string>
+    <string name="plan_preview_remove">Quitar de la selección</string>
+    <string name="plan_verify">Verificar</string>
+    <string name="result_freed_now">Liberado ahora: %1$s</string>
+    <string name="result_undo">Deshacer</string>
+    <string name="result_empty_trash_now">Vaciar la papelera ahora</string>
+    <string name="result_empty_trash_confirm">¿Eliminar %1$s de forma permanente? No se puede deshacer.</string>
+    <string name="result_delete_permanently">Eliminar</string>
+    <string name="trash_title">Papelera</string>
+    <string name="trash_description">Restaura o elimina los archivos que limpiaste</string>
+    <string name="trash_restore">Restaurar</string>
+    <string name="trash_delete_forever">Eliminar para siempre</string>
+    <string name="trash_empty">Vaciar papelera</string>
+    <string name="trash_empty_state">La papelera está vacía</string>
+    <string name="scan_stage_exact_copies">Buscando copias exactas…</string>
+    <string name="tab_trash">Papelera</string>
+    <string name="home_checking_storage">Revisando tu almacenamiento…</string>
+    <string name="home_updating">Actualizando…</string>
+    <string name="home_allow_access">Permitir acceso</string>
+    <string name="home_access_explainer">Smart Cleaner necesita acceso a todos los archivos para encontrar qué se puede limpiar. No se elimina nada sin tu confirmación.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d%% usado · %2$s libre</string>
+    <string name="swipe_delete">Eliminar</string>
+    <string name="swipe_keep">Conservar</string>
+    <string name="swipe_undo">Deshacer</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Terminar</string>
+    <string name="swipe_continue">Continuar</string>
+    <string name="swipe_grid_view">Vista de cuadrícula</string>
+    <string name="swipe_review_view">Revisar deslizando</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Elementos: %1$d · %2$s</item>
+        <item quantity="other">Elementos: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">Apps sin usar (%1$d)</item>
+        <item quantity="other">Apps sin usar (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Se muestran los %1$d elementos más grandes. Vuelve a analizar tras limpiar para ver más.</item>
+        <item quantity="other">Se muestran los %1$d elementos más grandes. Vuelve a analizar tras limpiar para ver más.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s se eliminan ahora · %2$s van a la papelera (días: %3$d)</item>
+        <item quantity="other">%1$s se eliminan ahora · %2$s van a la papelera (días: %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">En la papelera: %1$s — se libera en días: %2$d</item>
+        <item quantity="other">En la papelera: %1$s — se libera en días: %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Cambiados desde el análisis: %1$d</item>
+        <item quantity="other">Cambiados desde el análisis: %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">No se pudieron eliminar: %1$d</item>
+        <item quantity="other">No se pudieron eliminar: %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">Archivos restaurados: %1$d</item>
+        <item quantity="other">Archivos restaurados: %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Papelera: %1$s — se vacía en días: %2$d</item>
+        <item quantity="other">Papelera: %1$s — se vacía en días: %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Días restantes: %1$d</item>
+        <item quantity="other">Días restantes: %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">Los archivos permanecen aquí (días: %1$d) y luego se eliminan. La papelera ocupa espacio hasta que se vacía. Si desinstalas Smart Cleaner, elimina la carpeta .SmartCleanerTrash con un gestor de archivos.</item>
+        <item quantity="other">Los archivos permanecen aquí (días: %1$d) y luego se eliminan. La papelera ocupa espacio hasta que se vacía. Si desinstalas Smart Cleaner, elimina la carpeta .SmartCleanerTrash con un gestor de archivos.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Marcados: %1$d · %2$s</item>
+        <item quantity="other">Marcados: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Revisados: %1$d · marcados: %2$s</item>
+        <item quantity="other">Revisados: %1$d · marcados: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Ver y verificar</string>
+    <string name="deep_check_running">Comprobando archivos grandes que parecen idénticos…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">Archivos grandes que parecen idénticos: %1$d · hasta %2$s. Mira un vídeo corto para verificarlos.</item>
+        <item quantity="other">Archivos grandes que parecen idénticos: %1$d · hasta %2$s. Mira un vídeo corto para verificarlos.</item>
+    </plurals>
+    <string name="trash_full_title">No se pudo mover a la papelera</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">No se pudieron mover a la papelera (archivos: %1$d); puede que el almacenamiento esté lleno. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
+        <item quantity="other">No se pudieron mover a la papelera (archivos: %1$d); puede que el almacenamiento esté lleno. ¿Eliminarlos de forma permanente? No se puede deshacer.</item>
+    </plurals>
 </resources>

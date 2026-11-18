@@ -7,12 +7,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
+import com.mrzekai.depoakilli.data.RestoreResult
 import com.mrzekai.depoakilli.data.StoragePathRules
+import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
@@ -24,6 +27,7 @@ import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
+import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,6 +57,14 @@ data class CleanupResult(
     val kind: CleanupResultKind = CleanupResultKind.FILES,
     val operationSucceeded: Boolean = true,
     val subjectLabel: String? = null,
+    /** Bytes moved to the in-app trash; not included in [deletedBytes] (not freed yet). */
+    val trashedBytes: Long = 0L,
+    /** Trash entries created by this cleanup, used by Undo. */
+    val trashEntryIds: List<String> = emptyList(),
+    /** Items skipped because they changed or disappeared after the scan. */
+    val changedCount: Int = 0,
+    /** Items put back with Undo. */
+    val restoredCount: Int = 0,
 )
 
 private data class DeviceRefreshSnapshot(
@@ -104,8 +116,29 @@ data class CleanerUiState(
     val whatsAppScanProgress: Int = 0,
     val whatsAppLastScanCompleted: Boolean = false,
     val deviceInfo: DeviceInfoSnapshot = DeviceInfoSnapshot(),
+    val trashEntries: List<TrashEntry> = emptyList(),
+    /** Full-content duplicate check in progress during a scan. */
+    val scanHashing: Boolean = false,
+    val scanHashDoneBytes: Long = 0L,
+    val scanHashTotalBytes: Long = 0L,
+    /** The Smart plan, kept while a tool scan temporarily owns [summary]. */
+    val planSummary: ScanSummary? = null,
+    /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */
+    val planScannedAtElapsed: Long = 0L,
+    /** Group shown in the swipe review, null when closed. */
+    val swipeReviewGroup: CleanupGroup? = null,
+    /** Swipe marks per group; kept when the review is left and reopened. */
+    val swipeStates: Map<CleanupGroup, SwipeReviewState> = emptyMap(),
+    /** Plan group behind the open grid review, used for the grid/swipe toggle. */
+    val smartCategoryReviewGroup: CleanupGroup? = null,
+    /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
+    val deepCheckRunning: Boolean = false,
+    /** Items that could not go to Trash (e.g. storage full); the user may delete them permanently. */
+    val trashFallbackIds: Set<String> = emptySet(),
     val message: String? = null,
-)
+) {
+    val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
+}
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = DeviceRepository(application)
@@ -157,6 +190,84 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         restoreStorageChange()
         refreshDeviceState()
         refreshAppCaches()
+        purgeExpiredTrash()
+    }
+
+    /** Deletes trash entries older than the retention period, then refreshes the trash list. */
+    fun purgeExpiredTrash() {
+        viewModelScope.launch {
+            runCatching { repository.purgeExpiredTrash() }
+            refreshTrash()
+        }
+    }
+
+    fun refreshTrash() {
+        viewModelScope.launch {
+            val entries = runCatching { withContext(Dispatchers.IO) { repository.trashEntries() } }
+                .getOrDefault(emptyList())
+            _state.update { it.copy(trashEntries = entries) }
+        }
+    }
+
+    /** Puts the files of the shown cleanup back where they were. */
+    fun undoCleanup() {
+        val result = _state.value.cleanupResult ?: return
+        if (result.trashEntryIds.isEmpty()) return
+        restoreTrash(result.trashEntryIds) { restored ->
+            _state.update { state ->
+                val current = state.cleanupResult ?: return@update state
+                val remaining = current.trashEntryIds.filterNot { it in restored.restoredIds }
+                state.copy(
+                    cleanupResult = current.copy(
+                        trashEntryIds = remaining,
+                        trashedBytes = (current.trashedBytes - restored.restoredBytes).coerceAtLeast(0L),
+                        restoredCount = current.restoredCount + restored.restoredIds.size,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun restoreTrash(ids: Collection<String>, onDone: (RestoreResult) -> Unit = {}) {
+        if (ids.isEmpty()) return
+        viewModelScope.launch {
+            val result = runCatching { repository.restoreFromTrash(ids) }.getOrNull() ?: return@launch
+            val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
+            _state.update { it.copy(trashEntries = entries) }
+            onDone(result)
+        }
+    }
+
+    /** Permanently deletes trash entries (all when [ids] is null) and reports the measured result. */
+    fun emptyTrash(ids: Collection<String>? = null, onDone: (Long) -> Unit = {}) {
+        viewModelScope.launch {
+            val before = ioAvailableBytes()
+            val freed = runCatching { repository.emptyTrash(ids) }.getOrDefault(0L)
+            val entries = withContext(Dispatchers.IO) { repository.trashEntries() }
+            val storageAfter = ioStorageSnapshot()
+            _state.update { state ->
+                val current = state.cleanupResult
+                state.copy(
+                    trashEntries = entries,
+                    storage = storageAfter,
+                    cleanupResult = current?.let { result ->
+                        val gone = result.trashEntryIds.filterNot { id -> entries.any { it.id == id } }
+                        if (gone.isEmpty()) {
+                            result
+                        } else {
+                            result.copy(
+                                trashEntryIds = result.trashEntryIds - gone.toSet(),
+                                trashedBytes = (result.trashedBytes - freed).coerceAtLeast(0L),
+                                deletedBytes = result.deletedBytes + freed,
+                                afterAvailableBytes = storageAfter.availableBytes,
+                                beforeAvailableBytes = if (result.beforeAvailableBytes > 0L) result.beforeAvailableBytes else before,
+                            )
+                        }
+                    },
+                )
+            }
+            onDone(freed)
+        }
     }
 
     private fun restoreDashboardSnapshot() {
@@ -365,6 +476,63 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         scan(focus)
     }
 
+    private var scanJob: Job? = null
+
+    /** Cancels a running scan; the screen closes immediately and a new scan can start. */
+    fun cancelScan() {
+        scanJob?.cancel()
+        scanJob = null
+        _state.update {
+            it.copy(
+                scanning = false,
+                dashboardRefreshing = false,
+                scanHashing = false,
+                message = null,
+            )
+        }
+    }
+
+    /**
+     * Quick plan scan on app open (T1.10): only with all-files access, never
+     * while another scan runs, and only when there is no plan or it is older
+     * than [QUICK_SCAN_MAX_AGE_HOURS]. Nothing is ever deleted automatically.
+     */
+    fun onAppOpened() {
+        val current = _state.value
+        val hasPlan = current.planSummary != null ||
+            (current.scanFocus == ScanFocus.SMART && current.lastScanCompleted)
+        if (
+            AutoScanPolicy.shouldScan(
+                hasAccess = repository.hasAllFilesAccess(),
+                scanning = current.scanning,
+                hasPlan = hasPlan,
+                planScannedAtElapsed = current.planScannedAtElapsed,
+                nowElapsed = SystemClock.elapsedRealtime(),
+            )
+        ) {
+            scan(ScanFocus.SMART)
+        }
+    }
+
+    /** Brings the Smart plan back after a tool scan replaced the shown results. */
+    fun showPlan() {
+        _state.update { state ->
+            val stashed = state.planSummary
+            if (state.scanning || state.scanFocus == ScanFocus.SMART || stashed == null) {
+                state
+            } else {
+                state.copy(
+                    summary = stashed,
+                    planSummary = null,
+                    scanFocus = ScanFocus.SMART,
+                    lastScanCompleted = true,
+                    smartCategoryReview = null,
+                    smartCategoryReviewIds = null,
+                )
+            }
+        }
+    }
+
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
         if (!repository.hasAllFilesAccess()) {
@@ -386,7 +554,17 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         val scanStartedAtElapsed = SystemClock.elapsedRealtime()
         AppDiagnostics.breadcrumb("scan_started", mapOf("focus" to focus.name))
         _state.update {
+            // Keep the Smart plan while a tool scan borrows the results area.
+            val stash = when {
+                focus == ScanFocus.SMART -> null
+                it.scanFocus == ScanFocus.SMART && it.lastScanCompleted -> it.summary
+                else -> it.planSummary
+            }
             it.copy(
+                planSummary = stash,
+                scanHashing = false,
+                scanHashDoneBytes = 0L,
+                scanHashTotalBytes = 0L,
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
                 storageReview = StorageReviewSummary(),
@@ -401,16 +579,24 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 message = null,
             )
         }
-        viewModelScope.launch {
+        scanJob = viewModelScope.launch {
             runCatching {
-                repository.scan(focus) { directories, files ->
-                    _state.update { current ->
-                        current.copy(
-                            scanProgressDirectories = directories,
-                            scanProgressFiles = files,
-                        )
-                    }
-                }
+                repository.scan(
+                    focus = focus,
+                    onProgress = { directories, files ->
+                        _state.update { current ->
+                            current.copy(
+                                scanProgressDirectories = directories,
+                                scanProgressFiles = files,
+                            )
+                        }
+                    },
+                    onHashProgress = { done, total ->
+                        _state.update { current ->
+                            current.copy(scanHashing = true, scanHashDoneBytes = done, scanHashTotalBytes = total)
+                        }
+                    },
+                )
             }.onSuccess { summary ->
                 AppDiagnostics.breadcrumb(
                     "scan_completed",
@@ -492,7 +678,13 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         },
                         scanning = false,
                         dashboardRefreshing = false,
+                        scanHashing = false,
                         lastScanCompleted = true,
+                        planScannedAtElapsed = if (focus == ScanFocus.SMART) {
+                            SystemClock.elapsedRealtime()
+                        } else {
+                            it.planScannedAtElapsed
+                        },
                         storage = storageSnapshot,
                         memory = memorySnapshot,
                         hasAllFilesAccess = hasAllFilesAccess,
@@ -523,6 +715,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     current.copy(
                         scanning = false,
                         dashboardRefreshing = false,
+                        scanHashing = false,
                         message = getApplication<Application>().getString(R.string.message_scan_failed),
                     )
                 }
@@ -641,10 +834,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         failedCount = result.failedCount,
                         beforeAvailableBytes = storageBefore,
                         afterAvailableBytes = storageAfter.availableBytes,
+                        trashedBytes = result.trashedBytes,
+                        trashEntryIds = result.trashEntryIds,
+                        changedCount = result.changedCount,
                     )
+                    refreshTrash()
                     _state.update { state ->
                         val trackedWhatsAppBytes = state.dashboardCategoryBytes[CleanCategory.WHATSAPP_MEDIA] ?: 0L
-                        val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes)
+                        val trackedDeletedBytes = minOf(trackedWhatsAppBytes, result.deletedBytes + result.trashedBytes)
                         state.copy(
                             whatsAppSummary = state.whatsAppSummary.copy(
                                 items = state.whatsAppSummary.items.filterNot { it.id in result.deletedIds },
@@ -693,6 +890,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             it.copy(
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
+                smartCategoryReviewGroup = null,
             )
         }
     }
@@ -866,6 +1064,148 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    /** Selects or clears a whole plan group. Groups that are not group-selectable are ignored. */
+    fun setGroupSelected(group: CleanupGroup, selected: Boolean) {
+        _state.update { state ->
+            state.copy(summary = state.summary.copy(items = PlanSelection.setGroupSelected(state.summary.items, group, selected)))
+        }
+    }
+
+    fun toggleGroup(group: CleanupGroup) {
+        _state.update { state ->
+            state.copy(summary = state.summary.copy(items = PlanSelection.toggleGroup(state.summary.items, group)))
+        }
+    }
+
+    /** Full content check of one look-alike copy; a mismatch removes it from the list. */
+    fun verifyDuplicate(id: String) {
+        val item = _state.value.summary.items.firstOrNull { it.id == id } ?: return
+        viewModelScope.launch {
+            val verified = runSuspendCatching { repository.verifyDuplicate(item) }.getOrNull()
+            _state.update { state ->
+                state.copy(summary = state.summary.copy(items = PlanSelection.applyVerification(state.summary.items, id, verified)))
+            }
+        }
+    }
+
+    /**
+     * Deep duplicate check (T1B.6): full verification of the largest
+     * look-alike groups. Started by the user only, never during a scan.
+     */
+    fun runDeepDuplicateCheck() {
+        val current = _state.value
+        if (current.deepCheckRunning || current.scanning || current.cleanupInProgress) return
+        _state.update { it.copy(deepCheckRunning = true) }
+        viewModelScope.launch {
+            val results = runSuspendCatching { repository.verifyLargeDuplicateGroups(current.summary.items) }
+                .getOrDefault(emptyMap())
+            _state.update { state ->
+                state.copy(
+                    deepCheckRunning = false,
+                    summary = state.summary.copy(items = PlanSelection.applyVerifications(state.summary.items, results)),
+                )
+            }
+        }
+    }
+
+    fun dismissTrashFallback() {
+        _state.update { it.copy(trashFallbackIds = emptySet()) }
+    }
+
+    /**
+     * Second, explicit confirmation path: files that could not be moved to
+     * Trash are deleted permanently only after the user confirmed that.
+     */
+    fun deleteTrashFallbackPermanently() {
+        val ids = _state.value.trashFallbackIds
+        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        val items = _state.value.summary.items.filter { it.id in ids }
+        if (items.isEmpty() || _state.value.cleanupInProgress) return
+        _state.update { it.copy(cleanupInProgress = true, cleanupResult = null) }
+        viewModelScope.launch {
+            val before = ioAvailableBytes()
+            runSuspendCatching { repository.deleteDirectItems(items, forcePermanent = true) }
+                .onSuccess { direct ->
+                    finishCleanup(
+                        items = items,
+                        deletedIds = direct.deletedIds,
+                        deletedBytes = direct.deletedBytes,
+                        failedCount = direct.failedCount,
+                        storageBeforeBytes = before,
+                        changedCount = direct.changedCount,
+                    )
+                }
+                .onFailure {
+                    _state.update { state ->
+                        state.copy(
+                            cleanupInProgress = false,
+                            message = getApplication<Application>().getString(R.string.message_cleanup_failed),
+                        )
+                    }
+                }
+        }
+    }
+
+    /** Opens the swipe review for a plan group, keeping earlier marks for the same files. */
+    fun openSwipeReview(group: CleanupGroup) {
+        _state.update { state ->
+            val items = state.summary.items.filter { it.assessment.group == group }
+            val fresh = SwipeReviewState.start(items)
+            val previous = state.swipeStates[group]
+            val review = if (previous != null && previous.itemIds == fresh.itemIds) previous else fresh
+            state.copy(
+                swipeReviewGroup = group,
+                swipeStates = state.swipeStates + (group to review),
+                smartCategoryReview = null,
+                smartCategoryReviewIds = null,
+                smartCategoryReviewGroup = null,
+            )
+        }
+    }
+
+    fun swipeMark(delete: Boolean) = updateSwipe { it.mark(delete) }
+
+    fun swipeUndo() = updateSwipe { it.undo() }
+
+    fun swipeContinue() = updateSwipe { it.continueAfterBreak() }
+
+    /** Leaves the swipe review; marks stay unless [clearMarks] is set (after cleaning). */
+    fun closeSwipeReview(clearMarks: Boolean = false) {
+        _state.update { state ->
+            val group = state.swipeReviewGroup
+            state.copy(
+                swipeReviewGroup = null,
+                swipeStates = if (clearMarks && group != null) state.swipeStates - group else state.swipeStates,
+            )
+        }
+    }
+
+    /** Switches from the swipe review to the grid of the same group. */
+    fun switchSwipeToGrid() {
+        val state = _state.value
+        val group = state.swipeReviewGroup ?: return
+        val items = state.summary.items.filter { it.assessment.group == group }
+        closeSwipeReview()
+        if (items.isEmpty()) return
+        openSmartCategoryReview(items.first().assessment.category, items.mapTo(linkedSetOf(), CleanableItem::id))
+        _state.update { it.copy(smartCategoryReviewGroup = group) }
+    }
+
+    /** Grid review opened from a plan row; remembers the group for the swipe toggle. */
+    fun openPlanGroupGrid(group: CleanupGroup?, items: List<CleanableItem>) {
+        if (items.isEmpty()) return
+        openSmartCategoryReview(items.first().assessment.category, items.mapTo(linkedSetOf(), CleanableItem::id))
+        _state.update { it.copy(smartCategoryReviewGroup = group) }
+    }
+
+    private fun updateSwipe(change: (SwipeReviewState) -> SwipeReviewState) {
+        _state.update { state ->
+            val group = state.swipeReviewGroup ?: return@update state
+            val current = state.swipeStates[group] ?: return@update state
+            state.copy(swipeStates = state.swipeStates + (group to change(current)))
+        }
+    }
+
     fun setItemsSelected(ids: Set<String>, selected: Boolean) {
         if (ids.isEmpty()) return
         _state.update { state ->
@@ -916,7 +1256,19 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 val remaining = selected.filterNot { it.id in direct.attemptedIds }
                 val plan = repository.createDeleteRequest(remaining)
                 if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
-                    finishCleanup(selected, direct.deletedIds, direct.deletedBytes, direct.failedCount)
+                    finishCleanup(
+                        items = selected,
+                        deletedIds = direct.deletedIds,
+                        deletedBytes = direct.deletedBytes,
+                        failedCount = direct.failedCount,
+                        trashedBytes = direct.trashedBytes,
+                        trashEntryIds = direct.trashEntryIds,
+                        changedCount = direct.changedCount,
+                    )
+                    refreshTrash()
+                    if (direct.trashUnavailableIds.isNotEmpty()) {
+                        _state.update { it.copy(trashFallbackIds = direct.trashUnavailableIds) }
+                    }
                     onCleanupCompleted(direct.deletedIds.isNotEmpty())
                 } else {
                     pendingConsentItems = remaining
@@ -975,7 +1327,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         deletedBytes = result.deletedBytes,
                         failedCount = result.failedCount,
                         beforeAvailableBytes = storageBefore,
+                        trashedBytes = result.trashedBytes,
+                        trashEntryIds = result.trashEntryIds,
+                        changedCount = result.changedCount,
                     )
+                    refreshTrash()
                     onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->
@@ -1070,6 +1426,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         storageBeforeBytes: Long = pendingCleanupStorageBeforeBytes,
         clearPending: Boolean = true,
         result: CleanupResult? = null,
+        trashedBytes: Long = 0L,
+        trashEntryIds: List<String> = emptyList(),
+        changedCount: Int = 0,
     ) {
         val storageAfter = ioStorageSnapshot()
         val memoryAfter = ioMemorySnapshot()
@@ -1081,6 +1440,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 failedCount = failedCount,
                 beforeAvailableBytes = storageBeforeBytes,
                 afterAvailableBytes = storageAfter.availableBytes,
+                trashedBytes = trashedBytes,
+                trashEntryIds = trashEntryIds,
+                changedCount = changedCount,
             )
         } else {
             null
@@ -1098,8 +1460,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 .asSequence()
                 .filterNot { it.assessment.recommended }
                 .sumOf(CleanableItem::sizeBytes)
+            val removedUris = deletedItems.mapTo(hashSetOf(), CleanableItem::uri)
             state.copy(
                 summary = state.summary.copy(items = state.summary.items.filterNot { it.id in deletedIds }),
+                planSummary = state.planSummary?.let { plan ->
+                    plan.copy(items = plan.items.filterNot { it.uri in removedUris })
+                },
                 dashboardCleanableBytes = (state.dashboardCleanableBytes - deletedAutoSelectedBytes).coerceAtLeast(0L),
                 dashboardReviewBytes = (state.dashboardReviewBytes - deletedReviewBytes).coerceAtLeast(0L),
                 dashboardCategoryBytes = state.dashboardCategoryBytes.mapValues { (category, bytes) ->
@@ -1138,6 +1504,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         deletedBytes: Long,
         failedCount: Int,
         beforeAvailableBytes: Long,
+        trashedBytes: Long = 0L,
+        trashEntryIds: List<String> = emptyList(),
+        changedCount: Int = 0,
     ) {
         val storageAfter = ioStorageSnapshot()
         val memoryAfter = ioMemorySnapshot()
@@ -1147,6 +1516,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             failedCount = failedCount,
             beforeAvailableBytes = beforeAvailableBytes,
             afterAvailableBytes = storageAfter.availableBytes,
+            trashedBytes = trashedBytes,
+            trashEntryIds = trashEntryIds,
+            changedCount = changedCount,
         )
         _state.update { state ->
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
@@ -1419,5 +1791,31 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         const val WHATSAPP_COMPLETION_DELAY_MILLIS = 80L
         const val DEVICE_REFRESH_INTERVAL_MILLIS = 1_500L
         const val APP_CACHE_REFRESH_INTERVAL_MILLIS = 60L * 1000L
+    }
+}
+
+/** Like runCatching, but never swallows coroutine cancellation. */
+internal suspend inline fun <T> runSuspendCatching(block: () -> T): Result<T> = try {
+    Result.success(block())
+} catch (cancellation: CancellationException) {
+    throw cancellation
+} catch (failure: Exception) {
+    Result.failure(failure)
+}
+
+/** Pure rule for the automatic quick scan on app open (T1.10). */
+internal object AutoScanPolicy {
+    const val QUICK_SCAN_MAX_AGE_HOURS = 6L
+
+    fun shouldScan(
+        hasAccess: Boolean,
+        scanning: Boolean,
+        hasPlan: Boolean,
+        planScannedAtElapsed: Long,
+        nowElapsed: Long,
+    ): Boolean {
+        if (!hasAccess || scanning) return false
+        if (!hasPlan || planScannedAtElapsed <= 0L) return true
+        return nowElapsed - planScannedAtElapsed > java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
     }
 }

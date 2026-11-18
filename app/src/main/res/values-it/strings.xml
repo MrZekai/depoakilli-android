@@ -647,7 +647,8 @@
     <string name="disclosure_usage_body">L\'accesso all\'utilizzo è facoltativo. Consente a Smart Cleaner di leggere i totali di archiviazione/cache delle app segnalati da Android e gli ultimi tempi di utilizzo in modo da poter esaminare app di grandi dimensioni o inutilizzate. Non legge i contenuti privati ​​all\'interno di tali app e non elimina silenziosamente i dati protetti.</string>
     <string name="disclosure_continue">Continua</string>
     <string name="disclosure_not_now">Non ora</string>
-    <string name="smart_cleanup_ad_notice">La pulizia viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="smart_cleanup_ad_notice">Smart Cleaner è gratuita e mostra annunci: un banner, un annuncio nativo contrassegnato in alcuni elenchi, un pannello pubblicitario nel risultato della pulizia, talvolta un annuncio a schermo intero dopo una pulizia o al ritorno alla scheda Pulisci e un annuncio all’apertura mentre l’app si carica. Gli annunci non compaiono mai nei passaggi di autorizzazione o conferma; un breve video rimuove banner e annunci a schermo intero per 60 minuti.</string>
     <string name="whatsapp_cleanup_ad_notice">La pulizia WhatsApp viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
     <string name="premium_cleanup_ad_notice">La pulizia viene eseguita per prima e il risultato misurato viene mostrato per primo. La schermata dei risultati può includere un pannello di annunci sponsorizzati. Se viene visualizzato quel pannello, non segue alcun annuncio a schermo intero per la stessa pulizia. Se non viene visualizzato, dopo aver chiuso il risultato potrebbe essere visualizzato un annuncio a schermo intero idoneo.</string>
     <string name="home_smart_clean_subtitle">Esaminare i veri candidati alla pulizia</string>
@@ -804,4 +805,168 @@
     <string name="feedback_copy_address">Copia indirizzo</string>
     <string name="feedback_open_email">Apri l\'app di posta elettronica</string>
     <string name="feedback_address_copied">Indirizzo copiato</string>
+    <string name="plan_group_apk_installed">Installer di app già presenti</string>
+    <string name="plan_group_duplicate_safe">Copie in più</string>
+    <string name="plan_group_thumbnails">Cache delle anteprime</string>
+    <string name="plan_group_temp_files">File temporanei residui</string>
+    <string name="plan_group_partial_downloads">Download non completati</string>
+    <string name="plan_group_apk_old_version">Versioni precedenti degli installer</string>
+    <string name="plan_group_apk_other">Altri installer</string>
+    <string name="plan_group_duplicate_personal">Copie dei tuoi file</string>
+    <string name="plan_group_duplicate_unverified">File che sembrano identici</string>
+    <string name="plan_group_large_video">Video vecchi di grandi dimensioni</string>
+    <string name="plan_group_screen_recording">Registrazioni dello schermo</string>
+    <string name="plan_group_screenshot">Schermate vecchie</string>
+    <string name="plan_group_download_file">Download vecchi</string>
+    <string name="plan_group_download_document">Documenti e foto scaricati vecchi</string>
+    <string name="plan_group_large_other">File di grandi dimensioni</string>
+    <string name="plan_group_whatsapp_sent">Media WhatsApp che hai inviato</string>
+    <string name="plan_group_whatsapp_video">Video WhatsApp di grandi dimensioni</string>
+    <string name="plan_group_whatsapp_voice">Vecchi messaggi vocali WhatsApp</string>
+    <string name="plan_group_whatsapp_status">Vecchi stati WhatsApp</string>
+    <string name="reason_apk_installed">Questa app è già installata con questa versione o una più recente</string>
+    <string name="reason_apk_old_version">Sul dispositivo c’è anche un installer più recente di questa app</string>
+    <string name="reason_whatsapp_video">Video WhatsApp di grandi dimensioni</string>
+    <plurals name="reason_partial_download">
+        <item quantity="one">Download non completato • Età in giorni: %1$d</item>
+        <item quantity="many">Download non completato • Età in giorni: %1$d</item>
+        <item quantity="other">Download non completato • Età in giorni: %1$d</item>
+    </plurals>
+    <plurals name="reason_screen_recording">
+        <item quantity="one">Registrazione dello schermo • Età in giorni: %1$d</item>
+        <item quantity="many">Registrazione dello schermo • Età in giorni: %1$d</item>
+        <item quantity="other">Registrazione dello schermo • Età in giorni: %1$d</item>
+    </plurals>
+    <plurals name="reason_whatsapp_voice">
+        <item quantity="one">Messaggio vocale • Età in giorni: %1$d</item>
+        <item quantity="many">Messaggio vocale • Età in giorni: %1$d</item>
+        <item quantity="other">Messaggio vocale • Età in giorni: %1$d</item>
+    </plurals>
+    <string name="plan_recommended_title">Pulizia consigliata</string>
+    <string name="plan_clean_action">Pulisci %1$s</string>
+    <string name="plan_nothing_big">Niente di grande da pulire automaticamente</string>
+    <string name="plan_biggest_space_in">Lo spazio maggiore è in:</string>
+    <string name="plan_section_included">Incluso</string>
+    <string name="plan_section_system">Passaggi di sistema</string>
+    <string name="plan_section_review">Da controllare</string>
+    <string name="plan_small_items">Elementi piccoli</string>
+    <string name="plan_clear_app_caches">Svuota cache app</string>
+    <string name="plan_cache_about">circa %1$s</string>
+    <string name="plan_selected">Selezionati: %1$s</string>
+    <string name="plan_preview_title">Controlla prima di pulire</string>
+    <string name="plan_preview_whatsapp">I media WhatsApp eliminati non si apriranno nelle chat.</string>
+    <string name="plan_preview_cloud">Il backup nel cloud non viene controllato.</string>
+    <string name="plan_preview_clean">Pulisci</string>
+    <string name="plan_preview_remove">Rimuovi dalla selezione</string>
+    <string name="plan_verify">Verifica</string>
+    <string name="result_freed_now">Liberati ora: %1$s</string>
+    <string name="result_undo">Annulla</string>
+    <string name="result_empty_trash_now">Svuota il cestino ora</string>
+    <string name="result_empty_trash_confirm">Eliminare definitivamente %1$s? L’operazione non può essere annullata.</string>
+    <string name="result_delete_permanently">Elimina</string>
+    <string name="trash_title">Cestino</string>
+    <string name="trash_description">Ripristina o rimuovi i file puliti</string>
+    <string name="trash_restore">Ripristina</string>
+    <string name="trash_delete_forever">Elimina definitivamente</string>
+    <string name="trash_empty">Svuota cestino</string>
+    <string name="trash_empty_state">Il cestino è vuoto</string>
+    <string name="scan_stage_exact_copies">Controllo delle copie esatte…</string>
+    <string name="tab_trash">Cestino</string>
+    <string name="home_checking_storage">Controllo della memoria…</string>
+    <string name="home_updating">Aggiornamento…</string>
+    <string name="home_allow_access">Consenti accesso</string>
+    <string name="home_access_explainer">Smart Cleaner ha bisogno di accedere a tutti i file per trovare cosa pulire. Nulla viene eliminato senza la tua conferma.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_storage_line">%1$d%% occupato · %2$s liberi</string>
+    <string name="swipe_delete">Elimina</string>
+    <string name="swipe_keep">Tieni</string>
+    <string name="swipe_undo">Annulla</string>
+    <string name="swipe_counter">%1$d / %2$d</string>
+    <string name="swipe_finish">Fine</string>
+    <string name="swipe_continue">Continua</string>
+    <string name="swipe_grid_view">Vista a griglia</string>
+    <string name="swipe_review_view">Revisione a scorrimento</string>
+    <string name="swipe_age_days">%1$s · %2$s</string>
+    <plurals name="plan_recommended_summary">
+        <item quantity="one">Elementi: %1$d · %2$s</item>
+        <item quantity="many">Elementi: %1$d · %2$s</item>
+        <item quantity="other">Elementi: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="plan_unused_apps">
+        <item quantity="one">App inutilizzate (%1$d)</item>
+        <item quantity="many">App inutilizzate (%1$d)</item>
+        <item quantity="other">App inutilizzate (%1$d)</item>
+    </plurals>
+    <plurals name="plan_truncated">
+        <item quantity="one">Mostrati i %1$d elementi più grandi. Ripeti la scansione dopo la pulizia per vederne altri.</item>
+        <item quantity="many">Mostrati i %1$d elementi più grandi. Ripeti la scansione dopo la pulizia per vederne altri.</item>
+        <item quantity="other">Mostrati i %1$d elementi più grandi. Ripeti la scansione dopo la pulizia per vederne altri.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_summary">
+        <item quantity="one">%1$s eliminati ora · %2$s nel cestino (giorni: %3$d)</item>
+        <item quantity="many">%1$s eliminati ora · %2$s nel cestino (giorni: %3$d)</item>
+        <item quantity="other">%1$s eliminati ora · %2$s nel cestino (giorni: %3$d)</item>
+    </plurals>
+    <plurals name="result_in_trash">
+        <item quantity="one">Nel cestino: %1$s — liberato tra giorni: %2$d</item>
+        <item quantity="many">Nel cestino: %1$s — liberato tra giorni: %2$d</item>
+        <item quantity="other">Nel cestino: %1$s — liberato tra giorni: %2$d</item>
+    </plurals>
+    <plurals name="result_changed">
+        <item quantity="one">Modificati dopo la scansione: %1$d</item>
+        <item quantity="many">Modificati dopo la scansione: %1$d</item>
+        <item quantity="other">Modificati dopo la scansione: %1$d</item>
+    </plurals>
+    <plurals name="result_not_deleted">
+        <item quantity="one">Impossibile eliminare: %1$d</item>
+        <item quantity="many">Impossibile eliminare: %1$d</item>
+        <item quantity="other">Impossibile eliminare: %1$d</item>
+    </plurals>
+    <plurals name="result_restored">
+        <item quantity="one">File ripristinati: %1$d</item>
+        <item quantity="many">File ripristinati: %1$d</item>
+        <item quantity="other">File ripristinati: %1$d</item>
+    </plurals>
+    <plurals name="trash_home_line">
+        <item quantity="one">Cestino: %1$s — si svuota tra giorni: %2$d</item>
+        <item quantity="many">Cestino: %1$s — si svuota tra giorni: %2$d</item>
+        <item quantity="other">Cestino: %1$s — si svuota tra giorni: %2$d</item>
+    </plurals>
+    <plurals name="trash_days_left">
+        <item quantity="one">Giorni rimasti: %1$d</item>
+        <item quantity="many">Giorni rimasti: %1$d</item>
+        <item quantity="other">Giorni rimasti: %1$d</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_footer">
+        <item quantity="one">I file restano qui (giorni: %1$d), poi vengono eliminati. Il cestino occupa spazio finché non viene svuotato. Se disinstalli Smart Cleaner, elimina la cartella .SmartCleanerTrash con un file manager.</item>
+        <item quantity="many">I file restano qui (giorni: %1$d), poi vengono eliminati. Il cestino occupa spazio finché non viene svuotato. Se disinstalli Smart Cleaner, elimina la cartella .SmartCleanerTrash con un file manager.</item>
+        <item quantity="other">I file restano qui (giorni: %1$d), poi vengono eliminati. Il cestino occupa spazio finché non viene svuotato. Se disinstalli Smart Cleaner, elimina la cartella .SmartCleanerTrash con un file manager.</item>
+    </plurals>
+    <plurals name="swipe_marked">
+        <item quantity="one">Contrassegnati: %1$d · %2$s</item>
+        <item quantity="many">Contrassegnati: %1$d · %2$s</item>
+        <item quantity="other">Contrassegnati: %1$d · %2$s</item>
+    </plurals>
+    <plurals name="swipe_break">
+        <item quantity="one">Esaminati: %1$d · contrassegnati: %2$s</item>
+        <item quantity="many">Esaminati: %1$d · contrassegnati: %2$s</item>
+        <item quantity="other">Esaminati: %1$d · contrassegnati: %2$s</item>
+    </plurals>
+    <string name="deep_check_action">Guarda e verifica</string>
+    <string name="deep_check_running">Controllo dei file grandi che sembrano identici…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="deep_check_row">
+        <item quantity="one">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
+        <item quantity="many">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
+        <item quantity="other">File grandi che sembrano identici: %1$d · fino a %2$s. Guarda un breve video per verificarli.</item>
+    </plurals>
+    <string name="trash_full_title">Impossibile spostare nel cestino</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="trash_full_body">
+        <item quantity="one">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+        <item quantity="many">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+        <item quantity="other">Impossibile spostare nel cestino (file: %1$d); la memoria potrebbe essere piena. Eliminarli definitivamente? L’operazione non può essere annullata.</item>
+    </plurals>
 </resources>

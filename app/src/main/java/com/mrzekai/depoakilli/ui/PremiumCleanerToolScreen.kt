@@ -583,12 +583,6 @@ private fun PremiumCleanupConfirmationDialog(
                         )
                     }
 
-                    Text(
-                        stringResource(R.string.premium_cleanup_ad_notice),
-                        color = Color(0xFF9EB7D0),
-                        fontSize = 10.sp,
-                    )
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),

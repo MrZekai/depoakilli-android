@@ -1192,11 +1192,6 @@ private fun WhatsAppCleanupConfirmationDialog(
                         }
                     }
                 Text(
-                    stringResource(R.string.whatsapp_cleanup_ad_notice),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Text(
                     stringResource(R.string.whatsapp_cleanup_irreversible),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.labelSmall,

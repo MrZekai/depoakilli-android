@@ -84,18 +84,18 @@ fun BannerAd(
     }
 }
 
-class InterstitialAdController(private val context: Context) {
-    private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+class InterstitialAdController(
+    private val context: Context,
+    private val frequency: AdFrequencyStore = AdFrequencyStore(context),
+) {
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var interstitial: InterstitialAd? = null
     private var loading = false
     private var loadedAtElapsed = 0L
-    private var lastShownAt = preferences.getLong(KEY_LAST_SHOWN_AT, 0L)
     private var lastReleasedAt = 0L
     private var adsAllowed = false
     private var isShowing = false
-    private var shownThisProcess = false
 
     private var resumedActivity: Activity? = null
     private var hostResumedAtElapsed = 0L
@@ -103,7 +103,7 @@ class InterstitialAdController(private val context: Context) {
 
     fun setAdsAllowed(allowed: Boolean) {
         adsAllowed = allowed
-        if (allowed && !shownThisProcess) {
+        if (allowed) {
             scheduleStableLoad("ads-allowed")
         } else if (!allowed) {
             interstitial = null
@@ -116,9 +116,7 @@ class InterstitialAdController(private val context: Context) {
     fun onHostResumed(activity: Activity) {
         resumedActivity = activity
         hostResumedAtElapsed = SystemClock.elapsedRealtime()
-        if (!shownThisProcess) {
-            scheduleStableLoad("host-resumed")
-        }
+        scheduleStableLoad("host-resumed")
     }
 
     fun onHostPaused(activity: Activity) {
@@ -136,7 +134,7 @@ class InterstitialAdController(private val context: Context) {
         val generation = ++loadGeneration
         mainHandler.postDelayed(
             {
-                if (generation != loadGeneration || !adsAllowed || isShowing || shownThisProcess) return@postDelayed
+                if (generation != loadGeneration || !adsAllowed || isShowing) return@postDelayed
                 val host = resumedActivity
                 if (host == null || host.isFinishing || host.isDestroyed) return@postDelayed
 
@@ -152,7 +150,7 @@ class InterstitialAdController(private val context: Context) {
     }
 
     private fun loadNow(reason: String) {
-        if (!adsAllowed || loading || isShowing || shownThisProcess || isFresh()) return
+        if (!adsAllowed || loading || isShowing || isFresh()) return
         if (System.currentTimeMillis() - lastReleasedAt < MIN_RELOAD_AFTER_RELEASE_MILLIS) return
 
         interstitial = null
@@ -195,13 +193,32 @@ class InterstitialAdController(private val context: Context) {
             loadedAtElapsed > 0L &&
             SystemClock.elapsedRealtime() - loadedAtElapsed < INTERSTITIAL_TTL_MILLIS
 
+    /** True only when a full-screen ad would really be shown now (policy, host and a fresh ad). */
+    fun canShowNow(
+        activity: Activity,
+        trigger: InterstitialTrigger,
+        dwellMillis: Long = Long.MAX_VALUE,
+    ): Boolean {
+        val host = resumedActivity
+        return adsAllowed &&
+            !isShowing &&
+            host != null &&
+            host === activity &&
+            !host.isFinishing &&
+            !host.isDestroyed &&
+            isFresh() &&
+            AdPolicy.canShowInterstitial(frequency.load(), System.currentTimeMillis(), trigger, dwellMillis)
+    }
+
     fun showAtNaturalBreak(
         activity: Activity,
+        trigger: InterstitialTrigger = InterstitialTrigger.CLEANUP_DONE,
+        dwellMillis: Long = Long.MAX_VALUE,
         onWillShow: () -> Unit = {},
         onFinished: () -> Unit = {},
     ) {
-        if (shownThisProcess) {
-            Log.i(AD_DIAG_TAG, "INTERSTITIAL/SHOW_SKIP session-cap")
+        if (!AdPolicy.canShowInterstitial(frequency.load(), System.currentTimeMillis(), trigger, dwellMillis)) {
+            Log.i(AD_DIAG_TAG, "INTERSTITIAL/SHOW_SKIP policy trigger=$trigger")
             onFinished()
             return
         }
@@ -221,7 +238,6 @@ class InterstitialAdController(private val context: Context) {
             return
         }
 
-        val now = System.currentTimeMillis()
         val ad = interstitial
         if (ad == null || !isFresh()) {
             interstitial = null
@@ -229,11 +245,6 @@ class InterstitialAdController(private val context: Context) {
             Log.i(AD_DIAG_TAG, "INTERSTITIAL/SHOW_SKIP no-fresh-ad")
             onFinished()
             scheduleStableLoad("show-skip-no-ad")
-            return
-        }
-        if (now - lastShownAt < MIN_INTERVAL_MILLIS) {
-            Log.i(AD_DIAG_TAG, "INTERSTITIAL/SHOW_SKIP cooldown")
-            onFinished()
             return
         }
         interstitial = null
@@ -248,18 +259,15 @@ class InterstitialAdController(private val context: Context) {
             Log.i(AD_DIAG_TAG, "INTERSTITIAL/FLOW_FINISH via=$reason")
             AppDiagnostics.breadcrumb("interstitial_finish", mapOf("via" to reason))
             onFinished()
-            if (!shownThisProcess) {
-                scheduleStableLoad("after-$reason")
-            }
+            // Preload the next one; AdPolicy decides when it may be shown.
+            scheduleStableLoad("after-$reason")
         }
 
         // Let Google AdActivity own its default system UI/insets.
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdShowedFullScreenContent() {
-                shownThisProcess = true
                 loadGeneration++
-                lastShownAt = System.currentTimeMillis()
-                preferences.edit().putLong(KEY_LAST_SHOWN_AT, lastShownAt).apply()
+                frequency.update { AdPolicy.recordInterstitial(it, System.currentTimeMillis()) }
                 logAd("SHOWED", ad)
                 AppDiagnostics.breadcrumb("interstitial_show")
             }
@@ -311,10 +319,7 @@ class InterstitialAdController(private val context: Context) {
     }
 
     companion object {
-        private const val PREFERENCES_NAME = "interstitial_ads"
-        private const val KEY_LAST_SHOWN_AT = "last_shown_at"
         private const val AD_DIAG_TAG = "AdDiag"
-        private const val MIN_INTERVAL_MILLIS = 5L * 60L * 1000L
         private const val MIN_RELOAD_AFTER_RELEASE_MILLIS = 60L * 1000L
         private const val HOST_STABLE_DELAY_MILLIS = 1_200L
         private const val INTERSTITIAL_TTL_MILLIS = 50L * 60L * 1000L
