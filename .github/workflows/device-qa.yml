@@ -31,7 +31,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build QA APK
-        run: ./gradlew --stacktrace assembleQa assembleDebug
+        run: ./gradlew --stacktrace assembleQa
+
+      # A second, different app (the debug build) that the scenario fills with
+      # 700 MB of data. Built separately: compiling both at once runs out of memory.
+      - name: Build debug APK (stand-in big app)
+        run: ./gradlew --stacktrace assembleDebug
 
       - name: Enable KVM
         run: |
