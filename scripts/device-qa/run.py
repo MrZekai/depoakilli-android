@@ -161,6 +161,12 @@ def dismiss_ads(nodes=None):
             back()
         return True
     nodes = nodes if nodes is not None else dump()
+    # A slow emulator sometimes shows "<System app> isn't responding"; not our app.
+    if find(r"isn.t responding", nodes):
+        wait_btn = find(r"^Wait$", nodes)
+        if wait_btn:
+            tap(wait_btn)
+            return True
     consent = find(r"^(consent|accept all|agree|do not consent)$", nodes)
     if consent:
         tap(consent)
@@ -255,6 +261,8 @@ def main():
     seed_files("a")
     seed_big_app()
 
+    time.sleep(20)  # let the emulator settle after boot
+    dismiss_ads()
     launch()
     dismiss_ads()
 
