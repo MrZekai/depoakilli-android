@@ -68,4 +68,4 @@ It runs project validation, dependency metadata checks, unit tests, `lintClosedT
 
 Upload the signed AAB generated for version 1.0.4 (versionCode 50) to the appropriate Play track. The APK is for direct device verification; mapping and audit files are diagnostics.
 
-See `docs/CLOSED_TEST_RELEASE_V39.md`, `docs/DEVICE_QA_CHECKLIST.md`, `docs/PLAY_PERMISSIONS_V050.md`, and `PLAY_RELEASE_CHECKLIST.md`.
+See `docs/DEVICE_QA_CHECKLIST.md`, `docs/PERMISSIONS.md`, `docs/CLEANER_ENGINE.md` and `PLAY_RELEASE_CHECKLIST.md`.

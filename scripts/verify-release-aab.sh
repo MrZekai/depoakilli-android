@@ -18,6 +18,11 @@ fail() {
   exit 1
 }
 
+# Version comes from app/build.gradle.kts so a version bump needs no script edit.
+EXPECTED_VERSION_CODE="$(grep -oP 'versionCode = \K\d+' app/build.gradle.kts)"
+EXPECTED_VERSION_NAME="$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts | head -n 1)"
+[ -n "$EXPECTED_VERSION_CODE" ] && [ -n "$EXPECTED_VERSION_NAME" ] || fail "cannot read version from app/build.gradle.kts"
+
 [ -f "$AAB" ] || fail "AAB missing: $AAB"
 [ -f "$APK" ] || fail "APK missing: $APK"
 [[ "${SUPPORT_EMAIL:-}" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] \
@@ -70,8 +75,8 @@ audit_binary() {
   done < <(unzip -Z1 "$binary" | grep -E '^classes([0-9]+)?\.dex$')
 
   grep -Fq "package: name='com.mrzekai.depoakilli'" "$badging" || fail "$label package mismatch"
-  grep -Fq "versionCode='50'" "$badging" || fail "$label versionCode mismatch"
-  grep -Fq "versionName='1.0.4'" "$badging" || fail "$label versionName mismatch"
+  grep -Fq "versionCode='$EXPECTED_VERSION_CODE'" "$badging" || fail "$label versionCode mismatch"
+  grep -Fq "versionName='$EXPECTED_VERSION_NAME'" "$badging" || fail "$label versionName mismatch"
   grep -Fq "targetSdkVersion:'36'" "$badging" || fail "$label target API mismatch"
   ! grep -Fq 'application-debuggable' "$badging" || fail "$label is debuggable"
   grep -Fq 'ca-app-pub-1380972808968213~9043355268' "$manifest" \
@@ -109,7 +114,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner production release verification: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 1.0.4 (50)"
+  echo "Version: $EXPECTED_VERSION_NAME ($EXPECTED_VERSION_CODE)"
   echo "Target API: 36"
   echo "Upload certificate SHA-256: $AAB_CERT"
   echo "AdMob: live app, banner, interstitial and rewarded IDs; no Google sample IDs"

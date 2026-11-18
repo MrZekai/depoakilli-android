@@ -12,14 +12,67 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
 
+# T3.4: large UI files were split into packages. A check written against the
+# old file reads every file that now holds its code, so no check is lost.
+J = "app/src/main/java/com/mrzekai/depoakilli/"
+SPLIT_SOURCES = {
+    J + "ui/WhatsAppCleanerScreen.kt": [J + "ui/whatsapp/"],
+    J + "ui/PremiumCleanerToolScreen.kt": [J + "ui/tools/"],
+    J + "ui/AppCacheManagerScreen.kt": [J + "ui/AppCacheComponents.kt"],
+    J + "ui/DeviceCenterScreen.kt": [J + "ui/SettingsScreen.kt", J + "ui/AppManagerScreen.kt"],
+    J + "ui/CleanerApp.kt": [J + "ui/AppBottomBar.kt", J + "ui/CleanScreenRouter.kt", J + "ui/AppDialogs.kt"],
+    J + "ui/SmartCleanResultsScreen.kt": [
+        J + "ui/smart/SmartScanStates.kt",
+        J + "ui/smart/UnusedAppsSection.kt",
+        J + "ui/smart/CategoryDetailPage.kt",
+        J + "ui/smart/StorageDetailPage.kt",
+        J + "ui/smart/SmartFilePreview.kt",
+    ],
+    J + "data/DeviceRepository.kt": [
+        J + "data/StorageIndexer.kt",
+        J + "data/SharedStorageRemover.kt",
+        J + "data/ScanFocusRules.kt",
+        J + "data/StorageTypeStats.kt",
+        J + "data/AppStatsSource.kt",
+        J + "data/DeviceInfoSource.kt",
+    ],
+    J + "ui/CleanerViewModel.kt": [
+        J + "ui/CleanerUiState.kt",
+        J + "ui/CleanerViewModelCore.kt",
+        J + "ui/CleanerTrashLayer.kt",
+        J + "ui/CleanerDeviceLayer.kt",
+        J + "ui/CleanerAppCacheLayer.kt",
+        J + "ui/CleanerScanLayer.kt",
+        J + "ui/CleanerWhatsAppLayer.kt",
+        J + "ui/CleanerStorageReviewLayer.kt",
+        J + "ui/CleanerStateReducers.kt",
+    ],
+}
+
+
+def split_files(relative: str) -> list[pathlib.Path]:
+    files: list[pathlib.Path] = []
+    for part in SPLIT_SOURCES.get(relative, []):
+        target = ROOT / part
+        files += sorted(target.rglob("*.kt")) if target.is_dir() else [target]
+    if (ROOT / relative).is_file():
+        files.insert(0, ROOT / relative)
+    return files
+
+
 def require(relative: str) -> pathlib.Path:
     path = ROOT / relative
-    if not path.is_file():
+    if not path.is_file() and not (relative in SPLIT_SOURCES and split_files(relative)):
         errors.append(f"missing required file: {relative}")
     return path
 
 
 def read(relative: str) -> str:
+    if relative in SPLIT_SOURCES:
+        files = split_files(relative)
+        if not files:
+            errors.append(f"missing required file: {relative}")
+        return "\n".join(f.read_text(encoding="utf-8") for f in files)
     path = require(relative)
     if not path.is_file():
         return ""
@@ -76,7 +129,6 @@ required = [
     "scripts/verify-qa-apk.sh",
     "scripts/verify-qa-signing.sh",
     "PLAY_RELEASE_CHECKLIST.md",
-    "docs/CLOSED_TEST_RELEASE_V46.md",
     "PRIVACY_POLICY_EN.md",
     "PRIVACY_POLICY_TR.md",
     "TERMS_OF_SERVICE_EN.md",
@@ -124,13 +176,20 @@ for forbidden in (
 # Build / production-vs-QA AdMob contract.
 # ------------------------------------------------------------------
 build_file = read("app/build.gradle.kts")
+# T3.6: version constants come from Gradle, not from this script.
+_version_code = re.search(r"versionCode = (\d+)", build_file)
+_version_name = re.search(r'versionName = "([^"]+)"', build_file)
+if not _version_code or not _version_name:
+    errors.append("versionCode/versionName missing in app/build.gradle.kts")
+VERSION_CODE = _version_code.group(1) if _version_code else "?"
+VERSION_NAME = _version_name.group(1) if _version_name else "?"
 for expected in (
     'applicationId = "com.mrzekai.depoakilli"',
     "minSdk = 30",
     "targetSdk = 36",
     "compileSdk = 36",
-    "versionCode = 50",
-    'versionName = "1.0.4"',
+    f"versionCode = {VERSION_CODE}",
+    f'versionName = "{VERSION_NAME}"',
     "validateReleaseAds",
     'applicationIdSuffix = ".qa"',
     'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
@@ -444,7 +503,7 @@ for forbidden in (
     if forbidden in storage_analyzer:
         errors.append(f"Storage Analyzer must remain read-only: {forbidden}")
 
-download_block_start = repository.find("private val DOWNLOAD_TOOL_GROUPS")
+download_block_start = repository.find("val DOWNLOAD_TOOL_GROUPS = setOf(")
 if download_block_start < 0:
     errors.append("DOWNLOAD_TOOL_GROUPS missing")
 else:
@@ -982,7 +1041,7 @@ for expected in (
 junk_start = repository.find("ScanFocus.JUNK -> {")
 junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
 downloads_start = repository.find("ScanFocus.DOWNLOADS -> {")
-downloads_end = repository.find("private suspend fun indexSharedStorage", downloads_start)
+downloads_end = repository.find("fun ageDays(", downloads_start)
 if junk_start < 0 or junk_end <= junk_start or downloads_start < 0 or downloads_end <= downloads_start:
     errors.append("unable to inspect alpha10 Junk/Downloads partition")
 else:
@@ -999,7 +1058,8 @@ if "ScanFocus.SCREENSHOTS -> aiEngine.assessFocusedScreenshot(file)" not in repo
 for expected in (
     "val recordsStorageChange = comprehensive || focus == ScanFocus.ANALYZE",
     "if (recordsStorageChange)",
-    "recordsStorageChange && repository.hasUsageAccess()",
+    "withContext(Dispatchers.Default) { repository.hasUsageAccess() }",
+    "                    recordsStorageChange &&\n",
 ):
     if expected not in view_model:
         errors.append(f"ANALYZE must create a real Storage Change snapshot: {expected}")
@@ -1224,10 +1284,10 @@ for expected in (
     "assembleClosedTest",
     "lintClosedTest",
     "scripts/verify-closed-test-binaries.sh",
-    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v50",
-    "SmartCleaner-CLOSED-TEST-APK-v50",
-    "SmartCleaner-ClosedTest-Diagnostics-v50",
-    "SmartCleaner-ClosedTest-v50.aab",
+    "SmartCleaner-PLAY-CLOSED-TEST-AAB-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-CLOSED-TEST-APK-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-ClosedTest-Diagnostics-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-ClosedTest-v${{ env.VERSION_CODE }}.aab",
     "SUPPORT_EMAIL",
 ):
     if expected not in closed_test_workflow:
@@ -1236,8 +1296,8 @@ for expected in (
 closed_test_verifier = read("scripts/verify-closed-test-binaries.sh")
 for expected in (
     "com.mrzekai.depoakilli",
-    "1.0.4",
-    "versionCode='50'",
+    "EXPECTED_VERSION_NAME",
+    "versionCode='$EXPECTED_VERSION_CODE'",
     "ca-app-pub-3940256099942544/6300978111",
     "ca-app-pub-3940256099942544/1033173712",
     "ca-app-pub-3940256099942544/1044960115",
@@ -1263,15 +1323,15 @@ for expected in (
     "lintRelease",
     "bundleRelease assembleRelease",
     "scripts/verify-release-aab.sh",
-    "SmartCleaner-PLAY-PRODUCTION-AAB-v50",
-    "SmartCleaner-PRODUCTION-APK-v50",
+    "SmartCleaner-PLAY-PRODUCTION-AAB-v${{ env.VERSION_CODE }}",
+    "SmartCleaner-PRODUCTION-APK-v${{ env.VERSION_CODE }}",
 ):
     if expected not in release_workflow:
         errors.append(f"missing production workflow invariant: {expected}")
 
 release_verifier = read("scripts/verify-release-aab.sh")
 for expected in (
-    "versionCode='50'",
+    "versionCode='$EXPECTED_VERSION_CODE'",
     "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
     "ca-app-pub-1380972808968213~9043355268",
     "ca-app-pub-1380972808968213/2118175647",
@@ -1381,12 +1441,12 @@ for expected in (
     if expected not in repository:
         errors.append(f"missing v41 storage-safety invariant: {expected}")
 
-delete_start = repository.find("private fun removeFile(")
+delete_start = repository.find("    fun removeFile(")
 if delete_start < 0:
     errors.append("removeFile is missing")
 else:
     delete_section = repository[delete_start:delete_start + 1400]
-    if "isDeletableSharedStorageFile(file)" not in delete_section:
+    if "isDeletableSharedStorageFile(file, roots)" not in delete_section:
         errors.append("direct file deletion must be confined to shared storage roots")
 
 for expected in (
@@ -1509,10 +1569,18 @@ for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
         if resource_name in default_plurals:
             errors.append(f"{resource_name} is a plural; use pluralStringResource in {kotlin_file.relative_to(ROOT)}")
 
+# T3.6: every workflow names its artifacts from the Gradle version.
+for workflow in (".github/workflows/android-ci.yml", ".github/workflows/closed-test-build.yml", ".github/workflows/release-aab.yml"):
+    workflow_text = read(workflow)
+    if "Read app version from Gradle" not in workflow_text or "-v50" in workflow_text:
+        errors.append(f"{workflow} must read the version from app/build.gradle.kts")
+if "validate-translations.py" not in read(".github/workflows/android-ci.yml"):
+    errors.append("android-ci.yml must run scripts/validate-translations.py")
+
 if errors:
     print("Project validation failed:", file=sys.stderr)
     for error in errors:
         print(f" - {error}", file=sys.stderr)
     sys.exit(1)
 
-print("Smart Cleaner v1.0.4 (50) production + QA invariants are valid.")
+print(f"Smart Cleaner v{VERSION_NAME} ({VERSION_CODE}) production + QA invariants are valid.")

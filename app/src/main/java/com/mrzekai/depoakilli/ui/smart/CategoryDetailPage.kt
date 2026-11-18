@@ -1,0 +1,353 @@
+package com.mrzekai.depoakilli.ui.smart
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.ByteFormatter
+import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.ui.*
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.media.rememberThumbnail
+import com.mrzekai.depoakilli.ui.theme.ElectricBlue
+
+@Composable
+internal fun CategoryDetailPage(
+    category: CleanCategory,
+    items: List<CleanableItem>,
+    cleanupInProgress: Boolean,
+    onToggleCategory: () -> Unit,
+    onToggleItem: (String) -> Unit,
+    onPreview: (CleanableItem) -> Unit,
+    onCleanSelected: (Set<String>) -> Unit,
+    modifier: Modifier = Modifier,
+    gridAd: @Composable () -> Unit = {},
+) {
+    var confirmCleanup by remember { mutableStateOf(false) }
+    val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
+    val selectedItems = items.filter(CleanableItem::selected)
+    val selectedCount = selectedItems.size
+    val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
+    val allSelected = items.isNotEmpty() && selectedCount == items.size
+    val selectionState = sectionSelectionState(selectedCount, items.size)
+    val accent = categoryAccent(category)
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF02081A), Color(0xFF061633), Color(0xFF030A1E)),
+                ),
+            ),
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = SmartCard),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(14.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            stringResource(
+                                R.string.smart_detail_selected_summary,
+                                selectedCount,
+                                items.size,
+                                ByteFormatter.format(selectedBytes),
+                            ),
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                        )
+                        Text(
+                            stringResource(R.string.smart_detail_grid_hint),
+                            color = SmartTextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Surface(
+                        color = accent.copy(alpha = .16f),
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text(
+                            ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes)),
+                            color = accent,
+                            fontWeight = FontWeight.Black,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        )
+                    }
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF102850))
+                        .clickable { onToggleCategory() }
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TriStateCheckbox(
+                        state = selectionState,
+                        onClick = onToggleCategory,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = ElectricBlue,
+                            uncheckedColor = Color(0xFFA7B8D6),
+                            checkmarkColor = Color.White,
+                        ),
+                    )
+                    Spacer(Modifier.width(5.dp))
+                    // The tap/checkbox instruction is already shown once in the
+                    // header above; it is not repeated here (QA v43 polish).
+                    Text(
+                        stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+
+        if (displayItems.isEmpty()) {
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Text(stringResource(R.string.smart_detail_empty), color = SmartTextSecondary)
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 14.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                val beforeAd = displayItems.take(LIST_AD_AFTER_ITEMS)
+                val afterAd = displayItems.drop(LIST_AD_AFTER_ITEMS)
+                gridItems(beforeAd, key = CleanableItem::id) { item ->
+                    CategoryGridItem(
+                        item = item,
+                        accent = accent,
+                        onPreview = { onPreview(item) },
+                        onToggle = { onToggleItem(item.id) },
+                    )
+                }
+                // One full-width native ad after the 12th file (T1B.4), only in longer grids.
+                if (afterAd.isNotEmpty()) {
+                    item(key = "category-list-native", span = { GridItemSpan(maxLineSpan) }) { gridAd() }
+                }
+                gridItems(afterAd, key = CleanableItem::id) { item ->
+                    CategoryGridItem(
+                        item = item,
+                        accent = accent,
+                        onPreview = { onPreview(item) },
+                        onToggle = { onToggleItem(item.id) },
+                    )
+                }
+            }
+        }
+
+        ReviewCleanupFooter(
+            selectedCount = selectedCount,
+            selectedBytes = selectedBytes,
+            enabled = selectedItems.isNotEmpty() && !cleanupInProgress,
+            inProgress = cleanupInProgress,
+            onClick = { confirmCleanup = true },
+        )
+    }
+
+    if (confirmCleanup) {
+        DeleteConfirmDialog(
+            items = selectedItems,
+            onDismiss = { confirmCleanup = false },
+            onConfirm = {
+                confirmCleanup = false
+                onCleanSelected(selectedItems.mapTo(linkedSetOf(), CleanableItem::id))
+            },
+        )
+    }
+}
+
+@Composable
+internal fun CategoryGridItem(
+    item: CleanableItem,
+    accent: Color,
+    onPreview: () -> Unit,
+    onToggle: () -> Unit,
+) {
+    val bitmap by rememberThumbnail(item.uri, item.mimeType)
+
+    Card(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 214.dp),
+        onClick = onPreview,
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SmartCard),
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(112.dp)
+                    .background(Color(0xFF091A3B)),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (bitmap != null) {
+                    Image(
+                        bitmap = requireNotNull(bitmap),
+                        contentDescription = item.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color.Transparent, Color(0x5503091B)),
+                                ),
+                            ),
+                    )
+                } else {
+                    Surface(
+                        color = accent.copy(alpha = .16f),
+                        shape = RoundedCornerShape(18.dp),
+                    ) {
+                        Icon(
+                            FileVisuals.icon(item.mimeType, item.name),
+                            contentDescription = null,
+                            tint = accent,
+                            modifier = Modifier.padding(18.dp).size(38.dp),
+                        )
+                    }
+                }
+
+                if (item.mimeType.startsWith("video/")) {
+                    Surface(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color(0xCC06132F),
+                        shape = CircleShape,
+                    ) {
+                        Text(
+                            "▶",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        )
+                    }
+                }
+
+                Checkbox(
+                    checked = item.selected,
+                    onCheckedChange = { onToggle() },
+                    modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = ElectricBlue,
+                        uncheckedColor = Color.White,
+                        checkmarkColor = Color.White,
+                    ),
+                )
+
+                Surface(
+                    modifier = Modifier.align(Alignment.BottomStart).padding(7.dp),
+                    color = Color(0xD9030B20),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text(
+                        ByteFormatter.format(item.sizeBytes),
+                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
+            ) {
+                Text(
+                    item.name,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    compactRelativePath(item.relativePath),
+                    color = Color(0xFF9FB4D7),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    assessmentReason(item.assessment),
+                    color = Color(0xFFBFD0EA),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 12.sp,
+                )
+                Text(
+                    stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
+                    color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
+}

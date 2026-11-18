@@ -1,32 +1,15 @@
 package com.mrzekai.depoakilli.data
 
 import android.app.ActivityManager
-import android.app.AppOpsManager
-import android.app.usage.StorageStatsManager
-import android.app.usage.UsageStatsManager
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.BatteryManager
-import android.os.Build
-import android.os.Debug
 import android.os.Environment
 import android.os.ParcelFileDescriptor
-import android.os.Process
-import android.os.StatFs
 import android.os.SystemClock
 import android.os.storage.StorageManager
-import android.provider.MediaStore
-import android.webkit.MimeTypeMap
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.model.AiAssessment
-import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
-import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeleteMode
@@ -41,7 +24,6 @@ import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
-import com.mrzekai.depoakilli.model.StorageTypeStat
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
 import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
@@ -49,7 +31,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Files
 import java.lang.ref.SoftReference
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -75,93 +56,40 @@ class DeviceRepository(
     private val trashStore = TrashStore(
         indexFile = File(context.filesDir, TRASH_INDEX_FILE),
         trashRoots = { sharedStorageRoots() },
-        isAllowed = ::isDeletableSharedStorageFile,
-        removeFromMediaStore = ::removeDeletedPathFromMediaStore,
+        isAllowed = { file -> isDeletableSharedStorageFile(file, sharedStorageRoots()) },
+        removeFromMediaStore = { path -> removeDeletedPathFromMediaStore(context.contentResolver, path) },
         rescan = { path -> MediaScannerConnection.scanFile(context, arrayOf(path), null, null) },
     )
     private val resolver = context.contentResolver
+    private val remover = SharedStorageRemover(resolver, trashStore, onRemoved = { invalidateStorageIndex() })
+    private val deviceInfo = DeviceInfoSource(context, storageRoots = { sharedStorageRoots() })
+    private val appStats = AppStatsSource(context, ownCacheSize = { ownCacheSize() })
+    private val indexer = StorageIndexer(
+        fileLimit = { indexedFileLimit() },
+        makeIndexedFile = { storageRoot, file -> indexedFile(storageRoot, file) },
+    )
     private var sharedIndexCache: SoftReference<List<IndexedFile>>? = null
     private var sharedIndexCachedAtElapsed = 0L
 
-    fun storageSnapshot(): StorageSnapshot {
-        val snapshots = sharedStorageRoots().mapNotNull { root ->
-            runCatching {
-                val stats = StatFs(root.absolutePath)
-                StorageSnapshot(
-                    totalBytes = stats.totalBytes,
-                    availableBytes = stats.availableBytes,
-                )
-            }.getOrNull()
-        }
+    fun storageSnapshot(): StorageSnapshot = deviceInfo.storageSnapshot()
 
-        if (snapshots.isNotEmpty()) {
-            return StorageSnapshot(
-                totalBytes = snapshots.sumOf(StorageSnapshot::totalBytes),
-                availableBytes = snapshots.sumOf(StorageSnapshot::availableBytes),
-            )
-        }
+    fun memorySnapshot(): MemorySnapshot = deviceInfo.memorySnapshot()
 
-        val fallback = StatFs(Environment.getDataDirectory().absolutePath)
-        return StorageSnapshot(
-            totalBytes = fallback.totalBytes,
-            availableBytes = fallback.availableBytes,
-        )
-    }
+    fun deviceInfoSnapshot(): DeviceInfoSnapshot = deviceInfo.deviceInfoSnapshot()
 
-    fun memorySnapshot(): MemorySnapshot {
-        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val info = ActivityManager.MemoryInfo()
-        val processMemoryInfo = Debug.MemoryInfo()
-        manager.getMemoryInfo(info)
-        Debug.getMemoryInfo(processMemoryInfo)
-        return MemorySnapshot(
-            totalBytes = info.totalMem,
-            availableBytes = info.availMem,
-            appUsedBytes = processMemoryInfo.totalPss.toLong() * 1024L,
-            lowMemory = info.lowMemory,
-            lowMemoryThresholdBytes = info.threshold,
-        )
-    }
+    fun hasUsageAccess(): Boolean = appStats.hasUsageAccess()
 
-    @Suppress("DEPRECATION")
-    fun deviceInfoSnapshot(): DeviceInfoSnapshot {
-        val battery = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val batteryLevel = battery?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
-        val batteryScale = battery?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100
-        val batteryPercent = if (batteryLevel >= 0 && batteryScale > 0) {
-            (batteryLevel * 100 / batteryScale).coerceIn(0, 100)
-        } else {
-            0
-        }
-        val batteryStatus = battery?.getIntExtra(
-            BatteryManager.EXTRA_STATUS,
-            BatteryManager.BATTERY_STATUS_UNKNOWN,
-        ) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
-        val metrics = context.resources.displayMetrics
-        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageInfo(
-                context.packageName,
-                PackageManager.PackageInfoFlags.of(0L),
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageInfo(context.packageName, 0)
-        }
-        return DeviceInfoSnapshot(
-            manufacturer = Build.MANUFACTURER.orEmpty(),
-            model = Build.MODEL.orEmpty(),
-            androidVersion = Build.VERSION.RELEASE.orEmpty(),
-            sdkLevel = Build.VERSION.SDK_INT,
-            cpuAbi = Build.SUPPORTED_ABIS.firstOrNull().orEmpty(),
-            cpuCores = Runtime.getRuntime().availableProcessors().coerceAtLeast(1),
-            screenResolution = "${metrics.widthPixels} × ${metrics.heightPixels}",
-            batteryPercent = batteryPercent,
-            batteryTemperatureCelsius = (battery?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0) / 10f,
-            batteryCharging = batteryStatus == BatteryManager.BATTERY_STATUS_CHARGING ||
-                batteryStatus == BatteryManager.BATTERY_STATUS_FULL,
-            appVersion = packageInfo.versionName.orEmpty(),
-        )
-    }
+    suspend fun appCacheSnapshot(): AppCacheSnapshot = appStats.appCacheSnapshot()
+
+    suspend fun installedAppsSnapshot(): List<InstalledAppEntry> = appStats.installedAppsSnapshot()
+
+    private suspend fun indexSharedStorage(
+        onTraversalProgress: (visitedDirectories: Int, discoveredFiles: Int) -> Unit,
+    ): List<IndexedFile> = indexer.indexSharedStorage(sharedStorageRoots(), onTraversalProgress)
+
+    private suspend fun indexWhatsAppFiles(
+        onDiscovered: (Int, Int) -> Unit,
+    ): List<IndexedFile> = indexer.indexWhatsAppFiles(whatsappRootPairs(), MAX_WHATSAPP_FILES, onDiscovered)
 
     fun hasAllFilesAccess(): Boolean = Environment.isExternalStorageManager()
 
@@ -169,107 +97,6 @@ class DeviceRepository(
 
     fun ownCacheSize(): Long = directorySize(context.cacheDir) +
         (context.externalCacheDir?.let(::directorySize) ?: 0L)
-
-    @Suppress("DEPRECATION")
-    fun hasUsageAccess(): Boolean {
-        val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            appOps.unsafeCheckOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                context.packageName,
-            )
-        } else {
-            appOps.checkOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                context.packageName,
-            )
-        }
-        return mode == AppOpsManager.MODE_ALLOWED
-    }
-
-    suspend fun appCacheSnapshot(): AppCacheSnapshot = withContext(Dispatchers.IO) {
-        if (!hasUsageAccess()) {
-            return@withContext AppCacheSnapshot(supported = true, accessGranted = false)
-        }
-        val packageManager = context.packageManager
-        val applications = launcherApplications(packageManager)
-        val storageStats = context.getSystemService(StorageStatsManager::class.java)
-        val user = Process.myUserHandle()
-        val totalReportedCache = runCatching {
-            storageStats.queryStatsForUser(StorageManager.UUID_DEFAULT, user).cacheBytes
-        }.getOrDefault(0L)
-        val entries = applications.mapNotNull { application ->
-            coroutineContext.ensureActive()
-            runCatching {
-                val volume = application.storageUuid ?: StorageManager.UUID_DEFAULT
-                val cacheBytes = storageStats.queryStatsForPackage(
-                    volume,
-                    application.packageName,
-                    user,
-                ).cacheBytes.coerceAtLeast(0L)
-                if (cacheBytes == 0L) return@runCatching null
-                AppCacheEntry(
-                    packageName = application.packageName,
-                    label = application.loadLabel(packageManager).toString().ifBlank { application.packageName },
-                    cacheBytes = cacheBytes,
-                )
-            }.getOrNull()
-        }
-        AppCacheSnapshot(
-            supported = true,
-            accessGranted = true,
-            entries = entries.sortedByDescending(AppCacheEntry::cacheBytes),
-            scannedAppCount = applications.size,
-            reportedOtherAppsCacheBytes = (totalReportedCache - ownCacheSize()).coerceAtLeast(0L),
-        )
-    }
-
-    suspend fun installedAppsSnapshot(): List<InstalledAppEntry> = withContext(Dispatchers.IO) {
-        val packageManager = context.packageManager
-        val applications = launcherApplications(packageManager)
-        val usageAccessGranted = hasUsageAccess()
-        val usageMap = if (usageAccessGranted) {
-            val now = System.currentTimeMillis()
-            val manager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-            manager.queryUsageStats(
-                UsageStatsManager.INTERVAL_YEARLY,
-                now - TimeUnit.DAYS.toMillis(365),
-                now,
-            ).associateBy { it.packageName }
-        } else {
-            emptyMap()
-        }
-        val storageStats = context.getSystemService(StorageStatsManager::class.java)
-        val user = Process.myUserHandle()
-        applications.map { application ->
-            coroutineContext.ensureActive()
-            val stats = if (usageAccessGranted) {
-                runCatching {
-                    storageStats.queryStatsForPackage(
-                        application.storageUuid ?: StorageManager.UUID_DEFAULT,
-                        application.packageName,
-                        user,
-                    )
-                }.getOrNull()
-            } else {
-                null
-            }
-            InstalledAppEntry(
-                packageName = application.packageName,
-                label = application.loadLabel(packageManager).toString().ifBlank { application.packageName },
-                appBytes = stats?.appBytes ?: 0L,
-                dataBytes = stats?.dataBytes ?: 0L,
-                cacheBytes = stats?.cacheBytes ?: 0L,
-                lastUsedMillis = usageMap[application.packageName]?.lastTimeUsed ?: 0L,
-                systemApp = (
-                    application.flags and
-                        (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)
-                    ) != 0,
-            )
-        }.sortedByDescending(InstalledAppEntry::totalBytes)
-    }
 
     suspend fun clearOwnCache(): Long = withContext(Dispatchers.IO) {
         val before = ownCacheSize()
@@ -298,7 +125,7 @@ class DeviceRepository(
 
         indexed.forEach { file ->
             coroutineContext.ensureActive()
-            assessmentForFocus(file, focus)?.let { assessment ->
+            ScanFocusRules.assessmentForFocus(aiEngine, file, focus)?.let { assessment ->
                 assessments += file.toCleanable(assessment)
             }
         }
@@ -356,20 +183,7 @@ class DeviceRepository(
         // classification, so Deep Clean and Delete Duplicates report the same
         // duplicate set.
         val ranked = duplicateResult.mergeWith(assessed)
-            .filter { item ->
-                when (focus) {
-                    ScanFocus.SMART,
-                    ScanFocus.DEEP -> true
-                    ScanFocus.JUNK -> item.assessment.category == CleanCategory.JUNK
-                    ScanFocus.DUPLICATES -> item.assessment.category == CleanCategory.DUPLICATE
-                    ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
-                    ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
-                    ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
-                    ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS
-                    ScanFocus.APKS -> item.assessment.category == CleanCategory.APK_PACKAGE
-                    ScanFocus.ANALYZE -> false
-                }
-            }
+            .filter { item -> ScanFocusRules.matchesFocus(item, focus) }
             .distinctBy(CleanableItem::uri)
             .sortedByDescending(CleanableItem::sizeBytes)
             .toList()
@@ -532,13 +346,15 @@ class DeviceRepository(
     ): WhatsAppDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            // Volume roots are resolved once per batch, not once per file (T3.5).
+            val roots = sharedStorageRoots()
             val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
                     item.id,
                     item.sizeBytes,
-                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, CleanupGroup.WHATSAPP_SENT),
+                    remover.removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, CleanupGroup.WHATSAPP_SENT, roots),
                 )
             }
             WhatsAppDeleteResult(
@@ -557,18 +373,21 @@ class DeviceRepository(
     ): DirectDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            // Volume roots are resolved once per batch, not once per file (T3.5).
+            val roots = sharedStorageRoots()
             val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
                     item.id,
                     item.file.sizeBytes,
-                    removeFile(
+                    remover.removeFile(
                         item.file.uri,
                         item.file.sizeBytes,
                         item.file.modifiedAtMillis,
                         mode,
                         CleanupGroup.LARGE_OTHER,
+                        roots,
                     ),
                 )
             }
@@ -586,12 +405,14 @@ class DeviceRepository(
     ): DirectDeleteResult = withContext(Dispatchers.IO) {
         val directItems = items.filter { Uri.parse(it.uri).scheme == "file" }
         val outcome = RemovalTally()
+        // Volume roots are resolved once per batch, not once per file (T3.5).
+        val roots = sharedStorageRoots()
         directItems.forEach { item ->
             coroutineContext.ensureActive()
             val group = item.assessment.group
             val remove = {
                 val mode = if (forcePermanent) DeleteMode.PERMANENT else group.deleteMode
-                removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, group)
+                remover.removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, group, roots)
             }
             val originalUri = item.protectedDuplicateUri
             val removal = if (originalUri == null) {
@@ -649,239 +470,6 @@ class DeviceRepository(
         if (!hasAllFilesAccess()) 0L else trashStore.purgeExpired()
     }
 
-    private fun removeFile(
-        uriString: String,
-        expectedSizeBytes: Long,
-        expectedModifiedAtMillis: Long,
-        mode: DeleteMode,
-        group: CleanupGroup,
-    ): Removal = runCatching {
-        val uri = Uri.parse(uriString)
-        if (uri.scheme != "file") return@runCatching Removal.Failed(FailureReason.DENIED)
-        val file = File(uri.path ?: return@runCatching Removal.Failed(FailureReason.DENIED))
-        if (!file.exists()) return@runCatching Removal.Failed(FailureReason.MISSING)
-        if (!fileSnapshotStillMatches(uriString, expectedSizeBytes, expectedModifiedAtMillis)) {
-            return@runCatching Removal.Failed(FailureReason.CHANGED)
-        }
-        // Path rules expect a path relative to the storage volume root
-        // (e.g. "WhatsApp/Databases"), not the absolute path.
-        val relativeDir = volumeRootOf(file)?.let { root ->
-            runCatching { file.parentFile?.relativeTo(root)?.invariantSeparatorsPath }.getOrNull()
-        } ?: return@runCatching Removal.Failed(FailureReason.PROTECTED)
-        if (
-            !isDeletableSharedStorageFile(file) ||
-            StoragePathRules.isSkippedHiddenFile(file.name) ||
-            StoragePathRules.isProtectedUserDataPath(relativeDir, file.name)
-        ) {
-            return@runCatching Removal.Failed(FailureReason.PROTECTED)
-        }
-        val removal = when (mode) {
-            DeleteMode.TRASH -> {
-                val root = volumeRootOf(file)
-                val entry = root?.let { trashStore.moveToTrash(file, it, group) }
-                when {
-                    entry != null -> Removal.Trashed(entry.id)
-                    // The Trash folder itself cannot be created on this volume
-                    // (some manufacturers block it): reported separately.
-                    root == null || !trashStore.canUseTrash(root) -> Removal.Failed(FailureReason.TRASH_FOLDER_UNAVAILABLE)
-                    else -> Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
-                }
-            }
-            DeleteMode.PERMANENT -> {
-                if (FileDeleter.deleteUnprotected(file, relativeDir)) {
-                    removeDeletedPathFromMediaStore(file.absolutePath)
-                    Removal.Deleted
-                } else {
-                    Removal.Failed(FailureReason.DENIED)
-                }
-            }
-        }
-        if (removal !is Removal.Failed) invalidateStorageIndex()
-        removal
-    }.getOrDefault(Removal.Failed(FailureReason.DENIED))
-
-    private fun volumeRootOf(file: File): File? = sharedStorageRoots().firstOrNull { root ->
-        canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
-    }
-
-    private fun assessmentForFocus(file: IndexedFile, focus: ScanFocus): AiAssessment? {
-        return when (focus) {
-            ScanFocus.SMART -> aiEngine.assess(file)
-            ScanFocus.DEEP -> aiEngine.assessDeep(file)
-
-            ScanFocus.JUNK -> {
-                if (StoragePathRules.isDownloadPath(file.relativePath)) {
-                    null
-                } else {
-                    aiEngine.assess(file)?.takeIf {
-                        it.category == CleanCategory.JUNK
-                    }
-                }
-            }
-
-            ScanFocus.DUPLICATES,
-            ScanFocus.ANALYZE -> null
-
-            ScanFocus.APKS -> aiEngine.assess(file)?.takeIf {
-                it.category == CleanCategory.APK_PACKAGE
-            }
-
-            ScanFocus.LARGE_FILES -> if (file.sizeBytes >= CleaningThresholds.LARGE_BYTES) {
-                AiAssessment(
-                    category = CleanCategory.LARGE_FILE,
-                    safetyScore = 60,
-                    reasonRes = 0,
-                    reasonPluralRes = R.plurals.reason_large_file,
-                    reasonQuantity = ageDays(file.modifiedAtMillis).coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
-                    reasonArgs = listOf(ageDays(file.modifiedAtMillis)),
-                    recommended = false,
-                )
-            } else {
-                null
-            }
-
-            ScanFocus.MEDIA -> {
-                if (!file.mimeType.startsWith("image/") && !file.mimeType.startsWith("video/")) {
-                    null
-                } else {
-                    aiEngine.assessDeep(file)?.takeIf {
-                        it.category == CleanCategory.SCREENSHOT || it.category == CleanCategory.LARGE_FILE
-                    }
-                }
-            }
-
-            ScanFocus.SCREENSHOTS -> aiEngine.assessFocusedScreenshot(file)
-
-            ScanFocus.DOWNLOADS -> {
-                if (!StoragePathRules.isDownloadPath(file.relativePath)) {
-                    null
-                } else {
-                    aiEngine.assessDeep(file)?.takeIf { it.group in DOWNLOAD_TOOL_GROUPS }
-                }
-            }
-        }
-    }
-
-    private suspend fun indexSharedStorage(
-        onTraversalProgress: (visitedDirectories: Int, discoveredFiles: Int) -> Unit,
-    ): List<IndexedFile> {
-        val roots = sharedStorageRoots().mapNotNull(::scanRoot)
-        if (roots.isEmpty()) return emptyList()
-        // An unreadable primary volume must surface as a failed scan, never as
-        // an empty "nothing to clean" result or a fake storage-change snapshot.
-        if (runCatching { roots.first().file.listFiles() }.getOrNull() == null) {
-            throw java.io.IOException("Shared storage root is not readable")
-        }
-
-        val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<Pair<ScanRoot, File>>()
-        roots.forEach { root -> pending.addLast(root to root.file) }
-        // Shared storage can contain symlinks and bind mounts (vendor "internal
-        // storage" aliases, user-created links). Without a canonical-path guard
-        // the traversal can loop indefinitely and, worse, index one physical file
-        // several times under different paths - which the duplicate finder would
-        // then offer to "clean", deleting a real and unique file.
-        val visitedDirectoryPaths = hashSetOf<String>()
-        val visitedFilePaths = hashSetOf<String>()
-        var visitedDirectories = 0
-        var lastProgressDirectories = 0
-        var lastProgressFiles = 0
-        var lastProgressAt = 0L
-
-        val indexedFileLimit = indexedFileLimit()
-        while (pending.isNotEmpty() && output.size < indexedFileLimit) {
-            coroutineContext.ensureActive()
-            val (root, directory) = pending.removeFirst()
-            val directoryPath = canonicalPathWithinRoot(root.canonicalPath, directory) ?: continue
-            if (!visitedDirectoryPaths.add(directoryPath)) continue
-            visitedDirectories++
-            val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
-
-            for (child in children) {
-                coroutineContext.ensureActive()
-                if (child.isDirectory) {
-                    if (
-                        canonicalPathWithinRoot(root.canonicalPath, child) != null &&
-                        !shouldSkipDirectory(root.file, child)
-                    ) {
-                        pending.addLast(root to child)
-                    }
-                } else if (child.isFile) {
-                    // Only Android's trash and unfinished-write files are indexed among dot-files (V4).
-                    if (StoragePathRules.isSkippedHiddenFile(child.name)) continue
-                    val relative = runCatching { child.parentFile?.relativeTo(root.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
-                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
-                    val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
-                    if (!visitedFilePaths.add(filePath)) continue
-                    val size = child.length().coerceAtLeast(0L)
-                    if (size <= 0L) continue
-                    output += indexedFile(root.file, child)
-                    if (output.size >= indexedFileLimit) break
-                }
-            }
-
-            val now = SystemClock.elapsedRealtime()
-            val enoughProgress =
-                visitedDirectories - lastProgressDirectories >= 12 ||
-                    output.size - lastProgressFiles >= 300
-            if (enoughProgress && now - lastProgressAt >= SCAN_PROGRESS_THROTTLE_MILLIS) {
-                onTraversalProgress(visitedDirectories, output.size)
-                lastProgressDirectories = visitedDirectories
-                lastProgressFiles = output.size
-                lastProgressAt = now
-            }
-        }
-
-        if (visitedDirectories != lastProgressDirectories || output.size != lastProgressFiles) {
-            onTraversalProgress(visitedDirectories, output.size)
-        }
-        return output
-    }
-
-    private suspend fun indexWhatsAppFiles(
-        onDiscovered: (Int, Int) -> Unit,
-    ): List<IndexedFile> {
-        val rootPairs = whatsappRootPairs().mapNotNull { (storageRoot, mediaRoot) ->
-            scanRoot(storageRoot)?.let { it to mediaRoot }
-        }
-        if (rootPairs.isEmpty()) return emptyList()
-
-        val output = ArrayList<IndexedFile>()
-        val pending = ArrayDeque<Pair<ScanRoot, File>>()
-        rootPairs.forEach(pending::addLast)
-        val visitedDirectories = hashSetOf<String>()
-        val visitedFiles = hashSetOf<String>()
-
-        while (pending.isNotEmpty() && output.size < MAX_WHATSAPP_FILES) {
-            coroutineContext.ensureActive()
-            val (storageRoot, directory) = pending.removeFirst()
-            val directoryPath = canonicalPathWithinRoot(storageRoot.canonicalPath, directory) ?: continue
-            if (!visitedDirectories.add(directoryPath)) continue
-            val children = runCatching { directory.listFiles() }.getOrNull() ?: continue
-
-            for (child in children) {
-                coroutineContext.ensureActive()
-                if (child.isDirectory) {
-                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null &&
-                        !shouldSkipDirectory(storageRoot.file, child)) {
-                        pending.addLast(storageRoot to child)
-                    }
-                } else if (child.isFile && child.length() > 0L) {
-                    if (StoragePathRules.isSystemMarkerFile(child.name)) continue
-                    val relative = runCatching { child.parentFile?.relativeTo(storageRoot.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
-                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
-                    val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
-                    if (!visitedFiles.add(filePath)) continue
-                    output += indexedFile(storageRoot.file, child)
-                    if (output.size % 50 == 0) onDiscovered(visitedDirectories.size, output.size)
-                    if (output.size >= MAX_WHATSAPP_FILES) break
-                }
-            }
-        }
-        onDiscovered(visitedDirectories.size, output.size)
-        return output.distinctBy(IndexedFile::uri)
-    }
-
     private fun indexedFile(storageRoot: File, file: File): IndexedFile {
         val relative = runCatching { file.relativeTo(storageRoot).path }.getOrDefault(file.absolutePath)
         val parentPath = relative.substringBeforeLast('/', missingDelimiterValue = "")
@@ -927,69 +515,6 @@ class DeviceRepository(
         }
             .filter(File::isDirectory)
             .distinctBy(::canonicalPathOf)
-    }
-
-    private fun canonicalPathOf(file: File): String =
-        runCatching { file.canonicalPath }.getOrDefault(file.absolutePath)
-
-    private fun canonicalPathWithinRoot(rootPath: String, file: File): String? {
-        val filePath = canonicalPathOf(file)
-        if (rootPath.isEmpty()) return null
-        return filePath.takeIf {
-            it == rootPath || it.startsWith("$rootPath${File.separator}")
-        }
-    }
-
-    private fun scanRoot(file: File): ScanRoot? =
-        canonicalPathOf(file)
-            .trimEnd(File.separatorChar)
-            .takeIf(String::isNotEmpty)
-            ?.let { ScanRoot(file = file, canonicalPath = it) }
-
-    /**
-     * Defence in depth for every destructive path.
-     *
-     * Scan results already originate from [sharedStorageRoots], but deletion is
-     * irreversible, so the final gate re-resolves the target through its
-     * canonical path and refuses anything that is not inside a shared-storage
-     * volume, or that lives in the app-private Android/data and Android/obb
-     * trees this engine deliberately never manages. This also neutralises
-     * symlinks that point outside shared storage.
-     */
-    private fun isDeletableSharedStorageFile(file: File): Boolean {
-        val canonical = canonicalPathOf(file)
-        val root = sharedStorageRoots().firstOrNull { root ->
-            canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
-        } ?: return false
-        val rootPath = canonicalPathOf(root).trimEnd('/')
-        val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
-        return !StoragePathRules.isProtectedAppPrivatePath(relative) &&
-            !StoragePathRules.isProtectedUserDataPath(relative.substringBeforeLast('/', ""), file.name)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun removeDeletedPathFromMediaStore(absolutePath: String) {
-        runCatching {
-            // B4: also match rows in Android's trash and pending rows, so a
-            // file deleted from "Already in Android's trash" leaves no ghost
-            // entry in the Gallery trash. Errors are ignored as before.
-            val extras = android.os.Bundle().apply {
-                putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION, "${MediaStore.MediaColumns.DATA}=?")
-                putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(absolutePath))
-                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
-                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
-            }
-            resolver.delete(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), extras)
-        }
-    }
-
-    private fun shouldSkipDirectory(root: File, directory: File): Boolean {
-        val relative = StoragePathRules.normalizePath(
-            runCatching { directory.relativeTo(root).invariantSeparatorsPath }
-                .getOrDefault(directory.invariantSeparatorsPath),
-        )
-        return StoragePathRules.isProtectedAppPrivatePath(relative) ||
-            (directory.name.startsWith(".") && !StoragePathRules.isHiddenDirectoryAllowed(directory.name))
     }
 
     private fun whatsappRootPairs(): List<Pair<File, File>> = buildList {
@@ -1046,106 +571,6 @@ class DeviceRepository(
         }
     }.getOrNull()
 
-    private fun smartMediaTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
-        var imageCount = 0
-        var imageBytes = 0L
-        var videoCount = 0
-        var videoBytes = 0L
-
-        files.forEach { file ->
-            val mime = StoragePathRules.normalizeText(file.mimeType)
-            when {
-                mime.startsWith("image/") -> {
-                    if (!isWhatsAppSharedMedia(file)) {
-                        imageCount++
-                        imageBytes += file.sizeBytes
-                    }
-                }
-                mime.startsWith("video/") -> {
-                    if (!isWhatsAppSharedMedia(file)) {
-                        videoCount++
-                        videoBytes += file.sizeBytes
-                    }
-                }
-            }
-        }
-
-        return buildList {
-            if (videoCount > 0) add(StorageTypeStat(StorageFileType.VIDEOS, videoCount, videoBytes))
-            if (imageCount > 0) add(StorageTypeStat(StorageFileType.IMAGES, imageCount, imageBytes))
-        }
-    }
-
-    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean =
-        StoragePathRules.isWhatsAppPath(file.relativePath)
-
-    private fun storageTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
-        return files.groupBy(::storageFileType)
-            .map { (type, typedFiles) ->
-                StorageTypeStat(
-                    type = type,
-                    fileCount = typedFiles.size,
-                    totalBytes = typedFiles.sumOf(IndexedFile::sizeBytes),
-                )
-            }
-            .sortedByDescending(StorageTypeStat::totalBytes)
-    }
-
-    private fun storageTypePreviews(files: List<IndexedFile>): Map<StorageFileType, List<IndexedFile>> {
-        return files.groupBy(::storageFileType)
-            .mapValues { (_, typedFiles) ->
-                typedFiles
-                    .sortedByDescending(IndexedFile::sizeBytes)
-                    .take(MAX_STORAGE_PREVIEWS_PER_TYPE)
-            }
-    }
-
-    private fun storageFileType(file: IndexedFile): StorageFileType {
-        val mime = StoragePathRules.normalizeText(file.mimeType)
-        val extension = StoragePathRules.normalizeText(file.name.substringAfterLast('.', ""))
-        return when {
-            mime.startsWith("image/") -> StorageFileType.IMAGES
-            mime.startsWith("video/") -> StorageFileType.VIDEOS
-            mime.startsWith("audio/") -> StorageFileType.AUDIO
-            extension == "apk" || mime == APK_MIME -> StorageFileType.APK
-            extension in ARCHIVE_EXTENSIONS -> StorageFileType.ARCHIVES
-            mime.startsWith("text/") || extension in DOCUMENT_EXTENSIONS -> StorageFileType.DOCUMENTS
-            else -> StorageFileType.OTHER
-        }
-    }
-
-    private fun mimeType(file: File): String {
-        val extension = StoragePathRules.normalizeText(file.extension)
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension).orEmpty()
-    }
-
-    private fun launcherApplications(packageManager: PackageManager): List<ApplicationInfo> {
-        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val resolveInfos = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
-        } else {
-            @Suppress("DEPRECATION")
-            packageManager.queryIntentActivities(intent, 0)
-        }
-        return resolveInfos
-            .mapNotNull { it.activityInfo?.applicationInfo }
-            .filterNot { it.packageName == context.packageName }
-            .distinctBy(ApplicationInfo::packageName)
-    }
-
-    private fun fileSnapshotStillMatches(
-        uriString: String,
-        expectedSizeBytes: Long,
-        expectedModifiedAtMillis: Long,
-    ): Boolean = runCatching {
-        val uri = Uri.parse(uriString)
-        if (uri.scheme != "file") return@runCatching true
-        val file = File(requireNotNull(uri.path))
-        file.isFile &&
-            file.length() == expectedSizeBytes &&
-            (expectedModifiedAtMillis <= 0L || file.lastModified() == expectedModifiedAtMillis)
-    }.getOrDefault(false)
-
     private fun directorySize(root: File): Long {
         if (!root.exists()) return 0L
         var total = 0L
@@ -1162,54 +587,9 @@ class DeviceRepository(
         return total
     }
 
-    private fun ageDays(modifiedAtMillis: Long): Long {
-        if (modifiedAtMillis <= 0L) return 0L
-        return TimeUnit.MILLISECONDS.toDays(
-            (System.currentTimeMillis() - modifiedAtMillis).coerceAtLeast(0L),
-        )
-    }
-
 
 
     enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE, TRASH_FOLDER_UNAVAILABLE }
-
-    private sealed interface Removal {
-        data object Deleted : Removal
-        data class Trashed(val entryId: String) : Removal
-        data class Failed(val reason: FailureReason) : Removal
-    }
-
-    private class RemovalTally {
-        val removedIds = hashSetOf<String>()
-        val failed = LinkedHashMap<String, FailureReason>()
-        val trashEntryIds = ArrayList<String>()
-        var deletedBytes = 0L
-        var trashedBytes = 0L
-
-        fun record(id: String, sizeBytes: Long, removal: Removal) {
-            when (removal) {
-                Removal.Deleted -> {
-                    removedIds += id
-                    deletedBytes += sizeBytes
-                }
-                is Removal.Trashed -> {
-                    removedIds += id
-                    trashedBytes += sizeBytes
-                    trashEntryIds += removal.entryId
-                }
-                is Removal.Failed -> failed[id] = removal.reason
-            }
-        }
-
-        fun toDirectResult(attemptedIds: Set<String>) = DirectDeleteResult(
-            attemptedIds = attemptedIds,
-            deletedIds = removedIds,
-            deletedBytes = deletedBytes,
-            trashedBytes = trashedBytes,
-            trashEntryIds = trashEntryIds,
-            failed = failed,
-        )
-    }
 
     /**
      * [deletedIds] are every item that left its original place; [deletedBytes]
@@ -1256,31 +636,11 @@ class DeviceRepository(
         private const val MEDIUM_MEMORY_INDEXED_FILES = 100_000
         private const val SHARED_INDEX_CACHE_TTL_MILLIS = 90L * 1000L
         private const val MAX_WHATSAPP_FILES = 100_000
-        private const val MAX_STORAGE_PREVIEWS_PER_TYPE = 80
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
         // A review list is rebuilt when a checkbox is toggled. Keep the
         // interactive surface bounded even on high-memory devices so a single
         // tap cannot allocate and recompose tens of thousands of rows.
         private const val MAX_SELECTABLE_STORAGE_REVIEW_ITEMS = 10_000
-        private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
-        private val MEDIA_CATEGORIES = setOf(
-            CleanCategory.SCREENSHOT,
-            CleanCategory.LARGE_FILE,
-            CleanCategory.DUPLICATE,
-        )
-        private val DOWNLOAD_TOOL_GROUPS = setOf(
-            CleanupGroup.DOWNLOAD_FILE,
-            CleanupGroup.DOWNLOAD_DOCUMENT,
-            CleanupGroup.PARTIAL_DOWNLOADS,
-            CleanupGroup.TEMP_FILES,
-            CleanupGroup.LARGE_VIDEO,
-            CleanupGroup.OLD_VIDEO,
-            CleanupGroup.LARGE_OTHER,
-        )
-        private val ARCHIVE_EXTENSIONS = setOf("zip", "rar", "7z", "tar", "gz", "bz2", "xz")
-        private val DOCUMENT_EXTENSIONS = setOf(
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "rtf", "csv", "epub",
-        )
     }
 
     private fun indexedFileLimit(): Int {
@@ -1298,11 +658,6 @@ class DeviceRepository(
             MAX_SELECTABLE_STORAGE_REVIEW_ITEMS,
             (indexedFileLimit() / 4).coerceAtLeast(10_000),
         )
-
-    private data class ScanRoot(
-        val file: File,
-        val canonicalPath: String,
-    )
 }
 
 private fun Map<String, DeviceRepository.FailureReason>.trashUnavailableIds(): Set<String> =

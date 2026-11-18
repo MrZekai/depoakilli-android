@@ -18,6 +18,11 @@ fail() {
   exit 1
 }
 
+# Version comes from app/build.gradle.kts so a version bump needs no script edit.
+EXPECTED_VERSION_CODE="$(grep -oP 'versionCode = \K\d+' app/build.gradle.kts)"
+EXPECTED_VERSION_NAME="$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts | head -n 1)"
+[ -n "$EXPECTED_VERSION_CODE" ] && [ -n "$EXPECTED_VERSION_NAME" ] || fail "cannot read version from app/build.gradle.kts"
+
 [ -f "$AAB" ] || fail "AAB missing: $AAB"
 [ -f "$APK" ] || fail "APK missing: $APK"
 [[ "${SUPPORT_EMAIL:-}" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] \
@@ -83,8 +88,8 @@ audit_binary() {
 
   grep -q "package: name='com.mrzekai.depoakilli'" "$badging" \
     || fail "$label package mismatch"
-  grep -q "versionCode='50'" "$badging" || fail "$label versionCode mismatch"
-  grep -q "versionName='1.0.4'" "$badging" || fail "$label versionName mismatch"
+  grep -q "versionCode='$EXPECTED_VERSION_CODE'" "$badging" || fail "$label versionCode mismatch"
+  grep -q "versionName='$EXPECTED_VERSION_NAME'" "$badging" || fail "$label versionName mismatch"
   if grep -q "application-debuggable" "$badging"; then
     fail "$label must not be debuggable"
   fi
@@ -134,7 +139,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
 {
   echo "Smart Cleaner Play closed-test binary audit: PASS"
   echo "Package: com.mrzekai.depoakilli"
-  echo "Version: 1.0.4 (50)"
+  echo "Version: $EXPECTED_VERSION_NAME ($EXPECTED_VERSION_CODE)"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"

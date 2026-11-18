@@ -1,41 +1,29 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.annotation.StringRes
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material.icons.outlined.Handyman
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Handyman
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SwipeLeft
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -46,32 +34,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.ads.BannerAd
 import com.mrzekai.depoakilli.ads.ListNativeAdCard
-import com.mrzekai.depoakilli.model.CleanCategory
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
+import com.mrzekai.depoakilli.ui.whatsapp.WhatsAppCleanerDetailScreen
 
 /** Three tabs (T1.10): Clean (the plan), Tools and Trash. Settings live behind the gear icon. */
-private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
+internal enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
     HOME(R.string.tab_clean, Icons.Outlined.CleaningServices),
     TOOLS(R.string.tab_tools, Icons.Outlined.Handyman),
     TRASH(R.string.tab_trash, Icons.Outlined.Delete),
 }
 
-private enum class DetailScreen(@StringRes val titleRes: Int) {
+internal enum class DetailScreen(@StringRes val titleRes: Int) {
     CLEAN_RESULTS(R.string.clean_results_title),
     WHATSAPP(R.string.whatsapp_cleaner_title),
     APP_CACHE(R.string.cache_manager_title),
@@ -85,7 +67,7 @@ private enum class DetailScreen(@StringRes val titleRes: Int) {
 }
 
 /** Screens whose use counts for the return-from-tool interstitial (T1B.3 b). */
-private val TOOL_SCREENS = setOf(
+internal val TOOL_SCREENS = setOf(
     DetailScreen.CLEAN_RESULTS,
     DetailScreen.WHATSAPP,
     DetailScreen.APP_CACHE,
@@ -93,7 +75,7 @@ private val TOOL_SCREENS = setOf(
     DetailScreen.STORAGE_CHANGE,
 )
 
-private enum class AccessDisclosure {
+internal enum class AccessDisclosure {
     ALL_FILES,
     USAGE_ACCESS,
 }
@@ -341,50 +323,12 @@ fun CleanerApp(
                     state.cleanupResult == null &&
                     adFreeRemainingMillis <= 0L
 
-            if (detailScreen == null) {
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .navigationBarsPadding(),
-                ) {
-                    if (bannerAllowed) {
-                        // At least 24 dp between the banner and any action above or below it.
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
-                        Spacer(Modifier.height(24.dp))
-                        BannerAd(canRequestAds = true)
-                        Spacer(Modifier.height(24.dp))
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
-                    }
-                    NavigationBar(containerColor = Color(0xFF07132C)) {
-                        AppTab.entries.forEachIndexed { index, tab ->
-                            val title = stringResource(tab.titleRes)
-                            NavigationBarItem(
-                                selected = selectedTabIndex == index,
-                                onClick = { selectedTabIndex = index },
-                                icon = { Icon(tab.icon, contentDescription = title) },
-                                label = { Text(title) },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = ElectricBlue,
-                                    selectedTextColor = ElectricBlue,
-                                    indicatorColor = Color(0xFF123A75),
-                                ),
-                            )
-                        }
-                    }
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .background(Color(0xFF06112A))
-                        .navigationBarsPadding(),
-                ) {
-                    if (bannerAllowed) {
-                        HorizontalDivider(color = Color.White.copy(alpha = .10f))
-                        Spacer(Modifier.height(24.dp))
-                        BannerAd(canRequestAds = true)
-                    }
-                }
-            }
+            AppBottomBar(
+                detailScreenOpen = detailScreen != null,
+                bannerAllowed = bannerAllowed,
+                selectedTabIndex = selectedTabIndex,
+                onSelectTab = { selectedTabIndex = it },
+            )
         },
     ) { padding ->
         when (detailScreen) {
@@ -621,76 +565,26 @@ fun CleanerApp(
 
     val trashFallback = state.trashFallback
     if (trashFallback != null && state.cleanupResult == null && !state.cleanupInProgress) {
-        val count = trashFallback.ids.size
-        AlertDialog(
-            onDismissRequest = viewModel::dismissTrashFallback,
-            title = { Text(stringResource(R.string.trash_full_title), fontWeight = FontWeight.Black) },
-            text = {
-                Text(
-                    pluralStringResource(
-                        if (trashFallback.folderMissing) R.plurals.trash_folder_missing_body else R.plurals.trash_full_body,
-                        count,
-                        count,
-                    ),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = viewModel::deleteTrashFallbackPermanently) {
-                    Text(stringResource(R.string.trash_delete_forever))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = viewModel::dismissTrashFallback) { Text(stringResource(R.string.cancel)) }
-            },
+        TrashFallbackDialog(
+            fallback = trashFallback,
+            onDeletePermanently = viewModel::deleteTrashFallbackPermanently,
+            onDismiss = viewModel::dismissTrashFallback,
         )
     }
 
     accessDisclosure?.let { disclosure ->
-        AlertDialog(
-            onDismissRequest = { accessDisclosure = null },
-            title = {
-                Text(
-                    stringResource(
-                        if (disclosure == AccessDisclosure.ALL_FILES) {
-                            R.string.disclosure_all_files_title
-                        } else {
-                            R.string.disclosure_usage_title
-                        },
-                    ),
-                    fontWeight = FontWeight.Black,
-                )
-            },
-            text = {
-                Text(
-                    stringResource(
-                        if (disclosure == AccessDisclosure.ALL_FILES) {
-                            R.string.disclosure_all_files_body
-                        } else {
-                            R.string.disclosure_usage_body
-                        },
-                    ),
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        accessDisclosure = null
-                        if (disclosure == AccessDisclosure.ALL_FILES) {
-                            allFilesAskedOnce = true
-                            onRequestAllFilesAccess()
-                        } else {
-                            onRequestUsageAccess()
-                        }
-                    },
-                ) {
-                    Text(stringResource(R.string.disclosure_continue))
+        AccessDisclosureDialog(
+            disclosure = disclosure,
+            onContinue = {
+                accessDisclosure = null
+                if (disclosure == AccessDisclosure.ALL_FILES) {
+                    allFilesAskedOnce = true
+                    onRequestAllFilesAccess()
+                } else {
+                    onRequestUsageAccess()
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { accessDisclosure = null }) {
-                    Text(stringResource(R.string.disclosure_not_now))
-                }
-            },
+            onDismiss = { accessDisclosure = null },
         )
     }
 
@@ -779,119 +673,6 @@ fun CleanerApp(
         }
     }
 
-        if (fullScreenAdActive) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    CircularProgressIndicator(color = ElectricBlue)
-                    Text(
-                        stringResource(R.string.app_name),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.Black,
-                    )
-                }
-            }
-        }
+        if (fullScreenAdActive) FullScreenAdCover()
     }
-}
-
-@Composable
-private fun CleanScreen(
-    state: CleanerUiState,
-    onRequestAllFilesAccess: () -> Unit,
-    onScan: () -> Unit,
-    onToggleItem: (String) -> Unit,
-    onToggleCategory: (CleanCategory) -> Unit,
-    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
-    onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
-    onOpenStorageReview: (com.mrzekai.depoakilli.model.StorageFileType, Boolean) -> Unit,
-    onRequestUsageAccess: () -> Unit,
-    onRefreshInstalledApps: () -> Unit,
-    onUninstallApp: (String) -> Unit,
-    onToggleStorageReviewItem: (String) -> Unit,
-    onToggleAllStorageReviewItems: () -> Unit,
-    onClean: (Set<String>?) -> Unit,
-    onCleanStorage: () -> Unit,
-    modifier: Modifier = Modifier,
-    onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
-    onClearAppCaches: () -> Unit = {},
-    viewModel: CleanerViewModel? = null,
-    canRequestAds: Boolean = false,
-) {
-    if (
-        state.scanFocus == ScanFocus.SMART ||
-        (state.scanFocus == ScanFocus.ANALYZE && state.storageReview.type != null)
-    ) {
-        SmartCleanResultsScreen(
-            state = state,
-            onRequestAllFilesAccess = onRequestAllFilesAccess,
-            onScan = onScan,
-            onToggleItem = onToggleItem,
-            onToggleCategory = onToggleCategory,
-            onSetItemsSelected = onSetItemsSelected,
-            onOpenCategoryReview = onOpenCategoryReview,
-            onOpenStorageReview = onOpenStorageReview,
-            onRequestUsageAccess = onRequestUsageAccess,
-            onRefreshInstalledApps = onRefreshInstalledApps,
-            onUninstallApp = onUninstallApp,
-            onToggleStorageReviewItem = onToggleStorageReviewItem,
-            onToggleAllStorageReviewItems = onToggleAllStorageReviewItems,
-            onClean = onClean,
-            onCleanStorage = onCleanStorage,
-            modifier = modifier,
-            onToggleGroup = onToggleGroup,
-            onClearAppCaches = onClearAppCaches,
-            onOpenSwipeReview = { group -> viewModel?.openSwipeReview(group) },
-            onOpenPlanGrid = { group, items -> viewModel?.openPlanGroupGrid(group, items) },
-            onSwipeMark = { delete -> viewModel?.swipeMark(delete) },
-            onSwipeUndo = { viewModel?.swipeUndo() },
-            onSwipeContinue = { viewModel?.swipeContinue() },
-            onSwipeGrid = { viewModel?.switchSwipeToGrid() },
-            onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
-            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
-        )
-        return
-    }
-
-    if (state.scanFocus == ScanFocus.ANALYZE) {
-        StorageAnalyzerScreen(
-            state = state,
-            onRequestAllFilesAccess = onRequestAllFilesAccess,
-            onScan = onScan,
-            onReviewType = { type -> onOpenStorageReview(type, false) },
-            modifier = modifier,
-        )
-        return
-    }
-
-    // Every remaining focus is a tool scan (the old generic results list is removed, T3.1).
-    PremiumCleanerToolScreen(
-        state = state,
-        onRequestAllFilesAccess = onRequestAllFilesAccess,
-        onScan = onScan,
-        onToggleItem = onToggleItem,
-        onSetItemsSelected = onSetItemsSelected,
-        onClean = onClean,
-        modifier = modifier,
-    )
-}
-
-private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
-    ScanFocus.SMART -> R.string.scan_focus_smart
-    ScanFocus.DEEP -> R.string.scan_focus_deep
-    ScanFocus.JUNK -> R.string.scan_focus_junk
-    ScanFocus.DUPLICATES -> R.string.scan_focus_duplicates
-    ScanFocus.LARGE_FILES -> R.string.scan_focus_large
-    ScanFocus.MEDIA -> R.string.scan_focus_media
-    ScanFocus.SCREENSHOTS -> R.string.category_screenshots
-    ScanFocus.DOWNLOADS -> R.string.scan_focus_downloads
-    ScanFocus.APKS -> R.string.scan_focus_apks
-    ScanFocus.ANALYZE -> R.string.scan_focus_analyze
 }
