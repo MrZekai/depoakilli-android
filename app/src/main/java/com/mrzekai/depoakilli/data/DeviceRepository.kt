@@ -483,25 +483,37 @@ class DeviceRepository(
     suspend fun deleteDirectItems(items: List<CleanableItem>): DirectDeleteResult = withContext(Dispatchers.IO) {
         val directItems = items.filter { Uri.parse(it.uri).scheme == "file" }
         val deletedIds = hashSetOf<String>()
+        val failureReasons = mutableMapOf<String, DeleteFailureReason>()
         var deletedBytes = 0L
         directItems.forEach { item ->
             coroutineContext.ensureActive()
-            if (
-                fileSnapshotStillMatches(
-                    item.uri,
-                    item.sizeBytes,
-                    item.modifiedAtMillis,
-                ) &&
-                deleteUriDirectly(item.uri)
-            ) {
-                deletedIds += item.id
-                deletedBytes += item.sizeBytes
+            if (!fileSnapshotStillMatches(item.uri, item.sizeBytes, item.modifiedAtMillis)) return@forEach
+            val originalUri = item.protectedDuplicateUri
+            val result = if (originalUri == null) {
+                if (deleteUriDirectly(item.uri)) FileDeleter.Result.DELETED else FileDeleter.Result.DELETE_FAILED
+            } else {
+                val original = runCatching {
+                    val uri = Uri.parse(originalUri)
+                    if (uri.scheme != "file") null else uri.path?.let(::File)
+                }.getOrNull()
+                FileDeleter.deleteIfOriginalUnchanged(original, item.protectedDuplicateSizeBytes) {
+                    deleteUriDirectly(item.uri)
+                }
+            }
+            when (result) {
+                FileDeleter.Result.DELETED -> {
+                    deletedIds += item.id
+                    deletedBytes += item.sizeBytes
+                }
+                FileDeleter.Result.ORIGINAL_CHANGED -> failureReasons[item.id] = DeleteFailureReason.ORIGINAL_CHANGED
+                FileDeleter.Result.DELETE_FAILED -> Unit
             }
         }
         DirectDeleteResult(
             attemptedIds = directItems.mapTo(hashSetOf(), CleanableItem::id),
             deletedIds = deletedIds,
             deletedBytes = deletedBytes,
+            failureReasons = failureReasons,
         )
     }
 
@@ -540,7 +552,9 @@ class DeviceRepository(
                 AiAssessment(
                     category = CleanCategory.LARGE_FILE,
                     safetyScore = 60,
-                    reasonRes = R.string.reason_large_file,
+                    reasonRes = 0,
+                    reasonPluralRes = R.plurals.reason_large_file,
+                    reasonQuantity = ageDays(file.modifiedAtMillis).coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                     reasonArgs = listOf(ageDays(file.modifiedAtMillis)),
                     recommended = false,
                 )
@@ -621,6 +635,8 @@ class DeviceRepository(
                     }
                 } else if (child.isFile) {
                     if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    val relative = runCatching { child.parentFile?.relativeTo(root.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
+                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
                     if (!visitedFilePaths.add(filePath)) continue
                     val size = child.length().coerceAtLeast(0L)
@@ -672,11 +688,14 @@ class DeviceRepository(
             for (child in children) {
                 coroutineContext.ensureActive()
                 if (child.isDirectory) {
-                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null) {
+                    if (canonicalPathWithinRoot(storageRoot.canonicalPath, child) != null &&
+                        !shouldSkipDirectory(storageRoot.file, child)) {
                         pending.addLast(storageRoot to child)
                     }
                 } else if (child.isFile && child.length() > 0L) {
                     if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    val relative = runCatching { child.parentFile?.relativeTo(storageRoot.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
+                    if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(storageRoot.canonicalPath, child) ?: continue
                     if (!visitedFiles.add(filePath)) continue
                     output += indexedFile(storageRoot.file, child)
@@ -699,6 +718,7 @@ class DeviceRepository(
             mimeType = mimeType(file),
             modifiedAtMillis = file.lastModified().coerceAtLeast(0L),
             relativePath = parentPath,
+            volumeRoot = canonicalPathOf(storageRoot),
         )
     }
 
@@ -770,7 +790,8 @@ class DeviceRepository(
         } ?: return false
         val rootPath = canonicalPathOf(root).trimEnd('/')
         val relative = StoragePathRules.normalizePath(canonical.removePrefix(rootPath))
-        return !StoragePathRules.isProtectedAppPrivatePath(relative)
+        return !StoragePathRules.isProtectedAppPrivatePath(relative) &&
+            !StoragePathRules.isProtectedUserDataPath(relative.substringBeforeLast('/', ""), file.name)
     }
 
     @Suppress("DEPRECATION")
@@ -789,7 +810,8 @@ class DeviceRepository(
             runCatching { directory.relativeTo(root).invariantSeparatorsPath }
                 .getOrDefault(directory.invariantSeparatorsPath),
         )
-        return StoragePathRules.isProtectedAppPrivatePath(relative)
+        return StoragePathRules.isProtectedAppPrivatePath(relative) ||
+            (directory.name.startsWith(".") && !StoragePathRules.isHiddenDirectoryAllowed(directory.name))
     }
 
     private fun whatsappRootPairs(): List<Pair<File, File>> = buildList {
@@ -843,11 +865,14 @@ class DeviceRepository(
                 for (sameContentFiles in contentGroups) {
                     val decision = DuplicatePolicy.choose(sameContentFiles) ?: continue
                     protectedUris += decision.keep.uri
-                    val assessment = aiEngine.duplicateAssessment(decision.automaticSelectionIsSafe)
                     sameContentFiles.filterNot { it.uri == decision.keep.uri }.forEach { duplicate ->
-                        duplicates += duplicate.toCleanable(assessment).copy(
+                        val safe = DuplicatePolicy.autoSelectable(
+                            duplicate, decision.keep, duplicate.volumeRoot, decision.keep.volumeRoot,
+                        )
+                        duplicates += duplicate.toCleanable(aiEngine.duplicateAssessment(safe)).copy(
                             protectedDuplicateName = decision.keep.name,
                             protectedDuplicateUri = decision.keep.uri,
+                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
                         )
                     }
                 }
@@ -858,6 +883,7 @@ class DeviceRepository(
                         duplicates += duplicate.toCleanable(aiEngine.sampledDuplicateAssessment()).copy(
                             protectedDuplicateName = decision.keep.name,
                             protectedDuplicateUri = decision.keep.uri,
+                            protectedDuplicateSizeBytes = decision.keep.sizeBytes,
                         )
                     }
                 }
@@ -959,13 +985,8 @@ class DeviceRepository(
         }
     }
 
-    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean {
-        val path = StoragePathRules.normalizePath(file.relativePath)
-        return path.contains("/android/media/com.whatsapp/") ||
-            path.contains("/android/media/com.whatsapp.w4b/") ||
-            path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")
-    }
+    private fun isWhatsAppSharedMedia(file: IndexedFile): Boolean =
+        StoragePathRules.isWhatsAppPath(file.relativePath)
 
     private fun storageTypeStats(files: List<IndexedFile>): List<StorageTypeStat> {
         return files.groupBy(::storageFileType)
@@ -1042,7 +1063,7 @@ class DeviceRepository(
                 val file = File(path)
                 if (!isDeletableSharedStorageFile(file)) return@runCatching false
                 if (StoragePathRules.isSystemMarkerFile(file.name)) return@runCatching false
-                val removed = file.delete()
+                val removed = FileDeleter.deleteUnprotected(file, file.parent.orEmpty())
                 if (removed) {
                     removeDeletedPathFromMediaStore(file.absolutePath)
                 }
@@ -1101,10 +1122,13 @@ class DeviceRepository(
         data object NoMediaFiles : DeletePlan
     }
 
+    enum class DeleteFailureReason { ORIGINAL_CHANGED }
+
     data class DirectDeleteResult(
         val attemptedIds: Set<String>,
         val deletedIds: Set<String>,
         val deletedBytes: Long,
+        val failureReasons: Map<String, DeleteFailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
     }

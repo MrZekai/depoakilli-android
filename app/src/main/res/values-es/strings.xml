@@ -157,12 +157,21 @@
     <string name="category_app_cache_description">Archivos temporales seguros de la app</string>
     <string name="category_whatsapp">Contenido multimedia de WhatsApp</string>
     <string name="category_whatsapp_description">Estados y contenido enviado de hace más de 30 días. El Limpiador de WhatsApp muestra todo el contenido.</string>
-    <string name="reason_old_installer">Paquete instalador • antigüedad: %1$d d</string>
+    <plurals name="reason_old_installer">
+        <item quantity="one">Paquete instalador • Antigüedad en días: %1$d</item>
+        <item quantity="other">Paquete instalador • Antigüedad en días: %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">Paquete instalador descargado</string>
-    <string name="reason_old_screenshot">Captura de pantalla • antigüedad: %1$d d</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="one">Captura de pantalla • Antigüedad en días: %1$d</item>
+        <item quantity="other">Captura de pantalla • Antigüedad en días: %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">Captura de pantalla • solo revisión</string>
     <string name="reason_large_video">Video grande • antigüedad: %1$d d</string>
-    <string name="reason_old_download">Días en Descargas: %1$d</string>
+    <plurals name="reason_old_download">
+        <item quantity="one">Tiempo en Descargas • Antigüedad en días: %1$d</item>
+        <item quantity="other">Tiempo en Descargas • Antigüedad en días: %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">La huella digital de contenido coincide exactamente</string>
     <string name="reason_sampled_duplicate">Duplicado probable: mismo tamaño y muestras coincidentes. No verificado por completo — compara antes de eliminar.</string>
     <string name="reason_probable_duplicate">El tamaño y las muestras de contenido coinciden</string>
@@ -172,7 +181,10 @@
     <string name="cache_item_path">Caché de la app</string>
     <string name="reason_safe_cache">Archivos temporales seguros</string>
     <string name="reason_whatsapp_status">Archivo de estado temporal de WhatsApp</string>
-    <string name="reason_whatsapp_sent">Copia de contenido multimedia enviado • antigüedad: %1$d d; revisa antes de eliminar</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="one">Copia multimedia enviada; revisa antes de eliminar • Antigüedad en días: %1$d</item>
+        <item quantity="other">Copia multimedia enviada; revisa antes de eliminar • Antigüedad en días: %1$d</item>
+    </plurals>
     <string name="unnamed_file">Archivo sin nombre</string>
     <string name="back">Atrás</string>
     <string name="cancel">Cancelar</string>
@@ -317,10 +329,19 @@
     <string name="message_deep_cache_complete">Android completó la limpieza de caché del dispositivo solicitada.</string>
     <string name="message_own_cache_cleared">Se eliminaron %1$s de caché de Smart Cleaner.</string>
     <string name="message_whatsapp_not_found">No se encontró ninguna carpeta de contenido multimedia de WhatsApp o WhatsApp Business compatible en el almacenamiento compartido.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. El Gestor de caché de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. Los archivos que elimines explícitamente se eliminan mediante Android y Smart Cleaner no puede restaurarlos. Google conserva los datos que procesa según sus políticas publicadas.</string>
-    <string name="reason_large_file">Archivo grande • antigüedad: %1$d d</string>
-    <string name="reason_temporary_file">Elemento temporal o incompleto • antigüedad: %1$d d</string>
-    <string name="reason_thumbnail_cache">No es la foto original: caché de miniatura regenerable • antigüedad: %1$d d</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. El Gestor de caché de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. Los archivos que elimines explícitamente se eliminan mediante Android y Smart Cleaner no puede restaurarlos. Google conserva los datos que procesa según sus políticas publicadas.\n\nEl SDK de Google Mobile Ads procesa la dirección IP (para estimar la ubicación aproximada), el identificador de publicidad o de conjunto de aplicaciones, las interacciones con la aplicación y los datos de diagnóstico para mostrar anuncios. La aplicación no envía nombres ni contenido de archivos ni términos de búsqueda fuera del dispositivo.</string>
+    <plurals name="reason_large_file">
+        <item quantity="one">Archivo grande • Antigüedad en días: %1$d</item>
+        <item quantity="other">Archivo grande • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="one">Archivo temporal restante • Antigüedad en días: %1$d</item>
+        <item quantity="other">Archivo temporal restante • Antigüedad en días: %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="one">No es la foto original: caché de vista previa • Antigüedad en días: %1$d</item>
+        <item quantity="other">No es la foto original: caché de vista previa • Antigüedad en días: %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">Contenido multimedia compartido de WhatsApp — revisa antes de eliminar</string>
     <string name="safe_ai_cleaning_description_v050">Smart Cleaner analiza el almacenamiento compartido accesible en el dispositivo, aplica reglas de limpieza conservadoras, verifica los duplicados exactos por contenido y deja los archivos creados por el usuario sin seleccionar a menos que la eliminación sea claramente segura.</string>
     <string name="scan_focus_downloads">Descargas</string>
@@ -402,7 +423,7 @@
         <item quantity="many">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</item>
         <item quantity="other">Seleccionaste %1$s (elementos: %2$d). Revisa el desglose a continuación antes de continuar.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">La eliminación no se puede deshacer. Android puede mostrar su propia confirmación para contenido multimedia protegido.</string>
+    <string name="smart_cleanup_confirm_warning">La eliminación no se puede deshacer.</string>
     <string name="smart_cleanup_confirm_action">Limpiar seleccionados</string>
     <string name="smart_storage_preview_note">Máximo de archivos más grandes mostrados en esta categoría: %1$d. El análisis de almacenamiento no selecciona estos archivos automáticamente para limpiar.</string>
     <string name="smart_storage_preview_empty">No se capturó ningún archivo previsualizable para esta categoría.</string>
@@ -559,7 +580,10 @@
     <string name="smart_unused_apps_separate_note">La eliminación de apps es independiente del total del botón Limpiar y siempre usa la pantalla de desinstalación de Android.</string>
     <string name="smart_unused_apps_dialog_title">Revisión de apps sin usar</string>
     <string name="smart_unused_apps_dialog_note">Solo se muestran las apps con una hora de último uso conocida de al menos 60 días. Nada se elimina automáticamente.</string>
-    <string name="smart_unused_apps_last_used">Último uso: hace %1$d d</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="one">Último uso • Días transcurridos: %1$d</item>
+        <item quantity="other">Último uso • Días transcurridos: %1$d</item>
+    </plurals>
     <string name="premium_cleanup_confirm_title">¿Eliminar los archivos seleccionados?</string>
     <plurals name="premium_cleanup_confirm_body">
         <item quantity="one">Seleccionaste elementos: %1$d (%2$s). Continúa solo si quieres que se eliminen estos archivos.</item>
@@ -631,7 +655,10 @@
     <string name="home_last_cleanup_now">Justo ahora</string>
     <string name="home_last_cleanup_minutes">Hace %1$d min</string>
     <string name="home_last_cleanup_hours">Hace %1$d h</string>
-    <string name="home_last_cleanup_days">Hace %1$d d</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="one">Última limpieza • Días transcurridos: %1$d</item>
+        <item quantity="other">Última limpieza • Días transcurridos: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">Sugerencias inteligentes</string>
     <string name="home_different_tools_title">Más herramientas</string>
     <string name="home_suggestion_empty">No hay ninguna sugerencia prioritaria por ahora</string>

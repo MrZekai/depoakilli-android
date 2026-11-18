@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -238,27 +239,6 @@ internal fun CleanupResultDialog(
                         textAlign = TextAlign.Center,
                     )
 
-                    if (showRewardedOffer) {
-                        TextButton(onClick = onShowRewardedAd) {
-                            Text(
-                                stringResource(R.string.rewarded_ad_result_action),
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                        Spacer(Modifier.height(20.dp))
-                    }
-
-                    CleanupResultAdSurface(
-                        canRequestAds = canRequestAds,
-                        onAdPresented = { resultAdPresented = true },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    }
-
-                    // Keep the primary action visible while the ad slot loads
-                    // or the scrollable result content grows on a small device.
-                    Spacer(Modifier.height(16.dp))
-
                     Button(
                         onClick = { onDone(resultAdPresented) },
                         modifier = Modifier.fillMaxWidth(),
@@ -267,6 +247,24 @@ internal fun CleanupResultDialog(
                             stringResource(R.string.cleanup_result_done),
                             fontWeight = FontWeight.Black,
                         )
+                    }
+
+                    HorizontalDivider()
+                    Spacer(Modifier.height(24.dp))
+                    CleanupResultAdSurface(
+                        canRequestAds = canRequestAds,
+                        onAdPresented = { resultAdPresented = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    if (showRewardedOffer) {
+                        TextButton(onClick = onShowRewardedAd) {
+                            Text(
+                                stringResource(R.string.rewarded_ad_result_action),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
                     }
                 }
             }

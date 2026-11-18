@@ -315,7 +315,7 @@ fun CleanerApp(
                 ) {
                     if (bannerAllowed) {
                         BannerAd(canRequestAds = true)
-                        Spacer(Modifier.height(10.dp))
+                        Spacer(Modifier.height(24.dp))
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = .18f))
                     }
                     NavigationBar(containerColor = Color(0xFF07132C)) {
@@ -635,7 +635,7 @@ fun CleanerApp(
 
                     dismissResultAndReturn()
 
-                    if (eligibleForNaturalBreakAd) onCleanupSucceeded()
+                    if (eligibleForNaturalBreakAd && result.failedCount == 0) onCleanupSucceeded()
                     if (eligibleForNaturalBreakAd && !resultAdPresented) {
                         onCleanupResultDismissed()
                     }
@@ -938,7 +938,7 @@ private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    assessmentReason(item.assessment),
                     style = MaterialTheme.typography.labelSmall,
                     color = ElectricBlue,
                     maxLines = 2,

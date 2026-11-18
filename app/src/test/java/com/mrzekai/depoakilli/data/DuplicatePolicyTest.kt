@@ -45,18 +45,47 @@ class DuplicatePolicyTest {
         val decision = requireNotNull(DuplicatePolicy.choose(listOf(download, camera)))
 
         assertEquals(camera, decision.keep)
-        assertTrue(decision.automaticSelectionIsSafe)
+        assertTrue(DuplicatePolicy.autoSelectable(download, camera, "root", "root"))
     }
 
     @Test
-    fun `ambiguous group keeps oldest file but requires manual selection`() {
+    fun `oldest original is retained while download copy is selectable`() {
         val old = file("old", "Pictures/Exports/photo.jpg", modifiedAt = 100L)
         val recent = file("recent", "Download/photo.jpg", modifiedAt = 200L)
 
         val decision = requireNotNull(DuplicatePolicy.choose(listOf(recent, old)))
 
         assertEquals(old, decision.keep)
-        assertFalse(decision.automaticSelectionIsSafe)
+        assertTrue(DuplicatePolicy.autoSelectable(recent, old, "root", "root"))
+    }
+
+    @Test
+    fun `only verified copies in safe locations on the same volume are selectable`() {
+        val keep = file("keep", "DCIM/Camera", 1)
+        fun copy(path: String, name: String = "photo.jpg") =
+            file("copy", path, 2).copy(name = name)
+        fun safe(candidate: IndexedFile, root: String = "root") =
+            DuplicatePolicy.autoSelectable(candidate, keep, root, "root")
+
+        assertFalse(safe(copy("Android/media/com.whatsapp/WhatsApp/Media")))
+        assertFalse(safe(copy("WhatsApp/Media")))
+        assertFalse(safe(copy("Download"), "other"))
+        assertFalse(safe(copy("Pictures/Album")))
+        assertFalse(safe(copy("Download"), ""))
+        assertTrue(safe(copy("Download")))
+        assertTrue(safe(copy("Pictures/Album", "IMG (1).jpg")))
+        assertTrue(safe(copy("Pictures/Album", "IMG (99).jpg")))
+        assertFalse(safe(copy("Pictures/Album", "IMG (100).jpg")))
+        assertTrue(safe(copy("DCIM/Camera")))
+    }
+
+    @Test
+    fun `camera recognition is anchored to the volume root`() {
+        val older = file("older", "Pictures", 1)
+        for (path in listOf("Download/camera-uploads", "Backup/DCIM")) {
+            val candidate = file("candidate", path, 2)
+            assertEquals(older, requireNotNull(DuplicatePolicy.choose(listOf(candidate, older))).keep)
+        }
     }
 
     private fun file(id: String, path: String, modifiedAt: Long) = IndexedFile(

@@ -707,8 +707,9 @@ private fun homeRelativeCleanupLabel(timestampMillis: Long): String {
             R.string.home_last_cleanup_hours,
             TimeUnit.MILLISECONDS.toHours(ageMillis),
         )
-        else -> stringResource(
-            R.string.home_last_cleanup_days,
+        else -> pluralStringResource(
+            R.plurals.home_last_cleanup_days,
+            TimeUnit.MILLISECONDS.toDays(ageMillis).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
             TimeUnit.MILLISECONDS.toDays(ageMillis),
         )
     }

@@ -800,13 +800,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun isWhatsAppIndexedPath(relativePath: String): Boolean {
-        val path = StoragePathRules.normalizePath(relativePath)
-        return path.contains("/android/media/com.whatsapp/") ||
-            path.contains("/android/media/com.whatsapp.w4b/") ||
-            path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")
-    }
+    private fun isWhatsAppIndexedPath(relativePath: String): Boolean =
+        StoragePathRules.isWhatsAppPath(relativePath)
 
     fun closeStorageReview() {
         storageReviewGeneration++

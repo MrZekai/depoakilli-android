@@ -12,7 +12,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 50
 
     steps:
       - name: Checkout sources
@@ -32,6 +32,9 @@ jobs:
 
       - name: Verify project invariants
         run: python3 scripts/validate-project.py
+
+      - name: Verify translations
+        run: python3 scripts/validate-translations.py
 
       - name: Verify Android dependency metadata
         run: ./gradlew --stacktrace :app:checkDebugAarMetadata
@@ -164,3 +167,22 @@ jobs:
             exit 1
           fi
           echo "Android lint, slim QA APK, signing and packaged-binary checks passed."
+
+  full-checks:
+    # Every variant (debug, qa, closedTest, release) unit tests and lint.
+    # Runs without the production upload key: release/closed-test config
+    # validation tasks are skipped here and still gate real release builds.
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Run all unit tests and lint
+        run: |
+          chmod +x gradlew
+          ./gradlew --stacktrace test -x validateReleaseAds -x validateClosedTestConfiguration
+          ./gradlew --stacktrace lint -x validateReleaseAds -x validateClosedTestConfiguration

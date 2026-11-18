@@ -474,12 +474,15 @@ for expected in (
     "onSystemDismiss: () -> Unit",
     "onDone: (resultAdPresented: Boolean) -> Unit",
     "dismissOnClickOutside = false",
-    "Spacer(Modifier.height(16.dp))",
+    "Spacer(Modifier.height(24.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
     "verticalScroll(rememberScrollState())",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha5 result-dialog invariant: {expected}")
+
+if cleanup_dialog.find("R.string.cleanup_result_done") > cleanup_dialog.rfind("CleanupResultAdSurface("):
+    errors.append("result Done button must precede the ad surface")
 
 for expected in (
     "beginDeepCacheCleanupMeasurement()",
@@ -604,7 +607,7 @@ for expected in (
     "CleanupResultKind.SYSTEM_CACHE",
     "selectedTabIndex = AppTab.HOME.ordinal",
     "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
-    "Spacer(Modifier.height(10.dp))",
+    "Spacer(Modifier.height(24.dp))",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing result-first/UI invariant: {expected}")
@@ -1141,7 +1144,7 @@ if ".lowercase()" in ai_engine:
     errors.append("AiCleaningEngine must not use locale-sensitive lowercase()")
 
 for expected in (
-    "StoragePathRules.normalizePath(relativePath)",
+    "StoragePathRules.isWhatsAppPath(relativePath)",
     "storageReviewGeneration",
     "val reviewGeneration = ++storageReviewGeneration",
     "reviewGeneration == storageReviewGeneration",
@@ -1155,7 +1158,11 @@ for expected in (
 
 if "review.loading && review.items.isEmpty()" not in smart_results:
     errors.append("Storage Review previews must remain visible while background expansion loads")
-if "StoragePathRules.normalizePath(relativePath)" not in smart_results:
+path_rules = read("app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt")
+whatsapp_path_rule = path_rules.split("fun isWhatsAppPath(path: String)", 1)[-1].split("fun isProtectedUserDataPath", 1)[0]
+if ("StoragePathRules.isWhatsAppPath(relativePath)" not in smart_results or
+        "fun isWhatsAppPath(path: String)" not in path_rules or
+        "val normalized = normalizePath(path)" not in whatsapp_path_rule):
     errors.append("Smart review WhatsApp path matching must be locale-stable")
 
 for expected in (
@@ -1164,7 +1171,7 @@ for expected in (
     "onDismissRequest = onSystemDismiss",
     "dismissOnClickOutside = false",
     "onDone(resultAdPresented)",
-    "Spacer(Modifier.height(16.dp))",
+    "Spacer(Modifier.height(24.dp))",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
@@ -1320,13 +1327,22 @@ for expected in (
     "actions/checkout@v7",
     "actions/setup-java@v5",
     "gradle/actions/setup-gradle@v6",
-    "testDebugUnitTest",
-    "lintDebug",
+    "run: ./gradlew --stacktrace testDebugUnitTest",
+    "run: ./gradlew --stacktrace lintDebug",
     "assembleQa",
     "Verify stable test signing certificate",
 ):
     if expected not in workflow:
         errors.append(f"missing CI invariant: {expected}")
+
+phase_check = workflow.split("  full-checks:", 1)
+if len(phase_check) != 2 or not all(
+    expected in phase_check[1]
+    for expected in ("./gradlew --stacktrace test", "./gradlew --stacktrace lint")
+):
+    errors.append("full-checks CI must run full test and lint tasks")
+if len(phase_check) == 2 and ("ANDROID_KEYSTORE" in phase_check[1] or "head.ref ==" in phase_check[1]):
+    errors.append("full-checks CI must run on every PR without the production upload key")
 
 qa_signing_verifier = read("scripts/verify-qa-signing.sh")
 for expected in ("apksigner", "apksigner.bat", "apksigner.exe"):

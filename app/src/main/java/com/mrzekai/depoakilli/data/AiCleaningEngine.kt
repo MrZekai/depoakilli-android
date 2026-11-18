@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit
  * Conservative on-device rules used by Smart Scan.
  *
  * The engine only preselects items that are strongly likely to be disposable
- * (regeneratable thumbnails, temporary files and unambiguous exact duplicate
- * copies). Installers, WhatsApp media, user-created downloads, screenshots,
+ * (regeneratable thumbnails, temporary files and fully verified duplicate
+ * copies in suitable locations on the same storage volume). Installers, WhatsApp media, user-created downloads, screenshots,
  * large files and sent media are shown for review but are never silently
  * selected: a user may have kept any of them on purpose.
  */
@@ -31,7 +31,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.WHATSAPP_MEDIA,
                 safetyScore = if (isWhatsAppStatus) 98 else 78,
-                reasonRes = if (isWhatsAppStatus) R.string.reason_whatsapp_status else R.string.reason_whatsapp_sent,
+                reasonRes = if (isWhatsAppStatus) R.string.reason_whatsapp_status else 0,
+                reasonPluralRes = if (isWhatsAppStatus) null else R.plurals.reason_whatsapp_sent,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = if (isWhatsAppStatus) emptyList() else listOf(ageDays),
                 // WhatsApp media is personal content. Nothing inside it is
                 // preselected, statuses included; the user decides.
@@ -43,11 +45,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.JUNK,
                 safetyScore = if (path.contains("/.thumbnails/")) 97 else 94,
-                reasonRes = if (path.contains("/.thumbnails/")) {
-                    R.string.reason_thumbnail_cache
-                } else {
-                    R.string.reason_temporary_file
-                },
+                reasonRes = 0,
+                reasonPluralRes = if (path.contains("/.thumbnails/")) R.plurals.reason_thumbnail_cache else R.plurals.reason_temporary_file,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 // A folder name alone does not make personal documents disposable.
                 recommended = !isInterruptedDownload(name) &&
@@ -64,7 +64,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.APK_PACKAGE,
                 safetyScore = if (ageDays >= APK_LONG_KEPT_DAYS) 91 else if (installerIsOld) 86 else 70,
-                reasonRes = if (installerIsOld) R.string.reason_old_installer else R.string.reason_downloaded_installer,
+                reasonRes = if (installerIsOld) 0 else R.string.reason_downloaded_installer,
+                reasonPluralRes = if (installerIsOld) R.plurals.reason_old_installer else null,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = if (installerIsOld) listOf(ageDays) else emptyList(),
                 recommended = false,
             )
@@ -75,7 +77,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
                 safetyScore = if (ageDays >= 90) 88 else 78,
-                reasonRes = R.string.reason_old_screenshot,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_old_screenshot,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 recommended = false,
             )
@@ -86,7 +90,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.OLD_DOWNLOAD,
                 safetyScore = if (ageDays >= 365) 84 else 72,
-                reasonRes = R.string.reason_old_download,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_old_download,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 recommended = false,
             )
@@ -96,7 +102,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.LARGE_FILE,
                 safetyScore = if (ageDays >= 180) 76 else 60,
-                reasonRes = R.string.reason_large_file,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_large_file,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays.coerceAtLeast(0)),
                 recommended = false,
             )
@@ -124,7 +132,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.WHATSAPP_MEDIA,
                 safetyScore = 64,
-                reasonRes = R.string.reason_whatsapp_sent,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_whatsapp_sent,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 recommended = false,
             )
@@ -135,7 +145,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.SCREENSHOT,
                 safetyScore = 62,
-                reasonRes = R.string.reason_old_screenshot,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_old_screenshot,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 recommended = false,
             )
@@ -146,7 +158,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.OLD_DOWNLOAD,
                 safetyScore = 58,
-                reasonRes = R.string.reason_old_download,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_old_download,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays),
                 recommended = false,
             )
@@ -156,7 +170,9 @@ class AiCleaningEngine(
             return AiAssessment(
                 category = CleanCategory.LARGE_FILE,
                 safetyScore = 50,
-                reasonRes = R.string.reason_large_file,
+                reasonRes = 0,
+                reasonPluralRes = R.plurals.reason_large_file,
+                reasonQuantity = ageDays.coerceIn(0, Int.MAX_VALUE.toLong()).toInt(),
                 reasonArgs = listOf(ageDays.coerceAtLeast(0)),
                 recommended = false,
             )
@@ -248,11 +264,7 @@ class AiCleaningEngine(
     private fun isInterruptedDownload(name: String): Boolean =
         INTERRUPTED_DOWNLOAD_EXTENSIONS.any(name::endsWith)
 
-    private fun isWhatsAppSharedMediaPath(path: String): Boolean =
-        path.contains("/android/media/com.whatsapp/") ||
-            path.contains("/android/media/com.whatsapp.w4b/") ||
-            path.startsWith("/whatsapp/") ||
-            path.startsWith("/whatsapp business/")
+    private fun isWhatsAppSharedMediaPath(path: String): Boolean = StoragePathRules.isWhatsAppPath(path)
 
     private fun ageDays(modifiedAtMillis: Long): Long {
         if (modifiedAtMillis <= 0L) return 0

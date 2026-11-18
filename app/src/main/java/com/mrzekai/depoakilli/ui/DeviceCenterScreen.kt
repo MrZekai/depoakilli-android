@@ -649,7 +649,8 @@ internal fun LegalDetailScreen(page: LegalPage, info: DeviceInfoSnapshot, modifi
     val policyBody = when (page) {
         LegalPage.PRIVACY -> stringResource(R.string.privacy_policy_body_v050)
         LegalPage.TERMS -> stringResource(R.string.terms_of_service_body_v050)
-        LegalPage.ABOUT -> stringResource(R.string.about_app_body_v050, info.appVersion)
+        LegalPage.ABOUT -> stringResource(R.string.about_app_body_v050, info.appVersion) +
+            "\n\n" + stringResource(R.string.smart_cleanup_ad_notice)
     }
     val supportEmail = BuildConfig.SUPPORT_EMAIL.trim()
     val body = if (page != LegalPage.ABOUT && supportEmail.isNotBlank()) {

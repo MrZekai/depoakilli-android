@@ -160,12 +160,33 @@
     <string name="category_app_cache_description">ملفات التطبيق المؤقتة الآمنة</string>
     <string name="category_whatsapp">الوسائط WhatsApp</string>
     <string name="category_whatsapp_description">الحالات والوسائط المرسلة الأقدم من 30 يومًا. يعرض WhatsApp Cleaner جميع وسائط WhatsApp.</string>
-    <string name="reason_old_installer">حزمة التثبيت %1$d التي عمرها يوم واحد</string>
+    <plurals name="reason_old_installer">
+        <item quantity="zero">حزمة تثبيت • العمر بالأيام: %1$d</item>
+        <item quantity="one">حزمة تثبيت • العمر بالأيام: %1$d</item>
+        <item quantity="two">حزمة تثبيت • العمر بالأيام: %1$d</item>
+        <item quantity="few">حزمة تثبيت • العمر بالأيام: %1$d</item>
+        <item quantity="many">حزمة تثبيت • العمر بالأيام: %1$d</item>
+        <item quantity="other">حزمة تثبيت • العمر بالأيام: %1$d</item>
+    </plurals>
     <string name="reason_downloaded_installer">تم تنزيل حزمة التثبيت</string>
-    <string name="reason_old_screenshot">لقطة شاشة عمرها يوم %1$d</string>
+    <plurals name="reason_old_screenshot">
+        <item quantity="zero">لقطة شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="one">لقطة شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="two">لقطة شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="few">لقطة شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="many">لقطة شاشة • العمر بالأيام: %1$d</item>
+        <item quantity="other">لقطة شاشة • العمر بالأيام: %1$d</item>
+    </plurals>
     <string name="reason_screenshot_review">لقطة الشاشة • المراجعة فقط</string>
     <string name="reason_large_video">%1$d فيديو كبير عمره يوم</string>
-    <string name="reason_old_download">في التنزيلات لأيام %1$d</string>
+    <plurals name="reason_old_download">
+        <item quantity="zero">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+        <item quantity="one">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+        <item quantity="two">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+        <item quantity="few">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+        <item quantity="many">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+        <item quantity="other">الوقت في التنزيلات • العمر بالأيام: %1$d</item>
+    </plurals>
     <string name="reason_exact_duplicate">بصمة المحتوى متطابقة تمامًا</string>
     <string name="reason_sampled_duplicate">التكرار المحتمل: نفس الحجم والعينات المطابقة. لم يتم التحقق منه بالكامل — قارن قبل الحذف.</string>
     <string name="reason_probable_duplicate">تطابق عينات الحجم والمحتوى</string>
@@ -175,7 +196,14 @@
     <string name="cache_item_path">ذاكرة التخزين المؤقت للتطبيق</string>
     <string name="reason_safe_cache">ملفات مؤقتة آمنة</string>
     <string name="reason_whatsapp_status">ملف الحالة المؤقت WhatsApp</string>
-    <string name="reason_whatsapp_sent">نسخة الوسائط المرسلة من %1$d منذ أيام؛ المراجعة قبل الحذف</string>
+    <plurals name="reason_whatsapp_sent">
+        <item quantity="zero">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+        <item quantity="one">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+        <item quantity="two">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+        <item quantity="few">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+        <item quantity="many">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+        <item quantity="other">نسخة وسائط مرسلة؛ راجعها قبل الحذف • العمر بالأيام: %1$d</item>
+    </plurals>
     <string name="unnamed_file">ملف بدون اسم</string>
     <string name="back">العودة</string>
     <string name="cancel">إلغاء</string>
@@ -332,10 +360,31 @@
     <string name="message_deep_cache_complete">أكمل Android عملية تنظيف ذاكرة التخزين المؤقت للجهاز المطلوبة.</string>
     <string name="message_own_cache_cleared">تمت إزالة %1$s من ذاكرة التخزين المؤقت Smart Cleaner.</string>
     <string name="message_whatsapp_not_found">لم يتم العثور على مجلد وسائط WhatsApp أو WhatsApp Business مدعوم في وحدة التخزين المشتركة.</string>
-    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nقد تعالج Google Mobile Ads ومنصة الموافقة معرّفات الإعلانات وبيانات التشخيص وخيارات الموافقة وفق سياسات Google. تختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تُحذف الملفات التي تختار حذفها صراحةً عبر Android، ولا يستطيع Smart Cleaner استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.</string>
-    <string name="reason_large_file">ملف كبير • العمر: %1$d د</string>
-    <string name="reason_temporary_file">قطعة أثرية مؤقتة/غير كاملة • %1$d عمرها أيام</string>
-    <string name="reason_thumbnail_cache">ليست الصورة الأصلية: ذاكرة تخزين مؤقت مصغرة قابلة للتجديد • عمرها %1$d أيام</string>
+    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nقد تعالج Google Mobile Ads ومنصة الموافقة معرّفات الإعلانات وبيانات التشخيص وخيارات الموافقة وفق سياسات Google. تختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تُحذف الملفات التي تختار حذفها صراحةً عبر Android، ولا يستطيع Smart Cleaner استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.\n\nتعالج حزمة Google Mobile Ads عنوان IP لتقدير الموقع التقريبي، ومعرّف الإعلان أو معرّف مجموعة التطبيقات، وتفاعلات التطبيق وبيانات التشخيص لعرض الإعلانات. لا يرسل التطبيق نفسه أسماء الملفات أو محتوياتها أو عبارات البحث خارج الجهاز.</string>
+    <plurals name="reason_large_file">
+        <item quantity="zero">ملف كبير • العمر بالأيام: %1$d</item>
+        <item quantity="one">ملف كبير • العمر بالأيام: %1$d</item>
+        <item quantity="two">ملف كبير • العمر بالأيام: %1$d</item>
+        <item quantity="few">ملف كبير • العمر بالأيام: %1$d</item>
+        <item quantity="many">ملف كبير • العمر بالأيام: %1$d</item>
+        <item quantity="other">ملف كبير • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_temporary_file">
+        <item quantity="zero">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+        <item quantity="one">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+        <item quantity="two">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+        <item quantity="few">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+        <item quantity="many">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+        <item quantity="other">ملف مؤقت متبقٍ • العمر بالأيام: %1$d</item>
+    </plurals>
+    <plurals name="reason_thumbnail_cache">
+        <item quantity="zero">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+        <item quantity="one">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+        <item quantity="two">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+        <item quantity="few">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+        <item quantity="many">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+        <item quantity="other">ليست الصورة الأصلية: ذاكرة معاينة مؤقتة • العمر بالأيام: %1$d</item>
+    </plurals>
     <string name="reason_whatsapp_review">الوسائط المشتركة WhatsApp - قم بمراجعتها قبل الحذف</string>
     <string name="safe_ai_cleaning_description_v050">يقوم Smart Cleaner بتحليل مساحة التخزين المشتركة التي يمكن الوصول إليها على الجهاز، وتطبيق قواعد التنظيف المحافظة، والتحقق من التكرارات الدقيقة حسب المحتوى وترك الملفات التي أنشأها المستخدم غير محددة ما لم يكن الحذف آمنًا بشكل واضح.</string>
     <string name="scan_focus_downloads">التنزيلات</string>
@@ -403,7 +452,7 @@
     <string name="smart_clean_results_tap_hint">انقر لمراجعة ما سيتم حذفه بالضبط</string>
     <string name="smart_clean_summary_detail">إجمالي اقتراحات %1$s • تم تحديد عناصر %2$d • تم فحص ملفات %3$d</string>
     <string name="smart_selected_for_cleanup">تم اختياره للتنظيف</string>
-    <string name="smart_review_and_clean">مراجعة ونظيفة</string>
+    <string name="smart_review_and_clean">مراجعة وتنظيف</string>
     <string name="smart_show_all_count">عرض الكل (%1$d)</string>
     <string name="smart_storage_analyzer_subtitle">انقر فوق الصور أو مقاطع الفيديو أو الصوت أو المستندات أو APKs أو الفئات الأخرى لرؤية الملفات الموجودة خلف الأرقام.</string>
     <plurals name="smart_storage_file_count">
@@ -423,7 +472,7 @@
         <item quantity="many">اخترت %1$s. عدد العناصر: %2$d. راجع التفاصيل أدناه قبل المتابعة.</item>
         <item quantity="other">اخترت %1$s. عدد العناصر: %2$d. راجع التفاصيل أدناه قبل المتابعة.</item>
     </plurals>
-    <string name="smart_cleanup_confirm_warning">أنت تختار الملفات وتؤكد حذفها. لا يمكن التراجع عن الحذف. قد يطلب Android تأكيدًا إضافيًا للوسائط المحمية.</string>
+    <string name="smart_cleanup_confirm_warning">أنت تختار الملفات وتؤكد حذفها. لا يمكن التراجع عن الحذف.</string>
     <string name="smart_cleanup_confirm_action">تنظيف المحدد</string>
     <string name="smart_storage_preview_note">عرض ما يصل إلى %1$d من أكبر الملفات الموجودة في هذه الفئة. لا يقوم تحليل التخزين بتحديد هذه الملفات للتنظيف تلقائيًا.</string>
     <string name="smart_storage_preview_empty">لم يتم التقاط أي ملفات قابلة للمعاينة لهذه الفئة.</string>
@@ -601,7 +650,14 @@
     <string name="smart_unused_apps_separate_note">تعد عملية إزالة التطبيق منفصلة عن إجمالي زر التنظيف وتستخدم دائمًا شاشة إلغاء التثبيت الخاصة بـ Android.</string>
     <string name="smart_unused_apps_dialog_title">مراجعة التطبيقات غير المستخدمة</string>
     <string name="smart_unused_apps_dialog_note">يتم عرض فقط التطبيقات ذات وقت آخر استخدام معروف يبلغ 60 يومًا على الأقل. لا تتم إزالة أي شيء تلقائيًا.</string>
-    <string name="smart_unused_apps_last_used">آخر استخدام %1$d منذ أيام</string>
+    <plurals name="smart_unused_apps_last_used">
+        <item quantity="zero">آخر استخدام • الأيام المنقضية: %1$d</item>
+        <item quantity="one">آخر استخدام • الأيام المنقضية: %1$d</item>
+        <item quantity="two">آخر استخدام • الأيام المنقضية: %1$d</item>
+        <item quantity="few">آخر استخدام • الأيام المنقضية: %1$d</item>
+        <item quantity="many">آخر استخدام • الأيام المنقضية: %1$d</item>
+        <item quantity="other">آخر استخدام • الأيام المنقضية: %1$d</item>
+    </plurals>
     <string name="premium_cleanup_confirm_title">هل تريد حذف الملفات المحددة؟</string>
     <plurals name="premium_cleanup_confirm_body">
         <item quantity="zero">اخترت عناصر عددها %1$d وتشغل %2$s. تابع فقط إذا كنت تؤكد حذفها.</item>
@@ -688,7 +744,14 @@
     <string name="home_last_cleanup_now">الآن فقط</string>
     <string name="home_last_cleanup_minutes">%1$d منذ دقيقة</string>
     <string name="home_last_cleanup_hours">%1$d منذ ح</string>
-    <string name="home_last_cleanup_days">%1$d د مضت</string>
+    <plurals name="home_last_cleanup_days">
+        <item quantity="zero">آخر تنظيف • الأيام المنقضية: %1$d</item>
+        <item quantity="one">آخر تنظيف • الأيام المنقضية: %1$d</item>
+        <item quantity="two">آخر تنظيف • الأيام المنقضية: %1$d</item>
+        <item quantity="few">آخر تنظيف • الأيام المنقضية: %1$d</item>
+        <item quantity="many">آخر تنظيف • الأيام المنقضية: %1$d</item>
+        <item quantity="other">آخر تنظيف • الأيام المنقضية: %1$d</item>
+    </plurals>
     <string name="home_smart_suggestions_title">اقتراحات ذكية</string>
     <string name="home_different_tools_title">المزيد من الأدوات</string>
     <string name="home_suggestion_empty">لا يوجد اقتراح للأولوية في الوقت الحالي</string>

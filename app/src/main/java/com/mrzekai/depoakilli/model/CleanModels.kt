@@ -63,6 +63,7 @@ data class IndexedFile(
     val mimeType: String,
     val modifiedAtMillis: Long,
     val relativePath: String,
+    val volumeRoot: String = "",
 )
 
 
@@ -93,6 +94,8 @@ data class AiAssessment(
     @StringRes val reasonRes: Int,
     val reasonArgs: List<Any> = emptyList(),
     val recommended: Boolean,
+    val reasonPluralRes: Int? = null,
+    val reasonQuantity: Int = 0,
 )
 
 data class CleanableItem(
@@ -107,6 +110,7 @@ data class CleanableItem(
     val selected: Boolean = true,
     val protectedDuplicateName: String? = null,
     val protectedDuplicateUri: String? = null,
+    val protectedDuplicateSizeBytes: Long? = null,
 )
 
 data class WhatsAppMediaItem(

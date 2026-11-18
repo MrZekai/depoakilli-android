@@ -564,7 +564,7 @@ private fun SmartResultsContent(
                 FilePreviewDialog(
                     file = item.toSmartPreview(),
                     selected = item.selected,
-                    reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    reason = assessmentReason(item.assessment),
                     onToggleSelection = { onToggleItem(item.id) },
                     onDismiss = { previewItemId = null },
                 )
@@ -819,7 +819,7 @@ private fun SmartResultsContent(
             FilePreviewDialog(
                 file = item.toSmartPreview(),
                 selected = item.selected,
-                reason = stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                reason = assessmentReason(item.assessment),
                 onToggleSelection = { onToggleItem(item.id) },
                 onDismiss = { previewItemId = null },
             )
@@ -861,13 +861,8 @@ private fun smartMediaPreviews(
         .toList()
 }
 
-private fun isWhatsAppRelativePath(relativePath: String): Boolean {
-    val path = StoragePathRules.normalizePath(relativePath)
-    return path.contains("/android/media/com.whatsapp/") ||
-        path.contains("/android/media/com.whatsapp.w4b/") ||
-        path.startsWith("/whatsapp/") ||
-        path.startsWith("/whatsapp business/")
-}
+private fun isWhatsAppRelativePath(relativePath: String): Boolean =
+    StoragePathRules.isWhatsAppPath(relativePath)
 
 private fun unusedAppsForSmartReview(
     apps: List<InstalledAppEntry>,
@@ -1192,8 +1187,9 @@ private fun UnusedAppsReviewDialog(
                                     Column(Modifier.weight(1f)) {
                                         Text(app.label, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(
-                                            stringResource(
-                                                R.string.smart_unused_apps_last_used,
+                                            pluralStringResource(
+                                                R.plurals.smart_unused_apps_last_used,
+                                                daysSinceLastUse(app.lastUsedMillis).coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
                                                 daysSinceLastUse(app.lastUsedMillis),
                                             ),
                                             color = SmartTextSecondary,
@@ -1706,11 +1702,6 @@ private fun CleanupConfirmationDialog(summary: ScanSummary, onDismiss: () -> Uni
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(stringResource(R.string.smart_cleanup_confirm_warning), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error)
             }
         },
@@ -1758,11 +1749,6 @@ private fun CleanupItemsConfirmationDialog(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(
                     stringResource(R.string.smart_cleanup_confirm_warning),
                     style = MaterialTheme.typography.labelSmall,
@@ -2048,7 +2034,7 @@ private fun CategoryGridItem(
                     fontSize = 10.sp,
                 )
                 Text(
-                    stringResource(item.assessment.reasonRes, *item.assessment.reasonArgs.toTypedArray()),
+                    assessmentReason(item.assessment),
                     color = Color(0xFFBFD0EA),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -2556,11 +2542,6 @@ private fun StorageCleanupConfirmationDialog(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-                Text(
-                    stringResource(R.string.smart_cleanup_ad_notice),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Text(
                     stringResource(R.string.storage_review_delete_warning),
                     style = MaterialTheme.typography.labelSmall,

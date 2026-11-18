@@ -16,7 +16,6 @@ internal object DuplicatePolicy {
 
     data class Decision(
         val keep: IndexedFile,
-        val automaticSelectionIsSafe: Boolean,
     )
 
     fun choose(files: List<IndexedFile>): Decision? {
@@ -26,15 +25,20 @@ internal object DuplicatePolicy {
                 .thenBy(IndexedFile::modifiedAtMillis)
                 .thenBy { it.relativePath.length },
         ) ?: return null
-        return Decision(
-            keep = keep,
-            automaticSelectionIsSafe = files.count(::isCameraOriginal) == 1,
-        )
+        return Decision(keep = keep)
     }
 
-    private fun isCameraOriginal(file: IndexedFile): Boolean {
-        val path = StoragePathRules.normalizePath(file.relativePath)
-        return path.contains("dcim/") || path.contains("/dcim") ||
-            path.contains("camera/") || path.contains("/camera")
+    // Called only after both files have a matching full SHA-256 hash.
+    fun autoSelectable(copy: IndexedFile, keep: IndexedFile, copyVolumeRoot: String, keepVolumeRoot: String): Boolean {
+        if (copyVolumeRoot.isBlank() || copyVolumeRoot != keepVolumeRoot) return false
+        val path = StoragePathRules.normalizePath(copy.relativePath)
+        if (path.contains("/android/media/") || StoragePathRules.isWhatsAppPath(path)) return false
+        val name = StoragePathRules.normalizeText(copy.name).substringBeforeLast('.', copy.name)
+        val copyName = Regex("""(?i).*( \([1-9][0-9]?\)| - copy|_copy| copy)$""").matches(name)
+        return StoragePathRules.isDownloadPath(copy.relativePath) ||
+            path == StoragePathRules.normalizePath(keep.relativePath) || copyName
     }
+
+    private fun isCameraOriginal(file: IndexedFile): Boolean =
+        StoragePathRules.normalizePath(file.relativePath).startsWith("/dcim/")
 }
