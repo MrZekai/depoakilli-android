@@ -168,6 +168,7 @@ internal fun LazyListScope.cleanupPlanItems(
     onUninstallApp: (String) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
     showAppsNote: Boolean = false,
+    onAppsNoteShown: () -> Unit = {},
 ) {
     val rows = findingsRows(plan, unusedApps)
     val openFindingsRow: (FindingsRow) -> Unit = { row ->
@@ -258,6 +259,7 @@ internal fun LazyListScope.cleanupPlanItems(
         appRows = appRows,
         unusedRow = unusedAppsRow(unusedApps),
         showNote = showAppsNote,
+        onNoteShown = onAppsNoteShown,
         onOpenUnusedApps = onOpenUnusedApps,
         onOpenAppInfo = onOpenAppInfo,
         onUninstallApp = onUninstallApp,
@@ -341,6 +343,7 @@ private fun LazyListScope.appsSection(
     appRows: List<AppPlan.Row>?,
     unusedRow: FindingsRow.UnusedApps?,
     showNote: Boolean,
+    onNoteShown: () -> Unit,
     onOpenUnusedApps: () -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onUninstallApp: (String) -> Unit,
@@ -399,6 +402,7 @@ private fun LazyListScope.appsSection(
     }
     if (showNote && appRows.isNotEmpty()) {
         item(key = "plan-apps-note") {
+            androidx.compose.runtime.LaunchedEffect(Unit) { onNoteShown() }
             Text(
                 stringResource(R.string.plan_apps_note),
                 color = InkSoft,

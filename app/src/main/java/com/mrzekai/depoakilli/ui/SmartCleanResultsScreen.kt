@@ -390,11 +390,9 @@ internal fun SmartResultsContent(
         AppPlan.rows(installedApps, hasUsageAccess, context.packageName)
     }
     val appsNotePrefs = remember { context.getSharedPreferences("plan_apps", android.content.Context.MODE_PRIVATE) }
-    // The one-line note shows the first time the section has rows.
+    // The one-line note shows until the user has actually had it on screen once
+    // (marked from the note item itself, not merely when rows exist).
     val showAppsNote = remember { !appsNotePrefs.getBoolean("note_seen", false) }
-    LaunchedEffect(appRows?.isNotEmpty()) {
-        if (appRows?.isNotEmpty() == true) appsNotePrefs.edit().putBoolean("note_seen", true).apply()
-    }
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     // Home's "Apps hold X more" line lands on this section.
     LaunchedEffect(scrollToApps) {
@@ -457,6 +455,7 @@ internal fun SmartResultsContent(
                 onUninstallApp = onUninstallApp,
                 onRequestUsageAccess = onRequestUsageAccess,
                 showAppsNote = showAppsNote,
+                onAppsNoteShown = { appsNotePrefs.edit().putBoolean("note_seen", true).apply() },
             )
         }
     }

@@ -276,6 +276,7 @@ def main():
                   any(re.search(r"usage", t, re.I) for t in texts(disclosure)),
                   screenshot=shot("usage-access-disclosure"))
             back()
+        to_home()
     else:
         check("Home'da 'See what else I found' bağlantısı var", False, screenshot=shot("home-no-findings-link"))
 
@@ -291,10 +292,15 @@ def main():
         row = scroll_to(r"^Mostly saved data · Open its storage settings$", 4) if title else None
         check("Erişim açıkken 'Apps take the most space' bölümü ve 700 MB'lık uygulama satırı görünüyor",
               title and row, screenshot=shot("findings-apps-section"))
-        check("İlk seferde not görünüyor ('I can't delete inside other apps…')",
-              scroll_to(r"^I can.t delete inside other apps", 3))
         no_access_row = find(r"^See which apps take the most space$")
         check("Erişim açılınca 'erişim ver' satırı kayboldu", not no_access_row)
+        check("İlk seferde not görünüyor ('I can't delete inside other apps…')",
+              scroll_to(r"^I can.t delete inside other apps", 3), screenshot=shot("apps-note"))
+        # Find the row again: the list may have scrolled.
+        row = scroll_to(r"^Mostly saved data · Open its storage settings$", 4)
+        if not row:
+            sh(f"input swipe {W // 2} {int(H * 0.35)} {W // 2} {int(H * 0.75)} 350")
+            row = find(r"^Mostly saved data · Open its storage settings$")
         if row:
             tap(row)
             time.sleep(2)
