@@ -52,9 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.isAppSelectable
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.ui.common.BlackCard
@@ -104,6 +104,8 @@ internal fun PremiumToolResults(
     listAd: @Composable () -> Unit = {},
     onRefresh: () -> Unit = onScan,
     suggested: List<CleanableItem> = emptyList(),
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
+    verifyPercent: Int? = null,
 ) {
     val config = toolConfig(focus)
     var sortName by rememberSaveable(focus.name) { mutableStateOf(ToolSortMode.LARGEST.name) }
@@ -116,8 +118,11 @@ internal fun PremiumToolResults(
     // C3: "My pick" first — the Smart scan's suggestion for this tool, matched to
     // these results by file — then the other files, closed until opened.
     val suggestedUris = remember(suggested) { suggested.mapTo(HashSet(), CleanableItem::uri) }
-    val pickItems = summary.items.filter { it.uri in suggestedUris }
-    val otherItems = summary.items.filterNot { it.uri in suggestedUris }
+    // D1: the pick holds exactly what "Select my picks" selects; anything the app
+    // would not select on its own (camera, look-alikes) falls to "Other files".
+    val pickItems = summary.items.filter { it.uri in suggestedUris && it.isAppSelectable() }
+    val pickIds = pickItems.mapTo(HashSet(), CleanableItem::id)
+    val otherItems = summary.items.filterNot { it.id in pickIds }
     val suggestedBytes = suggested.sumOf(CleanableItem::sizeBytes)
     var othersOpen by rememberSaveable(focus.name) { mutableStateOf(false) }
     val showOthers = pickItems.isEmpty() || othersOpen
@@ -157,9 +162,9 @@ internal fun PremiumToolResults(
         DeleteConfirmDialog(
             items = summary.selectedItems,
             inProgress = cleanupInProgress,
-            onConfirm = {
+            onConfirm = { ids ->
                 showCleanupConfirmation = false
-                onClean(null)
+                onClean(ids)
             },
             onDismiss = { showCleanupConfirmation = false },
         )
@@ -176,7 +181,7 @@ internal fun PremiumToolResults(
             onBack = { detailKey = null },
             onPreview = { previewId = it.id },
             onToggleItem = onToggleItem,
-            onToggleAll = { setSectionSelection(activeDetail.items, onSetItemsSelected) },
+            onToggleAll = { setSectionSelection(activeDetail.items, onSetItemsSelected, onVerifyAndSelect) },
             onClean = { showCleanupConfirmation = true },
         )
         return
@@ -215,6 +220,10 @@ internal fun PremiumToolResults(
                                 pluralStringResource(R.plurals.home_scan_files_count, summary.items.size, summary.items.size) +
                                     " · " + ByteFormatter.format(summary.totalSuggestedBytes),
                             )
+                        }
+                        if (verifyPercent != null) {
+                            // D1: "Select all" on look-alikes is checking them byte for byte.
+                            PageLabel(stringResource(R.string.verify_select_progress, verifyPercent), strong = true)
                         }
                         if (focus == ScanFocus.DUPLICATES) {
                             PageLabel(stringResource(R.string.premium_duplicates_original_safe))
@@ -265,18 +274,14 @@ internal fun PremiumToolResults(
                             onViewAll = { detailKey = pickSection.key },
                             onPreview = { previewId = it.id },
                             onToggleItem = onToggleItem,
-                            onToggleAll = { setSectionSelection(pickSection.items, onSetItemsSelected) },
+                            onToggleAll = { setSectionSelection(pickSection.items, onSetItemsSelected, onVerifyAndSelect) },
                             headerAction = {
                                 PillButton(
                                     text = stringResource(R.string.tool_select_suggested),
                                     onClick = {
-                                        // Camera files are never part of a pick (C2); select the rest at once.
-                                        onSetItemsSelected(
-                                            pickSection.items.filterNot { StoragePathRules.isCameraPath(it.relativePath) }
-                                                .mapTo(linkedSetOf(), CleanableItem::id),
-                                            true,
-                                            false,
-                                        )
+                                        // The app's own selection (D1): bulk = true, the same rule
+                                        // that built the pick, so the count in the header is what gets selected.
+                                        onSetItemsSelected(pickSection.items.mapTo(linkedSetOf(), CleanableItem::id), true, true)
                                     },
                                     style = PillStyle.BLACK,
                                     modifier = Modifier.padding(bottom = 10.dp),
@@ -328,7 +333,7 @@ internal fun PremiumToolResults(
                                 onViewAll = { detailKey = section.key },
                                 onPreview = { previewId = it.id },
                                 onToggleItem = onToggleItem,
-                                onToggleAll = { setSectionSelection(section.items, onSetItemsSelected) },
+                                onToggleAll = { setSectionSelection(section.items, onSetItemsSelected, onVerifyAndSelect) },
                             )
                             rowIndex += minOf(section.items.size, TOOL_ROWS_PER_SECTION)
                         }
@@ -434,7 +439,8 @@ internal fun LazyListScope.toolSection(
 
 @Composable
 internal fun ToolSectionHeader(section: ToolSection, onToggleAll: () -> Unit) {
-    val selectionState = sectionSelectionState(section.items.count(CleanableItem::selected), section.items.size)
+    val candidates = com.mrzekai.depoakilli.ui.PlanSelection.selectAllCandidates(section.items)
+    val selectionState = sectionSelectionState(candidates.count(CleanableItem::selected), candidates.size)
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,

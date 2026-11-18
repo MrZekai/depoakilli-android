@@ -965,6 +965,9 @@ for resource_name in sorted(set(kotlin_refs) - default_names):
 smart_results = read("app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt")
 cleanup_plan_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt")
 preview_sheet_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/SelectedItemsPreviewSheet.kt")
+delete_confirm_ui_all = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt") + read(
+    "app/src/main/java/com/mrzekai/depoakilli/ui/common/GroupedDeleteConfirm.kt"
+)
 # Faz 5: the plan is split into Home (giant figure, safe clean, "easy part
 # done") and the findings list (T5.4: rows, start with the biggest, system
 # steps). The same invariants are checked on the new surfaces.
@@ -978,8 +981,10 @@ for expected in ("state.planFigures()", "HomeLogic.mode(", "DeleteConfirmDialog(
 for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
     if expected not in preview_sheet_ui:
         errors.append(f"missing single-confirmation preview invariant: {expected}")
-if "SelectedItemsPreviewSheet(" not in clean_tab_ui:
-    errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
+# Faz 5D (D2): Home confirms through the grouped confirmation, which hands
+# back exactly the ticked ids (groups can be unticked and opened).
+if "onConfirm = { ids ->" not in clean_tab_ui or "GroupedDeleteConfirm(" not in delete_confirm_ui_all:
+    errors.append("Smart plan must confirm through the grouped confirmation")
 for expected in (
     "DeleteConfirmDialog(",
     "StorageDetailPage",

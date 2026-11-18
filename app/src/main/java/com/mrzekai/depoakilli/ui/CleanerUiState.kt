@@ -114,6 +114,8 @@ data class CleanerUiState(
     val smartCategoryReviewGroup: CleanupGroup? = null,
     /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
     val deepCheckRunning: Boolean = false,
+    /** D1: "Select all" on look-alikes is running its full check (percent), else null. */
+    val verifySelectPercent: Int? = null,
     /** Items that could not go to Trash; the user may delete them permanently. */
     val trashFallback: TrashFallback? = null,
     /** Files kept in the swipe review (V10). */

@@ -18,7 +18,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -51,7 +52,6 @@ import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
-import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 
@@ -68,6 +68,7 @@ internal fun CleanupResultDialog(
     canRequestAds: Boolean,
     showRewardedOffer: Boolean,
     onShowRewardedAd: () -> Unit,
+    adFreeRemainingMillis: Long = 0L,
     onSystemDismiss: () -> Unit,
     onDone: (resultAdPresented: Boolean) -> Unit,
     onUndo: () -> Unit = {},
@@ -108,9 +109,11 @@ internal fun CleanupResultDialog(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    // D6: the scroll area itself ends above the navigation bar, so the
+                    // ad card never runs under the system buttons.
                     .systemBarsPadding()
-                    .padding(horizontal = 22.dp, vertical = 18.dp),
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 22.dp, end = 22.dp, top = 18.dp, bottom = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -224,16 +227,13 @@ internal fun CleanupResultDialog(
                     )
                 }
 
-                // C6: cache results carry no explanatory paragraph.
-                if (result.kind == CleanupResultKind.FILES) {
-                    Text(
-                        stringResource(R.string.cleanup_result_note),
-                        color = InkSoft,
-                        fontSize = 13.sp,
-                        lineHeight = 17.sp,
-                        textAlign = TextAlign.Center,
-                    )
-                }
+                // D5: the ad-free offer is a card under "Undo" and above the native;
+                // while the window runs it shows the minutes left instead.
+                AdFreeCard(
+                    remainingMillis = adFreeRemainingMillis,
+                    offer = showRewardedOffer,
+                    onWatch = onShowRewardedAd,
+                )
 
                 if (canRequestAds) {
                     // At least 24 dp between the buttons and the ad; the ad carries its label above it.
@@ -245,13 +245,6 @@ internal fun CleanupResultDialog(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(24.dp))
-                }
-                if (showRewardedOffer) {
-                    LinkButton(
-                        text = stringResource(R.string.rewarded_ad_result_action),
-                        onClick = onShowRewardedAd,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
             }
         }
@@ -299,12 +292,65 @@ private fun resultTitle(result: CleanupResult, partial: Boolean): String = when 
     else -> stringResource(R.string.cleanup_result_title)
 }
 
+/**
+ * "No ads for 60 minutes" (D5): a black card with a Lime play button, started
+ * only by the user. During the window it shows the minutes left and offers
+ * nothing.
+ */
+@Composable
+internal fun AdFreeCard(remainingMillis: Long, offer: Boolean, onWatch: () -> Unit) {
+    val active = remainingMillis > 0L
+    if (!active && !offer) return
+    val minutes = ((remainingMillis + 59_999L) / 60_000L).toInt()
+    Surface(
+        onClick = { if (!active) onWatch() },
+        enabled = !active,
+        color = com.mrzekai.depoakilli.ui.theme.Black,
+        contentColor = com.mrzekai.depoakilli.ui.theme.OnBlack,
+        shape = com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Card,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            androidx.compose.foundation.layout.Column(Modifier.weight(1f)) {
+                Text(
+                    if (active) pluralStringResource(R.plurals.ad_free_left, minutes, minutes) else stringResource(R.string.ad_free_card_title),
+                    color = com.mrzekai.depoakilli.ui.theme.OnBlack,
+                    fontSize = 17.sp,
+                    fontWeight = AppWeights.Title,
+                )
+                if (!active) {
+                    Text(
+                        stringResource(R.string.ad_free_card_sub),
+                        color = com.mrzekai.depoakilli.ui.theme.OnBlackSoft,
+                        fontSize = 13.sp,
+                    )
+                }
+            }
+            if (!active) {
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Outlined.PlayCircle,
+                    contentDescription = null,
+                    tint = com.mrzekai.depoakilli.ui.theme.Lime,
+                    modifier = Modifier.size(40.dp),
+                )
+            }
+        }
+    }
+}
+
 /** Counts that matter (files, skipped, restored, cancelled) in one black card. */
 @Composable
 private fun ResultDetails(result: CleanupResult) {
     val lines = buildList {
         if (result.kind == CleanupResultKind.FILES && result.deletedCount > 0) {
-            add(pluralStringResource(R.plurals.cleanup_result_files_removed, result.deletedCount, result.deletedCount))
+            // D6: files that went to Trash were moved; "deleted" only for permanent deletes.
+            val moved = result.trashEntryIds.size.coerceAtMost(result.deletedCount)
+            val removed = result.deletedCount - moved
+            if (moved > 0) add(pluralStringResource(R.plurals.result_files_moved, moved, moved))
+            if (removed > 0) add(pluralStringResource(R.plurals.cleanup_result_files_removed, removed, removed))
         }
         if (result.deletedBytes > 0L && result.beforeAvailableBytes > 0L && result.afterAvailableBytes > 0L) {
             add(

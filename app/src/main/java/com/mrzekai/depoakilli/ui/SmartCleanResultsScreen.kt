@@ -121,6 +121,7 @@ internal fun SmartCleanResultsScreen(
     onCloseSwipe: () -> Unit = {},
     autoOpenSuggestion: Boolean = false,
     onSuggestionOpened: () -> Unit = {},
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -193,6 +194,8 @@ internal fun SmartCleanResultsScreen(
             sharedFigures = state.planFigures(),
             autoOpenSuggestion = autoOpenSuggestion,
             onSuggestionOpened = onSuggestionOpened,
+            onVerifyAndSelect = onVerifyAndSelect,
+            verifySelectPercent = state.verifySelectPercent,
         )
     }
 }
@@ -239,6 +242,8 @@ internal fun SmartResultsContent(
     sharedFigures: PlanFigures? = null,
     autoOpenSuggestion: Boolean = false,
     onSuggestionOpened: () -> Unit = {},
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
+    verifySelectPercent: Int? = null,
 ) {
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
@@ -263,9 +268,16 @@ internal fun SmartResultsContent(
             items = reviewItems,
             cleanupInProgress = cleanupInProgress,
             onToggleCategory = {
-                val ids = reviewItems.mapTo(linkedSetOf(), CleanableItem::id)
-                onSetItemsSelected(ids, reviewItems.any { !it.selected }, true)
+                // D1: the user's "Select all" works both ways; look-alikes are checked first.
+                val candidates = PlanSelection.selectAllCandidates(reviewItems)
+                val ids = candidates.mapTo(linkedSetOf(), CleanableItem::id)
+                if (PlanSelection.needsVerification(reviewItems)) {
+                    onVerifyAndSelect(ids)
+                } else {
+                    onSetItemsSelected(ids, PlanSelection.selectAllTarget(reviewItems), false)
+                }
             },
+            verifyingPercent = verifySelectPercent,
             onToggleItem = onToggleItem,
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
@@ -354,11 +366,11 @@ internal fun SmartResultsContent(
                 suggestConfirm = false
                 suggestShowList = false
             },
-            onConfirm = {
+            onConfirm = { ids ->
                 suggestConfirm = false
                 suggestShowList = false
-                val ids = suggested.mapTo(linkedSetOf(), CleanableItem::id)
-                onSetItemsSelected(ids, true, false)
+                // The app's own pick: bulk = true keeps camera files and look-alikes out (D1).
+                onSetItemsSelected(ids, true, true)
                 onClean(ids)
             },
         )

@@ -65,7 +65,11 @@ object ToolSuggestion {
     }
 
     fun suggestedFor(tool: SuggestionTool, plan: CleanupPlan): List<CleanableItem> {
-        val picks = plan.autoItems + plan.suggestedItems
+        // D3: nothing changed in the last 30 days is a tool's pick either; D1: the
+        // pick is exactly what "Select my picks" will select.
+        val picks = (plan.autoItems.filter { it.isOldEnoughToSuggest() } + plan.suggestedItems)
+            .filter(CleanableItem::isAppSelectable)
+            .distinctBy(CleanableItem::uri)
         return picks.filter { item ->
             val group = item.assessment.group
             when (tool) {

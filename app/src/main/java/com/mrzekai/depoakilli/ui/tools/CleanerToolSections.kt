@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.ui.tools
 
+import com.mrzekai.depoakilli.ui.PlanSelection
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -138,13 +139,24 @@ internal fun sortItems(items: List<CleanableItem>, sortMode: ToolSortMode): List
     ToolSortMode.SELECTED -> items.sortedWith(compareByDescending<CleanableItem> { it.selected }.thenByDescending { it.sizeBytes })
 }
 
+/**
+ * A section's "Select all" box (D1): the user's own action, so it selects
+ * every file (camera files too) — with none or some selected it selects, only
+ * with all selected it clears. Look-alikes get the full check first.
+ */
 internal fun setSectionSelection(
     items: List<CleanableItem>,
     onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
 ) {
-    if (items.isEmpty()) return
-    val targetSelected = !items.all(CleanableItem::selected)
-    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected, true)
+    val candidates = PlanSelection.selectAllCandidates(items)
+    if (candidates.isEmpty()) return
+    val ids = candidates.mapTo(linkedSetOf(), CleanableItem::id)
+    if (PlanSelection.needsVerification(items)) {
+        onVerifyAndSelect(ids)
+    } else {
+        onSetItemsSelected(ids, PlanSelection.selectAllTarget(items), false)
+    }
 }
 
 internal fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {

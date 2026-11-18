@@ -86,6 +86,7 @@ internal fun CleanScreen(
             onCloseSwipe = onCloseSwipe,
             autoOpenSuggestion = autoOpenSuggestion,
             onSuggestionOpened = onSuggestionOpened,
+            onVerifyAndSelect = { ids -> viewModel?.verifyAndSelectCopies(ids) },
             onExcludeFolder = { root, path -> viewModel?.excludeFolder(root, path) },
             reviewAd = { index ->
                 // C5: the small list native follows the 3rd findings row when there are at least 4 rows.
@@ -123,5 +124,6 @@ internal fun CleanScreen(
         listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         onCancelScan = { viewModel?.cancelScan() },
         onRefresh = { viewModel?.refreshToolScan() },
+        onVerifyAndSelect = { ids -> viewModel?.verifyAndSelectCopies(ids) },
     )
 }

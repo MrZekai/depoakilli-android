@@ -100,12 +100,14 @@ class CleanerViewModel internal constructor(
 
     fun toggleCategory(category: CleanCategory) {
         _state.update { state ->
+            // D1: the user's "Select all" — both ways, partial selects; only
+            // look-alikes shown to be different are never selected.
             val categoryItems = state.summary.items.filter { it.assessment.category == category }
-            val select = categoryItems.any { it.isBulkSelectable() && !it.selected }
+            val select = PlanSelection.selectAllTarget(categoryItems)
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        val excluded = select && !item.isBulkSelectable()
+                        val excluded = select && item.verifiedDifferent
                         if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),

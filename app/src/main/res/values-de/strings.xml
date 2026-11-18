@@ -296,7 +296,6 @@
         <item quantity="other">%1$d-Dateien blieben unberührt, nachdem die Android-Bestätigung abgebrochen wurde</item>
     </plurals>
     <string name="cleanup_result_zero">Es wurde kein zusätzlicher Platz zurückgewonnen.</string>
-    <string name="cleanup_result_note">Diese Werte werden aus den tatsächlich auf diesem Gerät entfernten Dateien Smart Cleaner berechnet.</string>
     <string name="cleanup_result_storage_snapshot">Freier Speicher: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Warum Nutzungszugriff?</string>
     <string name="disclosure_usage_body">Der Nutzungszugriff ist optional. Damit kann Smart Cleaner die von Android gemeldeten App-Speicher-/Cache-Gesamtwerte und die zuletzt genutzten Zeiten lesen, sodass Sie große oder ungenutzte Apps überprüfen können. Die privaten Inhalte in diesen Apps werden nicht gelesen und ihre geschützten Daten werden nicht stillschweigend gelöscht.</string>
@@ -385,14 +384,8 @@
     <string name="storage_change_progress">Dateien: %1$d • Gescannte Ordner: %2$d</string>
     <string name="rewarded_ad_title">60 Minuten lang werbefrei</string>
     <string name="rewarded_ad_subtitle">Sehen Sie sich eine Stunde lang ein kurzes Video zum Ausblenden von Banner- und Übergangsanzeigen an.</string>
-    <string name="rewarded_ad_result_action">Sehen Sie sich 60 Minuten lang ein kurzes Video ohne Werbung an</string>
     <string name="rewarded_ad_earned">Die werbefreie Zeit beträgt 60 Minuten.</string>
     <string name="rewarded_ad_unavailable">Das Video ist noch nicht fertig. Bitte versuchen Sie es gleich noch einmal.</string>
-    <string name="ad_free_active_title">Die werbefreie Zeit ist aktiv</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">%1$d verbleibende Minute. Banner- und Übergangsanzeigen werden ausgeblendet.</item>
-        <item quantity="other">%1$d verbleibende Minuten. Banner- und Übergangsanzeigen werden ausgeblendet.</item>
-    </plurals>
     <string name="nothing_selected_hint">Dateien zum Bereinigen auswählen</string>
     <string name="premium_duplicate_copy_of">Kopie von %1$s</string>
     <string name="cache_modern_not_measured">Nicht gemessen – Nutzungszugriff zulassen</string>
@@ -738,5 +731,57 @@
     <plurals name="plan_camera_files">
         <item quantity="one">%1$d Datei · von der Kamera</item>
         <item quantity="other">%1$d Dateien · von der Kamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Videos und Fotos in Downloads</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Wird geprüft … %1$d %%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Keine Kopie</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Nicht geprüft</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Keine davon ist eine exakte Kopie.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">Die größten Dateien auf deinem Handy</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Alte Downloads und Installer</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Fotos, Videos und Sprachnachrichten</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">Dieselbe Datei zweimal gespeichert</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Ungenutzte Apps und App-Cache</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Was deinen Speicher belegt</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s belegt</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">60 Minuten ohne Werbung</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Sieh dir ein kurzes Video an</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Keine Werbung? Schalte sie 60 Minuten aus</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Ansehen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d Datei von deiner Kamera</item>
+        <item quantity="other">%1$d Dateien von deiner Kamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d ungenutzt</item>
+        <item quantity="other">%1$d ungenutzt</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Werbefrei · noch %1$d Min.</item>
+        <item quantity="other">Werbefrei · noch %1$d Min.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d Datei verschoben</item>
+        <item quantity="other">%1$d Dateien verschoben</item>
     </plurals>
 </resources>

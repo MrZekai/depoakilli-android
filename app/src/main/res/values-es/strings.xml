@@ -303,7 +303,6 @@
         <item quantity="other">Archivos sin modificar tras cancelar la confirmación de Android: %1$d</item>
     </plurals>
     <string name="cleanup_result_zero">No se recuperó espacio adicional.</string>
-    <string name="cleanup_result_note">Estos valores se calculan a partir de los archivos que Smart Cleaner realmente eliminó en este dispositivo.</string>
     <string name="cleanup_result_storage_snapshot">Instantánea de espacio libre: %1$s → %2$s</string>
     <string name="disclosure_usage_title">¿Por qué el acceso de uso?</string>
     <string name="disclosure_usage_body">El acceso de uso es opcional. Permite que Smart Cleaner lea los totales de almacenamiento/caché de apps reportados por Android y las horas de último uso para que puedas revisar apps grandes o sin usar. No lee el contenido privado dentro de esas apps ni elimina en silencio sus datos protegidos.</string>
@@ -394,15 +393,8 @@
     <string name="storage_change_progress">Archivos: %1$d • Carpetas analizadas: %2$d</string>
     <string name="rewarded_ad_title">Sin anuncios durante 60 minutos</string>
     <string name="rewarded_ad_subtitle">Mira un video corto para ocultar los anuncios de banner y transición durante una hora.</string>
-    <string name="rewarded_ad_result_action">Mira un video corto para 60 minutos sin anuncios</string>
     <string name="rewarded_ad_earned">El tiempo sin anuncios está activo durante 60 minutos.</string>
     <string name="rewarded_ad_unavailable">El video aún no está listo. Inténtalo de nuevo en un momento.</string>
-    <string name="ad_free_active_title">El tiempo sin anuncios está activo</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
-        <item quantity="many">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
-        <item quantity="other">Minutos restantes: %1$d. Los anuncios de banner y transición están ocultos.</item>
-    </plurals>
     <string name="nothing_selected_hint">Selecciona archivos para limpiar</string>
     <string name="premium_duplicate_copy_of">Copia de %1$s</string>
     <string name="cache_modern_not_measured">Sin medir: permite el acceso de uso</string>
@@ -748,5 +740,57 @@
     <plurals name="plan_camera_files">
         <item quantity="one">%1$d archivo · de la cámara</item>
         <item quantity="other">%1$d archivos · de la cámara</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Videos y fotos en Descargas</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Verificando… %1$d %%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">No es una copia</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Sin verificar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Ninguno es una copia exacta.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">Los archivos más grandes de tu teléfono</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Descargas antiguas e instaladores</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Fotos, videos y notas de voz</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">El mismo archivo guardado dos veces</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Apps sin usar y caché</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Qué ocupa tu espacio</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s lleno</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">Sin anuncios durante 60 minutos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Mira un video corto</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">¿No quieres anuncios? Desactívalos 60 minutos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Ver</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d archivo de tu cámara</item>
+        <item quantity="other">%1$d archivos de tu cámara</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d sin usar</item>
+        <item quantity="other">%1$d sin usar</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Sin anuncios · queda %1$d min</item>
+        <item quantity="other">Sin anuncios · quedan %1$d min</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d archivo movido</item>
+        <item quantity="other">%1$d archivos movidos</item>
     </plurals>
 </resources>

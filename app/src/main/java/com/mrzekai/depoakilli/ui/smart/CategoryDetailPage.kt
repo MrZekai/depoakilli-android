@@ -73,14 +73,17 @@ internal fun CategoryDetailPage(
     onCleanSelected: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
     gridAd: @Composable () -> Unit = {},
+    verifyingPercent: Int? = null,
 ) {
     var confirmCleanup by remember { mutableStateOf(false) }
     val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
     val selectedItems = items.filter(CleanableItem::selected)
     val selectedCount = selectedItems.size
     val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
-    val allSelected = items.isNotEmpty() && selectedCount == items.size
-    val selectionState = sectionSelectionState(selectedCount, items.size)
+    // D1: the box counts the files it can act on (not those shown to differ).
+    val candidates = com.mrzekai.depoakilli.ui.PlanSelection.selectAllCandidates(items)
+    val allSelected = candidates.isNotEmpty() && candidates.all(CleanableItem::selected)
+    val selectionState = sectionSelectionState(candidates.count(CleanableItem::selected), candidates.size)
     val accent = categoryAccent(category)
 
     Column(
@@ -136,13 +139,14 @@ internal fun CategoryDetailPage(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
                         .background(SmartCardAlt)
-                        .clickable { onToggleCategory() }
+                        .clickable(enabled = verifyingPercent == null && candidates.isNotEmpty()) { onToggleCategory() }
                         .padding(horizontal = 10.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TriStateCheckbox(
                         state = selectionState,
                         onClick = onToggleCategory,
+                        enabled = verifyingPercent == null && candidates.isNotEmpty(),
                         colors = CheckboxDefaults.colors(
                             checkedColor = Lime,
                             uncheckedColor = OnBlackSoft,
@@ -153,7 +157,11 @@ internal fun CategoryDetailPage(
                     // The tap/checkbox instruction is already shown once in the
                     // header above; it is not repeated here (QA v43 polish).
                     Text(
-                        stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
+                        when {
+                            verifyingPercent != null -> stringResource(R.string.verify_select_progress, verifyingPercent)
+                            allSelected -> stringResource(R.string.smart_detail_unselect_all)
+                            else -> stringResource(R.string.smart_detail_select_all)
+                        },
                         color = OnBlack,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f),
@@ -212,9 +220,9 @@ internal fun CategoryDetailPage(
         DeleteConfirmDialog(
             items = selectedItems,
             onDismiss = { confirmCleanup = false },
-            onConfirm = {
+            onConfirm = { ids ->
                 confirmCleanup = false
-                onCleanSelected(selectedItems.mapTo(linkedSetOf(), CleanableItem::id))
+                onCleanSelected(ids)
             },
         )
     }
@@ -325,8 +333,14 @@ internal fun CategoryGridItem(
                     fontSize = 12.sp,
                 )
                 Text(
-                    assessmentReason(item.assessment),
-                    color = OnBlackSoft,
+                    // D1/D6: look-alikes carry one short label, never a cut sentence.
+                    when {
+                        item.verifiedDifferent -> stringResource(R.string.verify_not_a_copy)
+                        item.assessment.group == com.mrzekai.depoakilli.model.CleanupGroup.DUPLICATE_UNVERIFIED ->
+                            stringResource(R.string.verify_not_verified)
+                        else -> assessmentReason(item.assessment)
+                    },
+                    color = if (item.verifiedDifferent) com.mrzekai.depoakilli.ui.theme.AdLabel else OnBlackSoft,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 12.sp,

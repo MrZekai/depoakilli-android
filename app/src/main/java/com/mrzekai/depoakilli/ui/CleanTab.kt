@@ -47,7 +47,6 @@ import com.mrzekai.depoakilli.ui.common.PageLabel
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.smart.ScanProgressBody
-import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
@@ -110,13 +109,26 @@ internal fun CleanTab(
         planIsTidy = planIsTidy,
         usedPercent = usedPercent,
     )
-    val scale = rememberGiantScale()
+    val baseScale = rememberGiantScale()
+    val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    val screenHeightDp = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp
     var confirmSafe by rememberSaveable { mutableStateOf(false) }
-    var showAllSafe by rememberSaveable { mutableStateOf(false) }
 
     PageFrame(modifier = modifier) {
         BoxWithConstraints {
             val viewport = maxHeight
+            // D7: the scale fits the height left between the status bar and the
+            // banner, one size smaller when the Trash line is shown.
+            val scale = if (mode == HomeMode.PLAN || mode == HomeMode.TIDY) {
+                com.mrzekai.depoakilli.ui.theme.GiantScale.forHome(
+                    screenHeightDp = screenHeightDp,
+                    availableHeightDp = viewport.value,
+                    fontScale = fontScale,
+                    trashLine = state.trashEntries.isNotEmpty(),
+                )
+            } else {
+                baseScale
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,27 +189,13 @@ internal fun CleanTab(
         val items = plan.selectedItems
         // B1: the shared confirmation writes the real split (Trash vs permanent)
         // of these files; "see all" opens the list where files can be removed.
+        // D2: group rows the user can untick or open; only the ticked ids are cleaned.
         DeleteConfirmDialog(
             items = items,
             inProgress = state.cleanupInProgress,
-            onSeeAll = {
-                confirmSafe = false
-                showAllSafe = true
-            },
             onDismiss = { confirmSafe = false },
-            onConfirm = {
-                confirmSafe = false
-                onClean(items.mapTo(linkedSetOf(), CleanableItem::id))
-            },
-        )
-    }
-    if (showAllSafe && mode == HomeMode.PLAN) {
-        SelectedItemsPreviewSheet(
-            items = plan.selectedItems,
-            onRemoveItem = onToggleItem,
-            onDismiss = { showAllSafe = false },
             onConfirm = { ids ->
-                showAllSafe = false
+                confirmSafe = false
                 onClean(ids)
             },
         )
@@ -303,6 +301,8 @@ private fun PlanHome(
             LinkButton(stringResource(R.string.home_review_rest), onClick = onSeeRest)
         }
         HomeTrashLine(trashEntries, onOpenTrash)
+        // D7: at least 12 dp between the last line and the banner.
+        Spacer(Modifier.height(12.dp))
     }
 }
 

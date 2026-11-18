@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.ads.ConsentManager
@@ -45,6 +46,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var rewardedAds: RewardedAdController
     private var pendingDeepCacheAfterStorageAccess = false
     private var reviewPromptInFlight = false
+
+    /** D5: the once-a-day "turn ads off for 60 minutes" bar after an interstitial. */
+    private var adFreeOfferVisible by androidx.compose.runtime.mutableStateOf(false)
+    private val adFreeOfferStore by lazy { com.mrzekai.depoakilli.ads.AdFreeOfferStore(this) }
 
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -131,6 +136,13 @@ class MainActivity : ComponentActivity() {
                 appOpenAds.setAdsAllowed(canRequestAds && !adFreeActive)
                 rewardedAds.setAdsAllowed(canRequestAds && !adFreeActive)
             }
+            // D5: "Ad-free · N min left" stays current while the window runs.
+            LaunchedEffect(adFreeActive) {
+                while (adFreeActive) {
+                    kotlinx.coroutines.delay(30_000L)
+                    app.adFreeWindow.refresh()
+                }
+            }
 
             DepoAkilliTheme {
                 Box(Modifier.fillMaxSize()) {
@@ -169,6 +181,16 @@ class MainActivity : ComponentActivity() {
                         onSendFeedback = ::sendFeedback,
                         onShareApp = ::shareApp,
                     )
+                    if (adFreeOfferVisible && !adFreeActive) {
+                        com.mrzekai.depoakilli.ads.AdFreeOfferBar(
+                            onWatch = {
+                                adFreeOfferVisible = false
+                                showRewardedAd()
+                            },
+                            onTimeout = { adFreeOfferVisible = false },
+                            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter),
+                        )
+                    }
                     if (appOpenCover) AppOpenCover()
                 }
             }
@@ -334,13 +356,15 @@ class MainActivity : ComponentActivity() {
         app.beginInterstitialSurface()
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
             {
+                var adShown = false
                 interstitialAds.showAtNaturalBreak(
                     activity = this,
                     trigger = trigger,
                     dwellMillis = dwellMillis,
-                    onWillShow = {},
+                    onWillShow = { adShown = true },
                     onFinished = {
                         app.endInterstitialSurface()
+                        if (adShown) maybeOfferAdFree()
                         onFinished()
                     },
                 )
@@ -534,6 +558,22 @@ class MainActivity : ComponentActivity() {
             onFinished = { app.endInterstitialSurface() },
             onUnavailable = { cleanerViewModel.runDeepDuplicateCheck() },
         )
+    }
+
+    /** D5: after an interstitial closed, at most once a day, offer the ad-free window. */
+    private fun maybeOfferAdFree() {
+        val app = application as DepoAkilliApplication
+        val today = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.dayOf(System.currentTimeMillis())
+        val offer = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.shouldOffer(
+            lastOfferDay = adFreeOfferStore.lastOfferDay(),
+            today = today,
+            adsAllowed = consentManager.canRequestAds.value,
+            adFreeActive = app.adFreeWindow.isActiveNow(),
+            rewardedReady = rewardedAds.isReady.value,
+        )
+        if (!offer) return
+        adFreeOfferStore.markOffered(today)
+        adFreeOfferVisible = true
     }
 
     private fun showRewardedAd() {

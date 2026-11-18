@@ -299,7 +299,6 @@
         <item quantity="other">Android onayı iptal edildiği için %1$d dosyaya dokunulmadı</item>
     </plurals>
     <string name="cleanup_result_zero">Ek alan açılamadı.</string>
-    <string name="cleanup_result_note">Bu değerler, Akıllı Temizleyici’nin bu cihazda gerçekten sildiği dosyalardan hesaplanır.</string>
 
     <string name="cleanup_result_storage_snapshot">Boş alan ölçümü: %1$s → %2$s</string>
 
@@ -392,14 +391,8 @@
     <string name="storage_change_progress">Dosya: %1$d • Taranan klasör: %2$d</string>
     <string name="rewarded_ad_title">60 dakika reklamsız kullanım</string>
     <string name="rewarded_ad_subtitle">Kısa bir video izle; banner ve geçiş reklamları bir saat gizlensin.</string>
-    <string name="rewarded_ad_result_action">60 dakika reklamsız kullanım için kısa video izle</string>
     <string name="rewarded_ad_earned">60 dakika boyunca reklamsız kullanım aktif.</string>
     <string name="rewarded_ad_unavailable">Video henüz hazır değil. Lütfen biraz sonra tekrar dene.</string>
-    <string name="ad_free_active_title">Reklamsız kullanım aktif</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">%1$d dakika kaldı. Banner ve geçiş reklamları gizlendi.</item>
-        <item quantity="other">%1$d dakika kaldı. Banner ve geçiş reklamları gizlendi.</item>
-    </plurals>
     <string name="nothing_selected_hint">Temizlemek için dosya seç</string>
     <string name="premium_duplicate_copy_of">%1$s kopyası</string>
     <string name="cache_modern_not_measured">Ölçülmedi – Kullanım Erişimi’ne izin ver</string>
@@ -660,5 +653,37 @@
     <plurals name="plan_camera_files">
         <item quantity="one">%1$d dosya · kameradan</item>
         <item quantity="other">%1$d dosya · kameradan</item>
+    </plurals>
+    <string name="plan_group_download_media">İndirilenlerdeki video ve fotoğraflar</string>
+    <string name="verify_select_progress">Doğrulanıyor… %%%1$d</string>
+    <string name="verify_not_a_copy">Kopya değil</string>
+    <string name="verify_not_verified">Doğrulanmadı</string>
+    <string name="verify_none_exact">Bunların hiçbiri birebir kopya değil.</string>
+    <string name="tools_row_large_sub">Telefonundaki en büyük dosyalar</string>
+    <string name="tools_row_downloads_sub">Eski indirilenler ve kurulum dosyaları</string>
+    <string name="tools_row_whatsapp_sub">Fotoğraf, video ve sesli mesajlar</string>
+    <string name="tools_row_duplicates_sub">Aynı dosyanın ikinci kopyaları</string>
+    <string name="tools_row_apps_sub">Kullanılmayan uygulamalar ve önbellek</string>
+    <string name="tools_row_storage_sub">Yerini neler tutuyor</string>
+    <string name="tools_storage_full">%1$s dolu</string>
+    <string name="ad_free_card_title">60 dakika reklamsız</string>
+    <string name="ad_free_card_sub">Kısa bir video izle</string>
+    <string name="ad_free_offer_bar">Reklam istemiyor musun? 60 dakika kapat</string>
+    <string name="ad_free_offer_watch">İzle</string>
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d dosya kameranızdan</item>
+        <item quantity="other">%1$d dosya kameranızdan</item>
+    </plurals>
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d kullanılmayan</item>
+        <item quantity="other">%1$d kullanılmayan</item>
+    </plurals>
+    <plurals name="ad_free_left">
+        <item quantity="one">Reklamsız · %1$d dk kaldı</item>
+        <item quantity="other">Reklamsız · %1$d dk kaldı</item>
+    </plurals>
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d dosya taşındı</item>
+        <item quantity="other">%1$d dosya taşındı</item>
     </plurals>
 </resources>

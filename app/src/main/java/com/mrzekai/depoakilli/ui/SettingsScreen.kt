@@ -248,9 +248,9 @@ internal fun SettingsDetailScreen(
                             )
                         }
                         if (adFreeRemainingMillis > 0L) {
+                            // D5: the window shows its minutes left; nothing is offered meanwhile.
                             CardRow(
-                                title = stringResource(R.string.ad_free_active_title),
-                                detail = pluralStringResource(R.plurals.ad_free_active_subtitle, adMinutes, adMinutes),
+                                title = pluralStringResource(R.plurals.ad_free_left, adMinutes, adMinutes),
                                 icon = Icons.Outlined.AutoAwesome,
                             )
                         }

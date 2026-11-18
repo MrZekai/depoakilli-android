@@ -161,7 +161,8 @@ internal fun TrashScreen(
                         PillButton(
                             text = stringResource(R.string.trash_restore_all),
                             onClick = { onRestore(visibleIds) },
-                            style = PillStyle.BLACK,
+                            // D6: restore reads in Lime on the black pill.
+                            style = PillStyle.BLACK_LIME,
                         )
                         LinkButton(
                             text = stringResource(R.string.trash_empty_v2, ByteFormatter.format(totalBytes)),
@@ -174,7 +175,7 @@ internal fun TrashScreen(
                                 onRestore(activeSelection)
                                 selected = emptySet()
                             },
-                            style = PillStyle.BLACK,
+                            style = PillStyle.BLACK_LIME,
                         )
                         LinkButton(
                             text = stringResource(R.string.trash_delete_forever),
@@ -239,8 +240,9 @@ private fun TrashRow(entry: TrashEntry, selected: Boolean, daysLeft: Int, onTogg
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            // D6: only the folder's name ("Download"), not the full storage path.
             Text(
-                bidiWrap(original.parent.orEmpty()),
+                bidiWrap(original.parentFile?.name.orEmpty()),
                 color = OnBlackSoft,
                 fontSize = 13.sp,
                 maxLines = 1,

@@ -27,5 +27,39 @@ data class GiantScale(val numberSp: Int, val buttonDp: Int) {
             usableHeightDp < 760 -> MEDIUM
             else -> LARGE
         }
+
+        /** One size down (SMALL stays SMALL). */
+        fun stepDown(scale: GiantScale): GiantScale = when (scale) {
+            LARGE -> MEDIUM
+            else -> SMALL
+        }
+
+        /**
+         * Height the plan Home needs at [scale] (D7): label, figure, line under
+         * it, button, the split sentence, "See what else" and — when files wait
+         * in Trash — the Trash line with 12 dp to the banner, plus the page padding.
+         */
+        fun homeNeedDp(scale: GiantScale, fontScale: Float, trashLine: Boolean): Float {
+            val text = fontScale.coerceAtLeast(1f)
+            val figure = scale.numberSp * 1.15f * text
+            val lines = (24f + 24f + 42f) * text
+            val links = 48f + if (trashLine) 48f + 12f else 0f
+            return 36f + 8f + figure + lines + 20f + scale.buttonDp + 16f + links
+        }
+
+        /**
+         * Faz 5D (D7): the Home scale is chosen for the height the page really
+         * has (screen minus status bar, banner, menu and navigation bar). With
+         * the Trash line it is one size smaller; then it steps down until the
+         * content fits. If even SMALL does not fit, the page scrolls.
+         */
+        fun forHome(screenHeightDp: Int, availableHeightDp: Float, fontScale: Float, trashLine: Boolean): GiantScale {
+            var scale = of(screenHeightDp, fontScale)
+            if (trashLine) scale = stepDown(scale)
+            while (scale != SMALL && homeNeedDp(scale, fontScale, trashLine) > availableHeightDp) {
+                scale = stepDown(scale)
+            }
+            return scale
+        }
     }
 }

@@ -1,4 +1,4 @@
-# Ad placements (Faz 5 "Make Room", Faz 5B, Faz 5C)
+# Ad placements (Faz 5 "Make Room", Faz 5B, Faz 5C, Faz 5D)
 
 All limits live in `app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt`
 and are unchanged in Faz 5. Every format requires UMP consent
@@ -23,6 +23,8 @@ units; release uses Smart Cleaner's own units (public AdMob identifiers in
 | App Manager, App Cache Manager | Small native in the list | After the 3rd app row when there are ≥6 rows; no banner. |
 | WhatsApp categories | Native in the list | Faz 5B. After the 2nd category card (`NATIVE_GROUP_LIST_AFTER_CARD`) when a 3rd card follows and the list holds ≥6 files; no banner. |
 | Storage Analyzer | Native in the list | Faz 5B. After the 2nd type card when there are ≥6 type cards. |
+| Result (Faz 5D) | Ad-free card | Black card "No ads for 60 minutes · Watch one short video" with a Lime play icon, under "Undo" and above the native. During the window: "Ad-free · N min left", nothing offered. |
+| After an interstitial (Faz 5D) | Ad-free offer bar | At most once a day, a 6-second bar "Don't want ads? Turn them off for 60 minutes" + "Watch". Only when ads are allowed, no window is running and a rewarded video is ready. |
 | Settings | Rewarded | 60 minutes without banner and full-screen ads. Also "Watch and verify" for the deep duplicate check, which runs even when no ad is ready. |
 
 Interstitials also keep their earlier triggers with the same limits: the

@@ -303,7 +303,6 @@
         <item quantity="other">Arquivos mantidos após o cancelamento da confirmação do Android: %1$d</item>
     </plurals>
     <string name="cleanup_result_zero">Nenhum espaço adicional foi recuperado.</string>
-    <string name="cleanup_result_note">Esses valores são calculados a partir dos arquivos que o Smart Cleaner realmente removeu neste dispositivo.</string>
     <string name="cleanup_result_storage_snapshot">Registro de espaço livre: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Por que acesso de uso?</string>
     <string name="disclosure_usage_body">O acesso de uso é opcional. Ele permite que o Smart Cleaner leia os totais de armazenamento/cache de apps reportados pelo Android e os horários de último uso, para que você possa revisar apps grandes ou não usados. Ele não lê o conteúdo privado dentro desses apps e não exclui silenciosamente seus dados protegidos.</string>
@@ -394,15 +393,8 @@
     <string name="storage_change_progress">Arquivos: %1$d • Pastas verificadas: %2$d</string>
     <string name="rewarded_ad_title">Sem anúncios por 60 minutos</string>
     <string name="rewarded_ad_subtitle">Assista a um vídeo curto para ocultar anúncios de banner e de transição por uma hora.</string>
-    <string name="rewarded_ad_result_action">Assista a um vídeo curto para ter 60 minutos sem anúncios</string>
     <string name="rewarded_ad_earned">O tempo sem anúncios está ativo por 60 minutos.</string>
     <string name="rewarded_ad_unavailable">O vídeo ainda não está pronto. Tente novamente em instantes.</string>
-    <string name="ad_free_active_title">O tempo sem anúncios está ativo</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">Minutos restantes: %1$d. Anúncios de banner e de transição estão ocultos.</item>
-        <item quantity="many">Minutos restantes: %1$d. Anúncios de banner e de transição estão ocultos.</item>
-        <item quantity="other">Minutos restantes: %1$d. Anúncios de banner e de transição estão ocultos.</item>
-    </plurals>
     <string name="nothing_selected_hint">Selecione arquivos para limpar</string>
     <string name="premium_duplicate_copy_of">Cópia de %1$s</string>
     <string name="cache_modern_not_measured">Não medido: permita o acesso de uso</string>
@@ -748,5 +740,57 @@
     <plurals name="plan_camera_files">
         <item quantity="one">%1$d arquivo · da câmera</item>
         <item quantity="other">%1$d arquivos · da câmera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Vídeos e fotos em Downloads</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Verificando… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Não é cópia</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Não verificado</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Nenhum deles é uma cópia exata.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">Os maiores arquivos do seu celular</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Downloads antigos e instaladores</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Fotos, vídeos e áudios</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">O mesmo arquivo salvo duas vezes</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Apps sem uso e cache</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">O que ocupa seu espaço</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s cheio</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">Sem anúncios por 60 minutos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Assista a um vídeo curto</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Não quer anúncios? Desative por 60 minutos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Assistir</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d arquivo da sua câmera</item>
+        <item quantity="other">%1$d arquivos da sua câmera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d sem uso</item>
+        <item quantity="other">%1$d sem uso</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Sem anúncios · falta %1$d min</item>
+        <item quantity="other">Sem anúncios · faltam %1$d min</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d arquivo movido</item>
+        <item quantity="other">%1$d arquivos movidos</item>
     </plurals>
 </resources>

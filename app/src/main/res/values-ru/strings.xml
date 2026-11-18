@@ -324,7 +324,6 @@
         <item quantity="other">Файлов, оставленных без изменений после отмены подтверждения Android: %1$d</item>
     </plurals>
     <string name="cleanup_result_zero">Никакое дополнительное пространство не было возвращено.</string>
-    <string name="cleanup_result_note">Эти значения рассчитаны на основе файлов Smart Cleaner, фактически удаленных на этом устройстве.</string>
     <string name="cleanup_result_storage_snapshot">Свободное место: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Почему доступ к использованию?</string>
     <string name="disclosure_usage_body">Доступ к использованию не является обязательным. Он позволяет Smart Cleaner считывать сообщаемые Android общие данные о хранилище/кэше приложений и времени последнего использования, чтобы вы могли просматривать большие или неиспользуемые приложения. Он не считывает личный контент внутри этих приложений и не удаляет их защищенные данные автоматически.</string>
@@ -417,16 +416,8 @@
     <string name="storage_change_progress">Файлов: %1$d • Проверено папок: %2$d</string>
     <string name="rewarded_ad_title">Без рекламы в течение 60 минут</string>
     <string name="rewarded_ad_subtitle">Посмотрите короткое видео, как скрыть баннеры и рекламные переходы на один час.</string>
-    <string name="rewarded_ad_result_action">Посмотрите короткое видео продолжительностью 60 минут без рекламы.</string>
     <string name="rewarded_ad_earned">Время без рекламы действует 60 минут.</string>
     <string name="rewarded_ad_unavailable">Видео еще не готово. Пожалуйста, повторите попытку через минуту.</string>
-    <string name="ad_free_active_title">Время без рекламы активно</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="few">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="many">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="other">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-    </plurals>
     <string name="nothing_selected_hint">Выберите файлы для очистки</string>
     <string name="premium_duplicate_copy_of">Копия %1$s</string>
     <string name="cache_modern_not_measured">Не измерено – разрешить доступ к использованию</string>
@@ -828,5 +819,65 @@
         <item quantity="few">%1$d файла · с камеры</item>
         <item quantity="many">%1$d файлов · с камеры</item>
         <item quantity="other">%1$d файлов · с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Видео и фото в «Загрузках»</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Проверка… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Не копия</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Не проверено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Ни один из них не является точной копией.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">Самые большие файлы на телефоне</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Старые загрузки и установщики</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Фото, видео и голосовые</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">Один файл, сохранённый дважды</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Неиспользуемые приложения и кеш</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Что занимает место</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s занято</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">60 минут без рекламы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Посмотрите короткое видео</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Не хотите рекламу? Отключите на 60 минут</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Смотреть</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d файл с камеры</item>
+        <item quantity="few">%1$d файла с камеры</item>
+        <item quantity="many">%1$d файлов с камеры</item>
+        <item quantity="other">%1$d файлов с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d не используется</item>
+        <item quantity="few">%1$d не используются</item>
+        <item quantity="many">%1$d не используются</item>
+        <item quantity="other">%1$d не используются</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Без рекламы · осталась %1$d мин</item>
+        <item quantity="few">Без рекламы · осталось %1$d мин</item>
+        <item quantity="many">Без рекламы · осталось %1$d мин</item>
+        <item quantity="other">Без рекламы · осталось %1$d мин</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d файл перемещён</item>
+        <item quantity="few">%1$d файла перемещены</item>
+        <item quantity="many">%1$d файлов перемещено</item>
+        <item quantity="other">%1$d файлов перемещено</item>
     </plurals>
 </resources>

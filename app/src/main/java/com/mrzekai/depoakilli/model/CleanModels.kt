@@ -54,6 +54,13 @@ enum class CleanupGroup(
     SCREENSHOT(R.string.plan_group_screenshot, 0, R.plurals.reason_old_screenshot, false, DeleteMode.TRASH),
     OTHER_APP_MEDIA(R.string.plan_group_other_app_media, 0, R.plurals.reason_other_app_media, false, DeleteMode.TRASH, groupSelectable = false),
     DOWNLOAD_FILE(R.string.plan_group_download_file, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
+
+    /**
+     * Faz 5D (D3): a findings row only — videos, music and photos of
+     * DOWNLOAD_FILE are the user's own and are asked about, never suggested.
+     * The engine never assigns it to a file.
+     */
+    DOWNLOAD_MEDIA(R.string.plan_group_download_media, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
     DOWNLOAD_DOCUMENT(R.string.plan_group_download_document, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH, groupSelectable = false),
     LARGE_OTHER(R.string.plan_group_large_other, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
     WHATSAPP_SENT(R.string.plan_group_whatsapp_sent, 0, R.plurals.reason_whatsapp_sent, false, DeleteMode.TRASH),
@@ -207,6 +214,8 @@ data class CleanableItem(
     val selected: Boolean = true,
     val protectedDuplicateName: String? = null,
     val protectedDuplicateUri: String? = null,
+    /** Faz 5D (D1): the full check showed this look-alike is not a copy; it is never selected for the user. */
+    val verifiedDifferent: Boolean = false,
     val protectedDuplicateSizeBytes: Long? = null,
     val volumeRoot: String = "",
     val protectedDuplicateRelativePath: String? = null,

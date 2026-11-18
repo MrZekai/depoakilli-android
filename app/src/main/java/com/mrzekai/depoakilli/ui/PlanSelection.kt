@@ -2,6 +2,7 @@ package com.mrzekai.depoakilli.ui
 
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
+import com.mrzekai.depoakilli.model.isAppSelectable
 import com.mrzekai.depoakilli.model.isBulkSelectable
 
 /** Pure selection rules of the cleanup plan, shared by the ViewModel and tests. */
@@ -18,12 +19,51 @@ internal object PlanSelection {
         }
     }
 
-    /** Bulk selection skips items that are not bulk-selectable; explicit selection does not. */
+    /**
+     * Faz 5D (D1): [bulk] marks a selection the app makes on its own ("My pick",
+     * "Select my picks"); it skips camera files and unverified look-alikes. A
+     * "Select all" the user taps passes `bulk = false` and selects every file.
+     */
     fun setItemsSelected(items: List<CleanableItem>, ids: Set<String>, selected: Boolean, bulk: Boolean): List<CleanableItem> =
         items.map { item ->
-            val excluded = bulk && selected && !item.isBulkSelectable()
+            val excluded = bulk && selected && !item.isAppSelectable()
             if (item.id in ids && item.selected != selected && !excluded) item.copy(selected = selected) else item
         }
+
+    /**
+     * What a "Select all" box does (D1): with none or some selected it selects
+     * all; only when all are selected does it clear them.
+     */
+    fun selectAllTarget(items: List<CleanableItem>): Boolean = !selectAllCandidates(items).all(CleanableItem::selected)
+
+    /** Files a "Select all" acts on: everything except look-alikes shown to be different. */
+    fun selectAllCandidates(items: List<CleanableItem>): List<CleanableItem> = items.filterNot(CleanableItem::verifiedDifferent)
+
+    /** A user "Select all" over [items] needs the full check first when it would select look-alikes. */
+    fun needsVerification(items: List<CleanableItem>): Boolean =
+        selectAllTarget(items) &&
+            selectAllCandidates(items).any { it.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED && !it.selected }
+
+    /**
+     * "Select all" on look-alikes after the full check (D1): exact copies are
+     * selected, a file that turned out different is marked and left alone,
+     * and in every set the original stays unselected.
+     */
+    fun selectVerifiedCopies(items: List<CleanableItem>, results: Map<String, CleanableItem?>): List<CleanableItem> {
+        val verifiedIds = results.filterValues { it != null }.keys
+        val updated = items.map { current ->
+            when {
+                current.id !in results -> current
+                else -> results[current.id]?.copy(selected = true)
+                    ?: current.copy(verifiedDifferent = true, selected = false)
+            }
+        }
+        val originals = updated.asSequence()
+            .filter { it.selected && it.id in verifiedIds }
+            .mapNotNull(CleanableItem::protectedDuplicateUri)
+            .toSet()
+        return updated.map { if (it.selected && it.uri in originals) it.copy(selected = false) else it }
+    }
 
     fun toggleGroup(items: List<CleanableItem>, group: CleanupGroup): List<CleanableItem> =
         setGroupSelected(

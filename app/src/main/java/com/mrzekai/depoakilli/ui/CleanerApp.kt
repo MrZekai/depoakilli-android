@@ -735,6 +735,7 @@ fun CleanerApp(
                 canRequestAds = canRequestAds,
                 showRewardedOffer = canRequestAds && adFreeRemainingMillis <= 0L && rewardedAdReady,
                 onShowRewardedAd = onShowRewardedAd,
+                adFreeRemainingMillis = adFreeRemainingMillis,
                 onSystemDismiss = {
                     dismissResultAndReturn()
                 },

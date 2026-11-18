@@ -399,36 +399,24 @@ internal fun deleteSafetyNotes(items: List<CleanableItem>): List<String> {
     return notes
 }
 
-/** Convenience for [CleanableItem] lists: splits the bytes by each group's delete mode. */
+/**
+ * Confirmation for [CleanableItem] lists (Faz 5D, D2): group rows that can be
+ * unticked and opened, the split by delete mode, and [onConfirm] receives
+ * exactly the ids still ticked.
+ */
 @Composable
 internal fun DeleteConfirmDialog(
     items: List<CleanableItem>,
     inProgress: Boolean = false,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    onSeeAll: (() -> Unit)? = null,
+    onConfirm: (Set<String>) -> Unit,
     initiallyShowAll: Boolean = false,
 ) {
-    val split = DeleteSplit.of(items)
-    DeleteConfirmDialog(
-        entries = items.map { item ->
-            DeleteConfirmEntry(
-                name = item.name,
-                folder = item.relativePath,
-                keptOriginal = item.protectedDuplicateName?.let { originalName ->
-                    listOfNotNull(item.protectedDuplicateRelativePath?.trim('/')?.takeIf(String::isNotBlank), originalName)
-                        .joinToString("/")
-                },
-            )
-        },
-        trashBytes = split.trashBytes,
-        permanentBytes = split.permanentBytes,
-        groupNames = ConfirmGroups.of(items).map { stringResource(it.titleRes) },
+    GroupedDeleteConfirm(
+        items = items,
         inProgress = inProgress,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
-        notes = deleteSafetyNotes(items),
-        onSeeAll = onSeeAll,
-        initiallyShowAll = initiallyShowAll,
+        initiallyOpenGroup = if (initiallyShowAll) ConfirmGroups.of(items).singleOrNull() else null,
     )
 }

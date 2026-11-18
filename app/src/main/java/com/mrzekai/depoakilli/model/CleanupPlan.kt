@@ -13,22 +13,59 @@ fun CleanableItem.isBulkSelectable(): Boolean =
     assessment.group.groupSelectable &&
         (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath))
 
+/** Faz 5D (D3): nothing changed in the last 30 days is suggested; documents need 180 days. */
+const val SUGGEST_MIN_AGE_DAYS = 30L
+const val SUGGEST_DOCUMENT_MIN_AGE_DAYS = 180L
+private const val DAY_MILLIS = 24L * 60L * 60L * 1000L
+
+/** Days since the file last changed; an unknown date counts as old. */
+fun CleanableItem.ageDays(nowMillis: Long = System.currentTimeMillis()): Long =
+    if (modifiedAtMillis <= 0L) Long.MAX_VALUE else ((nowMillis - modifiedAtMillis).coerceAtLeast(0L) / DAY_MILLIS)
+
+/** A video, song or photo saved in Downloads: the user's own, so asked about (D3). */
+fun CleanableItem.isDownloadMedia(): Boolean =
+    assessment.group == CleanupGroup.DOWNLOAD_FILE &&
+        (mimeType.startsWith("video/") || mimeType.startsWith("audio/") || mimeType.startsWith("image/"))
+
+/** Not recently changed: old enough for the app to suggest or select on its own (D3). */
+fun CleanableItem.isOldEnoughToSuggest(nowMillis: Long = System.currentTimeMillis()): Boolean {
+    val age = ageDays(nowMillis)
+    val minimum = if (assessment.group == CleanupGroup.DOWNLOAD_DOCUMENT) SUGGEST_DOCUMENT_MIN_AGE_DAYS else SUGGEST_MIN_AGE_DAYS
+    return age >= minimum
+}
+
 /**
- * Faz 5C tier 2 ("My pick"): a review file of a suggested group that is not
- * in the camera folder. Kept files and excluded folders never reach the plan
- * (UserChoiceFilter), so they are never suggested either.
+ * Faz 5C/5D tier 2 ("My pick"), the one place its rule lives: a review file of
+ * a suggested group, not in the camera folder, not a video/music/photo in
+ * Downloads, not changed in the last 30 days (documents 180), not shown to be
+ * different by a full check. Kept files and excluded folders never reach the
+ * plan (UserChoiceFilter), so they are never suggested either.
  */
-fun CleanableItem.isSuggestedPick(): Boolean =
+fun CleanableItem.isSuggestedPick(nowMillis: Long = System.currentTimeMillis()): Boolean =
     !assessment.group.auto &&
         assessment.group.suggested &&
-        !StoragePathRules.isCameraPath(relativePath)
+        !StoragePathRules.isCameraPath(relativePath) &&
+        !isDownloadMedia() &&
+        !verifiedDifferent &&
+        isOldEnoughToSuggest(nowMillis)
 
 /** Tier 3 ("I'll ask you"): a review file the user decides on one by one. */
-fun CleanableItem.isAskTier(): Boolean = !assessment.group.auto && !isSuggestedPick()
+fun CleanableItem.isAskTier(nowMillis: Long = System.currentTimeMillis()): Boolean =
+    !assessment.group.auto && !isSuggestedPick(nowMillis)
+
+/**
+ * Faz 5D (D1): a selection the app makes on its own ("My pick", "Select my
+ * picks", preselection) never takes camera files or unverified look-alikes.
+ * A "Select all" the user taps is not limited by this.
+ */
+fun CleanableItem.isAppSelectable(): Boolean =
+    (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath)) &&
+        assessment.group != CleanupGroup.DUPLICATE_UNVERIFIED &&
+        !verifiedDifferent
 
 /** Files of a findings row in the swipe review: tier 3 only, biggest first (C2, C5). */
 fun swipeItemsFor(group: CleanupGroup, items: List<CleanableItem>): List<CleanableItem> =
-    items.filter { it.assessment.group.rowGroup == group && it.isAskTier() }
+    items.filter { it.rowGroup == group && it.isAskTier() }
         .sortedByDescending(CleanableItem::sizeBytes)
 
 /**
@@ -37,6 +74,10 @@ fun swipeItemsFor(group: CleanupGroup, items: List<CleanableItem>): List<Cleanab
  */
 val CleanupGroup.rowGroup: CleanupGroup
     get() = if (this == CleanupGroup.LARGE_VIDEO) CleanupGroup.OLD_VIDEO else this
+
+/** The findings row of a file: as its group, with Downloads media in their own row (D3). */
+val CleanableItem.rowGroup: CleanupGroup
+    get() = if (isDownloadMedia()) CleanupGroup.DOWNLOAD_MEDIA else assessment.group.rowGroup
 
 data class PlanGroup(
     val group: CleanupGroup?,
@@ -109,7 +150,7 @@ data class CleanupPlan(
             val groupRows = reviewRows.filterNot(PlanGroup::smallReview)
                 .flatMap(PlanGroup::items)
                 .filter(CleanableItem::isAskTier)
-                .groupBy { it.assessment.group.rowGroup }
+                .groupBy { it.rowGroup }
                 .map { (group, items) -> planGroup(group, items) }
             val small = smallReview?.let { row ->
                 row.items.filter(CleanableItem::isAskTier).takeIf { it.isNotEmpty() }?.let { items ->

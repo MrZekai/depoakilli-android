@@ -352,7 +352,6 @@
         <item quantity="other">عدد الملفات التي لم تتغير بعد إلغاء تأكيد Android: %1$d</item>
     </plurals>
     <string name="cleanup_result_zero">لم يتم استعادة أي مساحة إضافية.</string>
-    <string name="cleanup_result_note">يتم حساب هذه القيم من الملفات التي تمت إزالتها بالفعل Smart Cleaner على هذا الجهاز.</string>
     <string name="cleanup_result_storage_snapshot">المساحة الفارغة: %1$s → %2$s</string>
     <string name="disclosure_usage_title">لماذا الوصول إلى الاستخدام؟</string>
     <string name="disclosure_usage_body">الوصول إلى الاستخدام اختياري. فهو يتيح لـ Smart Cleaner قراءة إجماليات تخزين/ذاكرة التخزين المؤقت للتطبيقات التي أبلغ عنها Android وأوقات الاستخدام الأخيرة حتى تتمكن من مراجعة التطبيقات الكبيرة أو غير المستخدمة. ولا يقرأ المحتوى الخاص داخل تلك التطبيقات ولا يحذف بياناتها المحمية بصمت.</string>
@@ -449,18 +448,8 @@
     <string name="storage_change_progress">الملفات: %1$d • المجلدات التي تم فحصها: %2$d</string>
     <string name="rewarded_ad_title">خالية من الإعلانات لمدة 60 دقيقة</string>
     <string name="rewarded_ad_subtitle">شاهد فيديو قصير لإخفاء البانر والإعلانات الانتقالية لمدة ساعة واحدة.</string>
-    <string name="rewarded_ad_result_action">شاهد مقطع فيديو قصيرًا لمدة 60 دقيقة بدون إعلانات</string>
     <string name="rewarded_ad_earned">الوقت الخالي من الإعلانات نشط لمدة 60 دقيقة.</string>
     <string name="rewarded_ad_unavailable">الفيديو ليس جاهزا بعد. الرجاء المحاولة مرة أخرى في لحظة.</string>
-    <string name="ad_free_active_title">الوقت الخالي من الإعلانات نشط</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="zero">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-        <item quantity="one">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-        <item quantity="two">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-        <item quantity="few">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-        <item quantity="many">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-        <item quantity="other">عدد الدقائق المتبقية: %1$d. إعلانات البانر والانتقال مخفية.</item>
-    </plurals>
     <string name="nothing_selected_hint">حدد الملفات لتنظيفها</string>
     <string name="premium_duplicate_copy_of">نسخة من %1$s</string>
     <string name="cache_modern_not_measured">لا يتم قياسه - السماح بالوصول إلى الاستخدام</string>
@@ -924,5 +913,73 @@
         <item quantity="few">%1$d ملف · من الكاميرا</item>
         <item quantity="many">%1$d ملف · من الكاميرا</item>
         <item quantity="other">%1$d ملف · من الكاميرا</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">الفيديوهات والصور في التنزيلات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">جارٍ التحقق… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">ليست نسخة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">لم يتم التحقق</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">لا يوجد بينها نسخة مطابقة تمامًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">أكبر الملفات على هاتفك</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">تنزيلات قديمة وملفات تثبيت</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">صور وفيديوهات ورسائل صوتية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">الملف نفسه محفوظ مرتين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">تطبيقات غير مستخدمة وذاكرة مؤقتة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">ما الذي يشغل مساحتك</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s ممتلئ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">بدون إعلانات لمدة 60 دقيقة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">شاهد فيديو قصيرًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">لا تريد الإعلانات؟ أوقفها لمدة 60 دقيقة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">شاهد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="zero">%1$d ملف من الكاميرا</item>
+        <item quantity="one">%1$d ملف من الكاميرا</item>
+        <item quantity="two">%1$d ملف من الكاميرا</item>
+        <item quantity="few">%1$d ملف من الكاميرا</item>
+        <item quantity="many">%1$d ملف من الكاميرا</item>
+        <item quantity="other">%1$d ملف من الكاميرا</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="zero">%1$d غير مستخدم</item>
+        <item quantity="one">%1$d غير مستخدم</item>
+        <item quantity="two">%1$d غير مستخدم</item>
+        <item quantity="few">%1$d غير مستخدم</item>
+        <item quantity="many">%1$d غير مستخدم</item>
+        <item quantity="other">%1$d غير مستخدم</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="zero">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+        <item quantity="one">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+        <item quantity="two">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+        <item quantity="few">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+        <item quantity="many">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+        <item quantity="other">بدون إعلانات · متبقٍ %1$d دقيقة</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="zero">تم نقل %1$d ملف</item>
+        <item quantity="one">تم نقل %1$d ملف</item>
+        <item quantity="two">تم نقل %1$d ملف</item>
+        <item quantity="few">تم نقل %1$d ملف</item>
+        <item quantity="many">تم نقل %1$d ملف</item>
+        <item quantity="other">تم نقل %1$d ملف</item>
     </plurals>
 </resources>

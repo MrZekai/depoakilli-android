@@ -310,7 +310,6 @@
         <item quantity="other">I file %1$d sono rimasti intatti dopo l\'annullamento della conferma Android</item>
     </plurals>
     <string name="cleanup_result_zero">Non è stato recuperato spazio aggiuntivo.</string>
-    <string name="cleanup_result_note">Questi valori sono calcolati dai file Smart Cleaner effettivamente rimossi su questo dispositivo.</string>
     <string name="cleanup_result_storage_snapshot">Istantanea dello spazio libero: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Perché l\'accesso all\'utilizzo?</string>
     <string name="disclosure_usage_body">L\'accesso all\'utilizzo è facoltativo. Consente a Smart Cleaner di leggere i totali di archiviazione/cache delle app segnalati da Android e gli ultimi tempi di utilizzo in modo da poter esaminare app di grandi dimensioni o inutilizzate. Non legge i contenuti privati ​​all\'interno di tali app e non elimina silenziosamente i dati protetti.</string>
@@ -401,15 +400,8 @@
     <string name="storage_change_progress">File: %1$d • Cartelle analizzate: %2$d</string>
     <string name="rewarded_ad_title">Senza pubblicità per 60 minuti</string>
     <string name="rewarded_ad_subtitle">Guarda un breve video per nascondere banner e annunci di transizione per un\'ora.</string>
-    <string name="rewarded_ad_result_action">Guarda un breve video per 60 minuti senza pubblicità</string>
     <string name="rewarded_ad_earned">Il tempo senza pubblicità è attivo per 60 minuti.</string>
     <string name="rewarded_ad_unavailable">Il video non è ancora pronto. Per favore riprova tra poco.</string>
-    <string name="ad_free_active_title">Il tempo senza pubblicità è attivo</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">%1$d minuti rimanenti. Banner e annunci di transizione sono nascosti.</item>
-        <item quantity="many">%1$d minuti rimanenti. Banner e annunci di transizione sono nascosti.</item>
-        <item quantity="other">%1$d minuti rimanenti. Banner e annunci di transizione sono nascosti.</item>
-    </plurals>
     <string name="nothing_selected_hint">Seleziona i file da pulire</string>
     <string name="premium_duplicate_copy_of">Copia di %1$s</string>
     <string name="cache_modern_not_measured">Non misurato: consenti l\'accesso all\'utilizzo</string>
@@ -782,5 +774,61 @@
         <item quantity="one">%1$d file · dalla fotocamera</item>
         <item quantity="many">%1$d file · dalla fotocamera</item>
         <item quantity="other">%1$d file · dalla fotocamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Video e foto in Download</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Verifica… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Non è una copia</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Non verificato</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Nessuno di questi è una copia esatta.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">I file più grandi del telefono</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Vecchi download e installer</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Foto, video e note vocali</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">Lo stesso file salvato due volte</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">App inutilizzate e cache</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Cosa occupa il tuo spazio</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s pieno</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">Niente annunci per 60 minuti</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Guarda un breve video</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Niente annunci? Disattivali per 60 minuti</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Guarda</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d file dalla fotocamera</item>
+        <item quantity="many">%1$d file dalla fotocamera</item>
+        <item quantity="other">%1$d file dalla fotocamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d inutilizzata</item>
+        <item quantity="many">%1$d inutilizzate</item>
+        <item quantity="other">%1$d inutilizzate</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Senza annunci · manca %1$d min</item>
+        <item quantity="many">Senza annunci · mancano %1$d min</item>
+        <item quantity="other">Senza annunci · mancano %1$d min</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d file spostato</item>
+        <item quantity="many">%1$d file spostati</item>
+        <item quantity="other">%1$d file spostati</item>
     </plurals>
 </resources>

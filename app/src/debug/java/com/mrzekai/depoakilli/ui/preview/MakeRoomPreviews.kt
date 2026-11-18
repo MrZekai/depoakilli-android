@@ -77,6 +77,20 @@ private fun HomeScanningPreview() = HomePreview(
     ),
 )
 
+/** D7: plan Home with the Trash line, on every preview size and text scale. */
+@MakeRoomPreviews
+@Composable
+private fun HomePlanWithTrashPreview() = HomePreview(
+    CleanerUiState(
+        storage = fullPhone,
+        hasAllFilesAccess = true,
+        dashboardSnapshotAtMillis = 1L,
+        dashboardCleanableBytes = 264_000_000L,
+        dashboardReviewBytes = 18 * GB,
+        trashEntries = listOf(trashEntry("t", "old-installer.apk", 185_000_000L, 1)),
+    ),
+)
+
 @MakeRoomPreviews
 @Composable
 private fun ToolsPreview() {

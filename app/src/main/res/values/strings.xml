@@ -299,7 +299,6 @@
         <item quantity="other">%1$d files were left untouched after Android confirmation was canceled</item>
     </plurals>
     <string name="cleanup_result_zero">No additional space was reclaimed.</string>
-    <string name="cleanup_result_note">These values are calculated from files Smart Cleaner actually removed on this device.</string>
 
     <string name="cleanup_result_storage_snapshot">Free-space snapshot: %1$s → %2$s</string>
 
@@ -392,14 +391,8 @@
     <string name="storage_change_progress">Files: %1$d • Folders scanned: %2$d</string>
     <string name="rewarded_ad_title">Ad-free for 60 minutes</string>
     <string name="rewarded_ad_subtitle">Watch a short video to hide banner and transition ads for one hour.</string>
-    <string name="rewarded_ad_result_action">Watch a short video for 60 ad-free minutes</string>
     <string name="rewarded_ad_earned">Ad-free time is active for 60 minutes.</string>
     <string name="rewarded_ad_unavailable">The video is not ready yet. Please try again in a moment.</string>
-    <string name="ad_free_active_title">Ad-free time is active</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">%1$d minute remaining. Banner and transition ads are hidden.</item>
-        <item quantity="other">%1$d minutes remaining. Banner and transition ads are hidden.</item>
-    </plurals>
     <string name="nothing_selected_hint">Select files to clean</string>
     <string name="premium_duplicate_copy_of">Copy of %1$s</string>
     <string name="cache_modern_not_measured">Not measured – allow Usage Access</string>
@@ -660,5 +653,37 @@
     <plurals name="plan_camera_files">
         <item quantity="one">%1$d file · from Camera</item>
         <item quantity="other">%1$d files · from Camera</item>
+    </plurals>
+    <string name="plan_group_download_media">Videos &amp; photos in Downloads</string>
+    <string name="verify_select_progress">Verifying… %1$d%%</string>
+    <string name="verify_not_a_copy">Not a copy</string>
+    <string name="verify_not_verified">Not verified</string>
+    <string name="verify_none_exact">None of these are exact copies.</string>
+    <string name="tools_row_large_sub">Biggest files on your phone</string>
+    <string name="tools_row_downloads_sub">Old downloads and installers</string>
+    <string name="tools_row_whatsapp_sub">Photos, videos and voice notes</string>
+    <string name="tools_row_duplicates_sub">Same file saved twice</string>
+    <string name="tools_row_apps_sub">Unused apps and app cache</string>
+    <string name="tools_row_storage_sub">What\'s taking your space</string>
+    <string name="tools_storage_full">%1$s full</string>
+    <string name="ad_free_card_title">No ads for 60 minutes</string>
+    <string name="ad_free_card_sub">Watch one short video</string>
+    <string name="ad_free_offer_bar">Don\'t want ads? Turn them off for 60 minutes</string>
+    <string name="ad_free_offer_watch">Watch</string>
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d file from your camera</item>
+        <item quantity="other">%1$d files from your camera</item>
+    </plurals>
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d unused</item>
+        <item quantity="other">%1$d unused</item>
+    </plurals>
+    <plurals name="ad_free_left">
+        <item quantity="one">Ad-free · %1$d min left</item>
+        <item quantity="other">Ad-free · %1$d min left</item>
+    </plurals>
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d file moved</item>
+        <item quantity="other">%1$d files moved</item>
     </plurals>
 </resources>

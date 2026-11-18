@@ -282,7 +282,6 @@
         <item quantity="other">File %1$d tidak tersentuh setelah konfirmasi Android dibatalkan</item>
     </plurals>
     <string name="cleanup_result_zero">Tidak ada ruang tambahan yang direklamasi.</string>
-    <string name="cleanup_result_note">Nilai ini dihitung dari file Smart Cleaner yang sebenarnya dihapus di perangkat ini.</string>
     <string name="cleanup_result_storage_snapshot">Cuplikan ruang bebas: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Mengapa Akses Penggunaan?</string>
     <string name="disclosure_usage_body">Akses Penggunaan bersifat opsional. Ini memungkinkan Smart Cleaner membaca total penyimpanan/cache aplikasi yang dilaporkan Android dan waktu terakhir digunakan sehingga Anda dapat meninjau aplikasi besar atau yang tidak digunakan. Itu tidak membaca konten pribadi di dalam aplikasi tersebut dan tidak menghapus data yang dilindungi secara diam-diam.</string>
@@ -369,13 +368,8 @@
     <string name="storage_change_progress">File: %1$d • Folder dipindai: %2$d</string>
     <string name="rewarded_ad_title">Bebas iklan selama 60 menit</string>
     <string name="rewarded_ad_subtitle">Tonton video pendek untuk menyembunyikan spanduk dan transisi iklan selama satu jam.</string>
-    <string name="rewarded_ad_result_action">Tonton video pendek selama 60 menit bebas iklan</string>
     <string name="rewarded_ad_earned">Waktu bebas iklan aktif selama 60 menit.</string>
     <string name="rewarded_ad_unavailable">Videonya belum siap. Silakan coba lagi sebentar lagi.</string>
-    <string name="ad_free_active_title">Waktu bebas iklan aktif</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="other">%1$d menit tersisa. Iklan spanduk dan transisi disembunyikan.</item>
-    </plurals>
     <string name="nothing_selected_hint">Pilih file yang akan dibersihkan</string>
     <string name="premium_duplicate_copy_of">Salinan %1$s</string>
     <string name="cache_modern_not_measured">Tidak diukur – izinkan Akses Penggunaan</string>
@@ -695,5 +689,53 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="plan_camera_files">
         <item quantity="other">%1$d file · dari Kamera</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Video &amp; foto di Unduhan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Memverifikasi… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Bukan salinan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Belum diverifikasi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Tidak ada yang merupakan salinan persis.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">File terbesar di ponselmu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Unduhan lama dan installer</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Foto, video, dan pesan suara</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">File yang sama tersimpan dua kali</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Aplikasi tak terpakai dan cache</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Apa yang memakan ruangmu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">Tanpa iklan selama 60 menit</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Tonton satu video singkat</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Tidak mau iklan? Matikan selama 60 menit</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Tonton</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="other">%1$d file dari kameramu</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="other">%1$d tak terpakai</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="other">Bebas iklan · sisa %1$d mnt</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="other">%1$d file dipindahkan</item>
     </plurals>
 </resources>
