@@ -201,6 +201,20 @@ def seed_files(tag, count=2, mb=300):
     sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1")
 
 
+BIG_APP = os.environ.get("QA_BIG_APP", "com.mrzekai.depoakilli.debug")
+
+
+def seed_big_app():
+    """A second, debuggable app (the debug build, a different package) with
+    700 MB of saved data: the plan's apps section must list it (>= 500 MB)."""
+    if BIG_APP not in sh("pm list packages"):
+        log(f"{BIG_APP} not installed; apps rows cannot be checked")
+        return False
+    sh(f"run-as {BIG_APP} sh -c 'mkdir -p files && dd if=/dev/urandom of=files/qa-big.bin bs=1048576 count=700 2>/dev/null'", timeout=240)
+    log("big app data: " + sh(f"run-as {BIG_APP} ls -l files").strip())
+    return True
+
+
 def launch():
     sh(f"monkey -p {PKG} -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1")
     time.sleep(4)
@@ -236,6 +250,7 @@ def main():
     sh(f"appops set {PKG} GET_USAGE_STATS ignore")
     sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS 2>/dev/null")
     seed_files("a")
+    seed_big_app()
 
     launch()
     dismiss_ads()
@@ -273,9 +288,32 @@ def main():
     if tap_text(r"^See what else I found$", 20):
         dismiss_ads()
         title = scroll_to(r"^Apps take the most space$")
-        check("Erişim açıkken 'Apps take the most space' bölümü görünüyor", title, screenshot=shot("findings-apps-section"))
+        row = scroll_to(r"^Mostly saved data · Open its storage settings$", 4) if title else None
+        check("Erişim açıkken 'Apps take the most space' bölümü ve 700 MB'lık uygulama satırı görünüyor",
+              title and row, screenshot=shot("findings-apps-section"))
+        check("İlk seferde not görünüyor ('I can't delete inside other apps…')",
+              scroll_to(r"^I can.t delete inside other apps", 3))
         no_access_row = find(r"^See which apps take the most space$")
         check("Erişim açılınca 'erişim ver' satırı kayboldu", not no_access_row)
+        if row:
+            tap(row)
+            time.sleep(2)
+            act = resumed_activity()
+            check("Satır uygulamanın Android ayar sayfasını açıyor (silmeden)", "settings" in act.lower(),
+                  note=act[-120:], screenshot=shot("app-settings-opened"))
+            check("Uygulama silinmedi", BIG_APP in sh("pm list packages"))
+            launch()
+    to_home()
+
+    # 3b. Home "Apps hold X more" → findings, scrolled to the apps section.
+    line = wait_for(r"^Apps hold .+ more\. See what you can do\.$", 20)
+    check("Home: 'Apps hold X more' satırı var", line, screenshot=shot("home-apps-line"))
+    if line:
+        tap(line)
+        dismiss_ads()
+        time.sleep(2)
+        check("Satıra basınca bulgular uygulamalar bölümüne kayıyor", wait_for(r"^Apps take the most space$", 15),
+              screenshot=shot("findings-scrolled-to-apps"))
     to_home()
 
     # 4. Clean up → result button order.
@@ -318,19 +356,18 @@ def main():
         tap(chip)
         check("Çip Çöp sekmesini açıyor", wait_for(r"qa-a-0|Delete forever|Restore", 15), screenshot=shot("trash-tab"))
 
-    # 7. Second cleanup, this time free the space for good.
+    # 7. Second cleanup, this time free the space for good. A clean app
+    # state gives a fresh scan (the Trash checks above are done).
     seed_files("b")
-    to_home()
-    again = find(r"^(Check again|MAKE ROOM)$")
-    if again:
-        tap(again)
-    if not wait_for(r"^CLEAN UP$", 180):
-        # Fall back: a fresh scan from the Tools/Storage path is not needed; relaunch.
-        launch()
-        n = wait_for(r"^(MAKE ROOM|Check again|CLEAN UP)$", 30)
-        if n and n.label != "CLEAN UP":
-            tap(n)
-        wait_for(r"^CLEAN UP$", 180)
+    sh(f"pm clear {PKG}")
+    sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
+    sh(f"appops set {PKG} GET_USAGE_STATS allow")
+    launch()
+    dismiss_ads()
+    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40)
+    if n and n.label.upper() == "MAKE ROOM":
+        tap(n)
+    wait_for(r"^CLEAN UP$", 180)
     tap_text(r"^CLEAN UP$", 20)
     tap_text(r"^Yes, clean up$", 20)
     free_now = wait_for(r"^Free .+ now$", 90)

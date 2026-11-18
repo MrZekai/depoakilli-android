@@ -31,7 +31,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build QA APK
-        run: ./gradlew --stacktrace assembleQa
+        run: ./gradlew --stacktrace assembleQa assembleDebug
 
       - name: Enable KVM
         run: |
@@ -51,6 +51,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r -g app/build/outputs/apk/qa/app-qa.apk
+            adb install -r app/build/outputs/apk/debug/app-debug.apk
             python3 scripts/device-qa/run.py
 
       - name: Upload screenshots and report
