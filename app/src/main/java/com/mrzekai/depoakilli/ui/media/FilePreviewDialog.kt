@@ -54,6 +54,7 @@ import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
 /** What a preview needs to know about a file, whatever screen it comes from. */
 internal data class MediaPreviewFile(
@@ -64,7 +65,7 @@ internal data class MediaPreviewFile(
     val voiceNote: Boolean = false,
 )
 
-private val DefaultAccent = Color(0xFF65E8FF)
+private val DefaultAccent = com.mrzekai.depoakilli.ui.theme.Lime
 
 /** Picks image, video, audio or a generic card for [file]. Every screen uses this one body. */
 @Composable
@@ -72,11 +73,12 @@ internal fun MediaPreviewContent(
     file: MediaPreviewFile,
     accent: Color = DefaultAccent,
     allowAudio: Boolean = true,
+    muted: Boolean = false,
 ) {
     val mime = file.mimeType.lowercase()
     when {
         mime.startsWith("image/") -> MediaImagePreview(file, accent)
-        mime.startsWith("video/") -> MediaVideoPreview(file, accent)
+        mime.startsWith("video/") -> MediaVideoPreview(file, accent, muted)
         allowAudio && (mime.startsWith("audio/") || file.voiceNote) -> MediaAudioPreview(file, accent)
         else -> MediaGenericPreview(file, accent)
     }
@@ -103,11 +105,13 @@ internal fun MediaImagePreview(file: MediaPreviewFile, accent: Color = DefaultAc
 
 /** Video with a single play/pause control; nothing plays until it is tapped. */
 @Composable
-internal fun MediaVideoPreview(file: MediaPreviewFile, accent: Color = DefaultAccent) {
+internal fun MediaVideoPreview(file: MediaPreviewFile, accent: Color = DefaultAccent, muted: Boolean = false) {
     val context = LocalContext.current
     val player = remember(file.uri) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(file.uri))
+            // The swipe review plays videos silently (Faz 5 T5.5).
+            if (muted) volume = 0f
             prepare()
         }
     }
@@ -169,19 +173,19 @@ internal fun MediaVideoPreview(file: MediaPreviewFile, accent: Color = DefaultAc
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Icon(Icons.Outlined.VideoFile, contentDescription = null, tint = Color(0xFFFFB45B), modifier = Modifier.size(56.dp))
+                Icon(Icons.Outlined.VideoFile, contentDescription = null, tint = com.mrzekai.depoakilli.ui.theme.AdLabel, modifier = Modifier.size(56.dp))
                 Text(
                     stringResource(if (noVideoTrack) R.string.smart_video_no_picture else R.string.smart_video_preview_error),
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Bold,
                 )
             }
         } else {
             Surface(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(18.dp),
-                color = Color(0xE606132F),
+                color = com.mrzekai.depoakilli.ui.theme.Black.copy(alpha = .9f),
                 shape = RoundedCornerShape(18.dp),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = .24f)),
+                border = BorderStroke(1.dp, OnBlack.copy(alpha = .24f)),
             ) {
                 Row(
                     modifier = Modifier
@@ -195,11 +199,11 @@ internal fun MediaVideoPreview(file: MediaPreviewFile, accent: Color = DefaultAc
                     Icon(
                         if (playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = OnBlack,
                     )
                     Text(
                         stringResource(if (playing) R.string.smart_video_pause else R.string.smart_video_play),
-                        color = Color.White,
+                        color = OnBlack,
                         fontWeight = FontWeight.Black,
                     )
                 }
@@ -240,9 +244,9 @@ internal fun MediaAudioPreview(file: MediaPreviewFile, accent: Color = DefaultAc
         Surface(color = accent.copy(alpha = .15f), shape = CircleShape) {
             Icon(Icons.Outlined.MusicNote, contentDescription = null, tint = accent, modifier = Modifier.padding(24.dp).size(56.dp))
         }
-        Text(file.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Text(file.name, color = OnBlack, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
         if (failed) {
-            Text(stringResource(R.string.whatsapp_audio_preview_error), color = Color(0xFFFFB45B))
+            Text(stringResource(R.string.whatsapp_audio_preview_error), color = com.mrzekai.depoakilli.ui.theme.AdLabel)
         } else {
             Button(onClick = { if (player.isPlaying) player.pause() else player.play() }) {
                 Icon(if (playing) Icons.Outlined.Pause else Icons.Outlined.PlayArrow, contentDescription = null)
@@ -264,8 +268,8 @@ internal fun MediaGenericPreview(file: MediaPreviewFile, accent: Color = Default
                 modifier = Modifier.padding(26.dp).size(64.dp),
             )
         }
-        Text(stringResource(R.string.smart_generic_preview_title), color = Color.White, fontWeight = FontWeight.Black)
-        Text(file.name, color = Color.White.copy(alpha = .82f), maxLines = 3, overflow = TextOverflow.Ellipsis)
+        Text(stringResource(R.string.smart_generic_preview_title), color = OnBlack, fontWeight = FontWeight.Black)
+        Text(file.name, color = OnBlack.copy(alpha = .82f), maxLines = 3, overflow = TextOverflow.Ellipsis)
         Text(ByteFormatter.format(file.sizeBytes), color = accent, fontWeight = FontWeight.Black)
     }
 }

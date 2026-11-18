@@ -29,15 +29,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
-import com.mrzekai.depoakilli.ui.theme.Lime400
+import com.mrzekai.depoakilli.ui.theme.AdLabel
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 @Composable
 internal fun SecurityCenterScreen(
@@ -50,14 +55,7 @@ internal fun SecurityCenterScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF07183E),
-                        Color(0xFF040A1C),
-                    ),
-                ),
-            ),
+            .background(Lime),
         contentPadding = PaddingValues(18.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
@@ -66,12 +64,12 @@ internal fun SecurityCenterScreen(
                 Text(
                     text = stringResource(R.string.security_center_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    color = Color.White,
+                    color = Ink,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     text = stringResource(R.string.security_center_subtitle),
-                    color = Color(0xFFAAB7D3),
+                    color = InkSoft,
                 )
             }
         }
@@ -122,24 +120,20 @@ private fun PermissionManageCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+        colors = CardDefaults.cardColors(containerColor = Black),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                color = if (ready) {
-                    Lime400.copy(alpha = .16f)
-                } else {
-                    ElectricBlue.copy(alpha = .16f)
-                },
+                color = BlackChip,
                 shape = CircleShape,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = if (ready) Lime400 else ElectricBlue,
+                    tint = Lime,
                     modifier = Modifier.padding(11.dp).size(28.dp),
                 )
             }
@@ -152,12 +146,12 @@ private fun PermissionManageCard(
             ) {
                 Text(
                     text = title,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     text = subtitle,
-                    color = Color(0xFFAAB7D3),
+                    color = OnBlackSoft,
                     style = MaterialTheme.typography.bodySmall,
                 )
 
@@ -166,11 +160,7 @@ private fun PermissionManageCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Surface(
-                        color = if (ready) {
-                            Lime400.copy(alpha = .16f)
-                        } else {
-                            Color(0xFFFFB21A).copy(alpha = .16f)
-                        },
+                        color = if (ready) Lime else AdLabel,
                         shape = RoundedCornerShape(10.dp),
                     ) {
                         Text(
@@ -179,7 +169,7 @@ private fun PermissionManageCard(
                                 else R.string.permissions_review_status,
                             ),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            color = if (ready) Lime400 else Color(0xFFFFC24B),
+                            color = Ink,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                         )
@@ -187,7 +177,7 @@ private fun PermissionManageCard(
 
                     Text(
                         text = stringResource(R.string.permissions_manage_android),
-                        color = Color(0xFF78B9FF),
+                        color = Lime,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                     )
@@ -197,7 +187,7 @@ private fun PermissionManageCard(
             Icon(
                 Icons.AutoMirrored.Outlined.ArrowForward,
                 contentDescription = null,
-                tint = Color(0xFF78B9FF),
+                tint = Lime,
             )
         }
     }
@@ -212,20 +202,20 @@ private fun SecurityInfoCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+        colors = CardDefaults.cardColors(containerColor = Black),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                color = Color(0xFF24D9A7).copy(alpha = .14f),
+                color = BlackChip,
                 shape = CircleShape,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = Color(0xFF54E2B5),
+                    tint = Lime,
                     modifier = Modifier.padding(11.dp).size(28.dp),
                 )
             }
@@ -238,22 +228,22 @@ private fun SecurityInfoCard(
             ) {
                 Text(
                     text = title,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     text = subtitle,
-                    color = Color(0xFFAAB7D3),
+                    color = OnBlackSoft,
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Surface(
-                    color = Color(0xFF24D9A7).copy(alpha = .14f),
+                    color = BlackChip,
                     shape = RoundedCornerShape(10.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.permissions_on_device_badge),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        color = Color(0xFF54E2B5),
+                        color = Lime,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                     )
@@ -271,21 +261,21 @@ private fun PrivacyPolicyCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF0E1935)),
+        colors = CardDefaults.cardColors(containerColor = Black),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                color = Color(0xFF8B5CF6).copy(alpha = .15f),
+                color = BlackChip,
                 shape = CircleShape,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         Icons.Outlined.PrivacyTip,
                         contentDescription = null,
-                        tint = Color(0xFFBA9BFF),
+                        tint = Lime,
                         modifier = Modifier.padding(11.dp).size(28.dp),
                     )
                 }
@@ -296,12 +286,12 @@ private fun PrivacyPolicyCard(
             Column(Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.permissions_privacy_policy_title),
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     text = stringResource(R.string.permissions_privacy_policy_subtitle),
-                    color = Color(0xFFAAB7D3),
+                    color = OnBlackSoft,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -309,7 +299,7 @@ private fun PrivacyPolicyCard(
             Icon(
                 Icons.AutoMirrored.Outlined.ArrowForward,
                 contentDescription = null,
-                tint = Color(0xFFBA9BFF),
+                tint = Lime,
             )
         }
     }

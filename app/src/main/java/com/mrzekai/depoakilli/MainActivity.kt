@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.ads.ConsentManager
@@ -45,6 +46,10 @@ class MainActivity : ComponentActivity() {
     private lateinit var rewardedAds: RewardedAdController
     private var pendingDeepCacheAfterStorageAccess = false
     private var reviewPromptInFlight = false
+
+    /** D5: the once-a-day "turn ads off for 60 minutes" bar after an interstitial. */
+    private var adFreeOfferVisible by androidx.compose.runtime.mutableStateOf(false)
+    private val adFreeOfferStore by lazy { com.mrzekai.depoakilli.ads.AdFreeOfferStore(this) }
 
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -89,10 +94,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // The UI is always dark, so both system bars use light icons on a
-        // transparent bar regardless of the device's light/dark setting.
-        val darkBars = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-        enableEdgeToEdge(statusBarStyle = darkBars, navigationBarStyle = darkBars)
+        // Faz 5: one theme regardless of the device's light/dark setting.
+        // Lime screens use dark status-bar icons; the black bottom menu uses
+        // light navigation icons. Screens adjust them with SystemBarIcons.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+        )
         // Phones stay portrait; tablets, foldables and desktop windows are
         // free to rotate and resize (Play large-screen quality guideline).
         if (resources.configuration.smallestScreenWidthDp < 600) {
@@ -128,6 +136,13 @@ class MainActivity : ComponentActivity() {
                 appOpenAds.setAdsAllowed(canRequestAds && !adFreeActive)
                 rewardedAds.setAdsAllowed(canRequestAds && !adFreeActive)
             }
+            // D5: "Ad-free · N min left" stays current while the window runs.
+            LaunchedEffect(adFreeActive) {
+                while (adFreeActive) {
+                    kotlinx.coroutines.delay(30_000L)
+                    app.adFreeWindow.refresh()
+                }
+            }
 
             DepoAkilliTheme {
                 Box(Modifier.fillMaxSize()) {
@@ -155,6 +170,7 @@ class MainActivity : ComponentActivity() {
                         onCleanupResultDismissed = ::onCleanupResultDismissed,
                         onCleanupSucceeded = ::onCleanupSucceeded,
                         onReturnedToClean = ::onReturnedToClean,
+                        onNaturalBreak = ::onNaturalBreak,
                         onDeepDuplicateCheck = ::runDeepDuplicateCheck,
                         onUninstallApp = ::uninstallApp,
                         onOpenAppInfo = ::openAppInfo,
@@ -165,6 +181,16 @@ class MainActivity : ComponentActivity() {
                         onSendFeedback = ::sendFeedback,
                         onShareApp = ::shareApp,
                     )
+                    if (adFreeOfferVisible && !adFreeActive) {
+                        com.mrzekai.depoakilli.ads.AdFreeOfferBar(
+                            onWatch = {
+                                adFreeOfferVisible = false
+                                showRewardedAd()
+                            },
+                            onTimeout = { adFreeOfferVisible = false },
+                            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter),
+                        )
+                    }
                     if (appOpenCover) AppOpenCover()
                 }
             }
@@ -175,6 +201,9 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
+        // E1: back from Android's uninstall or app settings, the apps section
+        // shows fresh sizes and a removed app's row disappears.
+        cleanerViewModel.refreshInstalledAppsIfAllowed()
         if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
         if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
         val app = application as DepoAkilliApplication
@@ -284,6 +313,12 @@ class MainActivity : ComponentActivity() {
         showPostTaskInterstitial(trigger = InterstitialTrigger.RETURN_TO_CLEAN, dwellMillis = dwellMillis)
     }
 
+    /** Faz 5 triggers: findings opened after a scan, swipe review confirmed. Same AdPolicy limits. */
+    private fun onNaturalBreak(trigger: InterstitialTrigger) {
+        if (reviewPromptInFlight) return
+        showPostTaskInterstitial(trigger = trigger)
+    }
+
     private fun maybeAskForReview() {
         val prefs = getSharedPreferences("review_prompt", MODE_PRIVATE)
         val now = System.currentTimeMillis()
@@ -324,13 +359,15 @@ class MainActivity : ComponentActivity() {
         app.beginInterstitialSurface()
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
             {
+                var adShown = false
                 interstitialAds.showAtNaturalBreak(
                     activity = this,
                     trigger = trigger,
                     dwellMillis = dwellMillis,
-                    onWillShow = {},
+                    onWillShow = { adShown = true },
                     onFinished = {
                         app.endInterstitialSurface()
+                        if (adShown) maybeOfferAdFree()
                         onFinished()
                     },
                 )
@@ -524,6 +561,22 @@ class MainActivity : ComponentActivity() {
             onFinished = { app.endInterstitialSurface() },
             onUnavailable = { cleanerViewModel.runDeepDuplicateCheck() },
         )
+    }
+
+    /** D5: after an interstitial closed, at most once a day, offer the ad-free window. */
+    private fun maybeOfferAdFree() {
+        val app = application as DepoAkilliApplication
+        val today = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.dayOf(System.currentTimeMillis())
+        val offer = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.shouldOffer(
+            lastOfferDay = adFreeOfferStore.lastOfferDay(),
+            today = today,
+            adsAllowed = consentManager.canRequestAds.value,
+            adFreeActive = app.adFreeWindow.isActiveNow(),
+            rewardedReady = rewardedAds.isReady.value,
+        )
+        if (!offer) return
+        adFreeOfferStore.markOffered(today)
+        adFreeOfferVisible = true
     }
 
     private fun showRewardedAd() {

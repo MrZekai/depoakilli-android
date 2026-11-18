@@ -2,18 +2,43 @@ package com.mrzekai.depoakilli.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Forest950 = Color(0xFF040A1C)
-val Forest900 = Color(0xFF091329)
-val Forest800 = Color(0xFF101E3D)
-val Forest700 = Color(0xFF172957)
-val Lime400 = Color(0xFF2BE878)
-val Lime300 = Color(0xFF5BF3A0)
-val Mint100 = Color(0xFFAAB7D3)
-val WhiteSoft = Color(0xFFF7F9FF)
-val Teal500 = Color(0xFF17D8C7)
-val Amber400 = Color(0xFFFFB21A)
-val Red400 = Color(0xFFFF5A67)
-val ElectricBlue = Color(0xFF1787FF)
-val Purple500 = Color(0xFF8A5CFF)
-val WhatsAppGreen = Color(0xFF20CF70)
-val Rose500 = Color(0xFFFF5B9A)
+// ---------------------------------------------------------------------------
+// "Make Room" design language (Faz 5). Lime pages, black cards, one accent.
+// Every text/background pair below is checked for WCAG AA by ContrastTest.
+// ---------------------------------------------------------------------------
+
+/** Page ground (Home, Tools, Trash, Settings, result); accent on black surfaces. */
+val Lime = Color(0xFF2BE878)
+
+/** Main text and icons on Lime. */
+val Ink = Color(0xFF04210F)
+
+/** Secondary text on Lime. */
+val InkSoft = Color(0xFF0B4A25)
+
+/** Cards, bottom menu, bottom sheets and the giant button. */
+val Black = Color(0xFF07090C)
+
+/** Dividers on black surfaces. */
+val BlackLine = Color(0xFF1B2026)
+
+/** Icon ground and the selected-tab pill on black surfaces. */
+val BlackChip = Color(0xFF1F2A22)
+
+/** Main text on black surfaces. */
+val OnBlack = Color(0xFFF7F9FF)
+
+/** Secondary text on black surfaces. */
+val OnBlackSoft = Color(0xFF9AA3B2)
+
+/** Only for deletes that cannot be undone. */
+val Coral = Color(0xFFFF6B5E)
+
+/** Text on Coral. */
+val CoralInk = Color(0xFF2A0703)
+
+/** Ground of the "Ad" label. */
+val AdLabel = Color(0xFFFFB21A)
+
+// Chart colours (Storage analysis only) are defined next to their chart in
+// StorageAnalyzerScreen.kt; no other screen uses colours outside this file.

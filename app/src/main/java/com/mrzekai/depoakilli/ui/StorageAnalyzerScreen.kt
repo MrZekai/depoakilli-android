@@ -1,6 +1,5 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,21 +13,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
-import androidx.compose.material.icons.outlined.MusicNote
-import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,7 +40,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
@@ -51,19 +49,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageTypeStat
+import com.mrzekai.depoakilli.ui.theme.AdLabel
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import kotlin.math.roundToInt
 
-private val AnalyzerBackground = Color(0xFF030A1D)
-private val AnalyzerCard = Color(0xFF0A1937)
-private val AnalyzerCardAlt = Color(0xFF0D2247)
-private val AnalyzerTextSecondary = Color(0xFFAAB9D3)
-private val AnalyzerCyan = Color(0xFF23C7FF)
-private val AnalyzerGreen = Color(0xFF29E39A)
-private val AnalyzerAmber = Color(0xFFFFB548)
+// Faz 5: Lime page and black cards; the per-type chart colours below stay.
+private val AnalyzerBackground = Lime
+private val AnalyzerCard = Black
+private val AnalyzerCardAlt = BlackChip
+private val AnalyzerTextSecondary = OnBlackSoft
+private val AnalyzerCyan = Lime
+private val AnalyzerGreen = Lime
+private val AnalyzerAmber = AdLabel
 
 @Composable
 internal fun StorageAnalyzerScreen(
@@ -72,10 +80,13 @@ internal fun StorageAnalyzerScreen(
     onScan: () -> Unit,
     onReviewType: (StorageFileType) -> Unit,
     modifier: Modifier = Modifier,
+    onRefresh: () -> Unit = onScan,
+    listAd: @Composable () -> Unit = {},
 ) {
     Surface(
         modifier = modifier.fillMaxSize(),
         color = AnalyzerBackground,
+        contentColor = Ink,
     ) {
         when {
             !state.hasAllFilesAccess -> AnalyzerAccessRequired(
@@ -90,8 +101,9 @@ internal fun StorageAnalyzerScreen(
 
             else -> AnalyzerResults(
                 state = state,
-                onScan = onScan,
+                onScan = onRefresh,
                 onReviewType = onReviewType,
+                listAd = listAd,
             )
         }
     }
@@ -134,7 +146,7 @@ private fun AnalyzerAccessRequired(
 
                 Text(
                     text = stringResource(R.string.all_files_access_title),
-                    color = Color.White,
+                    color = OnBlack,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Black,
                 )
@@ -173,23 +185,14 @@ private fun AnalyzerScanning(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.linearGradient(
-                            listOf(
-                                Color(0xFF0B2C72),
-                                Color(0xFF0E5C91),
-                                Color(0xFF0A7D72),
-                            ),
-                        ),
-                    )
                     .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(84.dp),
-                        color = Color.White,
-                        trackColor = Color.White.copy(alpha = .16f),
+                        color = Lime,
+                        trackColor = BlackChip,
                         strokeWidth = 7.dp,
                     )
                     Icon(
@@ -208,13 +211,13 @@ private fun AnalyzerScanning(
                 ) {
                     Text(
                         text = stringResource(R.string.storage_analyzer_title),
-                        color = Color.White,
+                        color = OnBlack,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Black,
                     )
                     Text(
                         text = stringResource(R.string.storage_analyzer_scanning_subtitle),
-                        color = Color.White.copy(alpha = .84f),
+                        color = OnBlack.copy(alpha = .84f),
                     )
                 }
             }
@@ -240,8 +243,8 @@ private fun AnalyzerScanning(
 
         LinearProgressIndicator(
             modifier = Modifier.fillMaxWidth(),
-            color = AnalyzerGreen,
-            trackColor = Color.White.copy(alpha = .08f),
+            color = Ink,
+            trackColor = InkSoft.copy(alpha = .25f),
         )
     }
 }
@@ -283,7 +286,7 @@ private fun AnalyzerEmpty(
 
                 Text(
                     text = stringResource(R.string.storage_analyzer_title),
-                    color = Color.White,
+                    color = OnBlack,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Black,
                 )
@@ -309,6 +312,7 @@ private fun AnalyzerResults(
     state: CleanerUiState,
     onScan: () -> Unit,
     onReviewType: (StorageFileType) -> Unit,
+    listAd: @Composable () -> Unit = {},
 ) {
     val summary = state.summary
     val totalIndexedBytes = summary.scannedBytes.coerceAtLeast(0L)
@@ -334,7 +338,7 @@ private fun AnalyzerResults(
         item {
             Text(
                 text = stringResource(R.string.storage_analyzer_types_title),
-                color = Color.White,
+                color = Ink,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
             )
@@ -356,17 +360,20 @@ private fun AnalyzerResults(
                 }
             }
         } else {
-            items(
-                items = summary.storageTypes,
-                key = { it.type.name },
-                contentType = { "storage_analyzer_type" },
-            ) { stat ->
-                AnalyzerTypeCard(
-                    stat = stat,
-                    totalIndexedBytes = totalIndexedBytes,
-                    previews = summary.storagePreviews[stat.type].orEmpty().take(3),
-                    onReview = { onReviewType(stat.type) },
-                )
+            // B7: one list native after the 2nd type card, in lists of 6 cards or more.
+            val showAd = summary.storageTypes.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
+            summary.storageTypes.forEachIndexed { index, stat ->
+                item(key = stat.type.name, contentType = "storage_analyzer_type") {
+                    AnalyzerTypeCard(
+                        stat = stat,
+                        totalIndexedBytes = totalIndexedBytes,
+                        previews = summary.storagePreviews[stat.type].orEmpty().take(3),
+                        onReview = { onReviewType(stat.type) },
+                    )
+                }
+                if (showAd && index == AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD - 1) {
+                    item(key = "analyzer-list-native") { listAd() }
+                }
             }
         }
 
@@ -374,7 +381,7 @@ private fun AnalyzerResults(
             item {
                 Text(
                     text = stringResource(R.string.scan_limit_note_v050),
-                    color = AnalyzerAmber,
+                    color = Ink,
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -382,7 +389,7 @@ private fun AnalyzerResults(
 
         item {
             Surface(
-                color = Color(0xFF09152D),
+                color = Black,
                 shape = RoundedCornerShape(18.dp),
             ) {
                 Row(
@@ -400,9 +407,9 @@ private fun AnalyzerResults(
                     Spacer(Modifier.width(9.dp))
                     Text(
                         text = stringResource(R.string.storage_analyzer_truth_note),
-                        color = Color(0xFF94A7C8),
+                        color = OnBlackSoft,
                         fontSize = 12.sp,
-                        lineHeight = 14.sp,
+                        lineHeight = 16.sp,
                     )
                 }
             }
@@ -412,13 +419,14 @@ private fun AnalyzerResults(
             TextButton(
                 onClick = onScan,
                 modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(contentColor = Ink),
             ) {
                 Icon(
                     Icons.Outlined.Refresh,
                     contentDescription = null,
                 )
                 Spacer(Modifier.width(7.dp))
-                Text(stringResource(R.string.scan_again))
+                Text(stringResource(R.string.cache_refresh))
             }
         }
     }
@@ -437,27 +445,18 @@ private fun AnalyzerHero(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        listOf(
-                            Color(0xFF0B2B72),
-                            Color(0xFF0B5E8E),
-                            Color(0xFF087B70),
-                        ),
-                    ),
-                )
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
                 text = stringResource(R.string.storage_analyzer_indexed_label),
-                color = Color.White.copy(alpha = .78f),
+                color = OnBlack.copy(alpha = .78f),
                 fontWeight = FontWeight.Bold,
             )
 
             Text(
                 text = ByteFormatter.format(scannedBytes),
-                color = Color.White,
+                color = Lime,
                 fontSize = 36.sp,
                 lineHeight = 39.sp,
                 fontWeight = FontWeight.Black,
@@ -471,7 +470,7 @@ private fun AnalyzerHero(
                     scannedFileCount,
                     ByteFormatter.format(freeBytes),
                 ),
-                color = Color.White.copy(alpha = .86f),
+                color = OnBlack.copy(alpha = .86f),
             )
         }
     }
@@ -514,7 +513,7 @@ private fun AnalyzerMetric(
             Column {
                 Text(
                     text = value,
-                    color = Color.White,
+                    color = OnBlack,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Black,
                 )
@@ -578,7 +577,7 @@ private fun AnalyzerTypeCard(
                 ) {
                     Text(
                         text = stringResource(stat.type.titleRes),
-                        color = Color.White,
+                        color = OnBlack,
                         fontWeight = FontWeight.Black,
                     )
                     Text(
@@ -628,7 +627,7 @@ private fun AnalyzerTypeCard(
                                 Text(
                                     text = file.name,
                                     modifier = Modifier.weight(1f),
-                                    color = Color(0xFFD9E2F5),
+                                    color = OnBlack,
                                     fontSize = 12.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,

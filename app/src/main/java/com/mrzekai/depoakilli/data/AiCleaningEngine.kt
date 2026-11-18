@@ -391,6 +391,7 @@ class AiCleaningEngine(
             CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
             CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT
             CleanupGroup.DOWNLOAD_FILE,
+            CleanupGroup.DOWNLOAD_MEDIA,
             CleanupGroup.DOWNLOAD_DOCUMENT -> CleanCategory.OLD_DOWNLOAD
             CleanupGroup.WHATSAPP_SENT,
             CleanupGroup.WHATSAPP_VIDEO,

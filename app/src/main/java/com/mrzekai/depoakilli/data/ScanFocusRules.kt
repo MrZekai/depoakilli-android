@@ -24,6 +24,10 @@ internal object ScanFocusRules {
         CleanupGroup.LARGE_VIDEO,
         CleanupGroup.OLD_VIDEO,
         CleanupGroup.LARGE_OTHER,
+        // C4: the Downloads tool also holds the APK packages (one tile).
+        CleanupGroup.APK_INSTALLED,
+        CleanupGroup.APK_OLD_VERSION,
+        CleanupGroup.APK_OTHER,
     )
 
     fun matchesFocus(item: CleanableItem, focus: ScanFocus): Boolean =
@@ -35,7 +39,8 @@ internal object ScanFocusRules {
             ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
             ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
             ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
-            ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS
+            ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS ||
+                item.assessment.category == CleanCategory.APK_PACKAGE
             ScanFocus.APKS -> item.assessment.category == CleanCategory.APK_PACKAGE
             ScanFocus.ANALYZE -> false
         }
@@ -90,7 +95,8 @@ internal object ScanFocusRules {
 
             ScanFocus.DOWNLOADS -> {
                 if (!StoragePathRules.isDownloadPath(file.relativePath)) {
-                    null
+                    // C4: APK packages outside Downloads join the Downloads tool.
+                    aiEngine.assess(file)?.takeIf { it.category == CleanCategory.APK_PACKAGE }
                 } else {
                     aiEngine.assessDeep(file)?.takeIf { it.group in DOWNLOAD_TOOL_GROUPS }
                 }

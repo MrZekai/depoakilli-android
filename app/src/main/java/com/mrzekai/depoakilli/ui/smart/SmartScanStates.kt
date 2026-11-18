@@ -1,365 +1,261 @@
 package com.mrzekai.depoakilli.ui.smart
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.InsertDriveFile
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
-import com.mrzekai.depoakilli.ui.*
+import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.ui.CleanerUiState
+import com.mrzekai.depoakilli.ui.common.BlackCard
+import com.mrzekai.depoakilli.ui.common.GiantNumber
+import com.mrzekai.depoakilli.ui.common.IconChip
+import com.mrzekai.depoakilli.ui.common.LimeProgressBar
+import com.mrzekai.depoakilli.ui.common.indexingProgress
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.common.PageLabel
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.rememberGiantScale
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.GiantScale
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
+import java.text.NumberFormat
 
+/** Asks for all-files access before a tool scan can run. */
 @Composable
 internal fun SmartAccessRequired(onRequest: () -> Unit, modifier: Modifier) {
-    Box(
-        modifier.fillMaxSize().background(SmartBackground).padding(22.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Card(
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = SmartCard),
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Icon(Icons.Outlined.Security, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(54.dp))
-                Text(stringResource(R.string.all_files_access_title), color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.all_files_access_clean_screen), color = SmartTextSecondary)
-                Button(onClick = onRequest, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.grant_access))
-                }
+    PageFrame(modifier = modifier) {
+        Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
+            BlackCard(contentPadding = PaddingValues(22.dp)) {
+                IconChip(Icons.Outlined.Security, size = 52.dp)
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    stringResource(R.string.all_files_access_title),
+                    color = OnBlack,
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp,
+                    fontWeight = AppWeights.Title,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.all_files_access_clean_screen), color = OnBlackSoft, fontSize = 15.sp, lineHeight = 21.sp)
+                Spacer(Modifier.height(16.dp))
+                PillButton(text = stringResource(R.string.grant_access), onClick = onRequest, style = PillStyle.LIME)
             }
         }
     }
 }
 
+/** A tool scan in progress: the same "Found so far" look as Home. */
 @Composable
 internal fun SmartScanningState(state: CleanerUiState, onCancel: () -> Unit, modifier: Modifier) {
-    Box(
-        modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF03091B),
-                        Color(0xFF071A4B),
-                        Color(0xFF05142E),
-                    ),
-                ),
-            )
-            .padding(horizontal = 18.dp, vertical = 14.dp),
-    ) {
+    val scale = rememberGiantScale()
+    PageFrame(modifier = modifier) {
         Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Card(
-                shape = RoundedCornerShape(30.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF071B45)),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.linearGradient(
-                                listOf(
-                                    Color(0xFF0A2D87),
-                                    Color(0xFF0B59C9),
-                                    Color(0xFF0B8B86),
-                                ),
-                            ),
-                        )
-                        .padding(20.dp),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(100.dp),
-                                strokeWidth = 8.dp,
-                                color = SmartGreen,
-                                trackColor = Color.White.copy(alpha = .14f),
-                            )
-                            Surface(
-                                color = Color(0xFF071B45).copy(alpha = .84f),
-                                shape = CircleShape,
-                            ) {
-                                Icon(
-                                    Icons.Outlined.CleaningServices,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.padding(18.dp).size(38.dp),
-                                )
-                            }
-                        }
-                        Spacer(Modifier.width(18.dp))
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(7.dp),
-                        ) {
-                            Text(
-                                stringResource(R.string.smart_scan_progress_title),
-                                color = Color.White,
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Black,
-                            )
-                            Text(
-                                stringResource(R.string.smart_scan_progress_subtitle),
-                                color = Color.White.copy(alpha = .86f),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
-                    }
-                }
-            }
-
+            ScanProgressBody(state = state, scale = scale, onCancel = onCancel)
+            Spacer(Modifier.height(14.dp))
             Text(
-                stringResource(R.string.smart_scan_live_title),
-                color = Color.White,
-                fontWeight = FontWeight.Black,
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                ScanMetricCard(
-                    value = state.scanProgressFiles.toString(),
-                    label = stringResource(R.string.smart_scan_files_label),
-                    icon = Icons.Outlined.InsertDriveFile,
-                    modifier = Modifier.weight(1f),
-                )
-                ScanMetricCard(
-                    value = state.scanProgressDirectories.toString(),
-                    label = stringResource(R.string.smart_scan_folders_label),
-                    icon = Icons.Outlined.Folder,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            Card(
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = SmartCard),
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        stringResource(R.string.smart_scan_checking_title),
-                        color = Color.White,
-                        fontWeight = FontWeight.Black,
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        ScanStagePill(
-                            title = stringResource(CleanCategory.JUNK.titleRes),
-                            accent = Color(0xFF35BFFF),
-                            modifier = Modifier.weight(1f),
-                        )
-                        ScanStagePill(
-                            title = stringResource(CleanCategory.DUPLICATE.titleRes),
-                            accent = Color(0xFF9A63FF),
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        ScanStagePill(
-                            title = stringResource(CleanCategory.LARGE_FILE.titleRes),
-                            accent = Color(0xFFFFB02E),
-                            modifier = Modifier.weight(1f),
-                        )
-                        ScanStagePill(
-                            title = stringResource(CleanCategory.APK_PACKAGE.titleRes),
-                            accent = Color(0xFF6ADE48),
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    ScanStagePill(
-                        title = stringResource(R.string.smart_scan_media_stage),
-                        accent = Color(0xFF31E0D0),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-            }
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFF09224E),
-                shape = RoundedCornerShape(18.dp),
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Outlined.Security, contentDescription = null, tint = SmartGreen, modifier = Modifier.size(22.dp))
-                    Spacer(Modifier.width(9.dp))
-                    Text(
-                        stringResource(R.string.scan_private),
-                        color = Color.White.copy(alpha = .90f),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            }
-
-            if (state.scanHashing) {
-                Text(
-                    stringResource(R.string.scan_stage_exact_copies),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
-                val total = state.scanHashTotalBytes
-                if (total > 0L) {
-                    LinearProgressIndicator(
-                        progress = { (state.scanHashDoneBytes.toFloat() / total.toFloat()).coerceIn(0f, 1f) },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = SmartGreen,
-                    )
-                } else {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = SmartGreen)
-                }
-            }
-
-            OutlinedButton(
-                onClick = onCancel,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-            ) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    }
-}
-
-@Composable
-internal fun ScanMetricCard(
-    value: String,
-    label: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        modifier = modifier.heightIn(min = 100.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = SmartCard),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Icon(icon, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(22.dp))
-            Column {
-                Text(value, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
-                Text(label, color = SmartTextSecondary, fontSize = 12.sp)
-            }
-        }
-    }
-}
-
-@Composable
-internal fun ScanStagePill(
-    title: String,
-    accent: Color,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier,
-        color = accent.copy(alpha = .13f),
-        shape = RoundedCornerShape(15.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, accent.copy(alpha = .45f)),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 11.dp, vertical = 9.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(accent),
-            )
-            Spacer(Modifier.width(7.dp))
-            Text(
-                title,
-                color = Color.White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
+                stringResource(R.string.scan_private),
+                color = InkSoft,
+                fontSize = 14.sp,
+                fontWeight = AppWeights.Strong,
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
 
+/** No scan yet on a results screen: one card and "Start scan". */
 @Composable
 internal fun SmartEmptyState(onScan: () -> Unit, modifier: Modifier) {
-    Box(
-        modifier.fillMaxSize().background(SmartBackground).padding(22.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Card(
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(containerColor = SmartCard),
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Icon(Icons.Outlined.AutoAwesome, contentDescription = null, tint = SmartCyan, modifier = Modifier.size(56.dp))
-                Text(stringResource(R.string.smart_clean_results_title), color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.smart_clean_results_empty_intro), color = SmartTextSecondary)
-                Button(onClick = onScan, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.start_scan)) }
+    PageFrame(modifier = modifier) {
+        Box(Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
+            BlackCard(contentPadding = PaddingValues(22.dp)) {
+                IconChip(Icons.Outlined.AutoAwesome, size = 52.dp)
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    stringResource(R.string.smart_clean_results_title),
+                    color = OnBlack,
+                    fontSize = 22.sp,
+                    fontWeight = AppWeights.Title,
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.smart_clean_results_empty_intro), color = OnBlackSoft, fontSize = 15.sp, lineHeight = 21.sp)
+                Spacer(Modifier.height(16.dp))
+                PillButton(text = stringResource(R.string.start_scan), onClick = onScan, style = PillStyle.LIME)
             }
         }
     }
 }
+
+/** Status of one line of the scan card. */
+private enum class StageStatus { WAITING, RUNNING, DONE }
+
+/**
+ * "Found so far" (T5.1 scanning look, also used by the tool scans): the
+ * measured bytes of the files classified so far (never animated up), which
+ * group is running, and Cancel.
+ */
+@Composable
+internal fun ScanProgressBody(
+    state: CleanerUiState,
+    scale: GiantScale,
+    onCancel: () -> Unit,
+) {
+    val found = state.scanFoundByCategory
+    val foundBytes = found?.values?.sum() ?: 0L
+    val indexing = found == null
+    // B5: the category stages belong to the Smart (and Deep) scan only; a tool
+    // scan shows how many files are being checked and a progress bar.
+    val smartScan = state.scanFocus == ScanFocus.SMART || state.scanFocus == ScanFocus.DEEP
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(Modifier.height(8.dp))
+        if (smartScan && foundBytes > 0L) {
+            PageLabel(stringResource(R.string.home_scan_label), strong = true)
+            GiantNumber(ByteFormatter.format(foundBytes), scale, modifier = Modifier.fillMaxWidth())
+            PageLabel(
+                if (state.scanHashing) {
+                    stringResource(R.string.scan_stage_exact_copies)
+                } else {
+                    stringResource(
+                        R.string.home_scan_now,
+                        pluralStringResource(R.plurals.home_scan_files_count, state.scanProgressFiles, state.scanProgressFiles),
+                    )
+                },
+            )
+        } else {
+            // Never a giant "0 B" (B5): until something is found, the files being checked are the news.
+            Text(
+                if (state.scanHashing) {
+                    stringResource(R.string.scan_stage_exact_copies)
+                } else {
+                    pluralStringResource(R.plurals.scan_files_checking, state.scanProgressFiles, state.scanProgressFiles)
+                },
+                color = Ink,
+                fontSize = 28.sp,
+                lineHeight = 34.sp,
+                fontWeight = AppWeights.Title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Spacer(Modifier.height(16.dp))
+            LimeProgressBar(
+                progress = indexingProgress(state.scanProgressFiles, ceiling = 0.9f),
+                color = Ink,
+                trackColor = InkSoft.copy(alpha = .25f),
+            )
+        }
+    }
+    if (!smartScan) {
+        Spacer(Modifier.height(24.dp))
+        PillButton(
+            text = stringResource(R.string.cancel),
+            onClick = onCancel,
+            style = PillStyle.INK_OUTLINE,
+        )
+        return
+    }
+    Spacer(Modifier.height(18.dp))
+    BlackCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            ScanStageLine(
+                title = stringResource(R.string.smart_scan_files_label),
+                value = NumberFormat.getIntegerInstance(LocalConfiguration.current.locales[0]).format(state.scanProgressFiles),
+                status = if (indexing) StageStatus.RUNNING else StageStatus.DONE,
+            )
+            val shown = if (found == null) {
+                listOf(CleanCategory.JUNK, CleanCategory.LARGE_FILE, CleanCategory.OLD_DOWNLOAD, CleanCategory.APK_PACKAGE)
+                    .map { it to null }
+            } else {
+                found.filterKeys { it != CleanCategory.DUPLICATE }
+                    .filterValues { it > 0L }
+                    .entries
+                    .sortedByDescending { it.value }
+                    .map { it.key to it.value }
+            }
+            shown.forEach { (category, bytes) ->
+                ScanStageLine(
+                    title = stringResource(category.titleRes),
+                    value = bytes?.let(ByteFormatter::format),
+                    status = if (bytes == null) StageStatus.WAITING else StageStatus.DONE,
+                )
+            }
+            ScanStageLine(
+                title = stringResource(CleanCategory.DUPLICATE.titleRes),
+                value = null,
+                status = if (state.scanHashing) StageStatus.RUNNING else StageStatus.WAITING,
+            )
+            val hashTotal = state.scanHashTotalBytes
+            when {
+                indexing -> LimeProgressBar(progress = indexingProgress(state.scanProgressFiles))
+                state.scanHashing && hashTotal > 0L -> LimeProgressBar(
+                    progress = 0.5f + 0.5f * (state.scanHashDoneBytes.toFloat() / hashTotal.toFloat()),
+                )
+                else -> LimeProgressBar(progress = 0.5f)
+            }
+        }
+    }
+    Spacer(Modifier.height(18.dp))
+    PillButton(
+        text = stringResource(R.string.cancel),
+        onClick = onCancel,
+        style = PillStyle.INK_OUTLINE,
+    )
+}
+
+@Composable
+private fun ScanStageLine(title: String, value: String?, status: StageStatus) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        when (status) {
+            StageStatus.DONE -> Icon(Icons.Outlined.Check, contentDescription = null, tint = Lime, modifier = Modifier.size(20.dp))
+            StageStatus.RUNNING -> CircularProgressIndicator(color = Lime, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+            StageStatus.WAITING -> Text("•", color = OnBlackSoft, fontSize = 20.sp, modifier = Modifier.size(20.dp), textAlign = TextAlign.Center)
+        }
+        Text(
+            title,
+            color = if (status == StageStatus.WAITING) OnBlackSoft else OnBlack,
+            fontWeight = AppWeights.Strong,
+            fontSize = 15.sp,
+            modifier = Modifier.weight(1f).padding(start = 12.dp),
+        )
+        if (value != null) Text(value, color = Lime, fontWeight = AppWeights.Giant, fontSize = 15.sp)
+    }
+}
+

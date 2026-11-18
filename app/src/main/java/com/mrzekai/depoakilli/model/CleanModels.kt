@@ -24,6 +24,10 @@ enum class DeleteMode { PERMANENT, TRASH }
 /**
  * Rows of the cleanup plan. Auto groups are preselected; Review groups are
  * listed for the user to decide. Nothing is deleted without confirmation.
+ *
+ * Faz 5B: installers and exact copies go to Trash (restorable for 7 days);
+ * only what the system or apps recreate (thumbnails, temporary files) and
+ * files already in another app's trash are deleted for good.
  */
 enum class CleanupGroup(
     @StringRes val titleRes: Int,
@@ -33,8 +37,8 @@ enum class CleanupGroup(
     val deleteMode: DeleteMode,
     val groupSelectable: Boolean = true,
 ) {
-    APK_INSTALLED(R.string.plan_group_apk_installed, R.string.reason_apk_installed, null, true, DeleteMode.PERMANENT),
-    DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.PERMANENT),
+    APK_INSTALLED(R.string.plan_group_apk_installed, R.string.reason_apk_installed, null, true, DeleteMode.TRASH),
+    DUPLICATE_SAFE(R.string.plan_group_duplicate_safe, R.string.reason_exact_duplicate, null, true, DeleteMode.TRASH),
     THUMBNAILS(R.string.plan_group_thumbnails, 0, R.plurals.reason_thumbnail_cache, true, DeleteMode.PERMANENT),
     TEMP_FILES(R.string.plan_group_temp_files, 0, R.plurals.reason_temporary_file, true, DeleteMode.PERMANENT),
     SYSTEM_TRASH(R.string.plan_group_system_trash, R.string.reason_system_trash, null, false, DeleteMode.PERMANENT),
@@ -50,6 +54,13 @@ enum class CleanupGroup(
     SCREENSHOT(R.string.plan_group_screenshot, 0, R.plurals.reason_old_screenshot, false, DeleteMode.TRASH),
     OTHER_APP_MEDIA(R.string.plan_group_other_app_media, 0, R.plurals.reason_other_app_media, false, DeleteMode.TRASH, groupSelectable = false),
     DOWNLOAD_FILE(R.string.plan_group_download_file, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
+
+    /**
+     * Faz 5D (D3): a findings row only — videos, music and photos of
+     * DOWNLOAD_FILE are the user's own and are asked about, never suggested.
+     * The engine never assigns it to a file.
+     */
+    DOWNLOAD_MEDIA(R.string.plan_group_download_media, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH),
     DOWNLOAD_DOCUMENT(R.string.plan_group_download_document, 0, R.plurals.reason_old_download, false, DeleteMode.TRASH, groupSelectable = false),
     LARGE_OTHER(R.string.plan_group_large_other, 0, R.plurals.reason_large_file, false, DeleteMode.TRASH),
     WHATSAPP_SENT(R.string.plan_group_whatsapp_sent, 0, R.plurals.reason_whatsapp_sent, false, DeleteMode.TRASH),
@@ -62,7 +73,28 @@ enum class CleanupGroup(
     WHATSAPP_DOCUMENT(R.string.plan_group_whatsapp_document, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH, groupSelectable = false),
     ;
 
+    /** Tier 2 ("My pick", Faz 5C); see [SUGGESTED]. */
+    val suggested: Boolean get() = this in SUGGESTED
+
     companion object {
+        /**
+         * Faz 5C tier 2 ("My pick"): groups that are very likely not needed and
+         * are not personal memories. Their files are suggested together, with
+         * one confirmation, and always go to Trash. Camera files never join.
+         */
+        val SUGGESTED: Set<CleanupGroup> by lazy {
+            setOf(
+                DOWNLOAD_FILE,
+                DOWNLOAD_DOCUMENT,
+                APK_OLD_VERSION,
+                APK_OTHER,
+                WHATSAPP_SENT,
+                WHATSAPP_STATUS,
+                SCREENSHOT,
+                DUPLICATE_PERSONAL,
+            )
+        }
+
         /** Fallback used by tool screens that build assessments without the plan engine. */
         fun fromCategory(category: CleanCategory): CleanupGroup = when (category) {
             CleanCategory.JUNK -> TEMP_FILES
@@ -182,6 +214,8 @@ data class CleanableItem(
     val selected: Boolean = true,
     val protectedDuplicateName: String? = null,
     val protectedDuplicateUri: String? = null,
+    /** Faz 5D (D1): the full check showed this look-alike is not a copy; it is never selected for the user. */
+    val verifiedDifferent: Boolean = false,
     val protectedDuplicateSizeBytes: Long? = null,
     val volumeRoot: String = "",
     val protectedDuplicateRelativePath: String? = null,
@@ -298,6 +332,8 @@ data class ScanSummary(
     val biggestFolders: List<FolderSize> = emptyList(),
     /** Review files hidden because the user chose to keep them (V10). */
     val hiddenKeptCount: Int = 0,
+    /** The tool scan reused the cached storage index, so the user did not wait for it (B7). */
+    val fromCachedIndex: Boolean = false,
 ) {
     /** Cleanup plan derived from [items]; always reflects the current selection. */
     val plan: CleanupPlan by lazy(LazyThreadSafetyMode.NONE) { buildPlan(items, truncated) }

@@ -7,24 +7,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,12 +29,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ui.common.bidiWrap
-import com.mrzekai.depoakilli.data.CleaningThresholds
+import com.mrzekai.depoakilli.ui.common.DeleteSplit
+import com.mrzekai.depoakilli.ui.common.DeleteSplitLines
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.DeleteMode
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.bidiWrap
+import com.mrzekai.depoakilli.ui.theme.AdLabel
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackLine
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 /**
  * The single confirmation before cleaning (T1.7): every selected file is
@@ -58,7 +63,6 @@ internal fun SelectedItemsPreviewSheet(
     val trashBytes = items.filter { it.assessment.group.deleteMode == DeleteMode.TRASH }
         .sumOf(CleanableItem::sizeBytes)
     val hasWhatsApp = items.any { StoragePathRules.isWhatsAppPath(it.relativePath) }
-    val days = CleaningThresholds.TRASH_RETENTION_DAYS
     val groups = items.groupBy { it.assessment.group }.entries.sortedByDescending { (_, list) ->
         list.sumOf(CleanableItem::sizeBytes)
     }
@@ -66,7 +70,9 @@ internal fun SelectedItemsPreviewSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color(0xFF071634),
+        shape = com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Sheet,
+        containerColor = Black,
+        contentColor = OnBlack,
     ) {
         Column(
             modifier = Modifier
@@ -77,7 +83,7 @@ internal fun SelectedItemsPreviewSheet(
         ) {
             Text(
                 stringResource(R.string.plan_preview_title),
-                color = Color.White,
+                color = OnBlack,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Black,
             )
@@ -85,7 +91,7 @@ internal fun SelectedItemsPreviewSheet(
                 Row(Modifier.fillMaxWidth()) {
                     Text(
                         stringResource(group.titleRes),
-                        color = Color.White,
+                        color = OnBlack,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -97,12 +103,12 @@ internal fun SelectedItemsPreviewSheet(
                             groupItems.size,
                             ByteFormatter.format(groupItems.sumOf(CleanableItem::sizeBytes)),
                         ),
-                        color = PlanTextSecondary,
+                        color = OnBlackSoft,
                         fontSize = 13.sp,
                     )
                 }
             }
-            HorizontalDivider(color = Color.White.copy(alpha = .1f))
+            HorizontalDivider(color = BlackLine)
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -116,7 +122,7 @@ internal fun SelectedItemsPreviewSheet(
                         Column(Modifier.weight(1f)) {
                             Text(
                                 item.name,
-                                color = Color.White,
+                                color = OnBlack,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
@@ -126,7 +132,7 @@ internal fun SelectedItemsPreviewSheet(
                                     bidiWrap(item.relativePath.ifBlank { "/" }),
                                     ByteFormatter.format(item.sizeBytes),
                                 ),
-                                color = PlanTextSecondary,
+                                color = OnBlackSoft,
                                 fontSize = 12.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -136,55 +142,45 @@ internal fun SelectedItemsPreviewSheet(
                             Icon(
                                 Icons.Outlined.Close,
                                 contentDescription = stringResource(R.string.plan_preview_remove),
-                                tint = PlanTextSecondary,
+                                tint = OnBlackSoft,
                             )
                         }
                     }
                 }
             }
-            HorizontalDivider(color = Color.White.copy(alpha = .1f))
-            Text(
-                pluralStringResource(
-                    R.plurals.plan_preview_summary,
-                    days,
-                    ByteFormatter.format(permanentBytes),
-                    ByteFormatter.format(trashBytes),
-                    days,
-                ),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-            )
+            HorizontalDivider(color = BlackLine)
+            // B1: only the parts that exist, each with its own promise.
+            DeleteSplitLines(DeleteSplit(trashBytes = trashBytes, permanentBytes = permanentBytes))
             if (hasWhatsApp) {
-                Text(stringResource(R.string.plan_preview_whatsapp), color = Color(0xFFFFC46B), fontSize = 13.sp)
+                Text(stringResource(R.string.plan_preview_whatsapp), color = AdLabel, fontSize = 13.sp)
             }
             val cameraCount = items.count { StoragePathRules.isCameraPath(it.relativePath) }
             if (cameraCount > 0) {
                 Text(
                     pluralStringResource(R.plurals.plan_preview_camera, cameraCount, cameraCount),
-                    color = Color(0xFFFFC46B),
+                    color = AdLabel,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                 )
             }
-            Text(stringResource(R.string.plan_preview_cloud), color = PlanTextSecondary, fontSize = 13.sp)
+            Text(stringResource(R.string.plan_preview_cloud), color = OnBlackSoft, fontSize = 13.sp)
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                OutlinedButton(
+                PillButton(
+                    text = stringResource(R.string.cancel),
                     onClick = onDismiss,
-                    modifier = Modifier.weight(1f).heightIn(min = 52.dp),
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-                Button(
+                    style = PillStyle.LIME_OUTLINE,
+                    modifier = Modifier.weight(1f),
+                )
+                PillButton(
+                    text = stringResource(R.string.plan_preview_clean),
                     onClick = { onConfirm(items.mapTo(linkedSetOf(), CleanableItem::id)) },
+                    style = PillStyle.LIME,
                     enabled = items.isNotEmpty(),
-                    modifier = Modifier.weight(1f).heightIn(min = 52.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PlanAccent, contentColor = PlanButtonText),
-                ) {
-                    Text(stringResource(R.string.plan_preview_clean), fontWeight = FontWeight.Black)
-                }
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }

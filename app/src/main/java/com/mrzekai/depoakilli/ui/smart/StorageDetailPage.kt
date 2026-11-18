@@ -23,9 +23,6 @@ import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -44,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
@@ -62,8 +58,14 @@ import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmEntry
 import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.common.SelectionBar
 import com.mrzekai.depoakilli.ui.media.rememberThumbnail
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 @Composable
 internal fun StorageDetailPage(
@@ -91,9 +93,7 @@ internal fun StorageDetailPage(
         modifier = modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF02081A), Color(0xFF061633), Color(0xFF030A1E)),
-                ),
+                SmartBackground,
             ),
     ) {
         Card(
@@ -130,7 +130,7 @@ internal fun StorageDetailPage(
                                     ByteFormatter.format(review.totalBytes),
                                 )
                             },
-                            color = Color.White,
+                            color = OnBlack,
                             fontWeight = FontWeight.Black,
                         )
                         Text(
@@ -146,7 +146,7 @@ internal fun StorageDetailPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFF102850))
+                            .background(SmartCardAlt)
                             .padding(horizontal = 12.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -162,7 +162,7 @@ internal fun StorageDetailPage(
                                 progressFiles,
                                 progressDirectories,
                             ),
-                            color = Color.White,
+                            color = OnBlack,
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
@@ -172,7 +172,7 @@ internal fun StorageDetailPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFF102850))
+                            .background(SmartCardAlt)
                             .clickable { onToggleAll() }
                             .padding(horizontal = 10.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -181,16 +181,16 @@ internal fun StorageDetailPage(
                             state = selectionState,
                             onClick = onToggleAll,
                             colors = CheckboxDefaults.colors(
-                                checkedColor = ElectricBlue,
-                                uncheckedColor = Color(0xFFA7B8D6),
-                                checkmarkColor = Color.White,
+                                checkedColor = Lime,
+                                uncheckedColor = OnBlackSoft,
+                                checkmarkColor = Ink,
                             ),
                         )
                         Spacer(Modifier.width(5.dp))
                         Column(Modifier.weight(1f)) {
                             Text(
                                 stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
-                                color = Color.White,
+                                color = OnBlack,
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
@@ -216,7 +216,7 @@ internal fun StorageDetailPage(
                 ) {
                     Text(
                         stringResource(R.string.storage_review_loading_hint),
-                        color = SmartTextSecondary,
+                        color = InkSoft,
                     )
                 }
             }
@@ -228,7 +228,7 @@ internal fun StorageDetailPage(
                 ) {
                     Text(
                         stringResource(R.string.smart_storage_preview_empty),
-                        color = SmartTextSecondary,
+                        color = InkSoft,
                     )
                 }
             }
@@ -273,7 +273,7 @@ internal fun StorageDetailPage(
         if (review.scanLimitReached) {
             Text(
                 stringResource(R.string.storage_review_limit_note),
-                color = Color(0xFFFFB45B),
+                color = Ink,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 4.dp),
             )
@@ -293,6 +293,7 @@ internal fun StorageDetailPage(
             entries = selectedItems.map { DeleteConfirmEntry(it.file.name, it.file.relativePath) },
             trashBytes = selectedItems.sumOf { it.file.sizeBytes },
             permanentBytes = 0L,
+            groupNames = listOf(stringResource(type.titleRes)),
             onDismiss = { confirmCleanup = false },
             onConfirm = {
                 confirmCleanup = false
@@ -323,7 +324,7 @@ internal fun StorageReviewGridItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(126.dp)
-                    .background(Color(0xFF091A3B)),
+                    .background(SmartCardAlt),
                 contentAlignment = Alignment.Center,
             ) {
                 if (bitmap != null) {
@@ -342,8 +343,8 @@ internal fun StorageReviewGridItem(
                     )
                 }
                 if (file.mimeType.startsWith("video/")) {
-                    Surface(color = Color(0xCC06132F), shape = CircleShape) {
-                        Text("▶", color = Color.White, fontSize = 20.sp, modifier = Modifier.padding(8.dp))
+                    Surface(color = Black.copy(alpha = .8f), shape = CircleShape) {
+                        Text("▶", color = OnBlack, fontSize = 20.sp, modifier = Modifier.padding(8.dp))
                     }
                 }
                 Checkbox(
@@ -351,19 +352,19 @@ internal fun StorageReviewGridItem(
                     onCheckedChange = { onToggle() },
                     modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
                     colors = CheckboxDefaults.colors(
-                        checkedColor = ElectricBlue,
-                        uncheckedColor = Color.White,
-                        checkmarkColor = Color.White,
+                        checkedColor = Lime,
+                        uncheckedColor = OnBlack,
+                        checkmarkColor = Ink,
                     ),
                 )
                 Surface(
                     modifier = Modifier.align(Alignment.BottomStart).padding(7.dp),
-                    color = Color(0xD9030B20),
+                    color = Black.copy(alpha = .85f),
                     shape = RoundedCornerShape(10.dp),
                 ) {
                     Text(
                         ByteFormatter.format(file.sizeBytes),
-                        color = Color.White,
+                        color = OnBlack,
                         fontWeight = FontWeight.Black,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
@@ -376,7 +377,7 @@ internal fun StorageReviewGridItem(
             ) {
                 Text(
                     file.name,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -384,14 +385,14 @@ internal fun StorageReviewGridItem(
                 )
                 Text(
                     compactRelativePath(file.relativePath),
-                    color = Color(0xFF9FB4D7),
+                    color = OnBlackSoft,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 12.sp,
                 )
                 Text(
                     stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
-                    color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
+                    color = if (item.selected) Lime else OnBlackSoft,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -432,7 +433,7 @@ internal fun StorageReviewListItem(
             Column(Modifier.weight(1f)) {
                 Text(
                     file.name,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -455,9 +456,9 @@ internal fun StorageReviewListItem(
                 checked = item.selected,
                 onCheckedChange = { onToggle() },
                 colors = CheckboxDefaults.colors(
-                    checkedColor = ElectricBlue,
-                    uncheckedColor = Color(0xFFA7B8D6),
-                    checkmarkColor = Color.White,
+                    checkedColor = Lime,
+                    uncheckedColor = OnBlackSoft,
+                    checkmarkColor = Ink,
                 ),
             )
         }
@@ -472,49 +473,11 @@ internal fun ReviewCleanupFooter(
     inProgress: Boolean,
     onClick: () -> Unit,
 ) {
-    Surface(
-        color = Color(0xFF030B20),
-        shadowElevation = 16.dp,
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Column(Modifier.weight(.42f)) {
-                Text(
-                    stringResource(R.string.smart_detail_selected_label),
-                    color = SmartTextSecondary,
-                    fontSize = 12.sp,
-                )
-                Text(
-                    "$selectedCount • ${ByteFormatter.format(selectedBytes)}",
-                    color = if (selectedCount > 0) SmartGreen else Color(0xFF8193B0),
-                    fontWeight = FontWeight.Black,
-                    fontSize = 17.sp,
-                )
-                if (selectedCount == 0) {
-                    Text(
-                        stringResource(R.string.nothing_selected_hint),
-                        color = SmartTextSecondary,
-                        fontSize = 12.sp,
-                    )
-                }
-            }
-            Button(
-                onClick = onClick,
-                enabled = enabled,
-                modifier = Modifier.weight(.58f).heightIn(min = 54.dp),
-                shape = RoundedCornerShape(20.dp),
-            ) {
-                Icon(Icons.Outlined.CleaningServices, contentDescription = null)
-                Spacer(Modifier.width(7.dp))
-                Text(
-                    stringResource(if (inProgress) R.string.smart_cleanup_in_progress else R.string.smart_review_and_clean),
-                    fontWeight = FontWeight.Black,
-                    maxLines = 1,
-                )
-            }
-        }
-    }
+    SelectionBar(
+        selectedCount = selectedCount,
+        selectedBytes = selectedBytes,
+        enabled = enabled,
+        busy = inProgress,
+        onMoveToTrash = onClick,
+    )
 }

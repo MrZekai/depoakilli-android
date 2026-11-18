@@ -95,6 +95,13 @@ data class CleanerUiState(
     val scanHashing: Boolean = false,
     val scanHashDoneBytes: Long = 0L,
     val scanHashTotalBytes: Long = 0L,
+    /**
+     * Measured bytes per category once the files are classified (Faz 5 Home
+     * "Found so far"); null until then. Exact duplicates arrive with the result.
+     */
+    val scanFoundByCategory: Map<CleanCategory, Long>? = null,
+    /** The last finished scan reused the cached index (no wait, so no natural break; B7). */
+    val lastScanFromCache: Boolean = false,
     /** The Smart plan, kept while a tool scan temporarily owns [summary]. */
     val planSummary: ScanSummary? = null,
     /** When the current Smart plan finished scanning (elapsed realtime), 0 when none. */
@@ -107,6 +114,8 @@ data class CleanerUiState(
     val smartCategoryReviewGroup: CleanupGroup? = null,
     /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
     val deepCheckRunning: Boolean = false,
+    /** D1: "Select all" on look-alikes is running its full check (percent), else null. */
+    val verifySelectPercent: Int? = null,
     /** Items that could not go to Trash; the user may delete them permanently. */
     val trashFallback: TrashFallback? = null,
     /** Files kept in the swipe review (V10). */

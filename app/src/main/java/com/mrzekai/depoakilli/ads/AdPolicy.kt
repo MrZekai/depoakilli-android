@@ -15,8 +15,13 @@ data class AdFrequencyState(
     val cleanupsCompleted: Int = 0,
 )
 
-/** (a) result closed with Done (also after swipe review); (b) back from a tool screen. */
-enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN }
+/**
+ * (a) result closed with Done; (b) back from a tool screen; (c) a finished
+ * scan opens the findings list; (d) the swipe review is confirmed (the ad
+ * shows while the files move, before the result). Every trigger uses the
+ * same limits below.
+ */
+enum class InterstitialTrigger { CLEANUP_DONE, RETURN_TO_CLEAN, OPEN_FINDINGS, SWIPE_FINISHED, TOOL_RESULT }
 
 /**
  * Every ad limit lives here (starting values; easy to tighten). Ads are only
@@ -32,9 +37,22 @@ object AdPolicy {
     const val INTERSTITIAL_MAX_PER_DAY = 8
     const val FULLSCREEN_GAP_SEC = 60L
     const val NATIVE_LIST_MIN_ROWS = 6
-    /** Clean tab: the list native ad follows the 4th "Worth a look" row. */
-    const val NATIVE_LIST_AFTER_REVIEW_ROW = 4
+    /**
+     * Faz 5C (C5): every list native is the small, row-sized card and follows
+     * the 3rd row; the large native with media stays on the result screen.
+     */
+    const val NATIVE_LIST_AFTER_ROW = 3
+
+    /** Tool, app and cache lists (lists of [NATIVE_LIST_MIN_ROWS] rows or more). */
+    const val NATIVE_LIST_AFTER_REVIEW_ROW = NATIVE_LIST_AFTER_ROW
+
+    /** Findings list: after the 3rd row when there are at least 4 rows. */
+    const val NATIVE_FINDINGS_AFTER_ROW = NATIVE_LIST_AFTER_ROW
+    const val NATIVE_FINDINGS_MIN_ROWS = 4
     const val SWIPE_BREAK_EVERY = 8
+
+    /** Faz 5B: card lists (WhatsApp categories, Storage Analyzer types) get the native after the 2nd card. */
+    const val NATIVE_GROUP_LIST_AFTER_CARD = 2
     const val RETURN_TO_CLEAN_MIN_DWELL_SEC = 20L
 
     fun dayOf(nowMillis: Long, zone: TimeZone = TimeZone.getDefault()): Long =

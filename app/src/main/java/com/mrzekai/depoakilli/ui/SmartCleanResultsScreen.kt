@@ -1,11 +1,9 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -14,36 +12,41 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.AppPlan
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
+import com.mrzekai.depoakilli.model.PlanFigures
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewSummary
+import com.mrzekai.depoakilli.model.swipeItemsFor
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
 import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import com.mrzekai.depoakilli.ui.smart.*
-import com.mrzekai.depoakilli.ui.smart.PlanBottomBar
-import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
+import com.mrzekai.depoakilli.ui.smart.PLAN_APPS_KEY
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
 
-internal val SmartBackground = Color(0xFF030B20)
-internal val SmartCard = Color(0xFF0A1C42)
-internal val SmartCardAlt = Color(0xFF0D2450)
-internal val SmartTextSecondary = Color(0xFFB4C4DF)
-internal val SmartCyan = Color(0xFF16C7FF)
-internal val SmartGreen = Color(0xFF28E58A)
+/** Faz 5 palette for the smart screens: Lime page, black cards, Lime accent. */
+internal val SmartBackground = com.mrzekai.depoakilli.ui.theme.Lime
+internal val SmartCard = com.mrzekai.depoakilli.ui.theme.Black
+internal val SmartCardAlt = com.mrzekai.depoakilli.ui.theme.BlackChip
+internal val SmartTextSecondary = com.mrzekai.depoakilli.ui.theme.OnBlackSoft
+internal val SmartCyan = com.mrzekai.depoakilli.ui.theme.Lime
+internal val SmartGreen = com.mrzekai.depoakilli.ui.theme.Lime
 
 internal data class SmartPreviewFile(
     val uri: String,
@@ -118,13 +121,19 @@ internal fun SmartCleanResultsScreen(
     onOpenFolder: (FolderSize) -> Unit = {},
     onOpenAppInfo: (String) -> Unit = {},
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit = { _, _ -> },
+    onCloseSwipe: () -> Unit = {},
+    autoOpenSuggestion: Boolean = false,
+    onSuggestionOpened: () -> Unit = {},
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
+    scrollToApps: Boolean = false,
+    onScrolledToApps: () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
     if (swipe != null && state.hasAllFilesAccess && !state.scanning) {
         SwipeReviewScreen(
             review = swipe,
-            items = state.summary.items.filter { it.assessment.group == swipeGroup },
+            items = swipeItemsFor(swipeGroup, state.summary.items),
             onMark = onSwipeMark,
             onUndo = onSwipeUndo,
             onContinue = onSwipeContinue,
@@ -135,6 +144,8 @@ internal fun SmartCleanResultsScreen(
                 onSwipeFinished()
             },
             modifier = modifier,
+            groupTitle = stringResource(swipeGroup.titleRes),
+            onClose = onCloseSwipe,
             breakCardContent = listAd,
         )
         return
@@ -185,6 +196,13 @@ internal fun SmartCleanResultsScreen(
             onOpenFolder = onOpenFolder,
             onOpenAppInfo = onOpenAppInfo,
             onExcludeFolder = onExcludeFolder,
+            sharedFigures = state.planFigures(),
+            autoOpenSuggestion = autoOpenSuggestion,
+            onSuggestionOpened = onSuggestionOpened,
+            onVerifyAndSelect = onVerifyAndSelect,
+            verifySelectPercent = state.verifySelectPercent,
+            scrollToApps = scrollToApps,
+            onScrolledToApps = onScrolledToApps,
         )
     }
 }
@@ -228,8 +246,14 @@ internal fun SmartResultsContent(
     onOpenFolder: (FolderSize) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit,
+    sharedFigures: PlanFigures? = null,
+    autoOpenSuggestion: Boolean = false,
+    onSuggestionOpened: () -> Unit = {},
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
+    verifySelectPercent: Int? = null,
+    scrollToApps: Boolean = false,
+    onScrolledToApps: () -> Unit = {},
 ) {
-    var showPreviewSheet by remember { mutableStateOf(false) }
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
     var showUnusedAppsReview by remember { mutableStateOf(false) }
@@ -253,9 +277,16 @@ internal fun SmartResultsContent(
             items = reviewItems,
             cleanupInProgress = cleanupInProgress,
             onToggleCategory = {
-                val ids = reviewItems.mapTo(linkedSetOf(), CleanableItem::id)
-                onSetItemsSelected(ids, reviewItems.any { !it.selected }, true)
+                // D1: the user's "Select all" works both ways; look-alikes are checked first.
+                val candidates = PlanSelection.selectAllCandidates(reviewItems)
+                val ids = candidates.mapTo(linkedSetOf(), CleanableItem::id)
+                if (PlanSelection.needsVerification(reviewItems)) {
+                    onVerifyAndSelect(ids)
+                } else {
+                    onSetItemsSelected(ids, PlanSelection.selectAllTarget(reviewItems), false)
+                }
             },
+            verifyingPercent = verifySelectPercent,
             onToggleItem = onToggleItem,
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
@@ -322,35 +353,83 @@ internal fun SmartResultsContent(
 
     val plan = summary.plan
     val deepCheck = remember(summary.items) { PlanSelection.deepCheckCandidates(summary.items) }
-    Column(
-        modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF02081A), Color(0xFF05142E), Color(0xFF030A1E)),
-                ),
-            ),
-    ) {
+    val findingsApps = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps else null
+    // C1: the same figures Home reads (no second calculation here).
+    val figures = sharedFigures ?: PlanFigures.of(plan, findingsApps)
+    // C2: "My pick" asks once through the shared confirmation, list visible on request.
+    var suggestConfirm by rememberSaveable { mutableStateOf(false) }
+    var suggestShowList by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(autoOpenSuggestion) {
+        if (autoOpenSuggestion) {
+            if (figures.showsSuggestion) suggestConfirm = true
+            onSuggestionOpened()
+        }
+    }
+    if (suggestConfirm) {
+        val suggested = plan.suggestedItems
+        DeleteConfirmDialog(
+            items = suggested,
+            inProgress = cleanupInProgress,
+            initiallyShowAll = suggestShowList,
+            onDismiss = {
+                suggestConfirm = false
+                suggestShowList = false
+            },
+            onConfirm = { ids ->
+                suggestConfirm = false
+                suggestShowList = false
+                // The app's own pick: bulk = true keeps camera files and look-alikes out (D1).
+                onSetItemsSelected(ids, true, true)
+                onClean(ids)
+            },
+        )
+    }
+    // E1: the apps section (real icons, Android's own uninstall or settings screens).
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appRows = remember(installedApps, hasUsageAccess) {
+        AppPlan.rows(installedApps, hasUsageAccess, context.packageName)
+    }
+    val appsNotePrefs = remember { context.getSharedPreferences("plan_apps", android.content.Context.MODE_PRIVATE) }
+    // The one-line note shows until the user has actually had it on screen once
+    // (marked from the note item itself, not merely when rows exist).
+    val showAppsNote = remember { !appsNotePrefs.getBoolean("note_seen", false) }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    // Home's "Apps hold X more" line lands on this section.
+    LaunchedEffect(scrollToApps) {
+        if (!scrollToApps) return@LaunchedEffect
+        repeat(40) {
+            val target = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == PLAN_APPS_KEY }
+            if (target != null) {
+                listState.animateScrollToItem(target.index)
+                onScrolledToApps()
+                return@LaunchedEffect
+            }
+            if (!listState.canScrollForward) {
+                onScrolledToApps()
+                return@LaunchedEffect
+            }
+            listState.scrollBy(500f)
+        }
+        onScrolledToApps()
+    }
+    PageFrame(modifier = modifier) {
         LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(start = 14.dp, top = 14.dp, end = 14.dp, bottom = 18.dp),
+            modifier = Modifier.fillMaxSize(),
+            state = listState,
+            contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             planHeader(this)
             cleanupPlanItems(
                 plan = plan,
-                appCacheBytes = appCacheBytes,
-                unusedAppCount = if (hasUsageAccess && installedApps.isNotEmpty()) unusedApps.size else null,
-                cleanupInProgress = cleanupInProgress,
-                onCleanRecommended = { if (!cleanupInProgress) showPreviewSheet = true },
-                onToggleRow = { row ->
-                    val group = row.group
-                    if (group != null) {
-                        onToggleGroup(group)
-                    } else {
-                        onSetItemsSelected(row.items.mapTo(linkedSetOf(), CleanableItem::id), !row.allBulkSelected, true)
-                    }
+                figures = figures,
+                onConfirmSuggested = { suggestConfirm = true },
+                onSeeSuggested = {
+                    suggestShowList = true
+                    suggestConfirm = true
                 },
+                appCacheBytes = appCacheBytes,
+                unusedApps = findingsApps,
                 onOpenRow = { row ->
                     val group = row.group
                     if (group != null && group in SwipeReviewState.SWIPE_GROUPS) {
@@ -371,30 +450,14 @@ internal fun SmartResultsContent(
                 biggestFolders = summary.biggestFolders,
                 hiddenKeptCount = summary.hiddenKeptCount,
                 onOpenFolder = onOpenFolder,
-                largestApps = if (hasUsageAccess) largestUserApps(installedApps) else null,
+                appRows = appRows,
                 onOpenAppInfo = onOpenAppInfo,
+                onUninstallApp = onUninstallApp,
                 onRequestUsageAccess = onRequestUsageAccess,
+                showAppsNote = showAppsNote,
+                onAppsNoteShown = { appsNotePrefs.edit().putBoolean("note_seen", true).apply() },
             )
         }
-
-        PlanBottomBar(
-            selectedBytes = plan.selectedBytes,
-            enabled = plan.selectedItems.isNotEmpty(),
-            inProgress = cleanupInProgress,
-            onReview = { if (!cleanupInProgress) showPreviewSheet = true },
-        )
-    }
-
-    if (showPreviewSheet) {
-        SelectedItemsPreviewSheet(
-            items = plan.selectedItems,
-            onRemoveItem = onToggleItem,
-            onDismiss = { showPreviewSheet = false },
-            onConfirm = { ids ->
-                showPreviewSheet = false
-                onClean(ids)
-            },
-        )
     }
 
     previewItemId?.let { itemId ->

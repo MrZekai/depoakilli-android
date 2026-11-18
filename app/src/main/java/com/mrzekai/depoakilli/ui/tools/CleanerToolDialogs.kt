@@ -7,50 +7,37 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.Security
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -61,17 +48,27 @@ import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
-import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.common.SelectionBar
 import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.BlackLine
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
+/** Every file of one group (opened with "View all"); the same rows as the tool list. */
 @Composable
 internal fun PremiumToolDetailPage(
     section: ToolSection,
-    focus: ScanFocus,
     sortMode: ToolSortMode,
     cleanupInProgress: Boolean,
     selectedCount: Int,
@@ -84,120 +81,50 @@ internal fun PremiumToolDetailPage(
     onClean: () -> Unit,
 ) {
     val sorted = sortItems(section.items, sortMode)
-    Column(Modifier.fillMaxSize()) {
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
-            }
-            Column(Modifier.weight(1f)) {
-                Text(section.title, color = Color.White, fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(section.subtitle, color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall)
-            }
-            TextButton(onClick = onToggleAll) {
-                Text(
-                    stringResource(if (section.items.all(CleanableItem::selected)) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
-                    color = section.accent,
-                    fontWeight = FontWeight.Black,
-                )
-            }
-        }
-        Box(Modifier.padding(horizontal = 14.dp)) {
-            PremiumSortRow(sortMode = sortMode, onChange = onSortMode)
-        }
-        Spacer(Modifier.height(10.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(150.dp),
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            gridItems(sorted, key = CleanableItem::id) { item ->
-                PremiumToolItemCard(
-                    item = item,
-                    accent = section.accent,
-                    onPreview = { onPreview(item) },
-                    onToggle = { onToggleItem(item.id) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-        PremiumToolBottomAction(
-            selectedCount = selectedCount,
-            selectedBytes = selectedBytes,
-            accent = section.accent,
-            accent2 = toolConfig(focus).accent2,
-            cleanupInProgress = cleanupInProgress,
-            onClean = onClean,
-        )
-    }
-}
-
-@Composable
-internal fun PremiumToolBottomAction(
-    selectedCount: Int,
-    selectedBytes: Long,
-    accent: Color,
-    accent2: Color,
-    cleanupInProgress: Boolean,
-    onClean: () -> Unit,
-) {
-    Surface(color = ToolBackground, shadowElevation = 12.dp) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Surface(
-                modifier = Modifier.width(122.dp).fillMaxHeight().heightIn(min = 66.dp),
-                color = ToolCard,
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(1.dp, accent.copy(alpha = .35f)),
+    PageFrame {
+        Column(Modifier.fillMaxSize()) {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Column(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalArrangement = Arrangement.Center) {
-                    Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 12.sp)
-                    Text(ByteFormatter.format(selectedBytes), color = accent, fontWeight = FontWeight.Black, fontSize = 20.sp)
-                    Text(
-                        if (selectedCount > 0) {
-                            pluralStringResource(R.plurals.premium_tool_selected_count, selectedCount, selectedCount)
-                        } else {
-                            stringResource(R.string.nothing_selected_hint)
-                        },
-                        color = ToolTextSecondary,
-                        fontSize = 12.sp,
-                    )
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Ink)
                 }
+                Text(
+                    section.title,
+                    color = Ink,
+                    fontWeight = AppWeights.Giant,
+                    fontSize = 20.sp,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
             }
-            Button(
-                onClick = onClean,
-                enabled = selectedCount > 0 && !cleanupInProgress,
-                modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 66.dp),
-                shape = RoundedCornerShape(21.dp),
-                contentPadding = PaddingValues(0.dp),
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(accent, accent2))),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (cleanupInProgress) {
-                            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = ContrastTokens.OnBrightAction, strokeWidth = 2.dp)
-                        } else {
-                            Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = ContrastTokens.OnBrightAction)
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.whatsapp_review_and_clean), color = ContrastTokens.OnBrightAction, fontWeight = FontWeight.Black, fontSize = 17.sp)
-                        Spacer(Modifier.width(8.dp))
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = ContrastTokens.OnBrightAction)
+                item(key = "detail-sort") { PremiumSortRow(sortMode = sortMode, onChange = onSortMode) }
+                item(key = "detail-head") { ToolSectionHeader(section = section, onToggleAll = onToggleAll) }
+                sorted.forEachIndexed { index, item ->
+                    item(key = "detail-row-" + item.id) {
+                        ToolFileRow(
+                            item = item,
+                            shape = stackedShape(index, sorted.size),
+                            showDivider = index < sorted.lastIndex,
+                            onPreview = { onPreview(item) },
+                            onToggle = { onToggleItem(item.id) },
+                        )
                     }
                 }
             }
+            SelectionBar(
+                selectedCount = selectedCount,
+                selectedBytes = selectedBytes,
+                enabled = selectedCount > 0 && !cleanupInProgress,
+                busy = cleanupInProgress,
+                onMoveToTrash = onClean,
+            )
         }
     }
 }
@@ -210,20 +137,20 @@ internal fun PremiumToolPreviewDialog(
     onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(Modifier.fillMaxSize(), color = ToolBackground) {
+        Surface(Modifier.fillMaxSize(), color = ToolBackground, contentColor = Ink) {
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onDismiss) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.back), tint = Ink)
                     }
                     Column(Modifier.weight(1f)) {
-                        Text(stringResource(R.string.whatsapp_preview_title), color = accent, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
+                        Text(stringResource(R.string.whatsapp_preview_title), color = InkSoft, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text(item.name, color = Ink, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 18.sp)
                     }
                 }
 
                 Box(
-                    Modifier.weight(1f).fillMaxWidth().padding(horizontal = 14.dp).clip(RoundedCornerShape(22.dp)).background(Color(0xFF020713)),
+                    Modifier.weight(1f).fillMaxWidth().padding(horizontal = 14.dp).clip(RoundedCornerShape(22.dp)).background(Black),
                     contentAlignment = Alignment.Center,
                 ) {
                     MediaPreviewContent(
@@ -244,7 +171,7 @@ internal fun PremiumToolPreviewDialog(
                             }
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                                Text(item.name, color = OnBlack, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
                                 Text(bidiWrap(compactPath(item.relativePath)), color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Column(horizontalAlignment = Alignment.End) {
@@ -255,20 +182,20 @@ internal fun PremiumToolPreviewDialog(
 
                         Surface(
                             modifier = Modifier.fillMaxWidth().clickable(onClick = onToggleSelection),
-                            color = if (item.selected) Color(0xFF0C4936) else Color(0xFF10284C),
+                            color = BlackChip,
                             shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, if (item.selected) ToolGreen.copy(alpha = .70f) else Color(0xFF5D7498)),
+                            border = BorderStroke(1.dp, if (item.selected) Lime else BlackLine),
                         ) {
                             Row(Modifier.padding(horizontal = 10.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = item.selected,
                                     onCheckedChange = { onToggleSelection() },
-                                    colors = CheckboxDefaults.colors(checkedColor = ToolGreen, uncheckedColor = Color(0xFFB9C7DE)),
+                                    colors = CheckboxDefaults.colors(checkedColor = Lime, uncheckedColor = OnBlackSoft, checkmarkColor = Ink),
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Column(Modifier.weight(1f)) {
-                                    Text(stringResource(if (item.selected) R.string.whatsapp_included else R.string.whatsapp_not_included), color = Color.White, fontWeight = FontWeight.Black)
-                                    Text(stringResource(if (item.selected) R.string.whatsapp_remove_from_cleanup else R.string.whatsapp_add_to_cleanup), color = Color(0xFFC1CEE2), style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(if (item.selected) R.string.whatsapp_included else R.string.whatsapp_not_included), color = OnBlack, fontWeight = FontWeight.Black)
+                                    Text(stringResource(if (item.selected) R.string.whatsapp_remove_from_cleanup else R.string.whatsapp_add_to_cleanup), color = OnBlackSoft, style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -278,7 +205,7 @@ internal fun PremiumToolPreviewDialog(
                                 Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Outlined.Security, contentDescription = null, tint = ToolGreen, modifier = Modifier.size(20.dp))
                                     Spacer(Modifier.width(8.dp))
-                                    Text(stringResource(R.string.duplicate_original_kept, item.protectedDuplicateName), color = Color.White.copy(alpha = .88f), style = MaterialTheme.typography.bodySmall)
+                                    Text(stringResource(R.string.duplicate_original_kept, item.protectedDuplicateName), color = OnBlack.copy(alpha = .88f), style = MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }

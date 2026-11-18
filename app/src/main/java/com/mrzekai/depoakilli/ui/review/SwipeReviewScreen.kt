@@ -1,25 +1,34 @@
 package com.mrzekai.depoakilli.ui.review
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -29,37 +38,47 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ui.common.bidiWrap
-import com.mrzekai.depoakilli.ui.ContrastTokens
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
-import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
+import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.SystemBarIcons
+import com.mrzekai.depoakilli.ui.common.RelativeAge
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Coral
+import com.mrzekai.depoakilli.ui.theme.CoralInk
+import com.mrzekai.depoakilli.ui.theme.GiantScale
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import com.mrzekai.depoakilli.ui.toMediaPreview
 import com.mrzekai.depoakilli.ui.toSmartPreview
-import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
-private val SwipeBackground = Color(0xFF030A1D)
-private val SwipeSecondary = Color(0xFFB4C4DF)
-private val SwipeRed = Color(0xFFFF5D68)
-private val SwipeGreen = Color(0xFF28E58A)
-private val SwipeButtonText = Color(0xFF03122B)
-
 /**
- * Swipe review (T1.11): one file at a time, largest first. Left / "Delete"
- * marks, right / "Keep" keeps; the buttons are the accessible equivalent of
- * the gestures. Nothing is deleted here: "Finish" opens the single preview
- * confirmation.
+ * Swipe review (T1.11, Faz 5 T5.5): the only black screen that shows a file,
+ * one at a time, largest first. Left / DELETE marks, right / KEEP keeps (and
+ * is remembered, V10); the two giant buttons are the accessible equivalent of
+ * the gestures. Videos play silently. Every 8 cards a break card with a
+ * native ad; nothing is deleted here: the end opens one confirmation. No
+ * banner on this screen.
  */
 @Composable
 internal fun SwipeReviewScreen(
@@ -71,103 +90,158 @@ internal fun SwipeReviewScreen(
     onShowGrid: () -> Unit,
     onConfirmClean: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
+    groupTitle: String = "",
+    onClose: () -> Unit = {},
     breakCardContent: @Composable () -> Unit = {},
 ) {
     val byId = remember(items) { items.associateBy(CleanableItem::id) }
     var showPreview by remember { mutableStateOf(false) }
     var removedFromPreview by remember { mutableStateOf(emptySet<String>()) }
     val marked = review.markedIds
+    val openConfirmation = {
+        removedFromPreview = emptySet()
+        showPreview = true
+    }
+    SystemBarIcons(darkStatusIcons = false, darkNavigationIcons = false)
 
-    Column(
+    Box(
         modifier
             .fillMaxSize()
-            .background(SwipeBackground)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+            .background(Black),
+        contentAlignment = Alignment.TopCenter,
     ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            val shown = (review.reviewedCount + if (review.currentId != null) 1 else 0).coerceAtMost(review.total)
-            Text(
-                stringResource(R.string.swipe_counter, shown, review.total),
-                color = Color.White,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.weight(1f),
-            )
-            TextButton(onClick = onShowGrid, modifier = Modifier.heightIn(min = 48.dp)) {
-                Text(stringResource(R.string.swipe_grid_view))
-            }
-        }
-
-        if (review.breakPending) {
-            // Break card: scrollable so the ad is never clipped; no other
-            // buttons on screen while it is shown.
-            Column(
-                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
-            ) {
-                BreakCard(
-                    reviewed = review.reviewedCount,
-                    markedBytes = review.markedBytes,
-                    onContinue = onContinue,
-                    adContent = breakCardContent,
+        Column(
+            Modifier
+                .fillMaxSize()
+                .widthIn(max = GiantScale.MAX_CONTENT_WIDTH_DP.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.back), tint = OnBlack)
+                }
+                val shown = (review.reviewedCount + if (review.currentId != null) 1 else 0).coerceAtMost(review.total)
+                Text(
+                    listOf(groupTitle, stringResource(R.string.swipe_counter, shown, review.total))
+                        .filter(String::isNotBlank)
+                        .joinToString(" · "),
+                    color = OnBlack,
+                    fontWeight = AppWeights.Title,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
                 )
+                LinkButton(stringResource(R.string.swipe_list), onClick = onShowGrid, color = Lime)
             }
-        } else {
 
-            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val currentItem = review.currentId?.let(byId::get)
-                when {
-                    currentItem != null -> SwipeCard(item = currentItem, onMark = onMark)
-                    else -> Text(
-                        pluralStringResource(
-                            R.plurals.swipe_marked,
-                            marked.size,
-                            marked.size,
-                            ByteFormatter.format(review.markedBytes),
-                        ),
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
+            if (review.breakPending) {
+                // Break card: scrollable so the ad is never clipped; no other
+                // buttons on screen while it is shown.
+                Column(
+                    Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+                ) {
+                    BreakCard(
+                        reviewed = review.reviewedCount,
+                        markedBytes = review.markedBytes,
+                        onContinue = onContinue,
+                        adContent = breakCardContent,
                     )
                 }
-            }
-
-            Text(
-                pluralStringResource(
-                    R.plurals.swipe_marked,
-                    marked.size,
-                    marked.size,
-                    ByteFormatter.format(review.markedBytes),
-                ),
-                color = SwipeSecondary,
-            )
-            if (review.currentId != null) {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Button(
-                        onClick = { onMark(true) },
-                        modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = ContrastTokens.OnBrightAction),
-                    ) { Text(stringResource(R.string.swipe_delete), fontWeight = FontWeight.Black) }
-                    Button(
-                        onClick = { onMark(false) },
-                        modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SwipeGreen, contentColor = SwipeButtonText),
-                    ) { Text(stringResource(R.string.swipe_keep), fontWeight = FontWeight.Black) }
+            } else {
+                val currentItem = review.currentId?.let(byId::get)
+                if (currentItem != null) {
+                    Text(
+                        stringResource(R.string.swipe_title),
+                        color = OnBlack,
+                        fontSize = 26.sp,
+                        lineHeight = 32.sp,
+                        fontWeight = AppWeights.Giant,
+                    )
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        SwipeCard(item = currentItem, onMark = onMark)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SwipeChoiceButton(
+                            text = stringResource(R.string.swipe_delete),
+                            icon = Icons.Outlined.Delete,
+                            container = Coral,
+                            content = CoralInk,
+                            onClick = { onMark(true) },
+                            modifier = Modifier.weight(1f),
+                        )
+                        SwipeChoiceButton(
+                            text = stringResource(R.string.swipe_keep),
+                            icon = Icons.Outlined.Check,
+                            container = Lime,
+                            content = Ink,
+                            onClick = { onMark(false) },
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                } else {
+                    // Every card decided: one summary and the single confirmation.
+                    Column(
+                        Modifier.weight(1f).fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            pluralStringResource(
+                                R.plurals.swipe_marked,
+                                marked.size,
+                                marked.size,
+                                ByteFormatter.format(review.markedBytes),
+                            ),
+                            color = OnBlack,
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = AppWeights.Title,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(20.dp))
+                        if (marked.isNotEmpty()) {
+                            PillButton(
+                                text = stringResource(R.string.swipe_finish),
+                                onClick = openConfirmation,
+                                style = PillStyle.LIME,
+                            )
+                        } else {
+                            PillButton(
+                                text = stringResource(R.string.result_done),
+                                onClick = onClose,
+                                style = PillStyle.LIME,
+                            )
+                        }
+                    }
                 }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedButton(
-                    onClick = onUndo,
-                    enabled = review.reviewedCount > 0,
-                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                ) { Text(stringResource(R.string.swipe_undo)) }
-                OutlinedButton(
-                    onClick = {
-                        removedFromPreview = emptySet()
-                        showPreview = true
-                    },
-                    enabled = marked.isNotEmpty(),
-                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                ) { Text(stringResource(R.string.swipe_finish)) }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    LinkButton(
+                        stringResource(R.string.swipe_undo_last),
+                        onClick = onUndo,
+                        color = OnBlack,
+                        enabled = review.reviewedCount > 0,
+                    )
+                    Spacer(Modifier.weight(1f))
+                    if (marked.isNotEmpty() && review.currentId != null) {
+                        // Finishing early opens the same single confirmation.
+                        LinkButton(
+                            stringResource(R.string.swipe_selected_note, ByteFormatter.format(review.markedBytes)),
+                            onClick = openConfirmation,
+                            color = Lime,
+                        )
+                    } else {
+                        Text(
+                            stringResource(R.string.swipe_selected_note, ByteFormatter.format(review.markedBytes)),
+                            color = OnBlackSoft,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                    }
+                }
             }
         }
     }
@@ -185,11 +259,40 @@ internal fun SwipeReviewScreen(
     }
 }
 
+/** One of the two 76 dp choice buttons (Coral DELETE, Lime KEEP). */
+@Composable
+private fun SwipeChoiceButton(
+    text: String,
+    icon: ImageVector,
+    container: Color,
+    content: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier.heightIn(min = 76.dp),
+        shape = RoundedCornerShape(38.dp),
+        color = container,
+        contentColor = content,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 18.dp),
+        ) {
+            Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(26.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(text, color = content, fontWeight = AppWeights.Giant, fontSize = 20.sp)
+        }
+    }
+}
+
 @Composable
 private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
     var dragX by remember(item.id) { mutableFloatStateOf(0f) }
     val preview = remember(item.id) { item.toSmartPreview() }
-    Surface(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .offset { IntOffset(dragX.roundToInt(), 0) }
@@ -209,37 +312,48 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
                     dragX += amount
                 }
             },
-        color = Color(0xFF0A1C42),
-        shape = RoundedCornerShape(24.dp),
     ) {
-        Column {
-            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                MediaPreviewContent(preview.toMediaPreview(), allowAudio = false)
+        Surface(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            color = BlackChip,
+            shape = RoundedCornerShape(26.dp),
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                MediaPreviewContent(preview.toMediaPreview(), allowAudio = false, muted = true)
             }
-            Column(Modifier.padding(14.dp)) {
-                Text(
-                    item.name,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(bidiWrap(item.relativePath), color = SwipeSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                val days = if (item.modifiedAtMillis > 0L) {
-                    TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis() - item.modifiedAtMillis).coerceAtLeast(0L)).toInt()
-                } else {
-                    0
-                }
+        }
+        // C6: "10 months ago", not "Age (days): 297".
+        val locale = androidx.compose.ui.platform.LocalConfiguration.current.locales[0]
+        val age = remember(item.modifiedAtMillis, locale) { RelativeAge.format(item.modifiedAtMillis, locale) }
+        Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
                 Text(
                     stringResource(
                         R.string.swipe_age_days,
-                        ByteFormatter.format(item.sizeBytes),
-                        pluralStringResource(R.plurals.reason_large_file, days, days).substringAfter("• "),
+                        bidiWrap(item.relativePath.ifBlank { "/" }),
+                        age,
                     ),
-                    color = SwipeSecondary,
-                    fontSize = 12.sp,
+                    color = OnBlackSoft,
+                    fontSize = 13.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    item.name,
+                    color = OnBlack,
+                    fontWeight = AppWeights.Strong,
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
+            Text(
+                ByteFormatter.format(item.sizeBytes),
+                color = Lime,
+                fontWeight = AppWeights.Giant,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(start = 12.dp),
+            )
         }
     }
 }
@@ -253,15 +367,19 @@ private fun BreakCard(reviewed: Int, markedBytes: Long, onContinue: () -> Unit, 
     ) {
         Text(
             pluralStringResource(R.plurals.swipe_break, reviewed, reviewed, ByteFormatter.format(markedBytes)),
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            color = OnBlack,
+            fontSize = 20.sp,
+            lineHeight = 26.sp,
+            fontWeight = AppWeights.Title,
+            textAlign = TextAlign.Center,
         )
-        Button(
+        PillButton(
+            text = stringResource(R.string.swipe_continue),
             onClick = onContinue,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = SwipeGreen, contentColor = SwipeButtonText),
-        ) { Text(stringResource(R.string.swipe_continue), fontWeight = FontWeight.Black) }
+            style = PillStyle.LIME,
+        )
+        // At least 24 dp between the ad and the button above.
+        Spacer(Modifier.height(8.dp))
         adContent()
     }
 }

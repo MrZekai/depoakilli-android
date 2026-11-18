@@ -13,6 +13,72 @@ fun CleanableItem.isBulkSelectable(): Boolean =
     assessment.group.groupSelectable &&
         (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath))
 
+/** Faz 5D (D3): nothing changed in the last 30 days is suggested; documents need 180 days. */
+const val SUGGEST_MIN_AGE_DAYS = 30L
+const val SUGGEST_DOCUMENT_MIN_AGE_DAYS = 180L
+private const val DAY_MILLIS = 24L * 60L * 60L * 1000L
+
+/** Days since the file last changed; an unknown date counts as old. */
+fun CleanableItem.ageDays(nowMillis: Long = System.currentTimeMillis()): Long =
+    if (modifiedAtMillis <= 0L) Long.MAX_VALUE else ((nowMillis - modifiedAtMillis).coerceAtLeast(0L) / DAY_MILLIS)
+
+/** A video, song or photo saved in Downloads: the user's own, so asked about (D3). */
+fun CleanableItem.isDownloadMedia(): Boolean =
+    assessment.group == CleanupGroup.DOWNLOAD_FILE &&
+        (mimeType.startsWith("video/") || mimeType.startsWith("audio/") || mimeType.startsWith("image/"))
+
+/** Not recently changed: old enough for the app to suggest or select on its own (D3). */
+fun CleanableItem.isOldEnoughToSuggest(nowMillis: Long = System.currentTimeMillis()): Boolean {
+    val age = ageDays(nowMillis)
+    val minimum = if (assessment.group == CleanupGroup.DOWNLOAD_DOCUMENT) SUGGEST_DOCUMENT_MIN_AGE_DAYS else SUGGEST_MIN_AGE_DAYS
+    return age >= minimum
+}
+
+/**
+ * Faz 5C/5D tier 2 ("My pick"), the one place its rule lives: a review file of
+ * a suggested group, not in the camera folder, not a video/music/photo in
+ * Downloads, not changed in the last 30 days (documents 180), not shown to be
+ * different by a full check. Kept files and excluded folders never reach the
+ * plan (UserChoiceFilter), so they are never suggested either.
+ */
+fun CleanableItem.isSuggestedPick(nowMillis: Long = System.currentTimeMillis()): Boolean =
+    !assessment.group.auto &&
+        assessment.group.suggested &&
+        !StoragePathRules.isCameraPath(relativePath) &&
+        !isDownloadMedia() &&
+        !verifiedDifferent &&
+        isOldEnoughToSuggest(nowMillis)
+
+/** Tier 3 ("I'll ask you"): a review file the user decides on one by one. */
+fun CleanableItem.isAskTier(nowMillis: Long = System.currentTimeMillis()): Boolean =
+    !assessment.group.auto && !isSuggestedPick(nowMillis)
+
+/**
+ * Faz 5D (D1): a selection the app makes on its own ("My pick", "Select my
+ * picks", preselection) never takes camera files or unverified look-alikes.
+ * A "Select all" the user taps is not limited by this.
+ */
+fun CleanableItem.isAppSelectable(): Boolean =
+    (assessment.group.auto || !StoragePathRules.isCameraPath(relativePath)) &&
+        assessment.group != CleanupGroup.DUPLICATE_UNVERIFIED &&
+        !verifiedDifferent
+
+/** Files of a findings row in the swipe review: tier 3 only, biggest first (C2, C5). */
+fun swipeItemsFor(group: CleanupGroup, items: List<CleanableItem>): List<CleanableItem> =
+    items.filter { it.rowGroup == group && it.isAskTier() }
+        .sortedByDescending(CleanableItem::sizeBytes)
+
+/**
+ * The findings row a group is listed under (C5): "Old videos" and "Large old
+ * videos" are one row; the swipe review shows both, biggest first.
+ */
+val CleanupGroup.rowGroup: CleanupGroup
+    get() = if (this == CleanupGroup.LARGE_VIDEO) CleanupGroup.OLD_VIDEO else this
+
+/** The findings row of a file: as its group, with Downloads media in their own row (D3). */
+val CleanableItem.rowGroup: CleanupGroup
+    get() = if (isDownloadMedia()) CleanupGroup.DOWNLOAD_MEDIA else assessment.group.rowGroup
+
 data class PlanGroup(
     val group: CleanupGroup?,
     val items: List<CleanableItem>,
@@ -66,6 +132,39 @@ data class CleanupPlan(
     val selectedGroupCount: Int get() = allRows.count { it.selectedBytes > 0L || it.selectedCount > 0 }
     val selectedItems: List<CleanableItem> get() = allRows.flatMap { row -> row.items.filter(CleanableItem::selected) }
     val isAlreadyTidy: Boolean get() = potentialBytes < CleaningThresholds.PLAN_MIN_BYTES
+
+    /** Tier 1 files (preselected Auto groups), listed or not. */
+    val autoItems: List<CleanableItem> get() = autoRows.flatMap(PlanGroup::items)
+
+    /** Tier 2 ("My pick", C2): suggested together, confirmed once, always to Trash. */
+    val suggestedItems: List<CleanableItem>
+        get() = reviewRows.flatMap(PlanGroup::items).filter(CleanableItem::isSuggestedPick)
+    val suggestedBytes: Long get() = suggestedItems.sumOf(CleanableItem::sizeBytes)
+
+    /**
+     * Tier 3 ("I'll ask you", C2): the review rows without the suggested files,
+     * with "Old videos" and "Large old videos" in one row (C5), biggest first.
+     */
+    val askRows: List<PlanGroup>
+        get() {
+            val groupRows = reviewRows.filterNot(PlanGroup::smallReview)
+                .flatMap(PlanGroup::items)
+                .filter(CleanableItem::isAskTier)
+                .groupBy { it.rowGroup }
+                .map { (group, items) -> planGroup(group, items) }
+            val small = smallReview?.let { row ->
+                row.items.filter(CleanableItem::isAskTier).takeIf { it.isNotEmpty() }?.let { items ->
+                    val sorted = items.sortedByDescending(CleanableItem::sizeBytes)
+                    row.copy(
+                        items = sorted,
+                        bytes = sorted.sumOf(CleanableItem::sizeBytes),
+                        selectedBytes = sorted.filter(CleanableItem::selected).sumOf(CleanableItem::sizeBytes),
+                    )
+                }
+            }
+            return (groupRows + listOfNotNull(small)).sortedByDescending(PlanGroup::bytes)
+        }
+    val askBytes: Long get() = askRows.sumOf(PlanGroup::bytes)
 }
 
 /**
@@ -116,7 +215,7 @@ fun buildPlan(items: List<CleanableItem>, truncated: Boolean = false): CleanupPl
     )
 }
 
-private fun planGroup(group: CleanupGroup, items: List<CleanableItem>): PlanGroup {
+internal fun planGroup(group: CleanupGroup, items: List<CleanableItem>): PlanGroup {
     val sorted = items.sortedByDescending(CleanableItem::sizeBytes)
     return PlanGroup(
         group = group,

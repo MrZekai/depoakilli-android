@@ -432,7 +432,8 @@ for expected in (
 for expected in (
     "STORAGE_CHANGE(R.string.storage_change_title)",
     "StorageChangeScreen(",
-    "onOpenStorageChange",
+    # Faz 5C (C4): storage change is the second tab of the Storage tool.
+    "detailScreen = DetailScreen.STORAGE_CHANGE",
     "DetailScreen.STORAGE_CHANGE -> true",
 ):
     if expected not in cleaner_app:
@@ -461,16 +462,21 @@ for expected in (
 # ------------------------------------------------------------------
 # Alpha8 Tools audit: distinct tools, truthful copy, read-only analyzer.
 # ------------------------------------------------------------------
+# Faz 5C (C4): six tiles. APK packages live in Downloads; app cache and
+# storage change are the second tabs of Apps and Storage (HubTabs).
 for expected in (
-    "onOpenStorageChange",
-    "ScanFocus.APKS",
-    "R.string.cache_manager_title",
-    "R.string.tools_cleaning_section_title",
-    "R.string.tools_storage_section_title",
-    "R.string.tools_apps_section_title",
+    "ScanFocus.DOWNLOADS",
+    "ScanFocus.LARGE_FILES",
+    "ScanFocus.ANALYZE",
+    "onOpenAppManager",
+    "onOpenWhatsApp",
+    "ToolSuggestion.suggestedBytes",
 ):
     if expected not in device_center:
         errors.append(f"missing alpha8 Tools invariant: {expected}")
+for expected in ("HubKind.APPS", "HubKind.STORAGE", "DetailScreen.APP_CACHE", "DetailScreen.STORAGE_CHANGE"):
+    if expected not in cleaner_app:
+        errors.append(f"missing Faz 5C tool tab invariant: {expected}")
 
 for forbidden in (
     "R.string.downloads_apk_title",
@@ -545,7 +551,7 @@ for expected in (
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha5 result-dialog invariant: {expected}")
 
-if cleanup_dialog.find("R.string.cleanup_result_done") > cleanup_dialog.rfind("CleanupResultAdSurface("):
+if cleanup_dialog.find("R.string.result_done") > cleanup_dialog.rfind("CleanupResultAdSurface("):
     errors.append("result Done button must precede the ad surface")
 
 for expected in (
@@ -594,7 +600,8 @@ for expected in (
 for expected in (
     "CleanupResultKind.APP_CACHE",
     "cleanup_result_app_cache_title",
-    "cleanup_result_app_cache_note",
+    # Faz 5C (C6): cache results drop the explanatory paragraph; the headline says it.
+    "R.string.result_cache_cleared",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha6 app-cache dialog invariant: {expected}")
@@ -655,10 +662,11 @@ for expected in (
         errors.append(f"missing result-first/UI invariant: {expected}")
 
 # Trust surfaces do not carry banners; content surfaces still can.
+# Faz 5 ad table: Home, Tools and Trash carry the banner above the menu.
 for expected in (
     "AppTab.HOME,",
-    "AppTab.TOOLS -> true",
-    "AppTab.TRASH -> false",
+    "AppTab.TOOLS,",
+    "AppTab.TRASH -> true",
     "DetailScreen.ACCESS,",
     "DetailScreen.SETTINGS,",
 ):
@@ -683,14 +691,14 @@ for expected in (
     if expected not in cleaner_app and expected not in device_center:
         errors.append(f"missing Phase-2 navigation invariant: {expected}")
 
-for expected in (
-    "HeroGradient",
-    "PrimaryGradient",
-    "ExploreGradient",
-    "PageGradient",
-):
+# Faz 5: no gradients and no navy pages; Home tokens map to the Lime/black palette.
+for expected in ("val Page = Lime", "val Surface = Black"):
     if expected not in home_tokens:
         errors.append(f"missing Home visual token: {expected}")
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    gradient_source = kotlin_file.read_text(encoding="utf-8")
+    if re.search(r"Brush\.(linear|vertical|horizontal|radial|sweep)Gradient", gradient_source):
+        errors.append(f"gradients are removed in the Faz 5 design: {kotlin_file.relative_to(ROOT)}")
 
 for expected in (
     "data class CleanupHistorySnapshot",
@@ -817,11 +825,9 @@ for required_name in (
     "cache_modern_individual_steps",
     "cache_modern_safety_note",
     "cleanup_result_system_cache_title",
-    "cleanup_result_system_cache_reduced",
+    "result_cache_cleared",
     "cleanup_result_system_cache_unmeasured",
-    "cleanup_result_system_cache_note",
     "cleanup_result_app_cache_title",
-    "cleanup_result_app_cache_note",
     "message_individual_cache_no_change",
 ):
     if f'name="{required_name}"' not in default_strings:
@@ -959,14 +965,26 @@ for resource_name in sorted(set(kotlin_refs) - default_names):
 smart_results = read("app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt")
 cleanup_plan_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt")
 preview_sheet_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/smart/SelectedItemsPreviewSheet.kt")
-for expected in ("RecommendedCleanupCard", "PlanBottomBar", "SystemStepRow", "plan.isAlreadyTidy"):
+delete_confirm_ui_all = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt") + read(
+    "app/src/main/java/com/mrzekai/depoakilli/ui/common/GroupedDeleteConfirm.kt"
+)
+# Faz 5: the plan is split into Home (giant figure, safe clean, "easy part
+# done") and the findings list (T5.4: rows, start with the biggest, system
+# steps). The same invariants are checked on the new surfaces.
+clean_tab_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt")
+for expected in ("fun findingsRows(", "plan-start-biggest", "plan-system-cache", "plan-kept-note"):
     if expected not in cleanup_plan_ui:
         errors.append(f"missing cleanup plan invariant: {expected}")
+for expected in ("state.planFigures()", "HomeLogic.mode(", "DeleteConfirmDialog("):
+    if expected not in clean_tab_ui:
+        errors.append(f"missing Home plan invariant: {expected}")
 for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsapp", "onRemoveItem"):
     if expected not in preview_sheet_ui:
         errors.append(f"missing single-confirmation preview invariant: {expected}")
-if "SelectedItemsPreviewSheet(" not in smart_results:
-    errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
+# Faz 5D (D2): Home confirms through the grouped confirmation, which hands
+# back exactly the ticked ids (groups can be unticked and opened).
+if "onConfirm = { ids ->" not in clean_tab_ui or "GroupedDeleteConfirm(" not in delete_confirm_ui_all:
+    errors.append("Smart plan must confirm through the grouped confirmation")
 for expected in (
     "DeleteConfirmDialog(",
     "StorageDetailPage",
@@ -980,7 +998,7 @@ for expected in (
 
 # T2.3: one delete confirmation and one media preview/thumbnail path.
 delete_confirm_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt")
-for expected in ("delete_confirm_title", "delete_confirm_show_all", "delete_confirm_action", "R.string.cancel", "delete_confirm_trash", "delete_confirm_permanent"):
+for expected in ("confirm_trash_title", "confirm_see_files", "confirm_yes_clean", "R.string.cancel", "confirm_trash_body", "confirm_split_permanent", "confirm_split_trash", "confirm_permanent_action", "PillStyle.WHITE"):
     if expected not in delete_confirm_ui:
         errors.append(f"missing shared delete confirmation invariant: {expected}")
 media_preview_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/FilePreviewDialog.kt")
@@ -1031,9 +1049,8 @@ for expected in (
 
 for expected in (
 
-    "R.string.tools_cleaning_section_title",
-    "ScanFocus.SCREENSHOTS",
-    "R.string.cache_manager_subtitle",
+    "ScanFocus.DUPLICATES",
+    "SuggestionTool.DUPLICATES",
 ):
     if expected not in device_center:
         errors.append(f"missing alpha9 Tools UX invariant: {expected}")

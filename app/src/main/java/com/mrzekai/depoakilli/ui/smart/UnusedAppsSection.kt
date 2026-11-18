@@ -47,6 +47,11 @@ import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.ui.*
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Coral
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import java.util.concurrent.TimeUnit
 
 internal fun isWhatsAppRelativePath(relativePath: String): Boolean =
@@ -84,7 +89,7 @@ internal fun UnusedAppsSectionCard(
     onAnalyzeApps: () -> Unit,
     onOpenAll: () -> Unit,
 ) {
-    val accent = Color(0xFF70E58E)
+    val accent = Lime
     val totalBytes = apps.sumOf { it.totalBytes }
 
     Card(
@@ -104,7 +109,7 @@ internal fun UnusedAppsSectionCard(
                 Column(Modifier.weight(1f)) {
                     Text(
                         stringResource(R.string.smart_unused_apps_title),
-                        color = Color.White,
+                        color = OnBlack,
                         fontWeight = FontWeight.Black,
                         fontSize = 17.sp,
                     )
@@ -144,7 +149,7 @@ internal fun UnusedAppsSectionCard(
                             Text(
                                 app.label,
                                 modifier = Modifier.weight(1f),
-                                color = Color.White,
+                                color = OnBlack,
                                 fontSize = 12.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -172,7 +177,7 @@ internal fun UnusedAppsSectionCard(
 
             Text(
                 stringResource(R.string.smart_unused_apps_separate_note),
-                color = Color(0xFF8FA9BA),
+                color = OnBlackSoft,
                 fontSize = 12.sp,
             )
         }
@@ -190,7 +195,7 @@ internal fun UnusedAppsReviewDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color(0xE603091B)).padding(18.dp),
+            modifier = Modifier.fillMaxSize().background(Black.copy(alpha = .88f)).padding(18.dp),
             contentAlignment = Alignment.Center,
         ) {
             Card(
@@ -204,7 +209,7 @@ internal fun UnusedAppsReviewDialog(
                 ) {
                     Text(
                         stringResource(R.string.smart_unused_apps_dialog_title),
-                        color = Color.White,
+                        color = OnBlack,
                         fontSize = 21.sp,
                         fontWeight = FontWeight.Black,
                     )
@@ -227,19 +232,19 @@ internal fun UnusedAppsReviewDialog(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Surface(
-                                        color = Color(0xFF70E58E).copy(alpha = .14f),
+                                        color = Lime.copy(alpha = .14f),
                                         shape = RoundedCornerShape(12.dp),
                                     ) {
                                         Icon(
                                             Icons.Outlined.Android,
                                             contentDescription = null,
-                                            tint = Color(0xFF70E58E),
+                                            tint = Lime,
                                             modifier = Modifier.padding(8.dp).size(22.dp),
                                         )
                                     }
                                     Spacer(Modifier.width(10.dp))
                                     Column(Modifier.weight(1f)) {
-                                        Text(app.label, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                        Text(app.label, color = OnBlack, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         Text(
                                             pluralStringResource(
                                                 R.plurals.smart_unused_apps_last_used,
@@ -249,10 +254,10 @@ internal fun UnusedAppsReviewDialog(
                                             color = SmartTextSecondary,
                                             fontSize = 12.sp,
                                         )
-                                        Text(ByteFormatter.format(app.totalBytes), color = Color(0xFF70E58E), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        Text(ByteFormatter.format(app.totalBytes), color = Lime, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                     }
                                     TextButton(onClick = { onUninstallApp(app.packageName) }) {
-                                        Text(stringResource(R.string.uninstall), color = Color(0xFFFF8794), fontWeight = FontWeight.Bold)
+                                        Text(stringResource(R.string.uninstall), color = Coral, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }

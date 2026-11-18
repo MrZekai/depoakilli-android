@@ -3,56 +3,66 @@ package com.mrzekai.depoakilli.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Android
-import androidx.compose.material.icons.outlined.AutoAwesome
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Chat
-import androidx.compose.material.icons.outlined.CleaningServices
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.DeleteSweep
 import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
-import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.VideoFile
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.model.SuggestionTool
+import com.mrzekai.depoakilli.model.ToolSuggestion
+import com.mrzekai.depoakilli.ui.common.BlackCard
+import com.mrzekai.depoakilli.ui.common.IconChip
+import com.mrzekai.depoakilli.ui.common.MakeRoomShapes
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.common.PageTitle
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.BlackChip
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 internal enum class LegalPage(@StringRes val titleRes: Int) {
     PRIVACY(R.string.privacy_policy),
@@ -60,350 +70,230 @@ internal enum class LegalPage(@StringRes val titleRes: Int) {
     ABOUT(R.string.about_app),
 }
 
+/** What a Tools row shows on its right (D4). */
+private sealed interface ToolValue {
+    /** The suggested amount: the only Lime number (C1). */
+    data class Suggested(val bytes: Long) : ToolValue
+
+    /** A plain fact in OnBlack ("16 unused", "85% full"). */
+    data class Fact(val text: String) : ToolValue
+
+    /** No Smart scan (or data) yet: a thin line, never "0". */
+    data object Unknown : ToolValue
+
+    /** Scanned, nothing to suggest: empty. */
+    data object Empty : ToolValue
+}
+
+/** One full-width row of Tools (Faz 5D, D4). */
+private data class ToolRow(
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector,
+    val value: ToolValue,
+    /** Longer description for TalkBack. */
+    val description: String,
+    val onClick: () -> Unit,
+)
+
+/**
+ * Tools (T5.7, Faz 5C C4, Faz 5D D4) on Lime: the 44 sp title and six
+ * full-width black rows that share the height of the page (at least 96 dp
+ * each). A row's Lime number is the suggested amount from [ToolSuggestion] —
+ * the same call the tool screen makes (C1); Apps and Storage show a plain
+ * fact instead. Before the first Smart scan a thin line stands in.
+ */
 @Composable
 internal fun DeviceCenterScreen(
     state: CleanerUiState,
     onScan: (ScanFocus) -> Unit,
     onRequestAllFilesAccess: () -> Unit,
     onOpenWhatsApp: () -> Unit,
-    onOpenCache: () -> Unit,
     onOpenAppManager: () -> Unit,
-    onOpenStorageChange: () -> Unit,
     modifier: Modifier = Modifier,
-    onOpenTrash: () -> Unit = {},
-    listAd: @Composable () -> Unit = {},
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item { ToolsHero(state) }
-
-        if (!state.hasAllFilesAccess) {
-            item {
-                PermissionToolCard(
-                    title = stringResource(R.string.all_files_access_title),
-                    subtitle = stringResource(R.string.all_files_access_description),
-                    action = stringResource(R.string.grant_access),
-                    onClick = onRequestAllFilesAccess,
-                )
-            }
-        }
-
-        item {
-            ToolsSectionHeader(
-                title = stringResource(R.string.tools_cleaning_section_title),
-                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.deep_cleaner_title),
-                subtitle = stringResource(R.string.deep_cleaner_subtitle),
-                icon = Icons.Outlined.AutoAwesome,
-                accent = Color(0xFF0A67DF),
-                onClick = { onScan(ScanFocus.DEEP) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.junk_cleaner_title),
-                subtitle = stringResource(R.string.junk_cleaner_subtitle_v050),
-                icon = Icons.Outlined.DeleteSweep,
-                accent = Color(0xFFEA6A22),
-                onClick = { onScan(ScanFocus.JUNK) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.scan_focus_duplicates),
-                subtitle = stringResource(R.string.duplicates_tool_subtitle_v050),
-                icon = Icons.Outlined.ContentCopy,
-                accent = Color(0xFF7047E8),
-                onClick = { onScan(ScanFocus.DUPLICATES) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.large_files_tool_title),
-                subtitle = stringResource(R.string.large_files_tool_subtitle_v050),
-                icon = Icons.Outlined.VideoFile,
-                accent = Color(0xFFEA3E5C),
-                onClick = { onScan(ScanFocus.LARGE_FILES) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.scan_focus_downloads),
-                subtitle = stringResource(R.string.tools_downloads_subtitle),
-                icon = Icons.Outlined.Download,
-                accent = Color(0xFF8A5B17),
-                onClick = { onScan(ScanFocus.DOWNLOADS) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.scan_focus_apks),
-                subtitle = stringResource(R.string.tools_apk_subtitle),
-                icon = Icons.Outlined.Android,
-                accent = Color(0xFF3A9B55),
-                onClick = { onScan(ScanFocus.APKS) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.category_screenshots),
-                subtitle = stringResource(R.string.screenshots_tool_subtitle),
-                icon = Icons.Outlined.PhotoLibrary,
-                accent = Color(0xFFDA57FF),
-                onClick = { onScan(ScanFocus.SCREENSHOTS) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.media_cleaner_title),
-                subtitle = stringResource(R.string.media_cleaner_subtitle),
-                icon = Icons.Outlined.PhotoLibrary,
-                accent = Color(0xFF0B8DD8),
-                onClick = { onScan(ScanFocus.MEDIA) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.whatsapp_cleaner_title),
-                subtitle = stringResource(R.string.whatsapp_cleaner_subtitle_v050),
-                icon = Icons.Outlined.Chat,
-                accent = Color(0xFF10A861),
-                onClick = onOpenWhatsApp,
-            )
-        }
-
-        item(key = "tools-list-native") { listAd() }
-
-        item {
-            ToolsSectionHeader(
-                title = stringResource(R.string.tools_storage_section_title),
-                subtitle = stringResource(R.string.tools_storage_section_subtitle),
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.storage_analyzer_title),
-                subtitle = stringResource(R.string.storage_analyzer_subtitle),
-                icon = Icons.Outlined.Storage,
-                accent = Color(0xFF5E4BBA),
-                onClick = { onScan(ScanFocus.ANALYZE) },
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.storage_change_title),
-                subtitle = stringResource(R.string.tools_storage_change_subtitle),
-                icon = Icons.Outlined.Timeline,
-                accent = Color(0xFF0E9A8A),
-                onClick = onOpenStorageChange,
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.trash_title),
-                subtitle = stringResource(R.string.trash_description),
-                icon = Icons.Outlined.Delete,
-                accent = Color(0xFFB0475A),
-                onClick = onOpenTrash,
-            )
-        }
-
-        item {
-            ToolsSectionHeader(
-                title = stringResource(R.string.tools_apps_section_title),
-                subtitle = stringResource(R.string.tools_apps_section_subtitle),
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.cache_manager_title),
-                subtitle = stringResource(R.string.cache_manager_subtitle),
-                icon = Icons.Outlined.CleaningServices,
-                accent = Color(0xFF1852D5),
-                onClick = onOpenCache,
-            )
-        }
-
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.app_manager_title),
-                subtitle = stringResource(R.string.app_manager_subtitle),
-                icon = Icons.Outlined.Android,
-                accent = Color(0xFF1F8A68),
-                onClick = onOpenAppManager,
-            )
-        }
-    }
-}
-
-@Composable
-internal fun ToolsHero(state: CleanerUiState) {
-    Card(shape = RoundedCornerShape(28.dp)) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.linearGradient(listOf(Color(0xFF07143B), Color(0xFF0A5BDC), Color(0xFF14AE8C))))
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(stringResource(R.string.cleaner_engine_badge), color = Color.White.copy(alpha = .78f), fontWeight = FontWeight.Bold)
-            Text(stringResource(R.string.tools_rebuilt_title), color = Color.White, fontSize = 26.sp, fontWeight = FontWeight.Black)
-            // Without Usage Access Android reports no per-app cache at all.
-            // Say so instead of printing "0 B", which read as a real
-            // measurement (QA v43 #03).
-            Text(
-                if (state.appCache.accessGranted) {
-                    stringResource(
-                        R.string.tools_rebuilt_status,
-                        ByteFormatter.format(state.storage.availableBytes),
-                        ByteFormatter.format(state.appCache.totalCacheBytes),
-                    )
-                } else {
-                    stringResource(
-                        R.string.tools_rebuilt_status_cache_unmeasured,
-                        ByteFormatter.format(state.storage.availableBytes),
-                    )
-                },
-                color = Color.White.copy(alpha = .86f),
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+    val smartPlan = state.smartSummary()?.plan
+    fun suggested(tool: SuggestionTool): ToolValue =
+        smartPlan?.let { plan ->
+            ToolSuggestion.suggestedBytes(tool, plan).takeIf { it > 0L }?.let { ToolValue.Suggested(it) } ?: ToolValue.Empty
+        } ?: ToolValue.Unknown
+    val unusedApps = state.findingsUnusedApps()
+    val appsValue = unusedApps?.let { apps ->
+        ToolValue.Fact(pluralStringResource(R.plurals.tools_apps_unused, apps.size, apps.size))
+    } ?: ToolValue.Unknown
+    val usedPercent = HomeLogic.usedPercent(state.storage.totalBytes, state.storage.availableBytes)
+    val storageValue = usedPercent?.let { percent ->
+        val formatted = java.text.NumberFormat.getPercentInstance(LocalConfiguration.current.locales[0]).format(percent / 100.0)
+        ToolValue.Fact(stringResource(R.string.tools_storage_full, formatted))
+    } ?: ToolValue.Unknown
+    val rows = listOf(
+        ToolRow(
+            stringResource(R.string.category_large_files),
+            stringResource(R.string.tools_row_large_sub),
+            Icons.Outlined.VideoFile,
+            suggested(SuggestionTool.LARGE_FILES),
+            stringResource(R.string.large_files_tool_subtitle_v050),
+        ) { onScan(ScanFocus.LARGE_FILES) },
+        ToolRow(
+            stringResource(R.string.scan_focus_downloads),
+            stringResource(R.string.tools_row_downloads_sub),
+            Icons.Outlined.Download,
+            suggested(SuggestionTool.DOWNLOADS),
+            stringResource(R.string.tools_downloads_subtitle) + " " + stringResource(R.string.tools_apk_subtitle),
+        ) { onScan(ScanFocus.DOWNLOADS) },
+        ToolRow(
+            stringResource(R.string.category_whatsapp),
+            stringResource(R.string.tools_row_whatsapp_sub),
+            Icons.Outlined.Chat,
+            suggested(SuggestionTool.WHATSAPP),
+            stringResource(R.string.whatsapp_cleaner_subtitle_v050),
+            onOpenWhatsApp,
+        ),
+        ToolRow(
+            stringResource(R.string.category_duplicates),
+            stringResource(R.string.tools_row_duplicates_sub),
+            Icons.Outlined.ContentCopy,
+            suggested(SuggestionTool.DUPLICATES),
+            stringResource(R.string.duplicates_tool_subtitle_v050),
+        ) { onScan(ScanFocus.DUPLICATES) },
+        // Apps and app cache share one screen with two tabs (C4).
+        ToolRow(
+            stringResource(R.string.home_hard_apps),
+            stringResource(R.string.tools_row_apps_sub),
+            Icons.Outlined.Apps,
+            appsValue,
+            stringResource(R.string.app_manager_subtitle) + " " + stringResource(R.string.cache_manager_subtitle),
+            onOpenAppManager,
+        ),
+        // Storage Analyzer and Storage change share one screen with two tabs (C4).
+        ToolRow(
+            stringResource(R.string.tool_storage),
+            stringResource(R.string.tools_row_storage_sub),
+            Icons.Outlined.Storage,
+            storageValue,
+            stringResource(R.string.storage_analyzer_subtitle) + " " + stringResource(R.string.tools_storage_change_subtitle),
+        ) { onScan(ScanFocus.ANALYZE) },
+    )
+    PageFrame(modifier = modifier) {
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            // D4: the six rows share the height under the title (and the access card).
+            val header = if (state.hasAllFilesAccess) 80.dp else 240.dp
+            val spacing = 10.dp
+            val rowHeight = ((maxHeight - header - 32.dp - spacing * 6) / 6).coerceAtLeast(96.dp)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                // The last row ends above the banner and the menu, never under them.
+                contentPadding = PaddingValues(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(spacing),
             ) {
-                StatusPill(
-                    text = if (state.hasAllFilesAccess) {
-                        stringResource(R.string.access_files_ready)
-                    } else {
-                        stringResource(R.string.access_files_missing)
-                    },
-                    active = state.hasAllFilesAccess,
-                    modifier = Modifier.weight(1f),
-                )
-                StatusPill(
-                    text = if (state.hasUsageAccess) {
-                        stringResource(R.string.access_usage_ready)
-                    } else {
-                        stringResource(R.string.access_usage_optional)
-                    },
-                    active = state.hasUsageAccess,
-                    modifier = Modifier.weight(1f),
-                )
+                item(key = "tools-title") {
+                    PageTitle(stringResource(R.string.tab_tools), modifier = Modifier.padding(start = 4.dp, bottom = 6.dp))
+                }
+                if (!state.hasAllFilesAccess) {
+                    item(key = "tools-access") {
+                        PermissionToolCard(
+                            title = stringResource(R.string.all_files_access_title),
+                            subtitle = stringResource(R.string.all_files_access_description),
+                            action = stringResource(R.string.grant_access),
+                            onClick = onRequestAllFilesAccess,
+                        )
+                    }
+                }
+                items(rows, key = { row -> "tools-" + row.title }) { row ->
+                    ToolRowCard(row, Modifier.fillMaxWidth().height(rowHeight))
+                }
             }
         }
     }
 }
 
 @Composable
-internal fun StatusPill(
-    text: String,
-    active: Boolean,
-    modifier: Modifier = Modifier,
-) {
+private fun ToolRowCard(row: ToolRow, modifier: Modifier = Modifier) {
+    val valueText = when (val value = row.value) {
+        is ToolValue.Suggested -> ByteFormatter.format(value.bytes)
+        is ToolValue.Fact -> value.text
+        ToolValue.Unknown, ToolValue.Empty -> null
+    }
     Surface(
-        modifier = modifier,
-        color = if (active) {
-            Color(0xFF9CF2C5).copy(alpha = .22f)
-        } else {
-            Color(0xFFFFD580).copy(alpha = .20f)
+        onClick = row.onClick,
+        modifier = modifier.semantics(mergeDescendants = true) {
+            contentDescription = listOfNotNull(row.title, valueText, row.description).joinToString(". ")
         },
-        shape = CircleShape,
+        color = Black,
+        contentColor = OnBlack,
+        shape = MakeRoomShapes.Card,
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier.size(48.dp).clip(CircleShape).background(BlackChip),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(row.icon, contentDescription = null, tint = Lime, modifier = Modifier.size(24.dp))
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    row.title,
+                    color = OnBlack,
+                    fontSize = 20.sp,
+                    lineHeight = 24.sp,
+                    fontWeight = AppWeights.Title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    row.subtitle,
+                    color = OnBlackSoft,
+                    fontSize = 13.sp,
+                    lineHeight = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            when (val value = row.value) {
+                is ToolValue.Suggested -> Text(
+                    ByteFormatter.format(value.bytes),
+                    color = Lime,
+                    fontSize = 18.sp,
+                    fontWeight = AppWeights.Giant,
+                    maxLines = 1,
+                )
+                is ToolValue.Fact -> Text(
+                    value.text,
+                    color = OnBlack,
+                    fontSize = 15.sp,
+                    fontWeight = AppWeights.Strong,
+                    maxLines = 1,
+                )
+                // Before the first Smart scan: a thin line, never "0" (D4).
+                ToolValue.Unknown -> Box(Modifier.width(18.dp).height(2.dp).background(OnBlackSoft))
+                ToolValue.Empty -> Unit
+            }
+            Icon(
+                Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                contentDescription = null,
+                tint = OnBlackSoft,
+                modifier = Modifier.padding(start = 4.dp),
+            )
+        }
     }
 }
 
 @Composable
 internal fun PermissionToolCard(title: String, subtitle: String, action: String, onClick: () -> Unit) {
-    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2414)), shape = RoundedCornerShape(20.dp)) {
-        Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.Security, contentDescription = null, tint = Color(0xFF9A6500))
+    BlackCard(contentPadding = PaddingValues(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconChip(Icons.Outlined.Security)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Black)
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(title, color = OnBlack, fontWeight = AppWeights.Title)
+                Text(subtitle, color = OnBlackSoft, fontSize = 13.sp, lineHeight = 17.sp)
             }
-            TextButton(onClick = onClick) { Text(action) }
         }
-    }
-}
-
-@Composable
-internal fun ToolsSectionHeader(
-    title: String,
-    subtitle: String,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 6.dp, bottom = 2.dp),
-        verticalArrangement = Arrangement.spacedBy(3.dp),
-    ) {
-        Text(
-            text = title,
-            color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
-        )
-        Text(
-            text = subtitle,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
-    }
-}
-
-@Composable
-internal fun ToolActionCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    accent: Color,
-    onClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(21.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    ) {
-        Row(Modifier.fillMaxWidth().padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
-            Surface(color = accent.copy(alpha = .13f), shape = RoundedCornerShape(15.dp)) {
-                Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.padding(11.dp).size(29.dp))
-            }
-            Spacer(Modifier.width(13.dp))
-            Column(Modifier.weight(1f)) {
-                Text(title, fontWeight = FontWeight.Black)
-                // Full description, wrapped: cutting it at two lines hid the
-                // important part ("lower-co…", "outside Downl…") (QA v43 #13).
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = accent)
-        }
+        PillButton(text = action, onClick = onClick, style = PillStyle.LIME, modifier = Modifier.padding(top = 12.dp))
     }
 }

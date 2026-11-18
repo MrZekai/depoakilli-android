@@ -7,6 +7,7 @@ import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.CleanableItem
+import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import kotlinx.coroutines.CancellationException
@@ -118,6 +119,16 @@ abstract class CleanerScanLayer(
         }
     }
 
+    /**
+     * "Refresh" on a tool screen (B4): drops the cached storage index so the
+     * same tool scans the storage again.
+     */
+    fun refreshToolScan() {
+        if (_state.value.scanning) return
+        repository.invalidateStorageIndex()
+        scan(_state.value.scanFocus)
+    }
+
     fun scan(focus: ScanFocus = ScanFocus.SMART) {
         if (_state.value.scanning) return
         if (!repository.hasAllFilesAccess()) {
@@ -150,6 +161,7 @@ abstract class CleanerScanLayer(
                 scanHashing = false,
                 scanHashDoneBytes = 0L,
                 scanHashTotalBytes = 0L,
+                scanFoundByCategory = null,
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
                 storageReview = StorageReviewSummary(),
@@ -180,6 +192,9 @@ abstract class CleanerScanLayer(
                         _state.update { current ->
                             current.copy(scanHashing = true, scanHashDoneBytes = done, scanHashTotalBytes = total)
                         }
+                    },
+                    onClassified = { found ->
+                        _state.update { current -> current.copy(scanFoundByCategory = found) }
                     },
                 )
             }.onSuccess { summary ->
@@ -213,6 +228,7 @@ abstract class CleanerScanLayer(
 
                 _state.update {
                     it.copy(
+                        lastScanFromCache = summary.fromCachedIndex,
                         summary = if (focus == ScanFocus.ANALYZE) {
                             it.summary.copy(
                                 scannedFileCount = summary.scannedFileCount,
@@ -307,6 +323,51 @@ abstract class CleanerScanLayer(
                         message = getApplication<Application>().getString(R.string.message_scan_failed),
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * "Select all" on look-alikes (D1): checks every unverified file in [ids]
+     * byte for byte first (no ad), then selects the exact copies and leaves
+     * each original; files that differ are marked "Not a copy". Already
+     * verified files in [ids] are selected directly.
+     */
+    fun verifyAndSelectCopies(ids: Set<String>) {
+        val current = _state.value
+        if (current.verifySelectPercent != null || current.scanning || current.cleanupInProgress) return
+        val targets = current.summary.items.filter {
+            it.id in ids && it.assessment.group == CleanupGroup.DUPLICATE_UNVERIFIED && !it.verifiedDifferent
+        }
+        val direct = ids - targets.mapTo(HashSet(), CleanableItem::id)
+        if (direct.isNotEmpty()) {
+            _state.update { state ->
+                state.copy(summary = state.summary.copy(items = PlanSelection.setItemsSelected(state.summary.items, direct, true, false)))
+            }
+        }
+        if (targets.isEmpty()) return
+        val total = targets.sumOf { it.sizeBytes * 2L }.coerceAtLeast(1L)
+        _state.update { it.copy(verifySelectPercent = 0) }
+        viewModelScope.launch {
+            val results = LinkedHashMap<String, CleanableItem?>()
+            var done = 0L
+            for (item in targets) {
+                val verified = runSuspendCatching {
+                    repository.verifyDuplicate(item) { hashed, _ ->
+                        val percent = (((done + hashed) * 100L) / total).toInt().coerceIn(0, 99)
+                        _state.update { state -> state.copy(verifySelectPercent = percent) }
+                    }
+                }.getOrNull()
+                results[item.id] = verified
+                done += item.sizeBytes * 2L
+            }
+            val anyExact = results.values.any { it != null }
+            _state.update { state ->
+                state.copy(
+                    verifySelectPercent = null,
+                    summary = state.summary.copy(items = PlanSelection.selectVerifiedCopies(state.summary.items, results)),
+                    message = if (anyExact) state.message else getApplication<Application>().getString(R.string.verify_none_exact),
+                )
             }
         }
     }

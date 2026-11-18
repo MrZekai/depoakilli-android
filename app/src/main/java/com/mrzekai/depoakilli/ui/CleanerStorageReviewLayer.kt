@@ -228,8 +228,9 @@ abstract class CleanerStorageReviewLayer(
     }
 
     fun toggleAllStorageReviewItems() {
-        // Personal media and whole folders are never selected all at once.
-        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES || _state.value.storageReview.folder != null) return
+        // D1: "Select all" is the user's own action and works on every review
+        // (personal media and folders too); the confirmation then shows the
+        // groups and a camera warning, and everything goes to Trash.
         _state.update { state ->
             val items = state.storageReview.items
             val select = items.any { !it.selected }

@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -56,7 +55,12 @@ import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.FileVisuals
 import com.mrzekai.depoakilli.ui.media.rememberThumbnail
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Ink
+import com.mrzekai.depoakilli.ui.theme.InkSoft
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 @Composable
 internal fun CategoryDetailPage(
@@ -69,24 +73,23 @@ internal fun CategoryDetailPage(
     onCleanSelected: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
     gridAd: @Composable () -> Unit = {},
+    verifyingPercent: Int? = null,
 ) {
     var confirmCleanup by remember { mutableStateOf(false) }
     val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
     val selectedItems = items.filter(CleanableItem::selected)
     val selectedCount = selectedItems.size
     val selectedBytes = selectedItems.sumOf(CleanableItem::sizeBytes)
-    val allSelected = items.isNotEmpty() && selectedCount == items.size
-    val selectionState = sectionSelectionState(selectedCount, items.size)
+    // D1: the box counts the files it can act on (not those shown to differ).
+    val candidates = com.mrzekai.depoakilli.ui.PlanSelection.selectAllCandidates(items)
+    val allSelected = candidates.isNotEmpty() && candidates.all(CleanableItem::selected)
+    val selectionState = sectionSelectionState(candidates.count(CleanableItem::selected), candidates.size)
     val accent = categoryAccent(category)
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color(0xFF02081A), Color(0xFF061633), Color(0xFF030A1E)),
-                ),
-            ),
+            .background(SmartBackground),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp),
@@ -109,7 +112,7 @@ internal fun CategoryDetailPage(
                                 items.size,
                                 ByteFormatter.format(selectedBytes),
                             ),
-                            color = Color.White,
+                            color = OnBlack,
                             fontWeight = FontWeight.Black,
                         )
                         Text(
@@ -135,26 +138,31 @@ internal fun CategoryDetailPage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF102850))
-                        .clickable { onToggleCategory() }
+                        .background(SmartCardAlt)
+                        .clickable(enabled = verifyingPercent == null && candidates.isNotEmpty()) { onToggleCategory() }
                         .padding(horizontal = 10.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TriStateCheckbox(
                         state = selectionState,
                         onClick = onToggleCategory,
+                        enabled = verifyingPercent == null && candidates.isNotEmpty(),
                         colors = CheckboxDefaults.colors(
-                            checkedColor = ElectricBlue,
-                            uncheckedColor = Color(0xFFA7B8D6),
-                            checkmarkColor = Color.White,
+                            checkedColor = Lime,
+                            uncheckedColor = OnBlackSoft,
+                            checkmarkColor = Ink,
                         ),
                     )
                     Spacer(Modifier.width(5.dp))
                     // The tap/checkbox instruction is already shown once in the
                     // header above; it is not repeated here (QA v43 polish).
                     Text(
-                        stringResource(if (allSelected) R.string.smart_detail_unselect_all else R.string.smart_detail_select_all),
-                        color = Color.White,
+                        when {
+                            verifyingPercent != null -> stringResource(R.string.verify_select_progress, verifyingPercent)
+                            allSelected -> stringResource(R.string.smart_detail_unselect_all)
+                            else -> stringResource(R.string.smart_detail_select_all)
+                        },
+                        color = OnBlack,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f),
                     )
@@ -164,7 +172,7 @@ internal fun CategoryDetailPage(
 
         if (displayItems.isEmpty()) {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.smart_detail_empty), color = SmartTextSecondary)
+                Text(stringResource(R.string.smart_detail_empty), color = InkSoft)
             }
         } else {
             LazyVerticalGrid(
@@ -212,9 +220,9 @@ internal fun CategoryDetailPage(
         DeleteConfirmDialog(
             items = selectedItems,
             onDismiss = { confirmCleanup = false },
-            onConfirm = {
+            onConfirm = { ids ->
                 confirmCleanup = false
-                onCleanSelected(selectedItems.mapTo(linkedSetOf(), CleanableItem::id))
+                onCleanSelected(ids)
             },
         )
     }
@@ -240,7 +248,7 @@ internal fun CategoryGridItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(112.dp)
-                    .background(Color(0xFF091A3B)),
+                    .background(SmartCardAlt),
                 contentAlignment = Alignment.Center,
             ) {
                 if (bitmap != null) {
@@ -249,15 +257,6 @@ internal fun CategoryGridItem(
                         contentDescription = item.name,
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(Color.Transparent, Color(0x5503091B)),
-                                ),
-                            ),
                     )
                 } else {
                     Surface(
@@ -276,12 +275,12 @@ internal fun CategoryGridItem(
                 if (item.mimeType.startsWith("video/")) {
                     Surface(
                         modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xCC06132F),
+                        color = Black.copy(alpha = .8f),
                         shape = CircleShape,
                     ) {
                         Text(
                             "▶",
-                            color = Color.White,
+                            color = OnBlack,
                             fontSize = 20.sp,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         )
@@ -293,20 +292,20 @@ internal fun CategoryGridItem(
                     onCheckedChange = { onToggle() },
                     modifier = Modifier.align(Alignment.TopEnd).padding(4.dp),
                     colors = CheckboxDefaults.colors(
-                        checkedColor = ElectricBlue,
-                        uncheckedColor = Color.White,
-                        checkmarkColor = Color.White,
+                        checkedColor = Lime,
+                        uncheckedColor = OnBlack,
+                        checkmarkColor = Ink,
                     ),
                 )
 
                 Surface(
                     modifier = Modifier.align(Alignment.BottomStart).padding(7.dp),
-                    color = Color(0xD9030B20),
+                    color = Black.copy(alpha = .85f),
                     shape = RoundedCornerShape(10.dp),
                 ) {
                     Text(
                         ByteFormatter.format(item.sizeBytes),
-                        color = Color.White,
+                        color = OnBlack,
                         fontWeight = FontWeight.Black,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
@@ -320,7 +319,7 @@ internal fun CategoryGridItem(
             ) {
                 Text(
                     item.name,
-                    color = Color.White,
+                    color = OnBlack,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -328,21 +327,27 @@ internal fun CategoryGridItem(
                 )
                 Text(
                     compactRelativePath(item.relativePath),
-                    color = Color(0xFF9FB4D7),
+                    color = OnBlackSoft,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 12.sp,
                 )
                 Text(
-                    assessmentReason(item.assessment),
-                    color = Color(0xFFBFD0EA),
+                    // D1/D6: look-alikes carry one short label, never a cut sentence.
+                    when {
+                        item.verifiedDifferent -> stringResource(R.string.verify_not_a_copy)
+                        item.assessment.group == com.mrzekai.depoakilli.model.CleanupGroup.DUPLICATE_UNVERIFIED ->
+                            stringResource(R.string.verify_not_verified)
+                        else -> assessmentReason(item.assessment)
+                    },
+                    color = if (item.verifiedDifferent) com.mrzekai.depoakilli.ui.theme.AdLabel else OnBlackSoft,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 12.sp,
                 )
                 Text(
                     stringResource(if (item.selected) R.string.smart_included_in_cleanup else R.string.smart_not_included_in_cleanup),
-                    color = if (item.selected) SmartGreen else Color(0xFFFFB45B),
+                    color = if (item.selected) Lime else OnBlackSoft,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,

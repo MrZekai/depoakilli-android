@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.ui.tools
 
+import com.mrzekai.depoakilli.ui.PlanSelection
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
@@ -34,10 +36,16 @@ import java.util.concurrent.TimeUnit
 @Composable
 internal fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolSection> {
     val items = summary.items
-    fun section(key: String, title: String, list: List<CleanableItem>, accent: Color): ToolSection = ToolSection(
+    fun section(
+        key: String,
+        title: String,
+        list: List<CleanableItem>,
+        accent: Color,
+        subtitle: String = "${list.size} • ${ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes))}",
+    ): ToolSection = ToolSection(
         key = key,
         title = title,
-        subtitle = "${list.size} • ${ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes))}",
+        subtitle = subtitle,
         accent = accent,
         items = list,
     )
@@ -53,11 +61,19 @@ internal fun premiumSections(focus: ScanFocus, summary: ScanSummary): List<ToolS
                 .sortedByDescending { list -> list.sumOf(CleanableItem::sizeBytes) }
             val visibleGroups = grouped.take(5).mapIndexed { index, list ->
                 val kept = list.first().protectedDuplicateName ?: unknownOriginal
+                // P3: the original's name on one line (ellipsized by the header),
+                // "1 copy · 192 MB" under it.
                 section(
                     key = "duplicate-$index-$kept",
-                    title = stringResource(R.string.premium_duplicate_group_title, kept),
+                    title = kept,
                     list = list,
                     accent = if (index % 2 == 0) ToolPurple else ToolCyan,
+                    subtitle = pluralStringResource(
+                        R.plurals.premium_duplicate_copies,
+                        list.size,
+                        list.size,
+                        ByteFormatter.format(list.sumOf(CleanableItem::sizeBytes)),
+                    ),
                 )
             }
             val remaining = grouped.drop(5).flatten()
@@ -123,13 +139,24 @@ internal fun sortItems(items: List<CleanableItem>, sortMode: ToolSortMode): List
     ToolSortMode.SELECTED -> items.sortedWith(compareByDescending<CleanableItem> { it.selected }.thenByDescending { it.sizeBytes })
 }
 
+/**
+ * A section's "Select all" box (D1): the user's own action, so it selects
+ * every file (camera files too) — with none or some selected it selects, only
+ * with all selected it clears. Look-alikes get the full check first.
+ */
 internal fun setSectionSelection(
     items: List<CleanableItem>,
     onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
+    onVerifyAndSelect: (Set<String>) -> Unit = {},
 ) {
-    if (items.isEmpty()) return
-    val targetSelected = !items.all(CleanableItem::selected)
-    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected, true)
+    val candidates = PlanSelection.selectAllCandidates(items)
+    if (candidates.isEmpty()) return
+    val ids = candidates.mapTo(linkedSetOf(), CleanableItem::id)
+    if (PlanSelection.needsVerification(items)) {
+        onVerifyAndSelect(ids)
+    } else {
+        onSetItemsSelected(ids, PlanSelection.selectAllTarget(items), false)
+    }
 }
 
 internal fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {
@@ -137,7 +164,7 @@ internal fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {
     ScanFocus.LARGE_FILES -> ToolVisualConfig(R.string.scan_focus_large, R.string.premium_large_subtitle, Icons.Outlined.VideoFile, ToolAmber, ToolCyan)
     ScanFocus.APKS -> ToolVisualConfig(R.string.scan_focus_apks, R.string.premium_apk_subtitle, Icons.Outlined.Android, ToolGreen, ToolCyan)
     ScanFocus.MEDIA -> ToolVisualConfig(R.string.scan_focus_media, R.string.premium_media_subtitle, Icons.Outlined.PhotoLibrary, ToolCyan, ToolPurple)
-    ScanFocus.SCREENSHOTS -> ToolVisualConfig(R.string.category_screenshots, R.string.screenshots_tool_subtitle, Icons.Outlined.PhotoLibrary, Color(0xFFDA57FF), ToolCyan)
+    ScanFocus.SCREENSHOTS -> ToolVisualConfig(R.string.category_screenshots, R.string.screenshots_tool_subtitle, Icons.Outlined.PhotoLibrary, ToolCyan, ToolCyan)
     ScanFocus.JUNK -> ToolVisualConfig(R.string.scan_focus_junk, R.string.premium_junk_subtitle, Icons.Outlined.DeleteSweep, ToolCyan, ToolGreen)
     ScanFocus.DOWNLOADS -> ToolVisualConfig(R.string.scan_focus_downloads, R.string.premium_downloads_subtitle, Icons.Outlined.Download, ToolAmber, ToolCyan)
     ScanFocus.DEEP -> ToolVisualConfig(R.string.scan_focus_deep, R.string.premium_deep_subtitle, Icons.Outlined.AutoAwesome, ToolGreen, ToolPurple)
@@ -157,12 +184,12 @@ internal fun sectionIcon(focus: ScanFocus, section: ToolSection): ImageVector = 
 internal fun categoryAccent(category: CleanCategory): Color = when (category) {
     CleanCategory.JUNK -> ToolCyan
     CleanCategory.DUPLICATE -> ToolPurple
-    CleanCategory.SCREENSHOT -> Color(0xFFDA57FF)
+    CleanCategory.SCREENSHOT -> ToolCyan
     CleanCategory.LARGE_FILE -> ToolAmber
-    CleanCategory.OLD_DOWNLOAD -> Color(0xFFFF8746)
+    CleanCategory.OLD_DOWNLOAD -> ToolAmber
     CleanCategory.APK_PACKAGE -> ToolGreen
-    CleanCategory.APP_CACHE -> Color(0xFF18D0CF)
-    CleanCategory.WHATSAPP_MEDIA -> Color(0xFF22C96C)
+    CleanCategory.APP_CACHE -> ToolCyan
+    CleanCategory.WHATSAPP_MEDIA -> ToolGreen
 }
 
 internal fun ageDays(modifiedAtMillis: Long, nowMillis: Long = System.currentTimeMillis()): Long {

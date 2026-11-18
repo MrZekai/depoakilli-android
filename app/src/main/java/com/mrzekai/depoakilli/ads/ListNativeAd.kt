@@ -59,9 +59,10 @@ fun ListNativeAdCard(
     }
 
     val loaded = nativeAd ?: return
-    val height = (330 + 180 * (LocalDensity.current.fontScale - 1).coerceAtLeast(0f)).dp
+    // C5: a row-sized card (≈ 96 dp, more with large text), no media view.
+    val height = (96 + 40 * (LocalDensity.current.fontScale - 1).coerceAtLeast(0f)).dp
     AndroidView(
-        factory = { viewContext -> createNativeAdView(viewContext).also { bindNativeAd(it, loaded) } },
+        factory = { viewContext -> createSmallNativeAdView(viewContext).also { bindNativeAd(it, loaded) } },
         update = { view -> bindNativeAd(view, loaded) },
         modifier = modifier
             .fillMaxWidth()

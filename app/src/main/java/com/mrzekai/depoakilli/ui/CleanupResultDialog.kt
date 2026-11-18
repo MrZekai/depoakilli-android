@@ -4,91 +4,92 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Icon
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.OutlinedButton
-import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.model.PlanGroup
 import com.mrzekai.depoakilli.ads.CleanupResultAdSurface
 import com.mrzekai.depoakilli.model.ByteFormatter
-import com.mrzekai.depoakilli.ui.theme.ElectricBlue
-import com.mrzekai.depoakilli.ui.theme.Lime400
+import com.mrzekai.depoakilli.model.PlanGroup
+import com.mrzekai.depoakilli.ui.common.AdTag
+import com.mrzekai.depoakilli.ui.common.BlackCard
+import com.mrzekai.depoakilli.ui.common.GiantNumber
+import com.mrzekai.depoakilli.ui.common.LinkButton
+import com.mrzekai.depoakilli.ui.common.PageFrame
+import com.mrzekai.depoakilli.ui.common.PageLabel
+import com.mrzekai.depoakilli.ui.common.PermanentDeleteSheet
+import com.mrzekai.depoakilli.ui.common.PillButton
+import com.mrzekai.depoakilli.ui.common.PillStyle
+import com.mrzekai.depoakilli.ui.common.rememberGiantScale
+import com.mrzekai.depoakilli.ui.theme.AppWeights
+import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.Lime
+import com.mrzekai.depoakilli.ui.theme.OnBlack
 
+/**
+ * Result (T5.6): full-screen Lime. A black circle with a check, the giant
+ * amount moved to Trash and when that space is really freed; "X freed" only
+ * for bytes actually deleted. No percentage claims. Buttons: black "Done",
+ * outlined "Free the space now" (the permanent-delete sheet comes first) and
+ * "Undo"; the native ad sits below them with its "Ad" label, 24 dp away.
+ */
 @Composable
 internal fun CleanupResultDialog(
     result: CleanupResult,
     canRequestAds: Boolean,
     showRewardedOffer: Boolean,
     onShowRewardedAd: () -> Unit,
+    adFreeRemainingMillis: Long = 0L,
     onSystemDismiss: () -> Unit,
     onDone: (resultAdPresented: Boolean) -> Unit,
     onUndo: () -> Unit = {},
     onEmptyTrash: () -> Unit = {},
     nextReview: PlanGroup? = null,
     onReviewNext: () -> Unit = {},
+    nextSuggestedBytes: Long = 0L,
+    onOpenSuggested: () -> Unit = {},
 ) {
     var resultAdPresented by remember(result) { mutableStateOf(false) }
     var confirmEmptyTrash by remember { mutableStateOf(false) }
-    val configuration = LocalConfiguration.current
     val partial = result.failedCount > 0 || result.cancelledCount > 0
-    val accent = if (partial) Color(0xFFFFB74D) else Lime400
-    val resultTitle = when {
-        result.kind == CleanupResultKind.APP_CACHE ->
-            stringResource(
-                R.string.cleanup_result_app_cache_title,
-                result.subjectLabel ?: stringResource(R.string.app_name),
-            )
-        result.kind == CleanupResultKind.SYSTEM_CACHE ->
-            stringResource(R.string.cleanup_result_system_cache_title)
-        partial -> stringResource(R.string.cleanup_result_partial_title)
-        else -> stringResource(R.string.cleanup_result_title)
-    }
+    val figures = ResultFigures.of(result)
+    val scale = rememberGiantScale()
 
     if (confirmEmptyTrash) {
-        EmptyTrashConfirmDialog(
+        PermanentDeleteSheet(
             bytes = result.trashedBytes,
+            body = stringResource(R.string.result_empty_trash_confirm, ByteFormatter.format(result.trashedBytes)),
             onDismiss = { confirmEmptyTrash = false },
-            onConfirm = {
+            onDeletePermanently = {
                 confirmEmptyTrash = false
                 onEmptyTrash()
             },
@@ -101,90 +102,85 @@ internal fun CleanupResultDialog(
             dismissOnBackPress = true,
             dismissOnClickOutside = false,
             usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false,
         ),
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xB8000615))
-                .padding(horizontal = 20.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Card(
+        PageFrame(modifier = Modifier.fillMaxSize()) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = (configuration.screenHeightDp * 0.94f).dp),
-                shape = RoundedCornerShape(30.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    .fillMaxSize()
+                    // D6: the scroll area itself ends above the navigation bar, so the
+                    // ad card never runs under the system buttons.
+                    .systemBarsPadding()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 22.dp, end = 22.dp, top = 18.dp, bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    Color(0xFF071B31),
-                                    Color(0xFF0B3A34),
-                                    Color(0xFF07152A),
-                                ),
-                            ),
-                        )
-                        .padding(22.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                        .size(72.dp)
+                        .clip(CircleShape)
+                        .background(Black),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(15.dp),
-                    ) {
-                    Surface(
-                        color = accent.copy(alpha = .16f),
-                        shape = CircleShape,
-                    ) {
-                        Icon(
-                            Icons.Outlined.CheckCircle,
-                            contentDescription = null,
-                            tint = accent,
-                            modifier = Modifier.padding(16.dp).size(44.dp),
-                        )
-                    }
-
-                    Text(
-                        text = resultTitle,
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Black,
-                        textAlign = TextAlign.Center,
+                    Icon(
+                        if (partial) Icons.Outlined.ErrorOutline else Icons.Outlined.Check,
+                        contentDescription = null,
+                        tint = Lime,
+                        modifier = Modifier.size(40.dp),
                     )
+                }
 
-                    if (result.kind == CleanupResultKind.FILES) {
-                        Text(
-                            stringResource(R.string.result_freed_now, ByteFormatter.format(result.deletedBytes)),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
-                        )
+                when (figures.headline) {
+                    ResultFigures.Headline.TRASHED -> {
+                        GiantNumber(ByteFormatter.format(result.trashedBytes), scale, modifier = Modifier.fillMaxWidth())
+                        PageLabel(stringResource(R.string.result_moved_to_trash), strong = true)
+                        PageLabel(stringResource(R.string.result_space_note))
+                        if (figures.showFreed) {
+                            PageLabel(
+                                stringResource(R.string.result_freed_for_good, ByteFormatter.format(result.deletedBytes)),
+                                strong = true,
+                            )
+                        }
                     }
-                    if (result.deletedBytes > 0L) {
-                        Text(
-                            ByteFormatter.format(result.deletedBytes),
-                            color = accent,
-                            fontSize = 43.sp,
-                            fontWeight = FontWeight.Black,
-                        )
-                        Text(
+                    ResultFigures.Headline.FREED -> {
+                        GiantNumber(ByteFormatter.format(result.deletedBytes), scale, modifier = Modifier.fillMaxWidth())
+                        PageLabel(
                             stringResource(
                                 if (result.kind != CleanupResultKind.FILES) {
-                                    R.string.cleanup_result_system_cache_reduced
+                                    // C6: "of cache cleared", no paragraph under it.
+                                    R.string.result_cache_cleared
                                 } else {
-                                    R.string.cleanup_result_space_reclaimed
+                                    R.string.result_freed
                                 },
                             ),
-                            color = Color(0xFFD4E9E3),
-                            fontWeight = FontWeight.Bold,
+                            strong = true,
                         )
-                    } else {
-                        Text(
+                        // E2: the free space measured before and after; hidden unless it really grew.
+                        figures.freeSpaceChange?.let { (before, after) ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Pill)
+                                    .background(Black)
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                            ) {
+                                Text(
+                                    stringResource(
+                                        R.string.result_free_space_change,
+                                        ByteFormatter.format(before),
+                                        ByteFormatter.format(after),
+                                    ),
+                                    color = Lime,
+                                    fontSize = 15.sp,
+                                    fontWeight = AppWeights.Title,
+                                )
+                            }
+                        }
+                    }
+                    ResultFigures.Headline.NOTHING -> {
+                        PageLabel(resultTitle(result, partial), strong = true)
+                        PageLabel(
                             stringResource(
                                 if (result.kind != CleanupResultKind.FILES) {
                                     R.string.cleanup_result_system_cache_unmeasured
@@ -192,238 +188,236 @@ internal fun CleanupResultDialog(
                                     R.string.cleanup_result_zero
                                 },
                             ),
-                            color = Color(0xFFD4E9E3),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center,
                         )
                     }
+                }
+                if (figures.headline != ResultFigures.Headline.NOTHING && result.kind == CleanupResultKind.APP_CACHE) {
+                    PageLabel(resultTitle(result, partial))
+                }
 
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = Color.White.copy(alpha = .06f),
-                        shape = RoundedCornerShape(18.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            if (result.kind == CleanupResultKind.FILES) {
-                                CleanupResultLine(
-                                    text = pluralStringResource(
-                                        R.plurals.cleanup_result_files_removed,
-                                        result.deletedCount,
-                                        result.deletedCount,
-                                    ),
-                                    accent = Lime400,
-                                )
-                            }
-                            if (result.beforeAvailableBytes > 0L && result.afterAvailableBytes > 0L) {
-                                CleanupResultLine(
-                                    text = stringResource(
-                                        R.string.cleanup_result_storage_snapshot,
-                                        ByteFormatter.format(result.beforeAvailableBytes),
-                                        ByteFormatter.format(result.afterAvailableBytes),
-                                    ),
-                                    accent = ElectricBlue,
-                                )
-                            }
-                            if (result.changedCount > 0) {
-                                CleanupResultLine(
-                                    text = pluralStringResource(
-                                        R.plurals.result_changed,
-                                        result.changedCount,
-                                        result.changedCount,
-                                    ),
-                                    accent = Color(0xFFFFC46B),
-                                )
-                            }
-                            val notDeleted = (result.failedCount - result.changedCount).coerceAtLeast(0)
-                            if (notDeleted > 0) {
-                                CleanupResultLine(
-                                    text = pluralStringResource(
-                                        R.plurals.result_not_deleted,
-                                        notDeleted,
-                                        notDeleted,
-                                    ),
-                                    accent = Color(0xFFFF8A80),
-                                )
-                            }
-                            if (result.restoredCount > 0) {
-                                CleanupResultLine(
-                                    text = pluralStringResource(
-                                        R.plurals.result_restored,
-                                        result.restoredCount,
-                                        result.restoredCount,
-                                    ),
-                                    accent = ElectricBlue,
-                                )
-                            }
-                            if (result.cancelledCount > 0) {
-                                CleanupResultLine(
-                                    text = pluralStringResource(
-                                        R.plurals.cleanup_result_cancelled,
-                                        result.cancelledCount,
-                                        result.cancelledCount,
-                                    ),
-                                    accent = Color(0xFFFFC46B),
-                                )
-                            }
-                        }
-                    }
+                ResultDetails(result)
 
-                    if (result.kind == CleanupResultKind.FILES) {
-                        CleanupTrashSection(
-                            result = result,
-                            onUndo = onUndo,
-                            onEmptyTrash = { confirmEmptyTrash = true },
-                        )
-                    }
-
-                    Text(
-                        stringResource(
-                            when (result.kind) {
-                                CleanupResultKind.SYSTEM_CACHE ->
-                                    R.string.cleanup_result_system_cache_note
-                                CleanupResultKind.APP_CACHE ->
-                                    R.string.cleanup_result_app_cache_note
-                                CleanupResultKind.FILES ->
-                                    R.string.cleanup_result_note
-                            },
-                        ),
-                        color = Color(0xFF9FB8C2),
-                        fontSize = 12.sp,
-                        lineHeight = 15.sp,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    // V9: the biggest group still left in the plan, above "Done".
-                    val nextGroup = nextReview?.group
-                    if (nextReview != null && nextGroup != null) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                stringResource(
-                                    R.string.result_next_group,
-                                    stringResource(nextGroup.titleRes),
-                                    ByteFormatter.format(nextReview.bytes),
-                                ),
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.weight(1f),
-                            )
-                            OutlinedButton(onClick = onReviewNext, modifier = Modifier.heightIn(min = 48.dp)) {
-                                Text(stringResource(R.string.result_review_next))
-                            }
-                        }
-                    }
-
-                    Button(
-                        onClick = { onDone(resultAdPresented) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
+                // C2: after tier 1, the next step is the "My pick" card.
+                if (nextSuggestedBytes > 0L) {
+                    BlackCard(contentPadding = PaddingValues(18.dp)) {
                         Text(
-                            stringResource(R.string.cleanup_result_done),
-                            fontWeight = FontWeight.Black,
+                            stringResource(R.string.plan_suggest_title),
+                            color = OnBlack,
+                            fontSize = 16.sp,
+                            lineHeight = 21.sp,
+                            fontWeight = AppWeights.Title,
+                        )
+                        PillButton(
+                            text = stringResource(R.string.plan_suggest_action, ByteFormatter.format(nextSuggestedBytes)),
+                            onClick = onOpenSuggested,
+                            style = PillStyle.LIME,
+                            modifier = Modifier.padding(top = 12.dp),
                         )
                     }
+                }
+                // V9: the biggest group still left in the plan, one line above "Done".
+                val nextGroup = nextReview?.group
+                if (nextSuggestedBytes <= 0L && nextReview != null && nextGroup != null) {
+                    LinkButton(
+                        text = stringResource(
+                            R.string.result_next_group,
+                            stringResource(nextGroup.titleRes),
+                            ByteFormatter.format(nextReview.bytes),
+                        ) + " · " + stringResource(R.string.result_review_next),
+                        onClick = onReviewNext,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
 
-                    HorizontalDivider()
+                // Faz 6 (E2): when files wait in Trash the first button frees them now
+                // (the permanent-delete sheet with its big "Cancel" still comes first),
+                // then an outlined "Done", then "Undo". Otherwise only "Done".
+                if (figures.canEmptyTrash) {
+                    PillButton(
+                        text = stringResource(R.string.result_free_now_bytes, ByteFormatter.format(result.trashedBytes)),
+                        onClick = { confirmEmptyTrash = true },
+                        style = PillStyle.BLACK_LIME,
+                    )
+                }
+                PillButton(
+                    text = stringResource(R.string.result_done),
+                    onClick = { onDone(resultAdPresented) },
+                    style = if (figures.canEmptyTrash) PillStyle.INK_OUTLINE else PillStyle.BLACK_LIME,
+                )
+                if (figures.canEmptyTrash) {
+                    LinkButton(
+                        text = stringResource(R.string.result_undo),
+                        onClick = onUndo,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
+                // D5: the ad-free offer is a card under "Undo" and above the native;
+                // while the window runs it shows the minutes left instead.
+                AdFreeCard(
+                    remainingMillis = adFreeRemainingMillis,
+                    offer = showRewardedOffer,
+                    onWatch = onShowRewardedAd,
+                )
+
+                if (canRequestAds) {
+                    // At least 24 dp between the buttons and the ad; the ad carries its label above it.
                     Spacer(Modifier.height(24.dp))
+                    AdTag(modifier = Modifier.align(Alignment.Start))
                     CleanupResultAdSurface(
                         canRequestAds = canRequestAds,
                         onAdPresented = { resultAdPresented = true },
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(24.dp))
-                    if (showRewardedOffer) {
-                        TextButton(onClick = onShowRewardedAd) {
-                            Text(
-                                stringResource(R.string.rewarded_ad_result_action),
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                    }
                 }
             }
         }
     }
 }
 
-@Composable
-private fun CleanupTrashSection(
-    result: CleanupResult,
-    onUndo: () -> Unit,
-    onEmptyTrash: () -> Unit,
+/** Which giant figure the result shows (pure; covered by unit tests). */
+internal data class ResultFigures(
+    val headline: Headline,
+    /** "X freed" line under a Trash headline: only for bytes really deleted. */
+    val showFreed: Boolean,
+    val canEmptyTrash: Boolean,
+    /** E2: free space before → after, only when both were measured and it grew. */
+    val freeSpaceChange: Pair<Long, Long>? = null,
 ) {
-    if (result.trashedBytes <= 0L || result.trashEntryIds.isEmpty()) return
-    val days = CleaningThresholds.TRASH_RETENTION_DAYS
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.White.copy(alpha = .06f),
-        shape = RoundedCornerShape(18.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                pluralStringResource(R.plurals.result_in_trash, days, ByteFormatter.format(result.trashedBytes), days),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
+    enum class Headline { TRASHED, FREED, NOTHING }
+
+    companion object {
+        fun of(result: CleanupResult): ResultFigures {
+            val trashed = result.kind == CleanupResultKind.FILES &&
+                result.trashedBytes > 0L &&
+                result.trashEntryIds.isNotEmpty()
+            val headline = when {
+                trashed -> Headline.TRASHED
+                result.deletedBytes > 0L -> Headline.FREED
+                else -> Headline.NOTHING
+            }
+            val measured = result.beforeAvailableBytes > 0L &&
+                result.afterAvailableBytes > result.beforeAvailableBytes
+            return ResultFigures(
+                headline = headline,
+                showFreed = trashed && result.deletedBytes > 0L,
+                canEmptyTrash = trashed,
+                freeSpaceChange = if (headline == Headline.FREED && result.kind == CleanupResultKind.FILES && measured) {
+                    result.beforeAvailableBytes to result.afterAvailableBytes
+                } else {
+                    null
+                },
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                OutlinedButton(onClick = onUndo, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.result_undo))
+        }
+    }
+}
+
+@Composable
+private fun resultTitle(result: CleanupResult, partial: Boolean): String = when {
+    result.kind == CleanupResultKind.APP_CACHE ->
+        stringResource(
+            R.string.cleanup_result_app_cache_title,
+            result.subjectLabel ?: stringResource(R.string.app_name),
+        )
+    result.kind == CleanupResultKind.SYSTEM_CACHE ->
+        stringResource(R.string.cleanup_result_system_cache_title)
+    partial -> stringResource(R.string.cleanup_result_partial_title)
+    else -> stringResource(R.string.cleanup_result_title)
+}
+
+/**
+ * "No ads for 60 minutes" (D5): a black card with a Lime play button, started
+ * only by the user. During the window it shows the minutes left and offers
+ * nothing.
+ */
+@Composable
+internal fun AdFreeCard(remainingMillis: Long, offer: Boolean, onWatch: () -> Unit) {
+    val active = remainingMillis > 0L
+    if (!active && !offer) return
+    val minutes = ((remainingMillis + 59_999L) / 60_000L).toInt()
+    Surface(
+        onClick = { if (!active) onWatch() },
+        enabled = !active,
+        color = com.mrzekai.depoakilli.ui.theme.Black,
+        contentColor = com.mrzekai.depoakilli.ui.theme.OnBlack,
+        shape = com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Card,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            androidx.compose.foundation.layout.Column(Modifier.weight(1f)) {
+                Text(
+                    if (active) pluralStringResource(R.plurals.ad_free_left, minutes, minutes) else stringResource(R.string.ad_free_card_title),
+                    color = com.mrzekai.depoakilli.ui.theme.OnBlack,
+                    fontSize = 17.sp,
+                    fontWeight = AppWeights.Title,
+                )
+                if (!active) {
+                    Text(
+                        stringResource(R.string.ad_free_card_sub),
+                        color = com.mrzekai.depoakilli.ui.theme.OnBlackSoft,
+                        fontSize = 13.sp,
+                    )
                 }
-                OutlinedButton(onClick = onEmptyTrash, modifier = Modifier.weight(1f).heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.result_empty_trash_now), textAlign = TextAlign.Center)
-                }
+            }
+            if (!active) {
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Outlined.PlayCircle,
+                    contentDescription = null,
+                    tint = com.mrzekai.depoakilli.ui.theme.Lime,
+                    modifier = Modifier.size(40.dp),
+                )
             }
         }
     }
 }
 
-/** Second confirmation before permanently deleting files from the trash. */
+/** Counts that matter (files, skipped, restored, cancelled) in one black card. */
 @Composable
-internal fun EmptyTrashConfirmDialog(bytes: Long, onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        text = { Text(stringResource(R.string.result_empty_trash_confirm, ByteFormatter.format(bytes))) },
-        confirmButton = {
-            TextButton(onClick = onConfirm) { Text(stringResource(R.string.result_delete_permanently)) }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
-        },
-    )
-}
-
-@Composable
-private fun CleanupResultLine(
-    text: String,
-    accent: Color,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Surface(
-            color = accent.copy(alpha = .18f),
-            shape = CircleShape,
-        ) {
-            Box(Modifier.size(9.dp))
+private fun ResultDetails(result: CleanupResult) {
+    val lines = buildList {
+        if (result.kind == CleanupResultKind.FILES && result.deletedCount > 0) {
+            // D6: files that went to Trash were moved; "deleted" only for permanent deletes.
+            val moved = result.trashEntryIds.size.coerceAtMost(result.deletedCount)
+            val removed = result.deletedCount - moved
+            if (moved > 0) add(pluralStringResource(R.plurals.result_files_moved, moved, moved))
+            if (removed > 0) add(pluralStringResource(R.plurals.cleanup_result_files_removed, removed, removed))
         }
-        Text(
-            text,
-            color = Color.White,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(start = 9.dp),
-        )
+        if (result.deletedBytes > 0L && result.beforeAvailableBytes > 0L && result.afterAvailableBytes > 0L) {
+            add(
+                stringResource(
+                    R.string.cleanup_result_storage_snapshot,
+                    ByteFormatter.format(result.beforeAvailableBytes),
+                    ByteFormatter.format(result.afterAvailableBytes),
+                ),
+            )
+        }
+        if (result.changedCount > 0) {
+            add(pluralStringResource(R.plurals.result_changed, result.changedCount, result.changedCount))
+        }
+        val notDeleted = (result.failedCount - result.changedCount).coerceAtLeast(0)
+        if (notDeleted > 0) add(pluralStringResource(R.plurals.result_not_deleted, notDeleted, notDeleted))
+        if (result.restoredCount > 0) {
+            add(pluralStringResource(R.plurals.result_restored, result.restoredCount, result.restoredCount))
+        }
+        if (result.cancelledCount > 0) {
+            add(pluralStringResource(R.plurals.cleanup_result_cancelled, result.cancelledCount, result.cancelledCount))
+        }
+    }
+    if (lines.isEmpty()) return
+    BlackCard(contentPadding = PaddingValues(16.dp)) {
+        lines.forEach { line ->
+            Text(
+                line,
+                color = OnBlack,
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontWeight = AppWeights.Strong,
+                modifier = Modifier.padding(vertical = 2.dp),
+            )
+        }
     }
 }

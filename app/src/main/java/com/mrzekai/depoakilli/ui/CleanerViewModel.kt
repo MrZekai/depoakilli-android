@@ -10,6 +10,7 @@ import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.isBulkSelectable
+import com.mrzekai.depoakilli.model.swipeItemsFor
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -99,12 +100,14 @@ class CleanerViewModel internal constructor(
 
     fun toggleCategory(category: CleanCategory) {
         _state.update { state ->
+            // D1: the user's "Select all" — both ways, partial selects; only
+            // look-alikes shown to be different are never selected.
             val categoryItems = state.summary.items.filter { it.assessment.category == category }
-            val select = categoryItems.any { it.isBulkSelectable() && !it.selected }
+            val select = PlanSelection.selectAllTarget(categoryItems)
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        val excluded = select && !item.isBulkSelectable()
+                        val excluded = select && item.verifiedDifferent
                         if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
@@ -177,7 +180,7 @@ class CleanerViewModel internal constructor(
     /** Opens the swipe review for a plan group, keeping earlier marks for the same files. */
     fun openSwipeReview(group: CleanupGroup) {
         _state.update { state ->
-            val items = state.summary.items.filter { it.assessment.group == group }
+            val items = swipeItemsFor(group, state.summary.items)
             val fresh = SwipeReviewState.start(items)
             val previous = state.swipeStates[group]
             val review = if (previous != null && previous.itemIds == fresh.itemIds) previous else fresh

@@ -4,9 +4,7 @@
     <string name="tab_clean">Очистка</string>
     <string name="tab_tools">Инструменты</string>
     <string name="home_storage_percent">%1$d%%</string>
-    <string name="junk_cleaner_title">Очистка мусора</string>
     <string name="whatsapp_cleaner_title">Очистка WhatsApp</string>
-    <string name="large_files_tool_title">Большие файлы</string>
     <string name="grant_access">Разрешить</string>
     <string name="scan_private">Ваш контент никогда не покидает устройство</string>
     <string name="start_scan">Начать сканирование</string>
@@ -20,17 +18,17 @@
     <string name="cache_own_app_subtitle">%1$s можно удалить напрямую и безопасно.</string>
     <string name="scan_focus_smart">Результат умной очистки</string>
     <string name="scan_focus_junk">Очистка мусора</string>
-    <string name="scan_focus_duplicates">Очистка дубликатов</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="scan_focus_duplicates">Дубликаты</string>
     <string name="scan_focus_large">Большие файлы</string>
     <string name="language_settings">Язык приложения</string>
     <string name="ad_privacy_preferences">Настройки конфиденциальности рекламы</string>
-    <string name="ad_privacy_preferences_subtitle">Изменение параметров согласия и персонализации</string>
-    <string name="sponsored">Реклама</string>
     <string name="message_scan_failed">Сканирование не удалось завершить. Проверьте разрешения мультимедиа и повторите попытку.</string>
     <string name="message_select_item">Выберите хотя бы один элемент для очистки.</string>
     <string name="message_cache_already_empty">Кэш приложения уже пуст.</string>
     <string name="message_whatsapp_scan_failed">Сканирование WhatsApp не удалось завершить. Подключите папку Media и повторите попытку.</string>
     <string name="message_screen_unavailable">Этот экран не удалось открыть на вашем устройстве.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="category_duplicates">Дубликаты</string>
     <string name="category_duplicates_description">Ненужные копии с идентичным содержанием</string>
     <string name="category_screenshots">Скриншоты</string>
@@ -109,31 +107,19 @@
     </plurals>
     <string name="settings_title">Настройки</string>
     <string name="rate_us">Оцените нас</string>
-    <string name="rate_us_subtitle">Откройте страницу Smart Cleaner в Google Play.</string>
     <string name="send_feedback">Отправить отзыв</string>
-    <string name="send_feedback_subtitle">Сообщите о проблеме или поделитесь предложением</string>
     <string name="share_app">Поделиться Smart Cleaner</string>
-    <string name="share_app_subtitle">Порекомендовать приложение кому-нибудь</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
-    <string name="privacy_policy_subtitle">Узнайте, как обрабатываются данные устройств и реклама.</string>
     <string name="terms_of_service">Условия использования</string>
-    <string name="terms_of_service_subtitle">Прочтите условия безопасного использования и удаления.</string>
     <string name="about_app">О приложении</string>
     <string name="legal_contact">Разработчик: MrZekai\nКонтактное лицо по вопросам конфиденциальности и поддержки: %1$s.</string>
-    <string name="about_app_subtitle">Версия, принципы продукта и возможности</string>
     <string name="feedback_subject">Отзыв о Smart Cleaner</string>
     <string name="feedback_template">Устройство: %1$s %2$s\nAndroid: %3$s\n\nОбратная связь:\n</string>
     <string name="share_app_message">Smart Cleaner безопасно анализирует хранилище на вашем устройстве: %1$s</string>
     <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner — это приложение для управления и обслуживания хранилища. Он сканирует общее хранилище на устройстве на наличие мусора, точных дубликатов, больших файлов, старых загрузок, установщиков APK, элементов обзора мультимедиа и медиафайлов WhatsApp. App Cache Manager использует официальный процесс очистки системного кэша Android; Android может потребовать подтверждения системы.\n\nПакет: com.mrzekai.depoakilli</string>
-    <string name="access_files_missing">Нужен доступ к файлам</string>
-    <string name="access_files_ready">Файлы готовы</string>
-    <string name="access_usage_optional">Доступ к статистике — по желанию</string>
-    <string name="access_usage_ready">Статистика приложения готова</string>
     <string name="all_files_access_clean_screen">Smart Cleaner требуется Android Доступ ко всем файлам для комплексного сканирования общего хранилища, не заставляя вас выбирать папки одну за другой.</string>
     <string name="all_files_access_description">Нужен для основных функций управления файлами: ненужные файлы, дубликаты, большие файлы, загрузки, APK и медиафайлы WhatsApp.</string>
     <string name="all_files_access_title">Полный доступ к управлению хранилищем</string>
-    <string name="app_manager_intro">Просмотрите запускаемые приложения, использование памяти и кэша в Smart Cleaner. При удалении приложения всегда используется официальное подтверждение удаления Android.</string>
-    <string name="app_manager_size_detail">Всего %1$s • Кэш %2$s</string>
     <string name="app_manager_subtitle">Просмотрите запускаемые приложения, размер хранилища, кэш и параметры удаления Android.</string>
     <string name="app_manager_title">Менеджер приложений</string>
     <string name="app_manager_usage_description">Доступ к использованию позволяет Smart Cleaner отображать общий объем хранилища приложений и информацию о последнем использовании. Персональный контент приложения не читается.</string>
@@ -149,14 +135,8 @@
     <string name="category_junk_description">Старые временные артефакты, миниатюры и незавершенные загрузки</string>
     <string name="category_large_files">Большие файлы</string>
     <string name="category_large_files_description">Файлы размером более 100 MB в доступном общем хранилище.</string>
-    <string name="deep_cleaner_subtitle">Широкий однопроходный обзор основных категорий хранилищ; личные файлы с низким уровнем конфиденциальности остаются только для просмотра</string>
-    <string name="deep_cleaner_title">Глубокая очистка</string>
     <string name="duplicates_tool_subtitle_v050">Находить точные дубликаты, проверенные по контенту; всегда сохраняется один оригинал</string>
-    <string name="junk_cleaner_subtitle_v050">Просматривайте временные файлы и миниатюры изображений вне загрузок; остатки загрузки остаются в загрузках</string>
-    <string name="language_settings_subtitle_v050">Используйте настройки языка приложения Android. Неподдерживаемые языки безопасно переключаются на английский.</string>
     <string name="large_files_tool_subtitle_v050">Найдите файлы более 100 MB — видео, архив, APK, аудио, документы и многое другое.</string>
-    <string name="media_cleaner_subtitle">Просмотрите точные дубликаты мультимедиа, старые снимки экрана и большие фотографии/видео.</string>
-    <string name="media_cleaner_title">Очистка медиафайлов</string>
     <string name="message_all_files_granted">Полный доступ к управлению хранилищем готов.</string>
     <string name="message_all_files_required">Включите доступ ко всем файлам, чтобы Smart Cleaner мог выполнить полное сканирование хранилища устройства.</string>
     <string name="message_all_files_required_for_cache">Для глубокой очистки кэша сначала нужен доступ ко всем файлам Android.</string>
@@ -195,13 +175,10 @@
     <string name="storage_type_other">Другие файлы</string>
     <string name="storage_type_videos">Видео</string>
     <string name="terms_of_service_body_v050">Smart Cleaner предоставляет инструменты для анализа хранилища на устройстве и управления файлами. Результаты сканирования — это рекомендации, а не резервные копии. Просмотрите выбранные файлы пользователя перед их удалением.\n\nSmart Cleaner может управлять доступными файлами общего хранилища после того, как Android предоставит доступ ко всем файлам. Android по-прежнему защищает личные внутренние данные других приложений. App Cache Manager использует официальное системное действие Android и может отображать необходимое подтверждение Android.\n\nSmart Cleaner не обещает воздействовать на защищённые сторонние приложения, системную оперативную память или температуру процессора и не заявляет выдуманных результатов. Доступность зависит от версии Android и производителя устройства.\n\nВы несете ответственность за проверку выбора перед удалением. Удаленные файлы не подлежат восстановлению. Реклама предоставляется сторонними службами в соответствии с их условиями и политиками.</string>
-    <string name="tools_rebuilt_status">Свободно: %1$s • Кэш приложений: %2$s</string>
-    <string name="tools_rebuilt_title">Инструменты очистки и хранилища</string>
     <string name="uninstall">Удалить</string>
     <string name="whatsapp_category_statuses">Статусы</string>
     <string name="whatsapp_category_statuses_description">Временные медиафайлы статусов WhatsApp в общем хранилище</string>
     <string name="whatsapp_cleaner_subtitle_v050">Сканируйте общие медиафайлы WhatsApp и WhatsApp Business прямо в Smart Cleaner</string>
-    <string name="cleaner_engine_badge">SMART CLEANER</string>
     <string name="security_center_title">Разрешения и конфиденциальность</string>
     <string name="security_center_subtitle">Управляйте доступом к Android и узнайте, для чего именно Smart Cleaner его использует.</string>
     <string name="security_storage_access">Доступ к хранилищу</string>
@@ -217,9 +194,6 @@
     <string name="clean_results_title">Результаты очистки</string>
     <string name="smart_clean_results_title">Результаты Smart Clean</string>
     <string name="smart_clean_results_empty_intro">Запустите Smart Clean, чтобы просмотреть доступные для просмотра предложения по очистке и информацию о доступной памяти.</string>
-    <string name="smart_scan_progress_title">Идёт сканирование Smart Clean</string>
-    <string name="smart_scan_progress_subtitle">Анализ мусора, дубликатов, больших файлов, APK и доступных медиафайлов для безопасного плана очистки.</string>
-    <string name="smart_review_and_clean">Проверить и очистить</string>
     <string name="smart_storage_preview_empty">Для этой категории не было сохранено ни одного файла для предварительного просмотра.</string>
     <string name="smart_included_in_cleanup">Включено в очистку</string>
     <string name="smart_not_included_in_cleanup">Не входит в очистку</string>
@@ -227,13 +201,9 @@
     <string name="smart_audio_pause">Пауза</string>
     <string name="smart_generic_preview_title">Детали файла</string>
     <string name="smart_reason_title">Почему это предлагается?</string>
-    <string name="smart_cleanup_in_progress">Очистка…</string>
     <string name="message_cleanup_failed">Не удалось завершить очистку. Больше ничего не изменилось.</string>
-    <string name="smart_scan_live_title">Сканирование в реальном времени</string>
     <string name="smart_scan_files_label">Найдено файлов</string>
     <string name="smart_scan_folders_label">Проверено папок</string>
-    <string name="smart_scan_checking_title">Сейчас проверяется</string>
-    <string name="smart_scan_media_stage">Медиа и загрузки</string>
     <string name="smart_detail_selected_summary">%1$d из %2$d выбран • %3$s</string>
     <string name="smart_detail_grid_hint">Коснитесь карточки, чтобы просмотреть ее. Используйте этот флажок только для включения или исключения его из очистки.</string>
     <string name="smart_detail_select_all">Выбрать все</string>
@@ -270,7 +240,8 @@
     <string name="storage_review_limit_note">Очень большая категория достигла безопасного предела отображения. Уточните папку или запустите анализ еще раз после очистки.</string>
     <string name="whatsapp_scanning_short">Умное сканирование мультимедиа</string>
     <string name="whatsapp_local_processing_note">Медиафайлы анализируются на этом устройстве.</string>
-    <string name="whatsapp_total_media">ВСЕ МЕДИАФАЙЛЫ WHATSAPP</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_total_media">Медиа WhatsApp</string>
     <string name="whatsapp_filter_incoming">Входящие</string>
     <string name="whatsapp_filter_sent">Отправлено</string>
     <string name="whatsapp_filter_all">Все</string>
@@ -279,41 +250,25 @@
     <string name="whatsapp_group_documents_more">Документы и многое другое</string>
     <string name="whatsapp_view_all">Посмотреть все</string>
     <string name="whatsapp_card_hint">Коснитесь файла для предварительного просмотра. • Установите флажок, чтобы добавить его в очистку.</string>
-    <string name="whatsapp_sort_largest">Сначала большие</string>
-    <string name="whatsapp_sort_newest">Сначала самые новые</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_largest">Крупные</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="whatsapp_sort_newest">Новые</string>
     <string name="whatsapp_no_files_for_filter">Нет файлов, соответствующих этому фильтру.</string>
-    <string name="whatsapp_selected_size">Выбрано</string>
-    <plurals name="whatsapp_selected_items_short">
-        <item quantity="one">Элементов: %1$d</item>
-        <item quantity="few">Элементов: %1$d</item>
-        <item quantity="many">Элементов: %1$d</item>
-        <item quantity="other">Элементов: %1$d</item>
-    </plurals>
-    <string name="whatsapp_review_and_clean">Проверить и очистить</string>
-    <string name="whatsapp_cleanup_in_progress">Очистка…</string>
     <string name="whatsapp_preview_title">Предварительный просмотр</string>
     <string name="whatsapp_included">Входит в очистку</string>
     <string name="whatsapp_not_included">Не включено</string>
     <string name="whatsapp_remove_from_cleanup">Нажмите, чтобы защитить этот файл от очистки.</string>
     <string name="whatsapp_add_to_cleanup">Нажмите, чтобы включить этот файл в очистку.</string>
     <string name="whatsapp_audio_preview_error">Этот аудиофайл не удалось воспроизвести на этом устройстве.</string>
-    <string name="premium_tool_scanning">Сканирование на вашем устройстве…</string>
-    <string name="premium_tool_on_device_title">Анализ на устройстве</string>
     <string name="premium_tool_nothing_found">Нечего проверять</string>
     <string name="premium_tool_nothing_found_detail">В доступном общем хранилище не найдено соответствующих файлов.</string>
-    <string name="premium_tool_found_size">Общий объём для проверки</string>
-    <string name="premium_tool_candidates">Кандидаты</string>
-    <string name="premium_tool_selected">Выбрано</string>
-    <string name="premium_tool_scanned">Отсканировано</string>
-    <plurals name="premium_tool_selected_count">
-        <item quantity="one">Элементов: %1$d</item>
-        <item quantity="few">Элементов: %1$d</item>
-        <item quantity="many">Элементов: %1$d</item>
-        <item quantity="other">Элементов: %1$d</item>
-    </plurals>
-    <string name="premium_sort_largest">Сначала большие</string>
-    <string name="premium_sort_newest">Сначала самые новые</string>
-    <string name="premium_sort_selected">Сначала выбранные</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_largest">Крупные</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_newest">Новые</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_sort_selected">Выбранные</string>
     <string name="premium_duplicates_subtitle">Точные совпадения по содержанию сгруппированы, поэтому вы можете сохранить оригинал и удалить только лишние копии.</string>
     <string name="premium_large_subtitle">Прежде чем решить, что следует удалить, просмотрите файлы, занимающие больше всего места.</string>
     <string name="premium_apk_subtitle">Просмотрите загруженные установочные пакеты Android, не затрагивая установленные приложения.</string>
@@ -321,9 +276,9 @@
     <string name="premium_junk_subtitle">Просматривайте временные файлы и миниатюры изображений вне загрузок. Остатки загрузок остаются в разделе «Загрузки».</string>
     <string name="premium_downloads_subtitle">Просматривайте старые загрузки и неполные артефакты загрузки без автоматического выбора личных файлов.</string>
     <string name="premium_deep_subtitle">Широкий однопроходный обзор основных категорий хранилищ. Личные файлы с низким уровнем конфиденциальности остаются только для просмотра.</string>
-    <string name="premium_duplicates_original_safe">Защищенный оригинал никогда не помещается в список удаления. Здесь показаны только проверенные дополнительные копии.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="premium_duplicates_original_safe">Оригиналы никогда не выбираются.</string>
     <string name="premium_duplicate_unknown_original">защищенный оригинал</string>
-    <string name="premium_duplicate_group_title">Копии %1$s</string>
     <string name="premium_apk_installer_note">Удаление APK здесь удаляет только файл установщика. Приложение, уже установленное на вашем телефоне, не удаляется.</string>
     <string name="premium_apk_old">Старые установщики</string>
     <string name="premium_apk_recent">Недавние установщики</string>
@@ -355,7 +310,6 @@
     </plurals>
     <string name="cleanup_result_title">Очистка завершена</string>
     <string name="cleanup_result_partial_title">Очистка частично завершена</string>
-    <string name="cleanup_result_space_reclaimed">Освобождено места</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">Удалено файлов: %1$d</item>
         <item quantity="few">Удалено файлов: %1$d</item>
@@ -369,15 +323,9 @@
         <item quantity="other">Файлов, оставленных без изменений после отмены подтверждения Android: %1$d</item>
     </plurals>
     <string name="cleanup_result_zero">Никакое дополнительное пространство не было возвращено.</string>
-    <string name="cleanup_result_note">Эти значения рассчитаны на основе файлов Smart Cleaner, фактически удаленных на этом устройстве.</string>
-    <string name="cleanup_result_done">Готово</string>
     <string name="cleanup_result_storage_snapshot">Свободное место: %1$s → %2$s</string>
-    <string name="disclosure_all_files_title">Зачем нужен полный доступ к хранилищу?</string>
-    <string name="disclosure_all_files_body">Smart Cleaner использует доступ ко всем файлам Android только для своих основных функций управления файлами: сканирование общего хранилища на предмет нежелательных кандидатов, точных дубликатов, больших файлов, загрузок, установщиков APK и общих носителей сообщений. Файлы остаются на вашем устройстве. Вы просматриваете то, что будет удалено. Android по-прежнему защищает личные данные других приложений.</string>
     <string name="disclosure_usage_title">Почему доступ к использованию?</string>
     <string name="disclosure_usage_body">Доступ к использованию не является обязательным. Он позволяет Smart Cleaner считывать сообщаемые Android общие данные о хранилище/кэше приложений и времени последнего использования, чтобы вы могли просматривать большие или неиспользуемые приложения. Он не считывает личный контент внутри этих приложений и не удаляет их защищенные данные автоматически.</string>
-    <string name="disclosure_continue">Продолжить</string>
-    <string name="disclosure_not_now">Не сейчас</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="smart_cleanup_ad_notice">Smart Cleaner бесплатен и показывает рекламу: баннер, одно помеченное нативное объявление в некоторых списках, рекламный блок в результате очистки, иногда полноэкранную рекламу после очистки или при возврате на вкладку «Очистка», а также рекламу при запуске во время загрузки. Реклама никогда не появляется на шагах разрешений и подтверждения; короткое видео убирает баннер и полноэкранную рекламу на 60 минут.</string>
     <string name="cache_modern_total_label">Общий кеш приложения</string>
@@ -405,11 +353,8 @@
     <string name="cache_modern_clean_now">Очистить сейчас</string>
     <string name="cache_modern_safety_note">Smart Cleaner измеряет кэш, о котором сообщает Android. Он не удаляет автоматически личные файлы другого приложения; Индивидуальная очистка выполняется с официального экрана приложения Android.</string>
     <string name="cleanup_result_system_cache_title">Очистка кэша Android завершена</string>
-    <string name="cleanup_result_system_cache_reduced">измеренное уменьшение кэша</string>
     <string name="cleanup_result_system_cache_unmeasured">Android завершил очистку кэша. На этом устройстве не было надежного сокращения байтов.</string>
-    <string name="cleanup_result_system_cache_note">Уменьшение кэша измеряется на основе статистики хранилища Android до и после очистки системы. Если Android не предоставляет надежную дельту, номер освобожденного пространства не придумывается.</string>
     <string name="cleanup_result_app_cache_title">Кэш %1$s очищен.</string>
-    <string name="cleanup_result_app_cache_note">Отображаемое сокращение основано на фактически очищенном или измеренном кэше до и после действия кэша Android.</string>
     <string name="message_individual_cache_no_change">После возврата из настроек Android не было обнаружено заметного уменьшения кэша.</string>
     <string name="permissions_review_status">Проверить</string>
     <string name="permissions_manage_android">Управление в Android</string>
@@ -445,18 +390,13 @@
     <string name="storage_change_time_minutes">%1$d мин. назад</string>
     <string name="storage_change_time_hours">%1$d ч. назад</string>
     <string name="storage_change_time_days">%1$d дн назад</string>
-    <string name="tools_cleaning_section_title">Целевые инструменты</string>
-    <string name="tools_cleaning_section_subtitle">Выберите одну категорию, если вы точно знаете, о чем хотите оставить отзыв.</string>
-    <string name="tools_storage_section_title">Хранение и анализ</string>
-    <string name="tools_storage_section_subtitle">Проверяйте загрузки, установщики APK, изменения кеша и хранилища отдельно.</string>
-    <string name="tools_apps_section_title">Приложения</string>
-    <string name="tools_apps_section_subtitle">Ознакомьтесь с вариантами хранения и управления приложениями Android.</string>
     <string name="tools_downloads_subtitle">Просмотрите старые загрузки и артефакты неполной загрузки в разделе «Загрузки».</string>
     <string name="tools_apk_subtitle">Просмотрите установочные пакеты APK в доступном общем хранилище.</string>
     <string name="tools_storage_change_subtitle">См. измеренное увеличение и уменьшение объема памяти между двумя реальными анализами.</string>
     <string name="storage_analyzer_scanning_subtitle">Классификация доступных файлов общего хранилища по типу…</string>
     <string name="storage_analyzer_empty_subtitle">Посмотрите, как изображения, видео, аудио, документы, архивы, APK и другие доступные файлы используют пространство.</string>
-    <string name="storage_analyzer_indexed_label">ИНДЕКСИРОВАННЫЕ ОБЩИЕ ФАЙЛЫ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="storage_analyzer_indexed_label">Проверенные файлы</string>
     <string name="storage_analyzer_indexed_summary">Проиндексировано файлов: %1$d • Свободно: %2$s</string>
     <string name="storage_analyzer_types_title">Типы файлов</string>
     <plurals name="storage_analyzer_type_summary">
@@ -475,19 +415,10 @@
     <string name="storage_change_progress">Файлов: %1$d • Проверено папок: %2$d</string>
     <string name="rewarded_ad_title">Без рекламы в течение 60 минут</string>
     <string name="rewarded_ad_subtitle">Посмотрите короткое видео, как скрыть баннеры и рекламные переходы на один час.</string>
-    <string name="rewarded_ad_result_action">Посмотрите короткое видео продолжительностью 60 минут без рекламы.</string>
     <string name="rewarded_ad_earned">Время без рекламы действует 60 минут.</string>
     <string name="rewarded_ad_unavailable">Видео еще не готово. Пожалуйста, повторите попытку через минуту.</string>
-    <string name="ad_free_active_title">Время без рекламы активно</string>
-    <plurals name="ad_free_active_subtitle">
-        <item quantity="one">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="few">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="many">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-        <item quantity="other">Осталось минут: %1$d. Баннеры и реклама при переходах скрыты.</item>
-    </plurals>
     <string name="nothing_selected_hint">Выберите файлы для очистки</string>
     <string name="premium_duplicate_copy_of">Копия %1$s</string>
-    <string name="tools_rebuilt_status_cache_unmeasured">%1$s свободно • Кэш приложения не измеряется – разрешите доступ к использованию.</string>
     <string name="cache_modern_not_measured">Не измерено – разрешить доступ к использованию</string>
     <string name="app_info">Информация о приложении</string>
     <string name="feedback_dialog_body">Напишите нам по адресу ниже. Вы можете скопировать его или открыть приложение электронной почты.</string>
@@ -495,15 +426,17 @@
     <string name="feedback_open_email">Открыть почтовое приложение</string>
     <string name="feedback_address_copied">Адрес скопирован</string>
     <string name="plan_group_apk_installed">Установщики уже установленных приложений</string>
-    <string name="plan_group_duplicate_safe">Лишние копии</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_safe">Дубликаты</string>
     <string name="plan_group_thumbnails">Кэш миниатюр</string>
     <string name="plan_group_temp_files">Оставшиеся временные файлы</string>
     <string name="plan_group_partial_downloads">Незавершённые загрузки</string>
     <string name="plan_group_apk_old_version">Старые версии установщиков</string>
     <string name="plan_group_apk_other">Другие установщики</string>
-    <string name="plan_group_duplicate_personal">Копии ваших файлов</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_group_duplicate_unverified">Файлы, похожие на одинаковые</string>
+    <string name="plan_group_duplicate_personal">Дубликаты</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_duplicate_unverified">Возможные дубликаты</string>
     <string name="plan_group_large_video">Большие старые видео</string>
     <string name="plan_group_screen_recording">Записи экрана</string>
     <string name="plan_group_screenshot">Старые снимки экрана</string>
@@ -535,47 +468,27 @@
         <item quantity="many">Голосовое сообщение • Возраст (дней): %1$d</item>
         <item quantity="other">Голосовое сообщение • Возраст (дней): %1$d</item>
     </plurals>
-    <string name="plan_recommended_title">Рекомендуемая очистка</string>
-    <string name="plan_clean_action">Очистить %1$s</string>
-    <string name="plan_nothing_big">Нет ничего крупного для автоматической очистки</string>
-    <string name="plan_biggest_space_in">Больше всего места занимают:</string>
-    <string name="plan_section_included">Включено</string>
     <string name="plan_section_system">Системные шаги</string>
-    <string name="plan_section_review">Стоит посмотреть</string>
     <string name="plan_small_items">Мелкие элементы</string>
     <string name="plan_clear_app_caches">Очистить кэш приложений</string>
     <string name="plan_cache_about">около %1$s</string>
-    <string name="plan_selected">Выбрано: %1$s</string>
     <string name="plan_preview_title">Проверьте перед очисткой</string>
     <string name="plan_preview_whatsapp">Удалённые медиафайлы WhatsApp не откроются в чатах.</string>
     <string name="plan_preview_cloud">Облачная резервная копия не проверяется.</string>
     <string name="plan_preview_clean">Очистить</string>
     <string name="plan_preview_remove">Убрать из выбора</string>
-    <string name="result_freed_now">Освобождено сейчас: %1$s</string>
     <string name="result_undo">Отменить</string>
-    <string name="result_empty_trash_now">Очистить корзину сейчас</string>
     <string name="result_empty_trash_confirm">Удалить %1$s навсегда? Это нельзя отменить.</string>
-    <string name="result_delete_permanently">Удалить</string>
-    <string name="trash_title">Корзина</string>
-    <string name="trash_description">Восстановите или удалите очищенные файлы</string>
     <string name="trash_restore">Восстановить</string>
     <string name="trash_delete_forever">Удалить навсегда</string>
-    <string name="trash_empty">Очистить корзину</string>
     <string name="trash_empty_state">Корзина пуста</string>
     <string name="scan_stage_exact_copies">Проверка точных копий…</string>
     <string name="tab_trash">Корзина</string>
-    <string name="home_updating">Обновление…</string>
-    <string name="home_allow_access">Разрешить доступ</string>
-    <string name="home_access_explainer">Smart Cleaner нужен доступ ко всем файлам, чтобы найти то, что можно очистить. Ничего не удаляется без вашего подтверждения.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_storage_line">Занято %1$d%% · свободно %2$s</string>
-    <string name="swipe_delete">Удалить</string>
-    <string name="swipe_keep">Оставить</string>
-    <string name="swipe_undo">Отменить</string>
+    <string name="swipe_delete">УДАЛИТЬ</string>
+    <string name="swipe_keep">ОСТАВИТЬ</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Готово</string>
     <string name="swipe_continue">Продолжить</string>
-    <string name="swipe_grid_view">Сетка</string>
     <string name="swipe_review_view">Просмотр свайпами</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -589,19 +502,6 @@
         <item quantity="few">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
         <item quantity="many">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
         <item quantity="other">Показаны самые крупные элементы: %1$d. Повторите сканирование после очистки, чтобы увидеть больше.</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_preview_summary">
-        <item quantity="one">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
-        <item quantity="few">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
-        <item quantity="many">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
-        <item quantity="other">%1$s удаляется сейчас · %2$s в корзину (дней: %3$d)</item>
-    </plurals>
-    <plurals name="result_in_trash">
-        <item quantity="one">В корзине: %1$s — освободится через дней: %2$d</item>
-        <item quantity="few">В корзине: %1$s — освободится через дней: %2$d</item>
-        <item quantity="many">В корзине: %1$s — освободится через дней: %2$d</item>
-        <item quantity="other">В корзине: %1$s — освободится через дней: %2$d</item>
     </plurals>
     <plurals name="result_changed">
         <item quantity="one">Изменено после сканирования: %1$d</item>
@@ -621,24 +521,11 @@
         <item quantity="many">Восстановлено файлов: %1$d</item>
         <item quantity="other">Восстановлено файлов: %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="few">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="many">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="other">Корзина: %1$s — очистится через дней: %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">Осталось дней: %1$d</item>
         <item quantity="few">Осталось дней: %1$d</item>
         <item quantity="many">Осталось дней: %1$d</item>
         <item quantity="other">Осталось дней: %1$d</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="trash_footer">
-        <item quantity="one">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
-        <item quantity="few">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
-        <item quantity="many">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
-        <item quantity="other">Файлы хранятся здесь (дней: %1$d), затем удаляются. Корзина занимает место, пока её не очистят. Если удалите Smart Cleaner, удалите папку .SmartCleanerTrash в файловом менеджере.</item>
     </plurals>
     <plurals name="swipe_marked">
         <item quantity="one">Отмечено: %1$d · %2$s</item>
@@ -653,7 +540,8 @@
         <item quantity="other">Просмотрено: %1$d · отмечено: %2$s</item>
     </plurals>
     <string name="deep_check_action">Смотреть и проверить</string>
-    <string name="deep_check_running">Проверка больших похожих файлов…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_running">Проверка возможных дубликатов…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
         <item quantity="one">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
@@ -661,7 +549,6 @@
         <item quantity="many">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
         <item quantity="other">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
     </plurals>
-    <string name="trash_full_title">Не удалось переместить в корзину</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
         <item quantity="one">Не удалось переместить в корзину (файлов: %1$d); возможно, память заполнена. Удалить навсегда? Это нельзя отменить.</item>
@@ -678,31 +565,6 @@
         <item quantity="few">Это устройство не позволяет Smart Cleaner создать папку Корзины, поэтому файлов: %1$d — нельзя сохранить для отмены. Удалить их навсегда? Это действие нельзя отменить.</item>
         <item quantity="many">Это устройство не позволяет Smart Cleaner создать папку Корзины, поэтому файлов: %1$d — нельзя сохранить для отмены. Удалить их навсегда? Это действие нельзя отменить.</item>
         <item quantity="other">Это устройство не позволяет Smart Cleaner создать папку Корзины, поэтому файлов: %1$d — нельзя сохранить для отмены. Удалить их навсегда? Это действие нельзя отменить.</item>
-    </plurals>
-    <string name="delete_confirm_permanent">%1$s будет удалено навсегда. Это действие нельзя отменить.</string>
-    <string name="delete_confirm_show_all">Показать все</string>
-    <string name="delete_confirm_show_less">Свернуть</string>
-    <string name="delete_confirm_action">Удалить</string>
-    <plurals name="delete_confirm_title">
-        <item quantity="one">Удалить %1$d файл?</item>
-        <item quantity="few">Удалить %1$d файла?</item>
-        <item quantity="many">Удалить %1$d файлов?</item>
-        <item quantity="other">Удалить %1$d файла?</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="delete_confirm_trash">
-        <item quantity="one">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
-        <item quantity="few">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
-        <item quantity="many">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
-        <item quantity="other">%1$s переместится в Корзину на %2$d дн. До этого их можно восстановить.</item>
-    </plurals>
-    <string name="home_saved_checked_recently">Проверено меньше часа назад</string>
-    <string name="home_saved_details">Подробнее</string>
-    <plurals name="home_saved_checked_hours">
-        <item quantity="one">Проверено %1$d час назад</item>
-        <item quantity="few">Проверено %1$d часа назад</item>
-        <item quantity="many">Проверено %1$d часов назад</item>
-        <item quantity="other">Проверено %1$d часа назад</item>
     </plurals>
     <string name="plan_group_whatsapp_old_video">Старые видео WhatsApp</string>
     <string name="plan_group_whatsapp_old_image">Старые фото WhatsApp</string>
@@ -727,23 +589,10 @@
         <item quantity="many">Сохранено другим приложением (дней назад: %1$d). После удаления приложение может показать файл как отсутствующий.</item>
         <item quantity="other">Сохранено другим приложением (дней назад: %1$d). После удаления приложение может показать файл как отсутствующий.</item>
     </plurals>
-    <string name="plan_up_to_freed">Можно освободить до %1$s</string>
-    <string name="plan_selected_safely">%1$s выбрано безопасно</string>
-    <string name="plan_worth_a_look_amount">%1$s стоит проверить</string>
-    <string name="plan_review_action">Проверить %1$s</string>
     <string name="plan_small_review">Небольшие группы для проверки</string>
     <string name="plan_biggest_folders">Самые большие папки</string>
-    <string name="plan_largest_apps">Самые большие приложения</string>
-    <string name="plan_largest_apps_access">Разрешите доступ к статистике, чтобы увидеть, какие приложения занимают больше всего места</string>
     <string name="result_next_group">Далее: %1$s · %2$s</string>
     <string name="result_review_next">Проверить</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="plan_camera_one_by_one">
-        <item quantity="one">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="few">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="many">Файлы с камеры (%1$d) нужно проверить по одному</item>
-        <item quantity="other">Файлы с камеры (%1$d) нужно проверить по одному</item>
-    </plurals>
     <plurals name="plan_preview_camera">
         <item quantity="one">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
         <item quantity="few">Файлы с камеры: %1$d. Облачная копия не проверяется.</item>
@@ -759,4 +608,293 @@
     <string name="message_folder_excluded">Файлы из %1$s больше не будут предлагаться.</string>
     <string name="message_excluded_folders_full">Можно исключить до 50 папок. Сначала уберите одну в Настройках.</string>
     <string name="plan_kept_hidden">Оставленные файлы, скрытые из плана: %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_first_label">Память телефона</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_first_sub">занято · свободно %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_make_room">ОСВОБОДИТЬ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_hint_find">посмотрю, сколько</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trust_line">Без аккаунта. Без подписки. Файлы не покидают телефон.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_label">До</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub">можно освободить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_clean">ОЧИСТИТЬ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_cta_hint_tap">одно касание</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_split">%1$s мусора очистится сразу. Про остальные %2$s я спрошу.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_scan_label">Найдено пока</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_scan_now">Проверяю: %1$s…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_title">Простое уже сделано. Вот что занимает место:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_sub">Память всё ещё занята на %1$d%%.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_tidy_title">Сейчас удалять нечего.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_check_again">Проверить снова</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_title_v2">Чтобы освободить место, нужен доступ к памяти</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_1">Файлы никуда не загружаются</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_2">Без аккаунта и регистрации</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_promise_3">Без вашего согласия ничего не удаляется</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_note_v2">Далее Android запросит «Доступ ко всем файлам». Он нужен только для поиска больших, старых и повторяющихся файлов.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="action_continue">Продолжить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="action_not_now">Не сейчас</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_trash_title">Переместить %1$s в корзину?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_yes_clean">Да, очистить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_flag">Это нельзя отменить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_title">Удалить %1$s навсегда?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_action">Удалить навсегда</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_found_title">ещё можно освободить. Вот что я нашёл:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_start_biggest">Начать с самого большого</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_title">Оставить?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_undo_last">Отменить последнее</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_selected_note">Выбрано %1$s · подтверждение в конце</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="swipe_list">Список</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_moved_to_trash">перемещено в корзину</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_space_note">Место освободится после очистки корзины: сама через 7 дней или сейчас.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_done">Готово</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_waiting">ждёт в корзине</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_note_v2">Место освободится только после очистки корзины. Файлы можно восстановить в течение 7 дней.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_restore_all">Восстановить всё</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_v2">Очистить корзину и освободить %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_move_to_trash">В корзину</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_label">Реклама</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_review_rest">Что ещё я нашёл</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_photos">Фото и видео</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_hard_apps">Приложения</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed_for_good">Освобождено %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_permanent_body">Эти файлы нельзя переместить в корзину, поэтому они будут удалены сразу.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_trash_body">
+        <item quantity="one">%1$d файл: %2$s.</item>
+        <item quantity="few">%1$d файла: %2$s.</item>
+        <item quantity="many">%1$d файлов: %2$s.</item>
+        <item quantity="other">%1$d файла: %2$s.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_see_files">
+        <item quantity="one">Показать все файлы (%1$d)</item>
+        <item quantity="few">Показать все файлы (%1$d)</item>
+        <item quantity="many">Показать все файлы (%1$d)</item>
+        <item quantity="other">Показать все файлы (%1$d)</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="home_scan_files_count">
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файла</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_app_cache">Кеш приложений</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_status_on">Вкл.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_status_off">Выкл.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_privacy_terms">Конфиденциальность и условия</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_kept_row">Оставленные файлы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_excluded_row">Папки без рекомендаций</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_clean_title">Очистить %1$s?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="confirm_split_permanent">%1$s кеша и временных файлов удаляется навсегда.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="app_manager_cache_line">кеш %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="disclosure_xiaomi_warning">Телефон покажет предупреждение и короткий обратный отсчёт. Для этого разрешения это нормально.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_split_trash">
+        <item quantity="one">%1$s уйдёт в корзину, восстановить можно в течение %2$d дня.</item>
+        <item quantity="few">%1$s уйдёт в корзину, восстановить можно в течение %2$d дней.</item>
+        <item quantity="many">%1$s уйдёт в корзину, восстановить можно в течение %2$d дней.</item>
+        <item quantity="other">%1$s уйдёт в корзину, восстановить можно в течение %2$d дней.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="scan_files_checking">
+        <item quantity="one">Проверяется %1$d файл…</item>
+        <item quantity="few">Проверяется %1$d файла…</item>
+        <item quantity="many">Проверяется %1$d файлов…</item>
+        <item quantity="other">Проверяется %1$d файлов…</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="premium_duplicate_copies">
+        <item quantity="one">%1$d копия · %2$s</item>
+        <item quantity="few">%1$d копии · %2$s</item>
+        <item quantity="many">%1$d копий · %2$s</item>
+        <item quantity="other">%1$d копий · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_title">Мой выбор: скорее всего, это вам не нужно</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_action">Переместить %1$s в корзину</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_suggest_see">Показать файлы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_title">Об этих я спрошу вас</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_select_suggested">Выбрать рекомендованные</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_other_header">Другие файлы · %1$d</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_total_note">из %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_no_suggestion">Здесь нечего советовать удалить.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="trash_empty_hint">Удалённое хранится здесь 7 дней.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tool_storage">Хранилище</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_cache_cleared">кеша очищено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tool_suggest_header">
+        <item quantity="one">Мой выбор · %1$d файл · %2$s</item>
+        <item quantity="few">Мой выбор · %1$d файла · %2$s</item>
+        <item quantity="many">Мой выбор · %1$d файлов · %2$s</item>
+        <item quantity="other">Мой выбор · %1$d файлов · %2$s</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_videos">
+        <item quantity="one">%1$d видео · с камеры</item>
+        <item quantity="few">%1$d видео · с камеры</item>
+        <item quantity="many">%1$d видео · с камеры</item>
+        <item quantity="other">%1$d видео · с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_files">
+        <item quantity="one">%1$d файл · с камеры</item>
+        <item quantity="few">%1$d файла · с камеры</item>
+        <item quantity="many">%1$d файлов · с камеры</item>
+        <item quantity="other">%1$d файлов · с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_group_download_media">Видео и фото в «Загрузках»</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_select_progress">Проверка… %1$d%%</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_a_copy">Не копия</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_not_verified">Не проверено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="verify_none_exact">Ни один из них не является точной копией.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_large_sub">Самые большие файлы на телефоне</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_downloads_sub">Старые загрузки и установщики</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_whatsapp_sub">Фото, видео и голосовые</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_duplicates_sub">Один файл, сохранённый дважды</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_apps_sub">Неиспользуемые приложения и кеш</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_row_storage_sub">Что занимает место</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="tools_storage_full">%1$s занято</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_title">60 минут без рекламы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_card_sub">Посмотрите короткое видео</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_bar">Не хотите рекламу? Отключите на 60 минут</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="ad_free_offer_watch">Смотреть</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="confirm_camera_files">
+        <item quantity="one">%1$d файл с камеры</item>
+        <item quantity="few">%1$d файла с камеры</item>
+        <item quantity="many">%1$d файлов с камеры</item>
+        <item quantity="other">%1$d файлов с камеры</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="tools_apps_unused">
+        <item quantity="one">%1$d не используется</item>
+        <item quantity="few">%1$d не используются</item>
+        <item quantity="many">%1$d не используются</item>
+        <item quantity="other">%1$d не используются</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="ad_free_left">
+        <item quantity="one">Без рекламы · осталась %1$d мин</item>
+        <item quantity="few">Без рекламы · осталось %1$d мин</item>
+        <item quantity="many">Без рекламы · осталось %1$d мин</item>
+        <item quantity="other">Без рекламы · осталось %1$d мин</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="result_files_moved">
+        <item quantity="one">%1$d файл перемещён</item>
+        <item quantity="few">%1$d файла перемещены</item>
+        <item quantity="many">%1$d файлов перемещено</item>
+        <item quantity="other">%1$d файлов перемещено</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Больше всего места занимают приложения</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">В основном данные · Открыть настройки хранилища</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Открыть настройки хранилища</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">Я не могу удалять внутри других приложений. Открою нужный экран.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Посмотреть, какие приложения занимают больше всего места</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Приложения занимают ещё %1$s. Посмотрите, что можно сделать.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">Освободить %1$s сейчас</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">освобождено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Свободно: %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Корзина: %1$s · Очистить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="one">Не открывалось %1$d день · Удалить</item>
+        <item quantity="few">Не открывалось %1$d дня · Удалить</item>
+        <item quantity="many">Не открывалось %1$d дней · Удалить</item>
+        <item quantity="other">Не открывалось %1$d дней · Удалить</item>
+    </plurals>
 </resources>

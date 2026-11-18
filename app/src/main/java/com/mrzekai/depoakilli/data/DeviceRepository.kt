@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.os.storage.StorageManager
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
+import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeleteMode
@@ -109,14 +110,17 @@ class DeviceRepository(
         focus: ScanFocus = ScanFocus.SMART,
         onProgress: (Int, Int) -> Unit = { _, _ -> },
         onHashProgress: HashProgress = { _, _ -> },
+        onClassified: (Map<CleanCategory, Long>) -> Unit = {},
     ): ScanSummary = withContext(Dispatchers.IO) {
         if (!hasAllFilesAccess()) {
             return@withContext ScanSummary(limitedAccess = true)
         }
 
-        // Smart and Deep always re-index; tool scans reuse a fresh (90 s) index.
+        // Smart and Deep always re-index; tool scans reuse a fresh (10 min) index
+        // that any delete, move to Trash, restore or "Refresh" drops (B4).
         val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
-        val indexed = (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
+        val cachedIndex = if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null
+        val indexed = cachedIndex
             ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
                 onProgress(visitedDirectories, discoveredFiles)
             }.also(::cacheSharedIndex)
@@ -145,6 +149,23 @@ class DeviceRepository(
                 byUri[uri]?.let { raw -> raw.toCleanable(aiEngine.rawCopyAssessment(raw, partner)) }
             }
         }
+
+        // Progress report only (Faz 5 Home): what the classified files add up
+        // to before exact copies are verified, with the same focus, de-dup and
+        // user-choice filters as the result. The result itself is unchanged.
+        val planScanForReport = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
+        val reportItems = assessed
+            .filter { item -> ScanFocusRules.matchesFocus(item, focus) }
+            .distinctBy(CleanableItem::uri)
+        val reportChosen = if (planScanForReport) {
+            UserChoiceFilter.apply(reportItems, keptItems.keys(), excludedFolders.folders()).items
+        } else {
+            reportItems
+        }
+        onClassified(
+            reportChosen.groupBy { it.assessment.category }
+                .mapValues { (_, categoryItems) -> categoryItems.sumOf(CleanableItem::sizeBytes) },
+        )
 
         // Smart Clean promises duplicates too, but must stay fast: it verifies
         // files up to QUICK_FULL_HASH_BYTES byte for byte and lists larger
@@ -220,6 +241,7 @@ class DeviceRepository(
             smartMediaTypes = smartMediaTypeStats(storageListFiles),
             truncated = truncated,
             hiddenKeptCount = userChoices.hiddenKept,
+            fromCachedIndex = cachedIndex != null,
             biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
                 FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
             } else {
@@ -634,7 +656,7 @@ class DeviceRepository(
         private const val MAX_INDEXED_FILES = 200_000
         private const val LOW_MEMORY_INDEXED_FILES = 50_000
         private const val MEDIUM_MEMORY_INDEXED_FILES = 100_000
-        private const val SHARED_INDEX_CACHE_TTL_MILLIS = 90L * 1000L
+        private const val SHARED_INDEX_CACHE_TTL_MILLIS = 10L * 60L * 1000L
         private const val MAX_WHATSAPP_FILES = 100_000
         private const val MAX_STORAGE_REVIEW_ITEMS = 50_000
         // A review list is rebuilt when a checkbox is toggled. Keep the

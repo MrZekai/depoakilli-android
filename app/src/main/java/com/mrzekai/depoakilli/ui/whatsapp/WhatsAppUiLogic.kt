@@ -18,8 +18,7 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaCategory
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.ui.*
 import com.mrzekai.depoakilli.ui.common.FileVisuals
-import com.mrzekai.depoakilli.ui.theme.Purple500
-import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
+import com.mrzekai.depoakilli.ui.theme.Lime
 import java.text.DateFormat
 import java.util.Date
 
@@ -86,11 +85,9 @@ internal fun groupIcon(group: WhatsAppUiGroup): ImageVector = when (group) {
     WhatsAppUiGroup.DOCUMENTS_OTHER -> Icons.Outlined.Description
 }
 
-internal fun groupAccent(group: WhatsAppUiGroup): Color = when (group) {
-    WhatsAppUiGroup.IMAGES -> WhatsAppGreen
-    WhatsAppUiGroup.VIDEOS -> Purple500
-    WhatsAppUiGroup.DOCUMENTS_OTHER -> WaAmber
-}
+/** One accent in the Faz 5 design: Lime on black for every group. */
+@Suppress("UNUSED_PARAMETER")
+internal fun groupAccent(group: WhatsAppUiGroup): Color = Lime
 
 @Composable
 internal fun localDate(millis: Long): String = remember(millis) {
