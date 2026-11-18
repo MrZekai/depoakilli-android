@@ -39,11 +39,12 @@ data class GiantScale(val numberSp: Int, val buttonDp: Int) {
          * it, button, the split sentence, "See what else" and — when files wait
          * in Trash — the Trash line with 12 dp to the banner, plus the page padding.
          */
-        fun homeNeedDp(scale: GiantScale, fontScale: Float, trashLine: Boolean): Float {
+        fun homeNeedDp(scale: GiantScale, fontScale: Float, trashLine: Boolean, extraLinks: Int = 0): Float {
             val text = fontScale.coerceAtLeast(1f)
             val figure = scale.numberSp * 1.15f * text
             val lines = (24f + 24f + 42f) * text
-            val links = 48f + if (trashLine) 48f + 12f else 0f
+            // Faz 6: the Trash chip and the apps line are 48 dp touch rows each.
+            val links = 48f + (if (trashLine) 48f + 12f else 0f) + 48f * extraLinks
             return 36f + 8f + figure + lines + 20f + scale.buttonDp + 16f + links
         }
 
@@ -53,10 +54,16 @@ data class GiantScale(val numberSp: Int, val buttonDp: Int) {
          * the Trash line it is one size smaller; then it steps down until the
          * content fits. If even SMALL does not fit, the page scrolls.
          */
-        fun forHome(screenHeightDp: Int, availableHeightDp: Float, fontScale: Float, trashLine: Boolean): GiantScale {
+        fun forHome(
+            screenHeightDp: Int,
+            availableHeightDp: Float,
+            fontScale: Float,
+            trashLine: Boolean,
+            extraLinks: Int = 0,
+        ): GiantScale {
             var scale = of(screenHeightDp, fontScale)
             if (trashLine) scale = stepDown(scale)
-            while (scale != SMALL && homeNeedDp(scale, fontScale, trashLine) > availableHeightDp) {
+            while (scale != SMALL && homeNeedDp(scale, fontScale, trashLine, extraLinks) > availableHeightDp) {
                 scale = stepDown(scale)
             }
             return scale

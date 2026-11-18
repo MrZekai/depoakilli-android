@@ -298,7 +298,6 @@
     </plurals>
     <string name="cleanup_result_title">Nettoyage terminé</string>
     <string name="cleanup_result_partial_title">Nettoyage partiellement terminé</string>
-    <string name="cleanup_result_space_reclaimed">Espace récupéré</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">Fichier %1$d supprimé</item>
         <item quantity="many">Fichiers %1$d supprimés</item>
@@ -498,11 +497,6 @@
         <item quantity="many">Fichiers restaurés : %1$d</item>
         <item quantity="other">Fichiers restaurés : %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
-        <item quantity="many">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
-        <item quantity="other">Corbeille : %1$s — vidée dans (jours) : %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">Jours restants : %1$d</item>
         <item quantity="many">Jours restants : %1$d</item>
@@ -563,8 +557,6 @@
     </plurals>
     <string name="plan_small_review">Petits groupes à vérifier</string>
     <string name="plan_biggest_folders">Dossiers les plus volumineux</string>
-    <string name="plan_largest_apps">Applis les plus volumineuses</string>
-    <string name="plan_largest_apps_access">Autorisez l’accès aux données d’utilisation pour voir les applis qui prennent le plus de place</string>
     <string name="result_next_group">Ensuite : %1$s · %2$s</string>
     <string name="result_review_next">Vérifier</string>
     <plurals name="plan_preview_camera">
@@ -656,7 +648,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">Terminé</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">Libérer la place maintenant</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">en attente dans la corbeille</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -830,5 +821,31 @@
         <item quantity="one">%1$d fichier déplacé</item>
         <item quantity="many">%1$d fichiers déplacés</item>
         <item quantity="other">%1$d fichiers déplacés</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Les apps prennent le plus de place</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">Surtout des données · Ouvrir ses réglages de stockage</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Ouvrir ses réglages de stockage</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">Je ne peux pas supprimer dans d\'autres apps. Je t\'emmène au bon écran.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Vois quelles apps prennent le plus de place</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Les apps prennent %1$s de plus. Vois ce que tu peux faire.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">Libérer %1$s maintenant</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">libérés</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Espace libre : %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Corbeille : %1$s · Vider</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="one">Pas ouverte depuis %1$d jour · Désinstaller</item>
+        <item quantity="many">Pas ouverte depuis %1$d jours · Désinstaller</item>
+        <item quantity="other">Pas ouverte depuis %1$d jours · Désinstaller</item>
     </plurals>
 </resources>

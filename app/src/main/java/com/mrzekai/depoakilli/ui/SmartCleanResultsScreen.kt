@@ -1,5 +1,6 @@
 package com.mrzekai.depoakilli.ui
 
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.model.AppPlan
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
@@ -35,6 +37,7 @@ import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
 import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import com.mrzekai.depoakilli.ui.smart.*
+import com.mrzekai.depoakilli.ui.smart.PLAN_APPS_KEY
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
 
 /** Faz 5 palette for the smart screens: Lime page, black cards, Lime accent. */
@@ -122,6 +125,8 @@ internal fun SmartCleanResultsScreen(
     autoOpenSuggestion: Boolean = false,
     onSuggestionOpened: () -> Unit = {},
     onVerifyAndSelect: (Set<String>) -> Unit = {},
+    scrollToApps: Boolean = false,
+    onScrolledToApps: () -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -196,6 +201,8 @@ internal fun SmartCleanResultsScreen(
             onSuggestionOpened = onSuggestionOpened,
             onVerifyAndSelect = onVerifyAndSelect,
             verifySelectPercent = state.verifySelectPercent,
+            scrollToApps = scrollToApps,
+            onScrolledToApps = onScrolledToApps,
         )
     }
 }
@@ -244,6 +251,8 @@ internal fun SmartResultsContent(
     onSuggestionOpened: () -> Unit = {},
     onVerifyAndSelect: (Set<String>) -> Unit = {},
     verifySelectPercent: Int? = null,
+    scrollToApps: Boolean = false,
+    onScrolledToApps: () -> Unit = {},
 ) {
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
@@ -375,9 +384,40 @@ internal fun SmartResultsContent(
             },
         )
     }
+    // E1: the apps section (real icons, Android's own uninstall or settings screens).
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appRows = remember(installedApps, hasUsageAccess) {
+        AppPlan.rows(installedApps, hasUsageAccess, context.packageName)
+    }
+    val appsNotePrefs = remember { context.getSharedPreferences("plan_apps", android.content.Context.MODE_PRIVATE) }
+    // The one-line note shows the first time the section has rows.
+    val showAppsNote = remember { !appsNotePrefs.getBoolean("note_seen", false) }
+    LaunchedEffect(appRows?.isNotEmpty()) {
+        if (appRows?.isNotEmpty() == true) appsNotePrefs.edit().putBoolean("note_seen", true).apply()
+    }
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    // Home's "Apps hold X more" line lands on this section.
+    LaunchedEffect(scrollToApps) {
+        if (!scrollToApps) return@LaunchedEffect
+        repeat(40) {
+            val target = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.key == PLAN_APPS_KEY }
+            if (target != null) {
+                listState.animateScrollToItem(target.index)
+                onScrolledToApps()
+                return@LaunchedEffect
+            }
+            if (!listState.canScrollForward) {
+                onScrolledToApps()
+                return@LaunchedEffect
+            }
+            listState.scrollBy(500f)
+        }
+        onScrolledToApps()
+    }
     PageFrame(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
+            state = listState,
             contentPadding = PaddingValues(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -412,9 +452,11 @@ internal fun SmartResultsContent(
                 biggestFolders = summary.biggestFolders,
                 hiddenKeptCount = summary.hiddenKeptCount,
                 onOpenFolder = onOpenFolder,
-                largestApps = if (hasUsageAccess) largestUserApps(installedApps) else null,
+                appRows = appRows,
                 onOpenAppInfo = onOpenAppInfo,
+                onUninstallApp = onUninstallApp,
                 onRequestUsageAccess = onRequestUsageAccess,
+                showAppsNote = showAppsNote,
             )
         }
     }

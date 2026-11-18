@@ -201,6 +201,9 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         cleanerViewModel.refreshDeviceState()
         cleanerViewModel.refreshAppCaches()
+        // E1: back from Android's uninstall or app settings, the apps section
+        // shows fresh sizes and a removed app's row disappears.
+        cleanerViewModel.refreshInstalledAppsIfAllowed()
         if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
         if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
         val app = application as DepoAkilliApplication

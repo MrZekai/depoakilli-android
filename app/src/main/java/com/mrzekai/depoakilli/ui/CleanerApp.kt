@@ -131,6 +131,7 @@ fun CleanerApp(
     var allFilesAskedOnce by rememberSaveable { mutableStateOf(false) }
     // C2: the result screen's "My pick" line opens the findings list with its confirmation.
     var openSuggestionRequested by rememberSaveable { mutableStateOf(false) }
+    var scrollToAppsRequested by rememberSaveable { mutableStateOf(false) }
     // Scan data lives in the ViewModel, not saved navigation state. After a
     // process restart the saved results route must not reopen without its data.
     LaunchedEffect(Unit) {
@@ -481,6 +482,8 @@ fun CleanerApp(
                         onCloseSwipe = ::navigateBackInApp,
                         autoOpenSuggestion = openSuggestionRequested,
                         onSuggestionOpened = { openSuggestionRequested = false },
+                        scrollToApps = scrollToAppsRequested,
+                        onScrolledToApps = { scrollToAppsRequested = false },
                     )
 
                     DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -618,6 +621,11 @@ fun CleanerApp(
                                 onClean = { ids -> onPrepareCleanup(ids) },
                                 onToggleItem = viewModel::toggleItem,
                                 onOpenFindings = ::openFindings,
+                                // E1: "Apps hold X more" opens the findings at the apps section.
+                                onOpenAppsSection = {
+                                    scrollToAppsRequested = true
+                                    openFindings()
+                                },
                                 onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
                                 hardActions = HomeHardActions(
                                     onOpenMedia = { launchScan(ScanFocus.MEDIA) },

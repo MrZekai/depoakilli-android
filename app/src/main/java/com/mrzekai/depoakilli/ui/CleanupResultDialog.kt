@@ -152,11 +152,31 @@ internal fun CleanupResultDialog(
                                     // C6: "of cache cleared", no paragraph under it.
                                     R.string.result_cache_cleared
                                 } else {
-                                    R.string.cleanup_result_space_reclaimed
+                                    R.string.result_freed
                                 },
                             ),
                             strong = true,
                         )
+                        // E2: the free space measured before and after; hidden unless it really grew.
+                        figures.freeSpaceChange?.let { (before, after) ->
+                            Box(
+                                modifier = Modifier
+                                    .clip(com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Pill)
+                                    .background(Black)
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                            ) {
+                                Text(
+                                    stringResource(
+                                        R.string.result_free_space_change,
+                                        ByteFormatter.format(before),
+                                        ByteFormatter.format(after),
+                                    ),
+                                    color = Lime,
+                                    fontSize = 15.sp,
+                                    fontWeight = AppWeights.Title,
+                                )
+                            }
+                        }
                     }
                     ResultFigures.Headline.NOTHING -> {
                         PageLabel(resultTitle(result, partial), strong = true)
@@ -209,17 +229,22 @@ internal fun CleanupResultDialog(
                     )
                 }
 
+                // Faz 6 (E2): when files wait in Trash the first button frees them now
+                // (the permanent-delete sheet with its big "Cancel" still comes first),
+                // then an outlined "Done", then "Undo". Otherwise only "Done".
+                if (figures.canEmptyTrash) {
+                    PillButton(
+                        text = stringResource(R.string.result_free_now_bytes, ByteFormatter.format(result.trashedBytes)),
+                        onClick = { confirmEmptyTrash = true },
+                        style = PillStyle.BLACK_LIME,
+                    )
+                }
                 PillButton(
                     text = stringResource(R.string.result_done),
                     onClick = { onDone(resultAdPresented) },
-                    style = PillStyle.BLACK_LIME,
+                    style = if (figures.canEmptyTrash) PillStyle.INK_OUTLINE else PillStyle.BLACK_LIME,
                 )
                 if (figures.canEmptyTrash) {
-                    PillButton(
-                        text = stringResource(R.string.result_free_now),
-                        onClick = { confirmEmptyTrash = true },
-                        style = PillStyle.INK_OUTLINE,
-                    )
                     LinkButton(
                         text = stringResource(R.string.result_undo),
                         onClick = onUndo,
@@ -257,6 +282,8 @@ internal data class ResultFigures(
     /** "X freed" line under a Trash headline: only for bytes really deleted. */
     val showFreed: Boolean,
     val canEmptyTrash: Boolean,
+    /** E2: free space before → after, only when both were measured and it grew. */
+    val freeSpaceChange: Pair<Long, Long>? = null,
 ) {
     enum class Headline { TRASHED, FREED, NOTHING }
 
@@ -270,10 +297,17 @@ internal data class ResultFigures(
                 result.deletedBytes > 0L -> Headline.FREED
                 else -> Headline.NOTHING
             }
+            val measured = result.beforeAvailableBytes > 0L &&
+                result.afterAvailableBytes > result.beforeAvailableBytes
             return ResultFigures(
                 headline = headline,
                 showFreed = trashed && result.deletedBytes > 0L,
                 canEmptyTrash = trashed,
+                freeSpaceChange = if (headline == Headline.FREED && result.kind == CleanupResultKind.FILES && measured) {
+                    result.beforeAvailableBytes to result.afterAvailableBytes
+                } else {
+                    null
+                },
             )
         }
     }

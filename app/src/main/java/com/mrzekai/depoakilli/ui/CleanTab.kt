@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,17 +35,16 @@ import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
-import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.ui.common.BigRow
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.GiantButton
 import com.mrzekai.depoakilli.ui.common.GiantNumber
 import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.common.PageLabel
-import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
 import com.mrzekai.depoakilli.ui.common.rememberGiantScale
 import com.mrzekai.depoakilli.ui.smart.ScanProgressBody
 import com.mrzekai.depoakilli.ui.theme.AppWeights
@@ -83,6 +83,7 @@ internal fun CleanTab(
     modifier: Modifier = Modifier,
     accessDeniedOnce: Boolean = false,
     onOpenSettings: () -> Unit = onAllowAccess,
+    onOpenAppsSection: () -> Unit = onOpenFindings,
 ) {
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
     val savedSummary = !showingPlan && state.dashboardSnapshotAtMillis > 0L
@@ -90,6 +91,14 @@ internal fun CleanTab(
     // C1: "up to X" is tier 1 plus the findings list (unused apps included),
     // from the same PlanFigures the findings screen and the Tools tiles read.
     val figures = state.planFigures()
+    // Faz 6 (E1): what big apps hold beyond "up to X" (only apps still in use).
+    val ownPackage = androidx.compose.ui.platform.LocalContext.current.packageName
+    val appsMoreBytes = remember(state.installedApps, state.hasUsageAccess) {
+        com.mrzekai.depoakilli.model.AppPlan.moreBytes(
+            com.mrzekai.depoakilli.model.AppPlan.rows(state.installedApps, state.hasUsageAccess, ownPackage),
+            state.findingsUnusedApps(),
+        )
+    }
     val potentialBytes = when {
         figures != null -> figures.homeMaxBytes
         savedSummary -> state.dashboardCleanableBytes + state.dashboardReviewBytes
@@ -125,6 +134,7 @@ internal fun CleanTab(
                     availableHeightDp = viewport.value,
                     fontScale = fontScale,
                     trashLine = state.trashEntries.isNotEmpty(),
+                    extraLinks = if (appsMoreBytes > 0L && showingPlan) 1 else 0,
                 )
             } else {
                 baseScale
@@ -166,6 +176,8 @@ internal fun CleanTab(
                             }
                         },
                         onSeeRest = if (showingPlan && plan.reviewBytes > 0L) onOpenFindings else null,
+                        appsMoreBytes = if (showingPlan) appsMoreBytes else 0L,
+                        onOpenApps = onOpenAppsSection,
                     )
                     HomeMode.HARD -> HardHome(
                         state = state,
@@ -264,6 +276,8 @@ private fun PlanHome(
     onOpenTrash: () -> Unit,
     onCleanUp: () -> Unit,
     onSeeRest: (() -> Unit)?,
+    appsMoreBytes: Long = 0L,
+    onOpenApps: () -> Unit = {},
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(8.dp))
@@ -299,6 +313,14 @@ private fun PlanHome(
         }
         if (onSeeRest != null) {
             LinkButton(stringResource(R.string.home_review_rest), onClick = onSeeRest)
+        }
+        // E1: big apps the user still uses; never part of "up to X".
+        if (appsMoreBytes > 0L) {
+            LinkButton(
+                stringResource(R.string.home_apps_line, ByteFormatter.format(appsMoreBytes)),
+                onClick = onOpenApps,
+                color = InkSoft,
+            )
         }
         HomeTrashLine(trashEntries, onOpenTrash)
         // D7: at least 12 dp between the last line and the banner.
@@ -407,18 +429,22 @@ private fun TidyHome(
 @Composable
 private fun HomeTrashLine(entries: List<TrashEntry>, onOpen: () -> Unit) {
     if (entries.isEmpty()) return
-    val days = remember(entries) {
-        val now = System.currentTimeMillis()
-        entries.minOf { trashDaysLeft(it, now) }
-    }
-    LinkButton(
-        text = pluralStringResource(
-            R.plurals.trash_home_line,
-            days,
-            ByteFormatter.format(entries.sumOf(TrashEntry::sizeBytes)),
-            days,
-        ),
+    // Faz 6 (E2): a black chip "Trash: X · Empty now" that opens the Trash tab.
+    Surface(
         onClick = onOpen,
-        color = InkSoft,
-    )
+        color = com.mrzekai.depoakilli.ui.theme.Black,
+        contentColor = com.mrzekai.depoakilli.ui.theme.OnBlack,
+        shape = com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Pill,
+        modifier = Modifier.padding(top = 4.dp).heightIn(min = 48.dp),
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.heightIn(min = 48.dp).padding(horizontal = 18.dp)) {
+            Text(
+                stringResource(R.string.home_trash_chip, ByteFormatter.format(entries.sumOf(TrashEntry::sizeBytes))),
+                color = com.mrzekai.depoakilli.ui.theme.Lime,
+                fontSize = 14.sp,
+                fontWeight = AppWeights.Title,
+                maxLines = 1,
+            )
+        }
+    }
 }

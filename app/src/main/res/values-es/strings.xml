@@ -291,7 +291,6 @@
     </plurals>
     <string name="cleanup_result_title">Limpieza completada</string>
     <string name="cleanup_result_partial_title">Limpieza parcialmente completada</string>
-    <string name="cleanup_result_space_reclaimed">Espacio recuperado</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">Archivos eliminados: %1$d</item>
         <item quantity="many">Archivos eliminados: %1$d</item>
@@ -483,10 +482,6 @@
         <item quantity="one">Archivos restaurados: %1$d</item>
         <item quantity="other">Archivos restaurados: %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Papelera: %1$s — se vacía en días: %2$d</item>
-        <item quantity="other">Papelera: %1$s — se vacía en días: %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">Días restantes: %1$d</item>
         <item quantity="other">Días restantes: %1$d</item>
@@ -539,8 +534,6 @@
     </plurals>
     <string name="plan_small_review">Grupos más pequeños para revisar</string>
     <string name="plan_biggest_folders">Carpetas más grandes</string>
-    <string name="plan_largest_apps">Apps más grandes</string>
-    <string name="plan_largest_apps_access">Permite el acceso de uso para ver qué apps ocupan más espacio</string>
     <string name="result_next_group">Siguiente: %1$s · %2$s</string>
     <string name="result_review_next">Revisar</string>
     <plurals name="plan_preview_camera">
@@ -631,7 +624,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">Listo</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">Liberar el espacio ahora</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">esperando en la papelera</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -792,5 +784,30 @@
     <plurals name="result_files_moved">
         <item quantity="one">%1$d archivo movido</item>
         <item quantity="other">%1$d archivos movidos</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Las apps ocupan más espacio</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">Sobre todo datos guardados · Abrir ajustes de almacenamiento</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Abrir ajustes de almacenamiento</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">No puedo borrar dentro de otras apps. Te llevo a la pantalla correcta.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Mira qué apps ocupan más espacio</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Las apps ocupan %1$s más. Mira qué puedes hacer.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">Liberar %1$s ahora</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">liberados</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Espacio libre: %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Papelera: %1$s · Vaciar ahora</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="one">Sin abrir hace %1$d día · Desinstalar</item>
+        <item quantity="other">Sin abrir hace %1$d días · Desinstalar</item>
     </plurals>
 </resources>

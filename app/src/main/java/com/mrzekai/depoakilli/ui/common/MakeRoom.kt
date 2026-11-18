@@ -277,6 +277,8 @@ fun BigRow(
     modifier: Modifier = Modifier,
     detail: String? = null,
     value: String? = null,
+    /** Replaces the icon chip (E1: a real app icon). */
+    leading: (@Composable () -> Unit)? = null,
 ) {
     Surface(
         modifier = modifier
@@ -292,7 +294,7 @@ fun BigRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            IconChip(icon)
+            if (leading != null) leading() else IconChip(icon)
             Column(Modifier.weight(1f)) {
                 Text(title, color = OnBlack, fontWeight = AppWeights.Title, fontSize = 16.sp, lineHeight = 20.sp)
                 if (detail != null) {

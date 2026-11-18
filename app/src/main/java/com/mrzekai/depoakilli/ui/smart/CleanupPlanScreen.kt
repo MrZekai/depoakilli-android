@@ -38,6 +38,7 @@ import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.CleanupPlan
+import com.mrzekai.depoakilli.model.AppPlan
 import com.mrzekai.depoakilli.model.PlanFigures
 import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
@@ -117,13 +118,15 @@ internal sealed interface FindingsRow {
  * pick" files sit in their own card above. Unused apps join only with Usage
  * Access.
  */
-internal fun findingsRows(plan: CleanupPlan, unusedApps: List<InstalledAppEntry>?): List<FindingsRow> {
-    val groups = plan.askRows.map { FindingsRow.Group(it) }
-    val apps = unusedApps?.takeIf { it.isNotEmpty() }?.let { list ->
+internal fun findingsRows(plan: CleanupPlan, @Suppress("UNUSED_PARAMETER") unusedApps: List<InstalledAppEntry>?): List<FindingsRow> =
+    // Faz 6 (E1): unused apps lead the apps section below instead of joining these rows.
+    plan.askRows.map { FindingsRow.Group(it) }.sortedByDescending(FindingsRow::bytes)
+
+/** The "unused apps" row that opens the apps section (E1); its bytes are in the findings total (C1). */
+internal fun unusedAppsRow(unusedApps: List<InstalledAppEntry>?): FindingsRow.UnusedApps? =
+    unusedApps?.takeIf { it.isNotEmpty() }?.let { list ->
         FindingsRow.UnusedApps(list.size, list.sumOf(InstalledAppEntry::totalBytes))
     }
-    return (groups + listOfNotNull(apps)).sortedByDescending(FindingsRow::bytes)
-}
 
 @Composable
 private fun SectionTitle(text: String) {
@@ -160,9 +163,11 @@ internal fun LazyListScope.cleanupPlanItems(
     biggestFolders: List<FolderSize> = emptyList(),
     hiddenKeptCount: Int = 0,
     onOpenFolder: (FolderSize) -> Unit = {},
-    largestApps: List<InstalledAppEntry>? = null,
+    appRows: List<AppPlan.Row>? = null,
     onOpenAppInfo: (String) -> Unit = {},
+    onUninstallApp: (String) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
+    showAppsNote: Boolean = false,
 ) {
     val rows = findingsRows(plan, unusedApps)
     val openFindingsRow: (FindingsRow) -> Unit = { row ->
@@ -249,6 +254,15 @@ internal fun LazyListScope.cleanupPlanItems(
             )
         }
     }
+    appsSection(
+        appRows = appRows,
+        unusedRow = unusedAppsRow(unusedApps),
+        showNote = showAppsNote,
+        onOpenUnusedApps = onOpenUnusedApps,
+        onOpenAppInfo = onOpenAppInfo,
+        onUninstallApp = onUninstallApp,
+        onRequestUsageAccess = onRequestUsageAccess,
+    )
     // V10/V11: files the user kept and folders not suggested stay hidden; say so.
     if (hiddenKeptCount > 0) {
         item(key = "plan-kept-note") {
@@ -285,27 +299,6 @@ internal fun LazyListScope.cleanupPlanItems(
             onClick = onClearAppCaches,
         )
     }
-    // V8: the biggest user apps; each row only opens Android's App info screen.
-    if (largestApps == null) {
-        item(key = "plan-system-largest-apps-access") {
-            BigRow(
-                icon = Icons.Outlined.Apps,
-                title = stringResource(R.string.plan_largest_apps),
-                detail = stringResource(R.string.plan_largest_apps_access),
-                onClick = onRequestUsageAccess,
-            )
-        }
-    } else if (largestApps.isNotEmpty()) {
-        item(key = "plan-system-largest-apps-title") { SectionTitle(stringResource(R.string.plan_largest_apps)) }
-        items(largestApps, key = { "largest-app-" + it.packageName }) { app ->
-            BigRow(
-                icon = Icons.Outlined.Apps,
-                title = app.label,
-                value = ByteFormatter.format(app.totalBytes),
-                onClick = { onOpenAppInfo(app.packageName) },
-            )
-        }
-    }
     if (deepCheck.first > 0 || deepCheckRunning) {
         item(key = "plan-deep-check") {
             DeepCheckRow(groups = deepCheck.first, bytes = deepCheck.second, running = deepCheckRunning, onClick = onDeepCheck)
@@ -331,6 +324,89 @@ internal fun LazyListScope.cleanupPlanItems(
             style = PillStyle.INK_OUTLINE,
             modifier = Modifier.padding(top = 8.dp),
         )
+    }
+}
+
+/** Key of the apps section title; Home's apps line scrolls here (E1). */
+internal const val PLAN_APPS_KEY = "plan-apps-title"
+
+/**
+ * Faz 6 (E1): "Apps take the most space", under the files the app asks about.
+ * Unused apps first, then up to five big apps with their real icons. A row
+ * only opens Android's uninstall confirmation (unused 30+ days) or the app's
+ * storage settings; the app never deletes inside another app. Without Usage
+ * access one row asks for it — no sizes are guessed. No ads in this section.
+ */
+private fun LazyListScope.appsSection(
+    appRows: List<AppPlan.Row>?,
+    unusedRow: FindingsRow.UnusedApps?,
+    showNote: Boolean,
+    onOpenUnusedApps: () -> Unit,
+    onOpenAppInfo: (String) -> Unit,
+    onUninstallApp: (String) -> Unit,
+    onRequestUsageAccess: () -> Unit,
+) {
+    if (appRows == null) {
+        item(key = PLAN_APPS_KEY) { SectionTitle(stringResource(R.string.plan_apps_title)) }
+        item(key = "plan-apps-access") {
+            BigRow(
+                icon = Icons.Outlined.Apps,
+                title = stringResource(R.string.plan_apps_need_access),
+                onClick = onRequestUsageAccess,
+            )
+        }
+        return
+    }
+    if (appRows.isEmpty() && unusedRow == null) return
+    item(key = PLAN_APPS_KEY) { SectionTitle(stringResource(R.string.plan_apps_title)) }
+    if (unusedRow != null) {
+        item(key = "plan-apps-unused") {
+            BigRow(
+                icon = Icons.Outlined.Apps,
+                title = pluralStringResource(R.plurals.plan_unused_apps, unusedRow.count, unusedRow.count),
+                value = ByteFormatter.format(unusedRow.bytes),
+                onClick = onOpenUnusedApps,
+            )
+        }
+    }
+    appRows.forEach { row ->
+        item(key = "plan-app-" + row.app.packageName) {
+            val days = row.unusedDays.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+            BigRow(
+                icon = Icons.Outlined.Apps,
+                title = row.app.label,
+                detail = when (row.action) {
+                    AppPlan.Action.UNINSTALL -> pluralStringResource(R.plurals.plan_app_unused, days, days)
+                    AppPlan.Action.SETTINGS_DATA_HEAVY -> stringResource(R.string.plan_app_data_heavy)
+                    AppPlan.Action.SETTINGS -> stringResource(R.string.plan_app_big)
+                },
+                value = ByteFormatter.format(row.app.totalBytes),
+                leading = {
+                    com.mrzekai.depoakilli.ui.AsyncAppIcon(
+                        packageName = row.app.packageName,
+                        modifier = Modifier.size(44.dp),
+                    )
+                },
+                onClick = {
+                    if (row.action == AppPlan.Action.UNINSTALL) {
+                        onUninstallApp(row.app.packageName)
+                    } else {
+                        onOpenAppInfo(row.app.packageName)
+                    }
+                },
+            )
+        }
+    }
+    if (showNote && appRows.isNotEmpty()) {
+        item(key = "plan-apps-note") {
+            Text(
+                stringResource(R.string.plan_apps_note),
+                color = InkSoft,
+                fontSize = 14.sp,
+                fontWeight = AppWeights.Strong,
+                modifier = Modifier.padding(horizontal = 4.dp),
+            )
+        }
     }
 }
 

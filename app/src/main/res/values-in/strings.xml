@@ -274,7 +274,6 @@
     </plurals>
     <string name="cleanup_result_title">Pembersihan selesai</string>
     <string name="cleanup_result_partial_title">Pembersihan selesai sebagian</string>
-    <string name="cleanup_result_space_reclaimed">Ruang dikosongkan</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="other">File %1$d dihapus</item>
     </plurals>
@@ -450,9 +449,6 @@
     <plurals name="result_restored">
         <item quantity="other">%1$d file dipulihkan</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="other">Sampah: %1$s — kosong dalam %2$d hari</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="other">%1$d hari lagi</item>
     </plurals>
@@ -498,8 +494,6 @@
     </plurals>
     <string name="plan_small_review">Grup kecil untuk dicek</string>
     <string name="plan_biggest_folders">Folder terbesar</string>
-    <string name="plan_largest_apps">Aplikasi terbesar</string>
-    <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
     <string name="result_next_group">Berikutnya: %1$s · %2$s</string>
     <string name="result_review_next">Tinjau</string>
     <plurals name="plan_preview_camera">
@@ -589,7 +583,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">Selesai</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">Kosongkan ruang sekarang</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">menunggu di Sampah</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -737,5 +730,29 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="result_files_moved">
         <item quantity="other">%1$d file dipindahkan</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Aplikasi memakan ruang terbanyak</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">Sebagian besar data tersimpan · Buka setelan penyimpanan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Buka setelan penyimpanan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">Aku tidak bisa menghapus di dalam aplikasi lain. Kuantar ke layar yang tepat.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Lihat aplikasi mana yang memakan ruang terbanyak</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Aplikasi memakan %1$s lagi. Lihat yang bisa kamu lakukan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">Kosongkan %1$s sekarang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">dikosongkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Ruang kosong: %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Sampah: %1$s · Kosongkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="other">Tidak dibuka %1$d hari · Copot</item>
     </plurals>
 </resources>

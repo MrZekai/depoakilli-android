@@ -310,7 +310,6 @@
     </plurals>
     <string name="cleanup_result_title">Очистка завершена</string>
     <string name="cleanup_result_partial_title">Очистка частично завершена</string>
-    <string name="cleanup_result_space_reclaimed">Освобождено места</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">Удалено файлов: %1$d</item>
         <item quantity="few">Удалено файлов: %1$d</item>
@@ -522,12 +521,6 @@
         <item quantity="many">Восстановлено файлов: %1$d</item>
         <item quantity="other">Восстановлено файлов: %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="few">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="many">Корзина: %1$s — очистится через дней: %2$d</item>
-        <item quantity="other">Корзина: %1$s — очистится через дней: %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">Осталось дней: %1$d</item>
         <item quantity="few">Осталось дней: %1$d</item>
@@ -598,8 +591,6 @@
     </plurals>
     <string name="plan_small_review">Небольшие группы для проверки</string>
     <string name="plan_biggest_folders">Самые большие папки</string>
-    <string name="plan_largest_apps">Самые большие приложения</string>
-    <string name="plan_largest_apps_access">Разрешите доступ к статистике, чтобы увидеть, какие приложения занимают больше всего места</string>
     <string name="result_next_group">Далее: %1$s · %2$s</string>
     <string name="result_review_next">Проверить</string>
     <plurals name="plan_preview_camera">
@@ -692,7 +683,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">Готово</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">Освободить место сейчас</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">ждёт в корзине</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -879,5 +869,32 @@
         <item quantity="few">%1$d файла перемещены</item>
         <item quantity="many">%1$d файлов перемещено</item>
         <item quantity="other">%1$d файлов перемещено</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Больше всего места занимают приложения</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">В основном данные · Открыть настройки хранилища</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Открыть настройки хранилища</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">Я не могу удалять внутри других приложений. Открою нужный экран.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Посмотреть, какие приложения занимают больше всего места</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Приложения занимают ещё %1$s. Посмотрите, что можно сделать.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">Освободить %1$s сейчас</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">освобождено</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Свободно: %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Корзина: %1$s · Очистить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="one">Не открывалось %1$d день · Удалить</item>
+        <item quantity="few">Не открывалось %1$d дня · Удалить</item>
+        <item quantity="many">Не открывалось %1$d дней · Удалить</item>
+        <item quantity="other">Не открывалось %1$d дней · Удалить</item>
     </plurals>
 </resources>

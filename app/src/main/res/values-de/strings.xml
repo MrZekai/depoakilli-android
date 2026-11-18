@@ -286,7 +286,6 @@
     </plurals>
     <string name="cleanup_result_title">Bereinigung abgeschlossen</string>
     <string name="cleanup_result_partial_title">Bereinigung teilweise abgeschlossen</string>
-    <string name="cleanup_result_space_reclaimed">Freigegebener Speicher</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">%1$d-Datei entfernt</item>
         <item quantity="other">%1$d-Dateien entfernt</item>
@@ -474,10 +473,6 @@
         <item quantity="one">Wiederhergestellte Dateien: %1$d</item>
         <item quantity="other">Wiederhergestellte Dateien: %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Papierkorb: %1$s – wird geleert in Tagen: %2$d</item>
-        <item quantity="other">Papierkorb: %1$s – wird geleert in Tagen: %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">Verbleibende Tage: %1$d</item>
         <item quantity="other">Verbleibende Tage: %1$d</item>
@@ -530,8 +525,6 @@
     </plurals>
     <string name="plan_small_review">Kleinere Gruppen zum Prüfen</string>
     <string name="plan_biggest_folders">Größte Ordner</string>
-    <string name="plan_largest_apps">Größte Apps</string>
-    <string name="plan_largest_apps_access">Erlauben Sie den Nutzungszugriff, um zu sehen, welche Apps am meisten Platz belegen</string>
     <string name="result_next_group">Als Nächstes: %1$s · %2$s</string>
     <string name="result_review_next">Prüfen</string>
     <plurals name="plan_preview_camera">
@@ -622,7 +615,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">Fertig</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">Platz jetzt freigeben</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">wartet im Papierkorb</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -783,5 +775,30 @@
     <plurals name="result_files_moved">
         <item quantity="one">%1$d Datei verschoben</item>
         <item quantity="other">%1$d Dateien verschoben</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">Apps belegen den meisten Platz</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">Meist gespeicherte Daten · Speichereinstellungen öffnen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">Speichereinstellungen öffnen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">In anderen Apps kann ich nichts löschen. Ich bringe dich zum richtigen Bildschirm.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">Sieh, welche Apps am meisten Platz belegen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">Apps belegen weitere %1$s. Sieh, was du tun kannst.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">%1$s jetzt freigeben</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">freigegeben</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">Freier Speicher: %1$s → %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">Papierkorb: %1$s · Jetzt leeren</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="one">Seit %1$d Tag nicht geöffnet · Deinstallieren</item>
+        <item quantity="other">Seit %1$d Tagen nicht geöffnet · Deinstallieren</item>
     </plurals>
 </resources>

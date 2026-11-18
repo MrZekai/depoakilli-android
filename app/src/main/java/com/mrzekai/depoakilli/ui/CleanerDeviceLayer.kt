@@ -71,6 +71,11 @@ abstract class CleanerDeviceLayer(
         }
     }
 
+    /** E1: refresh app sizes on return only when Usage access is on (no point without it). */
+    fun refreshInstalledAppsIfAllowed() {
+        if (_state.value.hasUsageAccess) refreshInstalledApps()
+    }
+
     fun refreshInstalledApps() {
         if (_state.value.loadingApps) return
         _state.update { it.copy(loadingApps = true) }

@@ -289,7 +289,6 @@
 
     <string name="cleanup_result_title">Temizlik tamamlandı</string>
     <string name="cleanup_result_partial_title">Temizlik kısmen tamamlandı</string>
-    <string name="cleanup_result_space_reclaimed">Açılan alan</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">%1$d dosya silindi</item>
         <item quantity="other">%1$d dosya silindi</item>
@@ -478,10 +477,6 @@
         <item quantity="one">%1$d dosya geri yüklendi</item>
         <item quantity="other">%1$d dosya geri yüklendi</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Çöp: %1$s — %2$d gün içinde boşalır</item>
-        <item quantity="other">Çöp: %1$s — %2$d gün içinde boşalır</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">%1$d gün kaldı</item>
         <item quantity="other">%1$d gün kaldı</item>
@@ -531,8 +526,6 @@
     </plurals>
     <string name="plan_small_review">Kontrol edilecek küçük gruplar</string>
     <string name="plan_biggest_folders">En büyük klasörler</string>
-    <string name="plan_largest_apps">En büyük uygulamalar</string>
-    <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
     <string name="result_next_group">Sıradaki: %1$s · %2$s</string>
     <string name="result_review_next">İncele</string>
     <plurals name="plan_preview_camera">
@@ -585,7 +578,6 @@
     <string name="result_moved_to_trash">çöpe taşındı</string>
     <string name="result_space_note">Yer, çöp boşalınca açılır: 7 gün sonra kendiliğinden ya da şimdi.</string>
     <string name="result_done">Bitti</string>
-    <string name="result_free_now">Yeri şimdi aç</string>
     <string name="trash_waiting">çöpte bekliyor</string>
     <string name="trash_note_v2">Çöp boşalana kadar bu yer açılmaz. Her dosya 7 gün geri alınabilir.</string>
     <string name="trash_restore_all">Hepsini geri al</string>
@@ -685,5 +677,19 @@
     <plurals name="result_files_moved">
         <item quantity="one">%1$d dosya taşındı</item>
         <item quantity="other">%1$d dosya taşındı</item>
+    </plurals>
+    <string name="plan_apps_title">En çok yeri uygulamalar tutuyor</string>
+    <string name="plan_app_data_heavy">Çoğu kayıtlı veri · Depolama ayarını aç</string>
+    <string name="plan_app_big">Depolama ayarını aç</string>
+    <string name="plan_apps_note">Başka uygulamaların içini silemem. Seni doğru ekrana götürürüm.</string>
+    <string name="plan_apps_need_access">Hangi uygulamalar en çok yer tutuyor, gör</string>
+    <string name="home_apps_line">Uygulamalar %1$s daha tutuyor. Ne yapabileceğine bak.</string>
+    <string name="result_free_now_bytes">%1$s yeri şimdi aç</string>
+    <string name="result_freed">yer açıldı</string>
+    <string name="result_free_space_change">Boş alan: %1$s → %2$s</string>
+    <string name="home_trash_chip">Çöp: %1$s · Şimdi boşalt</string>
+    <plurals name="plan_app_unused">
+        <item quantity="one">%1$d gündür açılmadı · Kaldır</item>
+        <item quantity="other">%1$d gündür açılmadı · Kaldır</item>
     </plurals>
 </resources>

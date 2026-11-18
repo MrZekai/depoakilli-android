@@ -289,7 +289,6 @@
 
     <string name="cleanup_result_title">Cleanup complete</string>
     <string name="cleanup_result_partial_title">Cleanup partially completed</string>
-    <string name="cleanup_result_space_reclaimed">Space reclaimed</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">%1$d file removed</item>
         <item quantity="other">%1$d files removed</item>
@@ -478,10 +477,6 @@
         <item quantity="one">%1$d file put back</item>
         <item quantity="other">%1$d files put back</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="one">Trash: %1$s — empties in %2$d day</item>
-        <item quantity="other">Trash: %1$s — empties in %2$d days</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="one">%1$d day left</item>
         <item quantity="other">%1$d days left</item>
@@ -531,8 +526,6 @@
     </plurals>
     <string name="plan_small_review">Smaller groups to check</string>
     <string name="plan_biggest_folders">Biggest folders</string>
-    <string name="plan_largest_apps">Largest apps</string>
-    <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
     <string name="result_next_group">Next: %1$s · %2$s</string>
     <string name="result_review_next">Review</string>
     <plurals name="plan_preview_camera">
@@ -585,7 +578,6 @@
     <string name="result_moved_to_trash">moved to Trash</string>
     <string name="result_space_note">The space is freed when Trash is emptied: on its own in 7 days, or now.</string>
     <string name="result_done">Done</string>
-    <string name="result_free_now">Free the space now</string>
     <string name="trash_waiting">waiting in Trash</string>
     <string name="trash_note_v2">This space isn’t freed until Trash is emptied. Files can be restored for 7 days.</string>
     <string name="trash_restore_all">Restore all</string>
@@ -685,5 +677,19 @@
     <plurals name="result_files_moved">
         <item quantity="one">%1$d file moved</item>
         <item quantity="other">%1$d files moved</item>
+    </plurals>
+    <string name="plan_apps_title">Apps take the most space</string>
+    <string name="plan_app_data_heavy">Mostly saved data · Open its storage settings</string>
+    <string name="plan_app_big">Open its storage settings</string>
+    <string name="plan_apps_note">I can\'t delete inside other apps. I\'ll take you to the right screen.</string>
+    <string name="plan_apps_need_access">See which apps take the most space</string>
+    <string name="home_apps_line">Apps hold %1$s more. See what you can do.</string>
+    <string name="result_free_now_bytes">Free %1$s now</string>
+    <string name="result_freed">freed</string>
+    <string name="result_free_space_change">Free space: %1$s → %2$s</string>
+    <string name="home_trash_chip">Trash: %1$s · Empty now</string>
+    <plurals name="plan_app_unused">
+        <item quantity="one">Not opened in %1$d day · Uninstall</item>
+        <item quantity="other">Not opened in %1$d days · Uninstall</item>
     </plurals>
 </resources>

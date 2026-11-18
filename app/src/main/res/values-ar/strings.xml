@@ -334,7 +334,6 @@
     </plurals>
     <string name="cleanup_result_title">اكتملت عملية التنظيف</string>
     <string name="cleanup_result_partial_title">اكتملت عملية التنظيف جزئيًا</string>
-    <string name="cleanup_result_space_reclaimed">المساحة المحررة</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="zero">عدد الملفات المحذوفة: %1$d</item>
         <item quantity="one">عدد الملفات المحذوفة: %1$d</item>
@@ -572,14 +571,6 @@
         <item quantity="many">الملفات المستعادة: %1$d</item>
         <item quantity="other">الملفات المستعادة: %1$d</item>
     </plurals>
-    <plurals name="trash_home_line">
-        <item quantity="zero">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-        <item quantity="one">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-        <item quantity="two">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-        <item quantity="few">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-        <item quantity="many">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-        <item quantity="other">المهملات: %1$s — تُفرغ بعد أيام: %2$d</item>
-    </plurals>
     <plurals name="trash_days_left">
         <item quantity="zero">الأيام المتبقية: %1$d</item>
         <item quantity="one">الأيام المتبقية: %1$d</item>
@@ -669,8 +660,6 @@
     </plurals>
     <string name="plan_small_review">مجموعات أصغر للمراجعة</string>
     <string name="plan_biggest_folders">أكبر المجلدات</string>
-    <string name="plan_largest_apps">أكبر التطبيقات</string>
-    <string name="plan_largest_apps_access">اسمح بالوصول إلى بيانات الاستخدام لمعرفة التطبيقات التي تستهلك أكبر مساحة</string>
     <string name="result_next_group">التالي: %1$s · %2$s</string>
     <string name="result_review_next">مراجعة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -768,7 +757,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="result_done">تم</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="result_free_now">حرّر المساحة الآن</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="trash_waiting">في انتظار المهملات</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -981,5 +969,34 @@
         <item quantity="few">تم نقل %1$d ملف</item>
         <item quantity="many">تم نقل %1$d ملف</item>
         <item quantity="other">تم نقل %1$d ملف</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_title">التطبيقات تشغل أكبر مساحة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_data_heavy">معظمها بيانات محفوظة · افتح إعدادات التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_app_big">افتح إعدادات التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_note">لا يمكنني الحذف داخل تطبيقات أخرى. سآخذك إلى الشاشة الصحيحة.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_apps_need_access">اعرف أي التطبيقات تشغل أكبر مساحة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_apps_line">التطبيقات تشغل %1$s إضافية. اعرف ما يمكنك فعله.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_now_bytes">حرّر %1$s الآن</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_freed">تم تحريرها</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="result_free_space_change">المساحة الفارغة: %1$s ← %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_trash_chip">المهملات: %1$s · أفرغها الآن</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_app_unused">
+        <item quantity="zero">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
+        <item quantity="one">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
+        <item quantity="two">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
+        <item quantity="few">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
+        <item quantity="many">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
+        <item quantity="other">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
     </plurals>
 </resources>

@@ -41,6 +41,8 @@ internal fun CleanScreen(
     onCloseSwipe: () -> Unit = {},
     autoOpenSuggestion: Boolean = false,
     onSuggestionOpened: () -> Unit = {},
+    scrollToApps: Boolean = false,
+    onScrolledToApps: () -> Unit = {},
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -87,6 +89,8 @@ internal fun CleanScreen(
             autoOpenSuggestion = autoOpenSuggestion,
             onSuggestionOpened = onSuggestionOpened,
             onVerifyAndSelect = { ids -> viewModel?.verifyAndSelectCopies(ids) },
+            scrollToApps = scrollToApps,
+            onScrolledToApps = onScrolledToApps,
             onExcludeFolder = { root, path -> viewModel?.excludeFolder(root, path) },
             reviewAd = { index ->
                 // C5: the small list native follows the 3rd findings row when there are at least 4 rows.
