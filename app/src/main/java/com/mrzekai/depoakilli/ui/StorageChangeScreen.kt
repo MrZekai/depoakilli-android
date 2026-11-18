@@ -96,7 +96,7 @@ internal fun StorageChangeScreen(
                             progressDirectories,
                         ),
                         color = Color(0xFF93A5C8),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -187,7 +187,7 @@ internal fun StorageChangeScreen(
                 Text(
                     text = stringResource(R.string.storage_change_analysis_scope),
                     color = Color(0xFF93A5C8),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     lineHeight = 14.sp,
                 )
             }
@@ -279,7 +279,7 @@ private fun StorageChangeHero(report: StorageChangeReport) {
                             storageChangeRelativeLabel(it.analyzedAtMillis),
                         ),
                         color = Color(0xFF8EE8D0),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -418,7 +418,7 @@ private fun StorageTypeChangeRow(change: StorageTypeChange) {
                         ByteFormatter.format(change.currentBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
 
@@ -466,7 +466,7 @@ private fun AppCacheChangeRow(change: AppCacheChange) {
                         ByteFormatter.format(change.currentBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
 
@@ -530,7 +530,7 @@ private fun StorageChangeTruthNote() {
             Text(
                 text = stringResource(R.string.storage_change_truth_note),
                 color = Color(0xFF93A5C8),
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 lineHeight = 14.sp,
             )
         }

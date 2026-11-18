@@ -45,6 +45,24 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `bulk selection skips documents and look alikes but explicit selection does not`() {
+        val items = listOf(
+            item("doc", CleanupGroup.DOWNLOAD_DOCUMENT, 10 * mb),
+            item("u", CleanupGroup.DUPLICATE_UNVERIFIED, 10 * mb),
+            item("f", CleanupGroup.DOWNLOAD_FILE, 10 * mb),
+        )
+        val ids = setOf("doc", "u", "f")
+        val bulk = PlanSelection.setItemsSelected(items, ids, selected = true, bulk = true)
+        assertEquals(setOf("f"), bulk.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+
+        val explicit = PlanSelection.setItemsSelected(items, setOf("doc", "u"), selected = true, bulk = false)
+        assertEquals(setOf("doc", "u"), explicit.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+
+        val cleared = PlanSelection.setItemsSelected(explicit, ids, selected = false, bulk = true)
+        assertTrue(cleared.none(CleanableItem::selected))
+    }
+
+    @Test
     fun `verification replaces or removes a look alike`() {
         val items = listOf(item("u", CleanupGroup.DUPLICATE_UNVERIFIED, 100 * mb))
         val verified = items.single().copy(assessment = engine.duplicateAssessment(false))
@@ -75,6 +93,26 @@ class CleanerViewModelPlanTest {
         assertTrue(AutoScanPolicy.shouldScan(hasAccess = true, scanning = false, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
         assertFalse(AutoScanPolicy.shouldScan(hasAccess = false, scanning = false, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
         assertFalse(AutoScanPolicy.shouldScan(hasAccess = true, scanning = true, hasPlan = false, planScannedAtElapsed = 0L, nowElapsed = now))
+    }
+
+    @Test
+    fun `a saved summary younger than six hours avoids a scan after restart`() {
+        val hour = 3_600_000L
+        val wall = 1_800_000_000_000L
+        fun scan(savedAt: Long) = AutoScanPolicy.shouldScan(
+            hasAccess = true,
+            scanning = false,
+            hasPlan = false,
+            planScannedAtElapsed = 0L,
+            nowElapsed = 5_000L,
+            savedSummaryAtMillis = savedAt,
+            nowMillis = wall,
+        )
+        assertFalse(scan(wall - 2 * hour))
+        assertTrue(scan(wall - 7 * hour))
+        assertTrue(scan(0L))
+        // A clock moved backwards never counts as fresh.
+        assertTrue(scan(wall + hour))
     }
 
     @Test

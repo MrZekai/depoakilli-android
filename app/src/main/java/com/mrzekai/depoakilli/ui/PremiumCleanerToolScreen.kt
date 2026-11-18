@@ -1,11 +1,5 @@
 package com.mrzekai.depoakilli.ui
 
-import android.content.Context
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.LruCache
-import android.util.Size
-import android.view.LayoutInflater
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -69,11 +63,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -81,39 +72,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
-import androidx.media3.common.Tracks
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
+import com.mrzekai.depoakilli.ui.common.DeleteConfirmDialog
+import com.mrzekai.depoakilli.ui.common.FileVisuals
+import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
+import com.mrzekai.depoakilli.ui.media.rememberThumbnail
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
-import java.io.File
 import java.text.DateFormat
 import java.util.Date
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 private val ToolBackground = Color(0xFF030A1D)
 private val ToolCard = Color(0xFF081A38)
@@ -147,31 +130,13 @@ private data class ToolSection(
     val items: List<CleanableItem>,
 )
 
-private object ToolThumbnailCache {
-    private val cache = object : LruCache<String, ImageBitmap>(72) {}
-
-    fun get(key: String): ImageBitmap? = synchronized(cache) { cache.get(key) }
-
-    fun put(key: String, bitmap: ImageBitmap) {
-        synchronized(cache) { cache.put(key, bitmap) }
-    }
-
-    fun clear() {
-        synchronized(cache) { cache.evictAll() }
-    }
-}
-
-internal fun releasePremiumToolThumbnailMemory() {
-    ToolThumbnailCache.clear()
-}
-
 @Composable
 internal fun PremiumCleanerToolScreen(
     state: CleanerUiState,
     onRequestAllFilesAccess: () -> Unit,
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -354,7 +319,7 @@ private fun PremiumToolResults(
     cleanupInProgress: Boolean,
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
 ) {
     val config = toolConfig(focus)
@@ -382,11 +347,9 @@ private fun PremiumToolResults(
     }
 
     if (showCleanupConfirmation) {
-        PremiumCleanupConfirmationDialog(
-            focus = focus,
-            selectedItems = summary.selectedItems,
-            accent = config.accent,
-            cleanupInProgress = cleanupInProgress,
+        DeleteConfirmDialog(
+            items = summary.selectedItems,
+            inProgress = cleanupInProgress,
             onConfirm = {
                 showCleanupConfirmation = false
                 onClean(null)
@@ -475,143 +438,6 @@ private fun PremiumToolResults(
 }
 
 @Composable
-private fun PremiumCleanupConfirmationDialog(
-    focus: ScanFocus,
-    selectedItems: List<CleanableItem>,
-    accent: Color,
-    cleanupInProgress: Boolean,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val selectedBytes = selectedItems.sumOf { it.sizeBytes }
-    val config = toolConfig(focus)
-
-    Dialog(
-        onDismissRequest = {
-            if (!cleanupInProgress) onDismiss()
-        },
-        properties = DialogProperties(usePlatformDefaultWidth = false),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xB8000615))
-                .padding(horizontal = 20.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(containerColor = ToolCard),
-                border = BorderStroke(1.dp, accent.copy(alpha = .45f)),
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(color = accent.copy(alpha = .16f), shape = CircleShape) {
-                            Icon(
-                                config.icon,
-                                contentDescription = null,
-                                tint = accent,
-                                modifier = Modifier.padding(13.dp).size(30.dp),
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                stringResource(R.string.premium_cleanup_confirm_title),
-                                color = Color.White,
-                                fontSize = 21.sp,
-                                fontWeight = FontWeight.Black,
-                            )
-                            Text(
-                                stringResource(config.titleRes),
-                                color = accent,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-
-                    Text(
-                        pluralStringResource(
-                            R.plurals.premium_cleanup_confirm_body,
-                            selectedItems.size,
-                            selectedItems.size,
-                            ByteFormatter.format(selectedBytes),
-                        ),
-                        color = ToolTextSecondary,
-                    )
-
-                    // Same file examples as the Smart Clean confirmation, so every
-                    // delete confirmation shows what is about to go (QA v43 polish).
-                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        selectedItems.take(5).forEach { item ->
-                            Text(
-                                "• ${item.name}",
-                                color = Color.White,
-                                style = MaterialTheme.typography.bodySmall,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                        if (selectedItems.size > 5) {
-                            Text(
-                                pluralStringResource(
-                                    R.plurals.smart_cleanup_more_items,
-                                    selectedItems.size - 5,
-                                    selectedItems.size - 5,
-                                ),
-                                color = ToolTextSecondary,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    }
-
-                    Surface(
-                        color = ToolRed.copy(alpha = .10f),
-                        shape = RoundedCornerShape(15.dp),
-                        border = BorderStroke(1.dp, ToolRed.copy(alpha = .25f)),
-                    ) {
-                        Text(
-                            stringResource(R.string.premium_cleanup_irreversible),
-                            color = Color(0xFFFFA7AE),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(12.dp),
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        TextButton(
-                            onClick = onDismiss,
-                            enabled = !cleanupInProgress,
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            Text(stringResource(R.string.cancel))
-                        }
-                        Button(
-                            onClick = onConfirm,
-                            enabled = selectedItems.isNotEmpty() && !cleanupInProgress,
-                            modifier = Modifier.weight(1.4f),
-                        ) {
-                            Text(
-                                stringResource(R.string.premium_cleanup_confirm_action),
-                                fontWeight = FontWeight.Black,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun PremiumToolHero(
     focus: ScanFocus,
     summary: ScanSummary,
@@ -679,7 +505,7 @@ private fun PremiumHeroStat(value: String, label: String, modifier: Modifier = M
     Surface(modifier = modifier, color = Color(0x55020A19), shape = RoundedCornerShape(14.dp)) {
         Column(Modifier.padding(horizontal = 9.dp, vertical = 8.dp)) {
             Text(value, color = Color.White, fontWeight = FontWeight.Black)
-            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 9.sp)
+            Text(label, color = Color.White.copy(alpha = .68f), fontSize = 12.sp)
         }
     }
 }
@@ -772,7 +598,7 @@ private fun PremiumToolSectionCard(
                             Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
                                 Text("+${section.items.size - 4}", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
                                 Spacer(Modifier.height(5.dp))
-                                Text(stringResource(R.string.whatsapp_view_all), color = section.accent, fontSize = 10.sp)
+                                Text(stringResource(R.string.whatsapp_view_all), color = section.accent, fontSize = 12.sp)
                             }
                         }
                     }
@@ -790,10 +616,7 @@ private fun PremiumToolItemCard(
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    val thumbnail by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri, key2 = item.modifiedAtMillis) {
-        value = loadToolThumbnail(context, item)
-    }
+    val thumbnail by rememberThumbnail(item.uri, item.mimeType)
     Card(
         onClick = onPreview,
         modifier = modifier.width(150.dp).height(190.dp),
@@ -809,7 +632,7 @@ private fun PremiumToolItemCard(
                 if (thumbnail != null) {
                     Image(requireNotNull(thumbnail), contentDescription = item.name, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                 } else {
-                    Icon(fileIcon(item), contentDescription = null, tint = accent, modifier = Modifier.size(43.dp))
+                    Icon(FileVisuals.icon(item.mimeType, item.name), contentDescription = null, tint = accent, modifier = Modifier.size(43.dp))
                 }
                 if (item.mimeType.startsWith("video/")) {
                     Surface(color = Color(0xB6020713), shape = CircleShape) {
@@ -823,12 +646,12 @@ private fun PremiumToolItemCard(
                     colors = CheckboxDefaults.colors(checkedColor = accent, uncheckedColor = Color.White, checkmarkColor = Color.White),
                 )
                 Surface(modifier = Modifier.align(Alignment.BottomStart).padding(6.dp), color = Color(0xCC020713), shape = RoundedCornerShape(9.dp)) {
-                    Text(ByteFormatter.format(item.sizeBytes), color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp))
+                    Text(ByteFormatter.format(item.sizeBytes), color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp))
                 }
             }
             Column(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 7.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp)
-                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 9.sp, maxLines = 1)
+                Text(item.name, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 12.sp, maxLines = 1)
                 // This card is a removable extra copy. Name the protected
                 // original instead of a label that read as if this file were
                 // the original (QA v43 #07).
@@ -836,7 +659,7 @@ private fun PremiumToolItemCard(
                     Text(
                         stringResource(R.string.premium_duplicate_copy_of, original),
                         color = ToolGreen,
-                        fontSize = 9.sp,
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -939,7 +762,7 @@ private fun PremiumToolBottomAction(
                 border = BorderStroke(1.dp, accent.copy(alpha = .35f)),
             ) {
                 Column(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalArrangement = Arrangement.Center) {
-                    Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 10.sp)
+                    Text(stringResource(R.string.premium_tool_selected), color = ToolTextSecondary, fontSize = 12.sp)
                     Text(ByteFormatter.format(selectedBytes), color = accent, fontWeight = FontWeight.Black, fontSize = 20.sp)
                     Text(
                         if (selectedCount > 0) {
@@ -948,7 +771,7 @@ private fun PremiumToolBottomAction(
                             stringResource(R.string.nothing_selected_hint)
                         },
                         color = ToolTextSecondary,
-                        fontSize = 9.sp,
+                        fontSize = 12.sp,
                     )
                 }
             }
@@ -965,14 +788,14 @@ private fun PremiumToolBottomAction(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (cleanupInProgress) {
-                            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.dp)
+                            CircularProgressIndicator(modifier = Modifier.size(22.dp), color = ContrastTokens.OnBrightAction, strokeWidth = 2.dp)
                         } else {
-                            Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = Color.White)
+                            Icon(Icons.Outlined.CleaningServices, contentDescription = null, tint = ContrastTokens.OnBrightAction)
                         }
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.whatsapp_review_and_clean), color = Color.White, fontWeight = FontWeight.Black, fontSize = 17.sp)
+                        Text(stringResource(R.string.whatsapp_review_and_clean), color = ContrastTokens.OnBrightAction, fontWeight = FontWeight.Black, fontSize = 17.sp)
                         Spacer(Modifier.width(8.dp))
-                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = Color.White)
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null, tint = ContrastTokens.OnBrightAction)
                     }
                 }
             }
@@ -1004,12 +827,10 @@ private fun PremiumToolPreviewDialog(
                     Modifier.weight(1f).fillMaxWidth().padding(horizontal = 14.dp).clip(RoundedCornerShape(22.dp)).background(Color(0xFF020713)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    when {
-                        item.mimeType.startsWith("image/") -> ToolImagePreview(item, accent)
-                        item.mimeType.startsWith("video/") -> ToolVideoPreview(item, accent)
-                        item.mimeType.startsWith("audio/") -> ToolAudioPreview(item, accent)
-                        else -> ToolGenericPreview(item, accent)
-                    }
+                    MediaPreviewContent(
+                        MediaPreviewFile(uri = item.uri, name = item.name, mimeType = item.mimeType, sizeBytes = item.sizeBytes),
+                        accent = accent,
+                    )
                 }
 
                 Card(
@@ -1020,16 +841,16 @@ private fun PremiumToolPreviewDialog(
                     Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Surface(color = accent.copy(alpha = .14f), shape = RoundedCornerShape(14.dp)) {
-                                Icon(fileIcon(item), contentDescription = null, tint = accent, modifier = Modifier.padding(10.dp).size(25.dp))
+                                Icon(FileVisuals.icon(item.mimeType, item.name), contentDescription = null, tint = accent, modifier = Modifier.padding(10.dp).size(25.dp))
                             }
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                                Text(compactPath(item.relativePath), color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(bidiWrap(compactPath(item.relativePath)), color = ToolTextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(ByteFormatter.format(item.sizeBytes), color = accent, fontWeight = FontWeight.Black)
-                                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 10.sp)
+                                Text(localDate(item.modifiedAtMillis), color = ToolTextSecondary, fontSize = 12.sp)
                             }
                         }
 
@@ -1066,116 +887,6 @@ private fun PremiumToolPreviewDialog(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ToolImagePreview(item: CleanableItem, accent: Color) {
-    val context = LocalContext.current
-    val bitmap by produceState<ImageBitmap?>(initialValue = null, key1 = item.uri) {
-        value = loadToolDisplayBitmap(context, item)
-    }
-    if (bitmap == null) CircularProgressIndicator(color = accent) else Image(requireNotNull(bitmap), contentDescription = item.name, modifier = Modifier.fillMaxSize().padding(8.dp), contentScale = ContentScale.Fit)
-}
-
-@Composable
-private fun ToolVideoPreview(item: CleanableItem, accent: Color) {
-    val context = LocalContext.current
-    val player = remember(item.uri) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(item.uri))
-            prepare()
-        }
-    }
-    var failed by remember(item.uri) { mutableStateOf(false) }
-    var noVideoTrack by remember(item.uri) { mutableStateOf(false) }
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onTracksChanged(tracks: Tracks) {
-                if (tracks.groups.isEmpty()) return
-                noVideoTrack = !tracks.groups.any { group -> group.type == C.TRACK_TYPE_VIDEO && group.isSelected }
-                if (noVideoTrack) player.pause()
-            }
-            override fun onPlayerError(error: PlaybackException) { failed = true }
-        }
-        player.addListener(listener)
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-    Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { viewContext ->
-                (LayoutInflater.from(viewContext).inflate(R.layout.smart_video_player, null, false) as PlayerView).apply {
-                    this.player = player
-                    useController = true
-                }
-            },
-            update = { view -> if (view.player !== player) view.player = player },
-        )
-        if (failed || noVideoTrack) {
-            Surface(color = Color(0xDD06132F), shape = RoundedCornerShape(18.dp)) {
-                Text(
-                    stringResource(if (noVideoTrack) R.string.smart_video_no_picture else R.string.smart_video_preview_error),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(18.dp),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ToolAudioPreview(item: CleanableItem, accent: Color) {
-    val context = LocalContext.current
-    val player = remember(item.uri) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(item.uri))
-            prepare()
-        }
-    }
-    var playing by remember(item.uri) { mutableStateOf(false) }
-    var failed by remember(item.uri) { mutableStateOf(false) }
-    DisposableEffect(player) {
-        val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) { playing = isPlaying }
-            override fun onPlayerError(error: PlaybackException) { failed = true }
-        }
-        player.addListener(listener)
-        onDispose {
-            player.removeListener(listener)
-            player.release()
-        }
-    }
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Surface(color = accent.copy(alpha = .15f), shape = CircleShape) {
-            Icon(Icons.Outlined.MusicNote, contentDescription = null, tint = accent, modifier = Modifier.padding(24.dp).size(56.dp))
-        }
-        Text(item.name, color = Color.White, fontWeight = FontWeight.Black, maxLines = 2, overflow = TextOverflow.Ellipsis)
-        if (failed) {
-            Text(stringResource(R.string.whatsapp_audio_preview_error), color = ToolAmber)
-        } else {
-            Button(onClick = { if (player.isPlaying) player.pause() else player.play() }) {
-                Icon(if (playing) Icons.Outlined.CheckCircle else Icons.Outlined.PlayArrow, contentDescription = null)
-                Spacer(Modifier.width(7.dp))
-                Text(stringResource(if (playing) R.string.smart_video_pause else R.string.smart_video_play))
-            }
-        }
-    }
-}
-
-@Composable
-private fun ToolGenericPreview(item: CleanableItem, accent: Color) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Surface(color = accent.copy(alpha = .15f), shape = RoundedCornerShape(26.dp)) {
-            Icon(fileIcon(item), contentDescription = null, tint = accent, modifier = Modifier.padding(26.dp).size(64.dp))
-        }
-        Text(stringResource(R.string.whatsapp_file_preview), color = Color.White, fontWeight = FontWeight.Black)
-        Text(item.name, color = ToolTextSecondary, maxLines = 3, overflow = TextOverflow.Ellipsis)
-        Text(ByteFormatter.format(item.sizeBytes), color = accent, fontWeight = FontWeight.Black)
     }
 }
 
@@ -1273,11 +984,11 @@ private fun sortItems(items: List<CleanableItem>, sortMode: ToolSortMode): List<
 
 private fun setSectionSelection(
     items: List<CleanableItem>,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
 ) {
     if (items.isEmpty()) return
     val targetSelected = !items.all(CleanableItem::selected)
-    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected)
+    onSetItemsSelected(items.asSequence().map(CleanableItem::id).toSet(), targetSelected, true)
 }
 
 private fun toolConfig(focus: ScanFocus): ToolVisualConfig = when (focus) {
@@ -1313,22 +1024,6 @@ private fun categoryAccent(category: CleanCategory): Color = when (category) {
     CleanCategory.WHATSAPP_MEDIA -> Color(0xFF22C96C)
 }
 
-private fun fileIcon(item: CleanableItem): ImageVector = when {
-    item.mimeType.startsWith("image/") -> Icons.Outlined.PhotoLibrary
-    item.mimeType.startsWith("video/") -> Icons.Outlined.VideoFile
-    item.mimeType.startsWith("audio/") -> Icons.Outlined.MusicNote
-    item.name.lowercase().endsWith(".apk") -> Icons.Outlined.Android
-    isDocumentOrArchive(item) -> Icons.Outlined.Description
-    else -> Icons.Outlined.InsertDriveFile
-}
-
-private fun isDocumentOrArchive(item: CleanableItem): Boolean {
-    val ext = item.name.substringAfterLast('.', "").lowercase()
-    return item.mimeType.startsWith("text/") ||
-        item.mimeType.contains("pdf") ||
-        ext in setOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "tar", "gz")
-}
-
 private fun ageDays(modifiedAtMillis: Long, nowMillis: Long = System.currentTimeMillis()): Long {
     if (modifiedAtMillis <= 0L || modifiedAtMillis > nowMillis) return 0L
     return TimeUnit.MILLISECONDS.toDays(nowMillis - modifiedAtMillis)
@@ -1345,48 +1040,9 @@ private fun compactPath(path: String): String {
     }
 }
 
-private suspend fun loadToolThumbnail(context: Context, item: CleanableItem): ImageBitmap? = withContext(Dispatchers.IO) {
-    ToolThumbnailCache.get(item.uri)?.let { return@withContext it }
-    val bitmap = runCatching {
-        val uri = Uri.parse(item.uri)
-        val loaded = if (uri.scheme == "content") {
-            context.contentResolver.loadThumbnail(uri, Size(420, 320), null)
-        } else {
-            val path = uri.path ?: return@runCatching null
-            val file = File(path)
-            if (!file.isFile) return@runCatching null
-            when {
-                item.mimeType.startsWith("video/") -> android.media.ThumbnailUtils.createVideoThumbnail(file, Size(420, 320), null)
-                item.mimeType.startsWith("image/") -> decodeToolBitmap(file, 520)
-                else -> null
-            }
-        }
-        loaded?.asImageBitmap()
-    }.getOrNull()
-    if (bitmap != null) ToolThumbnailCache.put(item.uri, bitmap)
-    bitmap
-}
-
-private suspend fun loadToolDisplayBitmap(context: Context, item: CleanableItem): ImageBitmap? = withContext(Dispatchers.IO) {
-    runCatching {
-        val uri = Uri.parse(item.uri)
-        if (uri.scheme == "content") {
-            context.contentResolver.loadThumbnail(uri, Size(1600, 1600), null).asImageBitmap()
-        } else {
-            val path = uri.path ?: return@runCatching null
-            val file = File(path)
-            if (!file.isFile) return@runCatching null
-            decodeToolBitmap(file, 1600)?.asImageBitmap()
-        }
-    }.getOrNull()
-}
-
-private fun decodeToolBitmap(file: File, maxSide: Int): android.graphics.Bitmap? {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    BitmapFactory.decodeFile(file.absolutePath, bounds)
-    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
-    var sample = 1
-    val largest = maxOf(bounds.outWidth, bounds.outHeight)
-    while (largest / sample > maxSide) sample *= 2
-    return BitmapFactory.decodeFile(file.absolutePath, BitmapFactory.Options().apply { inSampleSize = sample })
+private fun isDocumentOrArchive(item: CleanableItem): Boolean {
+    val ext = item.name.substringAfterLast('.', "").lowercase()
+    return item.mimeType.startsWith("text/") ||
+        item.mimeType.contains("pdf") ||
+        ext in setOf("pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "csv", "zip", "rar", "7z", "tar", "gz")
 }

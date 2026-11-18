@@ -2,59 +2,31 @@ package com.mrzekai.depoakilli.ui
 
 import androidx.annotation.StringRes
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Android
-import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.CleaningServices
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.DeleteSweep
-import androidx.compose.material.icons.outlined.Download
-import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Handyman
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.SwipeLeft
-import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -62,7 +34,6 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -77,34 +48,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd
 import com.mrzekai.depoakilli.ads.ListNativeAdCard
-import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
-import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.ScanFocus
-import com.mrzekai.depoakilli.model.ScanSummary
-import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.ui.theme.ElectricBlue
-import com.mrzekai.depoakilli.ui.theme.Lime400
-import com.mrzekai.depoakilli.ui.theme.WhatsAppGreen
 
 /** Three tabs (T1.10): Clean (the plan), Tools and Trash. Settings live behind the gear icon. */
 private enum class AppTab(@StringRes val titleRes: Int, val icon: ImageVector) {
@@ -175,6 +132,9 @@ fun CleanerApp(
     var detailScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var legalReturnScreen by rememberSaveable { mutableStateOf<DetailScreen?>(null) }
     var accessDisclosure by rememberSaveable { mutableStateOf<AccessDisclosure?>(null) }
+    // After the user returned from the system screen without granting access,
+    // the Clean tab shows one sentence and "Open settings" (T2.1).
+    var allFilesAskedOnce by rememberSaveable { mutableStateOf(false) }
     // Scan data lives in the ViewModel, not saved navigation state. After a
     // process restart the saved results route must not reopen without its data.
     LaunchedEffect(Unit) {
@@ -556,8 +516,11 @@ fun CleanerApp(
                         state = state,
                         onAllowAccess = ::requestAllFilesWithDisclosure,
                         onCancelScan = viewModel::cancelScan,
+                        accessDeniedOnce = allFilesAskedOnce,
+                        onOpenSettings = onRequestAllFilesAccess,
                         onOpenTrash = { selectedTabIndex = AppTab.TRASH.ordinal },
                         modifier = Modifier.padding(padding),
+                        onShowDetails = { viewModel.scan(ScanFocus.SMART) },
                     ) { displayState, header ->
                         SmartCleanResultsScreen(
                             state = displayState,
@@ -639,12 +602,21 @@ fun CleanerApp(
         }
     }
 
-    if (state.trashFallbackIds.isNotEmpty() && state.cleanupResult == null && !state.cleanupInProgress) {
-        val count = state.trashFallbackIds.size
+    val trashFallback = state.trashFallback
+    if (trashFallback != null && state.cleanupResult == null && !state.cleanupInProgress) {
+        val count = trashFallback.ids.size
         AlertDialog(
             onDismissRequest = viewModel::dismissTrashFallback,
             title = { Text(stringResource(R.string.trash_full_title), fontWeight = FontWeight.Black) },
-            text = { Text(pluralStringResource(R.plurals.trash_full_body, count, count)) },
+            text = {
+                Text(
+                    pluralStringResource(
+                        if (trashFallback.folderMissing) R.plurals.trash_folder_missing_body else R.plurals.trash_full_body,
+                        count,
+                        count,
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = viewModel::deleteTrashFallbackPermanently) {
                     Text(stringResource(R.string.trash_delete_forever))
@@ -687,6 +659,7 @@ fun CleanerApp(
                     onClick = {
                         accessDisclosure = null
                         if (disclosure == AccessDisclosure.ALL_FILES) {
+                            allFilesAskedOnce = true
                             onRequestAllFilesAccess()
                         } else {
                             onRequestUsageAccess()
@@ -801,7 +774,7 @@ private fun CleanScreen(
     onScan: () -> Unit,
     onToggleItem: (String) -> Unit,
     onToggleCategory: (CleanCategory) -> Unit,
-    onSetItemsSelected: (Set<String>, Boolean) -> Unit,
+    onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onOpenCategoryReview: (CleanCategory, Set<String>?) -> Unit,
     onOpenStorageReview: (com.mrzekai.depoakilli.model.StorageFileType, Boolean) -> Unit,
     onRequestUsageAccess: () -> Unit,
@@ -863,240 +836,16 @@ private fun CleanScreen(
         return
     }
 
-    if (state.scanFocus in setOf(
-            ScanFocus.DEEP,
-            ScanFocus.JUNK,
-            ScanFocus.DUPLICATES,
-            ScanFocus.LARGE_FILES,
-            ScanFocus.MEDIA,
-            ScanFocus.SCREENSHOTS,
-            ScanFocus.DOWNLOADS,
-            ScanFocus.APKS,
-        )
-    ) {
-        PremiumCleanerToolScreen(
-            state = state,
-            onRequestAllFilesAccess = onRequestAllFilesAccess,
-            onScan = onScan,
-            onToggleItem = onToggleItem,
-            onSetItemsSelected = onSetItemsSelected,
-            onClean = onClean,
-            modifier = modifier,
-        )
-        return
-    }
-
-    when {
-        !state.hasAllFilesAccess -> Box(modifier.fillMaxSize().padding(22.dp), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Icon(Icons.Outlined.Security, contentDescription = null, tint = ElectricBlue, modifier = Modifier.size(54.dp))
-                Text(stringResource(R.string.all_files_access_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.all_files_access_clean_screen), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(onClick = onRequestAllFilesAccess) { Text(stringResource(R.string.grant_access)) }
-            }
-        }
-
-        state.scanning -> ScanningState(state = state, modifier = modifier)
-        !state.lastScanCompleted -> EmptyScanState(state = state, onScan = onScan, modifier = modifier)
-        else -> ScanResults(
-            state = state,
-            onScan = onScan,
-            onToggleItem = onToggleItem,
-            onToggleCategory = onToggleCategory,
-            onClean = { onClean(null) },
-            modifier = modifier,
-        )
-    }
-}
-
-@Composable
-private fun ScanningState(state: CleanerUiState, modifier: Modifier) {
-    Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            CircularProgressIndicator(modifier = Modifier.size(58.dp))
-            Text(stringResource(R.string.scan_in_progress_v050), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Black)
-            Text(
-                stringResource(R.string.scan_live_counter, state.scanProgressFiles, state.scanProgressDirectories),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(stringResource(R.string.scan_private), style = MaterialTheme.typography.bodySmall, color = ElectricBlue)
-        }
-    }
-}
-
-@Composable
-private fun EmptyScanState(state: CleanerUiState, onScan: () -> Unit, modifier: Modifier) {
-    Box(modifier.fillMaxSize().padding(22.dp), contentAlignment = Alignment.Center) {
-        Card(shape = RoundedCornerShape(28.dp)) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Icon(categoryFocusIcon(state.scanFocus), contentDescription = null, tint = ElectricBlue, modifier = Modifier.size(56.dp))
-                Text(stringResource(scanFocusTitleRes(state.scanFocus)), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black)
-                Text(stringResource(R.string.safe_ai_cleaning_description_v050), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(onClick = onScan, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.start_scan)) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScanResults(
-    state: CleanerUiState,
-    onScan: () -> Unit,
-    onToggleItem: (String) -> Unit,
-    onToggleCategory: (CleanCategory) -> Unit,
-    onClean: () -> Unit,
-    modifier: Modifier,
-) {
-    val summary = state.summary
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        item {
-            ScanSummaryHero(summary, state.scanFocus)
-        }
-        if (summary.storageTypes.isNotEmpty()) {
-            item {
-                Card(shape = RoundedCornerShape(22.dp)) {
-                    Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-                        Text(stringResource(R.string.storage_analyzer_title), fontWeight = FontWeight.Black)
-                        summary.storageTypes.take(7).forEach { stat ->
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(stringResource(stat.type.titleRes), style = MaterialTheme.typography.bodySmall)
-                                Text(
-                                    "${stat.fileCount} • ${ByteFormatter.format(stat.totalBytes)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (summary.items.isEmpty() && state.scanFocus != ScanFocus.ANALYZE) {
-            item {
-                Text(stringResource(R.string.no_safe_suggestions), color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        } else if (summary.items.isNotEmpty()) {
-            summary.byCategory.forEach { (category, categoryItems) ->
-                item(key = "header-${category.name}") {
-                    CategoryHeader(category, categoryItems, onToggle = { onToggleCategory(category) })
-                }
-                items(categoryItems, key = CleanableItem::id) { item ->
-                    FileResultRow(item, onToggleItem)
-                }
-            }
-        }
-        if (summary.scanLimitReached) {
-            item { Text(stringResource(R.string.scan_limit_note_v050), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
-        }
-        item {
-            TextButton(onClick = onScan, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.scan_again)) }
-        }
-        if (summary.selectedItems.isNotEmpty()) {
-            item {
-                Button(onClick = onClean, modifier = Modifier.fillMaxWidth().height(54.dp)) {
-                    Text(stringResource(R.string.clean_action, ByteFormatter.format(summary.selectedBytes)), fontWeight = FontWeight.Black)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScanSummaryHero(summary: ScanSummary, focus: ScanFocus) {
-    Card(shape = RoundedCornerShape(26.dp)) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .background(Brush.horizontalGradient(listOf(Color(0xFF071B55), Color(0xFF0A67DF))))
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp),
-        ) {
-            Text(stringResource(scanFocusTitleRes(focus)), color = Color.White.copy(alpha = .8f), fontWeight = FontWeight.Bold)
-            Text(ByteFormatter.format(summary.selectedBytes), color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Black)
-            Text(stringResource(R.string.cleanable_space), color = Color(0xFF99F2C1), fontWeight = FontWeight.Bold)
-            Text(
-                stringResource(R.string.scan_stats_v050, summary.scannedFileCount, ByteFormatter.format(summary.scannedBytes), summary.selectedItems.size),
-                color = Color.White.copy(alpha = .8f),
-                style = MaterialTheme.typography.bodySmall,
-            )
-        }
-    }
-}
-
-@Composable
-private fun CategoryHeader(
-    category: CleanCategory,
-    items: List<CleanableItem>,
-    onToggle: () -> Unit,
-) {
-    val allSelected = items.isNotEmpty() && items.all(CleanableItem::selected)
-    Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onToggle).padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(categoryIcon(category), contentDescription = null, tint = ElectricBlue)
-        Spacer(Modifier.width(10.dp))
-        Column(Modifier.weight(1f)) {
-            Text(stringResource(category.titleRes), fontWeight = FontWeight.Black)
-            Text(
-                pluralStringResource(R.plurals.category_summary, items.size, items.size, ByteFormatter.format(items.sumOf(CleanableItem::sizeBytes))),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        Checkbox(checked = allSelected, onCheckedChange = { onToggle() })
-    }
-}
-
-@Composable
-private fun FileResultRow(item: CleanableItem, onToggleItem: (String) -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { onToggleItem(item.id) },
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(18.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(13.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(checked = item.selected, onCheckedChange = { onToggleItem(item.id) })
-            Spacer(Modifier.width(8.dp))
-            Column(Modifier.weight(1f)) {
-                Text(item.name, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    item.relativePath,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    assessmentReason(item.assessment),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = ElectricBlue,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                item.protectedDuplicateName?.let {
-                    Text(
-                        stringResource(R.string.duplicate_original_kept, it),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF0C8A5B),
-                    )
-                }
-            }
-            Spacer(Modifier.width(8.dp))
-            Text(ByteFormatter.format(item.sizeBytes), fontWeight = FontWeight.Black)
-        }
-    }
+    // Every remaining focus is a tool scan (the old generic results list is removed, T3.1).
+    PremiumCleanerToolScreen(
+        state = state,
+        onRequestAllFilesAccess = onRequestAllFilesAccess,
+        onScan = onScan,
+        onToggleItem = onToggleItem,
+        onSetItemsSelected = onSetItemsSelected,
+        onClean = onClean,
+        modifier = modifier,
+    )
 }
 
 private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
@@ -1105,35 +854,9 @@ private fun scanFocusTitleRes(focus: ScanFocus): Int = when (focus) {
     ScanFocus.JUNK -> R.string.scan_focus_junk
     ScanFocus.DUPLICATES -> R.string.scan_focus_duplicates
     ScanFocus.LARGE_FILES -> R.string.scan_focus_large
-    ScanFocus.WHATSAPP -> R.string.scan_focus_whatsapp
     ScanFocus.MEDIA -> R.string.scan_focus_media
     ScanFocus.SCREENSHOTS -> R.string.category_screenshots
     ScanFocus.DOWNLOADS -> R.string.scan_focus_downloads
     ScanFocus.APKS -> R.string.scan_focus_apks
     ScanFocus.ANALYZE -> R.string.scan_focus_analyze
-}
-
-private fun categoryFocusIcon(focus: ScanFocus): ImageVector = when (focus) {
-    ScanFocus.SMART -> Icons.Outlined.AutoAwesome
-    ScanFocus.DEEP -> Icons.Outlined.CleaningServices
-    ScanFocus.JUNK -> Icons.Outlined.DeleteSweep
-    ScanFocus.DUPLICATES -> Icons.Outlined.ContentCopy
-    ScanFocus.LARGE_FILES -> Icons.Outlined.VideoFile
-    ScanFocus.WHATSAPP -> Icons.Outlined.Chat
-    ScanFocus.MEDIA -> Icons.Outlined.PhotoLibrary
-    ScanFocus.SCREENSHOTS -> Icons.Outlined.PhotoLibrary
-    ScanFocus.DOWNLOADS -> Icons.Outlined.Download
-    ScanFocus.APKS -> Icons.Outlined.Android
-    ScanFocus.ANALYZE -> Icons.Outlined.Storage
-}
-
-private fun categoryIcon(category: CleanCategory): ImageVector = when (category) {
-    CleanCategory.JUNK -> Icons.Outlined.DeleteSweep
-    CleanCategory.DUPLICATE -> Icons.Outlined.ContentCopy
-    CleanCategory.SCREENSHOT -> Icons.Outlined.PhotoLibrary
-    CleanCategory.LARGE_FILE -> Icons.Outlined.VideoFile
-    CleanCategory.OLD_DOWNLOAD -> Icons.Outlined.Folder
-    CleanCategory.APK_PACKAGE -> Icons.Outlined.Android
-    CleanCategory.APP_CACHE -> Icons.Outlined.CleaningServices
-    CleanCategory.WHATSAPP_MEDIA -> Icons.Outlined.Chat
 }

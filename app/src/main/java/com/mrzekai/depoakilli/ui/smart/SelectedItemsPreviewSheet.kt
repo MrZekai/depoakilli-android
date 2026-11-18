@@ -32,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
@@ -122,7 +123,7 @@ internal fun SelectedItemsPreviewSheet(
                             Text(
                                 stringResource(
                                     R.string.swipe_age_days,
-                                    item.relativePath.ifBlank { "/" },
+                                    bidiWrap(item.relativePath.ifBlank { "/" }),
                                     ByteFormatter.format(item.sizeBytes),
                                 ),
                                 color = PlanTextSecondary,

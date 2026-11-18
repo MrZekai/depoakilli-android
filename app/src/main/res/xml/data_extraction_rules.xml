@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- See backup_rules.xml: device-specific state stays on this phone (T3.6). -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="external" path="." />
+        <exclude domain="sharedpref" path="dashboard_snapshot_v1.xml" />
+        <exclude domain="sharedpref" path="storage_change_v1.xml" />
+        <exclude domain="sharedpref" path="cleanup_history_v1.xml" />
+        <exclude domain="file" path="trash_index.json" />
+        <exclude domain="file" path="trash_index.json.bak" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="external" path="." />
+        <exclude domain="sharedpref" path="dashboard_snapshot_v1.xml" />
+        <exclude domain="sharedpref" path="storage_change_v1.xml" />
+        <exclude domain="sharedpref" path="cleanup_history_v1.xml" />
+        <exclude domain="file" path="trash_index.json" />
+        <exclude domain="file" path="trash_index.json.bak" />
     </device-transfer>
 </data-extraction-rules>

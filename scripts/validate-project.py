@@ -60,10 +60,8 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/ui/StorageAnalyzerScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SecurityCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/SmartCleanResultsScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt",
@@ -320,8 +318,15 @@ view_model = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerViewModel.
 cleaner_app = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
 device_center = read("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt")
 app_cache_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/AppCacheManagerScreen.kt")
-dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/NeonDashboardScreen.kt")
-home_components = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeDashboardComponents.kt")
+# T3.1: the old dashboard Home is gone; the Clean tab (plan) is Home. The
+# remaining Home checks run on the new surface.
+for removed_home in ("NeonDashboardScreen.kt", "HomeDashboardComponents.kt"):
+    if (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui" / removed_home).exists():
+        errors.append(f"dead dashboard file must stay deleted: {removed_home}")
+dashboard = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt") + read(
+    "app/src/main/java/com/mrzekai/depoakilli/ui/smart/CleanupPlanScreen.kt"
+)
+home_components = dashboard
 home_tokens = read("app/src/main/java/com/mrzekai/depoakilli/ui/HomeVisualTokens.kt")
 cleanup_history_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanupHistoryStore.kt")
 storage_change_store = read("app/src/main/java/com/mrzekai/depoakilli/ui/StorageChangeStore.kt")
@@ -374,18 +379,8 @@ for expected in (
     if expected not in cleaner_app:
         errors.append(f"missing alpha7 storage-change navigation invariant: {expected}")
 
-different_tools_start = dashboard.find("R.string.home_different_tools_title")
-if different_tools_start >= 0:
-    different_tools = dashboard[different_tools_start:]
-    if "R.string.home_privacy_title" in different_tools:
-        errors.append("Privacy Center must not remain as a Home different-tools card")
-    if "R.string.storage_change_title" not in different_tools:
-        errors.append("Storage Change must replace Privacy Center on Home")
-
 if "onPrivacyAccess: () -> Unit" in home_components:
     errors.append("Home header privacy action must be removed")
-if "icon = Icons.Outlined.CleaningServices" not in home_components:
-    errors.append("Home cleanup-ready metric must use cleaning semantics")
 
 for forbidden in (
     "onClick = if (state.hasAllFilesAccess) null else",
@@ -545,27 +540,6 @@ for expected in (
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha6 app-cache dialog invariant: {expected}")
 
-different_tools_start = dashboard.find("R.string.home_different_tools_title")
-if different_tools_start < 0:
-    errors.append("Home different-tools section is missing")
-else:
-    different_tools_section = dashboard[different_tools_start:]
-    if "modifier = Modifier.weight(1f)" in different_tools_section:
-        errors.append("Home different-tools cards must not remain in the cramped 3-column layout")
-
-shortcut_start = home_components.find("internal fun HomeToolShortcut(")
-shortcut_end = home_components.find("internal fun HomeExploreCard(", shortcut_start)
-if shortcut_start < 0 or shortcut_end <= shortcut_start:
-    errors.append("unable to inspect HomeToolShortcut")
-else:
-    shortcut_section = home_components[shortcut_start:shortcut_end]
-    for expected in (
-        ".fillMaxWidth()",
-        "fontSize = 16.sp",
-        "text = subtitle",
-    ):
-        if expected not in shortcut_section:
-            errors.append(f"missing alpha6 HomeToolShortcut invariant: {expected}")
 
 
 for forbidden in (
@@ -649,32 +623,6 @@ for expected in (
 ):
     if expected not in cleaner_app and expected not in device_center:
         errors.append(f"missing Phase-2 navigation invariant: {expected}")
-
-for expected in (
-    "HomeOpportunityCard(",
-    "HomeSmartCleanCard(",
-    "HomeCleanupProofCard(",
-    "HomeSuggestionCard(",
-    "HomeToolShortcut(",
-    "HomeExploreCard(",
-    "onOpenAppCache: () -> Unit",
-    "onOpenStorageChange: () -> Unit",
-    "onOpenTools: () -> Unit",
-):
-    if expected not in dashboard:
-        errors.append(f"missing alpha3 premium Home invariant: {expected}")
-
-for expected in (
-    "HomeBrandHeader",
-    "HomeOpportunityCard",
-    "HomeSmartCleanCard",
-    "HomeCleanupProofCard",
-    "HomeSuggestionCard",
-    "HomeToolShortcut",
-    "HomeExploreCard",
-):
-    if expected not in home_components:
-        errors.append(f"missing alpha3 Home component: {expected}")
 
 for expected in (
     "HeroGradient",
@@ -806,11 +754,6 @@ for required_name in (
     "smart_cleanup_ad_notice",
 
 
-    "home_last_cleanup_title",
-    "home_last_cleanup_summary",
-    "home_smart_suggestions_title",
-    "home_different_tools_title",
-    "home_discover_title",
     "cache_modern_total_label",
     "cache_modern_individual_steps",
     "cache_modern_safety_note",
@@ -964,23 +907,39 @@ for expected in ("ModalBottomSheet", "plan_preview_cloud", "plan_preview_whatsap
 if "SelectedItemsPreviewSheet(" not in smart_results:
     errors.append("Smart plan must confirm through SelectedItemsPreviewSheet")
 for expected in (
-    "CleanupConfirmationDialog",
+    "DeleteConfirmDialog(",
     "StorageDetailPage",
-    "StorageCleanupConfirmationDialog",
     "FilePreviewDialog",
+    "MediaPreviewContent(",
     "LazyVerticalGrid(",
-    "ExoPlayer.Builder",
     "smartCategoryReview",
 ):
     if expected not in smart_results and expected not in view_model:
         errors.append(f"missing Smart Clean/review invariant: {expected}")
+
+# T2.3: one delete confirmation and one media preview/thumbnail path.
+delete_confirm_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/common/DeleteConfirmDialog.kt")
+for expected in ("delete_confirm_title", "delete_confirm_show_all", "delete_confirm_action", "R.string.cancel", "delete_confirm_trash", "delete_confirm_permanent"):
+    if expected not in delete_confirm_ui:
+        errors.append(f"missing shared delete confirmation invariant: {expected}")
+media_preview_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/FilePreviewDialog.kt")
+media_thumbnails = read("app/src/main/java/com/mrzekai/depoakilli/ui/media/MediaThumbnails.kt")
+if "ExoPlayer.Builder" not in media_preview_ui or "MediaPlayer" in media_preview_ui:
+    errors.append("audio and video previews must share the ExoPlayer path")
+if "override fun sizeOf" not in media_thumbnails:
+    errors.append("thumbnail cache must be sized in bytes")
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    if kotlin_file.name not in {"MediaThumbnails.kt"} and ("LruCache<" in source or "BitmapFactory.decodeFile" in source):
+        errors.append(f"thumbnail decoding/caching must go through MediaThumbnails: {kotlin_file.relative_to(ROOT)}")
 
 whatsapp_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt")
 for expected in (
     "WhatsAppHeroCard",
     "WhatsAppGroupSection",
     "WhatsAppPreviewDialog",
-    "ExoPlayer.Builder",
+    "DeleteConfirmDialog(",
+    "MediaPreviewContent(",
 
 ):
     if expected not in whatsapp_ui:
@@ -989,9 +948,8 @@ for expected in (
 premium_tools = read("app/src/main/java/com/mrzekai/depoakilli/ui/PremiumCleanerToolScreen.kt")
 for expected in (
     "PremiumCleanerToolScreen",
-    "PremiumCleanupConfirmationDialog",
-
-    "ExoPlayer.Builder",
+    "DeleteConfirmDialog(",
+    "MediaPreviewContent(",
 ):
     if expected not in premium_tools:
         errors.append(f"missing premium cleaner review invariant: {expected}")
@@ -1011,7 +969,7 @@ for expected in (
         errors.append(f"missing alpha9 Screenshots invariant: {expected}")
 
 for expected in (
-    "R.string.tools_broad_scan_section_title",
+
     "R.string.tools_cleaning_section_title",
     "ScanFocus.SCREENSHOTS",
     "R.string.cache_manager_subtitle",
@@ -1022,7 +980,7 @@ for expected in (
 junk_start = repository.find("ScanFocus.JUNK -> {")
 junk_end = repository.find("ScanFocus.DUPLICATES", junk_start)
 downloads_start = repository.find("ScanFocus.DOWNLOADS -> {")
-downloads_end = repository.find("ScanFocus.WHATSAPP", downloads_start)
+downloads_end = repository.find("private suspend fun indexSharedStorage", downloads_start)
 if junk_start < 0 or junk_end <= junk_start or downloads_start < 0 or downloads_end <= downloads_start:
     errors.append("unable to inspect alpha10 Junk/Downloads partition")
 else:
@@ -1082,7 +1040,8 @@ if "onPrepareWhatsAppCleanup { changed ->" in cleaner_app:
 for expected in (
     "state.scanFocus == ScanFocus.ANALYZE && state.storageReview.type != null",
     "onReviewType = { type -> onOpenStorageReview(type, false) }",
-    "ScanFocus.SCREENSHOTS,",
+    # Screenshots and every other tool focus route to the tool screen (T3.1).
+    "Every remaining focus is a tool scan",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing alpha9 CleanerApp routing invariant: {expected}")
@@ -1098,8 +1057,6 @@ if "R.string.storage_analyzer_action_hint" in smart_results:
     errors.append("destructive storage review must not use the read-only Analyzer resource prefix")
 
 for required_copy in (
-    "sponsored ad panel",
-    "no full-screen ad follows for the same cleanup",
     "Find exact duplicates verified by content; one original is always kept",
     "Measure real Android-reported cache per app and verify the actual reduction after cleanup",
 ):
@@ -1107,8 +1064,6 @@ for required_copy in (
         errors.append(f"missing alpha9 English product-truth copy: {required_copy}")
 
 for required_copy in (
-    "sponsorlu reklam paneli",
-    "aynı temizlik için tam ekran reklam gösterilmez",
     "İçeriği doğrulanmış birebir kopyaları bul; her grupta bir orijinal her zaman korunur",
 ):
     if required_copy not in tr_strings:
@@ -1484,6 +1439,41 @@ if "FLAG_ACTIVITY_NEW_DOCUMENT" not in main_activity or "Intent.createChooser(in
     errors.append("rate/feedback external flows must return to the app / offer a chooser")
 if "FeedbackDialog(" not in device_center:
     errors.append("feedback must show the support address in-app")
+
+# T2.2 / T2.5: button text contrast and minimum text size are checked in source.
+for kotlin_file in (ROOT / "app/src/main/java").rglob("*.kt"):
+    source = kotlin_file.read_text(encoding="utf-8")
+    relative = kotlin_file.relative_to(ROOT)
+    if re.search(r"buttonColors\((?:[^()]|\([^()]*\))*?contentColor\s*=\s*Color\.White", source, re.S):
+        errors.append(f"white text on a coloured button fails contrast; use ContrastTokens.OnBrightAction: {relative}")
+    for size in re.findall(r"(?<![\w.])(\d+(?:\.\d+)?)\.sp", source):
+        if float(size) < 12:
+            errors.append(f"text below 12 sp in {relative}: {size}.sp")
+            break
+if "labelSmall = base.labelSmall.copy(fontSize = 12.sp" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/theme/Theme.kt"):
+    errors.append("Material labelSmall (11 sp) must be raised to 12 sp in the theme")
+
+for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
+    names = [node.attrib.get("name") for node in ET.parse(strings_path).getroot()]
+    duplicates = sorted({name for name in names if names.count(name) > 1})
+    if duplicates:
+        errors.append(f"duplicate resource names in {strings_path.parent.name}: {duplicates}")
+
+# T2.7: sizes follow the phone's language through Formatter, with a root fallback.
+byte_formatter_models = read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt")
+if "Formatter.formatShortFileSize" not in byte_formatter_models or "ByteFormatter.install(this)" not in read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt"):
+    errors.append("ByteFormatter must use Formatter.formatShortFileSize with the app context installed at start")
+
+if '"$progress%"' in read("app/src/main/java/com/mrzekai/depoakilli/ui/WhatsAppCleanerScreen.kt"):
+    errors.append("WhatsApp progress percent must come from a string resource")
+if "unicodeWrap" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/common/BidiText.kt"):
+    errors.append("paths and sizes must be bidi-wrapped for right-to-left languages")
+
+for rules_name in ("backup_rules.xml", "data_extraction_rules.xml"):
+    rules = read(f"app/src/main/res/xml/{rules_name}")
+    for excluded in ("dashboard_snapshot_v1.xml", "storage_change_v1.xml", "cleanup_history_v1.xml", "trash_index.json"):
+        if f'path="{excluded}"' not in rules:
+            errors.append(f"{rules_name} must exclude device-specific state: {excluded}")
 
 plural_sets = {}
 for strings_path in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):

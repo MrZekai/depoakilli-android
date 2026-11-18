@@ -114,8 +114,8 @@ internal fun DeviceCenterScreen(
 
         item {
             ToolsSectionHeader(
-                title = stringResource(R.string.tools_broad_scan_section_title),
-                subtitle = stringResource(R.string.tools_broad_scan_section_subtitle),
+                title = stringResource(R.string.tools_cleaning_section_title),
+                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
             )
         }
 
@@ -129,16 +129,6 @@ internal fun DeviceCenterScreen(
             )
         }
 
-        // At most one in-list native ad, before the second group (T1B.4).
-        item(key = "tools-list-native") { listAd() }
-
-        item {
-            ToolsSectionHeader(
-                title = stringResource(R.string.tools_cleaning_section_title),
-                subtitle = stringResource(R.string.tools_cleaning_section_subtitle),
-            )
-        }
-
         item {
             ToolActionCard(
                 title = stringResource(R.string.junk_cleaner_title),
@@ -148,6 +138,7 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.JUNK) },
             )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.scan_focus_duplicates),
@@ -157,6 +148,7 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.DUPLICATES) },
             )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.large_files_tool_title),
@@ -164,40 +156,6 @@ internal fun DeviceCenterScreen(
                 icon = Icons.Outlined.VideoFile,
                 accent = Color(0xFFEA3E5C),
                 onClick = { onScan(ScanFocus.LARGE_FILES) },
-            )
-        }
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.category_screenshots),
-                subtitle = stringResource(R.string.screenshots_tool_subtitle),
-                icon = Icons.Outlined.PhotoLibrary,
-                accent = Color(0xFFDA57FF),
-                onClick = { onScan(ScanFocus.SCREENSHOTS) },
-            )
-        }
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.media_cleaner_title),
-                subtitle = stringResource(R.string.media_cleaner_subtitle),
-                icon = Icons.Outlined.PhotoLibrary,
-                accent = Color(0xFF0B8DD8),
-                onClick = { onScan(ScanFocus.MEDIA) },
-            )
-        }
-        item {
-            ToolActionCard(
-                title = stringResource(R.string.whatsapp_cleaner_title),
-                subtitle = stringResource(R.string.whatsapp_cleaner_subtitle_v050),
-                icon = Icons.Outlined.Chat,
-                accent = Color(0xFF10A861),
-                onClick = onOpenWhatsApp,
-            )
-        }
-
-        item {
-            ToolsSectionHeader(
-                title = stringResource(R.string.tools_storage_section_title),
-                subtitle = stringResource(R.string.tools_storage_section_subtitle),
             )
         }
 
@@ -210,6 +168,7 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.DOWNLOADS) },
             )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.scan_focus_apks),
@@ -219,15 +178,46 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.APKS) },
             )
         }
+
         item {
             ToolActionCard(
-                title = stringResource(R.string.cache_manager_title),
-                subtitle = stringResource(R.string.cache_manager_subtitle),
-                icon = Icons.Outlined.CleaningServices,
-                accent = Color(0xFF1852D5),
-                onClick = onOpenCache,
+                title = stringResource(R.string.category_screenshots),
+                subtitle = stringResource(R.string.screenshots_tool_subtitle),
+                icon = Icons.Outlined.PhotoLibrary,
+                accent = Color(0xFFDA57FF),
+                onClick = { onScan(ScanFocus.SCREENSHOTS) },
             )
         }
+
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.media_cleaner_title),
+                subtitle = stringResource(R.string.media_cleaner_subtitle),
+                icon = Icons.Outlined.PhotoLibrary,
+                accent = Color(0xFF0B8DD8),
+                onClick = { onScan(ScanFocus.MEDIA) },
+            )
+        }
+
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.whatsapp_cleaner_title),
+                subtitle = stringResource(R.string.whatsapp_cleaner_subtitle_v050),
+                icon = Icons.Outlined.Chat,
+                accent = Color(0xFF10A861),
+                onClick = onOpenWhatsApp,
+            )
+        }
+
+        item(key = "tools-list-native") { listAd() }
+
+        item {
+            ToolsSectionHeader(
+                title = stringResource(R.string.tools_storage_section_title),
+                subtitle = stringResource(R.string.tools_storage_section_subtitle),
+            )
+        }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.storage_analyzer_title),
@@ -237,6 +227,7 @@ internal fun DeviceCenterScreen(
                 onClick = { onScan(ScanFocus.ANALYZE) },
             )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.storage_change_title),
@@ -246,6 +237,7 @@ internal fun DeviceCenterScreen(
                 onClick = onOpenStorageChange,
             )
         }
+
         item {
             ToolActionCard(
                 title = stringResource(R.string.trash_title),
@@ -260,6 +252,16 @@ internal fun DeviceCenterScreen(
             ToolsSectionHeader(
                 title = stringResource(R.string.tools_apps_section_title),
                 subtitle = stringResource(R.string.tools_apps_section_subtitle),
+            )
+        }
+
+        item {
+            ToolActionCard(
+                title = stringResource(R.string.cache_manager_title),
+                subtitle = stringResource(R.string.cache_manager_subtitle),
+                icon = Icons.Outlined.CleaningServices,
+                accent = Color(0xFF1852D5),
+                onClick = onOpenCache,
             )
         }
 

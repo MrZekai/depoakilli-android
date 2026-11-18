@@ -75,7 +75,6 @@ enum class ScanFocus {
     JUNK,
     DUPLICATES,
     LARGE_FILES,
-    WHATSAPP,
     MEDIA,
     SCREENSHOTS,
     DOWNLOADS,
@@ -305,7 +304,28 @@ data class ScanSummary(
 object ByteFormatter {
     private val units = listOf("B", "KB", "MB", "GB", "TB")
 
+    @Volatile
+    private var appContext: android.content.Context? = null
+
+    /** Called once at app start; sizes then follow the phone's language (T2.7). */
+    fun install(context: android.content.Context) {
+        appContext = context.applicationContext
+    }
+
     fun format(bytes: Long): String {
+        val context = appContext
+        if (context != null) {
+            val localized = runCatching {
+                android.text.format.Formatter.formatShortFileSize(context, bytes.coerceAtLeast(0L))
+            }.getOrNull()
+            // Kept in one direction inside right-to-left text (Arabic).
+            if (!localized.isNullOrBlank()) return runCatching { android.text.BidiFormatter.getInstance().unicodeWrap(localized) }.getOrDefault(localized)
+        }
+        return formatRoot(bytes)
+    }
+
+    /** Locale-independent fallback, also used by unit tests (no Android context). */
+    internal fun formatRoot(bytes: Long): String {
         if (bytes <= 0) return "0 B"
         var value = bytes.toDouble()
         var unitIndex = 0

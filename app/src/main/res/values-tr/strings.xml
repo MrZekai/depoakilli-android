@@ -1,152 +1,39 @@
 <resources>
     <string name="app_name">Akıllı Temizleyici</string>
-    <string name="app_tagline">HIZLI • KONTROLLÜ • CİHAZ İÇİNDE</string>
-    <string name="tab_home">Ana Sayfa</string>
     <string name="tab_clean">Temizlik</string>
     <string name="tab_tools">Araçlar</string>
-    <string name="scan_primary">AKILLI TEMİZLİĞİ BAŞLAT</string>
-    <string name="scan_primary_subtitle">Güvenli önerileri cihazında analiz et</string>
-    <string name="cleaning_center">Temizlik merkezi</string>
-    <string name="photos">Fotoğraflar</string>
-    <string name="photos_subtitle">Benzer ve eski</string>
-    <string name="large_videos">Büyük videolar</string>
-    <string name="large_videos_subtitle">150 MB üzeri</string>
-    <string name="apk_packages">APK paketleri</string>
-    <string name="apk_packages_subtitle">Eski kurulumlar</string>
-    <string name="downloads">İndirilenler</string>
-    <string name="downloads_subtitle">Eski dosyalar</string>
-    <string name="app_cache_quick">Uygulama önbelleği</string>
-    <string name="app_cache_quick_subtitle">%1$s geçici dosya</string>
-    <string name="smart_clean_ready">AKILLI TEMİZLİK</string>
-    <string name="smart_clean_title">Telefonun Hazır</string>
-    <string name="smart_clean_subtitle">Çöp, kopya ve büyük dosyaları tek taramada bul</string>
-    <string name="smart_clean_action">ŞİMDİ TARA</string>
-    <string name="smart_clean_scanning">TARANIYOR</string>
-    <string name="smart_clean_scanning_title">Telefonun taranıyor</string>
-    <string name="smart_scan_home_action">AKILLI TARAMA</string>
-    <string name="hero_performance">Daha fazla alan, daha net kontrol.</string>
-    <string name="home_storage_label">Depolama</string>
     <string name="home_storage_percent">%%%1$d</string>
-    <string name="home_ram_label">RAM boş</string>
-    <string name="reclaim_space">Alanını Geri Kazan</string>
-    <string name="junk_home_subtitle">Bu uygulamanın önbelleğini ve erişilebilir indirilen medyayı incele.</string>
-    <string name="ram_available_home">%1$s kullanılabilir</string>
-    <string name="duplicates_home_subtitle">Aynı dosyaların kopyalarını bul ve sil.</string>
-    <string name="whatsapp_home_subtitle">Gereksiz medya dosyalarını incele ve temizle.</string>
-    <string name="large_files_home_subtitle">Büyük boyutlu dosyaları bul ve yer aç.</string>
-    <string name="cache_home_subtitle">Önbellek kullanımını ölç ve güvenle yönet.</string>
-    <string name="cache_home_measured">%1$s önbellek ölçüldü; uygulamaları incele.</string>
-    <string name="device_overview">Cihaz özeti</string>
-    <string name="storage_short">%1$s boş</string>
-    <string name="ram_short">%1$s RAM boş</string>
-    <string name="cleaning_tools_title">Temizlik araçları</string>
-    <string name="cleaning_tools_subtitle">Her araç ayrı ve hedef odaklı bir işlem yapar</string>
     <string name="junk_cleaner_title">Çöp Temizliği</string>
-    <string name="junk_cleaner_subtitle">Bu uygulamanın önbelleği ve erişilebilir indirilen medya</string>
-    <string name="duplicates_tool_title">Kopyaları Sil</string>
-    <string name="duplicates_tool_subtitle">İçerik parmak iziyle birebir kopyaları bul</string>
     <string name="whatsapp_cleaner_title">WhatsApp Temizleyici</string>
-    <string name="whatsapp_cleaner_subtitle">Medya klasörünü bağla ve geçici öğeleri incele</string>
-    <string name="whatsapp_cleaner_connected">Klasör bağlı • geçici medyayı tara</string>
     <string name="large_files_tool_title">Büyük Dosyalar</string>
-    <string name="large_files_tool_subtitle">En çok alan kullanan videoları incele</string>
-    <string name="cache_tool_title">Uygulama Önbelleği</string>
-    <string name="cache_tool_subtitle">Önbelleği ölç ve Android temizlik kontrollerini aç</string>
-    <string name="storage_full">DOLU</string>
-    <string name="phone_storage">Telefon depolaması</string>
-    <string name="storage_used">%1$s kullanılıyor</string>
-    <string name="storage_free">%1$s boş alan</string>
-    <string name="storage_total">Toplam %1$s</string>
-    <string name="media_access_required">Medya erişimi gerekli</string>
-    <string name="media_access_explanation">Fotoğraf ve videolar yalnızca cihazında analiz edilir.</string>
     <string name="grant_access">İzin ver</string>
-    <string name="memory_status">Bellek durumu</string>
-    <string name="memory_available">%1$s kullanılabilir RAM • bu uygulama: %2$s</string>
-    <string name="memory_compact_subtitle">%1$s kullanılabilir • Akıllı Temizleyici %2$s</string>
-    <string name="last_scan">Son tarama</string>
-    <string name="last_scan_summary">%1$d öneri • %2$s</string>
-    <string name="scan_in_progress">Akıllı Temizleyici dosyaları analiz ediyor…</string>
     <string name="scan_private">İçerik cihazından çıkmıyor</string>
-    <string name="safe_ai_cleaning">Güvenli akıllı temizlik</string>
-    <string name="safe_ai_cleaning_description">Dosya yaşı, boyutu, türü ve içerik parmak izleri cihazında analiz edilir. Son kararı her zaman sen verirsin.</string>
     <string name="start_scan">Taramayı başlat</string>
-    <string name="grant_and_scan">Erişim ver ve tara</string>
-    <string name="enable_media_scan">Fotoğraf ve video taramasını etkinleştir</string>
-    <string name="limited_access_notice">Sınırlı erişim: yalnızca izin verdiğin medya analiz edildi.</string>
-    <string name="cleanable_space">TEMİZLENEBİLİR ALAN</string>
-    <string name="scan_stats">%1$d dosya tarandı • %2$d öğe seçili</string>
-    <string name="no_safe_suggestions">Harika! Güvenli bir temizlik önerisi bulunmadı.</string>
     <string name="scan_again">Yeniden tara</string>
-    <string name="clean_action">%1$s TEMİZLE</string>
-    <plurals name="category_summary">
-        <item quantity="one">%1$d öğe • %2$s</item>
-        <item quantity="other">%1$d öğe • %2$s</item>
-    </plurals>
-    <string name="file_confidence">%1$s • Güven: %%%2$d</string>
     <string name="cache_manager_title">Uygulama Önbelleği Yöneticisi</string>
     <string name="cache_manager_subtitle">Uygulama bazında Android’in bildirdiği gerçek önbelleği ölç; temizlik sonrası gerçek azalmayı doğrula</string>
     <string name="cache_access_required">Önbellek erişimi kapalı</string>
-    <string name="cache_access_explanation">Akıllı Temizleyici’nin uygulama depolama toplamlarını okuyabilmesi için Kullanım Erişimi ver. Kişisel içerikler okunmaz.</string>
     <string name="cache_grant_action">Önbellek taramasına izin ver</string>
-    <string name="cache_scanning">Uygulama önbellekleri taranıyor…</string>
-    <string name="cache_summary">%1$s cihaz önbelleği • %2$d uygulama listelendi</string>
-    <string name="cache_empty">Şu anda bildirilen uygulama önbelleği yok.</string>
-    <string name="cache_unsupported">Uygulama önbelleği toplamları Android 8.0 veya üstünü gerektirir.</string>
     <string name="cache_refresh">Yenile</string>
-    <string name="cache_other_apps">En çok önbellek kullanan uygulamalar</string>
-    <string name="cache_open_settings_hint">Uygulamaya dokun, ardından Depolama ve önbellek › Önbelleği temizle seç</string>
     <string name="cache_own_app">Akıllı Temizleyici önbelleği</string>
     <string name="cache_own_app_subtitle">%1$s doğrudan ve güvenle silinebilir</string>
-    <string name="cache_manual_notice">Android her uygulamanın özel dosyalarını korur. Akıllı Temizleyici gerçek önbelleği ölçer, ardından kontrol sende kalsın diye Android’in resmî uygulama ekranını açar.</string>
-    <string name="cache_detected_title">Uygulama önbelleği bulundu</string>
-    <string name="cache_detected_description">Android %1$s önbellek bildiriyor; incelemek için %2$d büyük uygulama listelendi.</string>
-    <string name="cache_scan_not_enabled">Uygulama önbelleklerini Akıllı Tarama’ya katmak için önbellek taramasını etkinleştir.</string>
-    <string name="review_cache">Uygulama önbelleklerini incele</string>
-    <string name="media_cleanup">Fotoğraf, video ve indirilenler</string>
-    <string name="media_cleanup_subtitle">Birebir kopyaları, büyük videoları ve erişilebilir eski indirmeleri bul</string>
-    <string name="space_found">BULUNAN ALAN</string>
-    <string name="scan_space_breakdown">%1$s gerçekten seçilebilir • %2$s korunan uygulama önbelleği ayrıca algılandı</string>
-    <string name="scan_selectable_only">%1$s seçildi ve onayınızdan sonra gerçekten temizlenebilir.</string>
-    <string name="cache_not_in_clean_total">Diğer uygulamaların korunan önbelleği yalnız bilgi amaçlıdır ve Temizle düğmesinin toplamına katılmaz.</string>
     <string name="scan_focus_smart">Akıllı temizlik sonucu</string>
     <string name="scan_focus_junk">Çöp Temizliği</string>
     <string name="scan_focus_duplicates">Kopyaları Sil</string>
     <string name="scan_focus_large">Büyük Dosyalar</string>
-    <string name="scan_focus_whatsapp">WhatsApp temizliği sonucu</string>
-    <string name="tools_title">Cihaz araçları</string>
-    <string name="tools_subtitle">Gerçek Android kontrolleri ve güvenli cihaz içi temizlik.</string>
-    <string name="clear_app_cache">Uygulama önbelleğini temizle</string>
-    <string name="clear_app_cache_subtitle">%1$s güvenli geçici dosyayı şimdi sil</string>
-    <string name="app_storage_details">Uygulama depolama detayları</string>
-    <string name="app_storage_details_subtitle">Bu uygulamanın Android depolama ve önbellek ekranını aç</string>
-    <string name="storage_settings">Depolama ayarları</string>
-    <string name="storage_settings_subtitle">Cihaz ve uygulama alan kullanımını yönet</string>
-    <string name="memory_and_apps">Bellek ve uygulamalar</string>
-    <string name="memory_and_apps_subtitle">%1$s kullanılabilir / %2$s toplam • yüklü uygulamaları incele</string>
     <string name="language_settings">Uygulama dili</string>
-    <string name="language_settings_subtitle">Telefonun desteklediği uygulama dili ayarını kullan; desteklenmeyen diller İngilizceye döner.</string>
     <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
     <string name="ad_privacy_preferences_subtitle">Onay ve kişiselleştirme seçimlerini değiştir</string>
     <string name="sponsored">Reklam</string>
     <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
-    <string name="message_cleanup_cancelled">Temizlik işlemi iptal edildi.</string>
-    <string name="message_cleanup_complete">Temizlik tamamlandı.</string>
-    <string name="message_cleanup_partial">Temizlik tamamlandı; ancak Android seçilen bazı dosyaları silemedi.</string>
-    <string name="message_cache_cleared">%1$s geçici uygulama önbelleği temizlendi.</string>
     <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
-    <string name="message_whatsapp_folder_invalid">WhatsApp veya WhatsApp Business Medya klasörünü seçin.</string>
-    <string name="message_whatsapp_access_required">Önce WhatsApp Medya klasörünü bağlayın.</string>
     <string name="message_whatsapp_scan_failed">WhatsApp taraması tamamlanamadı. Medya klasörünü yeniden bağlayıp tekrar deneyin.</string>
     <string name="message_screen_unavailable">Bu ekran cihazınızda açılamadı.</string>
-    <string name="message_whatsapp_cleanup_complete">Seçilen WhatsApp dosyalarından %1$s silindi • %2$d başarısız</string>
-    <string name="message_whatsapp_cleanup_partial">%1$s silindi • Android seçilen %2$d dosyayı silemedi</string>
     <string name="category_duplicates">Yinelenenler</string>
     <string name="category_duplicates_description">Aynı içeriğin gereksiz kopyaları</string>
     <string name="category_screenshots">Ekran görüntüleri</string>
     <string name="category_screenshots_description">Ekran görüntülerini incele</string>
-    <string name="category_large_videos">Büyük videolar</string>
-    <string name="category_large_videos_description">Depolamayı en çok kullanan videolar</string>
     <string name="category_old_downloads">Eski indirilenler</string>
     <string name="category_old_downloads_description">Uzun süredir İndirilenler klasöründe kalan dosyalar</string>
     <string name="category_apk_packages">APK paketleri</string>
@@ -155,29 +42,19 @@
     <string name="category_app_cache_description">Güvenli geçici uygulama dosyaları</string>
     <string name="category_whatsapp">WhatsApp medyası</string>
     <string name="category_whatsapp_description">Durumlar ve 30 günden eski gönderilen medya. Tüm WhatsApp medyası WhatsApp Temizleyici’de.</string>
-    <plurals name="reason_old_installer">
-        <item quantity="one">Kurulum paketi • Yaş (gün): %1$d</item>
-        <item quantity="other">Kurulum paketi • Yaş (gün): %1$d</item>
-    </plurals>
     <string name="reason_downloaded_installer">İndirilen kurulum paketi</string>
     <plurals name="reason_old_screenshot">
         <item quantity="one">Ekran görüntüsü • Yaş (gün): %1$d</item>
         <item quantity="other">Ekran görüntüsü • Yaş (gün): %1$d</item>
     </plurals>
     <string name="reason_screenshot_review">Ekran görüntüsü • yalnızca inceleme</string>
-    <string name="reason_large_video">%1$d günlük büyük video</string>
     <plurals name="reason_old_download">
         <item quantity="one">İndirilenlerde geçen süre • Yaş (gün): %1$d</item>
         <item quantity="other">İndirilenlerde geçen süre • Yaş (gün): %1$d</item>
     </plurals>
     <string name="reason_exact_duplicate">İçerik parmak izi birebir aynı</string>
     <string name="reason_sampled_duplicate">Muhtemel kopya: boyut ve örnekler eşleşiyor. Tam doğrulanmadı — silmeden önce karşılaştır.</string>
-    <string name="reason_probable_duplicate">Boyut ve içerik örnekleri aynı</string>
     <string name="duplicate_original_kept">Korunan orijinal: %1$s</string>
-    <string name="scan_limit_note">Performans için önce en eski ve en büyük dosyalar incelendi. Çok büyük arşivlerde yeniden tarama gerekebilir.</string>
-    <string name="cache_item_name">Akıllı Temizleyici önbelleği</string>
-    <string name="cache_item_path">Uygulama önbelleği</string>
-    <string name="reason_safe_cache">Silinmesi güvenli geçici dosyalar</string>
     <string name="reason_whatsapp_status">Geçici WhatsApp durum dosyası</string>
     <plurals name="reason_whatsapp_sent">
         <item quantity="one">Gönderilen medya kopyası; silmeden önce inceleyin • Yaş (gün): %1$d</item>
@@ -186,7 +63,6 @@
     <string name="unnamed_file">Adsız dosya</string>
     <string name="back">Geri</string>
     <string name="cancel">İptal</string>
-    <string name="delete_selected">Seçilenleri sil</string>
     <string name="whatsapp_access_title">WhatsApp için depolama erişimini etkinleştir</string>
     <string name="whatsapp_access_description">WhatsApp Temizleyici, Android Tüm dosyalara erişim iznini verdikten sonra WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde okur. Klasör seçici kullanılmaz.</string>
     <string name="whatsapp_choose_folder">Tam depolama erişimini etkinleştir</string>
@@ -196,7 +72,6 @@
     <string name="whatsapp_scan_action">WhatsApp dosyalarını tara</string>
     <string name="whatsapp_scanning_title">WhatsApp Medya analiz ediliyor</string>
     <string name="whatsapp_scanning_description">WhatsApp paylaşılan Medya içeriği doğrudan okunuyor, dosyalar sınıflandırılıyor ve önizlemeler hazırlanıyor…</string>
-    <string name="whatsapp_scan_complete">WHATSAPP MEDYASI BULUNDU</string>
     <plurals name="whatsapp_scan_stats">
         <item quantity="one">%1$d dosya bu cihazda sınıflandırıldı</item>
         <item quantity="other">%1$d dosya bu cihazda sınıflandırıldı</item>
@@ -221,33 +96,7 @@
         <item quantity="one">%1$d dosya • %2$s</item>
         <item quantity="other">%1$d dosya • %2$s</item>
     </plurals>
-    <string name="whatsapp_selected_count">%1$d seçildi</string>
-    <string name="whatsapp_delete_action">%1$s SİL</string>
-    <string name="whatsapp_delete_confirm_title">Seçilen WhatsApp dosyaları silinsin mi?</string>
-    <plurals name="whatsapp_delete_confirm_message">
-        <item quantity="one">Dosya sayısı: %1$d. Boyut: %2$s. Dosyalar kalıcı olarak silinecek.</item>
-        <item quantity="other">Dosya sayısı: %1$d. Boyut: %2$s. Dosyalar kalıcı olarak silinecek.</item>
-    </plurals>
-    <string name="device_center_title">Cihaz Merkezi</string>
-    <string name="device_center_live_status">Canlı cihaz durumu</string>
-    <string name="device_android_summary">Android %1$s • API %2$d</string>
-    <string name="device_storage_title">Kullanılabilir depolama</string>
-    <string name="device_storage_detail">Toplam %2$s alanın %1$s bölümü kullanılıyor</string>
-    <string name="device_ram_title">Kullanılabilir RAM</string>
-    <string name="device_ram_detail">Toplam %1$s RAM • Akıllı Temizleyici şu anda %2$s kullanıyor</string>
-    <string name="device_battery_title">Pil</string>
-    <string name="device_battery_detail">%1$s • %2$.1f °C</string>
-    <string name="battery_charging">Şarj oluyor</string>
-    <string name="battery_not_charging">Şarj olmuyor</string>
-    <string name="device_system_title">Sistem ayrıntıları</string>
-    <string name="device_cpu">CPU / çekirdek</string>
-    <string name="device_screen">Ekran</string>
-    <string name="device_app_version">Uygulama sürümü</string>
-    <string name="device_center_note">Değerler Android’den gerçek zamanlı okunur. Akıllı Temizleyici hayalî performans puanı üretmez veya korunan uygulamaları kapattığını iddia etmez.</string>
-    <string name="settings_center">Ayarlar ve destek</string>
-    <string name="settings_center_subtitle">Gizlilik, geri bildirim, paylaşma, değerlendirme ve uygulama bilgileri</string>
     <string name="settings_title">Ayarlar</string>
-    <string name="settings_subtitle">Akıllı Temizleyici’yi, gizliliği ve desteği yönet.</string>
     <string name="rate_us">Bizi değerlendirin</string>
     <string name="rate_us_subtitle">Akıllı Temizleyici’nin Google Play sayfasını aç</string>
     <string name="send_feedback">Geri bildirim gönder</string>
@@ -287,27 +136,9 @@
     <string name="category_junk_description">Eski geçici, küçük resim ve yarım kalmış indirme kalıntıları</string>
     <string name="category_large_files">Büyük dosyalar</string>
     <string name="category_large_files_description">Erişilebilir paylaşılan depolamadaki 100 MB üzeri dosyalar</string>
-    <string name="cleaner_engine_tools">Temizleme araçları</string>
-    <string name="cleaner_engine_tools_subtitle">Aşağıdaki her kart gerçek bir depolama yönetimi işi yapar.</string>
-    <string name="cleaning_tools_subtitle_v050">Temizleyici gibi gösterilen durum kartları değil, gerçek depolama araçları</string>
-    <string name="clear_only_smart_cleaner_cache">Yalnız Akıllı Temizleyici önbelleğini temizle</string>
-    <string name="deep_cache_detected">Android tarafından raporlanan cihaz önbelleği</string>
-    <string name="deep_cache_home_metric">%1$s uygulama önbelleği bulundu</string>
-    <string name="deep_cache_measured">%1$s cihaz önbelleği ölçüldü • Android onayıyla incele ve temizle</string>
-    <string name="deep_cache_subtitle">Uygulama önbelleklerini ölç ve Android’in resmî cihaz önbelleği temizliğini iste</string>
-    <string name="deep_cache_system_action">DERİN ÖNBELLEK TEMİZLİĞİ İSTE</string>
-    <string name="deep_cache_system_action_description">Android 11+, depolama yöneticileri için resmî bir önbellek temizleme işlemi sağlar. Akıllı Temizleyici bu işlemi ister; gerekli onayı Android gösterir ve temizliği Android gerçekleştirir.</string>
-    <string name="deep_cache_system_action_title">Cihaz uygulama önbelleği temizliği</string>
-    <string name="deep_cache_system_confirmation_note">Android bu işlem için sistem onayı ister. Akıllı Temizleyici özel önbellekleri sessizce silmiş gibi davranmaz.</string>
-    <string name="deep_cache_title">Derin Uygulama Önbelleği</string>
     <string name="deep_cleaner_subtitle">Ana depolama kategorilerini tek geçişte geniş kapsamlı incele; düşük güvenli kişisel dosyalar yalnız inceleme olarak kalır</string>
     <string name="deep_cleaner_title">Derin Temizlik</string>
-    <string name="downloads_apk_subtitle">Eski indirilenleri, kurulum APK’larını ve yarım indirme kalıntılarını incele</string>
-    <string name="downloads_apk_title">İndirilenler ve APK</string>
     <string name="duplicates_tool_subtitle_v050">İçeriği doğrulanmış birebir kopyaları bul; her grupta bir orijinal her zaman korunur</string>
-    <string name="full_storage_access_needed">Tam depolama taraması etkin değil</string>
-    <string name="full_storage_access_ready">Tam paylaşılan depolama motoru hazır</string>
-    <string name="hero_performance_v050">Maksimum temizlik, dürüst Android sınırları.</string>
     <string name="junk_cleaner_subtitle_v050">İndirilenler dışındaki geçici dosya ve küçük resim kalıntılarını incele; indirme kalıntıları İndirilenler’de kalır</string>
     <string name="language_settings_subtitle_v050">Android uygulama dili ayarını kullan. Desteklenmeyen diller güvenli biçimde İngilizceye döner.</string>
     <string name="large_files_tool_subtitle_v050">100 MB üzerindeki video, arşiv, APK, ses, belge ve diğer dosyaları bul</string>
@@ -316,12 +147,7 @@
     <string name="message_all_files_granted">Tam depolama yönetimi erişimi hazır.</string>
     <string name="message_all_files_required">Akıllı Temizleyici’nin kapsamlı cihaz depolama taraması yapabilmesi için Tüm dosyalara erişimi etkinleştir.</string>
     <string name="message_all_files_required_for_cache">Derin önbellek temizliği için önce Android Tüm dosyalara erişim izni gerekir.</string>
-    <string name="message_cache_cleanup_cancelled">Cihaz önbelleği temizliği iptal edildi.</string>
     <string name="message_cache_system_unavailable">Önbelleğin temizlendiği doğrulanamadı. Aşağıdan bir uygulama seçip Android ayarlarından önbelleğini temizleyin.</string>
-    <string name="message_cleanup_complete_detail">%1$s temizlendi.</string>
-    <string name="message_cleanup_partial_detail">%1$s temizlendi • %2$d öğe kaldırılamadı.</string>
-    <string name="message_deep_cache_complete">Android istenen cihaz önbelleği temizliğini tamamladı.</string>
-    <string name="message_own_cache_cleared">%1$s Akıllı Temizleyici önbelleği kaldırıldı.</string>
     <string name="message_whatsapp_not_found">Paylaşılan depolamada desteklenen WhatsApp veya WhatsApp Business Medya klasörü bulunamadı.</string>
     <string name="privacy_policy_body_v050">Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Akıllı Temizleyici tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nAkıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Açıkça sildiğiniz dosyalar Android aracılığıyla kaldırılır ve Akıllı Temizleyici tarafından geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
     <plurals name="reason_large_file">
@@ -336,16 +162,10 @@
         <item quantity="one">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
         <item quantity="other">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
     </plurals>
-    <string name="reason_whatsapp_review">WhatsApp paylaşılan medyası — silmeden önce incele</string>
     <string name="safe_ai_cleaning_description_v050">Akıllı Temizleyici erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
     <string name="scan_focus_downloads">İndirilenler</string>
     <string name="scan_focus_media">Medya Temizleyici</string>
-    <string name="scan_in_progress_v050">Akıllı Temizleyici erişilebilir depolamayı tarıyor…</string>
     <string name="scan_limit_note_v050">200.000 dosyalık güvenlik tavanına ulaşıldı. Sonuçlar gerçektir ancak cihaz bu geçişte indekslenenden daha fazla dosya içeriyor.</string>
-    <string name="scan_live_counter">%1$d dosya bulundu • %2$d klasör gezildi</string>
-    <string name="scan_stats_v050">%1$d dosya • %2$s indekslendi • %3$d seçildi</string>
-    <string name="settings_subtitle_v050">Dil, gizlilik, destek ve ürün bilgileri.</string>
-    <string name="smart_clean_action_v050">DERİN AKILLI TARAMAYI BAŞLAT</string>
     <string name="storage_analyzer_subtitle">Hiçbir şeyi silmek için seçmeden erişilebilir paylaşılan dosyaları türlerine göre analiz et</string>
     <string name="storage_analyzer_title">Depolama Analizi</string>
     <string name="storage_type_apk">APK kurulumları</string>
@@ -363,21 +183,6 @@
     <string name="whatsapp_category_statuses_description">Paylaşılan depolamadaki geçici WhatsApp durum medyaları</string>
     <string name="whatsapp_cleaner_subtitle_v050">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde tara</string>
     <string name="cleaner_engine_badge">AKILLI TEMİZLEYİCİ</string>
-    <string name="tab_security">Güvenlik</string>
-    <string name="tab_profile">Ben</string>
-    <string name="dashboard_total_cleanable">Toplam Temizlenebilir</string>
-    <string name="dashboard_safe_cleanable">Güvenle temizlenebilir</string>
-    <string name="dashboard_safe_ready">%1$s güvenle seçildi</string>
-    <string name="dashboard_review_ready">İncelemeyle +%1$s daha</string>
-    <string name="dashboard_cleaning_score">TEMİZLİK SKORU</string>
-    <string name="dashboard_cleanable_unknown">Gerçek temizlenebilir alanı hesaplamak için Akıllı Temizlik çalıştır</string>
-    <string name="dashboard_cleanable_ready">%1$s temizlenebilir</string>
-    <string name="smart_clean_primary">AKILLI TEMİZLİK</string>
-    <string name="smart_clean_primary_subtitle">Çöp, kopya, APK, medya ve büyük dosyaları tara</string>
-    <string name="dashboard_scanning">TARANIYOR…</string>
-    <string name="dashboard_access_hint">Kapsamlı temizlik için tam depolama erişimi bir kez istenir.</string>
-    <string name="dashboard_more_space_title">Önemli şeyler için daha fazla alan açın</string>
-    <string name="dashboard_more_space_subtitle">Daha eski, daha büyük ve inceleme gerektiren adaylar için Derin Temizlik kullanın.</string>
     <string name="security_center_title">İzinler ve Gizlilik</string>
     <string name="security_center_subtitle">Android erişimlerini yönet ve Akıllı Temizleyici’nin bunları neden kullandığını açıkça gör.</string>
     <string name="security_storage_access">Depolama erişimi</string>
@@ -387,37 +192,15 @@
     <string name="security_local_processing">Cihaz içinde işleme</string>
     <string name="security_local_processing_desc">Dosya analizi, parmak izleri ve depolama karşılaştırmaları bu cihazda kalır.</string>
     <string name="status_ready">Hazır</string>
-    <string name="status_needed">Gerekli</string>
     <string name="scan_focus_deep">Derin Temizlik</string>
     <string name="scan_focus_apks">APK Paketleri</string>
     <string name="scan_focus_analyze">Depolama Analizi</string>
     <string name="clean_results_title">Temizlik sonuçları</string>
-    <string name="dashboard_deep_detail">Detaylı Tara</string>
-    <string name="dashboard_ram_available">%1$s kullanılabilir</string>
     <string name="smart_clean_results_title">Akıllı Temizlik Sonuçları</string>
     <string name="smart_clean_results_empty_intro">Temizlenebilir önerileri ve tıklanabilir depolama dökümünü görmek için Akıllı Temizlik taramasını başlat.</string>
     <string name="smart_scan_progress_title">Akıllı Temizlik taraması sürüyor</string>
     <string name="smart_scan_progress_subtitle">Çöp, kopya, büyük dosya, APK ve erişilebilir medya güvenli bir temizlik planı için analiz ediliyor.</string>
-    <string name="smart_clean_suggestions_title">Temizlik önerileri</string>
-    <string name="smart_clean_suggestions_subtitle">Her kategori önce birkaç dosya gösterir. Silmeden önce tamamını açıp inceleyebilirsin.</string>
-    <string name="smart_clean_results_tap_hint">Nelerin silineceğini görmek için dokun</string>
-    <string name="smart_clean_summary_detail">Toplam %1$s öneri • %2$d öğe seçili • %3$d dosya tarandı</string>
-    <string name="smart_selected_for_cleanup">Temizlik için seçili</string>
     <string name="smart_review_and_clean">İncele ve temizle</string>
-    <string name="smart_show_all_count">Tümünü gör (%1$d)</string>
-    <string name="smart_storage_analyzer_subtitle">Fotoğraflar, videolar, ses/müzik, belgeler, APK ve diğer kategorilere dokunarak sayıların arkasındaki dosyaları gör.</string>
-    <plurals name="smart_storage_file_count">
-        <item quantity="one">%1$d dosya</item>
-        <item quantity="other">%1$d dosya</item>
-    </plurals>
-    <string name="smart_cleanup_confirm_title">Seçilenler temizlensin mi?</string>
-    <plurals name="smart_cleanup_confirm_body">
-        <item quantity="one">%1$s büyüklüğünde %2$d öğe seçtin. Devam etmeden önce aşağıdaki dökümü kontrol et.</item>
-        <item quantity="other">%1$s büyüklüğünde %2$d öğe seçtin. Devam etmeden önce aşağıdaki dökümü kontrol et.</item>
-    </plurals>
-    <string name="smart_cleanup_confirm_warning">Silme işlemi geri alınamaz.</string>
-    <string name="smart_cleanup_confirm_action">Seçilenleri temizle</string>
-    <string name="smart_storage_preview_note">Bu kategoride bulunan en büyük dosyalardan en fazla %1$d tanesi gösteriliyor. Depolama analizi bu dosyaları otomatik olarak temizliğe seçmez.</string>
     <string name="smart_storage_preview_empty">Bu kategori için önizlenebilir dosya yakalanmadı.</string>
     <string name="smart_included_in_cleanup">Temizliğe dahil</string>
     <string name="smart_not_included_in_cleanup">Temizliğe dahil değil</string>
@@ -425,18 +208,8 @@
     <string name="smart_audio_pause">Sesi duraklat</string>
     <string name="smart_generic_preview_title">Dosya ayrıntıları</string>
 
-    <string name="smart_cleanup_selected_examples">Seçilen dosyalardan örnekler</string>
-    <plurals name="smart_cleanup_more_items">
-        <item quantity="one">+%1$d seçili öğe daha</item>
-        <item quantity="other">+%1$d seçili öğe daha</item>
-    </plurals>
 
-    <string name="smart_clean_hero_subtitle">Temizlik başlamadan önce nelerin silineceğini incele.</string>
-    <string name="smart_items_selected">öğe seçildi</string>
-    <string name="smart_total_suggestions">toplam öneri</string>
-    <string name="smart_review_candidates">incelemeye değer</string>
     <string name="smart_reason_title">Neden önerildi?</string>
-    <string name="smart_files_scanned">dosya tarandı</string>
 
     <string name="smart_cleanup_in_progress">Temizleniyor…</string>
     <string name="message_cleanup_failed">Temizlik tamamlanamadı. Başka bir değişiklik yapılmadı.</string>
@@ -445,8 +218,6 @@
     <string name="smart_scan_live_title">Canlı tarama</string>
     <string name="smart_scan_files_label">Bulunan dosya</string>
     <string name="smart_scan_folders_label">Gezilen klasör</string>
-    <string name="smart_scan_on_device_value">YEREL</string>
-    <string name="smart_scan_on_device_label">Cihaz içinde</string>
     <string name="smart_scan_checking_title">Şu anda kontrol ediliyor</string>
     <string name="smart_scan_media_stage">Medya ve indirilenler</string>
     <string name="smart_detail_selected_summary">%1$d / %2$d seçili • %3$s</string>
@@ -471,7 +242,6 @@
     <string name="smart_video_preview_error">Bu video bu cihazda oynatılamadı.</string>
     <string name="smart_video_no_picture">Video görüntüsü bu cihazdaki codec tarafından desteklenmiyor.</string>
 
-    <string name="storage_review_action_hint">Bu ayrı bir manuel inceleme ekranıdır. Hiçbir dosya otomatik seçilmez; yalnız sizin seçtiğiniz dosyalar silinebilir.</string>
     <string name="storage_review_manual_reason">Depolama Analizi yalnızca manuel incelemedir. Sen temizliğe seçmediğin sürece bu dosya korunur.</string>
     <string name="storage_review_scanning">Kategorinin tamamı hazırlanıyor…</string>
     <plurals name="storage_review_summary">
@@ -479,16 +249,10 @@
         <item quantity="other">%1$d dosya • %2$s</item>
     </plurals>
     <string name="storage_review_no_auto_select">Burada hiçbir şey otomatik seçilmez. Önizlemek için dosyaya, silmek istediğinde yalnızca seçim kutusuna dokun.</string>
-    <string name="storage_review_scan_progress">%1$d dosya indekslendi • %2$d klasör gezildi</string>
+    <string name="storage_review_scan_progress">Dizine eklenen dosya: %1$d • Klasör: %2$d</string>
     <string name="storage_review_selected_summary">Seçili: %1$d • %2$s</string>
     <string name="storage_review_loading_hint">Bu depolama kategorisinin tam ve seçilebilir görünümü hazırlanıyor…</string>
     <string name="storage_review_limit_note">Çok büyük kategori güvenlik gösterim sınırına ulaştı. Bir miktar temizlikten sonra analizi yeniden çalıştırabilirsin.</string>
-    <string name="storage_review_delete_title">Seçili depolama dosyaları silinsin mi?</string>
-    <plurals name="storage_review_delete_body">
-        <item quantity="one">%1$d dosya seçtin; toplam %2$s. Devam etmeden önce aşağıdaki örnekleri kontrol et.</item>
-        <item quantity="other">%1$d dosya seçtin; toplam %2$s. Devam etmeden önce aşağıdaki örnekleri kontrol et.</item>
-    </plurals>
-    <string name="storage_review_delete_warning">Bunlar otomatik çöp değil, senin seçtiğin dosyalardır. Silme işlemi geri alınamaz.</string>
 
     <!-- v0.5.8 WhatsApp Cleaner premium review UI -->
     <string name="whatsapp_scanning_short">Akıllı medya taraması</string>
@@ -512,15 +276,12 @@
     </plurals>
     <string name="whatsapp_review_and_clean">İncele ve temizle</string>
     <string name="whatsapp_cleanup_in_progress">Temizleniyor…</string>
-    <string name="whatsapp_cleanup_irreversible">Seçilen dosyalar paylaşılan depolamadan kalıcı olarak silinir. Bu işlem geri alınamaz.</string>
-    <string name="whatsapp_confirm_and_continue">Devam et</string>
     <string name="whatsapp_preview_title">Önizleme</string>
     <string name="whatsapp_included">Temizliğe dahil</string>
     <string name="whatsapp_not_included">Temizliğe dahil değil</string>
     <string name="whatsapp_remove_from_cleanup">Bu dosyayı korumak için dokunun.</string>
     <string name="whatsapp_add_to_cleanup">Bu dosyayı temizliğe eklemek için dokunun.</string>
     <string name="whatsapp_audio_preview_error">Bu ses dosyası bu cihazda oynatılamadı.</string>
-    <string name="whatsapp_file_preview">Dosya ayrıntıları</string>
 
 
     <string name="premium_tool_scanning">Bu araç cihazında taranıyor…</string>
@@ -556,12 +317,6 @@
 
     <string name="premium_duplicate_more_groups">Diğer kopya grupları</string>
 
-    <string name="smart_clean_suggestions_subtitle_v0512">Öncelikli inceleme: videolar, görseller, WhatsApp, büyük dosyalar, kullanılmayan uygulamalar ve güvenli temizlik adayları. Aynı dosya bu üst bölümlerde tekrar gösterilmez.</string>
-    <plurals name="smart_media_priority_summary">
-        <item quantity="one">%1$d dosya • %2$s</item>
-        <item quantity="other">%1$d dosya • %2$s</item>
-    </plurals>
-    <string name="smart_media_priority_note">Manuel inceleme • WhatsApp medyası ayrı gösterilir • hiçbir şey önceden seçilmez</string>
     <string name="smart_unused_apps_title">Kullanılmayan uygulamalar</string>
     <string name="smart_unused_apps_permission">Uzun süredir kullanılmayan uygulamaları belirlemek için Kullanım Erişimi gerekir.</string>
     <string name="smart_unused_apps_permission_action">Kullanım Erişimini aç</string>
@@ -582,23 +337,12 @@
         <item quantity="other">Son kullanım • Geçen gün: %1$d</item>
     </plurals>
 
-    <string name="premium_cleanup_confirm_title">Seçilen dosyalar silinsin mi?</string>
-    <plurals name="premium_cleanup_confirm_body">
-        <item quantity="one">%1$d öğe seçtin; toplam %2$s. Bu dosyaların silinmesini istiyorsan devam et.</item>
-        <item quantity="other">%1$d öğe seçtin; toplam %2$s. Bu dosyaların silinmesini istiyorsan devam et.</item>
-    </plurals>
-    <string name="premium_cleanup_irreversible">Seçilen dosyalar kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
-    <string name="premium_cleanup_confirm_action">Evet, devam et</string>
     <string name="cleanup_result_title">Temizlik tamamlandı</string>
     <string name="cleanup_result_partial_title">Temizlik kısmen tamamlandı</string>
     <string name="cleanup_result_space_reclaimed">Açılan alan</string>
     <plurals name="cleanup_result_files_removed">
         <item quantity="one">%1$d dosya silindi</item>
         <item quantity="other">%1$d dosya silindi</item>
-    </plurals>
-    <plurals name="cleanup_result_failed">
-        <item quantity="one">%1$d dosya silinemedi</item>
-        <item quantity="other">%1$d dosya silinemedi</item>
     </plurals>
     <plurals name="cleanup_result_cancelled">
         <item quantity="one">Android onayı iptal edildiği için %1$d dosyaya dokunulmadı</item>
@@ -608,28 +352,8 @@
     <string name="cleanup_result_note">Bu değerler, Akıllı Temizleyici’nin bu cihazda gerçekten sildiği dosyalardan hesaplanır.</string>
     <string name="cleanup_result_done">Tamam</string>
 
-    <string name="dashboard_cleanup_opportunity">Güvenle temizlenebilir</string>
-    <string name="dashboard_review_amount">%1$s incelemeye değer</string>
-    <string name="dashboard_last_analysis_now">Son analiz: az önce</string>
-    <string name="dashboard_last_analysis_minutes">Son analiz: %1$d dk önce</string>
-    <string name="dashboard_last_analysis_hours">Son analiz: %1$d sa önce</string>
-    <string name="dashboard_last_analysis_days">Son analiz: %1$d gün önce</string>
-    <string name="dashboard_not_analyzed">Henüz analiz edilmedi</string>
-    <string name="dashboard_not_analyzed_hint">Gerçek temizlik fırsatını hesaplamak için Akıllı Temizlik’i çalıştır.</string>
-    <string name="dashboard_free_space">BOŞ ALAN</string>
-    <string name="dashboard_storage_used_percent">%1$d%% kullanılıyor</string>
-    <string name="dashboard_storage_unknown">Depolama bilgisi alınamadı</string>
-    <string name="dashboard_opportunity_ready">%1$s temizlik fırsatı</string>
-    <string name="dashboard_no_current_opportunity">Son analizde ek temizlik adayı yok</string>
-    <string name="smart_total_opportunity">Güvenle temizlenebilir</string>
-    <string name="smart_safe_candidates">Güvenli temizlik</string>
-    <string name="smart_clean_hero_subtitle_v0514">Yalnızca düşük riskli gereksiz dosyalar önceden seçilir. Kişisel medya asla otomatik seçilmez.</string>
     <string name="cleanup_result_storage_snapshot">Boş alan ölçümü: %1$s → %2$s</string>
 
-    <!-- v0.5.16.1 hardening -->
-    <string name="dashboard_no_cleanup_found">Hazır</string>
-    <string name="dashboard_no_risky_auto_selection">Riskli otomatik seçim yok</string>
-    <string name="dashboard_scanned_summary">%1$d dosya • %2$s analiz edildi</string>
     <string name="disclosure_all_files_title">Tam depolama erişimi neden gerekli?</string>
     <string name="disclosure_all_files_body">Akıllı Temizleyici, Android Tüm dosyalara erişim iznini yalnız temel dosya yönetimi özellikleri için kullanır: paylaşılan depolamada çöp adayları, birebir kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve paylaşılan mesajlaşma medyasını taramak. Dosyalar cihazından çıkmaz. Nelerin silineceğini sen incelersin. Android diğer uygulamaların özel verilerini korumaya devam eder.</string>
     <string name="disclosure_usage_title">Kullanım Erişimi neden gerekli?</string>
@@ -637,40 +361,7 @@
     <string name="disclosure_continue">Devam et</string>
     <string name="disclosure_not_now">Şimdi değil</string>
     <string name="smart_cleanup_ad_notice">Smart Cleaner ücretsizdir ve reklam gösterir: banner, bazı listelerde \"Reklam\" etiketli tek bir yerel reklam, temizlik sonucunda bir reklam paneli, temizlikten sonra ya da Temizle sekmesine dönerken zaman zaman tam ekran reklam ve uygulama açılırken bir açılış reklamı. İzin ve onay adımlarında reklam çıkmaz; kısa bir video izleyerek banner ve tam ekran reklamları 60 dakika kaldırabilirsiniz.</string>
-    <string name="whatsapp_cleanup_ad_notice">WhatsApp temizliği önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
-    <string name="premium_cleanup_ad_notice">Temizlik önce tamamlanır ve ölçülen sonuç önce gösterilir. Sonuç ekranında bir sponsorlu reklam paneli bulunabilir. Bu panel gösterilirse aynı temizlik için tam ekran reklam gösterilmez. Panel gösterilmezse sonucu kapattıktan sonra uygun bir tam ekran reklam gösterilebilir.</string>
 
-    <string name="home_smart_clean_subtitle">Gerçek temizlik adaylarını incele</string>
-    <string name="home_last_cleanup_title">Son temizlik</string>
-    <string name="home_last_cleanup_empty">Henüz temizlik kaydı yok</string>
-    <string name="home_last_cleanup_empty_subtitle">İlk temizliğinden sonra doğrulanmış kazanılan alan burada görünecek.</string>
-    <plurals name="home_last_cleanup_summary">
-        <item quantity="one">%1$s • %2$s temizlendi • %3$d dosya kaldırıldı</item>
-        <item quantity="other">%1$s • %2$s temizlendi • %3$d dosya kaldırıldı</item>
-    </plurals>
-    <string name="home_last_cleanup_total">Toplam %1$s geri kazanıldı</string>
-    <string name="home_last_cleanup_now">Az önce</string>
-    <string name="home_last_cleanup_minutes">%1$d dk önce</string>
-    <string name="home_last_cleanup_hours">%1$d sa önce</string>
-    <plurals name="home_last_cleanup_days">
-        <item quantity="one">Son temizlik • Geçen gün: %1$d</item>
-        <item quantity="other">Son temizlik • Geçen gün: %1$d</item>
-    </plurals>
-    <string name="home_smart_suggestions_title">Akıllı öneriler</string>
-    <string name="home_different_tools_title">Diğer araçlar</string>
-    <string name="home_suggestion_empty">Şu anda öncelikli öneri yok</string>
-    <string name="home_suggestion_empty_subtitle">Cihaz içi analizi yenilemek için Akıllı Temizlik çalıştır.</string>
-    <string name="home_cache_title">Uygulama Önbelleği</string>
-    <string name="home_cache_subtitle">Ölçülen uygulama önbelleğini incele</string>
-    <string name="home_cache_measured">%1$s ölçüldü</string>
-    <string name="home_privacy_title">Gizlilik Merkezi</string>
-    <string name="home_privacy_ready">Erişimler hazır</string>
-    <string name="home_privacy_review">İzinleri gözden geçir</string>
-    <string name="home_downloads_title">İndirilenler</string>
-    <string name="home_downloads_subtitle">İndirilen dosyaları yönet</string>
-    <string name="home_discover_title">Daha Fazlasını Keşfet</string>
-    <string name="home_discover_subtitle">Tüm temizlik ve depolama araçlarını görüntüle</string>
-    <string name="home_discover_action">Keşfet</string>
 
     <string name="cache_modern_total_label">Toplam uygulama önbelleği</string>
     <plurals name="cache_modern_measured_apps">
@@ -709,11 +400,6 @@
     <string name="permissions_privacy_policy_title">Gizlilik politikası</string>
     <string name="permissions_privacy_policy_subtitle">Dosyaların, izinlerin, reklam gizliliğinin ve cihaz içi işlemenin nasıl ele alındığını gör.</string>
     <string name="storage_change_title">Depolama Değişimi</string>
-    <string name="home_storage_change_no_baseline">Depolama değişimini izlemeye başlamak için ilk ölçümü oluştur</string>
-    <string name="home_storage_change_baseline_ready">İlk ölçüm kaydedildi • karşılaştırmak için bir analiz daha çalıştır</string>
-    <string name="home_storage_change_more_used">Son analizden beri %1$s daha fazla alan kullanılıyor</string>
-    <string name="home_storage_change_less_used">Son analizden beri %1$s daha az alan kullanılıyor</string>
-    <string name="home_storage_change_no_change">Son analizden beri ölçülebilir toplam depolama değişimi yok</string>
     <string name="storage_change_hero_label">NE DEĞİŞTİ?</string>
     <string name="storage_change_hero_no_baseline">İlk ölçümü burada oluştur. Akıllı Temizleyici gerçek bir depolama anlık görüntüsü kaydeder; geçmiş veri uydurulmaz.</string>
     <string name="storage_change_hero_baseline">İlk ölçüm hazır. Sonraki analiz farkı gösterecek.</string>
@@ -754,7 +440,7 @@
     <string name="storage_analyzer_scanning_subtitle">Erişilebilir paylaşılan dosyalar türlerine ayrılıyor…</string>
     <string name="storage_analyzer_empty_subtitle">Görsel, video, ses, belge, arşiv, APK ve diğer erişilebilir dosyaların alan kullanımını gör.</string>
     <string name="storage_analyzer_indexed_label">İNDEKSLENEN PAYLAŞILAN DOSYALAR</string>
-    <string name="storage_analyzer_indexed_summary">%1$d dosya indekslendi • cihazda %2$s boş</string>
+    <string name="storage_analyzer_indexed_summary">Dizine eklenen dosya: %1$d • Boş alan: %2$s</string>
     <string name="storage_analyzer_types_title">Dosya türleri</string>
     <plurals name="storage_analyzer_type_summary">
         <item quantity="one">%1$d dosya • %2$s • indekslenen verinin %%%3$d kadarı</item>
@@ -763,13 +449,11 @@
     <string name="storage_analyzer_largest_examples">En büyük örnekler</string>
     <string name="storage_analyzer_no_files">Bu analiz için erişilebilir dosya bulunamadı.</string>
     <string name="storage_analyzer_truth_note">Bu ekran yalnız bilgi amaçlıdır. Burada hiçbir dosya önceden seçilmez veya silinmez. Android/data ve Android/obb gibi korunan özel alanlar taranmaz.</string>
-    <string name="tools_broad_scan_section_title">Geniş tarama</string>
-    <string name="tools_broad_scan_section_subtitle">Birden fazla depolama kategorisini birlikte incelemek istediğinde tek geniş tarama kullan</string>
     <string name="screenshots_tool_subtitle">Tüm erişilebilir ekran görüntülerini tek, önizlenebilir listede incele; hiçbir öğe otomatik seçilmez</string>
     <string name="storage_analyzer_review_action">Bu dosya türünü incele →</string>
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>
-    <string name="storage_change_progress">%1$d dosya • %2$d klasör tarandı</string>
+    <string name="storage_change_progress">Dosya: %1$d • Taranan klasör: %2$d</string>
     <string name="rewarded_ad_title">60 dakika reklamsız kullanım</string>
     <string name="rewarded_ad_subtitle">Kısa bir video izle; banner ve geçiş reklamları bir saat gizlensin.</string>
     <string name="rewarded_ad_result_action">60 dakika reklamsız kullanım için kısa video izle</string>
@@ -780,9 +464,6 @@
         <item quantity="one">%1$d dakika kaldı. Banner ve geçiş reklamları gizlendi.</item>
         <item quantity="other">%1$d dakika kaldı. Banner ve geçiş reklamları gizlendi.</item>
     </plurals>
-    <string name="dashboard_safe_scope">Yalnızca düşük riskli dosyalar önceden seçilir</string>
-    <string name="smart_selected_hero_label">seçili</string>
-    <string name="smart_selected_amount">Seçili: %1$s</string>
     <string name="nothing_selected_hint">Temizlemek için dosya seç</string>
     <string name="premium_duplicate_copy_of">%1$s kopyası</string>
     <string name="tools_rebuilt_status_cache_unmeasured">%1$s boş • Uygulama önbelleği ölçülmedi – Kullanım Erişimi’ne izin ver</string>
@@ -842,7 +523,6 @@
     <string name="plan_preview_cloud">Bulut yedeği kontrol edilmez.</string>
     <string name="plan_preview_clean">Temizle</string>
     <string name="plan_preview_remove">Seçimden çıkar</string>
-    <string name="plan_verify">Doğrula</string>
     <string name="result_freed_now">Şimdi açılan alan: %1$s</string>
     <string name="result_undo">Geri al</string>
     <string name="result_empty_trash_now">Çöpü şimdi boşalt</string>
@@ -856,7 +536,6 @@
     <string name="trash_empty_state">Çöp kutusu boş</string>
     <string name="scan_stage_exact_copies">Birebir kopyalar kontrol ediliyor…</string>
     <string name="tab_trash">Çöp</string>
-    <string name="home_checking_storage">Depolama alanınız kontrol ediliyor…</string>
     <string name="home_updating">Güncelleniyor…</string>
     <string name="home_allow_access">Erişime izin ver</string>
     <string name="home_access_explainer">Smart Cleaner, temizlenebilecekleri bulmak için tüm dosyalara erişim ister. Onayınız olmadan hiçbir şey silinmez.</string>
@@ -932,5 +611,31 @@
     <plurals name="trash_full_body">
         <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
         <item quantity="other">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
+    </plurals>
+    <string name="cache_none_found">Uygulama önbelleği bulunamadı</string>
+    <string name="access_not_granted">Erişim verilmedi. Ayarlar\'dan izin verebilirsiniz.</string>
+    <string name="open_settings">Ayarları aç</string>
+    <plurals name="trash_folder_missing_body">
+        <item quantity="one">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
+        <item quantity="other">Bu cihaz Smart Cleaner’ın Çöp klasörünü oluşturmasına izin vermiyor, bu yüzden %1$d dosya geri alma için saklanamıyor. Bunun yerine kalıcı olarak silinsin mi? Bu işlem geri alınamaz.</item>
+    </plurals>
+    <string name="delete_confirm_permanent">%1$s kalıcı olarak silinecek. Bu işlem geri alınamaz.</string>
+    <string name="delete_confirm_show_all">Tümünü göster</string>
+    <string name="delete_confirm_show_less">Daha az göster</string>
+    <string name="delete_confirm_action">Sil</string>
+    <plurals name="delete_confirm_title">
+        <item quantity="one">%1$d dosya silinsin mi?</item>
+        <item quantity="other">%1$d dosya silinsin mi?</item>
+    </plurals>
+    <plurals name="delete_confirm_trash">
+        <item quantity="one">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
+        <item quantity="other">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
+    </plurals>
+    <string name="home_saved_totals">%1$s temizlenmeye hazır · %2$s göz atmaya değer</string>
+    <string name="home_saved_checked_recently">Bir saatten kısa süre önce kontrol edildi</string>
+    <string name="home_saved_details">Ayrıntıları göster</string>
+    <plurals name="home_saved_checked_hours">
+        <item quantity="one">%1$d saat önce kontrol edildi</item>
+        <item quantity="other">%1$d saat önce kontrol edildi</item>
     </plurals>
 </resources>

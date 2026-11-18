@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Device-specific state is not restored on another phone: the scan
+     summaries describe this phone's storage, and the trash index points at
+     files in this phone's .SmartCleanerTrash folder (T3.6). -->
 <full-backup-content>
     <exclude domain="external" path="." />
+    <exclude domain="sharedpref" path="dashboard_snapshot_v1.xml" />
+    <exclude domain="sharedpref" path="storage_change_v1.xml" />
+    <exclude domain="sharedpref" path="cleanup_history_v1.xml" />
+    <exclude domain="file" path="trash_index.json" />
+    <exclude domain="file" path="trash_index.json.bak" />
 </full-backup-content>

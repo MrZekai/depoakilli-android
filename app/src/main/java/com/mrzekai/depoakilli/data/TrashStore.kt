@@ -163,6 +163,9 @@ class TrashStore(
         freed
     }
 
+    /** False when the Trash folder cannot be created on [volumeRoot] at all. */
+    fun canUseTrash(volumeRoot: File): Boolean = synchronized(lock) { trashDirectory(volumeRoot) != null }
+
     fun entries(): List<TrashEntry> = synchronized(lock) { load() }
 
     fun trashBytes(): Long = entries().sumOf(TrashEntry::sizeBytes)

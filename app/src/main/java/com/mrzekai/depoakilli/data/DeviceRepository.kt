@@ -2,10 +2,8 @@ package com.mrzekai.depoakilli.data
 
 import android.app.ActivityManager
 import android.app.AppOpsManager
-import android.app.PendingIntent
 import android.app.usage.StorageStatsManager
 import android.app.usage.UsageStatsManager
-import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -288,15 +286,11 @@ class DeviceRepository(
         }
 
         // Smart and Deep always re-index; tool scans reuse a fresh (90 s) index.
-        val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP && focus != ScanFocus.WHATSAPP
-        val indexed = if (focus == ScanFocus.WHATSAPP) {
-            indexWhatsAppFiles(onProgress)
-        } else {
-            (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
-                ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
-                    onProgress(visitedDirectories, discoveredFiles)
-                }.also(::cacheSharedIndex)
-        }
+        val reuseIndex = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
+        val indexed = (if (reuseIndex) cachedSharedIndex()?.also { onProgress(0, it.size) } else null)
+            ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
+                onProgress(visitedDirectories, discoveredFiles)
+            }.also(::cacheSharedIndex)
         val assessments = ArrayList<CleanableItem>()
         var duplicateResult = DuplicatePolicy.ScanResult()
 
@@ -349,7 +343,6 @@ class DeviceRepository(
                     ScanFocus.JUNK -> item.assessment.category == CleanCategory.JUNK
                     ScanFocus.DUPLICATES -> item.assessment.category == CleanCategory.DUPLICATE
                     ScanFocus.LARGE_FILES -> item.assessment.category == CleanCategory.LARGE_FILE
-                    ScanFocus.WHATSAPP -> item.assessment.category == CleanCategory.WHATSAPP_MEDIA
                     ScanFocus.MEDIA -> item.assessment.category in MEDIA_CATEGORIES
                     ScanFocus.SCREENSHOTS -> item.assessment.category == CleanCategory.SCREENSHOT
                     ScanFocus.DOWNLOADS -> item.assessment.group in DOWNLOAD_TOOL_GROUPS
@@ -453,15 +446,19 @@ class DeviceRepository(
         WhatsAppLibrarySummary(items = items, scannedFileCount = indexed.size)
     }
 
-    suspend fun deleteWhatsAppItems(items: List<WhatsAppMediaItem>): WhatsAppDeleteResult =
+    suspend fun deleteWhatsAppItems(
+        items: List<WhatsAppMediaItem>,
+        forcePermanent: Boolean = false,
+    ): WhatsAppDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
                     item.id,
                     item.sizeBytes,
-                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, DeleteMode.TRASH, CleanupGroup.WHATSAPP_SENT),
+                    removeFile(item.uri, item.sizeBytes, item.modifiedAtMillis, mode, CleanupGroup.WHATSAPP_SENT),
                 )
             }
             WhatsAppDeleteResult(
@@ -474,9 +471,13 @@ class DeviceRepository(
             )
         }
 
-    suspend fun deleteStorageReviewItems(items: List<StorageReviewItem>): DirectDeleteResult =
+    suspend fun deleteStorageReviewItems(
+        items: List<StorageReviewItem>,
+        forcePermanent: Boolean = false,
+    ): DirectDeleteResult =
         withContext(Dispatchers.IO) {
             val outcome = RemovalTally()
+            val mode = if (forcePermanent) DeleteMode.PERMANENT else DeleteMode.TRASH
             items.forEach { item ->
                 coroutineContext.ensureActive()
                 outcome.record(
@@ -486,7 +487,7 @@ class DeviceRepository(
                         item.file.uri,
                         item.file.sizeBytes,
                         item.file.modifiedAtMillis,
-                        DeleteMode.TRASH,
+                        mode,
                         CleanupGroup.LARGE_OTHER,
                     ),
                 )
@@ -582,7 +583,13 @@ class DeviceRepository(
             DeleteMode.TRASH -> {
                 val root = volumeRootOf(file)
                 val entry = root?.let { trashStore.moveToTrash(file, it, group) }
-                if (entry != null) Removal.Trashed(entry.id) else Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
+                when {
+                    entry != null -> Removal.Trashed(entry.id)
+                    // The Trash folder itself cannot be created on this volume
+                    // (some manufacturers block it): reported separately.
+                    root == null || !trashStore.canUseTrash(root) -> Removal.Failed(FailureReason.TRASH_FOLDER_UNAVAILABLE)
+                    else -> Removal.Failed(FailureReason.TRASH_UNAVAILABLE)
+                }
             }
             DeleteMode.PERMANENT -> {
                 if (FileDeleter.deleteUnprotected(file, relativeDir)) {
@@ -599,15 +606,6 @@ class DeviceRepository(
 
     private fun volumeRootOf(file: File): File? = sharedStorageRoots().firstOrNull { root ->
         canonicalPathWithinRoot(canonicalPathOf(root).trimEnd(File.separatorChar), file) != null
-    }
-
-    fun createDeleteRequest(items: List<CleanableItem>): DeletePlan {
-        val mediaUris = items
-            .filter { Uri.parse(it.uri).scheme == "content" }
-            .map { Uri.parse(it.uri) }
-        if (mediaUris.isEmpty()) return DeletePlan.NoMediaFiles
-        val pendingIntent: PendingIntent = MediaStore.createDeleteRequest(resolver, mediaUris)
-        return DeletePlan.RequiresConsent(pendingIntent)
     }
 
     private fun assessmentForFocus(file: IndexedFile, focus: ScanFocus): AiAssessment? {
@@ -665,13 +663,6 @@ class DeviceRepository(
                     aiEngine.assessDeep(file)?.takeIf { it.group in DOWNLOAD_TOOL_GROUPS }
                 }
             }
-
-            ScanFocus.WHATSAPP -> aiEngine.assessDeep(file) ?: AiAssessment(
-                category = CleanCategory.WHATSAPP_MEDIA,
-                safetyScore = 55,
-                reasonRes = R.string.reason_whatsapp_review,
-                recommended = false,
-            )
         }
     }
 
@@ -1083,12 +1074,8 @@ class DeviceRepository(
     }
 
 
-    sealed interface DeletePlan {
-        data class RequiresConsent(val pendingIntent: PendingIntent) : DeletePlan
-        data object NoMediaFiles : DeletePlan
-    }
 
-    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE }
+    enum class FailureReason { CHANGED, MISSING, ORIGINAL_CHANGED, PROTECTED, DENIED, TRASH_UNAVAILABLE, TRASH_FOLDER_UNAVAILABLE }
 
     private sealed interface Removal {
         data object Deleted : Removal
@@ -1142,8 +1129,8 @@ class DeviceRepository(
         val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedIds.size - deletedIds.size
-        val trashUnavailableIds: Set<String> get() =
-            failed.filterValues { it == FailureReason.TRASH_UNAVAILABLE }.keys
+        val trashUnavailableIds: Set<String> get() = failed.trashUnavailableIds()
+        val trashFolderMissing: Boolean get() = failed.trashFolderMissing()
         val changedCount: Int get() = failed.values.count {
             it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
         }
@@ -1158,6 +1145,8 @@ class DeviceRepository(
         val failed: Map<String, FailureReason> = emptyMap(),
     ) {
         val failedCount: Int get() = attemptedCount - deletedIds.size
+        val trashUnavailableIds: Set<String> get() = failed.trashUnavailableIds()
+        val trashFolderMissing: Boolean get() = failed.trashFolderMissing()
         val changedCount: Int get() = failed.values.count {
             it == FailureReason.CHANGED || it == FailureReason.MISSING || it == FailureReason.ORIGINAL_CHANGED
         }
@@ -1178,11 +1167,6 @@ class DeviceRepository(
         // tap cannot allocate and recompose tens of thousands of rows.
         private const val MAX_SELECTABLE_STORAGE_REVIEW_ITEMS = 10_000
         private const val SCAN_PROGRESS_THROTTLE_MILLIS = 120L
-        private val JUNK_CATEGORIES = setOf(
-            CleanCategory.JUNK,
-            CleanCategory.OLD_DOWNLOAD,
-            CleanCategory.APK_PACKAGE,
-        )
         private val MEDIA_CATEGORIES = setOf(
             CleanCategory.SCREENSHOT,
             CleanCategory.LARGE_FILE,
@@ -1223,3 +1207,12 @@ class DeviceRepository(
         val canonicalPath: String,
     )
 }
+
+private fun Map<String, DeviceRepository.FailureReason>.trashUnavailableIds(): Set<String> =
+    filterValues {
+        it == DeviceRepository.FailureReason.TRASH_UNAVAILABLE ||
+            it == DeviceRepository.FailureReason.TRASH_FOLDER_UNAVAILABLE
+    }.keys
+
+private fun Map<String, DeviceRepository.FailureReason>.trashFolderMissing(): Boolean =
+    values.any { it == DeviceRepository.FailureReason.TRASH_FOLDER_UNAVAILABLE }

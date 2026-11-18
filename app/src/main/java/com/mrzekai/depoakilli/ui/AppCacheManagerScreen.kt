@@ -100,12 +100,12 @@ internal fun AppCacheManagerScreen(
     val entries = state.appCache.entries
     val maxCacheBytes = entries.maxOfOrNull(AppCacheEntry::cacheBytes)?.coerceAtLeast(1L) ?: 1L
     val visibleEntries = remember(entries, query, sortMode) {
-        val normalized = query.trim().lowercase(Locale.getDefault())
+        val normalized = query.trim().lowercase(Locale.ROOT)
         val filtered = if (normalized.isBlank()) {
             entries
         } else {
             entries.filter { app ->
-                app.label.lowercase(Locale.getDefault()).contains(normalized) ||
+                app.label.lowercase(Locale.ROOT).contains(normalized) ||
                     app.packageName.lowercase(Locale.ROOT).contains(normalized)
             }
         }
@@ -252,7 +252,9 @@ internal fun AppCacheManagerScreen(
                             verticalArrangement = Arrangement.spacedBy(5.dp),
                         ) {
                             Text(
-                                text = stringResource(R.string.cache_modern_no_result),
+                                text = stringResource(
+                                    if (query.isBlank()) R.string.cache_none_found else R.string.cache_modern_no_result,
+                                ),
                                 color = Color.White,
                                 fontWeight = FontWeight.Bold,
                             )
@@ -366,7 +368,7 @@ private fun CacheManagerHero(
             Text(
                 text = stringResource(R.string.cache_modern_hero_helper),
                 color = Color(0xFF8EE8D0),
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 lineHeight = 15.sp,
                 fontWeight = FontWeight.Bold,
             )
@@ -515,7 +517,7 @@ private fun CacheSystemActionCard(
             Text(
                 text = stringResource(R.string.cache_modern_system_action_subtitle),
                 color = Color.White.copy(alpha = .82f),
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 lineHeight = 15.sp,
             )
         }
@@ -602,7 +604,7 @@ private fun CacheAppRow(
                 Text(
                     text = app.packageName,
                     color = Color(0xFF7E8BA9),
-                    fontSize = 9.sp,
+                    fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -715,7 +717,7 @@ private fun OwnCacheCard(
                         ByteFormatter.format(ownCacheBytes),
                     ),
                     color = Color(0xFFAEB9D4),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                 )
             }
             Button(
@@ -750,7 +752,7 @@ private fun CacheSafetyNote() {
             Text(
                 text = stringResource(R.string.cache_modern_safety_note),
                 color = Color(0xFF93A5C8),
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 lineHeight = 14.sp,
             )
         }
@@ -801,7 +803,7 @@ private fun AppCacheActionSheet(
                     Text(
                         text = app.packageName,
                         color = Color(0xFF7E8BA9),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -832,7 +834,7 @@ private fun AppCacheActionSheet(
                     Text(
                         text = stringResource(R.string.cache_modern_individual_warning),
                         color = Color(0xFFFFC76D),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         lineHeight = 14.sp,
                     )
                 }

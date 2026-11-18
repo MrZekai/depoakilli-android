@@ -13,6 +13,13 @@ internal object PlanSelection {
         }
     }
 
+    /** Bulk selection skips items whose group is not group-selectable; explicit selection does not. */
+    fun setItemsSelected(items: List<CleanableItem>, ids: Set<String>, selected: Boolean, bulk: Boolean): List<CleanableItem> =
+        items.map { item ->
+            val excluded = bulk && selected && !item.assessment.group.groupSelectable
+            if (item.id in ids && item.selected != selected && !excluded) item.copy(selected = selected) else item
+        }
+
     fun toggleGroup(items: List<CleanableItem>, group: CleanupGroup): List<CleanableItem> =
         setGroupSelected(items, group, items.any { it.assessment.group == group && !it.selected })
 

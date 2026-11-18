@@ -38,12 +38,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.ui.common.bidiWrap
+import com.mrzekai.depoakilli.ui.ContrastTokens
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
-import com.mrzekai.depoakilli.ui.GenericFilePreview
-import com.mrzekai.depoakilli.ui.ImageFilePreview
-import com.mrzekai.depoakilli.ui.VideoFilePreview
 import com.mrzekai.depoakilli.ui.smart.SelectedItemsPreviewSheet
+import com.mrzekai.depoakilli.ui.media.MediaPreviewContent
+import com.mrzekai.depoakilli.ui.toMediaPreview
 import com.mrzekai.depoakilli.ui.toSmartPreview
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
@@ -144,7 +145,7 @@ internal fun SwipeReviewScreen(
                     Button(
                         onClick = { onMark(true) },
                         modifier = Modifier.weight(1f).heightIn(min = 56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeRed, contentColor = ContrastTokens.OnBrightAction),
                     ) { Text(stringResource(R.string.swipe_delete), fontWeight = FontWeight.Black) }
                     Button(
                         onClick = { onMark(false) },
@@ -213,12 +214,7 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
     ) {
         Column {
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                val mime = item.mimeType.lowercase()
-                when {
-                    mime.startsWith("image/") -> ImageFilePreview(preview)
-                    mime.startsWith("video/") -> VideoFilePreview(preview)
-                    else -> GenericFilePreview(preview)
-                }
+                MediaPreviewContent(preview.toMediaPreview(), allowAudio = false)
             }
             Column(Modifier.padding(14.dp)) {
                 Text(
@@ -228,7 +224,7 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(item.relativePath, color = SwipeSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(bidiWrap(item.relativePath), color = SwipeSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 val days = if (item.modifiedAtMillis > 0L) {
                     TimeUnit.MILLISECONDS.toDays((System.currentTimeMillis() - item.modifiedAtMillis).coerceAtLeast(0L)).toInt()
                 } else {

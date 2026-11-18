@@ -12,7 +12,6 @@ import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
-import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
@@ -23,6 +22,7 @@ import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
+import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -133,11 +133,23 @@ data class CleanerUiState(
     val smartCategoryReviewGroup: CleanupGroup? = null,
     /** "Deep duplicate check" (full hash of large look-alikes) in progress. */
     val deepCheckRunning: Boolean = false,
-    /** Items that could not go to Trash (e.g. storage full); the user may delete them permanently. */
-    val trashFallbackIds: Set<String> = emptySet(),
+    /** Items that could not go to Trash; the user may delete them permanently. */
+    val trashFallback: TrashFallback? = null,
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
+}
+
+/**
+ * Files a cleanup could not move to Trash. [folderMissing] means the Trash
+ * folder itself cannot be created on this device (not a one-off failure).
+ */
+data class TrashFallback(
+    val source: Source,
+    val ids: Set<String>,
+    val folderMissing: Boolean,
+) {
+    enum class Source { PLAN, WHATSAPP, STORAGE_REVIEW }
 }
 
 class CleanerViewModel(application: Application) : AndroidViewModel(application) {
@@ -146,11 +158,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private val cleanupHistoryStore = CleanupHistoryStore(application)
     private val storageChangeStore = StorageChangeStore(application)
     private val _state = MutableStateFlow(CleanerUiState())
-    private var pendingConsentItems: List<CleanableItem> = emptyList()
-    private var pendingCleanupDeletedBytes: Long = 0L
-    private var pendingCleanupDeletedCount: Int = 0
-    private var pendingCleanupFailedCount: Int = 0
-    private var pendingCleanupStorageBeforeBytes: Long = 0L
     private var pendingDeepCacheBeforeBytes: Long = 0L
     private var pendingDeepCacheStorageBeforeBytes: Long = 0L
     private var pendingIndividualCachePackage: String? = null
@@ -508,6 +515,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 hasPlan = hasPlan,
                 planScannedAtElapsed = current.planScannedAtElapsed,
                 nowElapsed = SystemClock.elapsedRealtime(),
+                savedSummaryAtMillis = current.dashboardSnapshotAtMillis,
+                nowMillis = System.currentTimeMillis(),
             )
         ) {
             scan(ScanFocus.SMART)
@@ -816,6 +825,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             onCompleted(false)
             return
         }
+        runWhatsAppDeletion(selected, forcePermanent = false, onCompleted = onCompleted)
+    }
+
+    private fun runWhatsAppDeletion(
+        selected: List<WhatsAppMediaItem>,
+        forcePermanent: Boolean,
+        onCompleted: (Boolean) -> Unit,
+    ) {
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -825,7 +842,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             val storageBefore = ioAvailableBytes()
-            runCatching { repository.deleteWhatsAppItems(selected) }
+            runSuspendCatching { repository.deleteWhatsAppItems(selected, forcePermanent) }
                 .onSuccess { result ->
                     val storageAfter = ioStorageSnapshot()
                     val measuredResult = CleanupResult(
@@ -861,6 +878,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     }
                     persistDashboardSnapshot()
                     recordCleanupHistory(measuredResult)
+                    offerTrashFallback(TrashFallback.Source.WHATSAPP, result.trashUnavailableIds, result.trashFolderMissing)
                     onCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->
@@ -1027,6 +1045,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun toggleAllStorageReviewItems() {
+        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES) return
         _state.update { state ->
             val items = state.storageReview.items
             val select = items.any { !it.selected }
@@ -1057,7 +1076,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        if (item.assessment.category == category) item.copy(selected = select) else item
+                        val excluded = select && !item.assessment.group.groupSelectable
+                        if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
             )
@@ -1109,7 +1129,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun dismissTrashFallback() {
-        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        _state.update { it.copy(trashFallback = null) }
+    }
+
+    private fun offerTrashFallback(source: TrashFallback.Source, ids: Set<String>, folderMissing: Boolean) {
+        if (ids.isEmpty()) return
+        _state.update { it.copy(trashFallback = TrashFallback(source, ids, folderMissing)) }
     }
 
     /**
@@ -1117,8 +1142,23 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
      * Trash are deleted permanently only after the user confirmed that.
      */
     fun deleteTrashFallbackPermanently() {
-        val ids = _state.value.trashFallbackIds
-        _state.update { it.copy(trashFallbackIds = emptySet()) }
+        val fallback = _state.value.trashFallback ?: return
+        _state.update { it.copy(trashFallback = null) }
+        if (_state.value.cleanupInProgress) return
+        val ids = fallback.ids
+        when (fallback.source) {
+            TrashFallback.Source.WHATSAPP -> {
+                val items = _state.value.whatsAppSummary.items.filter { it.id in ids }
+                if (items.isNotEmpty()) runWhatsAppDeletion(items, forcePermanent = true, onCompleted = {})
+                return
+            }
+            TrashFallback.Source.STORAGE_REVIEW -> {
+                val items = _state.value.storageReview.items.filter { it.id in ids }
+                if (items.isNotEmpty()) runStorageReviewDeletion(items, forcePermanent = true, onCleanupCompleted = {})
+                return
+            }
+            TrashFallback.Source.PLAN -> Unit
+        }
         val items = _state.value.summary.items.filter { it.id in ids }
         if (items.isEmpty() || _state.value.cleanupInProgress) return
         _state.update { it.copy(cleanupInProgress = true, cleanupResult = null) }
@@ -1206,22 +1246,20 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun setItemsSelected(ids: Set<String>, selected: Boolean) {
+    /**
+     * [bulk] is true for "select all" style actions; those never select items
+     * from groups that are not group-selectable (personal documents, look-alike
+     * copies). Explicit choices (swipe confirmation) pass false (T2.4).
+     */
+    fun setItemsSelected(ids: Set<String>, selected: Boolean, bulk: Boolean) {
         if (ids.isEmpty()) return
         _state.update { state ->
-            state.copy(
-                summary = state.summary.copy(
-                    items = state.summary.items.map { item ->
-                        if (item.id in ids && item.selected != selected) item.copy(selected = selected) else item
-                    },
-                ),
-            )
+            state.copy(summary = state.summary.copy(items = PlanSelection.setItemsSelected(state.summary.items, ids, selected, bulk)))
         }
     }
 
     fun prepareCleanup(
         itemIds: Set<String>? = null,
-        onPlanReady: (DeviceRepository.DeletePlan) -> Unit,
         onCleanupCompleted: (Boolean) -> Unit,
     ) {
         if (_state.value.cleanupInProgress) return
@@ -1241,7 +1279,6 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 "bytes" to selected.sumOf(CleanableItem::sizeBytes),
             ),
         )
-        resetPendingCleanupResult()
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -1250,44 +1287,25 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             )
         }
         viewModelScope.launch {
-            pendingCleanupStorageBeforeBytes = ioAvailableBytes()
-            runCatching {
+            val storageBefore = ioAvailableBytes()
+            runSuspendCatching {
+                // Every item is a shared-storage file path; the old MediaStore
+                // consent request was never reached and is removed (T3.1).
                 val direct = repository.deleteDirectItems(selected)
-                val remaining = selected.filterNot { it.id in direct.attemptedIds }
-                val plan = repository.createDeleteRequest(remaining)
-                if (plan is DeviceRepository.DeletePlan.NoMediaFiles) {
-                    finishCleanup(
-                        items = selected,
-                        deletedIds = direct.deletedIds,
-                        deletedBytes = direct.deletedBytes,
-                        failedCount = direct.failedCount,
-                        trashedBytes = direct.trashedBytes,
-                        trashEntryIds = direct.trashEntryIds,
-                        changedCount = direct.changedCount,
-                    )
-                    refreshTrash()
-                    if (direct.trashUnavailableIds.isNotEmpty()) {
-                        _state.update { it.copy(trashFallbackIds = direct.trashUnavailableIds) }
-                    }
-                    onCleanupCompleted(direct.deletedIds.isNotEmpty())
-                } else {
-                    pendingConsentItems = remaining
-                    pendingCleanupDeletedBytes = direct.deletedBytes
-                    pendingCleanupDeletedCount = direct.deletedIds.size
-                    pendingCleanupFailedCount = direct.failedCount
-                    finishCleanup(
-                        items = selected.filter { it.id in direct.attemptedIds },
-                        deletedIds = direct.deletedIds,
-                        deletedBytes = direct.deletedBytes,
-                        failedCount = direct.failedCount,
-                        clearPending = false,
-                    )
-                    onPlanReady(plan)
-                }
-            }.onFailure { error ->
-                if (error is CancellationException) return@onFailure
-                pendingConsentItems = emptyList()
-                resetPendingCleanupResult()
+                finishCleanup(
+                    items = selected,
+                    deletedIds = direct.deletedIds,
+                    deletedBytes = direct.deletedBytes,
+                    failedCount = direct.failedCount,
+                    storageBeforeBytes = storageBefore,
+                    trashedBytes = direct.trashedBytes,
+                    trashEntryIds = direct.trashEntryIds,
+                    changedCount = direct.changedCount,
+                )
+                refreshTrash()
+                offerTrashFallback(TrashFallback.Source.PLAN, direct.trashUnavailableIds, direct.trashFolderMissing)
+                onCleanupCompleted(direct.deletedIds.isNotEmpty())
+            }.onFailure {
                 _state.update { state ->
                     state.copy(
                         cleanupInProgress = false,
@@ -1309,7 +1327,14 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         storageReviewGeneration++
         storageReviewJob?.cancel()
         storageReviewJob = null
+        runStorageReviewDeletion(selected, forcePermanent = false, onCleanupCompleted = onCleanupCompleted)
+    }
 
+    private fun runStorageReviewDeletion(
+        selected: List<StorageReviewItem>,
+        forcePermanent: Boolean,
+        onCleanupCompleted: (Boolean) -> Unit,
+    ) {
         _state.update {
             it.copy(
                 cleanupInProgress = true,
@@ -1319,7 +1344,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
         viewModelScope.launch {
             val storageBefore = ioAvailableBytes()
-            runCatching { repository.deleteStorageReviewItems(selected) }
+            runSuspendCatching { repository.deleteStorageReviewItems(selected, forcePermanent) }
                 .onSuccess { result ->
                     finishStorageReviewCleanup(
                         attempted = selected,
@@ -1332,6 +1357,7 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                         changedCount = result.changedCount,
                     )
                     refreshTrash()
+                    offerTrashFallback(TrashFallback.Source.STORAGE_REVIEW, result.trashUnavailableIds, result.trashFolderMissing)
                     onCleanupCompleted(result.deletedIds.isNotEmpty())
                 }
                 .onFailure { error ->
@@ -1346,86 +1372,12 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun completeCleanup(approved: Boolean): Boolean {
-        val pending = pendingConsentItems
-        pendingConsentItems = emptyList()
-        val directDeletedCount = pendingCleanupDeletedCount
-        val directDeletedBytes = pendingCleanupDeletedBytes
-        val directFailedCount = pendingCleanupFailedCount
-        val storageBefore = pendingCleanupStorageBeforeBytes
-
-        if (!approved) {
-            resetPendingCleanupResult()
-            viewModelScope.launch {
-                val partialResult = if (directDeletedCount > 0 || directFailedCount > 0) {
-                    CleanupResult(
-                        deletedBytes = directDeletedBytes,
-                        deletedCount = directDeletedCount,
-                        failedCount = directFailedCount,
-                        cancelledCount = pending.size,
-                        beforeAvailableBytes = storageBefore,
-                        afterAvailableBytes = ioAvailableBytes(),
-                    )
-                } else {
-                    null
-                }
-                _state.update {
-                    it.copy(
-                        cleanupInProgress = false,
-                        cleanupResult = partialResult,
-                        message = if (partialResult == null) {
-                            getApplication<Application>().getString(R.string.message_cleanup_cancelled)
-                        } else {
-                            null
-                        },
-                    )
-                }
-                partialResult?.let(::recordCleanupHistory)
-            }
-            // A cancelled Android consent flow never triggers a monetization break.
-            return false
-        }
-
-        repository.invalidateStorageIndex()
-        val removedIds = pending.mapTo(hashSetOf(), CleanableItem::id)
-        val removedBytes = pending.sumOf(CleanableItem::sizeBytes)
-        resetPendingCleanupResult()
-        viewModelScope.launch {
-            val combinedResult = CleanupResult(
-                deletedBytes = directDeletedBytes + removedBytes,
-                deletedCount = directDeletedCount + removedIds.size,
-                failedCount = directFailedCount,
-                beforeAvailableBytes = storageBefore,
-                afterAvailableBytes = ioAvailableBytes(),
-            )
-            finishCleanup(
-                items = pending,
-                deletedIds = removedIds,
-                deletedBytes = removedBytes,
-                failedCount = 0,
-                storageBeforeBytes = storageBefore,
-                result = combinedResult,
-            )
-        }
-        return directDeletedCount + removedIds.size > 0
-    }
-
-    fun refreshAfterCleanup() {
-        refreshDeviceState()
-        val focus = _state.value.scanFocus
-        if (repository.hasAllFilesAccess() && _state.value.lastScanCompleted) {
-            scan(focus)
-        }
-    }
-
     private suspend fun finishCleanup(
         items: List<CleanableItem>,
         deletedIds: Set<String>,
         deletedBytes: Long,
         failedCount: Int,
-        storageBeforeBytes: Long = pendingCleanupStorageBeforeBytes,
-        clearPending: Boolean = true,
-        result: CleanupResult? = null,
+        storageBeforeBytes: Long,
         trashedBytes: Long = 0L,
         trashEntryIds: List<String> = emptyList(),
         changedCount: Int = 0,
@@ -1433,20 +1385,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         val storageAfter = ioStorageSnapshot()
         val memoryAfter = ioMemorySnapshot()
         val ownCacheAfter = ioOwnCacheBytes()
-        val measuredResult = if (clearPending) {
-            result ?: CleanupResult(
-                deletedBytes = deletedBytes,
-                deletedCount = deletedIds.size,
-                failedCount = failedCount,
-                beforeAvailableBytes = storageBeforeBytes,
-                afterAvailableBytes = storageAfter.availableBytes,
-                trashedBytes = trashedBytes,
-                trashEntryIds = trashEntryIds,
-                changedCount = changedCount,
-            )
-        } else {
-            null
-        }
+        val measuredResult = CleanupResult(
+            deletedBytes = deletedBytes,
+            deletedCount = deletedIds.size,
+            failedCount = failedCount,
+            beforeAvailableBytes = storageBeforeBytes,
+            afterAvailableBytes = storageAfter.availableBytes,
+            trashedBytes = trashedBytes,
+            trashEntryIds = trashEntryIds,
+            changedCount = changedCount,
+        )
         _state.update { state ->
             val deletedItems = items.filter { it.id in deletedIds }
             val deletedByCategory = deletedItems
@@ -1474,28 +1422,17 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                 storage = storageAfter,
                 memory = memoryAfter,
                 ownCacheBytes = ownCacheAfter,
-                cleanupInProgress = if (clearPending) false else state.cleanupInProgress,
-                cleanupResult = measuredResult ?: state.cleanupResult,
-                message = if (measuredResult == null) state.message else null,
+                cleanupInProgress = false,
+                cleanupResult = measuredResult,
+                message = null,
             )
         }
         persistDashboardSnapshot()
-        measuredResult?.let(::recordCleanupHistory)
-        if (clearPending) {
-            pendingConsentItems = emptyList()
-            resetPendingCleanupResult()
-        }
+        recordCleanupHistory(measuredResult)
     }
 
     fun dismissCleanupResult() {
         _state.update { it.copy(cleanupResult = null) }
-    }
-
-    private fun resetPendingCleanupResult() {
-        pendingCleanupDeletedBytes = 0L
-        pendingCleanupDeletedCount = 0
-        pendingCleanupFailedCount = 0
-        pendingCleanupStorageBeforeBytes = 0L
     }
 
     private suspend fun finishStorageReviewCleanup(
@@ -1813,9 +1750,19 @@ internal object AutoScanPolicy {
         hasPlan: Boolean,
         planScannedAtElapsed: Long,
         nowElapsed: Long,
+        savedSummaryAtMillis: Long = 0L,
+        nowMillis: Long = 0L,
     ): Boolean {
         if (!hasAccess || scanning) return false
-        if (!hasPlan || planScannedAtElapsed <= 0L) return true
-        return nowElapsed - planScannedAtElapsed > java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
+        val maxAge = java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
+        if (hasPlan && planScannedAtElapsed > 0L) return nowElapsed - planScannedAtElapsed > maxAge
+        // After the app was closed the plan is gone from memory, but the saved
+        // card totals (finding 8) are enough for 6 hours: no scan on every launch.
+        return !savedSummaryIsFresh(savedSummaryAtMillis, nowMillis)
     }
+
+    fun savedSummaryIsFresh(savedSummaryAtMillis: Long, nowMillis: Long): Boolean =
+        savedSummaryAtMillis > 0L &&
+            nowMillis >= savedSummaryAtMillis &&
+            nowMillis - savedSummaryAtMillis <= java.util.concurrent.TimeUnit.HOURS.toMillis(QUICK_SCAN_MAX_AGE_HOURS)
 }
