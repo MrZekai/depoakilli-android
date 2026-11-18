@@ -230,6 +230,9 @@ def free_bytes():
 
 
 def to_home():
+    tab = find(r"^Clean$")
+    if tab and tab.y1 > H * 0.85:
+        tap(tab)
     for _ in range(4):
         if find(r"^(MAKE ROOM|CLEAN UP)$") or find(r"^Up to$"):
             return True
@@ -368,9 +371,14 @@ def main():
     sh(f"pm clear {PKG}")
     sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
     sh(f"appops set {PKG} GET_USAGE_STATS allow")
+    sh(f"am force-stop {PKG}")
     launch()
     dismiss_ads()
-    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40)
+    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20)
+    if not n:
+        # The app may reopen on another tab; go to the Clean tab first.
+        tap_text(r"^Clean$", 10)
+        n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20)
     if n and n.label.upper() == "MAKE ROOM":
         tap(n)
     wait_for(r"^CLEAN UP$", 180)
