@@ -51,10 +51,13 @@ data class SwipeReviewState(
         /** Groups whose plan row opens the swipe review by default. */
         val SWIPE_GROUPS = setOf(
             CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.OLD_VIDEO,
             CleanupGroup.SCREEN_RECORDING,
             CleanupGroup.SCREENSHOT,
             CleanupGroup.WHATSAPP_VIDEO,
             CleanupGroup.WHATSAPP_SENT,
+            CleanupGroup.WHATSAPP_OLD_VIDEO,
+            CleanupGroup.WHATSAPP_OLD_IMAGE,
             CleanupGroup.DOWNLOAD_FILE,
         )
 

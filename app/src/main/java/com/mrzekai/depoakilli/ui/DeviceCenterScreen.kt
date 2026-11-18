@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -523,8 +524,30 @@ internal fun SettingsDetailScreen(
     onOpenPrivacyAccess: () -> Unit,
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
+    keptItemCount: Int = 0,
+    onClearKeptItems: () -> Unit = {},
+    excludedFolders: List<com.mrzekai.depoakilli.data.ExcludedFolder> = emptyList(),
+    onIncludeFolder: (com.mrzekai.depoakilli.data.ExcludedFolder) -> Unit = {},
 ) {
     var showFeedbackDialog by rememberSaveable { mutableStateOf(false) }
+    var confirmClearKept by rememberSaveable { mutableStateOf(false) }
+    if (confirmClearKept) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmClearKept = false },
+            text = { Text(stringResource(R.string.settings_kept_reset_confirm)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    confirmClearKept = false
+                    onClearKeptItems()
+                }) { Text(stringResource(R.string.settings_kept_reset)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmClearKept = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
     if (showFeedbackDialog) {
         FeedbackDialog(
             onOpenEmailApp = {
@@ -541,6 +564,40 @@ internal fun SettingsDetailScreen(
         contentPadding = PaddingValues(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        // V10: files kept in the swipe review; resetting asks first.
+        if (keptItemCount > 0) {
+            item(key = "settings-kept") {
+                SettingsActionRow(
+                    title = stringResource(R.string.settings_kept_files, keptItemCount),
+                    subtitle = stringResource(R.string.settings_kept_reset),
+                    icon = Icons.Outlined.Security,
+                    onClick = { confirmClearKept = true },
+                )
+            }
+        }
+        // V11: folders the user does not want suggestions from, removable one by one.
+        if (excludedFolders.isNotEmpty()) {
+            item(key = "settings-excluded-title") {
+                Text(stringResource(R.string.settings_excluded_title), fontWeight = FontWeight.Bold)
+            }
+            items(excludedFolders, key = { "excluded-" + it.volumeRoot + "/" + it.relativePath }) { folder ->
+                Card(shape = RoundedCornerShape(20.dp)) {
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 17.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f)) {
+                            Text(folder.name, fontWeight = FontWeight.Bold)
+                            Text(
+                                com.mrzekai.depoakilli.ui.common.bidiWrap(folder.relativePath),
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+                        androidx.compose.material3.TextButton(
+                            onClick = { onIncludeFolder(folder) },
+                            modifier = Modifier.heightIn(min = 48.dp),
+                        ) { Text(stringResource(R.string.settings_excluded_remove)) }
+                    }
+                }
+            }
+        }
         item {
             SettingsActionRow(
                 title = stringResource(R.string.security_center_title),

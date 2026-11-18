@@ -116,6 +116,36 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
+    fun `bulk selection never selects camera files but one-by-one selection can`() {
+        val items = listOf(
+            item("cam", CleanupGroup.OLD_VIDEO, 40 * mb).copy(relativePath = "DCIM/Camera"),
+            item("dl", CleanupGroup.OLD_VIDEO, 40 * mb).copy(relativePath = "Movies"),
+            item("shot", CleanupGroup.SCREENSHOT, 1 * mb).copy(relativePath = "DCIM/Screenshots"),
+            item("thumb", CleanupGroup.THUMBNAILS, 1 * mb).copy(relativePath = "DCIM/.thumbnails", selected = false),
+        )
+        val ids = items.map(CleanableItem::id).toSet()
+        val bulk = PlanSelection.setItemsSelected(items, ids, selected = true, bulk = true)
+        assertEquals(setOf("dl", "shot", "thumb"), bulk.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+        val grouped = PlanSelection.toggleGroup(items, CleanupGroup.OLD_VIDEO)
+        assertEquals(setOf("dl"), grouped.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+        // Toggling again clears the group instead of trying to select the camera file.
+        assertTrue(PlanSelection.toggleGroup(grouped, CleanupGroup.OLD_VIDEO).none { it.selected && it.assessment.group == CleanupGroup.OLD_VIDEO })
+        val explicit = PlanSelection.setItemsSelected(items, setOf("cam"), selected = true, bulk = false)
+        assertTrue(explicit.single { it.id == "cam" }.selected)
+        val row = com.mrzekai.depoakilli.model.buildPlan(items).review.firstOrNull { it.group == CleanupGroup.OLD_VIDEO }
+            ?: com.mrzekai.depoakilli.model.buildPlan(items).smallReview!!
+        assertEquals(1, row.items.count { com.mrzekai.depoakilli.data.StoragePathRules.isCameraPath(it.relativePath) })
+    }
+
+    @Test
+    fun `largest apps are the five biggest user apps`() {
+        val apps = (1..7).map { i ->
+            com.mrzekai.depoakilli.model.InstalledAppEntry("p$i", "App $i", appBytes = i * 100L, systemApp = i == 7)
+        }
+        assertEquals(listOf("p6", "p5", "p4", "p3", "p2"), largestUserApps(apps).map { it.packageName })
+    }
+
+    @Test
     fun `trash days left round up and never go negative`() {
         val day = 86_400_000L
         val entry = com.mrzekai.depoakilli.data.TrashEntry("id", "/a", "/t", 1L, 0L, deletedAtMillis = 0L, group = "")

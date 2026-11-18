@@ -31,6 +31,7 @@ import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeleteMode
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
+import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.IndexedFile
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
@@ -47,7 +48,6 @@ import com.mrzekai.depoakilli.model.WhatsAppMediaItem
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Files
-import java.nio.file.attribute.BasicFileAttributes
 import java.lang.ref.SoftReference
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +70,8 @@ class DeviceRepository(
     ),
 ) {
     private val duplicateFinder = DuplicateFinder(aiEngine, ::openUriInput)
+    private val keptItems = KeptItemsStore.create(context)
+    private val excludedFolders = ExcludedFoldersStore.create(context)
     private val trashStore = TrashStore(
         indexFile = File(context.filesDir, TRASH_INDEX_FILE),
         trashRoots = { sharedStorageRoots() },
@@ -300,7 +302,22 @@ class DeviceRepository(
                 assessments += file.toCleanable(assessment)
             }
         }
-        val assessed = aiEngine.markOlderApkVersions(assessments)
+        val apkAssessed = aiEngine.markOlderApkVersions(assessments)
+        // V5: a RAW file with a JPEG/HEIC partner in the same folder replaces
+        // any broader classification of that RAW file.
+        val rawPairs = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP || focus == ScanFocus.MEDIA) {
+            RawPairFinder.find(indexed)
+        } else {
+            emptyMap()
+        }
+        val assessed = if (rawPairs.isEmpty()) {
+            apkAssessed
+        } else {
+            val byUri = indexed.associateBy(IndexedFile::uri)
+            apkAssessed.filterNot { it.uri in rawPairs } + rawPairs.mapNotNull { (uri, partner) ->
+                byUri[uri]?.let { raw -> raw.toCleanable(aiEngine.rawCopyAssessment(raw, partner)) }
+            }
+        }
 
         // Smart Clean promises duplicates too, but must stay fast: it verifies
         // files up to QUICK_FULL_HASH_BYTES byte for byte and lists larger
@@ -311,13 +328,16 @@ class DeviceRepository(
             focus == ScanFocus.DUPLICATES ||
             focus == ScanFocus.MEDIA
         ) {
+            // Files already in Android's trash or unfinished writes are never a
+            // duplicate or a "kept original".
+            val visible = indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) }
             val duplicateSource = if (focus == ScanFocus.MEDIA) {
-                indexed.filter {
+                visible.filter {
                     val mime = StoragePathRules.normalizeText(it.mimeType)
                     mime.startsWith("image/") || mime.startsWith("video/")
                 }
             } else {
-                indexed
+                visible
             }
             duplicateResult = findDuplicates(
                 duplicateSource,
@@ -353,8 +373,27 @@ class DeviceRepository(
             .distinctBy(CleanableItem::uri)
             .sortedByDescending(CleanableItem::sizeBytes)
             .toList()
-        val truncated = ranked.size > CleaningThresholds.MAX_RESULT_ITEMS
-        val focusedItems = ranked.take(CleaningThresholds.MAX_RESULT_ITEMS)
+        // V10/V11: the user's "keep" decisions and excluded folders apply to
+        // review groups only; records of files that are gone are dropped.
+        // Tool screens list everything without a "hidden" note, so the filter
+        // applies to the Smart/Deep plan only.
+        val planScan = focus == ScanFocus.SMART || focus == ScanFocus.DEEP
+        val keptKeys = keptItems.keys()
+        if (keptKeys.isNotEmpty() && planScan) {
+            keptItems.retainOnly(
+                existing = indexed.asSequence().map(KeptItemsStore::keyOf).filter(keptKeys::contains).toHashSet(),
+                scannedVolumes = indexed.mapTo(hashSetOf(), IndexedFile::volumeRoot),
+            )
+        }
+        val userChoices = if (planScan) {
+            UserChoiceFilter.apply(ranked, keptItems.keys(), excludedFolders.folders())
+        } else {
+            UserChoiceFilter.Result(ranked, 0, 0)
+        }
+        val chosen = userChoices.items
+        val truncated = chosen.size > CleaningThresholds.MAX_RESULT_ITEMS
+        val storageListFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)
+        val focusedItems = chosen.take(CleaningThresholds.MAX_RESULT_ITEMS)
 
         ScanSummary(
             items = focusedItems,
@@ -362,10 +401,51 @@ class DeviceRepository(
             scannedBytes = indexed.sumOf(IndexedFile::sizeBytes),
             limitedAccess = false,
             scanLimitReached = indexed.size >= indexedFileLimit(),
-            storageTypes = storageTypeStats(indexed),
-            storagePreviews = storageTypePreviews(indexed),
-            smartMediaTypes = smartMediaTypeStats(indexed),
+            storageTypes = storageTypeStats(storageListFiles),
+            storagePreviews = storageTypePreviews(storageListFiles),
+            smartMediaTypes = smartMediaTypeStats(storageListFiles),
             truncated = truncated,
+            hiddenKeptCount = userChoices.hiddenKept,
+            biggestFolders = if (focus == ScanFocus.SMART || focus == ScanFocus.DEEP) {
+                FolderSizes.top(indexed.filterNot { StoragePathRules.isSystemMarkerFile(it.name) })
+            } else {
+                emptyList()
+            },
+        )
+    }
+
+    /**
+     * Every file in [folder] and below it (V7), largest first. Nothing is
+     * selected; hidden files are left out. The review uses the folder's most
+     * common file type only for its layout.
+     */
+    suspend fun scanFolderReview(
+        folder: FolderSize,
+        onProgress: (Int, Int) -> Unit = { _, _ -> },
+    ): StorageReviewSummary = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess()) return@withContext StorageReviewSummary(folder = folder)
+        val indexed = cachedSharedIndex()?.also { cached -> onProgress(0, cached.size) }
+            ?: indexSharedStorage { visitedDirectories, discoveredFiles ->
+                onProgress(visitedDirectories, discoveredFiles)
+            }.also(::cacheSharedIndex)
+        val inFolder = indexed.filter { file ->
+            FolderSizes.contains(folder, file) && !StoragePathRules.isSystemMarkerFile(file.name)
+        }
+        val dominantType = inFolder.groupBy(::storageFileType)
+            .maxByOrNull { (_, files) -> files.sumOf(IndexedFile::sizeBytes) }
+            ?.key ?: StorageFileType.OTHER
+        val items = inFolder.asSequence()
+            .sortedByDescending(IndexedFile::sizeBytes)
+            .take(storageReviewItemLimit())
+            .map { StorageReviewItem(file = it, selected = false) }
+            .toList()
+        StorageReviewSummary(
+            type = dominantType,
+            folder = folder,
+            items = items,
+            scannedFileCount = inFolder.size,
+            scanLimitReached = inFolder.size > storageReviewItemLimit(),
+            loading = false,
         )
     }
 
@@ -387,7 +467,7 @@ class DeviceRepository(
             onProgress(visitedDirectories, discoveredFiles)
         }.also(::cacheSharedIndex)
 
-        val typedFiles = indexed
+        val typedFiles = StoragePathRules.visibleInStorageLists(indexed, IndexedFile::name)
             .asSequence()
             .filter { storageFileType(it) == type }
             .filter { !excludeWhatsAppMedia || !isWhatsAppSharedMedia(it) }
@@ -537,6 +617,22 @@ class DeviceRepository(
         outcome.toDirectResult(directItems.mapTo(hashSetOf(), CleanableItem::id))
     }
 
+    // V10: files kept in the swipe review.
+    fun keepItem(item: CleanableItem) = keptItems.add(KeptItemsStore.keyOf(item))
+
+    fun unkeepItem(item: CleanableItem) = keptItems.remove(KeptItemsStore.keyOf(item))
+
+    fun keptItemCount(): Int = keptItems.count()
+
+    fun clearKeptItems() = keptItems.clear()
+
+    // V11: folders the user does not want suggestions from.
+    fun excludedFolderList(): List<ExcludedFolder> = excludedFolders.folders()
+
+    fun excludeFolder(folder: ExcludedFolder): Boolean = excludedFolders.add(folder)
+
+    fun includeFolder(folder: ExcludedFolder) = excludedFolders.remove(folder)
+
     fun trashEntries(): List<TrashEntry> = trashStore.entries()
 
     fun trashBytes(): Long = trashStore.trashBytes()
@@ -574,7 +670,7 @@ class DeviceRepository(
         } ?: return@runCatching Removal.Failed(FailureReason.PROTECTED)
         if (
             !isDeletableSharedStorageFile(file) ||
-            StoragePathRules.isSystemMarkerFile(file.name) ||
+            StoragePathRules.isSkippedHiddenFile(file.name) ||
             StoragePathRules.isProtectedUserDataPath(relativeDir, file.name)
         ) {
             return@runCatching Removal.Failed(FailureReason.PROTECTED)
@@ -711,7 +807,8 @@ class DeviceRepository(
                         pending.addLast(root to child)
                     }
                 } else if (child.isFile) {
-                    if (StoragePathRules.isSystemMarkerFile(child.name)) continue
+                    // Only Android's trash and unfinished-write files are indexed among dot-files (V4).
+                    if (StoragePathRules.isSkippedHiddenFile(child.name)) continue
                     val relative = runCatching { child.parentFile?.relativeTo(root.file)?.invariantSeparatorsPath }.getOrNull() ?: continue
                     if (StoragePathRules.isProtectedUserDataPath(relative, child.name)) continue
                     val filePath = canonicalPathWithinRoot(root.canonicalPath, child) ?: continue
@@ -796,14 +893,8 @@ class DeviceRepository(
             modifiedAtMillis = file.lastModified().coerceAtLeast(0L),
             relativePath = parentPath,
             volumeRoot = canonicalPathOf(storageRoot),
-            createdAtMillis = creationTimeOf(file),
         )
     }
-
-
-    private fun creationTimeOf(file: File): Long = runCatching {
-        Files.readAttributes(file.toPath(), BasicFileAttributes::class.java).creationTime().toMillis()
-    }.getOrDefault(0L).coerceAtLeast(0L)
 
     fun invalidateStorageIndex() {
         sharedIndexCache = null
@@ -879,11 +970,16 @@ class DeviceRepository(
     @Suppress("DEPRECATION")
     private fun removeDeletedPathFromMediaStore(absolutePath: String) {
         runCatching {
-            resolver.delete(
-                MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
-                "${MediaStore.MediaColumns.DATA}=?",
-                arrayOf(absolutePath),
-            )
+            // B4: also match rows in Android's trash and pending rows, so a
+            // file deleted from "Already in Android's trash" leaves no ghost
+            // entry in the Gallery trash. Errors are ignored as before.
+            val extras = android.os.Bundle().apply {
+                putString(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION, "${MediaStore.MediaColumns.DATA}=?")
+                putStringArray(android.content.ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, arrayOf(absolutePath))
+                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+                putInt(MediaStore.QUERY_ARG_MATCH_PENDING, MediaStore.MATCH_INCLUDE)
+            }
+            resolver.delete(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), extras)
         }
     }
 
@@ -1178,6 +1274,7 @@ class DeviceRepository(
             CleanupGroup.PARTIAL_DOWNLOADS,
             CleanupGroup.TEMP_FILES,
             CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.OLD_VIDEO,
             CleanupGroup.LARGE_OTHER,
         )
         private val ARCHIVE_EXTENSIONS = setOf("zip", "rar", "7z", "tar", "gz", "bz2", "xz")

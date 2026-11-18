@@ -2,26 +2,35 @@ package com.mrzekai.depoakilli.ui
 
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
+import com.mrzekai.depoakilli.model.isBulkSelectable
 
 /** Pure selection rules of the cleanup plan, shared by the ViewModel and tests. */
 internal object PlanSelection {
-    /** Selects or clears a whole group; groups that are not group-selectable are left unchanged. */
+    /**
+     * Selects or clears a whole group; groups that are not group-selectable are
+     * left unchanged and camera review items are never selected this way (B3).
+     */
     fun setGroupSelected(items: List<CleanableItem>, group: CleanupGroup, selected: Boolean): List<CleanableItem> {
         if (!group.groupSelectable) return items
         return items.map { item ->
-            if (item.assessment.group == group && item.selected != selected) item.copy(selected = selected) else item
+            val excluded = selected && !item.isBulkSelectable()
+            if (item.assessment.group == group && item.selected != selected && !excluded) item.copy(selected = selected) else item
         }
     }
 
-    /** Bulk selection skips items whose group is not group-selectable; explicit selection does not. */
+    /** Bulk selection skips items that are not bulk-selectable; explicit selection does not. */
     fun setItemsSelected(items: List<CleanableItem>, ids: Set<String>, selected: Boolean, bulk: Boolean): List<CleanableItem> =
         items.map { item ->
-            val excluded = bulk && selected && !item.assessment.group.groupSelectable
+            val excluded = bulk && selected && !item.isBulkSelectable()
             if (item.id in ids && item.selected != selected && !excluded) item.copy(selected = selected) else item
         }
 
     fun toggleGroup(items: List<CleanableItem>, group: CleanupGroup): List<CleanableItem> =
-        setGroupSelected(items, group, items.any { it.assessment.group == group && !it.selected })
+        setGroupSelected(
+            items,
+            group,
+            items.any { it.assessment.group == group && it.isBulkSelectable() && !it.selected },
+        )
 
     /**
      * Large look-alike groups the "Deep duplicate check" can verify:

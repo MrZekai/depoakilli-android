@@ -189,13 +189,21 @@ private fun SavedSummaryCard(
                 )
                 Text(
                     stringResource(
-                        R.string.home_saved_totals,
-                        ByteFormatter.format(state.dashboardCleanableBytes),
-                        ByteFormatter.format(state.dashboardReviewBytes),
+                        R.string.plan_up_to_freed,
+                        ByteFormatter.format(state.dashboardCleanableBytes + state.dashboardReviewBytes),
                     ),
                     color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    stringResource(R.string.plan_selected_safely, ByteFormatter.format(state.dashboardCleanableBytes)),
+                    color = CleanTabAccent,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    stringResource(R.string.plan_worth_a_look_amount, ByteFormatter.format(state.dashboardReviewBytes)),
+                    color = CleanTabSecondary,
                 )
                 Text(
                     if (hours < 1) {

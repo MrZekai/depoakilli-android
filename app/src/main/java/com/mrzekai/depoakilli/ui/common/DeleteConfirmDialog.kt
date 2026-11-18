@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -29,12 +30,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.CleaningThresholds
+import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.DeleteMode
 import com.mrzekai.depoakilli.ui.ContrastTokens
 
 private val DeleteRed = Color(0xFFFF5D68)
+
+/** One row of the confirmation: name, its folder and, for copies, the original that stays. */
+internal data class DeleteConfirmEntry(
+    val name: String,
+    val folder: String,
+    val keptOriginal: String? = null,
+)
 private const val PREVIEW_NAMES = 5
 
 /**
@@ -44,7 +53,7 @@ private const val PREVIEW_NAMES = 5
  */
 @Composable
 internal fun DeleteConfirmDialog(
-    names: List<String>,
+    entries: List<DeleteConfirmEntry>,
     trashBytes: Long,
     permanentBytes: Long,
     inProgress: Boolean = false,
@@ -53,7 +62,7 @@ internal fun DeleteConfirmDialog(
     extraContent: (@Composable () -> Unit)? = null,
 ) {
     var showAll by rememberSaveable { mutableStateOf(false) }
-    val count = names.size
+    val count = entries.size
     val days = CleaningThresholds.TRASH_RETENTION_DAYS
     AlertDialog(
         onDismissRequest = { if (!inProgress) onDismiss() },
@@ -61,15 +70,34 @@ internal fun DeleteConfirmDialog(
         title = { Text(pluralStringResource(R.plurals.delete_confirm_title, count, count), fontWeight = FontWeight.Black) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val visible = if (showAll) names else names.take(PREVIEW_NAMES)
-                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 220.dp)) {
-                    itemsIndexed(visible) { _, name ->
-                        Text(
-                            "• $name",
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                val visible = if (showAll) entries else entries.take(PREVIEW_NAMES)
+                LazyColumn(Modifier.fillMaxWidth().heightIn(max = 260.dp)) {
+                    itemsIndexed(visible) { _, entry ->
+                        // Name plus folder, so two files with the same name can be told
+                        // apart; copies also show the original that is kept.
+                        Column(Modifier.padding(vertical = 3.dp)) {
+                            Text(
+                                "• ${entry.name}",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                bidiWrap(entry.folder.ifBlank { "/" }),
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            entry.keptOriginal?.let { original ->
+                                Text(
+                                    stringResource(R.string.duplicate_original_kept, bidiWrap(original)),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
                     }
                 }
                 if (count > PREVIEW_NAMES) {
@@ -130,11 +158,26 @@ internal fun DeleteConfirmDialog(
 ) {
     val (permanent, trash) = items.partition { it.assessment.group.deleteMode == DeleteMode.PERMANENT }
     DeleteConfirmDialog(
-        names = items.map(CleanableItem::name),
+        entries = items.map { item ->
+            DeleteConfirmEntry(
+                name = item.name,
+                folder = item.relativePath,
+                keptOriginal = item.protectedDuplicateName?.let { originalName ->
+                    listOfNotNull(item.protectedDuplicateRelativePath?.trim('/')?.takeIf(String::isNotBlank), originalName)
+                        .joinToString("/")
+                },
+            )
+        },
         trashBytes = trash.sumOf(CleanableItem::sizeBytes),
         permanentBytes = permanent.sumOf(CleanableItem::sizeBytes),
         inProgress = inProgress,
         onDismiss = onDismiss,
         onConfirm = onConfirm,
+        // WhatsApp media deleted here no longer opens in the chat (V2 risk).
+        extraContent = if (items.any { StoragePathRules.isWhatsAppPath(it.relativePath) }) {
+            { Text(stringResource(R.string.plan_preview_whatsapp), style = MaterialTheme.typography.bodySmall) }
+        } else {
+            null
+        },
     )
 }

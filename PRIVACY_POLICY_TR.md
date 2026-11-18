@@ -1,6 +1,6 @@
 # Akıllı Temizleyici Gizlilik Politikası
 
-Son güncelleme: 27 Ağustos 2026
+Son güncelleme: 17 Kasım 2026
 
 Akıllı Temizleyici (`com.mrzekai.depoakilli`) MrZekai tarafından sunulur. Gizlilik ve destek iletişimi: {{SUPPORT_EMAIL}}.
 
@@ -22,7 +22,7 @@ Veriler bu sağlayıcılara şifreli ağ bağlantılarıyla iletilir. Saklama ve
 
 ## Dosya silme ve yerel saklama
 
-Dosyalar yalnız kullanıcı seçimi veya Android'in zorunlu tuttuğu sistem onayı sonrasında kaldırılır. Sildiğiniz dosyalar Akıllı Temizleyici tarafından geri getirilemeyebilir.
+Dosyalar yalnız kullanıcı seçimi veya Android'in zorunlu tuttuğu sistem onayı sonrasında kaldırılır. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp'e (gizli `.SmartCleanerTrash` klasörü) taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Akıllı Temizleyici'yi kaldırırsanız bu alanı boşaltmak için `.SmartCleanerTrash` klasörünü bir dosya yöneticisiyle silin.
 
 Tercihler ve toplu tarama/temizlik geçmişi yalnız yerel uygulama depolamasında, Akıllı Temizleyici'nin uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklanır. Uygulama verilerini temizlemek veya uygulamayı kaldırmak bu yerel uygulama verilerini siler; daha önce silmeyi seçtiğiniz dosyaları geri getirmez.
 

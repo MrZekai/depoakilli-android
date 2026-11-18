@@ -841,7 +841,9 @@ if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_s
 for expected in (
     'name="legal_contact"',
     "aggregate scan/cleanup history",
-    "cannot be restored by Smart Cleaner",
+    # The privacy text must describe the 7-day Trash truthfully.
+    "can be restored there for 7 days",
+    "cannot be restored.",
 ):
     if expected not in default_strings:
         errors.append(f"missing English privacy/contact invariant: {expected}")
@@ -1417,8 +1419,12 @@ if build_file.count('applicationIdSuffix = ".qa"') != 1:
 # ------------------------------------------------------------------
 if "fun isSystemMarkerFile(name: String)" not in storage_path_rules or 'normalizeText(name.trim()).startsWith(".")' not in storage_path_rules:
     errors.append("hidden dot-files must be recognised by StoragePathRules")
-if repository.count("StoragePathRules.isSystemMarkerFile(") < 3:
+# V4: only Android's trash (.trashed-…) and unfinished writes (.pending-…) are
+# exempt; every other dot-file is skipped by both indexers and refused at deletion.
+if repository.count("StoragePathRules.isSkippedHiddenFile(") < 2 or repository.count("StoragePathRules.isSystemMarkerFile(") < 1:
     errors.append("marker files must be skipped by both indexers and refused at deletion")
+if r'Regex("""^\.trashed-\d+-.+""")' not in storage_path_rules or r'Regex("""^\.pending-\d+-.+""")' not in storage_path_rules:
+    errors.append("only the MediaStore .trashed-/.pending- patterns may be exempt from the dot-file rule")
 if "recommended = isWhatsAppStatus" in ai_engine or "recommended = autoSelect" in ai_engine:
     errors.append("WhatsApp media and APK installers must never be preselected")
 if "isStillImage(" not in ai_engine:
@@ -1471,7 +1477,7 @@ if "unicodeWrap" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/common
 
 for rules_name in ("backup_rules.xml", "data_extraction_rules.xml"):
     rules = read(f"app/src/main/res/xml/{rules_name}")
-    for excluded in ("dashboard_snapshot_v1.xml", "storage_change_v1.xml", "cleanup_history_v1.xml", "trash_index.json"):
+    for excluded in ("dashboard_snapshot_v1.xml", "storage_change_v1.xml", "cleanup_history_v1.xml", "trash_index.json", "kept_items_v1.xml", "excluded_folders_v1.xml"):
         if f'path="{excluded}"' not in rules:
             errors.append(f"{rules_name} must exclude device-specific state: {excluded}")
 

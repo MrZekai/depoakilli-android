@@ -44,6 +44,9 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanupPlan
+import com.mrzekai.depoakilli.model.FolderSize
+import com.mrzekai.depoakilli.model.InstalledAppEntry
+import com.mrzekai.depoakilli.ui.common.bidiWrap
 import com.mrzekai.depoakilli.model.PlanGroup
 
 internal val PlanCard = Color(0xFF0A1C42)
@@ -54,11 +57,14 @@ internal val PlanCyan = Color(0xFF16C7FF)
 internal val PlanButtonText = Color(0xFF03122B)
 
 /** Stable key of a plan row; the merged small row has no group. */
-internal fun PlanGroup.rowKey(): String = group?.name ?: "SMALL_ITEMS"
+internal fun PlanGroup.rowKey(): String = group?.name ?: if (smallReview) "SMALL_REVIEW" else "SMALL_ITEMS"
 
 @Composable
-internal fun PlanGroup.title(): String =
-    group?.let { stringResource(it.titleRes) } ?: stringResource(R.string.plan_small_items)
+internal fun PlanGroup.title(): String = when {
+    group != null -> stringResource(group.titleRes)
+    smallReview -> stringResource(R.string.plan_small_review)
+    else -> stringResource(R.string.plan_small_items)
+}
 
 /**
  * Rows of the cleanup plan (T1.7): recommendation card, included rows,
@@ -79,6 +85,12 @@ internal fun LazyListScope.cleanupPlanItems(
     deepCheck: Pair<Int, Long> = 0 to 0L,
     deepCheckRunning: Boolean = false,
     onDeepCheck: () -> Unit = {},
+    biggestFolders: List<FolderSize> = emptyList(),
+    hiddenKeptCount: Int = 0,
+    onOpenFolder: (FolderSize) -> Unit = {},
+    largestApps: List<InstalledAppEntry>? = null,
+    onOpenAppInfo: (String) -> Unit = {},
+    onRequestUsageAccess: () -> Unit = {},
 ) {
     item(key = "plan-card") {
         RecommendedCleanupCard(
@@ -105,6 +117,32 @@ internal fun LazyListScope.cleanupPlanItems(
             onClick = onClearAppCaches,
         )
     }
+    // V8: the biggest user apps; each row only opens Android's App info screen.
+    if (largestApps == null) {
+        item(key = "plan-system-largest-apps-access") {
+            SystemStepRow(
+                title = stringResource(R.string.plan_largest_apps),
+                detail = stringResource(R.string.plan_largest_apps_access),
+                onClick = onRequestUsageAccess,
+            )
+        }
+    } else if (largestApps.isNotEmpty()) {
+        item(key = "plan-system-largest-apps-title") {
+            Text(
+                stringResource(R.string.plan_largest_apps),
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp),
+            )
+        }
+        items(largestApps, key = { "largest-app-" + it.packageName }) { app ->
+            SystemStepRow(
+                title = app.label,
+                detail = ByteFormatter.format(app.totalBytes),
+                onClick = { onOpenAppInfo(app.packageName) },
+            )
+        }
+    }
     if (unusedAppCount != null) {
         item(key = "plan-system-unused") {
             SystemStepRow(
@@ -114,9 +152,10 @@ internal fun LazyListScope.cleanupPlanItems(
             )
         }
     }
-    if (plan.review.isNotEmpty()) {
+    val reviewRows = plan.review + listOfNotNull(plan.smallReview)
+    if (reviewRows.isNotEmpty()) {
         item(key = "plan-review-title") { PlanSectionTitle(stringResource(R.string.plan_section_review)) }
-        plan.review.forEachIndexed { index, row ->
+        reviewRows.forEachIndexed { index, row ->
             item(key = "review-" + row.rowKey()) {
                 PlanRow(row = row, onToggle = { onToggleRow(row) }, onOpen = { onOpenRow(row) })
             }
@@ -135,6 +174,32 @@ internal fun LazyListScope.cleanupPlanItems(
                 pluralStringResource(R.plurals.plan_truncated, limit, limit),
                 color = Color(0xFFFFC46B),
                 fontSize = 13.sp,
+            )
+        }
+    }
+    // V7: where the space is, folder by folder (opens a review list, nothing selected).
+    if (biggestFolders.isNotEmpty()) {
+        item(key = "plan-folders-title") { PlanSectionTitle(stringResource(R.string.plan_biggest_folders)) }
+        items(biggestFolders, key = { "folder-" + it.volumeRoot + "/" + it.relativePath }) { folder ->
+            SystemStepRow(
+                title = folder.name,
+                detail = bidiWrap(folder.relativePath) + " • " + pluralStringResource(
+                    R.plurals.whatsapp_category_summary,
+                    folder.fileCount,
+                    folder.fileCount,
+                    ByteFormatter.format(folder.bytes),
+                ),
+                onClick = { onOpenFolder(folder) },
+            )
+        }
+    }
+    if (hiddenKeptCount > 0) {
+        item(key = "plan-kept-note") {
+            Text(
+                stringResource(R.string.plan_kept_hidden, hiddenKeptCount),
+                color = PlanTextSecondary,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 4.dp),
             )
         }
     }
@@ -203,20 +268,32 @@ internal fun RecommendedCleanupCard(
                     }
                 }
             } else {
-                val groups = plan.selectedGroupCount
+                // V7: the headline is everything listed below; the button only ever
+                // shows what is selected.
                 Text(
-                    pluralStringResource(
-                        R.plurals.plan_recommended_summary,
-                        groups,
-                        groups,
-                        ByteFormatter.format(plan.selectedBytes),
-                    ),
+                    stringResource(R.string.plan_up_to_freed, ByteFormatter.format(plan.potentialBytes)),
+                    color = Color.White,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Black,
+                )
+                Text(
+                    stringResource(R.string.plan_selected_safely, ByteFormatter.format(plan.recommendedBytes)),
+                    color = PlanAccent,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    stringResource(R.string.plan_worth_a_look_amount, ByteFormatter.format(plan.reviewBytes)),
                     color = PlanTextSecondary,
                     fontSize = 15.sp,
                 )
+                val reviewFirst = plan.selectedBytes <= 0L && plan.firstReviewRow != null
                 Button(
-                    onClick = onClean,
-                    enabled = plan.selectedBytes > 0L && !cleanupInProgress,
+                    onClick = {
+                        val first = plan.firstReviewRow
+                        if (reviewFirst && first != null) onOpenRow(first) else onClean()
+                    },
+                    enabled = (plan.selectedBytes > 0L || reviewFirst) && !cleanupInProgress,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PlanAccent,
@@ -225,6 +302,11 @@ internal fun RecommendedCleanupCard(
                 ) {
                     if (cleanupInProgress) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp, color = PlanButtonText)
+                    } else if (reviewFirst) {
+                        Text(
+                            stringResource(R.string.plan_review_action, ByteFormatter.format(plan.firstReviewRow?.bytes ?: 0L)),
+                            fontWeight = FontWeight.Black,
+                        )
                     } else {
                         Text(
                             stringResource(R.string.plan_clean_action, ByteFormatter.format(plan.selectedBytes)),
@@ -265,7 +347,7 @@ internal fun PlanRow(row: PlanGroup, onToggle: () -> Unit, onOpen: () -> Unit) {
         ) {
             if (row.groupSelectable) {
                 Checkbox(
-                    checked = row.allSelected,
+                    checked = row.allBulkSelected,
                     onCheckedChange = { onToggle() },
                     colors = CheckboxDefaults.colors(checkedColor = PlanAccent, checkmarkColor = PlanButtonText),
                 )
@@ -290,6 +372,15 @@ internal fun PlanRow(row: PlanGroup, onToggle: () -> Unit, onOpen: () -> Unit) {
                     color = PlanTextSecondary,
                     fontSize = 13.sp,
                 )
+                // B3: the checkbox never selects the user's own camera files.
+                val oneByOne = row.oneByOneCount
+                if (row.groupSelectable && oneByOne > 0) {
+                    Text(
+                        pluralStringResource(R.plurals.plan_camera_one_by_one, oneByOne, oneByOne),
+                        color = Color(0xFFFFC46B),
+                        fontSize = 13.sp,
+                    )
+                }
             }
             IconButtonArrow(onOpen)
         }

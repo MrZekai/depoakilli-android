@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.ads.BannerAd
 import com.mrzekai.depoakilli.ads.ListNativeAdCard
@@ -197,8 +198,12 @@ fun CleanerApp(
 
     fun navigateBackInApp() {
         when {
-            detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null ->
+            detailScreen == DetailScreen.CLEAN_RESULTS && state.storageReview.type != null -> {
+                val fromFolder = state.storageReview.folder != null
                 viewModel.closeStorageReview()
+                // A folder opens from the Clean tab; going back returns there.
+                if (fromFolder && state.scanFocus == ScanFocus.SMART) detailScreen = null
+            }
             detailScreen == DetailScreen.CLEAN_RESULTS && state.swipeReviewGroup != null -> {
                 viewModel.closeSwipeReview()
                 detailScreen = null
@@ -254,8 +259,10 @@ fun CleanerApp(
                                 scanFocusTitleRes(state.scanFocus)
                             else -> detailScreen?.titleRes ?: AppTab.entries[selectedTabIndex].titleRes
                         }
+                        val folderTitle = state.storageReview.folder?.name
+                            ?.takeIf { detailScreen == DetailScreen.CLEAN_RESULTS }
                         Text(
-                            stringResource(titleRes),
+                            folderTitle ?: stringResource(titleRes),
                             fontWeight = FontWeight.Black,
                         )
                     },
@@ -469,6 +476,10 @@ fun CleanerApp(
                 onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                 onOpenLegalPage = ::openLegalPage,
                 modifier = Modifier.padding(padding),
+                keptItemCount = state.keptItemCount,
+                onClearKeptItems = viewModel::clearKeptItems,
+                excludedFolders = state.excludedFolders,
+                onIncludeFolder = viewModel::includeFolder,
             )
 
             DetailScreen.ACCESS -> SecurityCenterScreen(
@@ -555,6 +566,12 @@ fun CleanerApp(
                                 detailScreen = DetailScreen.CLEAN_RESULTS
                             },
                             onDeepCheck = onDeepDuplicateCheck,
+                            onOpenFolder = { folder ->
+                                viewModel.openFolderReview(folder)
+                                detailScreen = DetailScreen.CLEAN_RESULTS
+                            },
+                            onOpenAppInfo = onOpenAppInfo,
+                            onExcludeFolder = viewModel::excludeFolder,
                             reviewAd = { index ->
                                 val plan = displayState.summary.plan
                                 val rows = plan.included.size + (if (plan.smallItems != null) 1 else 0) +
@@ -722,6 +739,24 @@ fun CleanerApp(
                 },
                 onUndo = viewModel::undoCleanup,
                 onEmptyTrash = { viewModel.emptyTrash(result.trashEntryIds) },
+                nextReview = if (result.kind == CleanupResultKind.FILES && state.scanFocus == ScanFocus.SMART) {
+                    state.summary.plan.review.firstOrNull { it.bytes >= CleaningThresholds.GROUP_MIN_BYTES }
+                } else {
+                    null
+                },
+                onReviewNext = {
+                    val next = state.summary.plan.review.firstOrNull()
+                    dismissResultAndReturn()
+                    val group = next?.group
+                    if (next != null && group != null) {
+                        if (group in com.mrzekai.depoakilli.ui.review.SwipeReviewState.SWIPE_GROUPS) {
+                            viewModel.openSwipeReview(group)
+                        } else {
+                            viewModel.openPlanGroupGrid(group, next.items)
+                        }
+                        detailScreen = DetailScreen.CLEAN_RESULTS
+                    }
+                },
                 onDone = { resultAdPresented ->
                     val eligibleForNaturalBreakAd =
                         result.operationSucceeded &&

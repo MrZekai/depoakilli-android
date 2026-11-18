@@ -156,7 +156,7 @@
     <string name="message_all_files_required_for_cache">La pulizia approfondita della cache richiede Android Prima l\'accesso a tutti i file.</string>
     <string name="message_cache_system_unavailable">Impossibile confermare la cancellazione della cache. Seleziona un\'app di seguito e apri le relative impostazioni Android per svuotarne la cache.</string>
     <string name="message_whatsapp_not_found">Nessuna cartella multimediale WhatsApp o WhatsApp Business supportata trovata nell\'archivio condiviso.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analizza i metadati dei file di archiviazione condivisa accessibili e, quando necessario per il rilevamento dei duplicati, le impronte digitali dei contenuti sul dispositivo. Queste impronte digitali e file personali più puliti non vengono caricati da Smart Cleaner.\n\nA è richiesto l\'accesso a tutti i file perché la gestione e la manutenzione dei file sono funzionalità fondamentali: scansione e gestione di posta indesiderata, duplicati, file di grandi dimensioni, download, programmi di installazione APK e supporti WhatsApp nello spazio di archiviazione condiviso. Android continua a bloccare le directory dei dati privati ​​protetti di altre app. \n\nUsage Access è facoltativo e viene utilizzato per leggere le statistiche di archiviazione/cache delle app e i timestamp dell\'ultimo utilizzo. App Cache Manager richiama l\'azione ufficiale del sistema di pulizia della cache di Android e Android controlla la conferma richiesta.\n\nGoogle Mobile Ads e la piattaforma di consenso possono elaborare identificatori pubblicitari, diagnostica e scelte di consenso in base alle norme di Google. I file vengono rimossi solo dopo la selezione dell\'utente o la conferma del sistema Android. \n\nSmart Cleaner non include un servizio di segnalazione di arresti anomali di terze parti. I nomi dei file, i percorsi, i contenuti dei file e le impronte digitali duplicate non vengono caricati per la segnalazione degli arresti anomali. \n\nSmart Cleaner mantiene le preferenze e aggrega la cronologia di scansione/pulizia solo nell\'archivio locale dell\'app finché non cancelli i dati dell\'app o non disinstalli l\'app. I file eliminati esplicitamente vengono rimossi tramite Android e non possono essere ripristinati da Smart Cleaner. Google conserva i dati che elabora in base alle norme pubblicate.\n\nPer mostrare annunci, il Google Mobile Ads SDK elabora l\'indirizzo IP (per stimare la posizione approssimativa), l\'ID pubblicità o l\'ID del gruppo di app, le interazioni con l\'app e i dati diagnostici. L\'app non invia fuori dal dispositivo nomi o contenuti dei file né termini di ricerca.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analizza i metadati dei file di archiviazione condivisa accessibili e, quando necessario per il rilevamento dei duplicati, le impronte digitali dei contenuti sul dispositivo. Queste impronte digitali e file personali più puliti non vengono caricati da Smart Cleaner.\n\nA è richiesto l\'accesso a tutti i file perché la gestione e la manutenzione dei file sono funzionalità fondamentali: scansione e gestione di posta indesiderata, duplicati, file di grandi dimensioni, download, programmi di installazione APK e supporti WhatsApp nello spazio di archiviazione condiviso. Android continua a bloccare le directory dei dati privati ​​protetti di altre app. \n\nUsage Access è facoltativo e viene utilizzato per leggere le statistiche di archiviazione/cache delle app e i timestamp dell\'ultimo utilizzo. App Cache Manager richiama l\'azione ufficiale del sistema di pulizia della cache di Android e Android controlla la conferma richiesta.\n\nGoogle Mobile Ads e la piattaforma di consenso possono elaborare identificatori pubblicitari, diagnostica e scelte di consenso in base alle norme di Google. I file vengono rimossi solo dopo la selezione dell\'utente o la conferma del sistema Android. \n\nSmart Cleaner non include un servizio di segnalazione di arresti anomali di terze parti. I nomi dei file, i percorsi, i contenuti dei file e le impronte digitali duplicate non vengono caricati per la segnalazione degli arresti anomali. \n\nSmart Cleaner mantiene le preferenze e aggrega la cronologia di scansione/pulizia solo nell\'archivio locale dell\'app finché non cancelli i dati dell\'app o non disinstalli l\'app. La maggior parte dei file che pulisci passa prima nel Cestino di Smart Cleaner su questo dispositivo e può essere ripristinata lì per 7 giorni; i file eliminati definitivamente e il Cestino già svuotato non possono essere ripristinati. Google conserva i dati che elabora in base alle norme pubblicate.\n\nPer mostrare annunci, il Google Mobile Ads SDK elabora l\'indirizzo IP (per stimare la posizione approssimativa), l\'ID pubblicità o l\'ID del gruppo di app, le interazioni con l\'app e i dati diagnostici. L\'app non invia fuori dal dispositivo nomi o contenuti dei file né termini di ricerca.</string>
     <plurals name="reason_large_file">
         <item quantity="one">File di grandi dimensioni • Età in giorni: %1$d</item>
         <item quantity="many">File di grandi dimensioni • Età in giorni: %1$d</item>
@@ -555,11 +555,6 @@
     <string name="swipe_grid_view">Vista a griglia</string>
     <string name="swipe_review_view">Revisione a scorrimento</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Elementi: %1$d · %2$s</item>
-        <item quantity="many">Elementi: %1$d · %2$s</item>
-        <item quantity="other">Elementi: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">App inutilizzate (%1$d)</item>
         <item quantity="many">App inutilizzate (%1$d)</item>
@@ -659,7 +654,6 @@
         <item quantity="many">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
         <item quantity="other">%1$s va nel Cestino per %2$d giorni. Puoi ripristinarlo fino ad allora.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s pronti da pulire · %2$s da controllare</string>
     <string name="home_saved_checked_recently">Controllato meno di un’ora fa</string>
     <string name="home_saved_details">Mostra dettagli</string>
     <plurals name="home_saved_checked_hours">
@@ -667,4 +661,53 @@
         <item quantity="many">Controllato %1$d ore fa</item>
         <item quantity="other">Controllato %1$d ore fa</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Video WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_old_image">Foto WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_old_audio">Audio WhatsApp meno recenti</string>
+    <string name="plan_group_whatsapp_document">Documenti WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Di %1$d giorno fa. Se lo elimini, non si aprirà nella chat.</item>
+        <item quantity="many">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
+        <item quantity="other">Di %1$d giorni fa. Se lo elimini, non si aprirà nella chat.</item>
+    </plurals>
+    <string name="plan_group_old_video">Video meno recenti</string>
+    <string name="plan_group_system_trash">Già nel cestino di Android</string>
+    <string name="reason_system_trash">L’hai eliminato in Galleria o File. Android lo rimuove dopo circa 30 giorni; eliminarlo qui libera subito lo spazio.</string>
+    <string name="plan_group_raw_copy">Copie RAW delle foto</string>
+    <string name="reason_raw_copy">Hai questa foto anche come %1$s nella stessa cartella. Il file RAW serve solo per la modifica avanzata.</string>
+    <string name="plan_group_other_app_media">Foto e video salvati da altre app</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Salvato da un’altra app %1$d giorno fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+        <item quantity="many">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+        <item quantity="other">Salvato da un’altra app %1$d giorni fa. L’app potrebbe mostrarlo come mancante se lo elimini.</item>
+    </plurals>
+    <string name="plan_up_to_freed">Si possono liberare fino a %1$s</string>
+    <string name="plan_selected_safely">%1$s selezionati in sicurezza</string>
+    <string name="plan_worth_a_look_amount">%1$s da controllare</string>
+    <string name="plan_review_action">Controlla %1$s</string>
+    <string name="plan_small_review">Gruppi più piccoli da controllare</string>
+    <string name="plan_biggest_folders">Cartelle più grandi</string>
+    <string name="plan_largest_apps">App più grandi</string>
+    <string name="plan_largest_apps_access">Consenti l’accesso all’utilizzo per vedere quali app occupano più spazio</string>
+    <string name="result_next_group">Prossimo: %1$s · %2$s</string>
+    <string name="result_review_next">Controlla</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d file della fotocamera va controllato uno per uno</item>
+        <item quantity="many">%1$d file della fotocamera vanno controllati uno per uno</item>
+        <item quantity="other">%1$d file della fotocamera vanno controllati uno per uno</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d file proviene dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+        <item quantity="many">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+        <item quantity="other">%1$d file provengono dalla fotocamera. Il backup nel cloud non viene controllato.</item>
+    </plurals>
+    <string name="settings_kept_files">File che hai deciso di tenere: %1$d</string>
+    <string name="settings_kept_reset">Suggeriscili di nuovo</string>
+    <string name="settings_kept_reset_confirm">Suggerire di nuovo alla prossima scansione tutti i file che hai tenuto?</string>
+    <string name="settings_excluded_title">Cartelle mai suggerite</string>
+    <string name="settings_excluded_remove">Rimuovi</string>
+    <string name="exclude_folder_action">Non suggerire file da questa cartella</string>
+    <string name="message_folder_excluded">I file di %1$s non verranno suggeriti.</string>
+    <string name="message_excluded_folders_full">Puoi escludere fino a 50 cartelle. Rimuovine prima una nelle Impostazioni.</string>
+    <string name="plan_kept_hidden">File tenuti nascosti da questo piano: %1$d</string>
 </resources>

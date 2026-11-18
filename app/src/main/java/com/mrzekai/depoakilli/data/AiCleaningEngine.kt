@@ -34,8 +34,23 @@ class AiCleaningEngine(
         // 1. Protected user data is never a candidate.
         if (StoragePathRules.isProtectedUserDataPath(file.relativePath, file.name)) return null
 
-        // 2. WhatsApp: review only, never Auto.
+        // 1b. Already in Android's trash (V4): review only, deleted right away.
+        if (StoragePathRules.isSystemTrashFile(file.name)) {
+            return assessment(CleanupGroup.SYSTEM_TRASH, modifiedAgeDays(file))
+        }
+        // 1c. Unfinished MediaStore writes: old ones are temporary junk.
+        if (StoragePathRules.isStalePendingFile(file.name)) {
+            val age = modifiedAgeDays(file)
+            return if (age >= CleaningThresholds.TEMP_DAYS && !path.contains("/android/media/")) {
+                assessment(CleanupGroup.TEMP_FILES, age)
+            } else {
+                null
+            }
+        }
+
+        // 2. WhatsApp: review only, never Auto. First match wins (V2).
         if (StoragePathRules.isWhatsAppPath(path)) {
+            if (WHATSAPP_NEVER_FOLDERS.any(path::contains)) return null
             return when {
                 path.contains("/.statuses/") && ageDays >= CleaningThresholds.WHATSAPP_STATUS_DAYS ->
                     assessment(CleanupGroup.WHATSAPP_STATUS, ageDays)
@@ -46,6 +61,14 @@ class AiCleaningEngine(
                 (path.contains("voice notes/") || name.startsWith("ptt-")) &&
                     ageDays >= CleaningThresholds.WHATSAPP_VOICE_DAYS ->
                     assessment(CleanupGroup.WHATSAPP_VOICE, ageDays)
+                isVideo && ageDays >= CleaningThresholds.WHATSAPP_OLD_VIDEO_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_VIDEO, ageDays)
+                mime.startsWith("image/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_IMAGE_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_IMAGE, ageDays)
+                path.contains("/whatsapp documents/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_DOCUMENT_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_DOCUMENT, ageDays)
+                mime.startsWith("audio/") && ageDays >= CleaningThresholds.WHATSAPP_OLD_AUDIO_DAYS ->
+                    assessment(CleanupGroup.WHATSAPP_OLD_AUDIO, ageDays)
                 else -> null
             }
         }
@@ -55,22 +78,23 @@ class AiCleaningEngine(
             return assessment(CleanupGroup.THUMBNAILS, ageDays)
         }
 
-        // 4. Old unfinished downloads.
+        // 4. Old unfinished downloads (Auto: modification time only).
+        val modifiedAge = modifiedAgeDays(file)
         if (
             PARTIAL_DOWNLOAD_EXTENSIONS.any(name::endsWith) &&
             StoragePathRules.isDownloadPath(file.relativePath) &&
-            ageDays >= CleaningThresholds.PARTIAL_DOWNLOAD_DAYS
+            modifiedAge >= CleaningThresholds.PARTIAL_DOWNLOAD_DAYS
         ) {
-            return assessment(CleanupGroup.PARTIAL_DOWNLOADS, ageDays)
+            return assessment(CleanupGroup.PARTIAL_DOWNLOADS, modifiedAge)
         }
 
-        // 5. Old temporary files outside other apps' media folders.
+        // 5. Old temporary files outside other apps' media folders (Auto: modification time only).
         if (
             TEMP_EXTENSIONS.any(name::endsWith) &&
-            ageDays >= CleaningThresholds.TEMP_DAYS &&
+            modifiedAge >= CleaningThresholds.TEMP_DAYS &&
             !path.contains("/android/media/")
         ) {
-            return assessment(CleanupGroup.TEMP_FILES, ageDays)
+            return assessment(CleanupGroup.TEMP_FILES, modifiedAge)
         }
 
         // 6. Installers.
@@ -102,6 +126,26 @@ class AiCleaningEngine(
             ageDays >= CleaningThresholds.LARGE_VIDEO_DAYS
         ) {
             return assessment(CleanupGroup.LARGE_VIDEO, ageDays)
+        }
+
+        // 9b. Older mid-size videos (V3); WhatsApp returned above.
+        if (
+            isVideo &&
+            file.sizeBytes >= CleaningThresholds.OLD_VIDEO_BYTES &&
+            ageDays >= CleaningThresholds.OLD_VIDEO_DAYS
+        ) {
+            return assessment(CleanupGroup.OLD_VIDEO, ageDays)
+        }
+
+        // 9c. Photos and videos saved by other apps (Telegram and similar), V6.
+        // Only image/* and video/*: offline maps, music and game data stay out (B2).
+        if (
+            (isVideo || mime.startsWith("image/")) &&
+            StoragePathRules.isOtherAppMediaPath(file.relativePath) &&
+            file.sizeBytes >= CleaningThresholds.OTHER_APP_MEDIA_BYTES &&
+            ageDays >= CleaningThresholds.OTHER_APP_MEDIA_DAYS
+        ) {
+            return assessment(CleanupGroup.OTHER_APP_MEDIA, ageDays)
         }
 
         // 10. Old downloads.
@@ -198,6 +242,8 @@ class AiCleaningEngine(
      * Screenshots are user-created content, so nothing is ever preselected.
      */
     fun assessFocusedScreenshot(file: IndexedFile): AiAssessment? {
+        // Android's trash and unfinished writes belong to the plan only (B1).
+        if (StoragePathRules.isSystemMarkerFile(file.name)) return null
         val ageDays = ageDays(file)
         val path = StoragePathRules.normalizePath(file.relativePath)
         val name = StoragePathRules.normalizeText(file.name)
@@ -221,6 +267,10 @@ class AiCleaningEngine(
         if (automaticSelectionIsSafe) CleanupGroup.DUPLICATE_SAFE else CleanupGroup.DUPLICATE_PERSONAL,
         ageDays = 0,
     )
+
+    /** RAW file whose processed photo [partnerName] sits next to it (V5). Review only. */
+    fun rawCopyAssessment(file: IndexedFile, partnerName: String): AiAssessment =
+        assessment(CleanupGroup.RAW_COPY, ageDays(file)).copy(reasonArgs = listOf(partnerName))
 
     /** Same size and matching samples only; never selectable as a group. */
     fun sampledDuplicateAssessment(): AiAssessment = assessment(CleanupGroup.DUPLICATE_UNVERIFIED, ageDays = 0)
@@ -270,9 +320,19 @@ class AiCleaningEngine(
         if (uri.scheme != "file") null else uri.path
     }.getOrNull()
 
-    /** Age from the newer of creation and modification time. */
+    /**
+     * Age for review groups: the capture date in the file name when there is
+     * one (survives copying to a new phone), otherwise the modification time (V1).
+     */
     fun ageDays(file: IndexedFile): Long {
-        val reference = maxOf(file.createdAtMillis, file.modifiedAtMillis)
+        val reference = FileNameDate.parse(file.name, nowMillis()) ?: file.modifiedAtMillis
+        return daysSince(reference)
+    }
+
+    /** Age for Auto groups: modification time only, never the name. */
+    fun modifiedAgeDays(file: IndexedFile): Long = daysSince(file.modifiedAtMillis)
+
+    private fun daysSince(reference: Long): Long {
         if (reference <= 0L) return 0
         return TimeUnit.MILLISECONDS.toDays((nowMillis() - reference).coerceAtLeast(0))
     }
@@ -290,6 +350,15 @@ class AiCleaningEngine(
         )
         private val PARTIAL_DOWNLOAD_EXTENSIONS = listOf(".crdownload", ".part", ".download")
         private val TEMP_EXTENSIONS = listOf(".tmp", ".temp")
+
+        /** WhatsApp folders that are never offered: stickers, profile photos, chat data. */
+        private val WHATSAPP_NEVER_FOLDERS = listOf(
+            "/whatsapp stickers/",
+            "/whatsapp profile photos/",
+            "/whatsapp business profile photos/",
+            "/databases/",
+            "/backups/",
+        )
         private val SCREEN_RECORDING_FOLDERS = listOf(
             "/screenrecord",
             "/screen recordings/",
@@ -305,6 +374,7 @@ class AiCleaningEngine(
 
         fun categoryOf(group: CleanupGroup): CleanCategory = when (group) {
             CleanupGroup.THUMBNAILS,
+            CleanupGroup.SYSTEM_TRASH,
             CleanupGroup.TEMP_FILES,
             CleanupGroup.PARTIAL_DOWNLOADS -> CleanCategory.JUNK
             CleanupGroup.APK_INSTALLED,
@@ -314,6 +384,9 @@ class AiCleaningEngine(
             CleanupGroup.DUPLICATE_PERSONAL,
             CleanupGroup.DUPLICATE_UNVERIFIED -> CleanCategory.DUPLICATE
             CleanupGroup.LARGE_VIDEO,
+            CleanupGroup.OLD_VIDEO,
+            CleanupGroup.RAW_COPY,
+            CleanupGroup.OTHER_APP_MEDIA,
             CleanupGroup.SCREEN_RECORDING,
             CleanupGroup.LARGE_OTHER -> CleanCategory.LARGE_FILE
             CleanupGroup.SCREENSHOT -> CleanCategory.SCREENSHOT
@@ -322,7 +395,11 @@ class AiCleaningEngine(
             CleanupGroup.WHATSAPP_SENT,
             CleanupGroup.WHATSAPP_VIDEO,
             CleanupGroup.WHATSAPP_VOICE,
-            CleanupGroup.WHATSAPP_STATUS -> CleanCategory.WHATSAPP_MEDIA
+            CleanupGroup.WHATSAPP_STATUS,
+            CleanupGroup.WHATSAPP_OLD_VIDEO,
+            CleanupGroup.WHATSAPP_OLD_IMAGE,
+            CleanupGroup.WHATSAPP_OLD_AUDIO,
+            CleanupGroup.WHATSAPP_DOCUMENT -> CleanCategory.WHATSAPP_MEDIA
         }
     }
 }

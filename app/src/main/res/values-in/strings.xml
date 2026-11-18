@@ -144,7 +144,7 @@
     <string name="message_all_files_required_for_cache">Pembersihan cache mendalam memerlukan Android Semua file diakses terlebih dahulu.</string>
     <string name="message_cache_system_unavailable">Pembersihan cache tidak dapat dikonfirmasi. Pilih aplikasi di bawah dan buka pengaturan Android untuk menghapus cache-nya.</string>
     <string name="message_whatsapp_not_found">Tidak ditemukan folder Media WhatsApp atau WhatsApp Business yang didukung di penyimpanan bersama.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner menganalisis metadata file penyimpanan bersama yang dapat diakses dan, bila diperlukan untuk deteksi duplikat, sidik jari konten pada perangkat. Sidik jari mesin yang lebih bersih dan file pribadi ini tidak diunggah oleh Smart Cleaner.\n\nASemua akses file diminta karena manajemen dan pemeliharaan file adalah fitur inti: memindai dan mengelola sampah, duplikat, file besar, unduhan, penginstal APK, dan media WhatsApp di seluruh penyimpanan bersama. Android terus memblokir direktori data pribadi aplikasi lain yang dilindungi. \n\nAkses Penggunaan bersifat opsional dan digunakan untuk membaca statistik penyimpanan/cache aplikasi dan stempel waktu yang terakhir digunakan. Pengelola Cache Aplikasi memanggil tindakan sistem pembersihan cache resmi Android dan Android mengontrol konfirmasi yang diperlukan. \n\nIklan Seluler Google dan platform izin dapat memproses pengidentifikasi iklan, diagnostik, dan pilihan izin berdasarkan kebijakan Google. File dihapus hanya setelah pemilihan pengguna atau konfirmasi sistem Android. \n\nSmart Cleaner tidak menyertakan layanan pelaporan kerusakan pihak ketiga. Nama file, jalur, konten file, dan sidik jari duplikat tidak diunggah untuk pelaporan kerusakan. \n\nSmart Cleaner menyimpan preferensi dan riwayat pemindaian/pembersihan agregat hanya di penyimpanan aplikasi lokal hingga Anda menghapus data aplikasi atau menghapus instalan aplikasi. File yang Anda hapus secara eksplisit akan dihapus melalui Android dan tidak dapat dipulihkan oleh Smart Cleaner. Google menyimpan data yang diprosesnya berdasarkan kebijakan yang dipublikasikan.\n\nSDK Google Mobile Ads memproses alamat IP (untuk memperkirakan lokasi), ID iklan atau ID set aplikasi, interaksi aplikasi, dan data diagnostik untuk menampilkan iklan. Aplikasi ini tidak mengirim nama atau isi file maupun istilah pencarian ke luar perangkat.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner menganalisis metadata file penyimpanan bersama yang dapat diakses dan, bila diperlukan untuk deteksi duplikat, sidik jari konten pada perangkat. Sidik jari mesin yang lebih bersih dan file pribadi ini tidak diunggah oleh Smart Cleaner.\n\nASemua akses file diminta karena manajemen dan pemeliharaan file adalah fitur inti: memindai dan mengelola sampah, duplikat, file besar, unduhan, penginstal APK, dan media WhatsApp di seluruh penyimpanan bersama. Android terus memblokir direktori data pribadi aplikasi lain yang dilindungi. \n\nAkses Penggunaan bersifat opsional dan digunakan untuk membaca statistik penyimpanan/cache aplikasi dan stempel waktu yang terakhir digunakan. Pengelola Cache Aplikasi memanggil tindakan sistem pembersihan cache resmi Android dan Android mengontrol konfirmasi yang diperlukan. \n\nIklan Seluler Google dan platform izin dapat memproses pengidentifikasi iklan, diagnostik, dan pilihan izin berdasarkan kebijakan Google. File dihapus hanya setelah pemilihan pengguna atau konfirmasi sistem Android. \n\nSmart Cleaner tidak menyertakan layanan pelaporan kerusakan pihak ketiga. Nama file, jalur, konten file, dan sidik jari duplikat tidak diunggah untuk pelaporan kerusakan. \n\nSmart Cleaner menyimpan preferensi dan riwayat pemindaian/pembersihan agregat hanya di penyimpanan aplikasi lokal hingga Anda menghapus data aplikasi atau menghapus instalan aplikasi. Sebagian besar file yang Anda bersihkan dipindahkan dulu ke Sampah Smart Cleaner di perangkat ini dan dapat dipulihkan di sana selama 7 hari; file yang dihapus permanen dan Sampah yang sudah dikosongkan tidak dapat dipulihkan. Google menyimpan data yang diprosesnya berdasarkan kebijakan yang dipublikasikan.\n\nSDK Google Mobile Ads memproses alamat IP (untuk memperkirakan lokasi), ID iklan atau ID set aplikasi, interaksi aplikasi, dan data diagnostik untuk menampilkan iklan. Aplikasi ini tidak mengirim nama atau isi file maupun istilah pencarian ke luar perangkat.</string>
     <plurals name="reason_large_file">
         <item quantity="other">File besar • Usia dalam hari: %1$d</item>
     </plurals>
@@ -511,9 +511,6 @@
     <string name="swipe_grid_view">Tampilan petak</string>
     <string name="swipe_review_view">Tinjau dengan geser</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="other">%1$d item · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="other">Aplikasi tak terpakai (%1$d)</item>
     </plurals>
@@ -581,10 +578,50 @@
     <plurals name="delete_confirm_trash">
         <item quantity="other">%1$s dipindahkan ke Sampah selama %2$d hari. Kamu bisa memulihkannya sampai saat itu.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s siap dibersihkan · %2$s layak dicek</string>
     <string name="home_saved_checked_recently">Dicek kurang dari satu jam lalu</string>
     <string name="home_saved_details">Lihat detail</string>
     <plurals name="home_saved_checked_hours">
         <item quantity="other">Dicek %1$d jam lalu</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Video WhatsApp lama</string>
+    <string name="plan_group_whatsapp_old_image">Foto WhatsApp lama</string>
+    <string name="plan_group_whatsapp_old_audio">Audio WhatsApp lama</string>
+    <string name="plan_group_whatsapp_document">Dokumen WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="other">Berusia %1$d hari. Jika dihapus, file tidak akan terbuka di chat.</item>
+    </plurals>
+    <string name="plan_group_old_video">Video lama</string>
+    <string name="plan_group_system_trash">Sudah di sampah Android</string>
+    <string name="reason_system_trash">Anda menghapus ini di Galeri atau File. Android menghapusnya setelah sekitar 30 hari; menghapusnya di sini mengosongkan ruang sekarang.</string>
+    <string name="plan_group_raw_copy">Salinan RAW foto</string>
+    <string name="reason_raw_copy">Foto ini juga ada sebagai %1$s di folder yang sama. File RAW hanya diperlukan untuk pengeditan lanjutan.</string>
+    <string name="plan_group_other_app_media">Foto dan video yang disimpan aplikasi lain</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="other">Disimpan oleh aplikasi lain %1$d hari lalu. Aplikasi itu mungkin menampilkannya sebagai hilang jika dihapus.</item>
+    </plurals>
+    <string name="plan_up_to_freed">Hingga %1$s dapat dikosongkan</string>
+    <string name="plan_selected_safely">%1$s dipilih dengan aman</string>
+    <string name="plan_worth_a_look_amount">%1$s layak dicek</string>
+    <string name="plan_review_action">Tinjau %1$s</string>
+    <string name="plan_small_review">Grup kecil untuk dicek</string>
+    <string name="plan_biggest_folders">Folder terbesar</string>
+    <string name="plan_largest_apps">Aplikasi terbesar</string>
+    <string name="plan_largest_apps_access">Izinkan Akses Penggunaan untuk melihat aplikasi yang paling banyak memakai ruang</string>
+    <string name="result_next_group">Berikutnya: %1$s · %2$s</string>
+    <string name="result_review_next">Tinjau</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="other">%1$d file dari kamera perlu dicek satu per satu</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="other">%1$d file berasal dari kamera Anda. Cadangan cloud tidak diperiksa.</item>
+    </plurals>
+    <string name="settings_kept_files">File yang Anda pilih untuk disimpan: %1$d</string>
+    <string name="settings_kept_reset">Sarankan lagi</string>
+    <string name="settings_kept_reset_confirm">Sarankan lagi semua file yang Anda simpan pada pemindaian berikutnya?</string>
+    <string name="settings_excluded_title">Folder yang tidak pernah disarankan</string>
+    <string name="settings_excluded_remove">Hapus</string>
+    <string name="exclude_folder_action">Jangan sarankan file dari folder ini</string>
+    <string name="message_folder_excluded">File dari %1$s tidak akan disarankan.</string>
+    <string name="message_excluded_folders_full">Anda dapat mengecualikan hingga 50 folder. Hapus satu di Pengaturan terlebih dahulu.</string>
+    <string name="plan_kept_hidden">File yang disimpan dan disembunyikan dari rencana ini: %1$d</string>
 </resources>

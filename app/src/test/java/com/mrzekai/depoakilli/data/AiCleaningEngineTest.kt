@@ -55,8 +55,93 @@ class AiCleaningEngineTest {
     }
 
     @Test
+    fun `android trash files are offered for review and old pending writes are junk`() {
+        val trashed = requireNotNull(engine.assess(file(".trashed-1767225600-IMG_1.jpg", "image/jpeg", 3, "DCIM/Camera/")))
+        assertEquals(CleanupGroup.SYSTEM_TRASH, trashed.group)
+        assertFalse(trashed.recommended)
+        assertEquals(com.mrzekai.depoakilli.model.DeleteMode.PERMANENT, CleanupGroup.SYSTEM_TRASH.deleteMode)
+        assertNull(group(file(".pending-1767225600-a.jpg", "image/jpeg", 6, "DCIM/Camera/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file(".pending-1767225600-a.jpg", "image/jpeg", 7, "DCIM/Camera/")))
+    }
+
+    @Test
+    fun `android trash files stay out of the screenshots tool and storage lists`() {
+        val trashed = file(".trashed-1767225600-Screenshot_1.png", "image/png", 40, "Pictures/Screenshots/")
+        assertNull(engine.assessFocusedScreenshot(trashed))
+        val visible = StoragePathRules.visibleInStorageLists(
+            listOf(trashed, file("Screenshot_2.png", "image/png", 40, "Pictures/Screenshots/"), file(".pending-1-a.jpg", "image/jpeg", 1, "DCIM/")),
+            IndexedFile::name,
+        )
+        assertEquals(listOf("Screenshot_2.png"), visible.map(IndexedFile::name))
+    }
+
+    @Test
+    fun `raw copies are review only and name their partner`() {
+        val raw = file("IMG_1.dng", "image/x-adobe-dng", 30, "DCIM/Camera/", 25 * mb)
+        assertNull(engine.assess(raw))
+        val assessment = engine.rawCopyAssessment(raw, "IMG_1.jpg")
+        assertEquals(CleanupGroup.RAW_COPY, assessment.group)
+        assertFalse(assessment.recommended)
+        assertEquals(listOf<Any>("IMG_1.jpg"), assessment.reasonArgs)
+    }
+
+    @Test
+    fun `media saved by other apps is offered for review`() {
+        val tg = "Android/media/org.telegram.messenger/Telegram/Telegram Video/"
+        assertEquals(CleanupGroup.OTHER_APP_MEDIA, group(file("x.mp4", "video/mp4", 120, tg, 30 * mb)))
+        assertEquals(CleanupGroup.OTHER_APP_MEDIA, group(file("x.jpg", "image/jpeg", 90, "Telegram/Telegram Images/", 5 * mb)))
+        assertNull(group(file("x.jpg", "image/jpeg", 89, "Telegram/Telegram Images/", 5 * mb)))
+        assertNull(group(file("x.jpg", "image/jpeg", 200, "Telegram/Telegram Images/", 5 * mb - 1)))
+        assertFalse(CleanupGroup.OTHER_APP_MEDIA.auto)
+        assertFalse(CleanupGroup.OTHER_APP_MEDIA.groupSelectable)
+        val app = "Android/media/net.osmand/files/"
+        assertNull(group(file("tr.obf", "application/octet-stream", 200, app, 300 * mb)).takeIf { it == CleanupGroup.OTHER_APP_MEDIA })
+        assertNull(group(file("song.mp3", "audio/mpeg", 200, app, 8 * mb)))
+        assertNull(group(file("save.db", "application/octet-stream", 200, app, 8 * mb)))
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/com.whatsapp/WhatsApp/Media/"))
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Android/media/"))
+        assertFalse(StoragePathRules.isOtherAppMediaPath("Pictures/Telegram/"))
+    }
+
+    @Test
+    fun `older mid-size videos are offered after large old videos`() {
+        val cam = "DCIM/Camera/"
+        assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 200, cam, 40 * mb)))
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(file("v.mp4", "video/mp4", 100, cam, 150 * mb)))
+        assertNull(group(file("v.mp4", "video/mp4", 179, cam, 40 * mb)))
+        assertNull(group(file("v.mp4", "video/mp4", 200, cam, 20 * mb - 1)))
+        assertEquals(CleanupGroup.OLD_VIDEO, group(file("v.mp4", "video/mp4", 180, cam, 20 * mb)))
+        assertFalse(CleanupGroup.OLD_VIDEO.auto)
+    }
+
+    @Test
+    fun `older whatsapp media groups use their age thresholds`() {
+        val wa = "Android/media/com.whatsapp/WhatsApp/Media/"
+        assertNull(group(file("v.mp4", "video/mp4", 89, wa + "WhatsApp Video/", 5 * mb)))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_VIDEO, group(file("v.mp4", "video/mp4", 90, wa + "WhatsApp Video/", 5 * mb)))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_VIDEO, group(file("v.mp4", "video/mp4", 100, wa + "WhatsApp Video/", 5 * mb)))
+        assertNull(group(file("p.jpg", "image/jpeg", 179, wa + "WhatsApp Images/")))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_IMAGE, group(file("p.jpg", "image/jpeg", 180, wa + "WhatsApp Images/")))
+        assertNull(group(file("d.pdf", "application/pdf", 89, wa + "WhatsApp Documents/")))
+        assertEquals(CleanupGroup.WHATSAPP_DOCUMENT, group(file("d.pdf", "application/pdf", 90, wa + "WhatsApp Documents/")))
+        assertNull(group(file("a.mp3", "audio/mpeg", 179, wa + "WhatsApp Audio/")))
+        assertEquals(CleanupGroup.WHATSAPP_OLD_AUDIO, group(file("a.mp3", "audio/mpeg", 180, wa + "WhatsApp Audio/")))
+        // Priority: an old video in Sent stays a sent item.
+        assertEquals(CleanupGroup.WHATSAPP_SENT, group(file("v.mp4", "video/mp4", 200, wa + "WhatsApp Video/Sent/", 5 * mb)))
+        // Stickers, profile photos and chat data are never offered.
+        assertNull(group(file("s.webp", "image/webp", 900, wa + "WhatsApp Stickers/")))
+        assertNull(group(file("p.jpg", "image/jpeg", 900, wa + "WhatsApp Profile Photos/")))
+        assertNull(group(file("msgstore.db.crypt14", "application/octet-stream", 900, "Android/media/com.whatsapp/WhatsApp/Databases/")))
+        assertNull(group(file("backup.crypt14", "application/octet-stream", 900, "Android/media/com.whatsapp/WhatsApp/Backups/")))
+        for (g in listOf(CleanupGroup.WHATSAPP_OLD_VIDEO, CleanupGroup.WHATSAPP_OLD_IMAGE, CleanupGroup.WHATSAPP_OLD_AUDIO, CleanupGroup.WHATSAPP_DOCUMENT)) {
+            assertFalse(g.auto)
+        }
+        assertFalse(CleanupGroup.WHATSAPP_DOCUMENT.groupSelectable)
+    }
+
+    @Test
     fun `other whatsapp media is never a candidate and nothing in whatsapp is auto`() {
-        assertNull(group(file("photo.jpg", "image/jpeg", 900, "WhatsApp/Media/WhatsApp Images/")))
+        assertNull(group(file("photo.jpg", "image/jpeg", 179, "WhatsApp/Media/WhatsApp Images/")))
         val all = listOf(
             file("s.jpg", "image/jpeg", 5, "WhatsApp/Media/.Statuses/"),
             file("a.jpg", "image/jpeg", 50, "WhatsApp/Media/WhatsApp Images/Sent/"),
@@ -216,9 +301,20 @@ class AiCleaningEngineTest {
     }
 
     @Test
-    fun `age uses the newer of creation and modification time`() {
-        val copied = file("a.zip", "application/zip", 400).copy(createdAtMillis = now - TimeUnit.DAYS.toMillis(5))
-        assertNull(engine.assess(copied))
+    fun `age comes from the date in the name before the modification time`() {
+        // Copied to a new phone yesterday, but filmed in 2023: the name decides.
+        val copied = file("VID_20230611_120000.mp4", "video/mp4", 1, "DCIM/Camera/", 150 * mb)
+        assertEquals(CleanupGroup.LARGE_VIDEO, group(copied))
+        assertTrue(engine.ageDays(copied) > 365)
+        // No date in the name: the modification time is used.
+        assertEquals(1L, engine.ageDays(file("clip.mp4", "video/mp4", 1, "DCIM/Camera/")))
+    }
+
+    @Test
+    fun `auto groups ignore the date in the name`() {
+        // A temporary file named with an old date but modified yesterday stays out.
+        assertNull(group(file("cache_20200101.tmp", "application/octet-stream", 1, "Documents/")))
+        assertEquals(CleanupGroup.TEMP_FILES, group(file("cache_20200101.tmp", "application/octet-stream", 7, "Documents/")))
     }
 
     @Test

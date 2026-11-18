@@ -174,7 +174,7 @@
     <string name="message_all_files_required_for_cache">يتطلب التنظيف العميق لذاكرة التخزين المؤقت الوصول إلى جميع الملفات Android أولاً.</string>
     <string name="message_cache_system_unavailable">لا يمكن تأكيد مسح ذاكرة التخزين المؤقت. حدد أحد التطبيقات أدناه وافتح إعدادات Android لمسح ذاكرة التخزين المؤقت الخاصة به.</string>
     <string name="message_whatsapp_not_found">لم يتم العثور على مجلد وسائط WhatsApp أو WhatsApp Business مدعوم في وحدة التخزين المشتركة.</string>
-    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nقد تعالج Google Mobile Ads ومنصة الموافقة معرّفات الإعلانات وبيانات التشخيص وخيارات الموافقة وفق سياسات Google. تختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تُحذف الملفات التي تختار حذفها صراحةً عبر Android، ولا يستطيع Smart Cleaner استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.\n\nتعالج حزمة Google Mobile Ads عنوان IP لتقدير الموقع التقريبي، ومعرّف الإعلان أو معرّف مجموعة التطبيقات، وتفاعلات التطبيق وبيانات التشخيص لعرض الإعلانات. لا يرسل التطبيق نفسه أسماء الملفات أو محتوياتها أو عبارات البحث خارج الجهاز.</string>
+    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nقد تعالج Google Mobile Ads ومنصة الموافقة معرّفات الإعلانات وبيانات التشخيص وخيارات الموافقة وفق سياسات Google. تختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تنتقل معظم الملفات التي تنظفها أولًا إلى سلة مهملات Smart Cleaner على هذا الجهاز ويمكن استعادتها منها خلال 7 أيام؛ أما الملفات المحذوفة نهائيًا وسلة المهملات بعد إفراغها فلا يمكن استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.\n\nتعالج حزمة Google Mobile Ads عنوان IP لتقدير الموقع التقريبي، ومعرّف الإعلان أو معرّف مجموعة التطبيقات، وتفاعلات التطبيق وبيانات التشخيص لعرض الإعلانات. لا يرسل التطبيق نفسه أسماء الملفات أو محتوياتها أو عبارات البحث خارج الجهاز.</string>
     <plurals name="reason_large_file">
         <item quantity="zero">ملف كبير • العمر بالأيام: %1$d</item>
         <item quantity="one">ملف كبير • العمر بالأيام: %1$d</item>
@@ -623,14 +623,6 @@
     <string name="swipe_grid_view">عرض الشبكة</string>
     <string name="swipe_review_view">المراجعة بالسحب</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="zero">العناصر: %1$d · %2$s</item>
-        <item quantity="one">العناصر: %1$d · %2$s</item>
-        <item quantity="two">العناصر: %1$d · %2$s</item>
-        <item quantity="few">العناصر: %1$d · %2$s</item>
-        <item quantity="many">العناصر: %1$d · %2$s</item>
-        <item quantity="other">العناصر: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="zero">تطبيقات غير مستخدمة (%1$d)</item>
         <item quantity="one">تطبيقات غير مستخدمة (%1$d)</item>
@@ -784,8 +776,6 @@
         <item quantity="many">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
         <item quantity="other">سيتم نقل %1$s إلى سلة المهملات لمدة %2$d يوم. يمكنك استعادتها حتى ذلك الحين.</item>
     </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="home_saved_totals">%1$s جاهزة للتنظيف · %2$s تستحق المراجعة</string>
     <string name="home_saved_checked_recently">تم الفحص قبل أقل من ساعة</string>
     <string name="home_saved_details">عرض التفاصيل</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -797,4 +787,73 @@
         <item quantity="many">تم الفحص قبل %1$d ساعة</item>
         <item quantity="other">تم الفحص قبل %1$d ساعة</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">مقاطع فيديو WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_old_image">صور WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_old_audio">ملفات صوت WhatsApp أقدم</string>
+    <string name="plan_group_whatsapp_document">مستندات WhatsApp</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="reason_whatsapp_old">
+        <item quantity="zero">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="one">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="two">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="few">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="many">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+        <item quantity="other">العمر بالأيام: %1$d. إذا حذفته فلن يُفتح في المحادثة.</item>
+    </plurals>
+    <string name="plan_group_old_video">مقاطع فيديو أقدم</string>
+    <string name="plan_group_system_trash">موجودة بالفعل في سلة مهملات Android</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_system_trash">حذفت هذا في المعرض أو الملفات. يزيله Android بعد نحو 30 يومًا؛ حذفه هنا يحرر المساحة الآن.</string>
+    <string name="plan_group_raw_copy">نسخ RAW من الصور</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="reason_raw_copy">لديك هذه الصورة أيضًا باسم %1$s في المجلد نفسه. ملف RAW مطلوب فقط للتحرير المتقدم.</string>
+    <string name="plan_group_other_app_media">صور ومقاطع فيديو حفظتها تطبيقات أخرى</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="reason_other_app_media">
+        <item quantity="zero">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="one">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="two">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="few">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="many">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+        <item quantity="other">حفظه تطبيق آخر (منذ أيام: %1$d). قد يظهره التطبيق كمفقود إذا حذفته.</item>
+    </plurals>
+    <string name="plan_up_to_freed">يمكن تحرير ما يصل إلى %1$s</string>
+    <string name="plan_selected_safely">%1$s محددة بأمان</string>
+    <string name="plan_worth_a_look_amount">%1$s تستحق المراجعة</string>
+    <string name="plan_review_action">مراجعة %1$s</string>
+    <string name="plan_small_review">مجموعات أصغر للمراجعة</string>
+    <string name="plan_biggest_folders">أكبر المجلدات</string>
+    <string name="plan_largest_apps">أكبر التطبيقات</string>
+    <string name="plan_largest_apps_access">اسمح بالوصول إلى بيانات الاستخدام لمعرفة التطبيقات التي تستهلك أكبر مساحة</string>
+    <string name="result_next_group">التالي: %1$s · %2$s</string>
+    <string name="result_review_next">مراجعة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="zero">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="one">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="two">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="few">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="many">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+        <item quantity="other">ملفات الكاميرا (%1$d) تحتاج إلى مراجعة واحدًا تلو الآخر</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_preview_camera">
+        <item quantity="zero">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="one">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="two">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="few">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="many">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+        <item quantity="other">ملفات من الكاميرا: %1$d. لا يتم التحقق من النسخ الاحتياطي السحابي.</item>
+    </plurals>
+    <string name="settings_kept_files">الملفات التي اخترت الاحتفاظ بها: %1$d</string>
+    <string name="settings_kept_reset">اقترحها مجددًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="settings_kept_reset_confirm">هل تريد اقتراح كل الملفات التي احتفظت بها مجددًا في الفحص التالي؟</string>
+    <string name="settings_excluded_title">مجلدات لا يتم اقتراحها أبدًا</string>
+    <string name="settings_excluded_remove">إزالة</string>
+    <string name="exclude_folder_action">لا تقترح ملفات من هذا المجلد</string>
+    <string name="message_folder_excluded">لن يتم اقتراح الملفات من %1$s.</string>
+    <string name="message_excluded_folders_full">يمكنك استبعاد 50 مجلدًا كحد أقصى. أزل مجلدًا من الإعدادات أولًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_kept_hidden">الملفات المحتفظ بها والمخفية من هذه الخطة: %1$d</string>
 </resources>

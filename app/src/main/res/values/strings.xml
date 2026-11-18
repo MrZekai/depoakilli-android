@@ -149,7 +149,7 @@
     <string name="message_all_files_required_for_cache">Deep cache cleanup requires Android All files access first.</string>
     <string name="message_cache_system_unavailable">Cache clearing could not be confirmed. Select an app below and open its Android settings to clear its cache.</string>
     <string name="message_whatsapp_not_found">No supported WhatsApp or WhatsApp Business Media folder was found in shared storage.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. App Cache Manager invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Files you explicitly delete are removed through Android and cannot be restored by Smart Cleaner. Google retains data it processes under its published policies.\n\nGoogle Mobile Ads SDK processes IP address (to estimate approximate location), advertising ID or app set ID, app interactions and diagnostic data to display ads. The app itself does not send file names, file contents or search terms off the device.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. App Cache Manager invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Most files you clean first move to Smart Cleaner’s Trash on this device and can be restored there for 7 days; files deleted permanently, and Trash once it is emptied, cannot be restored. Google retains data it processes under its published policies.\n\nGoogle Mobile Ads SDK processes IP address (to estimate approximate location), advertising ID or app set ID, app interactions and diagnostic data to display ads. The app itself does not send file names, file contents or search terms off the device.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Large file • Age in days: %1$d</item>
         <item quantity="other">Large file • Age in days: %1$d</item>
@@ -549,10 +549,6 @@
     <string name="swipe_grid_view">Grid view</string>
     <string name="swipe_review_view">Swipe review</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">%1$d item · %2$s</item>
-        <item quantity="other">%1$d items · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Unused apps (%1$d)</item>
         <item quantity="other">Unused apps (%1$d)</item>
@@ -631,11 +627,55 @@
         <item quantity="one">%1$s goes to Trash for %2$d day. You can restore it until then.</item>
         <item quantity="other">%1$s goes to Trash for %2$d days. You can restore it until then.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s ready to clean · %2$s worth a look</string>
     <string name="home_saved_checked_recently">Checked less than an hour ago</string>
     <string name="home_saved_details">Show details</string>
     <plurals name="home_saved_checked_hours">
         <item quantity="one">Checked %1$d hour ago</item>
         <item quantity="other">Checked %1$d hours ago</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Older WhatsApp videos</string>
+    <string name="plan_group_whatsapp_old_image">Older WhatsApp photos</string>
+    <string name="plan_group_whatsapp_old_audio">Older WhatsApp audio</string>
+    <string name="plan_group_whatsapp_document">WhatsApp documents</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">%1$d day old. If you delete it, it won’t open in the chat.</item>
+        <item quantity="other">%1$d days old. If you delete it, it won’t open in the chat.</item>
+    </plurals>
+    <string name="plan_group_old_video">Older videos</string>
+    <string name="plan_group_system_trash">Already in Android’s trash</string>
+    <string name="reason_system_trash">You deleted this in Gallery or Files. Android removes it after about 30 days; deleting it here frees the space now.</string>
+    <string name="plan_group_raw_copy">RAW copies of photos</string>
+    <string name="reason_raw_copy">You also have this photo as %1$s in the same folder. The RAW file is only needed for advanced editing.</string>
+    <string name="plan_group_other_app_media">Photos and videos saved by other apps</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Saved by another app %1$d day ago. The app may show it as missing if you delete it.</item>
+        <item quantity="other">Saved by another app %1$d days ago. The app may show it as missing if you delete it.</item>
+    </plurals>
+    <string name="plan_up_to_freed">Up to %1$s can be freed</string>
+    <string name="plan_selected_safely">%1$s selected safely</string>
+    <string name="plan_worth_a_look_amount">%1$s worth a look</string>
+    <string name="plan_review_action">Review %1$s</string>
+    <string name="plan_small_review">Smaller groups to check</string>
+    <string name="plan_biggest_folders">Biggest folders</string>
+    <string name="plan_largest_apps">Largest apps</string>
+    <string name="plan_largest_apps_access">Allow Usage Access to see which apps use the most space</string>
+    <string name="result_next_group">Next: %1$s · %2$s</string>
+    <string name="result_review_next">Review</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d file from your camera needs a one-by-one look</item>
+        <item quantity="other">%1$d files from your camera need a one-by-one look</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d file is from your camera. Cloud backup isn’t checked.</item>
+        <item quantity="other">%1$d files are from your camera. Cloud backup isn’t checked.</item>
+    </plurals>
+    <string name="settings_kept_files">Files you chose to keep: %1$d</string>
+    <string name="settings_kept_reset">Suggest them again</string>
+    <string name="settings_kept_reset_confirm">Suggest every file you kept again in the next scan?</string>
+    <string name="settings_excluded_title">Folders that are never suggested</string>
+    <string name="settings_excluded_remove">Remove</string>
+    <string name="exclude_folder_action">Don’t suggest files from this folder</string>
+    <string name="message_folder_excluded">Files from %1$s won’t be suggested.</string>
+    <string name="message_excluded_folders_full">You can exclude up to 50 folders. Remove one in Settings first.</string>
+    <string name="plan_kept_hidden">Kept files hidden from this plan: %1$d</string>
 </resources>

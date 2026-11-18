@@ -153,7 +153,7 @@
     <string name="message_all_files_required_for_cache">La limpieza profunda de caché requiere primero el acceso a todos los archivos de Android.</string>
     <string name="message_cache_system_unavailable">No se pudo confirmar la limpieza de la caché. Selecciona una aplicación de abajo y abre sus ajustes de Android para borrarla.</string>
     <string name="message_whatsapp_not_found">No se encontró ninguna carpeta de contenido multimedia de WhatsApp o WhatsApp Business compatible en el almacenamiento compartido.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. El Gestor de caché de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. Los archivos que elimines explícitamente se eliminan mediante Android y Smart Cleaner no puede restaurarlos. Google conserva los datos que procesa según sus políticas publicadas.\n\nEl SDK de Google Mobile Ads procesa la dirección IP (para estimar la ubicación aproximada), el identificador de publicidad o de conjunto de aplicaciones, las interacciones con la aplicación y los datos de diagnóstico para mostrar anuncios. La aplicación no envía nombres ni contenido de archivos ni términos de búsqueda fuera del dispositivo.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analiza los metadatos de archivos del almacenamiento compartido accesible y, cuando es necesario para la detección de duplicados, huellas digitales de contenido en el dispositivo. Smart Cleaner no sube estas huellas digitales del motor de limpieza ni los archivos personales.\n\nSe solicita el acceso a todos los archivos porque la gestión y el mantenimiento de archivos son funciones principales: analizar y gestionar archivos basura, duplicados, archivos grandes, descargas, instaladores APK y contenido multimedia de WhatsApp en el almacenamiento compartido. Android sigue bloqueando los directorios de datos privados protegidos de otras apps.\n\nEl acceso de uso es opcional y se usa para leer estadísticas de almacenamiento/caché de apps y marcas de tiempo de último uso. El Gestor de caché de apps invoca la acción oficial del sistema de limpieza de caché de Android, y Android controla la confirmación requerida.\n\nGoogle Mobile Ads y la plataforma de consentimiento pueden procesar identificadores publicitarios, diagnósticos y opciones de consentimiento según las políticas de Google. Los archivos se eliminan solo después de tu selección o de una confirmación del sistema de Android.\n\nSmart Cleaner no incluye ningún servicio externo de informes de fallos. Los nombres de archivo, rutas, contenidos de archivo y huellas digitales de duplicados no se suben para los informes de fallos.\n\nSmart Cleaner conserva las preferencias y el historial agregado de análisis/limpieza solo en el almacenamiento local de la app hasta que borres los datos de la app o la desinstales. La mayoría de los archivos que limpias pasan primero a la Papelera de Smart Cleaner en este dispositivo y puedes restaurarlos allí durante 7 días; los archivos eliminados de forma permanente y la Papelera ya vaciada no se pueden restaurar. Google conserva los datos que procesa según sus políticas publicadas.\n\nEl SDK de Google Mobile Ads procesa la dirección IP (para estimar la ubicación aproximada), el identificador de publicidad o de conjunto de aplicaciones, las interacciones con la aplicación y los datos de diagnóstico para mostrar anuncios. La aplicación no envía nombres ni contenido de archivos ni términos de búsqueda fuera del dispositivo.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Archivo grande • Antigüedad en días: %1$d</item>
         <item quantity="other">Archivo grande • Antigüedad en días: %1$d</item>
@@ -545,10 +545,6 @@
     <string name="swipe_grid_view">Vista de cuadrícula</string>
     <string name="swipe_review_view">Revisar deslizando</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">Elementos: %1$d · %2$s</item>
-        <item quantity="other">Elementos: %1$d · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Apps sin usar (%1$d)</item>
         <item quantity="other">Apps sin usar (%1$d)</item>
@@ -631,11 +627,55 @@
         <item quantity="one">%1$s irá a la Papelera durante %2$d día. Puedes restaurarlo hasta entonces.</item>
         <item quantity="other">%1$s irá a la Papelera durante %2$d días. Puedes restaurarlo hasta entonces.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s listo para limpiar · %2$s para revisar</string>
     <string name="home_saved_checked_recently">Revisado hace menos de una hora</string>
     <string name="home_saved_details">Ver detalles</string>
     <plurals name="home_saved_checked_hours">
         <item quantity="one">Revisado hace %1$d hora</item>
         <item quantity="other">Revisado hace %1$d horas</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Vídeos antiguos de WhatsApp</string>
+    <string name="plan_group_whatsapp_old_image">Fotos antiguas de WhatsApp</string>
+    <string name="plan_group_whatsapp_old_audio">Audios antiguos de WhatsApp</string>
+    <string name="plan_group_whatsapp_document">Documentos de WhatsApp</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">Tiene %1$d día. Si lo eliminas, no se abrirá en el chat.</item>
+        <item quantity="other">Tiene %1$d días. Si lo eliminas, no se abrirá en el chat.</item>
+    </plurals>
+    <string name="plan_group_old_video">Vídeos antiguos</string>
+    <string name="plan_group_system_trash">Ya en la papelera de Android</string>
+    <string name="reason_system_trash">Lo eliminaste en Galería o Archivos. Android lo borra tras unos 30 días; eliminarlo aquí libera el espacio ahora.</string>
+    <string name="plan_group_raw_copy">Copias RAW de fotos</string>
+    <string name="reason_raw_copy">También tienes esta foto como %1$s en la misma carpeta. El archivo RAW solo hace falta para edición avanzada.</string>
+    <string name="plan_group_other_app_media">Fotos y vídeos guardados por otras apps</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Guardado por otra app hace %1$d día. Esa app puede mostrarlo como no disponible si lo eliminas.</item>
+        <item quantity="other">Guardado por otra app hace %1$d días. Esa app puede mostrarlo como no disponible si lo eliminas.</item>
+    </plurals>
+    <string name="plan_up_to_freed">Se pueden liberar hasta %1$s</string>
+    <string name="plan_selected_safely">%1$s seleccionados de forma segura</string>
+    <string name="plan_worth_a_look_amount">%1$s para revisar</string>
+    <string name="plan_review_action">Revisar %1$s</string>
+    <string name="plan_small_review">Grupos más pequeños para revisar</string>
+    <string name="plan_biggest_folders">Carpetas más grandes</string>
+    <string name="plan_largest_apps">Apps más grandes</string>
+    <string name="plan_largest_apps_access">Permite el acceso de uso para ver qué apps ocupan más espacio</string>
+    <string name="result_next_group">Siguiente: %1$s · %2$s</string>
+    <string name="result_review_next">Revisar</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">%1$d archivo de tu cámara se revisa uno por uno</item>
+        <item quantity="other">%1$d archivos de tu cámara se revisan uno por uno</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d archivo es de tu cámara. No se comprueba la copia en la nube.</item>
+        <item quantity="other">%1$d archivos son de tu cámara. No se comprueba la copia en la nube.</item>
+    </plurals>
+    <string name="settings_kept_files">Archivos que decidiste conservar: %1$d</string>
+    <string name="settings_kept_reset">Volver a sugerirlos</string>
+    <string name="settings_kept_reset_confirm">¿Volver a sugerir en el próximo análisis todos los archivos que conservaste?</string>
+    <string name="settings_excluded_title">Carpetas que nunca se sugieren</string>
+    <string name="settings_excluded_remove">Quitar</string>
+    <string name="exclude_folder_action">No sugerir archivos de esta carpeta</string>
+    <string name="message_folder_excluded">No se sugerirán archivos de %1$s.</string>
+    <string name="message_excluded_folders_full">Puedes excluir hasta 50 carpetas. Quita una en Ajustes primero.</string>
+    <string name="plan_kept_hidden">Archivos conservados ocultos en este plan: %1$d</string>
 </resources>

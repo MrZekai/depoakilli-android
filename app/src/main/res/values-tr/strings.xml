@@ -149,7 +149,7 @@
     <string name="message_all_files_required_for_cache">Derin önbellek temizliği için önce Android Tüm dosyalara erişim izni gerekir.</string>
     <string name="message_cache_system_unavailable">Önbelleğin temizlendiği doğrulanamadı. Aşağıdan bir uygulama seçip Android ayarlarından önbelleğini temizleyin.</string>
     <string name="message_whatsapp_not_found">Paylaşılan depolamada desteklenen WhatsApp veya WhatsApp Business Medya klasörü bulunamadı.</string>
-    <string name="privacy_policy_body_v050">Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Akıllı Temizleyici tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nAkıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Açıkça sildiğiniz dosyalar Android aracılığıyla kaldırılır ve Akıllı Temizleyici tarafından geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
+    <string name="privacy_policy_body_v050">Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Akıllı Temizleyici tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nAkıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp’e taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Büyük dosya • Yaş (gün): %1$d</item>
         <item quantity="other">Büyük dosya • Yaş (gün): %1$d</item>
@@ -549,10 +549,6 @@
     <string name="swipe_grid_view">Izgara görünümü</string>
     <string name="swipe_review_view">Kaydırarak inceleme</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
-    <plurals name="plan_recommended_summary">
-        <item quantity="one">%1$d öğe · %2$s</item>
-        <item quantity="other">%1$d öğe · %2$s</item>
-    </plurals>
     <plurals name="plan_unused_apps">
         <item quantity="one">Kullanılmayan uygulamalar (%1$d)</item>
         <item quantity="other">Kullanılmayan uygulamalar (%1$d)</item>
@@ -631,11 +627,55 @@
         <item quantity="one">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
         <item quantity="other">%1$s %2$d gün boyunca Çöp’e taşınır. O zamana kadar geri yükleyebilirsin.</item>
     </plurals>
-    <string name="home_saved_totals">%1$s temizlenmeye hazır · %2$s göz atmaya değer</string>
     <string name="home_saved_checked_recently">Bir saatten kısa süre önce kontrol edildi</string>
     <string name="home_saved_details">Ayrıntıları göster</string>
     <plurals name="home_saved_checked_hours">
         <item quantity="one">%1$d saat önce kontrol edildi</item>
         <item quantity="other">%1$d saat önce kontrol edildi</item>
     </plurals>
+    <string name="plan_group_whatsapp_old_video">Eski WhatsApp videoları</string>
+    <string name="plan_group_whatsapp_old_image">Eski WhatsApp fotoğrafları</string>
+    <string name="plan_group_whatsapp_old_audio">Eski WhatsApp sesleri</string>
+    <string name="plan_group_whatsapp_document">WhatsApp belgeleri</string>
+    <plurals name="reason_whatsapp_old">
+        <item quantity="one">%1$d günlük. Silersen sohbette açılmaz.</item>
+        <item quantity="other">%1$d günlük. Silersen sohbette açılmaz.</item>
+    </plurals>
+    <string name="plan_group_old_video">Eski videolar</string>
+    <string name="plan_group_system_trash">Zaten Android çöpünde</string>
+    <string name="reason_system_trash">Bunu Galeri’de veya Dosyalar’da sildin. Android yaklaşık 30 gün sonra kaldırır; burada silmek yeri hemen açar.</string>
+    <string name="plan_group_raw_copy">Fotoğrafların RAW kopyaları</string>
+    <string name="reason_raw_copy">Bu fotoğraf aynı klasörde %1$s olarak da var. RAW dosyası yalnız gelişmiş düzenleme için gerekir.</string>
+    <string name="plan_group_other_app_media">Diğer uygulamaların kaydettiği fotoğraf ve videolar</string>
+    <plurals name="reason_other_app_media">
+        <item quantity="one">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
+        <item quantity="other">Başka bir uygulama %1$d gün önce kaydetti. Silersen o uygulama dosyayı eksik gösterebilir.</item>
+    </plurals>
+    <string name="plan_up_to_freed">En fazla %1$s boşaltılabilir</string>
+    <string name="plan_selected_safely">%1$s güvenle seçildi</string>
+    <string name="plan_worth_a_look_amount">%1$s göz atmaya değer</string>
+    <string name="plan_review_action">%1$s incele</string>
+    <string name="plan_small_review">Kontrol edilecek küçük gruplar</string>
+    <string name="plan_biggest_folders">En büyük klasörler</string>
+    <string name="plan_largest_apps">En büyük uygulamalar</string>
+    <string name="plan_largest_apps_access">Hangi uygulamaların en çok yer kapladığını görmek için Kullanım Erişimi’ne izin ver</string>
+    <string name="result_next_group">Sıradaki: %1$s · %2$s</string>
+    <string name="result_review_next">İncele</string>
+    <plurals name="plan_camera_one_by_one">
+        <item quantity="one">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
+        <item quantity="other">Kameranızdan %1$d dosyaya tek tek bakılmalı</item>
+    </plurals>
+    <plurals name="plan_preview_camera">
+        <item quantity="one">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
+        <item quantity="other">%1$d dosya kameranızdan. Bulut yedeği kontrol edilmez.</item>
+    </plurals>
+    <string name="settings_kept_files">Tutmayı seçtiğin dosyalar: %1$d</string>
+    <string name="settings_kept_reset">Yeniden öner</string>
+    <string name="settings_kept_reset_confirm">Tuttuğun tüm dosyalar bir sonraki taramada yeniden önerilsin mi?</string>
+    <string name="settings_excluded_title">Hiç önerilmeyen klasörler</string>
+    <string name="settings_excluded_remove">Kaldır</string>
+    <string name="exclude_folder_action">Bu klasörden dosya önerme</string>
+    <string name="message_folder_excluded">%1$s klasöründeki dosyalar artık önerilmeyecek.</string>
+    <string name="message_excluded_folders_full">En fazla 50 klasör hariç tutulabilir. Önce Ayarlar’dan birini kaldır.</string>
+    <string name="plan_kept_hidden">Bu plandan gizlenen tutulan dosyalar: %1$d</string>
 </resources>

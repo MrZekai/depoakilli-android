@@ -11,11 +11,13 @@ import com.mrzekai.depoakilli.data.RestoreResult
 import com.mrzekai.depoakilli.data.StoragePathRules
 import com.mrzekai.depoakilli.data.TrashEntry
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
+import com.mrzekai.depoakilli.data.ExcludedFolder
 import com.mrzekai.depoakilli.model.AppCacheSnapshot
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import com.mrzekai.depoakilli.model.DeviceInfoSnapshot
+import com.mrzekai.depoakilli.model.FolderSize
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.model.MemorySnapshot
 import com.mrzekai.depoakilli.model.ScanFocus
@@ -23,6 +25,7 @@ import com.mrzekai.depoakilli.model.ScanSummary
 import com.mrzekai.depoakilli.model.StorageFileType
 import com.mrzekai.depoakilli.model.StorageReviewItem
 import com.mrzekai.depoakilli.model.WhatsAppMediaItem
+import com.mrzekai.depoakilli.model.isBulkSelectable
 import com.mrzekai.depoakilli.model.StorageReviewSummary
 import com.mrzekai.depoakilli.model.StorageSnapshot
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -135,6 +138,10 @@ data class CleanerUiState(
     val deepCheckRunning: Boolean = false,
     /** Items that could not go to Trash; the user may delete them permanently. */
     val trashFallback: TrashFallback? = null,
+    /** Files kept in the swipe review (V10). */
+    val keptItemCount: Int = 0,
+    /** Folders the user does not want suggestions from (V11). */
+    val excludedFolders: List<ExcludedFolder> = emptyList(),
     val message: String? = null,
 ) {
     val trashBytes: Long get() = trashEntries.sumOf(TrashEntry::sizeBytes)
@@ -198,6 +205,60 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         refreshDeviceState()
         refreshAppCaches()
         purgeExpiredTrash()
+        refreshUserChoices()
+    }
+
+    /** Loads the counts behind V10/V11 for Settings and the plan note. */
+    fun refreshUserChoices() {
+        viewModelScope.launch {
+            val (kept, folders) = withContext(Dispatchers.IO) {
+                repository.keptItemCount() to repository.excludedFolderList()
+            }
+            _state.update { it.copy(keptItemCount = kept, excludedFolders = folders) }
+        }
+    }
+
+    /** "Suggest them again": forget every keep decision; the next scan shows them again. */
+    fun clearKeptItems() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repository.clearKeptItems() }
+            refreshUserChoices()
+        }
+    }
+
+    /**
+     * "Don't suggest files from this folder" (V11): stored, and the folder's
+     * review items leave the current plan right away.
+     */
+    fun excludeFolder(volumeRoot: String, relativePath: String) {
+        val folder = ExcludedFolder(volumeRoot, ExcludedFolder.normalize(relativePath))
+        // A file at the volume root has no folder to exclude; the button is hidden there too.
+        if (!folder.isValid) return
+        viewModelScope.launch {
+            val added = withContext(Dispatchers.IO) { repository.excludeFolder(folder) }
+            if (!added) {
+                _state.update { it.copy(message = getApplication<Application>().getString(R.string.message_excluded_folders_full)) }
+                return@launch
+            }
+            _state.update { state ->
+                val keep: (CleanableItem) -> Boolean = { item ->
+                    item.assessment.group.auto || !folder.contains(item.volumeRoot, item.relativePath)
+                }
+                state.copy(
+                    summary = state.summary.copy(items = state.summary.items.filter(keep)),
+                    planSummary = state.planSummary?.let { plan -> plan.copy(items = plan.items.filter(keep)) },
+                    message = getApplication<Application>().getString(R.string.message_folder_excluded, folder.name),
+                )
+            }
+            refreshUserChoices()
+        }
+    }
+
+    fun includeFolder(folder: ExcludedFolder) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { repository.includeFolder(folder) }
+            refreshUserChoices()
+        }
     }
 
     /** Deletes trash entries older than the retention period, then refreshes the trash list. */
@@ -1019,6 +1080,58 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     private fun isWhatsAppIndexedPath(relativePath: String): Boolean =
         StoragePathRules.isWhatsAppPath(relativePath)
 
+    /** Opens one of the biggest folders as a review list; nothing is selected (V7). */
+    fun openFolderReview(folder: FolderSize) {
+        if (!repository.hasAllFilesAccess()) {
+            _state.update {
+                it.copy(message = getApplication<Application>().getString(R.string.message_all_files_required))
+            }
+            return
+        }
+        storageReviewJob?.cancel()
+        val reviewGeneration = ++storageReviewGeneration
+        _state.update {
+            it.copy(
+                storageReview = StorageReviewSummary(type = StorageFileType.OTHER, folder = folder, loading = true),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+                message = null,
+            )
+        }
+        storageReviewJob = viewModelScope.launch {
+            runSuspendCatching {
+                repository.scanFolderReview(folder) { directories, files ->
+                    _state.update { state ->
+                        if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                            state.copy(storageReviewProgressDirectories = directories, storageReviewProgressFiles = files)
+                        } else {
+                            state
+                        }
+                    }
+                }
+            }.onSuccess { review ->
+                _state.update { state ->
+                    if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                        state.copy(storageReview = review)
+                    } else {
+                        state
+                    }
+                }
+            }.onFailure {
+                _state.update { state ->
+                    if (reviewGeneration == storageReviewGeneration && state.storageReview.folder == folder) {
+                        state.copy(
+                            storageReview = state.storageReview.copy(loading = false),
+                            message = getApplication<Application>().getString(R.string.message_scan_failed),
+                        )
+                    } else {
+                        state
+                    }
+                }
+            }
+        }
+    }
+
     fun closeStorageReview() {
         storageReviewGeneration++
         storageReviewJob?.cancel()
@@ -1045,7 +1158,8 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun toggleAllStorageReviewItems() {
-        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES) return
+        // Personal media and whole folders are never selected all at once.
+        if (_state.value.storageReview.type in PERSONAL_STORAGE_TYPES || _state.value.storageReview.folder != null) return
         _state.update { state ->
             val items = state.storageReview.items
             val select = items.any { !it.selected }
@@ -1072,11 +1186,11 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
     fun toggleCategory(category: CleanCategory) {
         _state.update { state ->
             val categoryItems = state.summary.items.filter { it.assessment.category == category }
-            val select = categoryItems.any { !it.selected }
+            val select = categoryItems.any { it.isBulkSelectable() && !it.selected }
             state.copy(
                 summary = state.summary.copy(
                     items = state.summary.items.map { item ->
-                        val excluded = select && !item.assessment.group.groupSelectable
+                        val excluded = select && !item.isBulkSelectable()
                         if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
@@ -1203,9 +1317,33 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun swipeMark(delete: Boolean) = updateSwipe { it.mark(delete) }
+    /** "Keep" is also remembered across scans (V10); "Delete" only marks. */
+    fun swipeMark(delete: Boolean) {
+        val state = _state.value
+        val currentId = state.swipeReviewGroup?.let(state.swipeStates::get)?.currentId
+        updateSwipe { it.mark(delete) }
+        if (!delete && currentId != null) {
+            val item = state.summary.items.firstOrNull { it.id == currentId } ?: return
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) { repository.keepItem(item) }
+                refreshUserChoices()
+            }
+        }
+    }
 
-    fun swipeUndo() = updateSwipe { it.undo() }
+    /** Undoing a "Keep" also forgets it (V10). */
+    fun swipeUndo() {
+        val state = _state.value
+        val last = state.swipeReviewGroup?.let(state.swipeStates::get)?.decisions?.lastOrNull()
+        updateSwipe { it.undo() }
+        if (last != null && !last.delete) {
+            val item = state.summary.items.firstOrNull { it.id == last.id } ?: return
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) { repository.unkeepItem(item) }
+                refreshUserChoices()
+            }
+        }
+    }
 
     fun swipeContinue() = updateSwipe { it.continueAfterBreak() }
 
@@ -1461,7 +1599,9 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
             val deletedFiles = attempted.filter { it.id in deletedIds }.map(StorageReviewItem::file)
             val deletedUris = deletedFiles.mapTo(hashSetOf()) { it.uri }
             val remainingSmartItems = state.summary.items.filterNot { it.uri in deletedUris }
-            val reviewType = state.storageReview.type
+            // A folder review mixes file types: type statistics are left as they are.
+            val reviewType = state.storageReview.type.takeIf { state.storageReview.folder == null }
+            val reviewFolder = state.storageReview.folder
             val deletedStorageBytes = deletedFiles.sumOf { it.sizeBytes }
             val deletedStorageCount = deletedFiles.size
             val updatedStorageTypes = state.summary.storageTypes.map { stat ->
@@ -1497,6 +1637,16 @@ class CleanerViewModel(application: Application) : AndroidViewModel(application)
                     smartMediaTypes = updatedSmartMediaTypes,
                     storagePreviews = state.summary.storagePreviews.mapValues { (_, files) ->
                         files.filterNot { it.uri in deletedUris }
+                    },
+                    biggestFolders = state.summary.biggestFolders.map { folder ->
+                        if (folder == reviewFolder) {
+                            folder.copy(
+                                bytes = (folder.bytes - deletedStorageBytes).coerceAtLeast(0L),
+                                fileCount = (folder.fileCount - deletedStorageCount).coerceAtLeast(0),
+                            )
+                        } else {
+                            folder
+                        }
                     },
                 ),
                 dashboardCleanableBytes = remainingSmartItems
