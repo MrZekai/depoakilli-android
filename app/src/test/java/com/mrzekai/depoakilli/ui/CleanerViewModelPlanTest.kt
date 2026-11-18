@@ -45,7 +45,9 @@ class CleanerViewModelPlanTest {
     }
 
     @Test
-    fun `bulk selection skips documents and look alikes but explicit selection does not`() {
+    // Faz 5D (D1): bulk = a selection the app makes itself. Since Faz 5C old
+    // documents belong to "My pick", so only look-alikes (and camera files) are skipped.
+    fun `app selection skips look alikes but the user's select all does not`() {
         val items = listOf(
             item("doc", CleanupGroup.DOWNLOAD_DOCUMENT, 10 * mb),
             item("u", CleanupGroup.DUPLICATE_UNVERIFIED, 10 * mb),
@@ -53,7 +55,7 @@ class CleanerViewModelPlanTest {
         )
         val ids = setOf("doc", "u", "f")
         val bulk = PlanSelection.setItemsSelected(items, ids, selected = true, bulk = true)
-        assertEquals(setOf("f"), bulk.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
+        assertEquals(setOf("doc", "f"), bulk.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
 
         val explicit = PlanSelection.setItemsSelected(items, setOf("doc", "u"), selected = true, bulk = false)
         assertEquals(setOf("doc", "u"), explicit.filter(CleanableItem::selected).map(CleanableItem::id).toSet())
