@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Akıllı Temizleyici</string>
+    <string name="app_name">Smart Cleaner</string>
     <string name="tab_clean">Temizlik</string>
     <string name="tab_tools">Araçlar</string>
     <string name="home_storage_percent">%%%1$d</string>
