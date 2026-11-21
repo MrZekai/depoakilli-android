@@ -85,7 +85,6 @@ def demo_status_bar():
     sh("cmd overlay enable com.android.internal.systemui.navbar.gestural")
     # No system "isn't responding" dialogs over the app (the emulator's own launcher is slow).
     sh("settings put global hide_error_dialogs 1")
-    sh("pm disable-user --user 0 com.google.android.apps.nexuslauncher")
 
 
 def push_media():
@@ -225,6 +224,12 @@ def k3_copies():
         if n and re.search(rx(s["home_cta_make_room"]), n.label):
             qa.tap(n)
         if not qa.wait_for(rx(s["home_review_rest"]), 240):
+            qa.launch()  # a cold emulator can still be on "starting…"
+            clear_system_dialogs()
+            n = qa.wait_for(rx(s["home_cta_make_room"]) + "|" + rx(s["home_review_rest"]), 60)
+            if n and re.search(rx(s["home_cta_make_room"]), n.label):
+                qa.tap(n)
+        if not qa.wait_for(rx(s["home_review_rest"]), 240):
             log(f"k3 {case}: no findings link: " + " | ".join(qa.texts())[:500])
             shot(out, case + "-no-findings")
             continue
@@ -246,6 +251,7 @@ def k3_copies():
             msg = qa.find(expect)
             if not msg:
                 time.sleep(0.3)
+        time.sleep(4)  # let the snackbar go so the screenshot shows the on-page result
         shot(out, case)
         log(f"k3 {case}: expected /{expect}/ -> {msg.label if msg else None}; visible: " + " | ".join(qa.texts())[:300])
 
