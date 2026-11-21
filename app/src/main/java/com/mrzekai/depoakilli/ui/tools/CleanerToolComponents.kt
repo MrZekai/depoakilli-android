@@ -452,7 +452,8 @@ internal fun ToolSectionHeader(section: ToolSection, onToggleAll: () -> Unit) {
                 fontWeight = AppWeights.Giant,
                 fontSize = 17.sp,
                 lineHeight = 22.sp,
-                maxLines = 1,
+                // K4: long translated titles take a second line instead of "…".
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
             if (section.subtitle.isNotBlank()) {

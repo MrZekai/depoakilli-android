@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Apps
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +45,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -235,14 +239,16 @@ private fun ToolRowCard(row: ToolRow, modifier: Modifier = Modifier) {
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(
+                // K4: one line that shrinks to fit ("Uygulamalar" next to "0 kullanılmayan"),
+                // never "…" and never a word cut in two.
+                BasicText(
                     row.title,
-                    color = OnBlack,
-                    fontSize = 20.sp,
-                    lineHeight = 24.sp,
-                    fontWeight = AppWeights.Title,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(color = OnBlack, fontSize = 20.sp, lineHeight = 24.sp, fontWeight = AppWeights.Title),
+                    ),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    softWrap = false,
+                    autoSize = TextAutoSize.StepBased(minFontSize = 13.sp, maxFontSize = 20.sp, stepSize = 1f.sp),
                 )
                 Text(
                     row.subtitle,
