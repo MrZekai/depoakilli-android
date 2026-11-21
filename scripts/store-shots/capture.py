@@ -188,8 +188,8 @@ def capture(listing, app_locale, values_dir):
 def k3_copies():
     """K3: "Select all" on possible duplicates in three cases, with a
     screenshot of the message: all different / some exact / all exact.
-    40 MB files with one copy each stay "possible" after the scan
-    (groups under 50 MB are not checked automatically)."""
+    1.1 GB sparse files stay "possible" after the scan (the automatic check
+    stops at 1 GB), and the plan lists them (groups over 50 MB)."""
     s = strings("values")
     out = os.path.join(OUT, "k3")
     os.makedirs(out, exist_ok=True)
@@ -197,10 +197,10 @@ def k3_copies():
     mb10 = 10 * 1024 * 1024
 
     def base(name):
-        qa.sh(f"dd if=/dev/urandom of={d}/{name}.zip bs=1048576 count=40 2>/dev/null", timeout=180)
+        qa.sh(f"truncate -s 1100M {d}/{name}.zip")
 
     def exact(name):
-        qa.sh(f"cp {d}/{name}.zip '{d}/{name} (1).zip'", timeout=120)
+        qa.sh(f"truncate -s 1100M '{d}/{name} (1).zip'")
 
     def different(name):  # same size and same sampled blocks; one byte differs at 10 MB
         exact(name)
@@ -241,7 +241,7 @@ def k3_copies():
         if not qa.tap_text(rx(s["smart_detail_select_all"]), 10):
             log(f"k3 {case}: no select all: " + " | ".join(qa.texts())[:500])
         msg = None
-        end = time.time() + 90
+        end = time.time() + 300
         while time.time() < end and not msg:
             msg = qa.find(expect)
             if not msg:
