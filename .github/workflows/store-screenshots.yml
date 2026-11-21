@@ -53,7 +53,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r -g app/build/outputs/apk/debug/app-debug.apk
-            python3 scripts/store-shots/capture.py store-media store-shots-out || true
+            SHOT_LOCALES=${{ vars.SHOT_LOCALES || 'none' }} python3 scripts/store-shots/capture.py store-media store-shots-out || true
 
       - name: Push screenshots to store-assets-raw
         if: always()

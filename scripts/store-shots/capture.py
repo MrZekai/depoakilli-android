@@ -186,63 +186,68 @@ def capture(listing, app_locale, values_dir):
 
 
 def k3_copies():
-    """K3: "Select all" on look-alike copies in three cases, with screenshots
-    of the message the user sees: all different / some exact / all exact."""
+    """K3: "Select all" on possible duplicates in three cases, with a
+    screenshot of the message: all different / some exact / all exact.
+    40 MB files with one copy each stay "possible" after the scan
+    (groups under 50 MB are not checked automatically)."""
     s = strings("values")
     out = os.path.join(OUT, "k3")
     os.makedirs(out, exist_ok=True)
-    qa.sh("rm -rf /sdcard/DCIM/Camera /sdcard/Pictures /sdcard/Download/* /sdcard/Android/media/com.whatsapp /sdcard/.SmartCleanerTrash")
     d = "/sdcard/Download"
     mb10 = 10 * 1024 * 1024
 
-    def variant(src, dst):  # same size and same sampled blocks, one byte differs at 10 MB
-        qa.sh(f"cp '{src}' '{dst}'; printf X | dd of='{dst}' bs=1 seek={mb10} conv=notrunc 2>/dev/null", timeout=120)
+    def base(name):
+        qa.sh(f"dd if=/dev/urandom of={d}/{name}.zip bs=1048576 count=40 2>/dev/null", timeout=180)
 
-    for name in ("alpha", "beta", "gamma"):
-        qa.sh(f"dd if=/dev/urandom of={d}/{name}.zip bs=1048576 count=40 2>/dev/null; touch -m -t 202403011200 {d}/{name}.zip", timeout=180)
-    variant(f"{d}/alpha.zip", f"{d}/alpha (1).zip")                       # all different
-    qa.sh(f"cp {d}/beta.zip '{d}/beta (1).zip'")                          # some exact
-    variant(f"{d}/beta.zip", f"{d}/beta (2).zip")
-    qa.sh(f"cp {d}/gamma.zip '{d}/gamma (1).zip'; cp {d}/gamma.zip '{d}/gamma (2).zip'")  # all exact
-    qa.sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=120)
-    fresh_app("en")
-    qa.launch()
-    clear_system_dialogs()
-    n = qa.wait_for(rx(s["home_cta_make_room"]) + "|" + rx(s["home_cta_clean"]), 40)
-    if n and re.search(rx(s["home_cta_make_room"]), n.label):
-        qa.tap(n)
-    qa.wait_for(rx(s["home_cta_clean"]) + "|" + rx(s["home_review_rest"]), 240)
-    for case, file_rx, expect in (
-        ("1-all-different", r"^alpha", r"exact cop"),
-        ("2-some-exact", r"^beta", r"exact cop"),
-        ("3-all-exact", r"^gamma", r"exact cop"),
-    ):
-        qa.tap_text(rx(s["tab_tools"]), 10)
-        time.sleep(2)
-        qa.tap_text(r"^Duplicates", 10)
-        time.sleep(3)
-        title = qa.scroll_to(file_rx, 10)
-        if not title:
-            log(f"k3 {case}: section not found: " + " | ".join(qa.texts())[:600])
-            shot(out, case + "-missing")
-            qa.back()
+    def exact(name):
+        qa.sh(f"cp {d}/{name}.zip '{d}/{name} (1).zip'", timeout=120)
+
+    def different(name):  # same size and same sampled blocks; one byte differs at 10 MB
+        exact(name)
+        qa.sh(f"printf X | dd of='{d}/{name} (1).zip' bs=1 seek={mb10} conv=notrunc 2>/dev/null", timeout=120)
+
+    cases = (
+        ("1-all-different", [("alpha", different)], r"None of these are exact copies"),
+        ("2-some-exact", [("alpha", different), ("beta", exact)], r"^1 exact copy selected$"),
+        ("3-all-exact", [("beta", exact), ("delta", exact)], r"^2 exact copies selected$"),
+    )
+    for case, files, expect in cases:
+        qa.sh("rm -rf /sdcard/DCIM/Camera /sdcard/Pictures /sdcard/Download/* /sdcard/Android/media/com.whatsapp /sdcard/.SmartCleanerTrash")
+        for name, kind in files:
+            base(name)
+            kind(name)
+        qa.sh(f"touch -m -t 202403011200 {d}/*")
+        qa.sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=120)
+        fresh_app("en")
+        qa.launch()
+        clear_system_dialogs()
+        n = qa.wait_for(rx(s["home_cta_make_room"]) + "|" + rx(s["home_cta_clean"]) + "|" + rx(s["home_review_rest"]), 40)
+        if n and re.search(rx(s["home_cta_make_room"]), n.label):
+            qa.tap(n)
+        if not qa.wait_for(rx(s["home_review_rest"]), 240):
+            log(f"k3 {case}: no findings link: " + " | ".join(qa.texts())[:500])
+            shot(out, case + "-no-findings")
             continue
-        nodes = qa.dump()
-        boxes = [x for x in nodes if "CheckBox" in x.cls and abs(x.cy - title.cy) < 90]
-        if not boxes:
-            boxes = [x for x in nodes if x.clickable and x.x1 > qa.W * 0.75 and abs(x.cy - title.cy) < 90]
-        if boxes:
-            qa.tap(boxes[0])
+        qa.tap_text(rx(s["home_review_rest"]), 10)
+        time.sleep(2)
+        row = qa.scroll_to(rx(s["plan_group_duplicate_unverified"]) + "|^" + re.escape(s["plan_group_duplicate_unverified"]), 10)
+        if not row:
+            log(f"k3 {case}: no possible-duplicates row: " + " | ".join(qa.texts())[:500])
+            shot(out, case + "-no-row")
+            continue
+        qa.tap(row)
+        time.sleep(2)
+        shot(out, case + "-before")
+        if not qa.tap_text(rx(s["smart_detail_select_all"]), 10):
+            log(f"k3 {case}: no select all: " + " | ".join(qa.texts())[:500])
         msg = None
-        end = time.time() + 60
+        end = time.time() + 90
         while time.time() < end and not msg:
             msg = qa.find(expect)
             if not msg:
-                time.sleep(0.5)
+                time.sleep(0.3)
         shot(out, case)
-        log(f"k3 {case}: message = {msg.label if msg else None}")
-        qa.back()
-        time.sleep(1)
+        log(f"k3 {case}: expected /{expect}/ -> {msg.label if msg else None}; visible: " + " | ".join(qa.texts())[:300])
 
 
 def main():
