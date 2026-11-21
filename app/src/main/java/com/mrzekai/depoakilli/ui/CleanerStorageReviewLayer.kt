@@ -29,6 +29,7 @@ abstract class CleanerStorageReviewLayer(
             it.copy(
                 smartCategoryReview = category,
                 smartCategoryReviewIds = itemIds,
+                verifyFeedback = null,
             )
         }
     }
@@ -39,6 +40,7 @@ abstract class CleanerStorageReviewLayer(
                 smartCategoryReview = null,
                 smartCategoryReviewIds = null,
                 smartCategoryReviewGroup = null,
+                verifyFeedback = null,
             )
         }
     }

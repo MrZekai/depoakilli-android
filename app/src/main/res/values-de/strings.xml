@@ -801,4 +801,9 @@
         <item quantity="one">Seit %1$d Tag nicht geöffnet · Deinstallieren</item>
         <item quantity="other">Seit %1$d Tagen nicht geöffnet · Deinstallieren</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="one">%1$d exakte Kopie ausgewählt</item>
+        <item quantity="other">%1$d exakte Kopien ausgewählt</item>
+    </plurals>
 </resources>

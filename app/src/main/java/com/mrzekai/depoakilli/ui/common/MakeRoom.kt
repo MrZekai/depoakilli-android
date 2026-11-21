@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,6 +55,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -209,11 +212,29 @@ fun GiantButton(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = diameter / 8),
                 ) {
+                    // Long single words ("AUFRÄUMEN", "NETTOYER", "BERSIHKAN") must never
+                    // break mid-word: shrink until the longest word fits on one line.
+                    val baseSp = (diameter.value / 7.4f).coerceIn(18f, 28f)
+                    val measurer = rememberTextMeasurer()
+                    val density = LocalDensity.current
+                    val maxWidthPx = with(density) { (diameter * 0.75f).roundToPx() }
+                    // Measure with the same font the label draws with (the app font, not the default).
+                    val labelStyle = LocalTextStyle.current
+                    val labelSp = remember(label, diameter, density, labelStyle) {
+                        giantLabelSize(label, baseSp) { word, sp ->
+                            measurer.measure(
+                                word,
+                                style = labelStyle.merge(TextStyle(fontSize = sp.sp, fontWeight = AppWeights.Giant)),
+                                softWrap = false,
+                                maxLines = 1,
+                            ).size.width <= maxWidthPx
+                        }
+                    }
                     Text(
                         label,
                         color = if (enabled) Lime else OnBlackSoft,
-                        fontSize = (diameter.value / 7.4f).coerceIn(18f, 28f).sp,
-                        lineHeight = (diameter.value / 6.4f).coerceIn(22f, 32f).sp,
+                        fontSize = labelSp.sp,
+                        lineHeight = (labelSp * 1.16f).sp,
                         fontWeight = AppWeights.Giant,
                         textAlign = TextAlign.Center,
                     )
@@ -232,6 +253,17 @@ fun GiantButton(
             }
         }
     }
+}
+
+/**
+ * Largest size from [baseSp] down to 14 sp at which every word of [label]
+ * fits on one line ([fits] measures a single word at a size).
+ */
+internal fun giantLabelSize(label: String, baseSp: Float, fits: (String, Float) -> Boolean): Float {
+    val words = label.split(' ', '\n').filter { it.isNotBlank() }
+    var sp = baseSp
+    while (sp > 14f && !words.all { fits(it, sp) }) sp -= 1f
+    return sp
 }
 
 /** Black card with 24 dp corners; children default to light text. */

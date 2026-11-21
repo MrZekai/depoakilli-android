@@ -65,6 +65,13 @@ internal object PlanSelection {
         return updated.map { if (it.selected && it.uri in originals) it.copy(selected = false) else it }
     }
 
+    /**
+     * K3: how many of the checked files ended up selected as exact copies,
+     * so "Select all" can always say in words what happened.
+     */
+    fun exactCopiesSelected(items: List<CleanableItem>, results: Map<String, CleanableItem?>): Int =
+        items.count { it.id in results && results[it.id] != null && it.selected }
+
     fun toggleGroup(items: List<CleanableItem>, group: CleanupGroup): List<CleanableItem> =
         setGroupSelected(
             items,

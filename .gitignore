@@ -18,3 +18,4 @@ release-secrets.properties
 delivery/
 *.apk
 *.aab
+__pycache__/

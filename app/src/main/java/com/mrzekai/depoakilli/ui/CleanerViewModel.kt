@@ -111,6 +111,7 @@ class CleanerViewModel internal constructor(
                         if (item.assessment.category == category && !excluded) item.copy(selected = select) else item
                     },
                 ),
+                verifyFeedback = null,
             )
         }
     }

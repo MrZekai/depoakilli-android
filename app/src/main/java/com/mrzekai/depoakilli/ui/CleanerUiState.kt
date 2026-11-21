@@ -116,6 +116,8 @@ data class CleanerUiState(
     val deepCheckRunning: Boolean = false,
     /** D1: "Select all" on look-alikes is running its full check (percent), else null. */
     val verifySelectPercent: Int? = null,
+    /** K3: what the last "Select all" check found, shown on the page itself. */
+    val verifyFeedback: String? = null,
     /** Items that could not go to Trash; the user may delete them permanently. */
     val trashFallback: TrashFallback? = null,
     /** Files kept in the swipe review (V10). */

@@ -255,6 +255,10 @@ def main():
     W, H = screen_size()
     log(f"screen {W}x{H}")
     sh("settings put global window_animation_scale 0; settings put global transition_animation_scale 0; settings put global animator_duration_scale 0")
+    # K6: no system "isn't responding" dialogs over the app; the emulator's
+    # own launcher is the usual culprit, and the scenario never needs it.
+    sh("settings put global hide_error_dialogs 1")
+    sh("pm disable-user --user 0 com.google.android.apps.nexuslauncher")
     sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
     sh(f"appops set {PKG} GET_USAGE_STATS ignore")
     sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS 2>/dev/null")
@@ -340,12 +344,12 @@ def main():
     check("Temizlik onayı soruluyor ('Yes, clean up')", confirm, screenshot=shot("confirm"))
     if confirm:
         tap(confirm)
-    free_now = wait_for(r"^Free .+ now$", 90)
+    free_now = wait_for(r"^Get .+ back now$", 90)
     nodes = dump()
     done = find(r"^Done$", nodes)
     undo = find(r"^Undo$", nodes)
     order_ok = bool(free_now and done and undo and free_now.cy < done.cy < undo.cy)
-    check("Sonuç: önce 'Free X now', sonra 'Done', sonra 'Undo'", order_ok,
+    check("Sonuç: önce 'Get X back now', sonra 'Done', sonra 'Undo'", order_ok,
           note=f"y: free={getattr(free_now, 'cy', None)} done={getattr(done, 'cy', None)} undo={getattr(undo, 'cy', None)}",
           screenshot=shot("result-trashed"))
     check("Sonuç: 'moved to Trash' yazıyor", find(r"moved to Trash", nodes))
@@ -360,7 +364,7 @@ def main():
         if cancel:
             tap(cancel)
         trash_after_cancel = sh(f"run-as {PKG} ls files 2>/dev/null; ls /sdcard/Android/data/{PKG}/files 2>/dev/null")
-        check("İptal'den sonra sonuç ekranı duruyor (hiçbir şey silinmedi)", wait_for(r"^Free .+ now$", 5))
+        check("İptal'den sonra sonuç ekranı duruyor (hiçbir şey silinmedi)", wait_for(r"^Get .+ back now$", 5))
     else:
         check("'Free now' düğmesi bulunamadı", False)
 
@@ -392,7 +396,7 @@ def main():
     wait_for(r"^CLEAN UP$", 180)
     tap_text(r"^CLEAN UP$", 20)
     tap_text(r"^Yes, clean up$", 20)
-    free_now = wait_for(r"^Free .+ now$", 90)
+    free_now = wait_for(r"^Get .+ back now$", 90)
     before = free_bytes()
     if free_now:
         tap(free_now)
@@ -405,7 +409,7 @@ def main():
         check("'Free space: A → B' hapı görünüyor (boş alan arttı)", pill,
               note=f"df: {before} → {after} bayt")
         check("Boşaltınca 'Free now' ve 'Undo' kalktı, yalnız 'Done' var",
-              find(r"^Done$", nodes) and not find(r"^Free .+ now$", nodes) and not find(r"^Undo$", nodes))
+              find(r"^Done$", nodes) and not find(r"^Get .+ back now$", nodes) and not find(r"^Undo$", nodes))
         files_left = sh("ls /sdcard/Download | grep -c qa-b-").strip()
         check("Seçilen dosyalar gerçekten silindi", files_left == "0", note=f"kalan: {files_left}")
         tap_text(r"^Done$", 10)

@@ -101,6 +101,27 @@ class Faz5DTest {
         assertTrue(byId.getValue("other").verifiedDifferent)
         assertFalse(byId.getValue("other").selected)
         assertFalse(PlanSelection.needsVerification(after.filter { it.id == "other" }))
+        // K3: the feedback counts the two exact copies only.
+        assertEquals(2, PlanSelection.exactCopiesSelected(after, results))
+    }
+
+    @Test
+    fun `select all on look-alikes always has a count to report`() {
+        val originalUri = "file:///Movies/a.mp4"
+        val items = listOf(
+            item("x", CleanupGroup.DUPLICATE_UNVERIFIED, path = "Movies", original = originalUri),
+            item("y", CleanupGroup.DUPLICATE_UNVERIFIED, path = "Movies", original = "file:///Movies/b.mp4"),
+        )
+        val verified = { it: CleanableItem -> it.copy(assessment = engine.assessment(CleanupGroup.DUPLICATE_PERSONAL, 400L)) }
+        // all different
+        val none = mapOf("x" to null, "y" to null)
+        assertEquals(0, PlanSelection.exactCopiesSelected(PlanSelection.selectVerifiedCopies(items, none), none))
+        // some copies
+        val some = mapOf("x" to verified(items[0]), "y" to null)
+        assertEquals(1, PlanSelection.exactCopiesSelected(PlanSelection.selectVerifiedCopies(items, some), some))
+        // all copies
+        val all = mapOf("x" to verified(items[0]), "y" to verified(items[1]))
+        assertEquals(2, PlanSelection.exactCopiesSelected(PlanSelection.selectVerifiedCopies(items, all), all))
     }
 
     @Test

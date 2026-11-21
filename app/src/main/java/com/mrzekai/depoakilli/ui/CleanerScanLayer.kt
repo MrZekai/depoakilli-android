@@ -347,7 +347,7 @@ abstract class CleanerScanLayer(
         }
         if (targets.isEmpty()) return
         val total = targets.sumOf { it.sizeBytes * 2L }.coerceAtLeast(1L)
-        _state.update { it.copy(verifySelectPercent = 0) }
+        _state.update { it.copy(verifySelectPercent = 0, verifyFeedback = null) }
         viewModelScope.launch {
             val results = LinkedHashMap<String, CleanableItem?>()
             var done = 0L
@@ -361,12 +361,22 @@ abstract class CleanerScanLayer(
                 results[item.id] = verified
                 done += item.sizeBytes * 2L
             }
-            val anyExact = results.values.any { it != null }
             _state.update { state ->
+                val items = PlanSelection.selectVerifiedCopies(state.summary.items, results)
+                val selected = PlanSelection.exactCopiesSelected(items, results)
+                val app = getApplication<Application>()
+                // K3: always say what happened, in all three cases, on the page
+                // itself (a snackbar can sit under the page and go unseen).
+                val feedback = if (selected == 0) {
+                    app.getString(R.string.verify_none_exact)
+                } else {
+                    app.resources.getQuantityString(R.plurals.verify_selected_exact, selected, selected)
+                }
                 state.copy(
                     verifySelectPercent = null,
-                    summary = state.summary.copy(items = PlanSelection.selectVerifiedCopies(state.summary.items, results)),
-                    message = if (anyExact) state.message else getApplication<Application>().getString(R.string.verify_none_exact),
+                    summary = state.summary.copy(items = items),
+                    verifyFeedback = feedback,
+                    message = feedback,
                 )
             }
         }

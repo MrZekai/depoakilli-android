@@ -128,4 +128,15 @@ class Faz6Test {
         assertTrue(figures.canEmptyTrash)
         assertNull(figures.freeSpaceChange)
     }
+
+    // ---- Store QA: big button never breaks a word ----
+
+    @Test
+    fun `giant button label shrinks until every word fits`() {
+        // Pretend each character is 0.6 em wide and the line holds 150 px.
+        val fits = { word: String, sp: Float -> word.length * sp * 0.6f <= 150f }
+        val sp = com.mrzekai.depoakilli.ui.common.giantLabelSize("AUFRÄUMEN", 28f, fits)
+        assertTrue(9 * sp * 0.6f <= 150f)
+        assertEquals(28f, com.mrzekai.depoakilli.ui.common.giantLabelSize("CLEAN UP", 28f, fits))
+    }
 }
