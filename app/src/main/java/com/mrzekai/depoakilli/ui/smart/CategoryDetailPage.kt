@@ -74,6 +74,7 @@ internal fun CategoryDetailPage(
     modifier: Modifier = Modifier,
     gridAd: @Composable () -> Unit = {},
     verifyingPercent: Int? = null,
+    verifyFeedback: String? = null,
 ) {
     var confirmCleanup by remember { mutableStateOf(false) }
     val displayItems = items.sortedByDescending(CleanableItem::sizeBytes)
@@ -165,6 +166,16 @@ internal fun CategoryDetailPage(
                         color = OnBlack,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f),
+                    )
+                }
+                // K3: the result of the last check stays readable right here.
+                if (verifyingPercent == null && verifyFeedback != null) {
+                    Text(
+                        verifyFeedback,
+                        color = Lime,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp, top = 6.dp),
                     )
                 }
             }

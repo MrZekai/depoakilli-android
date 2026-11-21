@@ -201,6 +201,7 @@ internal fun SmartCleanResultsScreen(
             onSuggestionOpened = onSuggestionOpened,
             onVerifyAndSelect = onVerifyAndSelect,
             verifySelectPercent = state.verifySelectPercent,
+            verifyFeedback = state.verifyFeedback,
             scrollToApps = scrollToApps,
             onScrolledToApps = onScrolledToApps,
         )
@@ -251,6 +252,7 @@ internal fun SmartResultsContent(
     onSuggestionOpened: () -> Unit = {},
     onVerifyAndSelect: (Set<String>) -> Unit = {},
     verifySelectPercent: Int? = null,
+    verifyFeedback: String? = null,
     scrollToApps: Boolean = false,
     onScrolledToApps: () -> Unit = {},
 ) {
@@ -287,6 +289,7 @@ internal fun SmartResultsContent(
                 }
             },
             verifyingPercent = verifySelectPercent,
+            verifyFeedback = verifyFeedback,
             onToggleItem = onToggleItem,
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
