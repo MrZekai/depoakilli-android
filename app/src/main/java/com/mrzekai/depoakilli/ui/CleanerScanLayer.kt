@@ -361,12 +361,19 @@ abstract class CleanerScanLayer(
                 results[item.id] = verified
                 done += item.sizeBytes * 2L
             }
-            val anyExact = results.values.any { it != null }
             _state.update { state ->
+                val items = PlanSelection.selectVerifiedCopies(state.summary.items, results)
+                val selected = PlanSelection.exactCopiesSelected(items, results)
+                val app = getApplication<Application>()
                 state.copy(
                     verifySelectPercent = null,
-                    summary = state.summary.copy(items = PlanSelection.selectVerifiedCopies(state.summary.items, results)),
-                    message = if (anyExact) state.message else getApplication<Application>().getString(R.string.verify_none_exact),
+                    summary = state.summary.copy(items = items),
+                    // K3: always say what happened, in all three cases.
+                    message = if (selected == 0) {
+                        app.getString(R.string.verify_none_exact)
+                    } else {
+                        app.resources.getQuantityString(R.plurals.verify_selected_exact, selected, selected)
+                    },
                 )
             }
         }

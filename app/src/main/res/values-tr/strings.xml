@@ -13,7 +13,7 @@
     <string name="cache_access_required">Önbellek erişimi kapalı</string>
     <string name="cache_grant_action">Önbellek taramasına izin ver</string>
     <string name="cache_refresh">Yenile</string>
-    <string name="cache_own_app">Akıllı Temizleyici önbelleği</string>
+    <string name="cache_own_app">Smart Cleaner önbelleği</string>
     <string name="cache_own_app_subtitle">%1$s doğrudan ve güvenle silinebilir</string>
     <string name="scan_focus_smart">Akıllı temizlik sonucu</string>
     <string name="scan_focus_junk">Çöp Temizliği</string>
@@ -60,11 +60,11 @@
     <string name="back">Geri</string>
     <string name="cancel">İptal</string>
     <string name="whatsapp_access_title">WhatsApp için depolama erişimini etkinleştir</string>
-    <string name="whatsapp_access_description">WhatsApp Temizleyici, Android Tüm dosyalara erişim iznini verdikten sonra WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde okur. Klasör seçici kullanılmaz.</string>
+    <string name="whatsapp_access_description">WhatsApp Temizleyici, Android Tüm dosyalara erişim iznini verdikten sonra WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Smart Cleaner içinde okur. Klasör seçici kullanılmaz.</string>
     <string name="whatsapp_choose_folder">Tam depolama erişimini etkinleştir</string>
-    <string name="whatsapp_access_once">Android özel Tüm dosyalara erişim ayarını yalnız izin gerektiğinde gösterir. Sonrasında WhatsApp taraması Akıllı Temizleyici içinde kalır.</string>
+    <string name="whatsapp_access_once">Android özel Tüm dosyalara erişim ayarını yalnız izin gerektiğinde gösterir. Sonrasında WhatsApp taraması Smart Cleaner içinde kalır.</string>
     <string name="whatsapp_ready_title">WhatsApp Medya hazır</string>
-    <string name="whatsapp_ready_description">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde tara ve silmeden önce tüm kategorileri incele.</string>
+    <string name="whatsapp_ready_description">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Smart Cleaner içinde tara ve silmeden önce tüm kategorileri incele.</string>
     <string name="whatsapp_scan_action">WhatsApp dosyalarını tara</string>
     <string name="whatsapp_scanning_title">WhatsApp Medya analiz ediliyor</string>
     <string name="whatsapp_scanning_description">WhatsApp paylaşılan Medya içeriği doğrudan okunuyor, dosyalar sınıflandırılıyor ve önizlemeler hazırlanıyor…</string>
@@ -100,11 +100,11 @@
     <string name="terms_of_service">Hizmet Şartları</string>
     <string name="about_app">Hakkında</string>
     <string name="legal_contact">Geliştirici: MrZekai\nGizlilik ve destek iletişimi: %1$s</string>
-    <string name="feedback_subject">Akıllı Temizleyici geri bildirimi</string>
+    <string name="feedback_subject">Smart Cleaner geri bildirimi</string>
     <string name="feedback_template">Cihaz: %1$s %2$s\nAndroid: %3$s\n\nGeri bildirim:\n</string>
-    <string name="share_app_message">Akıllı Temizleyici depolamayı cihazında güvenle analiz eder: %1$s</string>
-    <string name="about_app_body_v050">Akıllı Temizleyici %1$s\n\nAkıllı Temizleyici bir depolama yönetimi ve bakım uygulamasıdır. Paylaşılan depolamayı cihaz içinde çöp, birebir kopyalar, büyük dosyalar, eski indirilenler, APK kurulumları, medya inceleme öğeleri ve WhatsApp medyası için tarar. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme akışını kullanır; Android sistem onayı isteyebilir.\n\nPaket: com.mrzekai.depoakilli</string>
-    <string name="all_files_access_clean_screen">Akıllı Temizleyici, klasörleri tek tek seçtirmeden paylaşılan depolamayı kapsamlı taramak için Android Tüm dosyalara erişim iznine ihtiyaç duyar.</string>
+    <string name="share_app_message">Smart Cleaner depolamayı cihazında güvenle analiz eder: %1$s</string>
+    <string name="about_app_body_v050">Smart Cleaner %1$s\n\nSmart Cleaner bir depolama yönetimi ve bakım uygulamasıdır. Paylaşılan depolamayı cihaz içinde çöp, birebir kopyalar, büyük dosyalar, eski indirilenler, APK kurulumları, medya inceleme öğeleri ve WhatsApp medyası için tarar. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme akışını kullanır; Android sistem onayı isteyebilir.\n\nPaket: com.mrzekai.depoakilli</string>
+    <string name="all_files_access_clean_screen">Smart Cleaner, klasörleri tek tek seçtirmeden paylaşılan depolamayı kapsamlı taramak için Android Tüm dosyalara erişim iznine ihtiyaç duyar.</string>
     <string name="all_files_access_description">Temel dosya yönetimi ve bakım motoru için gereklidir: çöp, kopyalar, büyük dosyalar, indirilenler, APK’lar ve WhatsApp paylaşılan medyası.</string>
     <string name="all_files_access_title">Tam depolama yönetimi erişimi</string>
     <string name="app_manager_subtitle">Açılabilir uygulamaları, boyutlarını, önbelleklerini ve Android kaldırma seçeneklerini incele</string>
@@ -123,11 +123,11 @@
     <string name="duplicates_tool_subtitle_v050">İçeriği doğrulanmış birebir kopyaları bul; her grupta bir orijinal her zaman korunur</string>
     <string name="large_files_tool_subtitle_v050">100 MB üzerindeki video, arşiv, APK, ses, belge ve diğer dosyaları bul</string>
     <string name="message_all_files_granted">Tam depolama yönetimi erişimi hazır.</string>
-    <string name="message_all_files_required">Akıllı Temizleyici’nin kapsamlı cihaz depolama taraması yapabilmesi için Tüm dosyalara erişimi etkinleştir.</string>
+    <string name="message_all_files_required">Smart Cleaner’ın kapsamlı cihaz depolama taraması yapabilmesi için Tüm dosyalara erişimi etkinleştir.</string>
     <string name="message_all_files_required_for_cache">Derin önbellek temizliği için önce Android Tüm dosyalara erişim izni gerekir.</string>
     <string name="message_cache_system_unavailable">Önbelleğin temizlendiği doğrulanamadı. Aşağıdan bir uygulama seçip Android ayarlarından önbelleğini temizleyin.</string>
     <string name="message_whatsapp_not_found">Paylaşılan depolamada desteklenen WhatsApp veya WhatsApp Business Medya klasörü bulunamadı.</string>
-    <string name="privacy_policy_body_v050">Akıllı Temizleyici erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Akıllı Temizleyici tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nAkıllı Temizleyici üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nAkıllı Temizleyici tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp’e taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Smart Cleaner tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nSmart Cleaner üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nSmart Cleaner tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp’e taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Büyük dosya • Yaş (gün): %1$d</item>
         <item quantity="other">Büyük dosya • Yaş (gün): %1$d</item>
@@ -140,7 +140,7 @@
         <item quantity="one">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
         <item quantity="other">Orijinal fotoğraf değil: önizleme önbelleği • Yaş (gün): %1$d</item>
     </plurals>
-    <string name="safe_ai_cleaning_description_v050">Akıllı Temizleyici erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
+    <string name="safe_ai_cleaning_description_v050">Smart Cleaner erişilebilir depolamayı cihaz içinde analiz eder, temkinli temizlik kuralları uygular, birebir kopyaları içerikle doğrular ve silinmesi açıkça güvenli olmayan kullanıcı dosyalarını önceden seçmez.</string>
     <string name="scan_focus_downloads">İndirilenler</string>
     <string name="scan_focus_media">Medya Temizleyici</string>
     <string name="scan_limit_note_v050">200.000 dosyalık güvenlik tavanına ulaşıldı. Sonuçlar gerçektir ancak cihaz bu geçişte indekslenenden daha fazla dosya içeriyor.</string>
@@ -153,13 +153,13 @@
     <string name="storage_type_images">Görseller</string>
     <string name="storage_type_other">Diğer dosyalar</string>
     <string name="storage_type_videos">Videolar</string>
-    <string name="terms_of_service_body_v050">Akıllı Temizleyici cihaz içi depolama analizi ve dosya yönetimi araçları sunar. Tarama sonuçları öneridir, yedek değildir. Kullanıcı dosyalarını silmeden önce seçimi incele.\n\nAkıllı Temizleyici, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Uygulama Önbelleği Yöneticisi Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.\n\nAkıllı Temizleyici korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.\n\nSilmeden önce seçimleri incelemek kullanıcının sorumluluğundadır. Silinen dosyalar geri getirilemeyebilir. Reklamlar, ilgili üçüncü taraf hizmetlerin kendi şart ve politikalarına tabidir.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner cihaz içi depolama analizi ve dosya yönetimi araçları sunar. Tarama sonuçları öneridir, yedek değildir. Kullanıcı dosyalarını silmeden önce seçimi incele.\n\nSmart Cleaner, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Uygulama Önbelleği Yöneticisi Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.\n\nSmart Cleaner korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.\n\nSilmeden önce seçimleri incelemek kullanıcının sorumluluğundadır. Silinen dosyalar geri getirilemeyebilir. Reklamlar, ilgili üçüncü taraf hizmetlerin kendi şart ve politikalarına tabidir.</string>
     <string name="uninstall">Kaldır</string>
     <string name="whatsapp_category_statuses">Durumlar</string>
     <string name="whatsapp_category_statuses_description">Paylaşılan depolamadaki geçici WhatsApp durum medyaları</string>
-    <string name="whatsapp_cleaner_subtitle_v050">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Akıllı Temizleyici içinde tara</string>
+    <string name="whatsapp_cleaner_subtitle_v050">WhatsApp ve WhatsApp Business paylaşılan Medya içeriğini doğrudan Smart Cleaner içinde tara</string>
     <string name="security_center_title">İzinler ve Gizlilik</string>
-    <string name="security_center_subtitle">Android erişimlerini yönet ve Akıllı Temizleyici’nin bunları neden kullandığını açıkça gör.</string>
+    <string name="security_center_subtitle">Android erişimlerini yönet ve Smart Cleaner’ın bunları neden kullandığını açıkça gör.</string>
     <string name="security_storage_access">Depolama erişimi</string>
     <string name="security_usage_access">Kullanım erişimi</string>
     <string name="security_storage_access_desc">Paylaşılan depolama taraması, dosya temizliği, indirilenler, APK ve WhatsApp medyası için kullanılır.</string>
@@ -327,7 +327,7 @@
     <string name="cache_modern_individual_warning">Önbelleği temizle ile Depolamayı temizle / Verileri sil aynı işlem değildir. Uygulamayı sıfırlamak istemiyorsan verileri silme.</string>
     <string name="cache_modern_open_android">Android uygulama ayarını aç</string>
     <string name="cache_modern_clean_now">Şimdi temizle</string>
-    <string name="cache_modern_safety_note">Akıllı Temizleyici Android’in bildirdiği önbelleği ölçer. Başka uygulamaların özel dosyalarını sessizce silmez; tek tek temizlik Android’in resmî uygulama ekranından tamamlanır.</string>
+    <string name="cache_modern_safety_note">Smart Cleaner Android’in bildirdiği önbelleği ölçer. Başka uygulamaların özel dosyalarını sessizce silmez; tek tek temizlik Android’in resmî uygulama ekranından tamamlanır.</string>
 
     <string name="cleanup_result_system_cache_title">Android önbellek temizliği tamamlandı</string>
     <string name="cleanup_result_system_cache_unmeasured">Android önbellek temizliğini tamamladı. Bu cihazda güvenilir bir byte azalması ölçülemedi.</string>
@@ -341,7 +341,7 @@
     <string name="permissions_privacy_policy_subtitle">Dosyaların, izinlerin, reklam gizliliğinin ve cihaz içi işlemenin nasıl ele alındığını gör.</string>
     <string name="storage_change_title">Depolama Değişimi</string>
     <string name="storage_change_hero_label">NE DEĞİŞTİ?</string>
-    <string name="storage_change_hero_no_baseline">İlk ölçümü burada oluştur. Akıllı Temizleyici gerçek bir depolama anlık görüntüsü kaydeder; geçmiş veri uydurulmaz.</string>
+    <string name="storage_change_hero_no_baseline">İlk ölçümü burada oluştur. Smart Cleaner gerçek bir depolama anlık görüntüsü kaydeder; geçmiş veri uydurulmaz.</string>
     <string name="storage_change_hero_baseline">İlk ölçüm hazır. Sonraki analiz farkı gösterecek.</string>
     <string name="storage_change_hero_more_used">Cihazda %1$s daha fazla depolama kullanılıyor</string>
     <string name="storage_change_hero_less_used">Cihazda %1$s daha az depolama kullanılıyor</string>
@@ -353,7 +353,7 @@
     <string name="storage_change_difference">Fark</string>
     <string name="storage_change_types_title">Paylaşılan dosyalardaki değişim</string>
     <string name="storage_change_types_empty">Dosya türlerinde değişim algılanmadı</string>
-    <string name="storage_change_types_empty_subtitle">İki analizde Akıllı Temizleyici’nin tarayabildiği paylaşılan dosya türlerinin toplamları aynı görünüyor.</string>
+    <string name="storage_change_types_empty_subtitle">İki analizde Smart Cleaner’ın tarayabildiği paylaşılan dosya türlerinin toplamları aynı görünüyor.</string>
     <string name="storage_change_apps_title">Uygulama önbelleği değişimleri</string>
     <string name="storage_change_current_amount">Şimdiki toplam: %1$s</string>
     <string name="storage_change_app_cache_current">Şimdiki önbellek: %1$s</string>
@@ -691,5 +691,9 @@
     <plurals name="plan_app_unused">
         <item quantity="one">%1$d gündür açılmadı · Kaldır</item>
         <item quantity="other">%1$d gündür açılmadı · Kaldır</item>
+    </plurals>
+    <plurals name="verify_selected_exact">
+        <item quantity="one">%1$d birebir kopya seçildi</item>
+        <item quantity="other">%1$d birebir kopya seçildi</item>
     </plurals>
 </resources>

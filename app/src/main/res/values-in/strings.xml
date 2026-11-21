@@ -755,4 +755,8 @@
     <plurals name="plan_app_unused">
         <item quantity="other">Tidak dibuka %1$d hari · Copot</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="other">%1$d salinan persis dipilih</item>
+    </plurals>
 </resources>

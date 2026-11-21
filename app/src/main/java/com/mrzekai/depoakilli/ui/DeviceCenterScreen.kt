@@ -241,7 +241,8 @@ private fun ToolRowCard(row: ToolRow, modifier: Modifier = Modifier) {
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
                     fontWeight = AppWeights.Title,
-                    maxLines = 1,
+                    // K4: "Uygulamalar" and long translations wrap (row is at least 96 dp) instead of "…".
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(

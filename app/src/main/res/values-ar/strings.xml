@@ -999,4 +999,13 @@
         <item quantity="many">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
         <item quantity="other">لم يُفتح منذ %1$d يوم · إلغاء التثبيت</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="zero">تم تحديد %1$d نسخة مطابقة</item>
+        <item quantity="one">تم تحديد %1$d نسخة مطابقة</item>
+        <item quantity="two">تم تحديد %1$d نسخة مطابقة</item>
+        <item quantity="few">تم تحديد %1$d نسخ مطابقة</item>
+        <item quantity="many">تم تحديد %1$d نسخة مطابقة</item>
+        <item quantity="other">تم تحديد %1$d نسخة مطابقة</item>
+    </plurals>
 </resources>

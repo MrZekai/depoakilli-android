@@ -848,4 +848,10 @@
         <item quantity="many">Pas ouverte depuis %1$d jours · Désinstaller</item>
         <item quantity="other">Pas ouverte depuis %1$d jours · Désinstaller</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="one">%1$d copie exacte sélectionnée</item>
+        <item quantity="many">%1$d copies exactes sélectionnées</item>
+        <item quantity="other">%1$d copies exactes sélectionnées</item>
+    </plurals>
 </resources>

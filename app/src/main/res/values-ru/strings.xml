@@ -897,4 +897,11 @@
         <item quantity="many">Не открывалось %1$d дней · Удалить</item>
         <item quantity="other">Не открывалось %1$d дней · Удалить</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="one">Выбрана %1$d точная копия</item>
+        <item quantity="few">Выбрано %1$d точные копии</item>
+        <item quantity="many">Выбрано %1$d точных копий</item>
+        <item quantity="other">Выбрано %1$d точных копий</item>
+    </plurals>
 </resources>

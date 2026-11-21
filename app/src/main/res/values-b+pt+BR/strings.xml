@@ -810,4 +810,9 @@
         <item quantity="one">Não aberto há %1$d dia · Desinstalar</item>
         <item quantity="other">Não aberto há %1$d dias · Desinstalar</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="verify_selected_exact">
+        <item quantity="one">%1$d cópia exata selecionada</item>
+        <item quantity="other">%1$d cópias exatas selecionadas</item>
+    </plurals>
 </resources>
