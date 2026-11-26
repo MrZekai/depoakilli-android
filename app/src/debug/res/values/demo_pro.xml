@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: demo plans for store screenshots of the Pro screens.
+     Emulators have no Play products; release builds read prices from Play only. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string-array name="demo_pro_plans" tools:ignore="UnusedResources">
+        <item>YEARLY|$24.99|3|24990000|USD</item>
+        <item>WEEK_PASS|$4.99||4990000|USD</item>
+        <item>LIFETIME|$49.99||49990000|USD</item>
+    </string-array>
+</resources>

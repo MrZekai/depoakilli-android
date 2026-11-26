@@ -22,6 +22,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.billing.BillingEvent
 import com.mrzekai.depoakilli.billing.BillingProducts
+import com.mrzekai.depoakilli.billing.ProDemo
 import com.mrzekai.depoakilli.billing.ProPlanOption
 import com.mrzekai.depoakilli.pro.CleanupOrigin
 import com.mrzekai.depoakilli.pro.PhotoStats
@@ -98,15 +99,18 @@ class MainActivity : ComponentActivity() {
                 billing.events.collect(::showBillingMessage)
             }
         }
+        // Debug builds: demo Pro state for screenshots of the Pro screens (ProDemo).
+        if (BuildConfig.DEBUG) ProDemo.mode = intent?.getStringExtra("demo_pro")
         // The free-tier gates follow Google Play's answer on Pro.
         lifecycleScope.launch {
-            billing.state.collect { cleanerViewModel.setPro(it.isPro) }
+            billing.state.collect { cleanerViewModel.setPro(ProDemo.apply(applicationContext, it).isPro) }
         }
         // Plans (and whether a trial is offered) for the Y1 card and the paywall.
         billing.loadProducts()
 
         setContent {
-            val pro by billing.state.collectAsStateWithLifecycle()
+            val realPro by billing.state.collectAsStateWithLifecycle()
+            val pro = ProDemo.apply(applicationContext, realPro)
             val photoBytes by averagePhotoBytes.collectAsStateWithLifecycle()
             DepoAkilliTheme {
                 CleanerApp(
