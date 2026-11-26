@@ -18,7 +18,6 @@ import kotlin.coroutines.resume
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -49,6 +48,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
     private val connectMutex = Mutex()
 
     val entitlement = Entitlement(appContext)
+    private val prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     private val _state = MutableStateFlow(ProScreenState(isPro = entitlement.isPro.value))
     val state: StateFlow<ProScreenState> = _state.asStateFlow()
@@ -57,6 +57,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
     val events: SharedFlow<BillingEvent> = _events.asSharedFlow()
 
     private var productDetails: Map<String, ProductDetails> = emptyMap()
+    private var launchedKind: ProPlanKind? = null
 
     private val client: BillingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
@@ -95,7 +96,13 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
             val owned = (subs + oneTime).map(::toOwned)
             acknowledge(owned)
             entitlement.update(owned)
-            _state.update { it.copy(pending = EntitlementRules.hasPending(owned)) }
+            val lastWeekPass = prefs.getString(KEY_LAST_KIND, null) == ProPlanKind.WEEK_PASS.name
+            _state.update {
+                it.copy(
+                    pending = EntitlementRules.hasPending(owned),
+                    ownedPlan = EntitlementRules.ownedPlan(owned, lastWeekPass),
+                )
+            }
             if (userRequested) {
                 _events.tryEmit(
                     if (EntitlementRules.isPro(owned)) BillingEvent.RESTORED else BillingEvent.NOTHING_TO_RESTORE,
@@ -121,16 +128,31 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
                     offerId = offer.offerId,
                     offerToken = offer.offerToken,
                     phases = offer.pricingPhases.pricingPhaseList.map { phase ->
-                        PricingPhaseInfo(phase.priceAmountMicros, phase.formattedPrice, phase.billingPeriod)
+                        PricingPhaseInfo(
+                            phase.priceAmountMicros,
+                            phase.formattedPrice,
+                            phase.billingPeriod,
+                            phase.priceCurrencyCode,
+                        )
                     },
                 )
             }
-            val plans = ProOffers.build(offers, lifetime?.oneTimePurchaseOfferDetails?.formattedPrice)
-            _state.update { it.copy(loading = false, plans = plans) }
+            val oneTime = lifetime?.oneTimePurchaseOfferDetails
+            val plans = ProOffers.build(
+                offers,
+                oneTime?.formattedPrice,
+                oneTime?.priceAmountMicros ?: 0L,
+                oneTime?.priceCurrencyCode.orEmpty(),
+            )
+            _state.update { it.copy(loading = false, plans = plans, upgrade = ProOffers.upgrade(offers)) }
         }
     }
 
-    /** Opens Play's purchase sheet for [plan]. The result arrives in [onPurchasesUpdated]. */
+    /**
+     * Opens Play's purchase sheet for [plan]. The result arrives in [onPurchasesUpdated].
+     * A week-pass top-up ("Add time") is launched exactly like the first purchase;
+     * Play extends the pass and the top-up is acknowledged like any purchase.
+     */
     fun launchPurchase(activity: Activity, plan: ProPlanOption) {
         val productId = if (plan.kind == ProPlanKind.LIFETIME) BillingProducts.LIFETIME else BillingProducts.SUBSCRIPTION
         val details = productDetails[productId]
@@ -145,6 +167,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
         val flowParams = BillingFlowParams.newBuilder()
             .setProductDetailsParamsList(listOf(productParams))
             .build()
+        launchedKind = plan.kind
         val result = client.launchBillingFlow(activity, flowParams)
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK,
@@ -160,6 +183,11 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK -> {
                 val owned = purchases.orEmpty().map(::toOwned)
+                val kind = launchedKind
+                if (EntitlementRules.isPro(owned) && kind != null && kind != ProPlanKind.LIFETIME) {
+                    // Remembered so Y5 can name a pass (Play does not say which base plan a purchase is).
+                    prefs.edit().putString(KEY_LAST_KIND, kind.name).apply()
+                }
                 when {
                     EntitlementRules.isPro(owned) -> _events.tryEmit(BillingEvent.PRO_ACTIVATED)
                     EntitlementRules.hasPending(owned) -> _events.tryEmit(BillingEvent.PENDING)
@@ -175,19 +203,17 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
 
     private suspend fun ensureConnected(): Boolean = connectMutex.withLock {
         if (client.isReady) return@withLock true
-        repeat(CONNECT_ATTEMPTS) { attempt ->
-            val code = connectOnce().responseCode
-            if (code == BillingClient.BillingResponseCode.OK) return@withLock true
-            // No Play Store / billing not supported on this device: retrying will not help.
-            if (code == BillingClient.BillingResponseCode.BILLING_UNAVAILABLE ||
-                code == BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED ||
-                code == BillingClient.BillingResponseCode.DEVELOPER_ERROR
-            ) {
-                return@withLock false
+        // Faz 2: every attempt is time-limited (BillingConnect), so the lock is always released.
+        BillingConnect.connect {
+            when (connectOnce().responseCode) {
+                BillingClient.BillingResponseCode.OK -> BillingConnect.Outcome.OK
+                // No Play Store / billing not supported on this device: retrying will not help.
+                BillingClient.BillingResponseCode.BILLING_UNAVAILABLE,
+                BillingClient.BillingResponseCode.FEATURE_NOT_SUPPORTED,
+                BillingClient.BillingResponseCode.DEVELOPER_ERROR -> BillingConnect.Outcome.GIVE_UP
+                else -> BillingConnect.Outcome.RETRY
             }
-            if (attempt < CONNECT_ATTEMPTS - 1) delay(CONNECT_RETRY_BASE_MILLIS shl attempt)
         }
-        false
     }
 
     private suspend fun connectOnce(): BillingResult = suspendCancellableCoroutine { continuation ->
@@ -251,10 +277,11 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
         },
         acknowledged = purchase.isAcknowledged,
         token = purchase.purchaseToken,
+        autoRenewing = purchase.isAutoRenewing,
     )
 
     private companion object {
-        const val CONNECT_ATTEMPTS = 3
-        const val CONNECT_RETRY_BASE_MILLIS = 1_000L
+        const val PREFS = "pro_billing"
+        const val KEY_LAST_KIND = "last_bought_kind"
     }
 }

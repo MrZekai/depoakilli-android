@@ -52,6 +52,10 @@ internal data class DeviceRefreshSnapshot(
 )
 
 data class CleanerUiState(
+    /** Smart Cleaner Pro is on (Google Play); drives the free-tier gates. */
+    val isPro: Boolean = false,
+    /** Free tier memory (first free cleanup, today's decisions, monthly Pro bytes). */
+    val freeTier: com.mrzekai.depoakilli.pro.FreeTierSnapshot = com.mrzekai.depoakilli.pro.FreeTierSnapshot(),
     val storage: StorageSnapshot = StorageSnapshot(),
     val memory: MemorySnapshot = MemorySnapshot(),
     val ownCacheBytes: Long = 0L,

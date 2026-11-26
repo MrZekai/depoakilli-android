@@ -22,7 +22,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mrzekai.depoakilli.billing.BillingEvent
 import com.mrzekai.depoakilli.billing.BillingProducts
+import com.mrzekai.depoakilli.billing.ProDemo
 import com.mrzekai.depoakilli.billing.ProPlanOption
+import com.mrzekai.depoakilli.pro.CleanupOrigin
+import com.mrzekai.depoakilli.pro.PhotoStats
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.CleanerApp
@@ -96,9 +99,19 @@ class MainActivity : ComponentActivity() {
                 billing.events.collect(::showBillingMessage)
             }
         }
+        // Debug builds: demo Pro state for screenshots of the Pro screens (ProDemo).
+        if (BuildConfig.DEBUG) ProDemo.mode = intent?.getStringExtra("demo_pro")
+        // The free-tier gates follow Google Play's answer on Pro.
+        lifecycleScope.launch {
+            billing.state.collect { cleanerViewModel.setPro(ProDemo.apply(applicationContext, it).isPro) }
+        }
+        // Plans (and whether a trial is offered) for the Y1 card and the paywall.
+        billing.loadProducts()
 
         setContent {
-            val pro by billing.state.collectAsStateWithLifecycle()
+            val realPro by billing.state.collectAsStateWithLifecycle()
+            val pro = ProDemo.apply(applicationContext, realPro)
+            val photoBytes by averagePhotoBytes.collectAsStateWithLifecycle()
             DepoAkilliTheme {
                 CleanerApp(
                     viewModel = cleanerViewModel,
@@ -120,6 +133,8 @@ class MainActivity : ComponentActivity() {
                     onBuyPlan = ::buyPlan,
                     onRestorePurchases = { billing.refreshPurchases(userRequested = true) },
                     onManageSubscription = ::openSubscriptionManagement,
+                    averagePhotoBytes = photoBytes,
+                    onPaywallOpened = ::measurePhotos,
                     onRateApp = ::rateApp,
                     onSendFeedback = ::sendFeedback,
                     onShareApp = ::shareApp,
@@ -140,7 +155,38 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun cleanSelected(itemIds: Set<String>? = null) {
-        executeCleanupPlan(itemIds)
+        val origin = cleanerViewModel.takeNextCleanupOrigin()
+        if (origin == null) {
+            executeCleanupPlan(itemIds)
+            return
+        }
+        // Faz 2: the free first "My pick" cleanup is spent once it deletes something;
+        // what Pro features clear counts toward this month's figure (Y5).
+        val wasPro = billing.state.value.isPro
+        val firstUsed = cleanerViewModel.state.value.freeTier.firstCleanupUsed
+        val proSwipeBytes = if (origin == CleanupOrigin.SWIPE && itemIds != null) cleanerViewModel.proDecisionBytes(itemIds) else 0L
+        cleanerViewModel.prepareCleanup(itemIds = itemIds) { deletedAny ->
+            if (!deletedAny) return@prepareCleanup
+            val result = cleanerViewModel.state.value.cleanupResult
+            val cleared = (result?.deletedBytes ?: 0L) + (result?.trashedBytes ?: 0L)
+            when (origin) {
+                CleanupOrigin.ONE_TAP_PICK ->
+                    if (firstUsed && wasPro) cleanerViewModel.addProBytes(cleared) else cleanerViewModel.markFirstCleanupUsed()
+                CleanupOrigin.SWIPE -> if (wasPro) cleanerViewModel.addProBytes(proSwipeBytes.coerceAtMost(cleared))
+            }
+        }
+    }
+
+    /** Average photo size for the paywall's "about N photos" line (MediaStore, off the main thread). */
+    private val averagePhotoBytes = kotlinx.coroutines.flow.MutableStateFlow<Long?>(null)
+
+    private fun measurePhotos() {
+        if (averagePhotoBytes.value != null) return
+        lifecycleScope.launch {
+            averagePhotoBytes.value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                PhotoStats.averagePhotoBytes(applicationContext)
+            }
+        }
     }
 
     private fun cleanStorage() {

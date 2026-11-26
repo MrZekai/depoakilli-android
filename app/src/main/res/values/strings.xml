@@ -448,7 +448,6 @@
     <string name="swipe_keep">KEEP</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Finish</string>
-    <string name="swipe_continue">Continue</string>
     <string name="swipe_review_view">Swipe review</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -478,10 +477,6 @@
     <plurals name="swipe_marked">
         <item quantity="one">Marked: %1$d file · %2$s</item>
         <item quantity="other">Marked: %1$d files · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="one">%1$d reviewed · %2$s marked</item>
-        <item quantity="other">%1$d reviewed · %2$s marked</item>
     </plurals>
     <string name="deep_check_action">Verify</string>
     <string name="deep_check_running">Checking possible duplicates…</string>
@@ -564,7 +559,6 @@
     <string name="confirm_permanent_title">Delete %1$s for good?</string>
     <string name="confirm_permanent_action">Delete permanently</string>
     <string name="plan_found_title">more I can free. Here’s what I found:</string>
-    <string name="plan_start_biggest">Start with the biggest</string>
     <string name="swipe_title">Keep this one?</string>
     <string name="swipe_undo_last">Undo last choice</string>
     <string name="swipe_selected_note">%1$s selected · you confirm at the end</string>
@@ -682,22 +676,19 @@
         <item quantity="other">%1$d exact copies selected</item>
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
-    <string name="pro_subtitle">Pro features arrive in upcoming updates. Everything you use today stays as it is.</string>
     <string name="pro_loading">Loading plans…</string>
     <string name="pro_coming_soon_title">Coming soon</string>
     <string name="pro_coming_soon_body">Pro plans are not available yet. Everything in the app keeps working as before.</string>
     <string name="pro_active_title">Pro is on</string>
-    <string name="pro_active_body">Thank you. Pro is linked to your Google Play account.</string>
     <string name="pro_pending">Your purchase is waiting for payment. Pro turns on when Google Play completes it.</string>
     <string name="pro_plan_yearly">%s / year</string>
     <string name="pro_plan_week">%s / 1 week</string>
-    <string name="pro_plan_week_detail">Prepaid. Does not renew.</string>
+    <string name="pro_plan_week_detail">Prepaid. Ends on its own, doesn\'t renew.</string>
     <string name="pro_plan_lifetime">%s one time</string>
     <string name="pro_plan_lifetime_detail">One payment. No renewal.</string>
-    <string name="pro_buy_yearly">Subscribe for %s/year</string>
+    <string name="pro_buy_yearly">Start at %s a year</string>
     <string name="pro_buy_week">1 week for %s · does not renew</string>
     <string name="pro_buy_lifetime">Pay %s once</string>
-    <string name="pro_legal_renews">The yearly plan renews automatically. You can cancel anytime in Google Play &gt; Subscriptions. The rest of the app works without a subscription.</string>
     <string name="pro_restore">Restore purchases</string>
     <string name="pro_manage">Manage subscription</string>
     <string name="pro_message_activated">Pro is on. Thank you!</string>
@@ -706,13 +697,94 @@
     <string name="pro_message_nothing_to_restore">No Pro purchase was found on this Google account.</string>
     <string name="pro_message_failed">The purchase could not be completed. Please try again.</string>
     <string name="pro_message_unavailable">Google Play billing is not available right now.</string>
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="one">%1$d-day trial, then %2$s per year</item>
-        <item quantity="other">%1$d-day trial, then %2$s per year</item>
-    </plurals>
     <plurals name="pro_buy_trial">
         <item quantity="one">Try %1$d day, then %2$s/year</item>
         <item quantity="other">Try %1$d days, then %2$s/year</item>
     </plurals>
     <string name="pro_message_restore_failed">Purchases could not be checked. Please try again.</string>
+    <string name="pro_badge">PRO</string>
+    <string name="home_plan_sub_ready">I can clear. The first %s is ready:</string>
+    <string name="pro_card_title">%s more with Pro</string>
+    <string name="pro_card_title_about">About %s more with Pro</string>
+    <string name="pro_value_about">about %s</string>
+    <string name="pro_card_see">See Pro</string>
+    <string name="pro_fill_now">NOW</string>
+    <string name="pro_fill_with_pro">WITH PRO</string>
+    <string name="pro_fill_full">%s full</string>
+    <string name="pro_fill_note">Measured on this phone.</string>
+    <string name="pro_fill_note_estimate">Measured on this phone. The video gain is approximate.</string>
+    <string name="paywall_close">Close</string>
+    <string name="paywall_title">%s more to clear</string>
+    <string name="paywall_title_unknown">Clear space faster</string>
+    <string name="paywall_sub">Measured on this phone. Your photos never leave it.</string>
+    <string name="paywall_chip_undo">Undo for 7 days</string>
+    <string name="paywall_chip_on_phone">Stays on your phone</string>
+    <string name="paywall_chip_cancel">Cancel anytime</string>
+    <string name="paywall_plan_yearly">YEARLY</string>
+    <string name="paywall_plan_week">1-WEEK PASS</string>
+    <string name="paywall_plan_lifetime">LIFETIME</string>
+    <string name="pro_plan_yearly_renews">%s per year. Renews automatically.</string>
+    <string name="paywall_weekly_equivalent">about %s a week</string>
+    <string name="paywall_first_charge">No charge today. First payment on %s.</string>
+    <string name="paywall_legal">Cancel anytime in Google Play &gt; Subscriptions. Basic cleaning works without a subscription.</string>
+    <string name="honest_title">You don\'t need Pro right now.</string>
+    <string name="honest_body">Pro would clear only %s more on this phone. I won\'t waste your money.</string>
+    <string name="honest_body_zero">Right now Pro would clear nothing extra on this phone; your first big cleanup is on us. I won\'t waste your money.</string>
+    <string name="honest_ok">OK</string>
+    <string name="honest_see_plans">See plans anyway</string>
+    <string name="limit_header">TODAY %1$d / %2$d DECISIONS</string>
+    <string name="limit_title">That\'s it for today. You marked %s.</string>
+    <string name="limit_title_none">That\'s it for today.</string>
+    <string name="limit_clear">Clear %s</string>
+    <string name="limit_pro">Keep going without limits</string>
+    <string name="limit_tomorrow">I\'ll continue tomorrow</string>
+    <string name="pro_owned_yearly">Yearly plan</string>
+    <string name="pro_owned_week">1-week pass</string>
+    <string name="pro_owned_lifetime">Lifetime</string>
+    <string name="pro_owned_not_renewing">Subscription · not renewing</string>
+    <string name="pro_month_label">THIS MONTH WITH PRO</string>
+    <string name="pro_month_cleared">Cleared %s</string>
+    <string name="pro_month_none">You haven\'t cleared anything with Pro this month.</string>
+    <string name="pro_add_time">Add a week · %s</string>
+    <string name="pro_on_cancel_note">You can cancel anytime in Google Play &gt; Subscriptions. Pro stays on until the end of the period.</string>
+    <string name="plan_tier_now_title">Ready to clear</string>
+    <string name="plan_tier_now_body">App leftovers, old APKs, exact copies.</string>
+    <string name="plan_tier_now_action">Clean up</string>
+    <string name="plan_tier_pick_title">My pick</string>
+    <string name="plan_tier_pick_locked">Your first big cleanup was on us. One-tap cleanup is in Pro; picking files yourself is always open.</string>
+    <string name="plan_tier_pick_by_hand">Pick one by one</string>
+    <string name="plan_tier_pick_one_tap">Clear with one tap</string>
+    <string name="plan_ask_one_by_one">Show one by one</string>
+    <plurals name="pro_gain_pick">
+        <item quantity="one">%d file of my picks, one tap</item>
+        <item quantity="other">%d files of my picks, one tap</item>
+    </plurals>
+    <plurals name="pro_gain_video">
+        <item quantity="one">%d big video shrinks</item>
+        <item quantity="other">%d big videos shrink</item>
+    </plurals>
+    <plurals name="pro_card_try">
+        <item quantity="one">Try Pro for %d day</item>
+        <item quantity="other">Try Pro for %d days</item>
+    </plurals>
+    <plurals name="paywall_photos">
+        <item quantity="one">About %d photo\'s worth of space.</item>
+        <item quantity="other">About %d photos\' worth of space.</item>
+    </plurals>
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="one">%1$d-day trial, then %2$s per year. Renews automatically.</item>
+        <item quantity="other">%1$d-day trial, then %2$s per year. Renews automatically.</item>
+    </plurals>
+    <plurals name="paywall_anchor">
+        <item quantity="one">52 weeks for the price of %d week pass</item>
+        <item quantity="other">52 weeks for the price of %d week passes</item>
+    </plurals>
+    <plurals name="limit_body">
+        <item quantity="one">Without Pro you decide on %d file a day. The count starts over tomorrow; cleaning by hand in Tools is always open.</item>
+        <item quantity="other">Without Pro you decide on %d files a day. The count starts over tomorrow; cleaning by hand in Tools is always open.</item>
+    </plurals>
+    <plurals name="plan_ask_daily">
+        <item quantity="one">%d decision today; unlimited with Pro</item>
+        <item quantity="other">%d decisions today; unlimited with Pro</item>
+    </plurals>
 </resources>

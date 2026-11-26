@@ -11,6 +11,8 @@ data class OwnedPurchase(
     val state: State,
     val acknowledged: Boolean,
     val token: String,
+    /** Play's isAutoRenewing: true for an active yearly plan, false for a pass or a cancelled plan. */
+    val autoRenewing: Boolean = false,
 ) {
     enum class State { PURCHASED, PENDING, UNSPECIFIED }
 }
@@ -27,6 +29,22 @@ object EntitlementRules {
     fun hasPending(purchases: List<OwnedPurchase>): Boolean = purchases.any { purchase ->
         purchase.state == OwnedPurchase.State.PENDING &&
             purchase.products.any(BillingProducts.PRO_PRODUCTS::contains)
+    }
+
+    /**
+     * What the user owns (Y5). A non-renewing `pro` purchase is a week pass only
+     * when this device bought one ([lastBoughtWeekPass]); otherwise it may be a
+     * cancelled yearly plan, so it is not named.
+     */
+    fun ownedPlan(purchases: List<OwnedPurchase>, lastBoughtWeekPass: Boolean): OwnedPlan? {
+        val active = purchases.filter { it.state == OwnedPurchase.State.PURCHASED }
+        if (active.any { BillingProducts.LIFETIME in it.products }) return OwnedPlan.LIFETIME
+        val subscription = active.firstOrNull { BillingProducts.SUBSCRIPTION in it.products } ?: return null
+        return when {
+            subscription.autoRenewing -> OwnedPlan.YEARLY
+            lastBoughtWeekPass -> OwnedPlan.WEEK_PASS
+            else -> OwnedPlan.SUBSCRIPTION_NOT_RENEWING
+        }
     }
 
     /** Purchases Play still needs acknowledged (within 3 days, or it refunds them). */

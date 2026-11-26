@@ -11,6 +11,28 @@ data class ProPlanOption(
     val trialDays: Int? = null,
     /** Offer token for subscriptions; null for the one-time product. */
     val offerToken: String? = null,
+    /** Recurring price in micros and its ISO currency, for the price anchor (Faz 2.2b). */
+    val priceMicros: Long = 0L,
+    val currencyCode: String = "",
+)
+
+/** What the user owns, as far as the device can tell (Faz 2 Y5). */
+enum class OwnedPlan {
+    /** Auto-renewing yearly subscription. */
+    YEARLY,
+    /** Prepaid one-week pass (bought on this device). */
+    WEEK_PASS,
+    /** `pro_lifetime`. */
+    LIFETIME,
+    /** A `pro` subscription that does not renew: a cancelled yearly plan or a pass bought elsewhere. */
+    SUBSCRIPTION_NOT_RENEWING,
+}
+
+/** The `upgrade-yearly` offer (Faz 2 Y6): first-year price and the price after it. */
+data class UpgradeOffer(
+    val firstYearPrice: String,
+    val laterYearPrice: String,
+    val offerToken: String,
 )
 
 /** What the Pro page needs; built from Billing state. */
@@ -22,6 +44,17 @@ data class ProScreenState(
     val plans: List<ProPlanOption> = emptyList(),
     /** A purchase waits for payment; it grants nothing until Play completes it. */
     val pending: Boolean = false,
+    /** What the user owns; null when not Pro. */
+    val ownedPlan: OwnedPlan? = null,
+    /** Upgrade offer, when Play returns it (developer-determined; shown only by Y6 rules). */
+    val upgrade: UpgradeOffer? = null,
+    /**
+     * End of a prepaid pass / next renewal. Play Billing Library does not give
+     * these to the app (only the Play Developer API on a server does), so they
+     * stay null and no date is ever shown or guessed.
+     */
+    val passEndMillis: Long? = null,
+    val renewalMillis: Long? = null,
 ) {
     val available: Boolean get() = plans.isNotEmpty()
 }
@@ -32,6 +65,7 @@ data class PricingPhaseInfo(
     val formattedPrice: String,
     /** ISO 8601 period, e.g. P3D, P1W, P1Y. */
     val billingPeriod: String,
+    val currencyCode: String = "",
 )
 
 /** A subscription offer (pure copy of Play's SubscriptionOfferDetails). */
@@ -45,14 +79,29 @@ data class SubscriptionOfferInfo(
 
 /** Pure mapping from Play's answer to the plans the paywall lists (unit-tested). */
 object ProOffers {
-    fun build(subscriptionOffers: List<SubscriptionOfferInfo>, lifetimePrice: String?): List<ProPlanOption> {
+    fun build(
+        subscriptionOffers: List<SubscriptionOfferInfo>,
+        lifetimePrice: String?,
+        lifetimeMicros: Long = 0L,
+        lifetimeCurrency: String = "",
+    ): List<ProPlanOption> {
         val plans = mutableListOf<ProPlanOption>()
         yearly(subscriptionOffers)?.let(plans::add)
         weekPass(subscriptionOffers)?.let(plans::add)
         if (!lifetimePrice.isNullOrBlank()) {
-            plans += ProPlanOption(ProPlanKind.LIFETIME, lifetimePrice)
+            plans += ProPlanOption(ProPlanKind.LIFETIME, lifetimePrice, priceMicros = lifetimeMicros, currencyCode = lifetimeCurrency)
         }
         return plans
+    }
+
+    /** The upgrade offer with both prices (first year, then the yearly price), or null. */
+    fun upgrade(offers: List<SubscriptionOfferInfo>): UpgradeOffer? {
+        val offer = offers.firstOrNull {
+            it.basePlanId == BillingProducts.PLAN_YEARLY && it.offerId == BillingProducts.OFFER_UPGRADE
+        } ?: return null
+        val paid = offer.phases.filter { it.priceMicros > 0L }
+        if (paid.size < 2) return null
+        return UpgradeOffer(paid.first().formattedPrice, paid.last().formattedPrice, offer.offerToken)
     }
 
     private fun yearly(offers: List<SubscriptionOfferInfo>): ProPlanOption? {
@@ -62,25 +111,33 @@ object ProOffers {
         // The upgrade offer is developer-determined and is not shown here (Faz 2).
         val trial = forPlan.firstOrNull { it.offerId == BillingProducts.OFFER_TRIAL }
         val chosen = trial ?: base
-        val recurring = recurringPrice(chosen) ?: recurringPrice(base) ?: return null
+        val recurring = recurringPhase(chosen) ?: recurringPhase(base) ?: return null
         return ProPlanOption(
             kind = ProPlanKind.YEARLY,
-            formattedPrice = recurring,
+            formattedPrice = recurring.formattedPrice,
             trialDays = trial?.let(::trialDays),
             offerToken = chosen.offerToken,
+            priceMicros = recurring.priceMicros,
+            currencyCode = recurring.currencyCode,
         )
     }
 
     private fun weekPass(offers: List<SubscriptionOfferInfo>): ProPlanOption? {
         val base = offers.firstOrNull { it.basePlanId == BillingProducts.PLAN_WEEK_PASS && it.offerId == null }
             ?: return null
-        val price = recurringPrice(base) ?: return null
-        return ProPlanOption(ProPlanKind.WEEK_PASS, price, offerToken = base.offerToken)
+        val phase = recurringPhase(base) ?: return null
+        return ProPlanOption(
+            ProPlanKind.WEEK_PASS,
+            phase.formattedPrice,
+            offerToken = base.offerToken,
+            priceMicros = phase.priceMicros,
+            currencyCode = phase.currencyCode,
+        )
     }
 
-    /** The price paid after any free phase: the last phase that costs money. */
-    private fun recurringPrice(offer: SubscriptionOfferInfo): String? =
-        offer.phases.lastOrNull { it.priceMicros > 0L }?.formattedPrice
+    /** The phase paid after any free phase: the last phase that costs money. */
+    private fun recurringPhase(offer: SubscriptionOfferInfo): PricingPhaseInfo? =
+        offer.phases.lastOrNull { it.priceMicros > 0L }
 
     /** Length of the free phase in days; null when the offer has none. */
     fun trialDays(offer: SubscriptionOfferInfo): Int? =

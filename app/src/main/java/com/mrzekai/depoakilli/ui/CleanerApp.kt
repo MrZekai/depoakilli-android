@@ -103,6 +103,9 @@ fun CleanerApp(
     onBuyPlan: (ProPlanOption) -> Unit = {},
     onRestorePurchases: () -> Unit = {},
     onManageSubscription: () -> Unit = {},
+    /** Faz 2.2b: average photo size for "about N photos" (null until measured or without photos). */
+    averagePhotoBytes: Long? = null,
+    onPaywallOpened: () -> Unit = {},
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
@@ -118,6 +121,21 @@ fun CleanerApp(
     // C2: the result screen's "My pick" line opens the findings list with its confirmation.
     var openSuggestionRequested by rememberSaveable { mutableStateOf(false) }
     var scrollToAppsRequested by rememberSaveable { mutableStateOf(false) }
+    // Faz 2 Y2: the paywall opens only when the user taps (Y1 card, Y4, Y7, Settings).
+    var paywallOpen by rememberSaveable { mutableStateOf(false) }
+    val proEstimate = remember(state.summary, state.freeTier.firstCleanupUsed, state.scanFocus) { state.proEstimate() }
+    fun openPaywall() {
+        onOpenPro()
+        onPaywallOpened()
+        paywallOpen = true
+    }
+    // A purchase that turned Pro on goes from the paywall to "Pro is on" (Y5).
+    LaunchedEffect(pro.isPro) {
+        if (pro.isPro && paywallOpen) {
+            paywallOpen = false
+            detailScreen = DetailScreen.PRO
+        }
+    }
     // Scan data lives in the ViewModel, not saved navigation state. After a
     // process restart the saved results route must not reopen without its data.
     LaunchedEffect(Unit) {
@@ -387,6 +405,7 @@ fun CleanerApp(
                         onSuggestionOpened = { openSuggestionRequested = false },
                         scrollToApps = scrollToAppsRequested,
                         onScrolledToApps = { scrollToAppsRequested = false },
+                        onOpenPaywall = ::openPaywall,
                     )
 
                     DetailScreen.WHATSAPP -> WhatsAppCleanerDetailScreen(
@@ -448,7 +467,8 @@ fun CleanerApp(
                         isPro = pro.isPro,
                         onOpenPro = {
                             onOpenPro()
-                            detailScreen = DetailScreen.PRO
+                            // Y3: below 2 GB of real gain the app does not sell; Y5 when Pro is on.
+                            if (pro.isPro || !proEstimate.qualifies) detailScreen = DetailScreen.PRO else openPaywall()
                         },
                         onOpenLanguageSettings = onOpenLanguageSettings,
                         onRateApp = onRateApp,
@@ -488,15 +508,28 @@ fun CleanerApp(
                         modifier = Modifier,
                     )
 
-                    DetailScreen.PRO -> ProScreen(
-                        state = pro,
-                        onBuy = onBuyPlan,
-                        onRestore = onRestorePurchases,
-                        onManageSubscription = onManageSubscription,
-                        onOpenLegalPage = ::openLegalPage,
-                        onClose = ::navigateBackInApp,
-                        modifier = Modifier,
-                    )
+                    DetailScreen.PRO -> when {
+                        pro.isPro -> com.mrzekai.depoakilli.ui.pro.ProOnScreen(
+                            state = pro,
+                            monthBytes = state.freeTier.monthBytes(),
+                            onManageSubscription = onManageSubscription,
+                            onRestore = onRestorePurchases,
+                            onAddTime = onBuyPlan,
+                            onOpenLegalPage = ::openLegalPage,
+                            modifier = Modifier,
+                        )
+                        !proEstimate.qualifies -> com.mrzekai.depoakilli.ui.pro.HonestProScreen(
+                            gainBytes = proEstimate.totalBytes,
+                            onOk = ::navigateBackInApp,
+                            onSeePlans = ::openPaywall,
+                            modifier = Modifier,
+                        )
+                        else -> LaunchedEffect(Unit) {
+                            // Not Pro (any more) and a real gain: the paywall, never this page.
+                            navigateBackInApp()
+                            openPaywall()
+                        }
+                    }
 
                     DetailScreen.PRIVACY,
                     DetailScreen.TERMS,
@@ -555,6 +588,23 @@ fun CleanerApp(
                                 accessDeniedOnce = allFilesAskedOnce,
                                 onOpenSettings = onRequestAllFilesAccess,
                                 modifier = Modifier,
+                                proCard = if (
+                                    com.mrzekai.depoakilli.pro.FreeTierRules.showProCard(
+                                        isPro = pro.isPro,
+                                        estimate = proEstimate,
+                                        nowMillis = System.currentTimeMillis(),
+                                        hiddenUntilMillis = state.freeTier.proCardHiddenUntil,
+                                    )
+                                ) {
+                                    HomeProCard(
+                                        estimate = proEstimate,
+                                        trialDays = pro.plans.firstOrNull { it.kind == com.mrzekai.depoakilli.billing.ProPlanKind.YEARLY }?.trialDays,
+                                        onOpenPaywall = ::openPaywall,
+                                        onNotNow = viewModel::snoozeProCard,
+                                    )
+                                } else {
+                                    null
+                                },
                             )
                         }
 
@@ -584,6 +634,26 @@ fun CleanerApp(
                 }
             }
         }
+    }
+
+    // Y2: over everything (bottom bar included); ✕ and system Back close it.
+    if (paywallOpen) {
+        com.mrzekai.depoakilli.ui.pro.PaywallScreen(
+            state = pro,
+            facts = com.mrzekai.depoakilli.ui.pro.PaywallFacts(
+                estimate = proEstimate,
+                totalBytes = state.storage.totalBytes,
+                availableBytes = state.storage.availableBytes,
+                averagePhotoBytes = averagePhotoBytes,
+            ),
+            onBuy = onBuyPlan,
+            onRestore = onRestorePurchases,
+            onOpenLegalPage = { page ->
+                paywallOpen = false
+                openLegalPage(page)
+            },
+            onClose = { paywallOpen = false },
+        )
     }
 
     val trashFallback = state.trashFallback
@@ -663,7 +733,8 @@ fun CleanerApp(
                         result.kind == CleanupResultKind.FILES &&
                             state.scanFocus == ScanFocus.SMART &&
                             it.showsSuggestion &&
-                            it.safeBytes < CleaningThresholds.PLAN_MIN_BYTES
+                            it.safeBytes < CleaningThresholds.PLAN_MIN_BYTES &&
+                            com.mrzekai.depoakilli.pro.FreeTierRules.canUseOneTapPick(pro.isPro, state.freeTier.firstCleanupUsed)
                     }
                     ?.suggestedBytes ?: 0L,
                 onOpenSuggested = {

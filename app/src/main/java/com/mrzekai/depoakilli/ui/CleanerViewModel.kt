@@ -2,6 +2,7 @@ package com.mrzekai.depoakilli.ui
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
+import com.mrzekai.depoakilli.DepoAkilliApplication
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.data.ExcludedFolder
@@ -9,8 +10,10 @@ import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
-import com.mrzekai.depoakilli.model.isBulkSelectable
 import com.mrzekai.depoakilli.model.swipeItemsFor
+import com.mrzekai.depoakilli.pro.CleanupOrigin
+import com.mrzekai.depoakilli.pro.FreeTierRules
+import com.mrzekai.depoakilli.pro.FreeTierStore
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +28,17 @@ class CleanerViewModel internal constructor(
     /** Used by the default ViewModel factory. Tests pass a fake repository. */
     constructor(application: Application) : this(application, DeviceRepository(application))
 
+    /** Free tier (first free cleanup, daily decisions, monthly Pro bytes); local only. */
+    private val freeTierStore: FreeTierStore? = (application as? DepoAkilliApplication)?.freeTier
+    private var nextCleanupOrigin: CleanupOrigin? = null
+
+    /** Files marked for deletion with Pro beyond the day's free decisions (counted in Y5). */
+    private val proDecisionIds = mutableSetOf<String>()
+
     init {
+        freeTierStore?.let { store ->
+            viewModelScope.launch { store.state.collect { snapshot -> _state.update { it.copy(freeTier = snapshot) } } }
+        }
         restoreSavedState()
         refreshDeviceState()
         refreshAppCaches()
@@ -195,11 +208,49 @@ class CleanerViewModel internal constructor(
         }
     }
 
-    /** "Keep" is also remembered across scans (V10); "Delete" only marks. */
+    /** Google Play's answer on Pro, mirrored for the free-tier gates. */
+    fun setPro(isPro: Boolean) {
+        if (_state.value.isPro != isPro) _state.update { it.copy(isPro = isPro) }
+    }
+
+    /** The next cleanup comes from this button (read once by the activity). */
+    fun setNextCleanupOrigin(origin: CleanupOrigin) {
+        nextCleanupOrigin = origin
+    }
+
+    fun takeNextCleanupOrigin(): CleanupOrigin? = nextCleanupOrigin.also { nextCleanupOrigin = null }
+
+    /** Bytes of [ids] the user decided on with Pro beyond the free daily decisions. */
+    fun proDecisionBytes(ids: Set<String>): Long =
+        _state.value.summary.items.filter { it.id in ids && it.id in proDecisionIds }.sumOf(CleanableItem::sizeBytes)
+
+    fun markFirstCleanupUsed() {
+        freeTierStore?.markFirstCleanupUsed()
+    }
+
+    fun addProBytes(bytes: Long) {
+        if (bytes > 0L) freeTierStore?.addProBytes(bytes)
+    }
+
+    fun snoozeProCard() {
+        freeTierStore?.snoozeProCard()
+    }
+
+    /**
+     * "Keep" is also remembered across scans (V10); "Delete" only marks.
+     * Without Pro, 20 decisions a day (Faz 2 Y4); the screen then shows the
+     * daily-limit sheet and no further mark is taken.
+     */
     fun swipeMark(delete: Boolean) {
         val state = _state.value
+        val usedToday = state.freeTier.decisionsToday()
+        if (FreeTierRules.decisionsLocked(state.isPro, usedToday)) return
         val currentId = state.swipeReviewGroup?.let(state.swipeStates::get)?.currentId
         updateSwipe { it.mark(delete) }
+        if (currentId != null) {
+            if (state.isPro && delete && usedToday >= FreeTierRules.DAILY_DECISIONS) proDecisionIds += currentId
+            freeTierStore?.countDecision()
+        }
         if (!delete && currentId != null) {
             val item = state.summary.items.firstOrNull { it.id == currentId } ?: return
             viewModelScope.launch {
@@ -214,6 +265,10 @@ class CleanerViewModel internal constructor(
         val state = _state.value
         val last = state.swipeReviewGroup?.let(state.swipeStates::get)?.decisions?.lastOrNull()
         updateSwipe { it.undo() }
+        if (last != null) {
+            proDecisionIds -= last.id
+            freeTierStore?.undoDecision()
+        }
         if (last != null && !last.delete) {
             val item = state.summary.items.firstOrNull { it.id == last.id } ?: return
             viewModelScope.launch {
@@ -222,8 +277,6 @@ class CleanerViewModel internal constructor(
             }
         }
     }
-
-    fun swipeContinue() = updateSwipe { it.continueAfterBreak() }
 
     /** Leaves the swipe review; marks stay unless [clearMarks] is set (after cleaning). */
     fun closeSwipeReview(clearMarks: Boolean = false) {

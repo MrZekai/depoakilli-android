@@ -11,8 +11,6 @@ data class SwipeReviewState(
     val itemIds: List<String>,
     val sizes: Map<String, Long>,
     val decisions: List<Decision> = emptyList(),
-    /** Number of break cards the user has passed with "Continue". */
-    val breaksPassed: Int = 0,
 ) {
     data class Decision(val id: String, val delete: Boolean)
 
@@ -20,14 +18,7 @@ data class SwipeReviewState(
     val total: Int get() = itemIds.size
     val finished: Boolean get() = decisions.size >= itemIds.size
 
-    /** A break card is due after every [SWIPE_BREAK_EVERY] decisions while items remain. */
-    val breakPending: Boolean
-        get() = decisions.isNotEmpty() &&
-            decisions.size % SWIPE_BREAK_EVERY == 0 &&
-            decisions.size < itemIds.size &&
-            breaksPassed < decisions.size / SWIPE_BREAK_EVERY
-
-    val currentId: String? get() = if (finished || breakPending) null else itemIds[decisions.size]
+    val currentId: String? get() = if (finished) null else itemIds[decisions.size]
     val markedIds: Set<String> get() = decisions.asSequence().filter(Decision::delete).mapTo(linkedSetOf(), Decision::id)
     val markedBytes: Long get() = markedIds.sumOf { sizes[it] ?: 0L }
 
@@ -38,16 +29,10 @@ data class SwipeReviewState(
 
     fun undo(): SwipeReviewState {
         if (decisions.isEmpty()) return this
-        val remaining = decisions.dropLast(1)
-        return copy(decisions = remaining, breaksPassed = minOf(breaksPassed, remaining.size / SWIPE_BREAK_EVERY))
+        return copy(decisions = decisions.dropLast(1))
     }
 
-    fun continueAfterBreak(): SwipeReviewState =
-        if (breakPending) copy(breaksPassed = decisions.size / SWIPE_BREAK_EVERY) else this
-
     companion object {
-        const val SWIPE_BREAK_EVERY = 8
-
         /** Groups whose plan row opens the swipe review by default. */
         val SWIPE_GROUPS = setOf(
             CleanupGroup.LARGE_VIDEO,
@@ -68,9 +53,5 @@ data class SwipeReviewState(
                 sizes = sorted.associate { it.id to it.sizeBytes },
             )
         }
-
-        /** Positions (number of decisions made) at which a break card appears. */
-        fun breakPositions(total: Int): List<Int> =
-            (SWIPE_BREAK_EVERY until total step SWIPE_BREAK_EVERY).toList()
     }
 }

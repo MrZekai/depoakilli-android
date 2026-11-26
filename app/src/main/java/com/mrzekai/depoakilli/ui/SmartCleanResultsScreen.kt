@@ -35,6 +35,9 @@ import com.mrzekai.depoakilli.ui.common.PageFrame
 import com.mrzekai.depoakilli.ui.media.MediaPreviewFile
 import com.mrzekai.depoakilli.ui.review.SwipeReviewScreen
 import com.mrzekai.depoakilli.ui.review.SwipeReviewState
+import com.mrzekai.depoakilli.pro.CleanupOrigin
+import com.mrzekai.depoakilli.pro.FreeTierRules
+import com.mrzekai.depoakilli.ui.smart.PlanTiers
 import com.mrzekai.depoakilli.ui.smart.*
 import com.mrzekai.depoakilli.ui.smart.PLAN_APPS_KEY
 import com.mrzekai.depoakilli.ui.smart.cleanupPlanItems
@@ -111,7 +114,6 @@ internal fun SmartCleanResultsScreen(
     },
     onSwipeMark: (Boolean) -> Unit = {},
     onSwipeUndo: () -> Unit = {},
-    onSwipeContinue: () -> Unit = {},
     onSwipeGrid: () -> Unit = {},
     onSwipeFinished: () -> Unit = {},
     onDeepCheck: () -> Unit = {},
@@ -124,6 +126,8 @@ internal fun SmartCleanResultsScreen(
     onVerifyAndSelect: (Set<String>) -> Unit = {},
     scrollToApps: Boolean = false,
     onScrolledToApps: () -> Unit = {},
+    onOpenPaywall: () -> Unit = {},
+    onCleanupOrigin: (CleanupOrigin) -> Unit = {},
 ) {
     val swipeGroup = state.swipeReviewGroup
     val swipe = swipeGroup?.let(state.swipeStates::get)
@@ -133,16 +137,19 @@ internal fun SmartCleanResultsScreen(
             items = swipeItemsFor(swipeGroup, state.summary.items),
             onMark = onSwipeMark,
             onUndo = onSwipeUndo,
-            onContinue = onSwipeContinue,
             onShowGrid = onSwipeGrid,
             onConfirmClean = { ids ->
                 onSetItemsSelected(ids, true, false)
+                onCleanupOrigin(CleanupOrigin.SWIPE)
                 onClean(ids)
                 onSwipeFinished()
             },
             modifier = modifier,
             groupTitle = stringResource(swipeGroup.titleRes),
             onClose = onCloseSwipe,
+            dailyUsed = state.freeTier.decisionsToday(),
+            dailyLimit = if (state.isPro) null else FreeTierRules.DAILY_DECISIONS,
+            onOpenPaywall = onOpenPaywall,
         )
         return
     }
@@ -198,6 +205,10 @@ internal fun SmartCleanResultsScreen(
             verifyFeedback = state.verifyFeedback,
             scrollToApps = scrollToApps,
             onScrolledToApps = onScrolledToApps,
+            isPro = state.isPro,
+            oneTapAllowed = FreeTierRules.canUseOneTapPick(state.isPro, state.freeTier.firstCleanupUsed),
+            onOpenPaywall = onOpenPaywall,
+            onCleanupOrigin = onCleanupOrigin,
         )
     }
 }
@@ -247,6 +258,10 @@ internal fun SmartResultsContent(
     verifyFeedback: String? = null,
     scrollToApps: Boolean = false,
     onScrolledToApps: () -> Unit = {},
+    isPro: Boolean = false,
+    oneTapAllowed: Boolean = true,
+    onOpenPaywall: () -> Unit = {},
+    onCleanupOrigin: (CleanupOrigin) -> Unit = {},
 ) {
     var previewItemId by remember { mutableStateOf<String?>(null) }
     var previewStorageItemId by remember { mutableStateOf<String?>(null) }
@@ -355,7 +370,8 @@ internal fun SmartResultsContent(
     var suggestShowList by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(autoOpenSuggestion) {
         if (autoOpenSuggestion) {
-            if (figures.showsSuggestion) suggestConfirm = true
+            // Y7: after the free first cleanup the card shows the Pro gate instead (no paywall by itself).
+            if (figures.showsSuggestion && oneTapAllowed) suggestConfirm = true
             onSuggestionOpened()
         }
     }
@@ -374,6 +390,21 @@ internal fun SmartResultsContent(
                 suggestShowList = false
                 // The app's own pick: bulk = true keeps camera files and look-alikes out (D1).
                 onSetItemsSelected(ids, true, true)
+                onCleanupOrigin(CleanupOrigin.ONE_TAP_PICK)
+                onClean(ids)
+            },
+        )
+    }
+    // Y7 tier 1 on the plan page: the same confirmation as Home's big button.
+    var safeConfirm by rememberSaveable { mutableStateOf(false) }
+    val safeItems = remember(plan) { plan.autoItems.filter(CleanableItem::selected) }
+    if (safeConfirm && safeItems.isNotEmpty()) {
+        DeleteConfirmDialog(
+            items = safeItems,
+            inProgress = cleanupInProgress,
+            onDismiss = { safeConfirm = false },
+            onConfirm = { ids ->
+                safeConfirm = false
                 onClean(ids)
             },
         )
@@ -449,6 +480,20 @@ internal fun SmartResultsContent(
                 onRequestUsageAccess = onRequestUsageAccess,
                 showAppsNote = showAppsNote,
                 onAppsNoteShown = { appsNotePrefs.edit().putBoolean("note_seen", true).apply() },
+                tiers = PlanTiers(
+                    safeItems = safeItems,
+                    onCleanSafe = { safeConfirm = true },
+                    oneTapAllowed = oneTapAllowed,
+                    // Picking by hand stays free: the biggest kind of suggested files opens as a grid.
+                    onPickSuggested = {
+                        plan.suggestedItems
+                            .groupBy { it.assessment.category }
+                            .maxByOrNull { (_, items) -> items.sumOf(CleanableItem::sizeBytes) }
+                            ?.let { (category, items) -> onOpenCategoryReview(category, items.mapTo(linkedSetOf(), CleanableItem::id)) }
+                    },
+                    onOpenPaywall = onOpenPaywall,
+                    dailyLimit = if (isPro) null else FreeTierRules.DAILY_DECISIONS,
+                ),
             )
         }
     }

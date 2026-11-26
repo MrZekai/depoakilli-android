@@ -22,3 +22,19 @@ internal fun CleanerUiState.findingsUnusedApps(): List<InstalledAppEntry>? =
 /** C1: Home, the findings list and the Tools tiles all read these figures. */
 internal fun CleanerUiState.planFigures(): PlanFigures? =
     smartSummary()?.let { PlanFigures.of(it.plan, findingsUnusedApps()) }
+
+/**
+ * Faz 2.1: Pro's measured extra on this phone, from the current Smart scan
+ * only. Before a scan, or before the free first "My pick" cleanup is spent,
+ * there is nothing to add.
+ */
+internal fun CleanerUiState.proEstimate(): com.mrzekai.depoakilli.pro.ProGainEstimator.Estimate {
+    val figures = planFigures()
+    val plan = summary.plan
+    return com.mrzekai.depoakilli.pro.ProGainEstimator.estimate(
+        suggestedBytes = figures?.suggestedBytes ?: 0L,
+        suggestedCount = if (figures != null) plan.suggestedItems.size else 0,
+        firstCleanupUsed = freeTier.firstCleanupUsed,
+        videoSizes = summary.items.filter { it.mimeType.startsWith("video/") }.map { it.sizeBytes },
+    )
+}

@@ -84,6 +84,8 @@ internal fun CleanTab(
     accessDeniedOnce: Boolean = false,
     onOpenSettings: () -> Unit = onAllowAccess,
     onOpenAppsSection: () -> Unit = onOpenFindings,
+    /** Faz 2 Y1: Pro's measured extra, or null when the card must not show. */
+    proCard: HomeProCard? = null,
 ) {
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
     val savedSummary = !showingPlan && state.dashboardSnapshotAtMillis > 0L
@@ -178,6 +180,9 @@ internal fun CleanTab(
                         onSeeRest = if (showingPlan && plan.reviewBytes > 0L) onOpenFindings else null,
                         appsMoreBytes = if (showingPlan) appsMoreBytes else 0L,
                         onOpenApps = onOpenAppsSection,
+                        proCard = if (showingPlan && !state.cleanupInProgress) proCard else null,
+                        totalBytes = state.storage.totalBytes,
+                        availableBytes = state.storage.availableBytes,
                     )
                     HomeMode.HARD -> HardHome(
                         state = state,
@@ -278,18 +283,28 @@ private fun PlanHome(
     onSeeRest: (() -> Unit)?,
     appsMoreBytes: Long = 0L,
     onOpenApps: () -> Unit = {},
+    proCard: HomeProCard? = null,
+    totalBytes: Long = 0L,
+    availableBytes: Long = 0L,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(8.dp))
         PageLabel(stringResource(R.string.home_plan_label), strong = true)
         GiantNumber(ByteFormatter.format(potentialBytes), scale, modifier = Modifier.fillMaxWidth())
-        PageLabel(stringResource(R.string.home_plan_sub))
+        // Y1: "I can clear. The first X is ready:" above the free button that cleans X.
+        PageLabel(
+            if (safeBytes > 0L) {
+                stringResource(R.string.home_plan_sub_ready, ByteFormatter.format(safeBytes))
+            } else {
+                stringResource(R.string.home_plan_sub)
+            },
+        )
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(20.dp))
         GiantButton(
             label = stringResource(R.string.home_cta_clean),
-            hint = stringResource(R.string.home_cta_hint_tap),
+            hint = if (safeBytes > 0L) ByteFormatter.format(safeBytes) else stringResource(R.string.home_cta_hint_tap),
             onClick = onCleanUp,
             diameter = scale.buttonDp.dp,
             busy = busy,
@@ -323,10 +338,30 @@ private fun PlanHome(
             )
         }
         HomeTrashLine(trashEntries, onOpenTrash)
-        // D7: at least 12 dp between the last line and the banner.
+        // Y1: the free button stays first and biggest; Pro's card comes after everything else.
+        if (proCard != null) {
+            com.mrzekai.depoakilli.ui.pro.ProGainCard(
+                estimate = proCard.estimate,
+                totalBytes = totalBytes,
+                availableBytes = availableBytes,
+                trialDays = proCard.trialDays,
+                onOpenPaywall = proCard.onOpenPaywall,
+                onNotNow = proCard.onNotNow,
+                modifier = Modifier.padding(top = 14.dp),
+            )
+        }
+        // D7: at least 12 dp between the last line and the bottom bar.
         Spacer(Modifier.height(12.dp))
     }
 }
+
+/** Faz 2 Y1 card data; CleanerApp passes it only when the card may show. */
+internal data class HomeProCard(
+    val estimate: com.mrzekai.depoakilli.pro.ProGainEstimator.Estimate,
+    val trialDays: Int?,
+    val onOpenPaywall: () -> Unit,
+    val onNotNow: () -> Unit,
+)
 
 @Composable
 private fun HardHome(

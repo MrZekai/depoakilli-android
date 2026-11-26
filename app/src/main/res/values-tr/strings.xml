@@ -448,7 +448,6 @@
     <string name="swipe_keep">KALSIN</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Bitir</string>
-    <string name="swipe_continue">Devam et</string>
     <string name="swipe_review_view">Kaydırarak inceleme</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -478,10 +477,6 @@
     <plurals name="swipe_marked">
         <item quantity="one">İşaretli: %1$d dosya · %2$s</item>
         <item quantity="other">İşaretli: %1$d dosya · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="one">%1$d incelendi · %2$s işaretli</item>
-        <item quantity="other">%1$d incelendi · %2$s işaretli</item>
     </plurals>
     <string name="deep_check_action">Doğrula</string>
     <string name="deep_check_running">Olası kopyalar kontrol ediliyor…</string>
@@ -564,7 +559,6 @@
     <string name="confirm_permanent_title">%1$s kalıcı silinsin mi?</string>
     <string name="confirm_permanent_action">Kalıcı olarak sil</string>
     <string name="plan_found_title">daha açabilirim. Bunları buldum:</string>
-    <string name="plan_start_biggest">En büyüğünden başla</string>
     <string name="swipe_title">Bu kalsın mı?</string>
     <string name="swipe_undo_last">Son kararı geri al</string>
     <string name="swipe_selected_note">%1$s seçildi · sonda onaylarsın</string>
@@ -682,22 +676,19 @@
         <item quantity="other">%1$d birebir kopya seçildi</item>
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
-    <string name="pro_subtitle">Pro özellikleri sonraki güncellemelerle geliyor. Bugün kullandığın her şey olduğu gibi kalır.</string>
     <string name="pro_loading">Planlar yükleniyor…</string>
     <string name="pro_coming_soon_title">Yakında</string>
     <string name="pro_coming_soon_body">Pro planları henüz hazır değil. Uygulamadaki her şey eskisi gibi çalışmaya devam ediyor.</string>
     <string name="pro_active_title">Pro açık</string>
-    <string name="pro_active_body">Teşekkürler. Pro, Google Play hesabına bağlı.</string>
     <string name="pro_pending">Satın alman ödeme bekliyor. Google Play tamamlayınca Pro açılır.</string>
     <string name="pro_plan_yearly">%s / yıl</string>
     <string name="pro_plan_week">%s / 1 hafta</string>
-    <string name="pro_plan_week_detail">Ön ödemeli. Yenilenmez.</string>
+    <string name="pro_plan_week_detail">Ön ödemeli. Kendiliğinden biter, yenilenmez.</string>
     <string name="pro_plan_lifetime">%s tek sefer</string>
     <string name="pro_plan_lifetime_detail">Tek ödeme. Yenileme yok.</string>
-    <string name="pro_buy_yearly">Yılda %s ile abone ol</string>
+    <string name="pro_buy_yearly">Yılda %s ile başla</string>
     <string name="pro_buy_week">1 hafta %s · yenilenmez</string>
     <string name="pro_buy_lifetime">%s tek sefer öde</string>
-    <string name="pro_legal_renews">Yıllık plan otomatik yenilenir. İstediğin an Google Play &gt; Abonelikler\'den iptal edebilirsin. Uygulamanın geri kalanı abonelik olmadan çalışır.</string>
     <string name="pro_restore">Satın alımları geri yükle</string>
     <string name="pro_manage">Aboneliği yönet</string>
     <string name="pro_message_activated">Pro açıldı. Teşekkürler!</string>
@@ -706,13 +697,94 @@
     <string name="pro_message_nothing_to_restore">Bu Google hesabında Pro satın alımı bulunamadı.</string>
     <string name="pro_message_failed">Satın alma tamamlanamadı. Lütfen tekrar dene.</string>
     <string name="pro_message_unavailable">Google Play ödeme sistemi şu an kullanılamıyor.</string>
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="one">%1$d gün deneme, sonra yılda %2$s</item>
-        <item quantity="other">%1$d gün deneme, sonra yılda %2$s</item>
-    </plurals>
     <plurals name="pro_buy_trial">
         <item quantity="one">%1$d gün dene, sonra %2$s/yıl</item>
         <item quantity="other">%1$d gün dene, sonra %2$s/yıl</item>
     </plurals>
     <string name="pro_message_restore_failed">Satın alımlar kontrol edilemedi. Lütfen tekrar dene.</string>
+    <string name="pro_badge">PRO</string>
+    <string name="home_plan_sub_ready">açabilirim. İlk %s hazır:</string>
+    <string name="pro_card_title">Pro ile %s daha</string>
+    <string name="pro_card_title_about">Pro ile yaklaşık %s daha</string>
+    <string name="pro_value_about">yaklaşık %s</string>
+    <string name="pro_card_see">Pro\'yu gör</string>
+    <string name="pro_fill_now">ŞİMDİ</string>
+    <string name="pro_fill_with_pro">PRO İLE</string>
+    <string name="pro_fill_full">%s dolu</string>
+    <string name="pro_fill_note">Bu telefonda ölçüldü.</string>
+    <string name="pro_fill_note_estimate">Bu telefonda ölçüldü. Video kazancı yaklaşıktır.</string>
+    <string name="paywall_close">Kapat</string>
+    <string name="paywall_title">%s daha aç</string>
+    <string name="paywall_title_unknown">Daha hızlı yer aç</string>
+    <string name="paywall_sub">Bu telefonda ölçtüm. Fotoğrafların telefondan çıkmaz.</string>
+    <string name="paywall_chip_undo">7 gün geri al</string>
+    <string name="paywall_chip_on_phone">Telefondan çıkmaz</string>
+    <string name="paywall_chip_cancel">İstediğin an iptal</string>
+    <string name="paywall_plan_yearly">YILLIK</string>
+    <string name="paywall_plan_week">1 HAFTALIK GEÇİŞ</string>
+    <string name="paywall_plan_lifetime">ÖMÜR BOYU</string>
+    <string name="pro_plan_yearly_renews">Yılda %s. Otomatik yenilenir.</string>
+    <string name="paywall_weekly_equivalent">haftada yaklaşık %s</string>
+    <string name="paywall_first_charge">Bugün ücret yok. İlk ödeme %s.</string>
+    <string name="paywall_legal">İstediğin an Google Play &gt; Abonelikler\'den iptal et. Temel temizlik abonelik olmadan çalışır.</string>
+    <string name="honest_title">Şu an Pro\'ya ihtiyacın yok.</string>
+    <string name="honest_body">Pro bu telefonda yalnız %s daha açardı. Paranı boşa harcatmam.</string>
+    <string name="honest_body_zero">Şu an Pro bu telefonda ek yer açmazdı; ilk büyük temizlik zaten bizden. Paranı boşa harcatmam.</string>
+    <string name="honest_ok">Tamam</string>
+    <string name="honest_see_plans">Yine de planları gör</string>
+    <string name="limit_header">BUGÜN %1$d / %2$d KARAR</string>
+    <string name="limit_title">Bugünlük bu kadar. %s işaretledin.</string>
+    <string name="limit_title_none">Bugünlük bu kadar.</string>
+    <string name="limit_clear">%s\'ı temizle</string>
+    <string name="limit_pro">Sınırsız devam et</string>
+    <string name="limit_tomorrow">Yarın devam ederim</string>
+    <string name="pro_owned_yearly">Yıllık plan</string>
+    <string name="pro_owned_week">1 haftalık geçiş</string>
+    <string name="pro_owned_lifetime">Ömür boyu</string>
+    <string name="pro_owned_not_renewing">Abonelik · yenilenmiyor</string>
+    <string name="pro_month_label">BU AY ABONELİĞİN</string>
+    <string name="pro_month_cleared">%s açtı</string>
+    <string name="pro_month_none">Bu ay Pro ile bir şey açmadın.</string>
+    <string name="pro_add_time">Süre ekle · %s</string>
+    <string name="pro_on_cancel_note">İstediğin an Google Play &gt; Abonelikler\'den iptal edebilirsin. Dönem sonuna kadar Pro açık kalır.</string>
+    <string name="plan_tier_now_title">Hemen temizlenir</string>
+    <string name="plan_tier_now_body">Uygulama artıkları, eski APK\'lar, birebir kopyalar.</string>
+    <string name="plan_tier_now_action">Temizle</string>
+    <string name="plan_tier_pick_title">Önerim</string>
+    <string name="plan_tier_pick_locked">İlk büyük temizlik bizdendi. Tek onayla toplu temizlik Pro\'da; tek tek seçmek hep açık.</string>
+    <string name="plan_tier_pick_by_hand">Tek tek seç</string>
+    <string name="plan_tier_pick_one_tap">Tek onayla temizle</string>
+    <string name="plan_ask_one_by_one">Sırayla göster</string>
+    <plurals name="pro_gain_pick">
+        <item quantity="one">Önerim: %d dosya, tek onayla</item>
+        <item quantity="other">Önerim: %d dosya, tek onayla</item>
+    </plurals>
+    <plurals name="pro_gain_video">
+        <item quantity="one">%d büyük video sıkışır</item>
+        <item quantity="other">%d büyük video sıkışır</item>
+    </plurals>
+    <plurals name="pro_card_try">
+        <item quantity="one">Pro\'yu %d gün dene</item>
+        <item quantity="other">Pro\'yu %d gün dene</item>
+    </plurals>
+    <plurals name="paywall_photos">
+        <item quantity="one">Yaklaşık %d fotoğraflık yer.</item>
+        <item quantity="other">Yaklaşık %d fotoğraflık yer.</item>
+    </plurals>
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="one">%1$d gün deneme, sonra yılda %2$s. Otomatik yenilenir.</item>
+        <item quantity="other">%1$d gün deneme, sonra yılda %2$s. Otomatik yenilenir.</item>
+    </plurals>
+    <plurals name="paywall_anchor">
+        <item quantity="one">%d haftalık geçiş fiyatına 52 hafta</item>
+        <item quantity="other">%d haftalık geçiş fiyatına 52 hafta</item>
+    </plurals>
+    <plurals name="limit_body">
+        <item quantity="one">Pro olmadan günde %d dosyaya karar verebilirsin. Sayaç yarın sıfırlanır; Araçlar\'da elle temizlik her zaman açık.</item>
+        <item quantity="other">Pro olmadan günde %d dosyaya karar verebilirsin. Sayaç yarın sıfırlanır; Araçlar\'da elle temizlik her zaman açık.</item>
+    </plurals>
+    <plurals name="plan_ask_daily">
+        <item quantity="one">Bugün %d karar; Pro\'da sınırsız</item>
+        <item quantity="other">Bugün %d karar; Pro\'da sınırsız</item>
+    </plurals>
 </resources>

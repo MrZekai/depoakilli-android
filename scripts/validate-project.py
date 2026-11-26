@@ -99,7 +99,13 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/billing/BillingProducts.kt",
     "app/src/main/java/com/mrzekai/depoakilli/billing/Entitlement.kt",
     "app/src/main/java/com/mrzekai/depoakilli/billing/ProOffers.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ui/ProScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/pro/PaywallScreen.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/pro/ProStatusScreens.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/pro/DailyLimitSheet.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/pro/ProGainEstimator.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTier.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTierStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/billing/BillingConnect.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
@@ -400,6 +406,38 @@ for expected in (
 ):
     if expected not in products_src:
         errors.append(f"missing product id invariant: {expected}")
+# Faz 2: every Play connection attempt is time-limited (the lock is always released).
+billing_connect = read("app/src/main/java/com/mrzekai/depoakilli/billing/BillingConnect.kt")
+for expected in ("withTimeoutOrNull(timeoutMillis)", "ATTEMPT_TIMEOUT_MILLIS = 10_000L"):
+    if expected not in billing_connect:
+        errors.append(f"missing billing time-limit invariant: {expected}")
+if "BillingConnect.connect" not in billing_repo:
+    errors.append("BillingRepository must connect through BillingConnect (time-limited)")
+
+# Faz 2 free tier and honest paywall (CODEX_TASK_FAZ2_ABONELIK).
+gain_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/ProGainEstimator.kt")
+for expected in (
+    "PRO_MIN_GAIN_BYTES = 2_000_000_000L",
+    "COMPRESSION_FLOOR_RATIO = 0.30",
+    "VIDEO_COMPRESSION_AVAILABLE = false",
+):
+    if expected not in gain_src:
+        errors.append(f"missing Pro gain invariant: {expected}")
+free_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/FreeTier.kt")
+for expected in ("DAILY_DECISIONS = 20", "if (today > day) DecisionCounter(today, 0) else this"):
+    if expected not in free_src:
+        errors.append(f"missing free-tier invariant: {expected}")
+paywall_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/pro/PaywallScreen.kt")
+for expected in ("BackHandler(onBack = onClose)", "Icons.Outlined.Close", "R.string.paywall_legal", "R.string.pro_restore"):
+    if expected not in paywall_src:
+        errors.append(f"missing paywall invariant: {expected}")
+for forbidden in ("delay(", "countdown", "Countdown", "Coral"):
+    if forbidden in paywall_src:
+        errors.append(f"paywall must not use {forbidden} (no timers, no fear colours)")
+# No paywall opens by itself: only the openPaywall() taps set it.
+if read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").count("paywallOpen = true") != 1:
+    errors.append("the paywall must open only through openPaywall() (user taps)")
+
 for billing_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/billing").rglob("*.kt"):
     if re.search(r'"[^"]*(\$|USD|€|₺)\s?\d', billing_file.read_text(encoding="utf-8")):
         errors.append(f"prices must come from ProductDetails, not code: {billing_file.name}")
@@ -698,7 +736,9 @@ for forbidden in (
 # Smart Cleaner Pro (2.0 Faz 1.3): one Settings row opens the Pro page.
 for expected in (
     "PRO(R.string.pro_title)",
-    "DetailScreen.PRO -> ProScreen(",
+    "DetailScreen.PRO -> when {",
+    "PaywallScreen(",
+    "FreeTierRules.showProCard(",
     "detailScreen = DetailScreen.PRO",
 ):
     if expected not in cleaner_app:
@@ -1012,7 +1052,7 @@ delete_confirm_ui_all = read("app/src/main/java/com/mrzekai/depoakilli/ui/common
 # done") and the findings list (T5.4: rows, start with the biggest, system
 # steps). The same invariants are checked on the new surfaces.
 clean_tab_ui = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanTab.kt")
-for expected in ("fun findingsRows(", "plan-start-biggest", "plan-system-cache", "plan-kept-note"):
+for expected in ("fun findingsRows(", "plan-ask-card", "plan-system-cache", "plan-kept-note"):
     if expected not in cleanup_plan_ui:
         errors.append(f"missing cleanup plan invariant: {expected}")
 for expected in ("state.planFigures()", "HomeLogic.mode(", "DeleteConfirmDialog("):

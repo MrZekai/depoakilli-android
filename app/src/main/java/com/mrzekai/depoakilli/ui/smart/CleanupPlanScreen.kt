@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -168,6 +169,8 @@ internal fun LazyListScope.cleanupPlanItems(
     onRequestUsageAccess: () -> Unit = {},
     showAppsNote: Boolean = false,
     onAppsNoteShown: () -> Unit = {},
+    /** Faz 2 Y7: tier cards. */
+    tiers: PlanTiers = PlanTiers(),
 ) {
     val rows = findingsRows(plan, unusedApps)
     val openFindingsRow: (FindingsRow) -> Unit = { row ->
@@ -176,6 +179,7 @@ internal fun LazyListScope.cleanupPlanItems(
             is FindingsRow.UnusedApps -> onOpenUnusedApps()
         }
     }
+    val showSafeCard = tiers.safeItems.isNotEmpty() && figures.safeBytes >= com.mrzekai.depoakilli.data.CleaningThresholds.PLAN_MIN_BYTES
     item(key = "plan-card") {
         val scale = rememberGiantScale()
         Column(
@@ -183,7 +187,9 @@ internal fun LazyListScope.cleanupPlanItems(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // C1: the same figure Home subtracts from its "up to X".
-            GiantNumber(ByteFormatter.format(figures.findingsBytes), scale, modifier = Modifier.fillMaxWidth())
+            // Y7: with the "Ready to clear" card on this page, its bytes are part of the figure.
+            val giantBytes = if (showSafeCard) figures.homeMaxBytes else figures.findingsBytes
+            GiantNumber(ByteFormatter.format(giantBytes), scale, modifier = Modifier.fillMaxWidth())
             Text(
                 stringResource(R.string.plan_found_title),
                 color = Ink,
@@ -193,19 +199,41 @@ internal fun LazyListScope.cleanupPlanItems(
             )
         }
     }
+    // Y7 tier 1: always open, no limit.
+    if (showSafeCard) {
+        item(key = "plan-tier-now") {
+            ReadyNowCard(bytes = figures.safeBytes, onClean = tiers.onCleanSafe)
+        }
+    }
     // C2 tier 2: one card, one button, one confirmation; everything to Trash.
+    // Y7: after the free first cleanup, one-tap cleanup is Pro; picking by hand stays open.
     if (figures.showsSuggestion) {
         item(key = "plan-suggest") {
-            SuggestionCard(
-                plan = plan,
-                bytes = figures.suggestedBytes,
-                onConfirm = onConfirmSuggested,
-                onSee = onSeeSuggested,
-            )
+            if (tiers.oneTapAllowed) {
+                SuggestionCard(
+                    plan = plan,
+                    bytes = figures.suggestedBytes,
+                    onConfirm = onConfirmSuggested,
+                    onSee = onSeeSuggested,
+                )
+            } else {
+                LockedSuggestionCard(
+                    bytes = figures.suggestedBytes,
+                    onPickOneByOne = tiers.onPickSuggested,
+                    onOneTap = tiers.onOpenPaywall,
+                )
+            }
         }
     }
     if (rows.isNotEmpty()) {
-        item(key = "plan-ask-title") { SectionTitle(stringResource(R.string.plan_ask_title)) }
+        item(key = "plan-ask-card") {
+            AskCard(
+                plan = plan,
+                fileCount = plan.askRows.sumOf { it.items.size },
+                dailyLimit = tiers.dailyLimit,
+                onShowOneByOne = { openFindingsRow(rows.first()) },
+            )
+        }
     }
     rows.forEachIndexed { index, row ->
         item(key = "review-" + when (row) {
@@ -241,16 +269,6 @@ internal fun LazyListScope.cleanupPlanItems(
                     onClick = onOpenUnusedApps,
                 )
             }
-        }
-    }
-    if (rows.isNotEmpty()) {
-        item(key = "plan-start-biggest") {
-            PillButton(
-                text = stringResource(R.string.plan_start_biggest),
-                onClick = { openFindingsRow(rows.first()) },
-                style = PillStyle.BLACK,
-                modifier = Modifier.padding(top = 6.dp),
-            )
         }
     }
     appsSection(
@@ -463,7 +481,99 @@ private fun SuggestionCard(plan: CleanupPlan, bytes: Long, onConfirm: () -> Unit
     }
 }
 
-/** Optional rewarded feature: verify large look-alike files (T1B.6). */
+/** Faz 2 Y7: what the plan page needs to show its three tiers and the Pro gate. */
+internal data class PlanTiers(
+    /** Tier 1 files ("Ready to clear"), cleaned through the usual confirmation. */
+    val safeItems: List<com.mrzekai.depoakilli.model.CleanableItem> = emptyList(),
+    val onCleanSafe: () -> Unit = {},
+    /** The free first "My pick" cleanup is still unused, or the user has Pro. */
+    val oneTapAllowed: Boolean = true,
+    val onPickSuggested: () -> Unit = {},
+    val onOpenPaywall: () -> Unit = {},
+    /** Free daily decisions; null with Pro. */
+    val dailyLimit: Int? = null,
+)
+
+/** Y7 tier 1: app leftovers, old APKs and exact copies; always free. */
+@Composable
+private fun ReadyNowCard(bytes: Long, onClean: () -> Unit) {
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.plan_tier_now_title), color = OnBlack, fontSize = 18.sp, fontWeight = AppWeights.Title, modifier = Modifier.weight(1f))
+            Text(ByteFormatter.format(bytes), color = Lime, fontSize = 18.sp, fontWeight = AppWeights.Giant)
+        }
+        Text(stringResource(R.string.plan_tier_now_body), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
+        PillButton(
+            text = stringResource(R.string.plan_tier_now_action),
+            onClick = onClean,
+            style = PillStyle.LIME,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+/** Y7 tier 2 after the free first cleanup: PRO badge; picking by hand stays open. */
+@Composable
+private fun LockedSuggestionCard(bytes: Long, onPickOneByOne: () -> Unit, onOneTap: () -> Unit) {
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.plan_tier_pick_title), color = OnBlack, fontSize = 18.sp, fontWeight = AppWeights.Title)
+            com.mrzekai.depoakilli.ui.pro.ProBadge(Modifier.padding(start = 8.dp))
+            Spacer(Modifier.weight(1f))
+            Text(ByteFormatter.format(bytes), color = Lime, fontSize = 18.sp, fontWeight = AppWeights.Giant)
+        }
+        Text(stringResource(R.string.plan_tier_pick_locked), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
+        Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PillButton(
+                text = stringResource(R.string.plan_tier_pick_by_hand),
+                onClick = onPickOneByOne,
+                style = PillStyle.LIME_OUTLINE,
+                modifier = Modifier.weight(1f),
+            )
+            PillButton(
+                text = stringResource(R.string.plan_tier_pick_one_tap),
+                onClick = onOneTap,
+                style = PillStyle.LIME,
+                modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+/** Y7 tier 3: files the app asks about, one by one; the free daily allowance is said up front. */
+@Composable
+private fun AskCard(plan: CleanupPlan, fileCount: Int, dailyLimit: Int?, onShowOneByOne: () -> Unit) {
+    val groupNames = plan.askRows
+        .sortedByDescending(PlanGroup::bytes)
+        .take(2)
+        .map { it.title() }
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.plan_ask_title), color = OnBlack, fontSize = 18.sp, fontWeight = AppWeights.Title, modifier = Modifier.weight(1f))
+            Text(
+                pluralStringResource(R.plurals.home_scan_files_count, fileCount, fileCount),
+                color = Lime,
+                fontSize = 18.sp,
+                fontWeight = AppWeights.Giant,
+            )
+        }
+        val lines = listOfNotNull(
+            groupNames.joinToString(" · ").takeIf(String::isNotBlank),
+            dailyLimit?.let { pluralStringResource(R.plurals.plan_ask_daily, it, it) },
+        )
+        if (lines.isNotEmpty()) {
+            Text(lines.joinToString(". "), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
+        }
+        PillButton(
+            text = stringResource(R.string.plan_ask_one_by_one),
+            onClick = onShowOneByOne,
+            style = PillStyle.LIME_OUTLINE,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+/** Optional feature: verify large look-alike files (T1B.6). */
 @Composable
 internal fun DeepCheckRow(groups: Int, bytes: Long, running: Boolean, onClick: () -> Unit) {
     BlackCard(contentPadding = PaddingValues(16.dp)) {

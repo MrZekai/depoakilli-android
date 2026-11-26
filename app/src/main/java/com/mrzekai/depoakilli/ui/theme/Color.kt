@@ -42,3 +42,9 @@ val AdLabel = Color(0xFFFFB21A)
 
 // Chart colours (Storage analysis only) are defined next to their chart in
 // StorageAnalyzerScreen.kt; no other screen uses colours outside this file.
+
+/** Selected plan on the paywall (Faz 2). */
+val PlanSelected = Color(0xFF12161C)
+
+/** Lines and plan borders on black (Faz 2 paywall). */
+val CardLine = Color(0xFF2A313B)

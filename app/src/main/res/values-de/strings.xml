@@ -444,7 +444,6 @@
     <string name="swipe_keep">BEHALTEN</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Fertig</string>
-    <string name="swipe_continue">Weiter</string>
     <string name="swipe_review_view">Wischen zum Prüfen</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -474,10 +473,6 @@
     <plurals name="swipe_marked">
         <item quantity="one">Markiert: %1$d · %2$s</item>
         <item quantity="other">Markiert: %1$d · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="one">Geprüft: %1$d · markiert: %2$s</item>
-        <item quantity="other">Geprüft: %1$d · markiert: %2$s</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_action">Prüfen</string>
@@ -593,8 +588,6 @@
     <string name="confirm_permanent_action">Endgültig löschen</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="plan_found_title">kann ich noch freigeben. Das habe ich gefunden:</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_start_biggest">Mit dem Größten anfangen</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="swipe_title">Behalten?</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -788,8 +781,6 @@
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_subtitle">Pro-Funktionen kommen mit den nächsten Updates. Alles, was Sie heute nutzen, bleibt, wie es ist.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_loading">Tarife werden geladen…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_coming_soon_title">Demnächst</string>
@@ -798,27 +789,23 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_active_title">Pro ist aktiv</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_active_body">Vielen Dank. Pro ist mit Ihrem Google Play-Konto verknüpft.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_pending">Ihr Kauf wartet auf die Zahlung. Pro wird aktiv, sobald Google Play ihn abschließt.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_yearly">%s / Jahr</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_week">%s / 1 Woche</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_plan_week_detail">Vorausbezahlt. Verlängert sich nicht.</string>
+    <string name="pro_plan_week_detail">Vorausbezahlt. Endet von selbst, keine Verlängerung.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime">%s einmalig</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime_detail">Eine Zahlung. Keine Verlängerung.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_buy_yearly">Für %s/Jahr abonnieren</string>
+    <string name="pro_buy_yearly">Für %s pro Jahr starten</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_week">1 Woche für %s · ohne Verlängerung</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_lifetime">Einmalig %s zahlen</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_legal_renews">Der Jahrestarif verlängert sich automatisch. Sie können jederzeit unter Google Play &gt; Abos kündigen. Der Rest der App funktioniert ohne Abo.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_restore">Käufe wiederherstellen</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -836,15 +823,155 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_unavailable">Die Google Play-Abrechnung ist gerade nicht verfügbar.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="one">%1$d Tag Testzeitraum, dann %2$s pro Jahr</item>
-        <item quantity="other">%1$d Tage Testzeitraum, dann %2$s pro Jahr</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_buy_trial">
         <item quantity="one">%1$d Tag testen, dann %2$s/Jahr</item>
         <item quantity="other">%1$d Tage testen, dann %2$s/Jahr</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_restore_failed">Käufe konnten nicht geprüft werden. Bitte erneut versuchen.</string>
+    <string name="pro_badge">PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub_ready">kann ich freigeben. Die ersten %s sind bereit:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title">%s mehr mit Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title_about">Etwa %s mehr mit Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_value_about">etwa %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_see">Pro ansehen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_now">JETZT</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_with_pro">MIT PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_full">%s voll</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note">Auf diesem Handy gemessen.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note_estimate">Auf diesem Handy gemessen. Der Videogewinn ist geschätzt.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_close">Schließen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title">%s mehr freigeben</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title_unknown">Schneller Platz schaffen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_sub">Auf diesem Handy gemessen. Ihre Fotos verlassen es nie.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_undo">7 Tage rückgängig</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_on_phone">Bleibt auf dem Handy</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_cancel">Jederzeit kündbar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_yearly">JÄHRLICH</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_week">1-WOCHEN-PASS</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_lifetime">LEBENSLANG</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly_renews">%s pro Jahr. Verlängert sich automatisch.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_weekly_equivalent">etwa %s pro Woche</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_first_charge">Heute keine Kosten. Erste Zahlung am %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_legal">Jederzeit kündbar unter Google Play &gt; Abos. Die Grundreinigung funktioniert ohne Abo.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_title">Sie brauchen Pro gerade nicht.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body">Pro würde auf diesem Handy nur %s mehr freigeben. Ich verschwende Ihr Geld nicht.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body_zero">Gerade würde Pro auf diesem Handy nichts zusätzlich freigeben; die erste große Reinigung geht auf uns. Ich verschwende Ihr Geld nicht.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_ok">OK</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_see_plans">Tarife trotzdem ansehen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_header">HEUTE %1$d / %2$d ENTSCHEIDUNGEN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title">Das war\'s für heute. Sie haben %s markiert.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title_none">Das war\'s für heute.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_clear">%s freigeben</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_pro">Ohne Limit weitermachen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_tomorrow">Ich mache morgen weiter</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_yearly">Jahrestarif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_week">1-Wochen-Pass</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_lifetime">Lebenslang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_not_renewing">Abo · verlängert sich nicht</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_label">DIESEN MONAT MIT PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_cleared">%s freigegeben</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_none">Sie haben diesen Monat nichts mit Pro freigegeben.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_add_time">Eine Woche hinzufügen · %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_on_cancel_note">Sie können jederzeit unter Google Play &gt; Abos kündigen. Pro bleibt bis zum Ende des Zeitraums aktiv.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_title">Sofort freigebbar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_body">App-Reste, alte APKs, exakte Kopien.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_action">Aufräumen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_title">Meine Auswahl</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_locked">Die erste große Reinigung ging auf uns. Aufräumen mit einem Tipp gibt es in Pro; Dateien selbst auswählen geht immer.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_by_hand">Einzeln wählen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_one_tap">Mit einem Tipp aufräumen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_one_by_one">Einzeln zeigen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_pick">
+        <item quantity="one">%d Datei meiner Auswahl, ein Tipp</item>
+        <item quantity="other">%d Dateien meiner Auswahl, ein Tipp</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_video">
+        <item quantity="one">%d großes Video wird kleiner</item>
+        <item quantity="other">%d große Videos werden kleiner</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_card_try">
+        <item quantity="one">Pro %d Tag testen</item>
+        <item quantity="other">Pro %d Tage testen</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_photos">
+        <item quantity="one">Platz für etwa %d Foto.</item>
+        <item quantity="other">Platz für etwa %d Fotos.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="one">%1$d Tag Testzeitraum, dann %2$s pro Jahr. Verlängert sich automatisch.</item>
+        <item quantity="other">%1$d Tage Testzeitraum, dann %2$s pro Jahr. Verlängert sich automatisch.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_anchor">
+        <item quantity="one">52 Wochen zum Preis von %d Wochenpass</item>
+        <item quantity="other">52 Wochen zum Preis von %d Wochenpässen</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="limit_body">
+        <item quantity="one">Ohne Pro entscheiden Sie über %d Datei pro Tag. Der Zähler beginnt morgen neu; Aufräumen von Hand unter Werkzeuge ist immer möglich.</item>
+        <item quantity="other">Ohne Pro entscheiden Sie über %d Dateien pro Tag. Der Zähler beginnt morgen neu; Aufräumen von Hand unter Werkzeuge ist immer möglich.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_ask_daily">
+        <item quantity="one">%d Entscheidung heute; unbegrenzt mit Pro</item>
+        <item quantity="other">%d Entscheidungen heute; unbegrenzt mit Pro</item>
+    </plurals>
 </resources>

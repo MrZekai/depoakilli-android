@@ -4,7 +4,6 @@ import com.mrzekai.depoakilli.data.AiCleaningEngine
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -13,25 +12,18 @@ class SwipeReviewLogicTest {
     private val engine = AiCleaningEngine { 0L }
 
     @Test
-    fun `twelve files need twelve decisions and one break`() {
+    fun `twelve files need twelve decisions and no break card`() {
         var review = SwipeReviewState.start((1..12).map { item("f$it", it * 10L) })
         assertEquals("f12", review.currentId)
-        var breaks = 0
         var decisions = 0
         while (!review.finished) {
-            if (review.breakPending) {
-                breaks++
-                assertNull(review.currentId)
-                review = review.continueAfterBreak()
-            } else {
-                review = review.mark(delete = decisions % 3 == 0)
-                decisions++
-            }
+            // Faz 2: the ad-era break card is gone; every step shows a file.
+            assertTrue(review.currentId != null)
+            review = review.mark(delete = decisions % 3 == 0)
+            decisions++
         }
         assertEquals(12, decisions)
-        assertEquals(1, breaks)
-        assertEquals(listOf(8), SwipeReviewState.breakPositions(12))
-        assertEquals(listOf(8, 16), SwipeReviewState.breakPositions(17))
+        assertNull(review.currentId)
     }
 
     @Test
@@ -47,15 +39,13 @@ class SwipeReviewLogicTest {
     }
 
     @Test
-    fun `undo at a break removes the break and undo after it does not repeat it`() {
+    fun `undo after the eighth decision shows the eighth file again`() {
         var review = SwipeReviewState.start((1..10).map { item("f$it", it.toLong()) })
         repeat(8) { review = review.mark(false) }
-        assertTrue(review.breakPending)
-        val undone = review.undo()
-        assertFalse(undone.breakPending)
-        review = review.continueAfterBreak().mark(true).undo()
-        assertFalse(review.breakPending)
-        assertEquals(8, review.reviewedCount)
+        assertEquals("f2", review.currentId)
+        review = review.undo()
+        assertEquals("f3", review.currentId)
+        assertEquals(7, review.reviewedCount)
     }
 
     @Test
@@ -63,7 +53,6 @@ class SwipeReviewLogicTest {
         val review = SwipeReviewState.start(emptyList())
         assertTrue(review.finished)
         assertNull(review.currentId)
-        assertFalse(review.breakPending)
         assertEquals(review, review.mark(true))
         assertEquals(0L, review.markedBytes)
     }
