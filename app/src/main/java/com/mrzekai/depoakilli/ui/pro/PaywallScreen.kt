@@ -223,7 +223,8 @@ internal fun PaywallScreen(
                     lineHeight = 16.sp,
                     modifier = Modifier.padding(top = 8.dp),
                 )
-                Row(horizontalArrangement = Arrangement.Center) {
+                // Whole links wrap to a new line; a long word is never split.
+                FlowRow(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     LinkButton(stringResource(R.string.terms_of_service), onClick = { onOpenLegalPage(LegalPage.TERMS) }, color = OnBlackSoft)
                     LinkButton(stringResource(R.string.privacy_policy), onClick = { onOpenLegalPage(LegalPage.PRIVACY) }, color = OnBlackSoft)
                 }

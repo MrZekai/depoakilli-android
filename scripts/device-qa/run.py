@@ -258,12 +258,12 @@ def to_home():
     if tab and tab.y1 > H * 0.85:
         tap(tab)
     for step in range(4):
-        if find(r"^(MAKE ROOM|CLEAN UP)$") or find(r"^Up to$"):
+        if find(r"^(?-i:MAKE ROOM|CLEAN UP)$") or find(r"^Up to$"):
             return True
         back()
         log(f"to_home back {step}: {resumed_activity()[-80:]} :: " + " | ".join(texts())[:160])
     launch()
-    return bool(wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20))
+    return bool(wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20))
 
 
 # ---------------- scenario ----------------
@@ -290,11 +290,11 @@ def main():
     dismiss_ads()
 
     # 1. Home → scan.
-    first = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40)
+    first = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 40)
     check("Uygulama açıldı, Home göründü", first, screenshot=shot("home-start"))
     if first and first.label.upper() == "MAKE ROOM":
         tap(first)
-    plan = wait_for(r"^CLEAN UP$", 180)
+    plan = wait_for(r"^(?-i:CLEAN UP)$", 180)
     check("Tarama bitti, plan Home'da 'CLEAN UP' var", plan, screenshot=shot("home-plan"))
 
     # 2. Findings without Usage access: one row offering access.
@@ -364,7 +364,7 @@ def main():
 
     # 4. Clean up → result button order.
     before_trash_files = sh("ls /sdcard/Download | grep -c qa-a-").strip()
-    tap_text(r"^CLEAN UP$", 20)
+    tap_text(r"^(?-i:CLEAN UP)$", 20)
     confirm = wait_for(r"^Yes, clean up$", 20)
     check("Temizlik onayı soruluyor ('Yes, clean up')", confirm, screenshot=shot("confirm"))
     if confirm:
@@ -411,15 +411,15 @@ def main():
     sh(f"am force-stop {PKG}")
     launch()
     dismiss_ads()
-    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20)
+    n = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20)
     if not n:
         # The app may reopen on another tab; go to the Clean tab first.
         tap_text(r"^Clean$", 10)
-        n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20)
+        n = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20)
     if n and n.label.upper() == "MAKE ROOM":
         tap(n)
-    wait_for(r"^CLEAN UP$", 180)
-    tap_text(r"^CLEAN UP$", 20)
+    wait_for(r"^(?-i:CLEAN UP)$", 180)
+    tap_text(r"^(?-i:CLEAN UP)$", 20)
     tap_text(r"^Yes, clean up$", 20)
     free_now = wait_for(r"^Get .+ back now$", 90)
     before = free_bytes()
@@ -489,10 +489,10 @@ def main():
     sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
     sh(f"appops set {PKG} GET_USAGE_STATS allow")
     launch()
-    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 30) or (tap_text(r"^Clean$", 10) and wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20))
+    n = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 30) or (tap_text(r"^Clean$", 10) and wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20))
     if n and n.label.upper() == "MAKE ROOM":
         tap(n)
-    wait_for(r"^CLEAN UP$", 180)
+    wait_for(r"^(?-i:CLEAN UP)$", 180)
 
     # Y3: before the free first cleanup is spent, Pro adds nothing here.
     if open_settings_pro("y3"):
@@ -606,14 +606,14 @@ def main():
     sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
     sh(f"appops set {PKG} GET_USAGE_STATS allow")
     launch()
-    home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40, dismiss=False)
+    home_offline = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 40, dismiss=False)
     if not home_offline:
         tap_text(r"^Clean$", 10)
-        home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20, dismiss=False)
+        home_offline = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20, dismiss=False)
     check("Uçak modunda uygulama açılıyor, Home çalışıyor", home_offline, screenshot=shot("home-airplane"))
     if home_offline and home_offline.label.upper() == "MAKE ROOM":
         tap(home_offline)
-    check("Uçak modunda tarama bitiyor (plan 'CLEAN UP' geldi)", wait_for(r"^CLEAN UP$", 180, dismiss=False),
+    check("Uçak modunda tarama bitiyor (plan 'CLEAN UP' geldi)", wait_for(r"^(?-i:CLEAN UP)$", 180, dismiss=False),
           screenshot=shot("scan-airplane"))
     if open_settings_pro("airplane"):
         check("Uçak modunda Ayarlar > Pro açılıyor (Y3 ya da paywall)",
@@ -627,7 +627,7 @@ def main():
     sh(f"am force-stop {PKG}")
     launch()
     dismiss_ads()
-    home_big = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40)
+    home_big = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 40)
     check("Büyük yazı (1.3): Home açılıyor, ana düğme ekranda", home_big and home_big.y2 <= H,
           screenshot=shot("home-font-1.3"))
     sh("settings put system font_scale 1.0")

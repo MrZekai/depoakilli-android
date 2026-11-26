@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
@@ -86,23 +85,24 @@ internal fun FillBars(now: Int, after: Int, modifier: Modifier = Modifier, showN
 
 @Composable
 private fun FillBarRow(label: String, percent: Int, barColor: Color, valueColor: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            label,
-            color = OnBlackSoft,
-            fontSize = 12.sp,
-            fontWeight = AppWeights.Title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.width(84.dp),
-        )
+    // The label gets its own line: long labels ("MAINTENANT", "DENGAN PRO") never cut.
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                label,
+                color = OnBlackSoft,
+                fontSize = 12.sp,
+                fontWeight = AppWeights.Title,
+                modifier = Modifier.weight(1f),
+            )
+            Text(percentLabel(percent), color = valueColor, fontSize = 13.sp, fontWeight = AppWeights.Title, maxLines = 1)
+        }
         LimeProgressBar(
             progress = percent / 100f,
             color = barColor,
             trackColor = CardLine,
-            modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp),
         )
-        Text(percentLabel(percent), color = valueColor, fontSize = 13.sp, fontWeight = AppWeights.Title, maxLines = 1)
     }
 }
 
