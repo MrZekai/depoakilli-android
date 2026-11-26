@@ -359,6 +359,7 @@ class MainActivity : ComponentActivity() {
                 BillingEvent.PENDING -> R.string.pro_message_pending
                 BillingEvent.RESTORED -> R.string.pro_message_restored
                 BillingEvent.NOTHING_TO_RESTORE -> R.string.pro_message_nothing_to_restore
+                BillingEvent.RESTORE_FAILED -> R.string.pro_message_restore_failed
                 BillingEvent.FAILED -> R.string.pro_message_failed
                 BillingEvent.UNAVAILABLE -> R.string.pro_message_unavailable
             },

@@ -854,4 +854,6 @@
         <item quantity="one">Teste %1$d dia, depois %2$s/ano</item>
         <item quantity="other">Teste %1$d dias, depois %2$s/ano</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restore_failed">Não foi possível verificar as compras. Tente novamente.</string>
 </resources>

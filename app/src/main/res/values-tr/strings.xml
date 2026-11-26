@@ -714,4 +714,5 @@
         <item quantity="one">%1$d gün dene, sonra %2$s/yıl</item>
         <item quantity="other">%1$d gün dene, sonra %2$s/yıl</item>
     </plurals>
+    <string name="pro_message_restore_failed">Satın alımlar kontrol edilemedi. Lütfen tekrar dene.</string>
 </resources>

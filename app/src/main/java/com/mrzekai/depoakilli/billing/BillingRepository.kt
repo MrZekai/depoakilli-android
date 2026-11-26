@@ -32,7 +32,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /** One-off results the UI turns into a short message. */
-enum class BillingEvent { PRO_ACTIVATED, PENDING, RESTORED, NOTHING_TO_RESTORE, FAILED, UNAVAILABLE }
+enum class BillingEvent { PRO_ACTIVATED, PENDING, RESTORED, NOTHING_TO_RESTORE, RESTORE_FAILED, FAILED, UNAVAILABLE }
 
 /**
  * Google Play Billing for Smart Cleaner Pro (2.0 Faz 1).
@@ -89,7 +89,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
             val subs = queryPurchases(BillingClient.ProductType.SUBS)
             val oneTime = queryPurchases(BillingClient.ProductType.INAPP)
             if (subs == null || oneTime == null) {
-                if (userRequested) _events.tryEmit(BillingEvent.FAILED)
+                if (userRequested) _events.tryEmit(BillingEvent.RESTORE_FAILED)
                 return@launch
             }
             val owned = (subs + oneTime).map(::toOwned)

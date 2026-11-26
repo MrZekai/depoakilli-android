@@ -1051,4 +1051,6 @@
         <item quantity="many">جرّب %1$d أيام، ثم %2$s/سنة</item>
         <item quantity="other">جرّب %1$d أيام، ثم %2$s/سنة</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restore_failed">تعذّر التحقق من المشتريات. يُرجى المحاولة مرة أخرى.</string>
 </resources>

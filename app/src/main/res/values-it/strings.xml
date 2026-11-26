@@ -894,4 +894,6 @@
         <item quantity="many">Prova %1$d giorni, poi %2$s/anno</item>
         <item quantity="other">Prova %1$d giorni, poi %2$s/anno</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restore_failed">Impossibile controllare gli acquisti. Riprova.</string>
 </resources>

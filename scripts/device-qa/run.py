@@ -452,7 +452,7 @@ def main():
         restore = scroll_to(r"^Restore purchases$", 3)
         if restore:
             tap(restore)
-            msg = wait_for(r"(No Pro purchase was found|Google Play billing is not available|Purchases restored|could not be completed)", 25, dismiss=False)
+            msg = wait_for(r"(No Pro purchase was found|Google Play billing is not available|Purchases restored|could not be checked)", 25, dismiss=False)
             check("'Satın alımları geri yükle' bir sonuç mesajı veriyor", msg,
                   note=getattr(msg, "label", ""), screenshot=shot("pro-restore"))
         else:
@@ -464,14 +464,20 @@ def main():
 
     sh("cmd connectivity airplane-mode enable")
     time.sleep(3)
-    sh(f"am force-stop {PKG}")
+    # A fresh app state, so the offline run includes a full scan.
+    sh(f"pm clear {PKG}")
+    sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
+    sh(f"appops set {PKG} GET_USAGE_STATS allow")
     launch()
     home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40, dismiss=False)
+    if not home_offline:
+        tap_text(r"^Clean$", 10)
+        home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20, dismiss=False)
     check("Uçak modunda uygulama açılıyor, Home çalışıyor", home_offline, screenshot=shot("home-airplane"))
     if home_offline and home_offline.label.upper() == "MAKE ROOM":
         tap(home_offline)
-        check("Uçak modunda tarama bitiyor", wait_for(r"^(CLEAN UP|Up to)$", 180, dismiss=False),
-              screenshot=shot("scan-airplane"))
+    check("Uçak modunda tarama bitiyor (plan 'CLEAN UP' geldi)", wait_for(r"^CLEAN UP$", 180, dismiss=False),
+          screenshot=shot("scan-airplane"))
     open_pro_page("airplane")
     back()
     sh("cmd connectivity airplane-mode disable")
