@@ -205,6 +205,8 @@ internal fun PaywallScreen(
                         val date = remember(trial, locale) {
                             DateFormat.getDateInstance(DateFormat.LONG, locale)
                                 .format(Date(ProPricing.firstChargeMillis(System.currentTimeMillis(), trial)))
+                                // "29 ноября 2026 г." already ends with a dot; the sentence adds its own.
+                                .trimEnd('.')
                         }
                         Text(
                             stringResource(R.string.paywall_first_charge, date),
