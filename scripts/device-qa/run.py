@@ -257,10 +257,11 @@ def to_home():
     tab = find(r"^Clean$")
     if tab and tab.y1 > H * 0.85:
         tap(tab)
-    for _ in range(4):
+    for step in range(4):
         if find(r"^(MAKE ROOM|CLEAN UP)$") or find(r"^Up to$"):
             return True
         back()
+        log(f"to_home back {step}: {resumed_activity()[-80:]} :: " + " | ".join(texts())[:160])
     launch()
     return bool(wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20))
 
@@ -308,7 +309,9 @@ def main():
             check("Bu satır kullanım erişimi açıklamasını açıyor",
                   any(re.search(r"usage", t, re.I) for t in texts(disclosure)),
                   screenshot=shot("usage-access-disclosure"))
+            log("disclosure: " + " | ".join(texts())[:300])
             back()
+            log("after disclosure back: " + " | ".join(texts())[:300])
         to_home()
     else:
         check("Home'da 'See what else I found' bağlantısı var", False, screenshot=shot("home-no-findings-link"))
