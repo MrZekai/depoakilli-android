@@ -571,7 +571,9 @@ def main():
         to_home()
 
     # Y1: Home card with Pro's measured extra (>= 2 GB), "Not now" hides it.
-    card = scroll_to(r"more with Pro$", 4)
+    # Only the one-tap row (Faz 2): "Clear X with one tap"; with a Pro-only row: "X more with Pro".
+    card_rx = r"^(.+ more with Pro|Clear .+ with one tap)$"
+    card = scroll_to(card_rx, 4)
     check("Y1: Home'da 'X more with Pro' kartı (kazanç >= 2 GB)", card, screenshot=shot("y1-card"))
     if card:
         cta = find(r"^(Try Pro for .+|See Pro)$")
@@ -583,7 +585,7 @@ def main():
         if not_now:
             tap(not_now)
         time.sleep(1)
-        check("Y1: 'Not now' kartı gizliyor", not find(r"more with Pro$"), screenshot=shot("y1-hidden"))
+        check("Y1: 'Not now' kartı gizliyor", not find(card_rx), screenshot=shot("y1-hidden"))
 
     # Settings > Pro with a real gain opens the paywall; restore answers there.
     if open_settings_pro("paywall"):

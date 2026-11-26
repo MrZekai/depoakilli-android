@@ -32,6 +32,18 @@ object ProGainEstimator {
         val totalBytes: Long get() = rows.sumOf(Row::bytes)
         val qualifies: Boolean get() = totalBytes >= PRO_MIN_GAIN_BYTES
         val hasEstimates: Boolean get() = rows.any { !it.measured }
+
+        /**
+         * Gain only Pro can give (e.g. video compression). One-tap "My pick"
+         * is not in it: the same files can be cleared by hand without Pro.
+         */
+        val proOnlyBytes: Long get() = rows.filter { it.kind != Kind.ONE_TAP_PICK }.sumOf(Row::bytes)
+
+        /** The before/after fill bars appear only for a gain Pro alone gives. */
+        val showsFillBars: Boolean get() = proOnlyBytes > 0L
+
+        /** Only the one-tap row: the headline says "Clear X with one tap". */
+        val oneTapOnly: Boolean get() = rows.isNotEmpty() && rows.all { it.kind == Kind.ONE_TAP_PICK }
     }
 
     /**

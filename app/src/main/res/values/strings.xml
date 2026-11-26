@@ -715,6 +715,7 @@
     <string name="pro_fill_note_estimate">Measured on this phone. The video gain is approximate.</string>
     <string name="paywall_close">Close</string>
     <string name="paywall_title">%s more to clear</string>
+    <string name="paywall_title_one_tap">Clear %s with one tap</string>
     <string name="paywall_title_unknown">Clear space faster</string>
     <string name="paywall_sub">Measured on this phone. Your photos never leave it.</string>
     <string name="paywall_chip_undo">Undo for 7 days</string>
@@ -768,8 +769,8 @@
         <item quantity="other">Try Pro for %d days</item>
     </plurals>
     <plurals name="paywall_photos">
-        <item quantity="one">About %d photo\'s worth of space.</item>
-        <item quantity="other">About %d photos\' worth of space.</item>
+        <item quantity="one">About %,d photo\'s worth of space.</item>
+        <item quantity="other">About %,d photos\' worth of space.</item>
     </plurals>
     <plurals name="pro_plan_yearly_trial_renews">
         <item quantity="one">%1$d-day trial, then %2$s per year. Renews automatically.</item>

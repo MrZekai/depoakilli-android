@@ -126,7 +126,11 @@ internal fun ProGainCard(
             ProBadge()
             Text(
                 stringResource(
-                    if (estimate.hasEstimates) R.string.pro_card_title_about else R.string.pro_card_title,
+                    when {
+                        estimate.oneTapOnly -> R.string.paywall_title_one_tap
+                        estimate.hasEstimates -> R.string.pro_card_title_about
+                        else -> R.string.pro_card_title
+                    },
                     ByteFormatter.format(estimate.totalBytes),
                 ),
                 color = OnBlack,
@@ -144,8 +148,11 @@ internal fun ProGainCard(
                 }
             }
         }
-        ProPricing.fillPercents(totalBytes, availableBytes, estimate.totalBytes)?.let { (now, after) ->
-            FillBars(now, after, modifier = Modifier.padding(top = 12.dp), showNote = false)
+        // Bars only for a gain Pro alone gives (Fable audit, Faz 2).
+        if (estimate.showsFillBars) {
+            ProPricing.fillPercents(totalBytes, availableBytes, estimate.proOnlyBytes)?.let { (now, after) ->
+                FillBars(now, after, modifier = Modifier.padding(top = 12.dp), showNote = false)
+            }
         }
         Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             PillButton(

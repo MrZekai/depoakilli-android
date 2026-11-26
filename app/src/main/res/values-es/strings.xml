@@ -863,6 +863,8 @@
     <string name="paywall_close">Cerrar</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title">Libera %s más</string>
+    <!-- [ÇEVİRİ GEREKLİ] paywall_title_one_tap -->
+    <string name="paywall_title_one_tap">Libera %s con un toque</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title_unknown">Libera espacio más rápido</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -960,8 +962,8 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="paywall_photos">
-        <item quantity="one">Espacio para unas %d foto.</item>
-        <item quantity="other">Espacio para unas %d fotos.</item>
+        <item quantity="one">Espacio para unas %,d foto.</item>
+        <item quantity="other">Espacio para unas %,d fotos.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_plan_yearly_trial_renews">

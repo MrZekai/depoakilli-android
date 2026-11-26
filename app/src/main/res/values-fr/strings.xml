@@ -901,6 +901,8 @@
     <string name="paywall_close">Fermer</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title">Libérez %s de plus</string>
+    <!-- [ÇEVİRİ GEREKLİ] paywall_title_one_tap -->
+    <string name="paywall_title_one_tap">Libérez %s en un geste</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title_unknown">Libérez de l\'espace plus vite</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1001,9 +1003,9 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="paywall_photos">
-        <item quantity="one">L\'espace d\'environ %d photo.</item>
-        <item quantity="many">L\'espace d\'environ %d photos.</item>
-        <item quantity="other">L\'espace d\'environ %d photos.</item>
+        <item quantity="one">L\'espace d\'environ %,d photo.</item>
+        <item quantity="many">L\'espace d\'environ %,d photos.</item>
+        <item quantity="other">L\'espace d\'environ %,d photos.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_plan_yearly_trial_renews">
