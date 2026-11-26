@@ -1,0 +1,70 @@
+name: Pro screen shots
+
+# Raw Play Store screenshots on an emulator with synthetic demo data only.
+# Pushes the PNGs to the `store-pro-raw` branch (no app code, no keys).
+on:
+  push:
+    branches: [store-pro-shots]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  shots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Build debug APK
+        run: |
+          chmod +x gradlew
+          ./gradlew --stacktrace assembleDebug "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
+
+      - name: Demo media
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install --quiet pillow
+          python3 scripts/store-shots/make_media.py store-media
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Capture on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disk-size: 8000M
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb install -r -g app/build/outputs/apk/debug/app-debug.apk
+            SHOT_LOCALES=${{ vars.SHOT_LOCALES || 'en-US,tr-TR,es-ES,pt-BR,de-DE,fr-FR,it-IT,ru-RU,id,ar' }} python3 scripts/store-shots/capture_pro.py store-media store-shots-out || true
+
+      - name: Push screenshots to store-pro-raw
+        if: always()
+        run: |
+          set -e
+          ls -R store-shots-out | head -80 || true
+          mkdir -p /tmp/raw && cp -r store-shots-out/. /tmp/raw/ || true
+          rm -rf /tmp/pub && mkdir /tmp/pub && cp -r /tmp/raw/. /tmp/pub/ && cd /tmp/pub
+          git init -q -b store-pro-raw
+          git config user.name "store-shots-bot"
+          git config user.email "store-shots-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Raw store screenshots ${GITHUB_SHA::7}" || exit 0
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" store-pro-raw
