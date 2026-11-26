@@ -151,16 +151,10 @@ private fun TrashEmptyPreview() {
 private fun SettingsPreview() {
     DepoAkilliTheme {
         SettingsDetailScreen(
-            privacyOptionsRequired = true,
-            canRequestAds = true,
-            adFreeRemainingMillis = 0L,
-            rewardedAdReady = true,
             onOpenLanguageSettings = {},
             onRateApp = {},
             onSendFeedback = {},
             onShareApp = {},
-            onShowPrivacyOptions = {},
-            onShowRewardedAd = {},
             onOpenPrivacyAccess = {},
             onOpenLegalPage = {},
             hasAllFilesAccess = true,
@@ -180,9 +174,6 @@ private fun ResultPreview() {
                 trashedBytes = 3 * GB,
                 trashEntryIds = listOf("1"),
             ),
-            canRequestAds = false,
-            showRewardedOffer = false,
-            onShowRewardedAd = {},
             onSystemDismiss = {},
             onDone = {},
         )
@@ -202,9 +193,6 @@ private fun ResultFreedPreview() {
                 beforeAvailableBytes = 4 * GB,
                 afterAvailableBytes = 7 * GB,
             ),
-            canRequestAds = false,
-            showRewardedOffer = false,
-            onShowRewardedAd = {},
             onSystemDismiss = {},
             onDone = {},
         )

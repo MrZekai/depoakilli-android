@@ -59,7 +59,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.WhatsAppLibrarySummary
@@ -85,7 +84,6 @@ internal fun WhatsAppResultsScreen(
     onToggleItem: (String) -> Unit,
     onToggleCategory: (WhatsAppMediaCategory) -> Unit,
     onDeleteSelected: () -> Unit,
-    listAd: @Composable () -> Unit = {},
     suggested: List<CleanableItem> = emptyList(),
 ) {
     // C3: "My pick" (sent media and statuses the Smart scan suggests), then the
@@ -230,11 +228,7 @@ internal fun WhatsAppResultsScreen(
                 } else {
                     emptyList()
                 }
-                // B7: one list native after the 2nd category card when a 3rd card
-                // follows and the list holds at least 6 files.
-                val showAd = visibleGroups.size > AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD &&
-                    visibleGroups.sumOf { (_, groupItems) -> groupItems.size } >= AdPolicy.NATIVE_LIST_MIN_ROWS
-                visibleGroups.forEachIndexed { index, (group, groupItems) ->
+                visibleGroups.forEach { (group, groupItems) ->
                     item(key = "wa-group-${group.name}") {
                         WhatsAppGroupSection(
                             group = group,
@@ -246,9 +240,6 @@ internal fun WhatsAppResultsScreen(
                             onViewAll = { detailGroupName = group.name },
                             onPreview = { previewItemId = it.id },
                         )
-                    }
-                    if (showAd && index == AdPolicy.NATIVE_GROUP_LIST_AFTER_CARD - 1) {
-                        item(key = "wa-list-native") { listAd() }
                     }
                 }
             }

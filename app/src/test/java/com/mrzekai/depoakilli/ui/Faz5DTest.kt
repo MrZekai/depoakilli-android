@@ -1,6 +1,5 @@
 package com.mrzekai.depoakilli.ui
 
-import com.mrzekai.depoakilli.ads.AdFreeOfferPolicy
 import com.mrzekai.depoakilli.data.AiCleaningEngine
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.CleanupGroup
@@ -198,16 +197,5 @@ class Faz5DTest {
                 assertTrue(scale == GiantScale.SMALL || GiantScale.homeNeedDp(scale, font, true) <= available)
             }
         }
-    }
-
-    // ---- D5 -------------------------------------------------------------
-
-    @Test
-    fun `the ad-free bar is offered at most once a day and never during the window`() {
-        assertTrue(AdFreeOfferPolicy.shouldOffer(null, 10L, adsAllowed = true, adFreeActive = false, rewardedReady = true))
-        assertFalse(AdFreeOfferPolicy.shouldOffer(10L, 10L, adsAllowed = true, adFreeActive = false, rewardedReady = true))
-        assertTrue(AdFreeOfferPolicy.shouldOffer(9L, 10L, adsAllowed = true, adFreeActive = false, rewardedReady = true))
-        assertFalse(AdFreeOfferPolicy.shouldOffer(null, 10L, adsAllowed = true, adFreeActive = true, rewardedReady = true))
-        assertFalse(AdFreeOfferPolicy.shouldOffer(null, 10L, adsAllowed = false, adFreeActive = false, rewardedReady = true))
     }
 }

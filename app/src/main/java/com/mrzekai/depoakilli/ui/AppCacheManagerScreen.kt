@@ -56,7 +56,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.AppCacheEntry
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.common.ActionCard
@@ -86,7 +85,6 @@ internal fun AppCacheManagerScreen(
     onClearOwnCache: () -> Unit,
     onOpenAppDetails: (String) -> Unit,
     modifier: Modifier = Modifier,
-    listAd: @Composable () -> Unit = {},
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     var sortMode by rememberSaveable { mutableStateOf(CacheSortMode.LARGEST) }
@@ -292,18 +290,13 @@ internal fun AppCacheManagerScreen(
                     }
                 }
             } else {
-                // B7: one list native after the 4th row, in lists of 6 rows or more.
-                val showAd = visibleEntries.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
-                visibleEntries.forEachIndexed { index, app ->
+                visibleEntries.forEach { app ->
                     item(key = app.packageName, contentType = "cache_app_row") {
                         CacheAppRow(
                             app = app,
                             maxCacheBytes = maxCacheBytes,
                             onClick = { selectedApp = app },
                         )
-                    }
-                    if (showAd && index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1) {
-                        item(key = "app-cache-native") { listAd() }
                     }
                 }
             }

@@ -107,28 +107,27 @@ audit_binary() {
     fi
   done
 
-  for sample_id in \
-    'ca-app-pub-3940256099942544~3347511713' \
-    'ca-app-pub-3940256099942544/6300978111' \
-    'ca-app-pub-3940256099942544/1033173712' \
-    'ca-app-pub-3940256099942544/1044960115'
+  # 2.0: no ad SDK. No AdMob id, no advertising-id permission, no ads classes;
+  # Google Play Billing is present.
+  if grep -Fq 'ca-app-pub-' "$manifest" || grep -Fq 'ca-app-pub-' "$dex_strings"; then
+    fail "$label contains an AdMob id"
+  fi
+  for forbidden in \
+    com.google.android.gms.ads \
+    com.google.android.gms.permission.AD_ID \
+    android.permission.ACCESS_ADSERVICES_AD_ID
   do
-    if ! grep -Fq "$sample_id" "$manifest" && ! grep -Fq "$sample_id" "$dex_strings"; then
-      fail "$label is missing Google sample ad ID: $sample_id"
+    if grep -Fq "$forbidden" "$permissions" || grep -Fq "$forbidden" "$manifest"; then
+      fail "$label contains ad surface: $forbidden"
     fi
   done
-  if grep -Fq 'ca-app-pub-1380972808968213' "$manifest" || grep -Fq 'ca-app-pub-1380972808968213' "$dex_strings"; then
-    fail "$label contains a production AdMob publisher ID"
-  fi
-  if grep -Fq 'ca-app-pub-3940256099942544/9257395921' "$dex_strings"; then
-    fail "$label contains the Google sample App Open ad ID"
-  fi
-  if ! grep -Fq 'ca-app-pub-3940256099942544/5224354917' "$dex_strings"; then
-    fail "$label is missing Google sample Rewarded ad ID"
-  fi
-  if grep -Fq 'ca-app-pub-1380972808968213/4039180256' "$dex_strings"; then
-    fail "$label contains production Rewarded ad ID"
-  fi
+  for forbidden in 'Lcom/google/android/gms/ads/' 'Lcom/google/android/ump/'; do
+    if grep -Fq "$forbidden" "$dex_strings"; then
+      fail "$label contains ad SDK classes: $forbidden"
+    fi
+  done
+  grep -Fq 'com.android.vending.BILLING' "$permissions" \
+    || fail "$label is missing the Google Play Billing permission"
   grep -Fq "$SUPPORT_EMAIL" "$dex_strings" \
     || fail "$label does not contain the configured support contact"
 }
@@ -144,7 +143,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"
   echo "Upload certificate SHA-256: $AAB_CERT"
-  echo "Ads: Google sample Banner + Interstitial + Native; App Open absent"
+  echo "Ads: none (no AdMob id, no AD_ID, no ads classes); Google Play Billing present"
   echo "Debuggable: no"
 } | tee "$OUT/summary.txt"
 

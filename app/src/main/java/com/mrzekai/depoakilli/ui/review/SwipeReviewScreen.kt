@@ -92,7 +92,6 @@ internal fun SwipeReviewScreen(
     modifier: Modifier = Modifier,
     groupTitle: String = "",
     onClose: () -> Unit = {},
-    breakCardContent: @Composable () -> Unit = {},
 ) {
     val byId = remember(items) { items.associateBy(CleanableItem::id) }
     var showPreview by remember { mutableStateOf(false) }
@@ -138,8 +137,7 @@ internal fun SwipeReviewScreen(
             }
 
             if (review.breakPending) {
-                // Break card: scrollable so the ad is never clipped; no other
-                // buttons on screen while it is shown.
+                // Break card: a short progress summary every few cards.
                 Column(
                     Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
                 ) {
@@ -147,7 +145,6 @@ internal fun SwipeReviewScreen(
                         reviewed = review.reviewedCount,
                         markedBytes = review.markedBytes,
                         onContinue = onContinue,
-                        adContent = breakCardContent,
                     )
                 }
             } else {
@@ -359,7 +356,7 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun BreakCard(reviewed: Int, markedBytes: Long, onContinue: () -> Unit, adContent: @Composable () -> Unit) {
+private fun BreakCard(reviewed: Int, markedBytes: Long, onContinue: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -378,8 +375,5 @@ private fun BreakCard(reviewed: Int, markedBytes: Long, onContinue: () -> Unit, 
             onClick = onContinue,
             style = PillStyle.LIME,
         )
-        // At least 24 dp between the ad and the button above.
-        Spacer(Modifier.height(8.dp))
-        adContent()
     }
 }

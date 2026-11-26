@@ -22,7 +22,6 @@
     <string name="scan_focus_duplicates">Duplikat</string>
     <string name="scan_focus_large">File Besar</string>
     <string name="language_settings">Bahasa aplikasi</string>
-    <string name="ad_privacy_preferences">Preferensi privasi iklan</string>
     <string name="message_scan_failed">Pemindaian tidak dapat diselesaikan. Periksa izin media dan coba lagi.</string>
     <string name="message_select_item">Pilih setidaknya satu item untuk dibersihkan.</string>
     <string name="message_cache_already_empty">Cache aplikasi sudah kosong.</string>
@@ -124,7 +123,7 @@
     <string name="message_all_files_required_for_cache">Pembersihan cache mendalam memerlukan Android Semua file diakses terlebih dahulu.</string>
     <string name="message_cache_system_unavailable">Pembersihan cache tidak dapat dikonfirmasi. Pilih aplikasi di bawah dan buka pengaturan Android untuk menghapus cache-nya.</string>
     <string name="message_whatsapp_not_found">Tidak ditemukan folder Media WhatsApp atau WhatsApp Business yang didukung di penyimpanan bersama.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner menganalisis metadata file penyimpanan bersama yang dapat diakses dan, bila diperlukan untuk deteksi duplikat, sidik jari konten pada perangkat. Sidik jari mesin yang lebih bersih dan file pribadi ini tidak diunggah oleh Smart Cleaner.\n\nASemua akses file diminta karena manajemen dan pemeliharaan file adalah fitur inti: memindai dan mengelola sampah, duplikat, file besar, unduhan, penginstal APK, dan media WhatsApp di seluruh penyimpanan bersama. Android terus memblokir direktori data pribadi aplikasi lain yang dilindungi. \n\nAkses Penggunaan bersifat opsional dan digunakan untuk membaca statistik penyimpanan/cache aplikasi dan stempel waktu yang terakhir digunakan. Pengelola Cache Aplikasi memanggil tindakan sistem pembersihan cache resmi Android dan Android mengontrol konfirmasi yang diperlukan. \n\nIklan Seluler Google dan platform izin dapat memproses pengidentifikasi iklan, diagnostik, dan pilihan izin berdasarkan kebijakan Google. File dihapus hanya setelah pemilihan pengguna atau konfirmasi sistem Android. \n\nSmart Cleaner tidak menyertakan layanan pelaporan kerusakan pihak ketiga. Nama file, jalur, konten file, dan sidik jari duplikat tidak diunggah untuk pelaporan kerusakan. \n\nSmart Cleaner menyimpan preferensi dan riwayat pemindaian/pembersihan agregat hanya di penyimpanan aplikasi lokal hingga Anda menghapus data aplikasi atau menghapus instalan aplikasi. Sebagian besar file yang Anda bersihkan dipindahkan dulu ke Sampah Smart Cleaner di perangkat ini dan dapat dipulihkan di sana selama 7 hari; file yang dihapus permanen dan Sampah yang sudah dikosongkan tidak dapat dipulihkan. Google menyimpan data yang diprosesnya berdasarkan kebijakan yang dipublikasikan.\n\nSDK Google Mobile Ads memproses alamat IP (untuk memperkirakan lokasi), ID iklan atau ID set aplikasi, interaksi aplikasi, dan data diagnostik untuk menampilkan iklan. Aplikasi ini tidak mengirim nama atau isi file maupun istilah pencarian ke luar perangkat.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner menganalisis metadata file penyimpanan bersama yang dapat diakses dan, bila diperlukan untuk deteksi duplikat, sidik jari konten pada perangkat. Sidik jari mesin yang lebih bersih dan file pribadi ini tidak diunggah oleh Smart Cleaner.\n\nASemua akses file diminta karena manajemen dan pemeliharaan file adalah fitur inti: memindai dan mengelola sampah, duplikat, file besar, unduhan, penginstal APK, dan media WhatsApp di seluruh penyimpanan bersama. Android terus memblokir direktori data pribadi aplikasi lain yang dilindungi. \n\nAkses Penggunaan bersifat opsional dan digunakan untuk membaca statistik penyimpanan/cache aplikasi dan stempel waktu yang terakhir digunakan. Pengelola Cache Aplikasi memanggil tindakan sistem pembersihan cache resmi Android dan Android mengontrol konfirmasi yang diperlukan. \n\nFile dihapus hanya setelah pemilihan pengguna atau konfirmasi sistem Android.\n\nSmart Cleaner tidak menyertakan layanan pelaporan kerusakan pihak ketiga. Nama file, jalur, konten file, dan sidik jari duplikat tidak diunggah untuk pelaporan kerusakan. \n\nSmart Cleaner menyimpan preferensi dan riwayat pemindaian/pembersihan agregat hanya di penyimpanan aplikasi lokal hingga Anda menghapus data aplikasi atau menghapus instalan aplikasi. Sebagian besar file yang Anda bersihkan dipindahkan dulu ke Sampah Smart Cleaner di perangkat ini dan dapat dipulihkan di sana selama 7 hari; file yang dihapus permanen dan Sampah yang sudah dikosongkan tidak dapat dipulihkan. Google menyimpan data yang diprosesnya berdasarkan kebijakan yang dipublikasikan.</string>
     <plurals name="reason_large_file">
         <item quantity="other">File besar • Usia dalam hari: %1$d</item>
     </plurals>
@@ -147,7 +146,7 @@
     <string name="storage_type_images">Gambar</string>
     <string name="storage_type_other">File lainnya</string>
     <string name="storage_type_videos">Video</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner menyediakan analisis penyimpanan pada perangkat dan alat manajemen file. Hasil pemindaian adalah rekomendasi, bukan cadangan. Tinjau file pengguna yang dipilih sebelum menghapusnya.\n\nSmart Cleaner dapat mengelola file penyimpanan bersama yang dapat diakses setelah Android memberikan akses Semua file. Android tetap melindungi data internal pribadi aplikasi lain. Manajer Cache Aplikasi menggunakan tindakan sistem resmi Android dan mungkin menampilkan konfirmasi Android yang diperlukan. \n\nSmart Cleaner tidak menjanjikan perubahan pada aplikasi pihak ketiga yang dilindungi, RAM sistem, atau suhu CPU, maupun hasil kinerja yang dibuat-buat. Ketersediaan bergantung pada versi Android dan produsen perangkat.\n\nAnda bertanggung jawab untuk meninjau pilihan sebelum penghapusan. File yang terhapus mungkin tidak dapat dipulihkan. Iklan disediakan oleh layanan pihak ketiga berdasarkan syarat dan kebijakan masing-masing.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner menyediakan analisis penyimpanan pada perangkat dan alat manajemen file. Hasil pemindaian adalah rekomendasi, bukan cadangan. Tinjau file pengguna yang dipilih sebelum menghapusnya.\n\nSmart Cleaner dapat mengelola file penyimpanan bersama yang dapat diakses setelah Android memberikan akses Semua file. Android tetap melindungi data internal pribadi aplikasi lain. Manajer Cache Aplikasi menggunakan tindakan sistem resmi Android dan mungkin menampilkan konfirmasi Android yang diperlukan. \n\nSmart Cleaner tidak menjanjikan perubahan pada aplikasi pihak ketiga yang dilindungi, RAM sistem, atau suhu CPU, maupun hasil kinerja yang dibuat-buat. Ketersediaan bergantung pada versi Android dan produsen perangkat.\n\nAnda bertanggung jawab untuk meninjau pilihan sebelum penghapusan. File yang terhapus mungkin tidak dapat dipulihkan.</string>
     <string name="uninstall">Copot pemasangan</string>
     <string name="whatsapp_category_statuses">Status</string>
     <string name="whatsapp_category_statuses_description">Media status WhatsApp sementara disimpan di penyimpanan bersama</string>
@@ -284,8 +283,6 @@
     <string name="cleanup_result_storage_snapshot">Cuplikan ruang bebas: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Mengapa Akses Penggunaan?</string>
     <string name="disclosure_usage_body">Akses Penggunaan bersifat opsional. Ini memungkinkan Smart Cleaner membaca total penyimpanan/cache aplikasi yang dilaporkan Android dan waktu terakhir digunakan sehingga Anda dapat meninjau aplikasi besar atau yang tidak digunakan. Itu tidak membaca konten pribadi di dalam aplikasi tersebut dan tidak menghapus data yang dilindungi secara diam-diam.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="smart_cleanup_ad_notice">Smart Cleaner gratis dan menampilkan iklan: banner, satu iklan native berlabel di beberapa daftar, panel iklan pada hasil pembersihan, sesekali iklan layar penuh setelah pembersihan atau saat kembali ke tab Bersihkan, dan iklan pembuka saat aplikasi dimuat. Iklan tidak pernah muncul di langkah izin atau konfirmasi; video singkat menghapus banner dan iklan layar penuh selama 60 menit.</string>
     <string name="cache_modern_total_label">Total cache aplikasi</string>
     <plurals name="cache_modern_measured_apps">
         <item quantity="other">Aplikasi %1$d diukur</item>
@@ -315,7 +312,8 @@
     <string name="permissions_manage_android">Kelola di Android</string>
     <string name="permissions_on_device_badge">DI PERANGKAT</string>
     <string name="permissions_privacy_policy_title">Kebijakan privasi</string>
-    <string name="permissions_privacy_policy_subtitle">Lihat cara file, izin, privasi iklan, dan pemrosesan di perangkat ditangani.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="permissions_privacy_policy_subtitle">Lihat cara file, izin, dan pemrosesan di perangkat ditangani.</string>
     <string name="storage_change_title">Perubahan penyimpanan</string>
     <string name="storage_change_hero_label">APA YANG BERUBAH?</string>
     <string name="storage_change_hero_no_baseline">Buat pengukuran pertama di sini. Smart Cleaner menyimpan snapshot penyimpanan nyata; tidak ada sejarah yang ditemukan.</string>
@@ -365,10 +363,6 @@
     <string name="storage_change_create_baseline">Buat pengukuran pertama</string>
     <string name="storage_change_analysis_scope">Menjalankan analisis penyimpanan bersama yang sebenarnya dan menyimpan snapshot baru untuk Perubahan Penyimpanan. Tidak ada pembersihan yang dilakukan dengan tindakan ini.</string>
     <string name="storage_change_progress">File: %1$d • Folder dipindai: %2$d</string>
-    <string name="rewarded_ad_title">Bebas iklan selama 60 menit</string>
-    <string name="rewarded_ad_subtitle">Tonton video pendek untuk menyembunyikan spanduk dan transisi iklan selama satu jam.</string>
-    <string name="rewarded_ad_earned">Waktu bebas iklan aktif selama 60 menit.</string>
-    <string name="rewarded_ad_unavailable">Videonya belum siap. Silakan coba lagi sebentar lagi.</string>
     <string name="nothing_selected_hint">Pilih file yang akan dibersihkan</string>
     <string name="premium_duplicate_copy_of">Salinan %1$s</string>
     <string name="cache_modern_not_measured">Tidak diukur – izinkan Akses Penggunaan</string>
@@ -458,12 +452,13 @@
     <plurals name="swipe_break">
         <item quantity="other">%1$d ditinjau · %2$s ditandai</item>
     </plurals>
-    <string name="deep_check_action">Tonton dan verifikasi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_action">Verifikasi</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_running">Memeriksa kemungkinan duplikat…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
-        <item quantity="other">File besar yang tampak identik: %1$d · hingga %2$s. Tonton video singkat untuk memverifikasinya.</item>
+        <item quantity="other">File besar yang tampak identik: %1$d · hingga %2$s. Ketuk Verifikasi untuk memeriksanya.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
@@ -594,8 +589,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tool_move_to_trash">Pindahkan ke Sampah</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_label">Iklan</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_review_rest">Lihat temuan lainnya</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_hard_photos">Foto &amp; video</string>
@@ -708,24 +701,12 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tools_storage_full">%1$s penuh</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_title">Tanpa iklan selama 60 menit</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_sub">Tonton satu video singkat</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_bar">Tidak mau iklan? Matikan selama 60 menit</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_watch">Tonton</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_camera_files">
         <item quantity="other">%1$d file dari kameramu</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="tools_apps_unused">
         <item quantity="other">%1$d tak terpakai</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="ad_free_left">
-        <item quantity="other">Bebas iklan · sisa %1$d mnt</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="result_files_moved">
@@ -758,5 +739,62 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="verify_selected_exact">
         <item quantity="other">%1$d salinan persis dipilih</item>
+    </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_subtitle">Fitur Pro hadir di pembaruan berikutnya. Semua yang Anda gunakan hari ini tetap seperti biasa.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_loading">Memuat paket…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_title">Segera hadir</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_body">Paket Pro belum tersedia. Semua di aplikasi tetap berfungsi seperti sebelumnya.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_title">Pro aktif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_body">Terima kasih. Pro terhubung ke akun Google Play Anda.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_pending">Pembelian Anda menunggu pembayaran. Pro aktif setelah Google Play menyelesaikannya.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly">%s / tahun</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week">%s / 1 minggu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week_detail">Prabayar. Tidak diperpanjang.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime">%s sekali bayar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime_detail">Satu kali bayar. Tanpa perpanjangan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_yearly">Berlangganan %s/tahun</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_week">1 minggu %s · tidak diperpanjang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_lifetime">Bayar %s sekali</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_legal_renews">Paket tahunan diperpanjang otomatis. Anda dapat membatalkannya kapan saja di Google Play &gt; Langganan. Bagian lain aplikasi berfungsi tanpa langganan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_restore">Pulihkan pembelian</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_manage">Kelola langganan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_activated">Pro aktif. Terima kasih!</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_pending">Pembelian tertunda. Pro aktif setelah pembayaran selesai.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restored">Pembelian dipulihkan. Pro aktif.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_nothing_to_restore">Tidak ada pembelian Pro di akun Google ini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_failed">Pembelian tidak dapat diselesaikan. Coba lagi.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_unavailable">Penagihan Google Play sedang tidak tersedia.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="other">Uji coba %1$d hari, lalu %2$s per tahun</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_buy_trial">
+        <item quantity="other">Coba %1$d hari, lalu %2$s/tahun</item>
     </plurals>
 </resources>

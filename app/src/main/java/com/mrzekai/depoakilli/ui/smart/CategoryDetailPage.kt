@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.items
@@ -72,7 +71,6 @@ internal fun CategoryDetailPage(
     onPreview: (CleanableItem) -> Unit,
     onCleanSelected: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
-    gridAd: @Composable () -> Unit = {},
     verifyingPercent: Int? = null,
     verifyFeedback: String? = null,
 ) {
@@ -193,21 +191,7 @@ internal fun CategoryDetailPage(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                val beforeAd = displayItems.take(LIST_AD_AFTER_ITEMS)
-                val afterAd = displayItems.drop(LIST_AD_AFTER_ITEMS)
-                gridItems(beforeAd, key = CleanableItem::id) { item ->
-                    CategoryGridItem(
-                        item = item,
-                        accent = accent,
-                        onPreview = { onPreview(item) },
-                        onToggle = { onToggleItem(item.id) },
-                    )
-                }
-                // One full-width native ad after the 12th file (T1B.4), only in longer grids.
-                if (afterAd.isNotEmpty()) {
-                    item(key = "category-list-native", span = { GridItemSpan(maxLineSpan) }) { gridAd() }
-                }
-                gridItems(afterAd, key = CleanableItem::id) { item ->
+                gridItems(displayItems, key = CleanableItem::id) { item ->
                     CategoryGridItem(
                         item = item,
                         accent = accent,

@@ -25,7 +25,6 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.QueryStats
-import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Storage
@@ -44,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -70,24 +68,19 @@ import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 /**
- * Settings (T5.10) on Lime: four black groups of 52 dp rows with a Lime
- * status and an arrow — access and language; kept files and folders not
- * suggested; ad-free time and ad privacy; rate, share, feedback and
- * privacy & terms. Every earlier function stays; only the look changed.
+ * Settings (T5.10) on Lime: black groups of 52 dp rows with a Lime status
+ * and an arrow — Smart Cleaner Pro; access and language; kept files and
+ * folders not suggested; rate, share, feedback and privacy & terms.
  */
 @Composable
 internal fun SettingsDetailScreen(
     listState: LazyListState = rememberLazyListState(),
-    privacyOptionsRequired: Boolean,
-    canRequestAds: Boolean,
-    adFreeRemainingMillis: Long,
-    rewardedAdReady: Boolean,
+    isPro: Boolean = false,
+    onOpenPro: () -> Unit = {},
     onOpenLanguageSettings: () -> Unit,
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
-    onShowPrivacyOptions: () -> Unit,
-    onShowRewardedAd: () -> Unit,
     onOpenPrivacyAccess: () -> Unit,
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
@@ -183,8 +176,6 @@ internal fun SettingsDetailScreen(
         )
     }
 
-    val adMinutes = ((adFreeRemainingMillis + 59_999L) / 60_000L).toInt()
-    val showRewarded = canRequestAds && adFreeRemainingMillis <= 0L && rewardedAdReady
     PageFrame(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -192,6 +183,17 @@ internal fun SettingsDetailScreen(
             contentPadding = PaddingValues(start = 16.dp, top = 4.dp, end = 16.dp, bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
+            item(key = "settings-pro") {
+                SettingsGroup {
+                    // 2.0 Faz 1: the subscription page; Pro unlocks nothing yet.
+                    CardRow(
+                        title = stringResource(R.string.pro_title),
+                        status = if (isPro) on else null,
+                        icon = Icons.Outlined.AutoAwesome,
+                        onClick = onOpenPro,
+                    )
+                }
+            }
             item(key = "settings-access") {
                 SettingsGroup {
                     CardRow(
@@ -234,35 +236,6 @@ internal fun SettingsDetailScreen(
                         onClick = if (excludedFolders.isNotEmpty()) ({ showExcluded = true }) else null,
                         showArrow = excludedFolders.isNotEmpty(),
                     )
-                }
-            }
-            if (showRewarded || adFreeRemainingMillis > 0L || privacyOptionsRequired) {
-                item(key = "settings-ads") {
-                    SettingsGroup {
-                        if (showRewarded) {
-                            CardRow(
-                                title = stringResource(R.string.rewarded_ad_title),
-                                detail = stringResource(R.string.rewarded_ad_subtitle),
-                                icon = Icons.Outlined.AutoAwesome,
-                                onClick = onShowRewardedAd,
-                            )
-                        }
-                        if (adFreeRemainingMillis > 0L) {
-                            // D5: the window shows its minutes left; nothing is offered meanwhile.
-                            CardRow(
-                                title = pluralStringResource(R.plurals.ad_free_left, adMinutes, adMinutes),
-                                icon = Icons.Outlined.AutoAwesome,
-                            )
-                        }
-                        if (privacyOptionsRequired) {
-                            if (showRewarded || adFreeRemainingMillis > 0L) CardDivider()
-                            CardRow(
-                                title = stringResource(R.string.ad_privacy_preferences),
-                                icon = Icons.Outlined.Security,
-                                onClick = onShowPrivacyOptions,
-                            )
-                        }
-                    }
                 }
             }
             item(key = "settings-about") {
@@ -364,8 +337,7 @@ internal fun LegalDetailScreen(page: LegalPage, info: DeviceInfoSnapshot, modifi
     val policyBody = when (page) {
         LegalPage.PRIVACY -> stringResource(R.string.privacy_policy_body_v050)
         LegalPage.TERMS -> stringResource(R.string.terms_of_service_body_v050)
-        LegalPage.ABOUT -> stringResource(R.string.about_app_body_v050, info.appVersion) +
-            "\n\n" + stringResource(R.string.smart_cleanup_ad_notice)
+        LegalPage.ABOUT -> stringResource(R.string.about_app_body_v050, info.appVersion)
     }
     val supportEmail = BuildConfig.SUPPORT_EMAIL.trim()
     val body = if (page != LegalPage.ABOUT && supportEmail.isNotBlank()) {

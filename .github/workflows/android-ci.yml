@@ -193,5 +193,5 @@ jobs:
         run: |
           chmod +x gradlew
           # All four variants compile here; give the Kotlin compiler room (runner has 16 GB).
-          ./gradlew --stacktrace test "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateReleaseAds -x validateClosedTestConfiguration
-          ./gradlew --stacktrace lint "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateReleaseAds -x validateClosedTestConfiguration
+          ./gradlew --stacktrace test "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateRelease -x validateClosedTestConfiguration
+          ./gradlew --stacktrace lint "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k" -x validateRelease -x validateClosedTestConfiguration

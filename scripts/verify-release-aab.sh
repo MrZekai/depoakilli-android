@@ -79,23 +79,27 @@ audit_binary() {
   grep -Fq "versionName='$EXPECTED_VERSION_NAME'" "$badging" || fail "$label versionName mismatch"
   grep -Fq "targetSdkVersion:'36'" "$badging" || fail "$label target API mismatch"
   ! grep -Fq 'application-debuggable' "$badging" || fail "$label is debuggable"
-  grep -Fq 'ca-app-pub-1380972808968213~9043355268' "$manifest" \
-    || fail "$label live AdMob app ID missing"
-  for id in \
-    'ca-app-pub-1380972808968213/2118175647' \
-    'ca-app-pub-1380972808968213/8492012303' \
-    'ca-app-pub-1380972808968213/4039180256'
+  # 2.0: no ad SDK. No AdMob id, no advertising-id permission, no ads classes;
+  # Google Play Billing is present.
+  if grep -Fq 'ca-app-pub-' "$manifest" || grep -Fq 'ca-app-pub-' "$dex_strings"; then
+    fail "$label contains an AdMob id"
+  fi
+  for forbidden in \
+    com.google.android.gms.ads \
+    com.google.android.gms.permission.AD_ID \
+    android.permission.ACCESS_ADSERVICES_AD_ID
   do
-    grep -Fq "$id" "$dex_strings" || fail "$label missing live AdMob unit: $id"
+    if grep -Fq "$forbidden" "$perms" || grep -Fq "$forbidden" "$manifest"; then
+      fail "$label contains ad surface: $forbidden"
+    fi
   done
-  if [ -n "${ADMOB_RESULT_NATIVE_ID:-}" ]; then
-    grep -Fq "$ADMOB_RESULT_NATIVE_ID" "$dex_strings" \
-      || fail "$label missing configured Native ad unit"
-  fi
-  if grep -Fq 'ca-app-pub-3940256099942544' "$manifest" || \
-     grep -Fq 'ca-app-pub-3940256099942544' "$dex_strings"; then
-    fail "$label contains Google sample AdMob ID"
-  fi
+  for forbidden in 'Lcom/google/android/gms/ads/' 'Lcom/google/android/ump/'; do
+    if grep -Fq "$forbidden" "$dex_strings"; then
+      fail "$label contains ad SDK classes: $forbidden"
+    fi
+  done
+  grep -Fq 'com.android.vending.BILLING' "$perms" \
+    || fail "$label is missing the Google Play Billing permission"
   grep -Fq "$SUPPORT_EMAIL" "$dex_strings" || fail "$label support contact missing"
   for forbidden in \
     android.permission.FOREGROUND_SERVICE \
@@ -117,7 +121,7 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
   echo "Version: $EXPECTED_VERSION_NAME ($EXPECTED_VERSION_CODE)"
   echo "Target API: 36"
   echo "Upload certificate SHA-256: $AAB_CERT"
-  echo "AdMob: live app, banner, interstitial and rewarded IDs; no Google sample IDs"
+  echo "Ads: none (no AdMob id, no AD_ID, no ads classes); Google Play Billing present"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"

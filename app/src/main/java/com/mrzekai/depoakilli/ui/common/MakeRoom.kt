@@ -64,7 +64,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
 import com.mrzekai.depoakilli.ui.theme.BlackChip
@@ -555,21 +554,6 @@ fun LinkButton(
             textAlign = TextAlign.Center,
         )
     }
-}
-
-/** The "Ad" label every native placement shows. */
-@Composable
-fun AdTag(modifier: Modifier = Modifier) {
-    Text(
-        stringResource(R.string.ad_label),
-        modifier = modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(AdLabel)
-            .padding(horizontal = 6.dp, vertical = 2.dp),
-        color = Ink,
-        fontSize = 12.sp,
-        fontWeight = AppWeights.Giant,
-    )
 }
 
 /** Thin progress bar on black (Lime fill). [progress] is 0..1. */

@@ -22,7 +22,6 @@
     <string name="scan_focus_duplicates">Duplicados</string>
     <string name="scan_focus_large">Arquivos grandes</string>
     <string name="language_settings">Idioma do app</string>
-    <string name="ad_privacy_preferences">Preferências de privacidade de anúncios</string>
     <string name="message_scan_failed">Não foi possível concluir a análise. Verifique as permissões de mídia e tente novamente.</string>
     <string name="message_select_item">Selecione pelo menos um item para limpar.</string>
     <string name="message_cache_already_empty">O cache do app já está vazio.</string>
@@ -133,7 +132,7 @@
     <string name="message_all_files_required_for_cache">A limpeza profunda de cache exige primeiro o acesso a todos os arquivos do Android.</string>
     <string name="message_cache_system_unavailable">Não foi possível confirmar a limpeza do cache. Selecione um app abaixo e abra as configurações do Android para limpá-lo.</string>
     <string name="message_whatsapp_not_found">Nenhuma pasta compatível de mídia do WhatsApp ou do WhatsApp Business foi encontrada no armazenamento compartilhado.</string>
-    <string name="privacy_policy_body_v050">O Smart Cleaner analisa os metadados de arquivos do armazenamento compartilhado acessível e, quando necessário para a detecção de duplicados, impressões digitais de conteúdo no dispositivo. Essas impressões digitais do mecanismo de limpeza e os arquivos pessoais não são enviados pelo Smart Cleaner.\n\nO acesso a todos os arquivos é solicitado porque o gerenciamento e a manutenção de arquivos são funcionalidades principais: analisar e gerenciar arquivos temporários, duplicados, arquivos grandes, downloads, instaladores APK e mídia do WhatsApp no armazenamento compartilhado. O Android continua bloqueando os diretórios de dados privados protegidos de outros apps.\n\nO acesso de uso é opcional e é usado para ler estatísticas de armazenamento/cache de apps e horários de último uso. O Gerenciador de cache de apps invoca a ação oficial do sistema de limpeza de cache do Android, e o Android controla a confirmação exigida.\n\nO Google Mobile Ads e a plataforma de consentimento podem processar identificadores de publicidade, diagnósticos e escolhas de consentimento de acordo com as políticas do Google. Os arquivos só são removidos após a seleção do usuário ou uma confirmação do sistema do Android.\n\nO Smart Cleaner não inclui nenhum serviço de relatório de falhas de terceiros. Nomes de arquivo, caminhos, conteúdos de arquivo e impressões digitais de duplicados não são enviados para relatórios de falhas.\n\nO Smart Cleaner mantém preferências e o histórico agregado de análises/limpezas apenas no armazenamento local do app até que você limpe os dados do app ou o desinstale. A maioria dos arquivos que você limpa vai primeiro para a Lixeira do Smart Cleaner neste dispositivo e pode ser restaurada lá por 7 dias; arquivos excluídos permanentemente e a Lixeira já esvaziada não podem ser restaurados. O Google retém os dados que processa de acordo com suas políticas publicadas.\n\nO SDK do Google Mobile Ads processa o endereço IP (para estimar a localização aproximada), o ID de publicidade ou ID do conjunto de apps, as interações com o app e dados de diagnóstico para exibir anúncios. O próprio app não envia nomes ou conteúdo de arquivos nem termos de pesquisa para fora do dispositivo.</string>
+    <string name="privacy_policy_body_v050">O Smart Cleaner analisa os metadados de arquivos do armazenamento compartilhado acessível e, quando necessário para a detecção de duplicados, impressões digitais de conteúdo no dispositivo. Essas impressões digitais do mecanismo de limpeza e os arquivos pessoais não são enviados pelo Smart Cleaner.\n\nO acesso a todos os arquivos é solicitado porque o gerenciamento e a manutenção de arquivos são funcionalidades principais: analisar e gerenciar arquivos temporários, duplicados, arquivos grandes, downloads, instaladores APK e mídia do WhatsApp no armazenamento compartilhado. O Android continua bloqueando os diretórios de dados privados protegidos de outros apps.\n\nO acesso de uso é opcional e é usado para ler estatísticas de armazenamento/cache de apps e horários de último uso. O Gerenciador de cache de apps invoca a ação oficial do sistema de limpeza de cache do Android, e o Android controla a confirmação exigida.\n\nOs arquivos só são removidos após a seleção do usuário ou uma confirmação do sistema do Android.\n\nO Smart Cleaner não inclui nenhum serviço de relatório de falhas de terceiros. Nomes de arquivo, caminhos, conteúdos de arquivo e impressões digitais de duplicados não são enviados para relatórios de falhas.\n\nO Smart Cleaner mantém preferências e o histórico agregado de análises/limpezas apenas no armazenamento local do app até que você limpe os dados do app ou o desinstale. A maioria dos arquivos que você limpa vai primeiro para a Lixeira do Smart Cleaner neste dispositivo e pode ser restaurada lá por 7 dias; arquivos excluídos permanentemente e a Lixeira já esvaziada não podem ser restaurados. O Google retém os dados que processa de acordo com suas políticas publicadas.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Arquivo grande • Idade em dias: %1$d</item>
         <item quantity="other">Arquivo grande • Idade em dias: %1$d</item>
@@ -159,7 +158,7 @@
     <string name="storage_type_images">Imagens</string>
     <string name="storage_type_other">Outros arquivos</string>
     <string name="storage_type_videos">Vídeos</string>
-    <string name="terms_of_service_body_v050">O Smart Cleaner oferece análise de armazenamento e ferramentas de gerenciamento de arquivos no dispositivo. Os resultados da análise são recomendações, não backups. Revise os arquivos do usuário selecionados antes de excluí-los.\n\nO Smart Cleaner pode gerenciar arquivos do armazenamento compartilhado acessível depois que o Android conceder o acesso a todos os arquivos. O Android continua protegendo os dados internos privados de outros apps. O Gerenciador de cache de apps usa a ação oficial do sistema do Android e pode exibir uma confirmação obrigatória do Android.\n\nO Smart Cleaner não afirma encerrar apps protegidos de terceiros, aumentar a RAM de todo o dispositivo, resfriar a CPU ou criar ganhos de desempenho fictícios. A disponibilidade pode variar de acordo com a versão do Android e o fabricante do dispositivo.\n\nVocê é responsável por revisar as seleções antes de excluir. Os arquivos excluídos podem não ser recuperáveis. Anúncios são fornecidos por serviços de terceiros, sujeitos aos respectivos termos e políticas.</string>
+    <string name="terms_of_service_body_v050">O Smart Cleaner oferece análise de armazenamento e ferramentas de gerenciamento de arquivos no dispositivo. Os resultados da análise são recomendações, não backups. Revise os arquivos do usuário selecionados antes de excluí-los.\n\nO Smart Cleaner pode gerenciar arquivos do armazenamento compartilhado acessível depois que o Android conceder o acesso a todos os arquivos. O Android continua protegendo os dados internos privados de outros apps. O Gerenciador de cache de apps usa a ação oficial do sistema do Android e pode exibir uma confirmação obrigatória do Android.\n\nO Smart Cleaner não afirma encerrar apps protegidos de terceiros, aumentar a RAM de todo o dispositivo, resfriar a CPU ou criar ganhos de desempenho fictícios. A disponibilidade pode variar de acordo com a versão do Android e o fabricante do dispositivo.\n\nVocê é responsável por revisar as seleções antes de excluir. Os arquivos excluídos podem não ser recuperáveis.</string>
     <string name="uninstall">Desinstalar</string>
     <string name="whatsapp_category_statuses">Status</string>
     <string name="whatsapp_category_statuses_description">Mídia temporária de status do WhatsApp armazenada no armazenamento compartilhado</string>
@@ -305,8 +304,6 @@
     <string name="cleanup_result_storage_snapshot">Registro de espaço livre: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Por que acesso de uso?</string>
     <string name="disclosure_usage_body">O acesso de uso é opcional. Ele permite que o Smart Cleaner leia os totais de armazenamento/cache de apps reportados pelo Android e os horários de último uso, para que você possa revisar apps grandes ou não usados. Ele não lê o conteúdo privado dentro desses apps e não exclui silenciosamente seus dados protegidos.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="smart_cleanup_ad_notice">O Smart Cleaner é gratuito e exibe anúncios: um banner, um anúncio nativo identificado em algumas listas, um painel de anúncio no resultado da limpeza, às vezes um anúncio em tela cheia após uma limpeza ou ao voltar para a aba Limpar e um anúncio de abertura enquanto o app carrega. Anúncios nunca aparecem em etapas de permissão ou confirmação; um vídeo curto remove o banner e os anúncios em tela cheia por 60 minutos.</string>
     <string name="cache_modern_total_label">Cache total de apps</string>
     <plurals name="cache_modern_measured_apps">
         <item quantity="one">Apps medidos: %1$d</item>
@@ -338,7 +335,8 @@
     <string name="permissions_manage_android">Gerenciar no Android</string>
     <string name="permissions_on_device_badge">NO DISPOSITIVO</string>
     <string name="permissions_privacy_policy_title">Política de privacidade</string>
-    <string name="permissions_privacy_policy_subtitle">Veja como arquivos, permissões, privacidade de publicidade e processamento no dispositivo são tratados.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="permissions_privacy_policy_subtitle">Veja como arquivos, permissões e processamento no dispositivo são tratados.</string>
     <string name="storage_change_title">Mudança no armazenamento</string>
     <string name="storage_change_hero_label">O QUE MUDOU?</string>
     <string name="storage_change_hero_no_baseline">Crie a primeira medição aqui. O Smart Cleaner salva um registro real do armazenamento; nenhum histórico é inventado.</string>
@@ -390,10 +388,6 @@
     <string name="storage_change_create_baseline">Criar primeira medição</string>
     <string name="storage_change_analysis_scope">Executa uma análise real do armazenamento compartilhado e salva um novo registro para Mudança no armazenamento. Esta ação não realiza nenhuma limpeza.</string>
     <string name="storage_change_progress">Arquivos: %1$d • Pastas verificadas: %2$d</string>
-    <string name="rewarded_ad_title">Sem anúncios por 60 minutos</string>
-    <string name="rewarded_ad_subtitle">Assista a um vídeo curto para ocultar anúncios de banner e de transição por uma hora.</string>
-    <string name="rewarded_ad_earned">O tempo sem anúncios está ativo por 60 minutos.</string>
-    <string name="rewarded_ad_unavailable">O vídeo ainda não está pronto. Tente novamente em instantes.</string>
     <string name="nothing_selected_hint">Selecione arquivos para limpar</string>
     <string name="premium_duplicate_copy_of">Cópia de %1$s</string>
     <string name="cache_modern_not_measured">Não medido: permita o acesso de uso</string>
@@ -494,13 +488,14 @@
         <item quantity="one">Revisados: %1$d · marcados: %2$s</item>
         <item quantity="other">Revisados: %1$d · marcados: %2$s</item>
     </plurals>
-    <string name="deep_check_action">Assistir e verificar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_action">Verificar</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_running">Verificando possíveis duplicados…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
-        <item quantity="one">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
-        <item quantity="other">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Assista a um vídeo curto para verificá-los.</item>
+        <item quantity="one">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Toque em Verificar para conferi-los.</item>
+        <item quantity="other">Arquivos grandes que parecem idênticos: %1$d · até %2$s. Toque em Verificar para conferi-los.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
@@ -635,8 +630,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tool_move_to_trash">Mover para a lixeira</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_label">Anúncio</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_review_rest">Ver o que mais encontrei</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_hard_photos">Fotos e vídeos</string>
@@ -758,14 +751,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tools_storage_full">%1$s cheio</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_title">Sem anúncios por 60 minutos</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_sub">Assista a um vídeo curto</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_bar">Não quer anúncios? Desative por 60 minutos</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_watch">Assistir</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_camera_files">
         <item quantity="one">%1$d arquivo da sua câmera</item>
         <item quantity="other">%1$d arquivos da sua câmera</item>
@@ -774,11 +759,6 @@
     <plurals name="tools_apps_unused">
         <item quantity="one">%1$d sem uso</item>
         <item quantity="other">%1$d sem uso</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="ad_free_left">
-        <item quantity="one">Sem anúncios · falta %1$d min</item>
-        <item quantity="other">Sem anúncios · faltam %1$d min</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="result_files_moved">
@@ -814,5 +794,64 @@
     <plurals name="verify_selected_exact">
         <item quantity="one">%1$d cópia exata selecionada</item>
         <item quantity="other">%1$d cópias exatas selecionadas</item>
+    </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_subtitle">Os recursos Pro chegam nas próximas atualizações. Tudo o que você usa hoje continua igual.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_loading">Carregando planos…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_title">Em breve</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_body">Os planos Pro ainda não estão disponíveis. Tudo no app continua funcionando como antes.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_title">Pro está ativo</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_body">Obrigado. O Pro está vinculado à sua conta do Google Play.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_pending">Sua compra aguarda pagamento. O Pro será ativado quando o Google Play concluí-la.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly">%s / ano</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week">%s / 1 semana</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week_detail">Pré-pago. Não é renovado.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime">%s pagamento único</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime_detail">Um pagamento. Sem renovação.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_yearly">Assinar por %s/ano</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_week">1 semana por %s · não renova</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_lifetime">Pagar %s uma vez</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_legal_renews">O plano anual é renovado automaticamente. Você pode cancelar quando quiser em Google Play &gt; Assinaturas. O resto do app funciona sem assinatura.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_restore">Restaurar compras</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_manage">Gerenciar assinatura</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_activated">O Pro está ativo. Obrigado!</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_pending">Compra pendente. O Pro será ativado quando o pagamento for concluído.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restored">Compras restauradas. O Pro está ativo.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_nothing_to_restore">Nenhuma compra do Pro foi encontrada nesta conta do Google.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_failed">Não foi possível concluir a compra. Tente novamente.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_unavailable">O faturamento do Google Play não está disponível agora.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="one">%1$d dia de teste, depois %2$s por ano</item>
+        <item quantity="other">%1$d dias de teste, depois %2$s por ano</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_buy_trial">
+        <item quantity="one">Teste %1$d dia, depois %2$s/ano</item>
+        <item quantity="other">Teste %1$d dias, depois %2$s/ano</item>
     </plurals>
 </resources>

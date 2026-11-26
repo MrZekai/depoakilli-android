@@ -22,7 +22,6 @@
     <string name="scan_focus_duplicates">Дубликаты</string>
     <string name="scan_focus_large">Большие файлы</string>
     <string name="language_settings">Язык приложения</string>
-    <string name="ad_privacy_preferences">Настройки конфиденциальности рекламы</string>
     <string name="message_scan_failed">Сканирование не удалось завершить. Проверьте разрешения мультимедиа и повторите попытку.</string>
     <string name="message_select_item">Выберите хотя бы один элемент для очистки.</string>
     <string name="message_cache_already_empty">Кэш приложения уже пуст.</string>
@@ -142,7 +141,7 @@
     <string name="message_all_files_required_for_cache">Для глубокой очистки кэша сначала нужен доступ ко всем файлам Android.</string>
     <string name="message_cache_system_unavailable">Очистка кэша не может быть подтверждена. Выберите приложение ниже и откройте его настройки Android, чтобы очистить его кеш.</string>
     <string name="message_whatsapp_not_found">В общем хранилище не найдена поддерживаемая папка WhatsApp или WhatsApp Business Media.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner анализирует доступные метаданные файлов общего хранилища и, при необходимости, для обнаружения дубликатов, «отпечатки пальцев» контента на устройстве. Эти отпечатки пальцев и личные файлы более чистого движка не загружаются Smart Cleaner.\n\nДоступ ко всем файлам запрашивается, поскольку управление файлами и их обслуживание являются основными функциями: сканирование и управление ненужными файлами, дубликатами, большими файлами, загрузками, установщиками APK и носителями WhatsApp в общем хранилище. Android продолжает блокировать защищенные каталоги личных данных других приложений.\n\nДоступ к использованию является необязательным и используется для чтения статистики хранилища/кэша приложений и временных меток последнего использования. App Cache Manager вызывает официальное действие системы очистки кэша Android, а Android контролирует необходимое подтверждение.\n\nGoogle Mobile Ads и платформа согласия могут обрабатывать рекламные идентификаторы, диагностику и варианты согласия в соответствии с политиками Google. Файлы удаляются только после выбора пользователя или подтверждения системы Android.\n\nSmart Cleaner не включает стороннюю службу отчетов о сбоях. Имена файлов, пути, содержимое файлов и дубликаты отпечатков пальцев не загружаются для отчетов о сбоях.\n\nSmart Cleaner сохраняет настройки и совокупную историю сканирования/очистки только в локальном хранилище приложений до тех пор, пока вы не очистите данные приложения или не удалите его. Большинство очищенных файлов сначала попадает в Корзину Smart Cleaner на этом устройстве, и их можно восстановить в течение 7 дней; файлы, удалённые навсегда, и очищенную Корзину восстановить нельзя. Google хранит данные, которые обрабатывает, в соответствии со своими опубликованными политиками.\n\nДля показа рекламы Google Mobile Ads SDK обрабатывает IP-адрес (для приблизительного определения местоположения), рекламный идентификатор или идентификатор набора приложений, взаимодействия с приложением и диагностические данные. Само приложение не отправляет имена и содержимое файлов или поисковые запросы за пределы устройства.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner анализирует доступные метаданные файлов общего хранилища и, при необходимости, для обнаружения дубликатов, «отпечатки пальцев» контента на устройстве. Эти отпечатки пальцев и личные файлы более чистого движка не загружаются Smart Cleaner.\n\nДоступ ко всем файлам запрашивается, поскольку управление файлами и их обслуживание являются основными функциями: сканирование и управление ненужными файлами, дубликатами, большими файлами, загрузками, установщиками APK и носителями WhatsApp в общем хранилище. Android продолжает блокировать защищенные каталоги личных данных других приложений.\n\nДоступ к использованию является необязательным и используется для чтения статистики хранилища/кэша приложений и временных меток последнего использования. App Cache Manager вызывает официальное действие системы очистки кэша Android, а Android контролирует необходимое подтверждение.\n\nФайлы удаляются только после выбора пользователя или подтверждения системы Android.\n\nSmart Cleaner не включает стороннюю службу отчетов о сбоях. Имена файлов, пути, содержимое файлов и дубликаты отпечатков пальцев не загружаются для отчетов о сбоях.\n\nSmart Cleaner сохраняет настройки и совокупную историю сканирования/очистки только в локальном хранилище приложений до тех пор, пока вы не очистите данные приложения или не удалите его. Большинство очищенных файлов сначала попадает в Корзину Smart Cleaner на этом устройстве, и их можно восстановить в течение 7 дней; файлы, удалённые навсегда, и очищенную Корзину восстановить нельзя. Google хранит данные, которые обрабатывает, в соответствии со своими опубликованными политиками.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Большой файл • Возраст (дней): %1$d</item>
         <item quantity="few">Большой файл • Возраст (дней): %1$d</item>
@@ -174,7 +173,7 @@
     <string name="storage_type_images">Изображения</string>
     <string name="storage_type_other">Другие файлы</string>
     <string name="storage_type_videos">Видео</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner предоставляет инструменты для анализа хранилища на устройстве и управления файлами. Результаты сканирования — это рекомендации, а не резервные копии. Просмотрите выбранные файлы пользователя перед их удалением.\n\nSmart Cleaner может управлять доступными файлами общего хранилища после того, как Android предоставит доступ ко всем файлам. Android по-прежнему защищает личные внутренние данные других приложений. App Cache Manager использует официальное системное действие Android и может отображать необходимое подтверждение Android.\n\nSmart Cleaner не обещает воздействовать на защищённые сторонние приложения, системную оперативную память или температуру процессора и не заявляет выдуманных результатов. Доступность зависит от версии Android и производителя устройства.\n\nВы несете ответственность за проверку выбора перед удалением. Удаленные файлы не подлежат восстановлению. Реклама предоставляется сторонними службами в соответствии с их условиями и политиками.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner предоставляет инструменты для анализа хранилища на устройстве и управления файлами. Результаты сканирования — это рекомендации, а не резервные копии. Просмотрите выбранные файлы пользователя перед их удалением.\n\nSmart Cleaner может управлять доступными файлами общего хранилища после того, как Android предоставит доступ ко всем файлам. Android по-прежнему защищает личные внутренние данные других приложений. App Cache Manager использует официальное системное действие Android и может отображать необходимое подтверждение Android.\n\nSmart Cleaner не обещает воздействовать на защищённые сторонние приложения, системную оперативную память или температуру процессора и не заявляет выдуманных результатов. Доступность зависит от версии Android и производителя устройства.\n\nВы несете ответственность за проверку выбора перед удалением. Удаленные файлы не подлежат восстановлению.</string>
     <string name="uninstall">Удалить</string>
     <string name="whatsapp_category_statuses">Статусы</string>
     <string name="whatsapp_category_statuses_description">Временные медиафайлы статусов WhatsApp в общем хранилище</string>
@@ -326,8 +325,6 @@
     <string name="cleanup_result_storage_snapshot">Свободное место: %1$s → %2$s</string>
     <string name="disclosure_usage_title">Почему доступ к использованию?</string>
     <string name="disclosure_usage_body">Доступ к использованию не является обязательным. Он позволяет Smart Cleaner считывать сообщаемые Android общие данные о хранилище/кэше приложений и времени последнего использования, чтобы вы могли просматривать большие или неиспользуемые приложения. Он не считывает личный контент внутри этих приложений и не удаляет их защищенные данные автоматически.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="smart_cleanup_ad_notice">Smart Cleaner бесплатен и показывает рекламу: баннер, одно помеченное нативное объявление в некоторых списках, рекламный блок в результате очистки, иногда полноэкранную рекламу после очистки или при возврате на вкладку «Очистка», а также рекламу при запуске во время загрузки. Реклама никогда не появляется на шагах разрешений и подтверждения; короткое видео убирает баннер и полноэкранную рекламу на 60 минут.</string>
     <string name="cache_modern_total_label">Общий кеш приложения</string>
     <plurals name="cache_modern_measured_apps">
         <item quantity="one">Приложений с измеренным объёмом: %1$d</item>
@@ -360,7 +357,8 @@
     <string name="permissions_manage_android">Управление в Android</string>
     <string name="permissions_on_device_badge">НА УСТРОЙСТВЕ</string>
     <string name="permissions_privacy_policy_title">Политика конфиденциальности</string>
-    <string name="permissions_privacy_policy_subtitle">Посмотрите, как обрабатываются файлы, разрешения, конфиденциальность рекламы и обработка данных на устройстве.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="permissions_privacy_policy_subtitle">Посмотрите, как обрабатываются файлы, разрешения и данные на устройстве.</string>
     <string name="storage_change_title">Изменение хранилища</string>
     <string name="storage_change_hero_label">ЧТО ИЗМЕНИЛОСЬ?</string>
     <string name="storage_change_hero_no_baseline">Создайте здесь первое измерение. Smart Cleaner сохраняет реальный снимок хранилища; никакая история не придумана.</string>
@@ -413,10 +411,6 @@
     <string name="storage_change_create_baseline">Создать первое измерение</string>
     <string name="storage_change_analysis_scope">Выполняет реальный анализ общего хранилища и сохраняет новый снимок для изменения хранилища. Это действие не выполняет никакой очистки.</string>
     <string name="storage_change_progress">Файлов: %1$d • Проверено папок: %2$d</string>
-    <string name="rewarded_ad_title">Без рекламы в течение 60 минут</string>
-    <string name="rewarded_ad_subtitle">Посмотрите короткое видео, как скрыть баннеры и рекламные переходы на один час.</string>
-    <string name="rewarded_ad_earned">Время без рекламы действует 60 минут.</string>
-    <string name="rewarded_ad_unavailable">Видео еще не готово. Пожалуйста, повторите попытку через минуту.</string>
     <string name="nothing_selected_hint">Выберите файлы для очистки</string>
     <string name="premium_duplicate_copy_of">Копия %1$s</string>
     <string name="cache_modern_not_measured">Не измерено – разрешить доступ к использованию</string>
@@ -539,15 +533,16 @@
         <item quantity="many">Просмотрено: %1$d · отмечено: %2$s</item>
         <item quantity="other">Просмотрено: %1$d · отмечено: %2$s</item>
     </plurals>
-    <string name="deep_check_action">Смотреть и проверить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_action">Проверить</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_running">Проверка возможных дубликатов…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
-        <item quantity="one">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
-        <item quantity="few">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
-        <item quantity="many">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
-        <item quantity="other">Большие похожие файлы: %1$d · до %2$s. Посмотрите короткое видео, чтобы проверить их.</item>
+        <item quantity="one">Большие похожие файлы: %1$d · до %2$s. Нажмите «Проверить», чтобы сверить их.</item>
+        <item quantity="few">Большие похожие файлы: %1$d · до %2$s. Нажмите «Проверить», чтобы сверить их.</item>
+        <item quantity="many">Большие похожие файлы: %1$d · до %2$s. Нажмите «Проверить», чтобы сверить их.</item>
+        <item quantity="other">Большие похожие файлы: %1$d · до %2$s. Нажмите «Проверить», чтобы сверить их.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
@@ -694,8 +689,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tool_move_to_trash">В корзину</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_label">Реклама</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_review_rest">Что ещё я нашёл</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_hard_photos">Фото и видео</string>
@@ -835,14 +828,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tools_storage_full">%1$s занято</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_title">60 минут без рекламы</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_sub">Посмотрите короткое видео</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_bar">Не хотите рекламу? Отключите на 60 минут</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_watch">Смотреть</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_camera_files">
         <item quantity="one">%1$d файл с камеры</item>
         <item quantity="few">%1$d файла с камеры</item>
@@ -855,13 +840,6 @@
         <item quantity="few">%1$d не используются</item>
         <item quantity="many">%1$d не используются</item>
         <item quantity="other">%1$d не используются</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="ad_free_left">
-        <item quantity="one">Без рекламы · осталась %1$d мин</item>
-        <item quantity="few">Без рекламы · осталось %1$d мин</item>
-        <item quantity="many">Без рекламы · осталось %1$d мин</item>
-        <item quantity="other">Без рекламы · осталось %1$d мин</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="result_files_moved">
@@ -903,5 +881,68 @@
         <item quantity="few">Выбрано %1$d точные копии</item>
         <item quantity="many">Выбрано %1$d точных копий</item>
         <item quantity="other">Выбрано %1$d точных копий</item>
+    </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_subtitle">Функции Pro появятся в следующих обновлениях. Всё, чем вы пользуетесь сейчас, останется как есть.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_loading">Загрузка тарифов…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_title">Скоро</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_body">Тарифы Pro пока недоступны. Всё в приложении работает как раньше.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_title">Pro включён</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_body">Спасибо. Pro привязан к вашему аккаунту Google Play.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_pending">Покупка ожидает оплаты. Pro включится, когда Google Play её завершит.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly">%s / год</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week">%s / 1 неделя</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week_detail">Предоплата. Не продлевается.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime">%s один раз</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime_detail">Один платёж. Без продления.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_yearly">Подписаться за %s/год</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_week">1 неделя за %s · без продления</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_lifetime">Оплатить %s один раз</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_legal_renews">Годовой тариф продлевается автоматически. Отменить можно в любой момент в Google Play &gt; Подписки. Остальная часть приложения работает без подписки.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_restore">Восстановить покупки</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_manage">Управлять подпиской</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_activated">Pro включён. Спасибо!</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_pending">Покупка ожидает. Pro включится после оплаты.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restored">Покупки восстановлены. Pro включён.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_nothing_to_restore">Покупка Pro в этом аккаунте Google не найдена.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_failed">Не удалось завершить покупку. Попробуйте ещё раз.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_unavailable">Оплата через Google Play сейчас недоступна.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="one">Пробный период %1$d день, затем %2$s в год</item>
+        <item quantity="few">Пробный период %1$d дня, затем %2$s в год</item>
+        <item quantity="many">Пробный период %1$d дней, затем %2$s в год</item>
+        <item quantity="other">Пробный период %1$d дней, затем %2$s в год</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_buy_trial">
+        <item quantity="one">Попробовать %1$d день, затем %2$s/год</item>
+        <item quantity="few">Попробовать %1$d дня, затем %2$s/год</item>
+        <item quantity="many">Попробовать %1$d дней, затем %2$s/год</item>
+        <item quantity="other">Попробовать %1$d дней, затем %2$s/год</item>
     </plurals>
 </resources>
