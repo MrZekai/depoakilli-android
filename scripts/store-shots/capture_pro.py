@@ -42,6 +42,7 @@ def strings(values_dir):
                 items = {i.get("quantity"): (i.text or "") for i in el}
                 text = items.get("other") or next(iter(items.values()), "")
                 out[el.get("name")] = text.replace("\\'", "'").replace('\\"', '"').strip()
+                out[el.get("name") + "@all"] = [t.replace("\\'", "'").replace('\\"', '"').strip() for t in items.values()]
     return out
 
 
@@ -194,7 +195,8 @@ def capture(listing, app_locale, values_dir):
     card = qa.scroll_to(rx(s["pro_card_title"]), 4)
     shot(out, "02-y1-home-card")
     if card:
-        cta = qa.scroll_to(rx(s["pro_card_try"]) + "|" + rx(s["pro_card_see"]), 4)
+        tries = "|".join(rx(t) for t in s["pro_card_try@all"])
+        cta = qa.scroll_to(tries + "|" + rx(s["pro_card_see"]), 4)
         if cta:
             qa.tap(cta)
             time.sleep(2)

@@ -53,7 +53,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r -g app/build/outputs/apk/debug/app-debug.apk
-            SHOT_LOCALES=${{ vars.SHOT_LOCALES || 'en-US,tr-TR,es-ES,pt-BR,de-DE,fr-FR,it-IT,ru-RU,id,ar' }} python3 scripts/store-shots/capture_pro.py store-media store-shots-out || true
+            SHOT_LOCALES=${{ vars.SHOT_LOCALES || 'ru-RU' }} python3 scripts/store-shots/capture_pro.py store-media store-shots-out || true
 
       - name: Push screenshots to store-pro-raw
         if: always()
