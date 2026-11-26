@@ -135,7 +135,7 @@ internal fun PaywallScreen(
                     .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                PaywallHeadline(gain)
+                PaywallHeadline(gain, oneTapOnly = facts.estimate.oneTapOnly)
                 Text(
                     listOfNotNull(
                         ProPricing.photoEquivalent(gain, facts.averagePhotoBytes)?.let {
@@ -157,8 +157,9 @@ internal fun PaywallScreen(
                         }
                     }
                 }
-                if (gain > 0L) {
-                    ProPricing.fillPercents(facts.totalBytes, facts.availableBytes, gain)?.let { (now, after) ->
+                // Bars only for a gain Pro alone gives; one-tap files can be cleared by hand too.
+                if (facts.estimate.showsFillBars) {
+                    ProPricing.fillPercents(facts.totalBytes, facts.availableBytes, facts.estimate.proOnlyBytes)?.let { (now, after) ->
                         Surface(color = PlanSelected, shape = MakeRoomShapes.Card, modifier = Modifier.fillMaxWidth()) {
                             FillBars(now, after, Modifier.padding(14.dp), estimateNote = facts.estimate.hasEstimates)
                         }
@@ -167,7 +168,7 @@ internal fun PaywallScreen(
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     TrustChip(stringResource(R.string.paywall_chip_undo))
                     TrustChip(stringResource(R.string.paywall_chip_on_phone))
-                    if (state.plans.any { it.kind != ProPlanKind.LIFETIME }) TrustChip(stringResource(R.string.paywall_chip_cancel))
+                    if (selected != null && selected.kind != ProPlanKind.LIFETIME) TrustChip(stringResource(R.string.paywall_chip_cancel))
                 }
                 when {
                     state.plans.isEmpty() && state.loading -> PaywallInfo(stringResource(R.string.pro_loading), null)
@@ -218,13 +219,16 @@ internal fun PaywallScreen(
                     }
                 }
                 // >= 12 sp, #9AA3B2 on #07090C (contrast ≈ 7.6:1).
-                Text(
-                    stringResource(R.string.paywall_legal),
-                    color = OnBlackSoft,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                // Lifetime is one payment: nothing to cancel, so no cancel line.
+                if (selected?.kind != ProPlanKind.LIFETIME) {
+                    Text(
+                        stringResource(R.string.paywall_legal),
+                        color = OnBlackSoft,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
                 // Whole links wrap to a new line; a long word is never split.
                 FlowRow(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     LinkButton(stringResource(R.string.terms_of_service), onClick = { onOpenLegalPage(LegalPage.TERMS) }, color = OnBlackSoft)
@@ -236,10 +240,10 @@ internal fun PaywallScreen(
 }
 
 @Composable
-private fun PaywallHeadline(gain: Long) {
+private fun PaywallHeadline(gain: Long, oneTapOnly: Boolean) {
     if (gain > 0L) {
         val value = ByteFormatter.format(gain)
-        val full = stringResource(R.string.paywall_title, value)
+        val full = stringResource(if (oneTapOnly) R.string.paywall_title_one_tap else R.string.paywall_title, value)
         val start = full.indexOf(value)
         Text(
             buildAnnotatedString {

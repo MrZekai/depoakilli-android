@@ -28,7 +28,7 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 53
+        versionCode = 54
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

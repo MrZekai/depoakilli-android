@@ -77,6 +77,21 @@ class ProFaz2Test {
     }
 
     @Test
+    fun `fill bars only for a gain Pro alone gives`() {
+        // One-tap "My pick" only: the same files can be cleared by hand, so no bars.
+        val pickOnly = ProGainEstimator.estimate(18 * gb, 40, true)
+        assertTrue(pickOnly.oneTapOnly)
+        assertFalse(pickOnly.showsFillBars)
+        assertEquals(0L, pickOnly.proOnlyBytes)
+        // With video compression (Pro only), the bars show that part alone.
+        val withVideo = ProGainEstimator.estimate(18 * gb, 40, true, listOf(5 * gb), videoCompressionAvailable = true)
+        assertFalse(withVideo.oneTapOnly)
+        assertTrue(withVideo.showsFillBars)
+        assertEquals(withVideo.totalBytes - 18 * gb, withVideo.proOnlyBytes)
+        assertFalse(ProGainEstimator.estimate(0L, 0, false).oneTapOnly)
+    }
+
+    @Test
     fun `video compression stays out in Faz 2 even with big videos`() {
         val videos = listOf(5 * gb, 3 * gb, 50_000_000L)
         val off = ProGainEstimator.estimate(0L, 0, true, videos)

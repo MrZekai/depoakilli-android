@@ -715,6 +715,7 @@
     <string name="pro_fill_note_estimate">Bu telefonda ölçüldü. Video kazancı yaklaşıktır.</string>
     <string name="paywall_close">Kapat</string>
     <string name="paywall_title">%s daha aç</string>
+    <string name="paywall_title_one_tap">Tek onayla %s temizle</string>
     <string name="paywall_title_unknown">Daha hızlı yer aç</string>
     <string name="paywall_sub">Bu telefonda ölçtüm. Fotoğrafların telefondan çıkmaz.</string>
     <string name="paywall_chip_undo">7 gün geri al</string>
@@ -768,8 +769,8 @@
         <item quantity="other">Pro\'yu %d gün dene</item>
     </plurals>
     <plurals name="paywall_photos">
-        <item quantity="one">Yaklaşık %d fotoğraflık yer.</item>
-        <item quantity="other">Yaklaşık %d fotoğraflık yer.</item>
+        <item quantity="one">Yaklaşık %,d fotoğraflık yer.</item>
+        <item quantity="other">Yaklaşık %,d fotoğraflık yer.</item>
     </plurals>
     <plurals name="pro_plan_yearly_trial_renews">
         <item quantity="one">%1$d gün deneme, sonra yılda %2$s. Otomatik yenilenir.</item>

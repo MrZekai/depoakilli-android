@@ -808,6 +808,8 @@
     <string name="paywall_close">Tutup</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title">Kosongkan %s lagi</string>
+    <!-- [ÇEVİRİ GEREKLİ] paywall_title_one_tap -->
+    <string name="paywall_title_one_tap">Kosongkan %s sekali ketuk</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title_unknown">Kosongkan ruang lebih cepat</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -902,7 +904,7 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="paywall_photos">
-        <item quantity="other">Ruang untuk sekitar %d foto.</item>
+        <item quantity="other">Ruang untuk sekitar %,d foto.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_plan_yearly_trial_renews">

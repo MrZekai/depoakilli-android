@@ -950,6 +950,8 @@
     <string name="paywall_close">Закрыть</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title">Освободить ещё %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] paywall_title_one_tap -->
+    <string name="paywall_title_one_tap">Освободить %s одним касанием</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="paywall_title_unknown">Освобождайте место быстрее</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1053,10 +1055,10 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="paywall_photos">
-        <item quantity="one">Место примерно для %d фото.</item>
-        <item quantity="few">Место примерно для %d фото.</item>
-        <item quantity="many">Место примерно для %d фото.</item>
-        <item quantity="other">Место примерно для %d фото.</item>
+        <item quantity="one">Место примерно для %,d фото.</item>
+        <item quantity="few">Место примерно для %,d фото.</item>
+        <item quantity="many">Место примерно для %,d фото.</item>
+        <item quantity="other">Место примерно для %,d фото.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_plan_yearly_trial_renews">

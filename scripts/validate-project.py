@@ -431,6 +431,12 @@ paywall_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/pro/PaywallScree
 for expected in ("BackHandler(onBack = onClose)", "Icons.Outlined.Close", "R.string.paywall_legal", "R.string.pro_restore"):
     if expected not in paywall_src:
         errors.append(f"missing paywall invariant: {expected}")
+# Fable audit (Faz 2): fill bars only for a Pro-only gain; no cancel line for lifetime.
+for expected in ("facts.estimate.showsFillBars", "facts.estimate.proOnlyBytes", "selected?.kind != ProPlanKind.LIFETIME"):
+    if expected not in paywall_src:
+        errors.append(f"missing paywall honesty invariant: {expected}")
+if "estimate.showsFillBars" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/pro/ProComponents.kt"):
+    errors.append("Y1 card must show fill bars only for a Pro-only gain")
 for forbidden in ("delay(", "countdown", "Countdown", "Coral"):
     if forbidden in paywall_src:
         errors.append(f"paywall must not use {forbidden} (no timers, no fear colours)")
