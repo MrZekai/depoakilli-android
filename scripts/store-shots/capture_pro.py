@@ -194,7 +194,7 @@ def capture(listing, app_locale, values_dir):
     card = qa.scroll_to(rx(s["pro_card_title"]), 4)
     shot(out, "02-y1-home-card")
     if card:
-        cta = qa.find(rx(s["pro_card_try"]) + "|" + rx(s["pro_card_see"]))
+        cta = qa.scroll_to(rx(s["pro_card_try"]) + "|" + rx(s["pro_card_see"]), 4)
         if cta:
             qa.tap(cta)
             time.sleep(2)
@@ -204,7 +204,9 @@ def capture(listing, app_locale, values_dir):
             shot(out, "04-y2-paywall-bottom")
             qa.back()
             time.sleep(1)
-    qa.to_home()
+    for _ in range(4):  # back to the top of Home (qa.to_home matches English only)
+        qa.sh(f"input swipe {qa.W // 2} {int(qa.H * 0.3)} {qa.W // 2} {int(qa.H * 0.8)} 300")
+    time.sleep(1)
     if qa.tap_text(rx(s["home_review_rest"]), 15):
         time.sleep(2)
         shot(out, "05-y7-plan")
