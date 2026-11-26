@@ -319,6 +319,7 @@ def main():
     time.sleep(1)
     launch()
     to_home()
+    log("after usage access: " + " | ".join(texts())[:600])
     if tap_text(r"^See what else I found$", 20):
         dismiss_ads()
         title = scroll_to(r"^Apps take the most space$")
@@ -342,7 +343,10 @@ def main():
                   note=act[-120:], screenshot=shot("app-settings-opened"))
             check("Uygulama silinmedi", BIG_APP in sh("pm list packages"))
             launch()
+    else:
+        log("no findings link after usage access: " + " | ".join(texts())[:600])
     to_home()
+    log("before apps line: " + " | ".join(texts())[:600])
 
     # 3b. Home "Apps hold X more" → findings, scrolled to the apps section.
     line = wait_for(r"^Apps hold .+ more\. See what you can do\.$", 20)
@@ -572,7 +576,9 @@ def main():
             tap(cta)
             check("Y1: kart düğmesi paywall'u açıyor", wait_for(r"^Close$", 10, dismiss=False))
             back()
-        tap_text(r"^Not now$", 10)
+        not_now = scroll_to(r"^Not now$", 4)
+        if not_now:
+            tap(not_now)
         time.sleep(1)
         check("Y1: 'Not now' kartı gizliyor", not find(r"more with Pro$"), screenshot=shot("y1-hidden"))
 
