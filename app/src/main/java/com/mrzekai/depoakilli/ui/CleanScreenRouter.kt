@@ -1,13 +1,10 @@
 package com.mrzekai.depoakilli.ui
 
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.ads.ListNativeAdCard
 import com.mrzekai.depoakilli.model.CleanCategory
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.ui.tools.PremiumCleanerToolScreen
@@ -33,11 +30,9 @@ internal fun CleanScreen(
     onToggleGroup: (com.mrzekai.depoakilli.model.CleanupGroup) -> Unit = {},
     onClearAppCaches: () -> Unit = {},
     viewModel: CleanerViewModel? = null,
-    canRequestAds: Boolean = false,
     onDeepCheck: () -> Unit = {},
     onOpenFolder: (com.mrzekai.depoakilli.model.FolderSize) -> Unit = {},
     onOpenAppInfo: (String) -> Unit = {},
-    onSwipeConfirmed: () -> Unit = {},
     onCloseSwipe: () -> Unit = {},
     autoOpenSuggestion: Boolean = false,
     onSuggestionOpened: () -> Unit = {},
@@ -73,11 +68,7 @@ internal fun CleanScreen(
             onSwipeUndo = { viewModel?.swipeUndo() },
             onSwipeContinue = { viewModel?.swipeContinue() },
             onSwipeGrid = { viewModel?.switchSwipeToGrid() },
-            onSwipeFinished = {
-                viewModel?.closeSwipeReview(clearMarks = true)
-                onSwipeConfirmed()
-            },
-            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
+            onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
             onCancelScan = { viewModel?.cancelScan() },
             onDeepCheck = onDeepCheck,
             onOpenFolder = { folder ->
@@ -92,13 +83,6 @@ internal fun CleanScreen(
             scrollToApps = scrollToApps,
             onScrolledToApps = onScrolledToApps,
             onExcludeFolder = { root, path -> viewModel?.excludeFolder(root, path) },
-            reviewAd = { index ->
-                // C5: the small list native follows the 3rd findings row when there are at least 4 rows.
-                val rows = state.summary.plan.askRows.size
-                if (index == AdPolicy.NATIVE_FINDINGS_AFTER_ROW - 1 && rows >= AdPolicy.NATIVE_FINDINGS_MIN_ROWS) {
-                    item(key = "plan-list-native") { ListNativeAdCard(canRequestAds = canRequestAds) }
-                }
-            },
         )
         return
     }
@@ -111,7 +95,6 @@ internal fun CleanScreen(
             onReviewType = { type -> onOpenStorageReview(type, false) },
             modifier = modifier,
             onRefresh = { viewModel?.refreshToolScan() },
-            listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         )
         return
     }
@@ -125,7 +108,6 @@ internal fun CleanScreen(
         onSetItemsSelected = onSetItemsSelected,
         onClean = onClean,
         modifier = modifier,
-        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
         onCancelScan = { viewModel?.cancelScan() },
         onRefresh = { viewModel?.refreshToolScan() },
         onVerifyAndSelect = { ids -> viewModel?.verifyAndSelectCopies(ids) },

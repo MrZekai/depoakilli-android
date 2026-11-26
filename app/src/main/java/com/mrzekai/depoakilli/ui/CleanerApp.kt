@@ -43,9 +43,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.ads.InterstitialTrigger
-import com.mrzekai.depoakilli.ads.ListNativeAdCard
+import com.mrzekai.depoakilli.billing.ProPlanOption
+import com.mrzekai.depoakilli.billing.ProScreenState
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
 import com.mrzekai.depoakilli.model.ToolSuggestion
@@ -74,16 +73,8 @@ internal enum class DetailScreen(@StringRes val titleRes: Int) {
     PRIVACY(R.string.privacy_policy),
     TERMS(R.string.terms_of_service),
     ABOUT(R.string.about_app),
+    PRO(R.string.pro_title),
 }
-
-/** Screens whose use counts for the return-from-tool interstitial (T1B.3 b). */
-internal val TOOL_SCREENS = setOf(
-    DetailScreen.CLEAN_RESULTS,
-    DetailScreen.WHATSAPP,
-    DetailScreen.APP_CACHE,
-    DetailScreen.APP_MANAGER,
-    DetailScreen.STORAGE_CHANGE,
-)
 
 internal enum class AccessDisclosure {
     ALL_FILES,
@@ -94,12 +85,7 @@ internal enum class AccessDisclosure {
 @Composable
 fun CleanerApp(
     viewModel: CleanerViewModel,
-    canRequestAds: Boolean,
-    fullScreenAdActive: Boolean,
-    appOpenCoverVisible: Boolean = false,
-    privacyOptionsRequired: Boolean,
-    adFreeRemainingMillis: Long,
-    rewardedAdReady: Boolean,
+    pro: ProScreenState,
     onRequestAllFilesAccess: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onClearAllAppCaches: () -> Unit,
@@ -109,14 +95,14 @@ fun CleanerApp(
     onPrepareWhatsAppCleanup: ((Boolean) -> Unit) -> Unit,
     onCleanupResultDismissed: () -> Unit,
     onCleanupSucceeded: () -> Unit,
-    onReturnedToClean: (dwellMillis: Long) -> Unit = {},
-    onNaturalBreak: (InterstitialTrigger) -> Unit = {},
     onDeepDuplicateCheck: () -> Unit = {},
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onOpenLanguageSettings: () -> Unit,
-    onShowPrivacyOptions: () -> Unit,
-    onShowRewardedAd: () -> Unit,
+    onOpenPro: () -> Unit = {},
+    onBuyPlan: (ProPlanOption) -> Unit = {},
+    onRestorePurchases: () -> Unit = {},
+    onManageSubscription: () -> Unit = {},
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
@@ -140,43 +126,6 @@ fun CleanerApp(
         }
     }
     val snackbarHostState = remember { SnackbarHostState() }
-    // Trigger (b): time spent on a tool screen before returning to the Clean or
-    // Tools tab. Settings, privacy, terms and about pages never count.
-    var detailEnteredAt by remember { mutableStateOf(0L) }
-    LaunchedEffect(detailScreen) {
-        val toolScreen = detailScreen in TOOL_SCREENS
-        when {
-            toolScreen && detailEnteredAt == 0L ->
-                detailEnteredAt = android.os.SystemClock.elapsedRealtime()
-            detailScreen == null && detailEnteredAt > 0L -> {
-                val dwell = android.os.SystemClock.elapsedRealtime() - detailEnteredAt
-                detailEnteredAt = 0L
-                if (state.cleanupResult == null && !state.cleanupInProgress && !state.scanning) onReturnedToClean(dwell)
-            }
-            !toolScreen -> detailEnteredAt = 0L
-        }
-    }
-
-    // B7: a finished tool scan is a natural break before its results list.
-    // Not after a Smart or Deep scan (those have their own triggers), not when
-    // the result came straight from the cached index (the user did not wait),
-    // and not after a cancelled scan. AdPolicy limits still decide.
-    var toolScanWasRunning by remember { mutableStateOf(false) }
-    val toolScanRunning = state.scanning && isToolScanFocus(state.scanFocus)
-    LaunchedEffect(toolScanRunning) {
-        if (toolScanWasRunning && !toolScanRunning && state.lastScanCompleted && !state.lastScanFromCache) {
-            onNaturalBreak(InterstitialTrigger.TOOL_RESULT)
-        }
-        toolScanWasRunning = toolScanRunning
-    }
-    var whatsAppScanWasRunning by remember { mutableStateOf(false) }
-    LaunchedEffect(state.whatsAppScanning) {
-        if (whatsAppScanWasRunning && !state.whatsAppScanning && state.whatsAppLastScanCompleted) {
-            onNaturalBreak(InterstitialTrigger.TOOL_RESULT)
-        }
-        whatsAppScanWasRunning = state.whatsAppScanning
-    }
-
     LaunchedEffect(state.message) {
         state.message?.let {
             snackbarHostState.showSnackbar(it)
@@ -203,12 +152,11 @@ fun CleanerApp(
         }
     }
 
-    /** Findings list (T5.4); the interstitial follows a finished scan (AdPolicy limits apply). */
+    /** Findings list (T5.4). */
     fun openFindings() {
         legalReturnScreen = null
         viewModel.showPlan()
         detailScreen = DetailScreen.CLEAN_RESULTS
-        onNaturalBreak(InterstitialTrigger.OPEN_FINDINGS)
     }
 
     /** C4: switches between the two tabs of the Apps or Storage tool. */
@@ -275,7 +223,7 @@ fun CleanerApp(
             state.smartCategoryReview != null ||
             selectedTabIndex != AppTab.HOME.ordinal
 
-    BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive) {
+    BackHandler(enabled = hasInAppBackTarget) {
         navigateBackInApp()
     }
 
@@ -390,53 +338,10 @@ fun CleanerApp(
             }
         },
         bottomBar = {
-            // Faz 5 ad table: banner on Home, Tools and Trash (above the menu)
-            // and on the findings list; tool lists carry an in-list native
-            // instead, and the swipe review has its own break card.
-            val findingsListOpen = state.scanFocus == ScanFocus.SMART &&
-                state.smartCategoryReview == null &&
-                state.storageReview.type == null &&
-                state.swipeReviewGroup == null
-            val screenAllowsBanner = when (detailScreen) {
-                null -> when (AppTab.entries[selectedTabIndex]) {
-                    AppTab.HOME,
-                    AppTab.TOOLS,
-                    AppTab.TRASH -> true
-                }
-                DetailScreen.CLEAN_RESULTS -> state.hasAllFilesAccess &&
-                    (findingsListOpen || state.scanFocus == ScanFocus.ANALYZE)
-                DetailScreen.WHATSAPP,
-                DetailScreen.APP_CACHE,
-                DetailScreen.APP_MANAGER -> false
-                DetailScreen.STORAGE_CHANGE -> true
-                DetailScreen.SETTINGS,
-                DetailScreen.ACCESS,
-                DetailScreen.PRIVACY,
-                DetailScreen.TERMS,
-                DetailScreen.ABOUT -> false
-            }
-
-            val bannerAllowed =
-                canRequestAds &&
-                    screenAllowsBanner &&
-                    accessDisclosure == null &&
-                    !fullScreenAdActive &&
-                    !appOpenCoverVisible &&
-                    // No banner next to the swipe-review break card (it has its own native ad).
-                    state.swipeReviewGroup?.let { state.swipeStates[it]?.breakPending } != true &&
-                    // No ad while a scan runs (Faz 5 ad table: "Taranıyor: yok").
-                    !state.scanning &&
-                    !state.dashboardRefreshing &&
-                    !state.whatsAppScanning &&
-                    !state.cleanupInProgress &&
-                    state.cleanupResult == null &&
-                    adFreeRemainingMillis <= 0L
-
             AppBottomBar(
                 detailScreenOpen = detailScreen != null,
                 // C6: the black swipe screen keeps a black navigation bar.
                 darkNavigationArea = swipeVisible,
-                bannerAllowed = bannerAllowed,
                 selectedTabIndex = selectedTabIndex,
                 onSelectTab = { selectedTabIndex = it },
             )
@@ -475,10 +380,8 @@ fun CleanerApp(
                         onToggleGroup = viewModel::toggleGroup,
                         onClearAppCaches = onClearAllAppCaches,
                         viewModel = viewModel,
-                        canRequestAds = canRequestAds,
                         onDeepCheck = onDeepDuplicateCheck,
                         onOpenAppInfo = onOpenAppInfo,
-                        onSwipeConfirmed = { onNaturalBreak(InterstitialTrigger.SWIPE_FINISHED) },
                         onCloseSwipe = ::navigateBackInApp,
                         autoOpenSuggestion = openSuggestionRequested,
                         onSuggestionOpened = { openSuggestionRequested = false },
@@ -500,7 +403,6 @@ fun CleanerApp(
                             }
                         },
                         modifier = Modifier,
-                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                         // C1/C3: the same ToolSuggestion call as the Tools tile.
                         suggested = state.smartSummary()?.plan
                             ?.let { ToolSuggestion.suggestedFor(SuggestionTool.WHATSAPP, it) }
@@ -515,7 +417,6 @@ fun CleanerApp(
                         onClearOwnCache = viewModel::clearOwnAppCache,
                         onOpenAppDetails = onOpenAppDetails,
                         modifier = Modifier,
-                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                     )
 
                     DetailScreen.APP_MANAGER -> AppManagerScreen(
@@ -525,7 +426,6 @@ fun CleanerApp(
                         onUninstallApp = onUninstallApp,
                         onOpenAppInfo = onOpenAppInfo,
                         modifier = Modifier,
-                        listAd = { ListNativeAdCard(canRequestAds = canRequestAds) },
                     )
 
                     DetailScreen.STORAGE_CHANGE -> StorageChangeScreen(
@@ -545,16 +445,15 @@ fun CleanerApp(
                     )
 
                     DetailScreen.SETTINGS -> SettingsDetailScreen(
-                        privacyOptionsRequired = privacyOptionsRequired,
-                        canRequestAds = canRequestAds,
-                        adFreeRemainingMillis = adFreeRemainingMillis,
-                        rewardedAdReady = rewardedAdReady,
+                        isPro = pro.isPro,
+                        onOpenPro = {
+                            onOpenPro()
+                            detailScreen = DetailScreen.PRO
+                        },
                         onOpenLanguageSettings = onOpenLanguageSettings,
                         onRateApp = onRateApp,
                         onSendFeedback = onSendFeedback,
                         onShareApp = onShareApp,
-                        onShowPrivacyOptions = onShowPrivacyOptions,
-                        onShowRewardedAd = onShowRewardedAd,
                         onOpenPrivacyAccess = { detailScreen = DetailScreen.ACCESS },
                         onOpenLegalPage = ::openLegalPage,
                         modifier = Modifier,
@@ -586,6 +485,16 @@ fun CleanerApp(
                             legalReturnScreen = DetailScreen.ACCESS
                             detailScreen = DetailScreen.PRIVACY
                         },
+                        modifier = Modifier,
+                    )
+
+                    DetailScreen.PRO -> ProScreen(
+                        state = pro,
+                        onBuy = onBuyPlan,
+                        onRestore = onRestorePurchases,
+                        onManageSubscription = onManageSubscription,
+                        onOpenLegalPage = ::openLegalPage,
+                        onClose = ::navigateBackInApp,
                         modifier = Modifier,
                     )
 
@@ -703,15 +612,13 @@ fun CleanerApp(
         )
     }
 
-    if (!fullScreenAdActive) {
+    run {
         state.cleanupResult?.let { result ->
             val dismissResultAndReturn: () -> Unit = {
                 val returnScreen = detailScreen
                 val returnTabIndex = selectedTabIndex
 
                 viewModel.dismissCleanupResult()
-                // Done already gives the post-cleanup break; no second one on return.
-                detailEnteredAt = 0L
                 legalReturnScreen = null
                 // Done returns to the tool's main screen with refreshed
                 // totals, not to the sub-list the cleanup was started from,
@@ -740,10 +647,6 @@ fun CleanerApp(
 
             CleanupResultDialog(
                 result = result,
-                canRequestAds = canRequestAds,
-                showRewardedOffer = canRequestAds && adFreeRemainingMillis <= 0L && rewardedAdReady,
-                onShowRewardedAd = onShowRewardedAd,
-                adFreeRemainingMillis = adFreeRemainingMillis,
                 onSystemDismiss = {
                     dismissResultAndReturn()
                 },
@@ -782,8 +685,8 @@ fun CleanerApp(
                         detailScreen = DetailScreen.CLEAN_RESULTS
                     }
                 },
-                onDone = { resultAdPresented ->
-                    val eligibleForNaturalBreakAd =
+                onDone = {
+                    val succeeded =
                         result.operationSucceeded &&
                             (
                                 result.deletedCount > 0 ||
@@ -793,18 +696,13 @@ fun CleanerApp(
 
                     dismissResultAndReturn()
 
-                    if (eligibleForNaturalBreakAd && result.failedCount == 0) onCleanupSucceeded()
-                    // Trigger (a): Done closes the result, also when the result
-                    // panel already showed an ad; AdPolicy limits frequency.
-                    if (eligibleForNaturalBreakAd) {
-                        onCleanupResultDismissed()
-                    }
+                    if (succeeded && result.failedCount == 0) onCleanupSucceeded()
+                    if (succeeded) onCleanupResultDismissed()
                 },
             )
         }
     }
 
-        if (fullScreenAdActive) FullScreenAdCover()
     }
 }
 
@@ -819,8 +717,6 @@ private fun trashFallbackBytes(state: CleanerUiState, fallback: TrashFallback): 
 }
 
 /** Tool scans (everything but the Smart and Deep scans) end in a tool result list (B7). */
-private fun isToolScanFocus(focus: ScanFocus): Boolean = focus != ScanFocus.SMART && focus != ScanFocus.DEEP
-
 /** The two-tab tools of C4. */
 internal enum class HubKind { APPS, STORAGE }
 

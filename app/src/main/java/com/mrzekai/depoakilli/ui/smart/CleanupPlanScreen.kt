@@ -156,7 +156,6 @@ internal fun LazyListScope.cleanupPlanItems(
     onClearAppCaches: () -> Unit,
     onOpenUnusedApps: () -> Unit,
     onScanAgain: () -> Unit,
-    afterReviewRow: LazyListScope.(index: Int) -> Unit = {},
     deepCheck: Pair<Int, Long> = 0 to 0L,
     deepCheckRunning: Boolean = false,
     onDeepCheck: () -> Unit = {},
@@ -243,7 +242,6 @@ internal fun LazyListScope.cleanupPlanItems(
                 )
             }
         }
-        afterReviewRow(this, index)
     }
     if (rows.isNotEmpty()) {
         item(key = "plan-start-biggest") {

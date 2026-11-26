@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mrzekai.depoakilli.R
@@ -103,7 +102,6 @@ internal fun SmartCleanResultsScreen(
     onToggleGroup: (CleanupGroup) -> Unit = {},
     onClearAppCaches: () -> Unit = {},
     planHeader: LazyListScope.() -> Unit = {},
-    reviewAd: LazyListScope.(Int) -> Unit = {},
     onCancelScan: () -> Unit = {},
     onOpenSwipeReview: (CleanupGroup) -> Unit = {},
     onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit = { _, items ->
@@ -116,7 +114,6 @@ internal fun SmartCleanResultsScreen(
     onSwipeContinue: () -> Unit = {},
     onSwipeGrid: () -> Unit = {},
     onSwipeFinished: () -> Unit = {},
-    listAd: @Composable () -> Unit = {},
     onDeepCheck: () -> Unit = {},
     onOpenFolder: (FolderSize) -> Unit = {},
     onOpenAppInfo: (String) -> Unit = {},
@@ -146,7 +143,6 @@ internal fun SmartCleanResultsScreen(
             modifier = modifier,
             groupTitle = stringResource(swipeGroup.titleRes),
             onClose = onCloseSwipe,
-            breakCardContent = listAd,
         )
         return
     }
@@ -187,12 +183,10 @@ internal fun SmartCleanResultsScreen(
             onToggleGroup = onToggleGroup,
             onClearAppCaches = onClearAppCaches,
             planHeader = planHeader,
-            reviewAd = reviewAd,
             onOpenSwipeReview = onOpenSwipeReview,
             onOpenPlanGrid = onOpenPlanGrid,
             deepCheckRunning = state.deepCheckRunning,
             onDeepCheck = onDeepCheck,
-            listAd = listAd,
             onOpenFolder = onOpenFolder,
             onOpenAppInfo = onOpenAppInfo,
             onExcludeFolder = onExcludeFolder,
@@ -238,12 +232,10 @@ internal fun SmartResultsContent(
     onToggleGroup: (CleanupGroup) -> Unit,
     onClearAppCaches: () -> Unit,
     planHeader: LazyListScope.() -> Unit,
-    reviewAd: LazyListScope.(Int) -> Unit,
     onOpenSwipeReview: (CleanupGroup) -> Unit,
     onOpenPlanGrid: (CleanupGroup?, List<CleanableItem>) -> Unit,
     deepCheckRunning: Boolean,
     onDeepCheck: () -> Unit,
-    listAd: @Composable () -> Unit,
     onOpenFolder: (FolderSize) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     onExcludeFolder: (volumeRoot: String, relativePath: String) -> Unit,
@@ -294,7 +286,6 @@ internal fun SmartResultsContent(
             onPreview = { previewItemId = it.id },
             onCleanSelected = { ids -> onClean(ids) },
             modifier = modifier,
-            gridAd = listAd,
         )
         previewItemId?.let { itemId ->
             summary.items.firstOrNull { it.id == itemId }?.let { item ->
@@ -446,7 +437,6 @@ internal fun SmartResultsContent(
                     if (!hasUsageAccess) onRequestUsageAccess() else showUnusedAppsReview = true
                 },
                 onScanAgain = onScan,
-                afterReviewRow = reviewAd,
                 deepCheck = deepCheck,
                 deepCheckRunning = deepCheckRunning,
                 onDeepCheck = onDeepCheck,
@@ -491,8 +481,6 @@ internal fun SmartResultsContent(
         )
     }
 }
-
-internal const val LIST_AD_AFTER_ITEMS = 12
 
 internal val PERSONAL_STORAGE_TYPES = setOf(StorageFileType.IMAGES, StorageFileType.VIDEOS, StorageFileType.DOCUMENTS)
 

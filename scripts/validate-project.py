@@ -95,8 +95,11 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt",
     "app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt",
     "app/src/main/java/com/mrzekai/depoakilli/diagnostics/AppDiagnostics.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt",
-    "app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/billing/BillingRepository.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/billing/BillingProducts.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/billing/Entitlement.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/billing/ProOffers.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/ProScreen.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
@@ -168,12 +171,17 @@ for forbidden in (
     "BIND_ACCESSIBILITY_SERVICE",
     "KILL_BACKGROUND_PROCESSES",
     "WRITE_EXTERNAL_STORAGE",
+    # 2.0: no ad SDK — no AdMob application id, no advertising id.
+    "com.google.android.gms.ads",
+    "ADMOB_APP_ID",
+    "AD_ID",
+    "ACCESS_NETWORK_STATE",
 ):
     if forbidden in manifest:
         errors.append(f"forbidden manifest capability present: {forbidden}")
 
 # ------------------------------------------------------------------
-# Build / production-vs-QA AdMob contract.
+# Build contract (2.0: Google Play Billing, no ad SDK).
 # ------------------------------------------------------------------
 build_file = read("app/build.gradle.kts")
 # T3.6: version constants come from Gradle, not from this script.
@@ -190,24 +198,34 @@ for expected in (
     "compileSdk = 36",
     f"versionCode = {VERSION_CODE}",
     f'versionName = "{VERSION_NAME}"',
-    "validateReleaseAds",
+    "validateRelease",
+    'tasks.matching { it.name == "preReleaseBuild" }',
     'applicationIdSuffix = ".qa"',
-    'liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"',
-    'liveBannerId = "ca-app-pub-1380972808968213/2118175647"',
-    'liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"',
-    'sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"',
-    'providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")',
+    "implementation(libs.android.billing.ktx)",
     'providers.environmentVariable("SUPPORT_EMAIL")',
-    '"ADMOB_RESULT_NATIVE_ID"',
     '"SUPPORT_EMAIL"',
     'create("closedTest") {',
     "validateClosedTestConfiguration",
     'tasks.matching { it.name == "preClosedTestBuild" }',
-    'manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId',
-    'manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId',
 ):
     if expected not in build_file:
-        errors.append(f"missing build/AdMob invariant: {expected}")
+        errors.append(f"missing build invariant: {expected}")
+# 2.0: the ad SDK, consent SDK and every AdMob id are gone from the build.
+for forbidden in (
+    "ca-app-pub-",
+    "ADMOB_",
+    "play.services.ads",
+    "google.ump",
+    "validateReleaseAds",
+):
+    if forbidden in build_file:
+        errors.append(f"ad SDK leftover in app/build.gradle.kts: {forbidden}")
+catalog = read("gradle/libs.versions.toml")
+for forbidden in ("play-services-ads", "user-messaging-platform"):
+    if forbidden in catalog:
+        errors.append(f"ad SDK leftover in gradle/libs.versions.toml: {forbidden}")
+if 'com.android.billingclient:billing-ktx' not in catalog:
+    errors.append("Google Play Billing (billing-ktx) must be in the version catalog")
 
 # ------------------------------------------------------------------
 # Core storage-manager engine remains real.
@@ -245,25 +263,20 @@ for forbidden in (
         errors.append(f"forbidden/legacy storage implementation remains: {forbidden}")
 
 # ------------------------------------------------------------------
-# Result-first cleanup monetization.
-# The only direct no-argument showPostTaskInterstitial() call must be the
-# result-dismiss handoff. Destructive work itself must not call the ad.
+# Result-first cleanup (2.0: no ad follows a cleanup).
+# The old interstitial handoff and its ad-gated variants stay forbidden;
+# destructive work never waits on anything but its own result.
 # ------------------------------------------------------------------
 main_activity = read("app/src/main/java/com/mrzekai/depoakilli/MainActivity.kt")
 for expected in (
     "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION",
     "StorageManager.ACTION_CLEAR_APP_CACHE",
     "Settings.ACTION_USAGE_ACCESS_SETTINGS",
-    "interstitialAds.onHostResumed(this)",
-    "interstitialAds.onHostPaused(this)",
-    "showPostTaskInterstitial",
     "onCleanupResultDismissed",
     "onCleanupResultDismissed = ::onCleanupResultDismissed",
     "onPrepareCleanup = ::cleanSelected",
     "onPrepareStorageCleanup = ::cleanStorage",
     "onPrepareWhatsAppCleanup = ::cleanWhatsApp",
-    "override fun onTrimMemory(level: Int)",
-    "ComponentCallbacks2.TRIM_MEMORY_BACKGROUND",
     "BuildConfig.SUPPORT_EMAIL.trim()",
     'Uri.fromParts("mailto", supportEmail, null)',
 ):
@@ -281,18 +294,35 @@ for forbidden in (
     if forbidden in main_activity:
         errors.append(f"obsolete RAM/ad-gating flow remains in MainActivity: {forbidden}")
 
-if main_activity.count("showPostTaskInterstitial()") != 1:
-    errors.append(
-        "v0.5.17 requires exactly one direct no-argument Interstitial handoff "
-        "(after CleanupResult dismissal)"
-    )
+# 2.0: no interstitial or any other ad after a cleanup; closing the result
+# only refreshes the measured storage state.
 result_handoff = (
     "private fun onCleanupResultDismissed() {",
-    "cleanerViewModel.refreshDeviceState()",
-    "showPostTaskInterstitial()",
+    "cleanerViewModel.refreshDeviceState(force = true)",
 )
 if not all(token in main_activity for token in result_handoff):
-    errors.append("cleanup-result dismissal must own the natural-break Interstitial handoff")
+    errors.append("cleanup-result dismissal must refresh the measured storage state")
+for forbidden in (
+    "showPostTaskInterstitial",
+    "Interstitial",
+    "appOpenAds",
+    "rewardedAds",
+    "ConsentManager",
+    "consentManager",
+    "AdFree",
+):
+    if forbidden in main_activity:
+        errors.append(f"ad flow leftover in MainActivity: {forbidden}")
+# Billing (2.0 Faz 1): purchases are re-read on every resume and Play's own
+# subscription page is used for "Manage subscription".
+for expected in (
+    "billing.refreshPurchases()",
+    "billing.refreshPurchases(userRequested = true)",
+    "BillingProducts.MANAGE_SUBSCRIPTIONS_URL",
+    "billing.launchPurchase(this, plan)",
+):
+    if expected not in main_activity:
+        errors.append(f"missing billing activity flow: {expected}")
 if "setContent {" in main_activity and "import androidx.activity.compose.setContent" not in main_activity:
     errors.append("MainActivity uses setContent without the required Compose import")
 
@@ -305,66 +335,74 @@ for expected in (
         errors.append(f"missing local-only diagnostics invariant: {expected}")
 
 # ------------------------------------------------------------------
-# Full-screen session caps and adaptive banner.
+# 2.0: no ad SDK anywhere in the app (CODEX_TASK_ABONELIK_2.0 Faz 1.1).
+# The ads package is deleted and no source imports Google Mobile Ads or UMP.
 # ------------------------------------------------------------------
-ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdComponents.kt")
-result_ads = read("app/src/main/java/com/mrzekai/depoakilli/ads/ResultAdComponents.kt")
-for expected in (
-    "INTERSTITIAL/SHOW_SKIP policy",
-    "AdPolicy.canShowInterstitial(",
-    "AdPolicy.recordInterstitial(",
-    "getCurrentOrientationAnchoredAdaptiveBannerAdSize",
-    "Lifecycle.Event.ON_RESUME -> adView.resume()",
-    "Lifecycle.Event.ON_PAUSE -> adView.pause()",
-    "adView.destroy()",
-    "releaseCachedAd",
-):
-    if expected not in ads:
-        errors.append(f"missing closed-test ad invariant: {expected}")
-ad_policy = read("app/src/main/java/com/mrzekai/depoakilli/ads/AdPolicy.kt")
-for expected in (
-    "INTERSTITIAL_MIN_INTERVAL_SEC = 120L",
-    "INTERSTITIAL_MAX_PER_DAY = 8",
-    "FULLSCREEN_GAP_SEC = 60L",
-    "s.cleanupsCompleted == 0 && s.launchCount <= 1",
-):
-    if expected not in ad_policy:
-        errors.append(f"missing full-screen ad limit: {expected}")
-if "shownThisProcess" in ads:
-    errors.append("the per-process interstitial cap is replaced by AdPolicy limits")
-if "AdSize.BANNER" in ads:
-    errors.append("fixed 320x50 banner must not return; use anchored adaptive banner")
-if "setImmersiveMode(true)" in ads:
-    errors.append("Interstitial must let Google AdActivity own system UI/insets")
+if (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ads").exists():
+    errors.append("the ads package must stay deleted (2.0 has no ad SDK)")
+for source in (ROOT / "app/src").rglob("*.kt"):
+    text = source.read_text(encoding="utf-8")
+    for forbidden in (
+        "com.google.android.gms.ads",
+        "com.google.android.ump",
+        "com.mrzekai.depoakilli.ads",
+        "canRequestAds",
+        "ListNativeAdCard",
+        "BannerAd(",
+    ):
+        if forbidden in text:
+            errors.append(f"ad SDK leftover in {source.relative_to(ROOT)}: {forbidden}")
 
 application = read("app/src/main/java/com/mrzekai/depoakilli/DepoAkilliApplication.kt")
 for expected in (
-    "fullScreenAdSurfaceActive",
-    "beginInterstitialSurface",
-    "endInterstitialSurface",
     "ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN",
+    "BillingRepository(this)",
 ):
     if expected not in application:
-        errors.append(f"missing app lifecycle/ad invariant: {expected}")
+        errors.append(f"missing app lifecycle invariant: {expected}")
+for forbidden in ("fullScreenAdSurfaceActive", "beginInterstitialSurface", "adFreeWindow"):
+    if forbidden in application:
+        errors.append(f"ad lifecycle leftover in Application: {forbidden}")
 
-# App open ad (T1B.2): allowed only behind the loading cover, never after a
-# return from a screen the app opened itself (settings, permissions, cache,
-# uninstall, review, share).
-app_open = read("app/src/main/java/com/mrzekai/depoakilli/ads/AppOpenAdController.kt")
+# Billing core (2.0 Faz 1.2): acknowledge every purchase, never unlock on PENDING,
+# keep the last known state for offline starts, prices only from ProductDetails.
+billing_repo = read("app/src/main/java/com/mrzekai/depoakilli/billing/BillingRepository.kt")
+entitlement_src = read("app/src/main/java/com/mrzekai/depoakilli/billing/Entitlement.kt")
+products_src = read("app/src/main/java/com/mrzekai/depoakilli/billing/BillingProducts.kt")
 for expected in (
-    "AdPolicy.canShowAppOpen(",
-    "AdPolicy.APP_OPEN_MAX_WAIT_MS",
-    "MIN_BACKGROUND_MILLIS",
-    "MAX_AD_AGE_MILLIS",
-    "adUnitId.isNotBlank()",
+    "enableAutoServiceReconnection()",
+    "enablePrepaidPlans()",
+    "acknowledgePurchase(",
+    "queryPurchasesAsync(",
+    "queryProductDetailsAsync(",
+    "launchBillingFlow(",
+    "BillingClient.ProductType.SUBS",
+    "BillingClient.ProductType.INAPP",
 ):
-    if expected not in app_open:
-        errors.append(f"missing app open safety invariant: {expected}")
-for expected in ("override fun onUserLeaveHint()", "appOpenAds.onUserLeftApp()", "AppOpenCover()"):
-    if expected not in main_activity:
-        errors.append(f"app open must only follow a user-initiated absence: {expected}")
-if 'sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"' not in build_file:
-    errors.append("debug/QA/closed-test builds must use Google's sample app open unit")
+    if expected not in billing_repo:
+        errors.append(f"missing billing invariant: {expected}")
+if "consumeAsync" in billing_repo or "consumePurchase" in billing_repo:
+    errors.append("Pro purchases are acknowledged, never consumed")
+for expected in (
+    "OwnedPurchase.State.PURCHASED &&",
+    "last_known_is_pro",
+):
+    if expected not in entitlement_src:
+        errors.append(f"missing entitlement invariant: {expected}")
+for expected in (
+    'SUBSCRIPTION = "pro"',
+    'PLAN_YEARLY = "yearly"',
+    'PLAN_WEEK_PASS = "week-pass"',
+    'OFFER_TRIAL = "trial-3d"',
+    'OFFER_UPGRADE = "upgrade-yearly"',
+    'LIFETIME = "pro_lifetime"',
+    "https://play.google.com/store/account/subscriptions?sku=",
+):
+    if expected not in products_src:
+        errors.append(f"missing product id invariant: {expected}")
+for billing_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/billing").rglob("*.kt"):
+    if re.search(r'"[^"]*(\$|USD|€|₺)\s?\d', billing_file.read_text(encoding="utf-8")):
+        errors.append(f"prices must come from ProductDetails, not code: {billing_file.name}")
 
 if "releaseForMemoryOptimization" in application:
     errors.append("obsolete RAM-optimizer-named ad release API remains in Application")
@@ -434,7 +472,6 @@ for expected in (
     "StorageChangeScreen(",
     # Faz 5C (C4): storage change is the second tab of the Storage tool.
     "detailScreen = DetailScreen.STORAGE_CHANGE",
-    "DetailScreen.STORAGE_CHANGE -> true",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing alpha7 storage-change navigation invariant: {expected}")
@@ -518,31 +555,15 @@ else:
         errors.append("Downloads tool must not overlap the dedicated APK tool")
 
 # ------------------------------------------------------------------
-# Alpha5 result Native/MREC monetization and Android cache result.
+# Alpha5 result screen and Android cache result (2.0: no result ad).
 # ------------------------------------------------------------------
-for expected in (
-    "AdLoader.Builder",
-    "MediaView",
-    "NativeAdView",
-    "AdSize.MEDIUM_RECTANGLE",
-    "CleanupResultAdSurface",
-    "ADMOB_RESULT_NATIVE_ID",
-):
-    if expected not in result_ads:
-        errors.append(f"missing alpha5 result-ad invariant: {expected}")
-
-for forbidden in ("VAST", "ExoPlayer", "Media3"):
-    if forbidden in result_ads:
-        errors.append(f"custom/VAST ad playback must not be implemented: {forbidden}")
 
 cleanup_dialog = read(
     "app/src/main/java/com/mrzekai/depoakilli/ui/CleanupResultDialog.kt"
 )
 for expected in (
-    "CleanupResultAdSurface(",
-    "onAdPresented = { resultAdPresented = true }",
     "onSystemDismiss: () -> Unit",
-    "onDone: (resultAdPresented: Boolean) -> Unit",
+    "onDone: () -> Unit",
     "dismissOnClickOutside = false",
     "Spacer(Modifier.height(24.dp))",
     "CleanupResultKind.SYSTEM_CACHE",
@@ -551,8 +572,9 @@ for expected in (
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha5 result-dialog invariant: {expected}")
 
-if cleanup_dialog.find("R.string.result_done") > cleanup_dialog.rfind("CleanupResultAdSurface("):
-    errors.append("result Done button must precede the ad surface")
+for forbidden in ("CleanupResultAdSurface", "AdTag", "AdFreeCard", "resultAdPresented", "canRequestAds"):
+    if forbidden in cleanup_dialog:
+        errors.append(f"result screen must carry no ad: {forbidden}")
 
 for expected in (
     "beginDeepCacheCleanupMeasurement()",
@@ -563,10 +585,10 @@ for expected in (
         errors.append(f"missing truthful Android-cache result invariant: {expected}")
 
 if "state.cleanupResult == null" not in cleaner_app:
-    errors.append("normal bottom banner must be disabled while cleanup result is visible")
+    errors.append("Trash fallback must wait until the cleanup result is closed")
 
-if "if (eligibleForNaturalBreakAd) {\n                        onCleanupResultDismissed()" not in cleaner_app:
-    errors.append("Interstitial follows result Done for successful cleanups (frequency limited by AdPolicy)")
+if "if (succeeded) onCleanupResultDismissed()" not in cleaner_app:
+    errors.append("result Done of a successful cleanup must refresh the measured storage state")
 
 # ------------------------------------------------------------------
 # Alpha6 measurable cache results + readable Home tool cards.
@@ -634,7 +656,7 @@ for source_name, source in (
 if memory_dialog.exists():
     errors.append("MemoryOptimizationResultDialog.kt must be deleted in v0.5.17")
 
-# Cleanup result remains measured and independent of ads.
+# Cleanup result remains measured (2.0: the app has no ads at all).
 for expected in (
     "data class CleanupResult",
     "cleanupResult",
@@ -650,28 +672,37 @@ for expected in (
 for expected in (
     "CleanupResultDialog(",
     "onCleanupResultDismissed()",
-    "eligibleForNaturalBreakAd",
-    "resultAdPresented",
     "state.cleanupResult == null",
     "CleanupResultKind.SYSTEM_CACHE",
     "selectedTabIndex = AppTab.HOME.ordinal",
-    "BackHandler(enabled = hasInAppBackTarget && !fullScreenAdActive)",
-    "Spacer(Modifier.height(24.dp))",
+    "BackHandler(enabled = hasInAppBackTarget)",
 ):
     if expected not in cleaner_app:
         errors.append(f"missing result-first/UI invariant: {expected}")
 
-# Trust surfaces do not carry banners; content surfaces still can.
-# Faz 5 ad table: Home, Tools and Trash carry the banner above the menu.
+# 2.0: no surface carries an ad — no banner, native, interstitial or cover.
+for forbidden in (
+    "eligibleForNaturalBreakAd",
+    "resultAdPresented",
+    "fullScreenAdActive",
+    "FullScreenAdCover",
+    "bannerAllowed",
+    "BannerAd",
+    "onNaturalBreak",
+    "InterstitialTrigger",
+    "listAd",
+    "reviewAd",
+):
+    if forbidden in cleaner_app:
+        errors.append(f"ad surface leftover in the app shell: {forbidden}")
+# Smart Cleaner Pro (2.0 Faz 1.3): one Settings row opens the Pro page.
 for expected in (
-    "AppTab.HOME,",
-    "AppTab.TOOLS,",
-    "AppTab.TRASH -> true",
-    "DetailScreen.ACCESS,",
-    "DetailScreen.SETTINGS,",
+    "PRO(R.string.pro_title)",
+    "DetailScreen.PRO -> ProScreen(",
+    "detailScreen = DetailScreen.PRO",
 ):
     if expected not in cleaner_app:
-        errors.append(f"missing banner trust-surface gate: {expected}")
+        errors.append(f"missing Smart Cleaner Pro navigation invariant: {expected}")
 
 for forbidden in (
     "AppTab.SECURITY",
@@ -743,8 +774,6 @@ for forbidden in (
 ):
     if forbidden in dashboard or forbidden in home_components:
         errors.append(f"Home must not fake a premium/sponsored product surface: {forbidden}")
-if cleaner_app.count("BannerAd(canRequestAds = true)") < 2:
-    errors.append("content shells must retain gated banner placements")
 
 
 # ------------------------------------------------------------------
@@ -775,7 +804,6 @@ for expected in (
     "Settings.ACTION_APPLICATION_DETAILS_SETTINGS",
     "appDetailsLauncher",
     "onOpenAppDetails = ::openAppCacheSettings",
-    "POST_TASK_AD_SETTLE_MILLIS = 350L",
 ):
     if expected not in main_activity:
         errors.append(f"missing alpha4 app-details/speed activity invariant: {expected}")
@@ -818,7 +846,6 @@ for required_name in (
     "privacy_policy_body_v050",
     "terms_of_service_body_v050",
     "about_app_body_v050",
-    "smart_cleanup_ad_notice",
 
 
     "cache_modern_total_label",
@@ -892,15 +919,28 @@ for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
                 f"stale/misleading copy remains in {strings_path.relative_to(ROOT)}: {stale_copy}"
             )
 
-# Ad disclosure lives on the About screen, not inside deletion confirmations,
-# and names every format in use (T0.6, T1B.7).
-for name, body in (("English", default_strings), ("Turkish", tr_strings)):
-    notice = re.search(r'<string name="smart_cleanup_ad_notice">(.*?)</string>', body, re.S)
-    text = notice.group(1) if notice else ""
-    for token in (("app open", "native", "full-screen", "60 minutes") if name == "English"
-                  else ("açılış reklamı", "yerel reklam", "tam ekran", "60 dakika")):
-        if token not in text:
-            errors.append(f"{name} ad disclosure must mention: {token}")
+# 2.0: no ads, so no ad disclosure, ad-free offer or ad privacy text remains,
+# and the in-app privacy/terms texts no longer describe an ad SDK.
+for strings_path in (ROOT / "app/src/main/res").glob("values*/strings.xml"):
+    body = strings_path.read_text(encoding="utf-8")
+    for resource_name in (
+        "smart_cleanup_ad_notice",
+        "ad_label",
+        "ad_privacy_preferences",
+        "rewarded_ad_title",
+        "rewarded_ad_subtitle",
+        "rewarded_ad_earned",
+        "rewarded_ad_unavailable",
+        "ad_free_card_title",
+        "ad_free_card_sub",
+        "ad_free_offer_bar",
+        "ad_free_offer_watch",
+        "ad_free_left",
+    ):
+        if f'name="{resource_name}"' in body:
+            errors.append(f"ad resource remains in {strings_path.relative_to(ROOT)}: {resource_name}")
+    if "Google Mobile Ads" in body or "Iklan Seluler Google" in body:
+        errors.append(f"in-app legal text still describes the ad SDK: {strings_path.relative_to(ROOT)}")
 if "RAM Optimization releases" in default_strings or "RAM Optimizasyonu" in tr_strings:
     errors.append("Terms/resources must not describe the removed RAM Optimizer feature")
 for expected in (
@@ -1220,18 +1260,17 @@ if ("StoragePathRules.isWhatsAppPath(relativePath)" not in smart_results or
 
 for expected in (
     "onSystemDismiss: () -> Unit",
-    "onDone: (resultAdPresented: Boolean) -> Unit",
+    "onDone: () -> Unit",
     "onDismissRequest = onSystemDismiss",
     "dismissOnClickOutside = false",
-    "onDone(resultAdPresented)",
+    "onClick = onDone,",
     "Spacer(Modifier.height(24.dp))",
 ):
     if expected not in cleanup_dialog:
         errors.append(f"missing alpha10 result-dialog safety invariant: {expected}")
 
-# v41 accidental-click safety: the gap between the sponsored surface and the
-# primary action must be constant, so the Done button cannot move downwards at
-# the moment the result ad finishes loading.
+# v41 accidental-click safety (2.0: no result ad; the check stays so no
+# load-dependent layout shift can come back).
 if "if (resultAdPresented) {" in cleanup_dialog:
     errors.append(
         "result-dialog ad/action separation must not be conditional on the ad "
@@ -1239,14 +1278,14 @@ if "if (resultAdPresented) {" in cleanup_dialog:
     )
 
 system_start = cleaner_app.find("onSystemDismiss = {")
-done_start = cleaner_app.find("onDone = { resultAdPresented ->", system_start)
+done_start = cleaner_app.find("onDone = {", system_start)
 if system_start < 0 or done_start <= system_start:
     errors.append("Cleanup result must expose separate system-dismiss and Done handlers")
 else:
     if "onCleanupResultDismissed()" in cleaner_app[system_start:done_start]:
-        errors.append("Back/system dismissal must never request an Interstitial")
+        errors.append("Back/system dismissal must not run the Done flow")
     if "onCleanupResultDismissed()" not in cleaner_app[done_start:done_start + 1300]:
-        errors.append("Only explicit Done may own the cleanup Interstitial fallback")
+        errors.append("Only explicit Done may run the post-cleanup refresh")
 
 for expected in (
     "StoragePathRules.normalizeText(mimeType)",
@@ -1315,12 +1354,11 @@ for expected in (
     "com.mrzekai.depoakilli",
     "EXPECTED_VERSION_NAME",
     "versionCode='$EXPECTED_VERSION_CODE'",
-    "ca-app-pub-3940256099942544/6300978111",
-    "ca-app-pub-3940256099942544/1033173712",
-    "ca-app-pub-3940256099942544/1044960115",
-    "ca-app-pub-3940256099942544/5224354917",
-    "ca-app-pub-1380972808968213/4039180256",
-    "ca-app-pub-1380972808968213",
+    # 2.0: the binary gate proves the ad SDK is absent and Billing present.
+    "fail \"$label contains an AdMob id\"",
+    "com.google.android.gms.permission.AD_ID",
+    "Lcom/google/android/gms/ads/",
+    "com.android.vending.BILLING",
     "android.permission.FOREGROUND_SERVICE",
     "androidx.work.impl.foreground.SystemForegroundService",
     "androidx.compose.ui.tooling.PreviewActivity",
@@ -1335,7 +1373,6 @@ release_workflow = read(".github/workflows/release-aab.yml")
 for expected in (
     "Play Production AAB + APK",
     "SUPPORT_EMAIL",
-    "ADMOB_RESULT_NATIVE_ID",
     "testDebugUnitTest",
     "lintRelease",
     "bundleRelease assembleRelease",
@@ -1345,16 +1382,17 @@ for expected in (
 ):
     if expected not in release_workflow:
         errors.append(f"missing production workflow invariant: {expected}")
+if "ADMOB" in release_workflow:
+    errors.append("production workflow must not pass AdMob secrets (2.0 has no ads)")
 
 release_verifier = read("scripts/verify-release-aab.sh")
 for expected in (
     "versionCode='$EXPECTED_VERSION_CODE'",
     "e15e1d31ea6dda44c7f8333eabdc9f4a4d0e9d8feeb9f321958b496edf4f4afd",
-    "ca-app-pub-1380972808968213~9043355268",
-    "ca-app-pub-1380972808968213/2118175647",
-    "ca-app-pub-1380972808968213/8492012303",
-    "ca-app-pub-1380972808968213/4039180256",
-    "ca-app-pub-3940256099942544",
+    "fail \"$label contains an AdMob id\"",
+    "com.google.android.gms.permission.AD_ID",
+    "Lcom/google/android/gms/ads/",
+    "com.android.vending.BILLING",
     "RELEASE_BINARY_GATE_PASS",
 ):
     if expected not in release_verifier:

@@ -85,7 +85,6 @@ internal fun PremiumCleanerToolScreen(
     onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
     modifier: Modifier = Modifier,
-    listAd: @Composable () -> Unit = {},
     onCancelScan: () -> Unit = {},
     onRefresh: () -> Unit = onScan,
     onVerifyAndSelect: (Set<String>) -> Unit = {},
@@ -106,7 +105,6 @@ internal fun PremiumCleanerToolScreen(
                 onToggleItem = onToggleItem,
                 onSetItemsSelected = onSetItemsSelected,
                 onClean = onClean,
-                listAd = listAd,
                 onRefresh = onRefresh,
                 // C1/C3: the same ToolSuggestion call as the Tools tile, on the Smart
                 // scan's plan (this tool's own result only when no Smart scan exists).

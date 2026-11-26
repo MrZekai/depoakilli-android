@@ -18,9 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,10 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.CleanupResultAdSurface
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.PlanGroup
-import com.mrzekai.depoakilli.ui.common.AdTag
 import com.mrzekai.depoakilli.ui.common.BlackCard
 import com.mrzekai.depoakilli.ui.common.GiantNumber
 import com.mrzekai.depoakilli.ui.common.LinkButton
@@ -60,17 +56,13 @@ import com.mrzekai.depoakilli.ui.theme.OnBlack
  * amount moved to Trash and when that space is really freed; "X freed" only
  * for bytes actually deleted. No percentage claims. Buttons: black "Done",
  * outlined "Free the space now" (the permanent-delete sheet comes first) and
- * "Undo"; the native ad sits below them with its "Ad" label, 24 dp away.
+ * "Undo".
  */
 @Composable
 internal fun CleanupResultDialog(
     result: CleanupResult,
-    canRequestAds: Boolean,
-    showRewardedOffer: Boolean,
-    onShowRewardedAd: () -> Unit,
-    adFreeRemainingMillis: Long = 0L,
     onSystemDismiss: () -> Unit,
-    onDone: (resultAdPresented: Boolean) -> Unit,
+    onDone: () -> Unit,
     onUndo: () -> Unit = {},
     onEmptyTrash: () -> Unit = {},
     nextReview: PlanGroup? = null,
@@ -78,7 +70,6 @@ internal fun CleanupResultDialog(
     nextSuggestedBytes: Long = 0L,
     onOpenSuggested: () -> Unit = {},
 ) {
-    var resultAdPresented by remember(result) { mutableStateOf(false) }
     var confirmEmptyTrash by remember { mutableStateOf(false) }
     val partial = result.failedCount > 0 || result.cancelledCount > 0
     val figures = ResultFigures.of(result)
@@ -241,7 +232,7 @@ internal fun CleanupResultDialog(
                 }
                 PillButton(
                     text = stringResource(R.string.result_done),
-                    onClick = { onDone(resultAdPresented) },
+                    onClick = onDone,
                     style = if (figures.canEmptyTrash) PillStyle.INK_OUTLINE else PillStyle.BLACK_LIME,
                 )
                 if (figures.canEmptyTrash) {
@@ -251,26 +242,7 @@ internal fun CleanupResultDialog(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-
-                // D5: the ad-free offer is a card under "Undo" and above the native;
-                // while the window runs it shows the minutes left instead.
-                AdFreeCard(
-                    remainingMillis = adFreeRemainingMillis,
-                    offer = showRewardedOffer,
-                    onWatch = onShowRewardedAd,
-                )
-
-                if (canRequestAds) {
-                    // At least 24 dp between the buttons and the ad; the ad carries its label above it.
-                    Spacer(Modifier.height(24.dp))
-                    AdTag(modifier = Modifier.align(Alignment.Start))
-                    CleanupResultAdSurface(
-                        canRequestAds = canRequestAds,
-                        onAdPresented = { resultAdPresented = true },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(24.dp))
-                }
+                Spacer(Modifier.height(24.dp))
             }
         }
     }
@@ -324,55 +296,6 @@ private fun resultTitle(result: CleanupResult, partial: Boolean): String = when 
         stringResource(R.string.cleanup_result_system_cache_title)
     partial -> stringResource(R.string.cleanup_result_partial_title)
     else -> stringResource(R.string.cleanup_result_title)
-}
-
-/**
- * "No ads for 60 minutes" (D5): a black card with a Lime play button, started
- * only by the user. During the window it shows the minutes left and offers
- * nothing.
- */
-@Composable
-internal fun AdFreeCard(remainingMillis: Long, offer: Boolean, onWatch: () -> Unit) {
-    val active = remainingMillis > 0L
-    if (!active && !offer) return
-    val minutes = ((remainingMillis + 59_999L) / 60_000L).toInt()
-    Surface(
-        onClick = { if (!active) onWatch() },
-        enabled = !active,
-        color = com.mrzekai.depoakilli.ui.theme.Black,
-        contentColor = com.mrzekai.depoakilli.ui.theme.OnBlack,
-        shape = com.mrzekai.depoakilli.ui.common.MakeRoomShapes.Card,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        androidx.compose.foundation.layout.Row(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            androidx.compose.foundation.layout.Column(Modifier.weight(1f)) {
-                Text(
-                    if (active) pluralStringResource(R.plurals.ad_free_left, minutes, minutes) else stringResource(R.string.ad_free_card_title),
-                    color = com.mrzekai.depoakilli.ui.theme.OnBlack,
-                    fontSize = 17.sp,
-                    fontWeight = AppWeights.Title,
-                )
-                if (!active) {
-                    Text(
-                        stringResource(R.string.ad_free_card_sub),
-                        color = com.mrzekai.depoakilli.ui.theme.OnBlackSoft,
-                        fontSize = 13.sp,
-                    )
-                }
-            }
-            if (!active) {
-                androidx.compose.material3.Icon(
-                    androidx.compose.material.icons.Icons.Outlined.PlayCircle,
-                    contentDescription = null,
-                    tint = com.mrzekai.depoakilli.ui.theme.Lime,
-                    modifier = Modifier.size(40.dp),
-                )
-            }
-        }
-    }
 }
 
 /** Counts that matter (files, skipped, restored, cancelled) in one black card. */

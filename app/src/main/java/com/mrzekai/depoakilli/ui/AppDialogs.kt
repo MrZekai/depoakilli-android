@@ -1,19 +1,13 @@
 package com.mrzekai.depoakilli.ui
 
 import android.os.Build
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +28,6 @@ import com.mrzekai.depoakilli.ui.common.SheetBody
 import com.mrzekai.depoakilli.ui.common.SheetTitle
 import com.mrzekai.depoakilli.ui.theme.AdLabel
 import com.mrzekai.depoakilli.ui.theme.AppWeights
-import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 
@@ -126,29 +119,6 @@ internal fun AccessDisclosureDialog(
             color = OnBlack,
             modifier = Modifier.fillMaxWidth(),
         )
-    }
-}
-
-/** Covers the app while a full-screen ad is showing. */
-@Composable
-internal fun FullScreenAdCover() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Lime),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            CircularProgressIndicator(color = Ink)
-            Text(
-                stringResource(R.string.app_name),
-                color = Ink,
-                fontWeight = AppWeights.Giant,
-            )
-        }
     }
 }
 

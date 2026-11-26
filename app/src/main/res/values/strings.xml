@@ -20,7 +20,6 @@
     <string name="scan_focus_duplicates">Duplicates</string>
     <string name="scan_focus_large">Large Files</string>
     <string name="language_settings">App language</string>
-    <string name="ad_privacy_preferences">Ad privacy preferences</string>
     <string name="message_scan_failed">Scan couldn’t finish. Check media permissions and try again.</string>
     <string name="message_select_item">Select at least one item to clean.</string>
     <string name="message_cache_already_empty">The app cache is already empty.</string>
@@ -127,7 +126,7 @@
     <string name="message_all_files_required_for_cache">Deep cache cleanup requires Android All files access first.</string>
     <string name="message_cache_system_unavailable">Cache clearing could not be confirmed. Select an app below and open its Android settings to clear its cache.</string>
     <string name="message_whatsapp_not_found">No supported WhatsApp or WhatsApp Business Media folder was found in shared storage.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. App Cache Manager invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nGoogle Mobile Ads and the consent platform may process advertising identifiers, diagnostics and consent choices under Google policies. Files are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Most files you clean first move to Smart Cleaner’s Trash on this device and can be restored there for 7 days; files deleted permanently, and Trash once it is emptied, cannot be restored. Google retains data it processes under its published policies.\n\nGoogle Mobile Ads SDK processes IP address (to estimate approximate location), advertising ID or app set ID, app interactions and diagnostic data to display ads. The app itself does not send file names, file contents or search terms off the device.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner analyzes accessible shared-storage file metadata and, when needed for duplicate detection, on-device content fingerprints. These cleaner-engine fingerprints and personal files are not uploaded by Smart Cleaner.\n\nAll files access is requested because file management and maintenance are core features: scanning and managing junk, duplicates, large files, downloads, APK installers and WhatsApp media across shared storage. Android continues to block other apps’ protected private data directories.\n\nUsage Access is optional and is used to read app storage/cache statistics and last-used timestamps. App Cache Manager invokes Android’s official cache-cleaning system action and Android controls the required confirmation.\n\nFiles are removed only after user selection or an Android system confirmation.\n\nSmart Cleaner does not include a third-party crash-reporting service. File names, paths, file contents and duplicate fingerprints are not uploaded for crash reporting.\n\nSmart Cleaner keeps preferences and aggregate scan/cleanup history only in local app storage until you clear app data or uninstall the app. Most files you clean first move to Smart Cleaner’s Trash on this device and can be restored there for 7 days; files deleted permanently, and Trash once it is emptied, cannot be restored. Google retains data it processes under its published policies.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Large file • Age in days: %1$d</item>
         <item quantity="other">Large file • Age in days: %1$d</item>
@@ -153,7 +152,7 @@
     <string name="storage_type_images">Images</string>
     <string name="storage_type_other">Other files</string>
     <string name="storage_type_videos">Videos</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.\n\nSmart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. App Cache Manager uses Android’s official system action and may display a required Android confirmation.\n\nSmart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable. Ads are provided by third-party services under their respective terms and policies.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner provides on-device storage analysis and file-management tools. Scan results are recommendations, not backups. Review selected user files before deleting them.\n\nSmart Cleaner can manage accessible shared-storage files after Android grants All files access. Android still protects other apps’ private internal data. App Cache Manager uses Android’s official system action and may display a required Android confirmation.\n\nSmart Cleaner does not claim to kill protected third-party apps, boost device-wide RAM, cool the CPU, or create fictional performance gains. Availability can vary by Android version and device manufacturer.\n\nYou are responsible for reviewing selections before deletion. Deleted files may not be recoverable.</string>
     <string name="uninstall">Uninstall</string>
     <string name="whatsapp_category_statuses">Statuses</string>
     <string name="whatsapp_category_statuses_description">Temporary WhatsApp status media stored in shared storage</string>
@@ -303,7 +302,6 @@
 
     <string name="disclosure_usage_title">Why Usage Access?</string>
     <string name="disclosure_usage_body">Usage Access is optional. It lets Smart Cleaner read Android-reported app storage/cache totals and last-used times so you can review large or unused apps. It does not read the private content inside those apps and does not silently delete their protected data.</string>
-    <string name="smart_cleanup_ad_notice">Smart Cleaner is free and shows ads: a banner, one labeled native ad in some lists, an ad panel on the cleanup result, an occasional full-screen ad after a cleanup or when you return to the Clean tab, and an app open ad while the app loads. Ads never appear inside permission or confirmation steps, and a short video can remove banner and full-screen ads for 60 minutes.</string>
 
 
     <string name="cache_modern_total_label">Total app cache</string>
@@ -338,7 +336,7 @@
     <string name="permissions_manage_android">Manage in Android</string>
     <string name="permissions_on_device_badge">ON DEVICE</string>
     <string name="permissions_privacy_policy_title">Privacy policy</string>
-    <string name="permissions_privacy_policy_subtitle">See how files, permissions, advertising privacy and on-device processing are handled.</string>
+    <string name="permissions_privacy_policy_subtitle">See how files, permissions and on-device processing are handled.</string>
     <string name="storage_change_title">Storage change</string>
     <string name="storage_change_hero_label">WHAT CHANGED?</string>
     <string name="storage_change_hero_no_baseline">Create the first measurement here. Smart Cleaner saves a real storage snapshot; no history is invented.</string>
@@ -388,10 +386,6 @@
     <string name="storage_change_create_baseline">Create first measurement</string>
     <string name="storage_change_analysis_scope">Runs a real shared-storage analysis and saves a new snapshot for Storage Change. No cleanup is performed by this action.</string>
     <string name="storage_change_progress">Files: %1$d • Folders scanned: %2$d</string>
-    <string name="rewarded_ad_title">Ad-free for 60 minutes</string>
-    <string name="rewarded_ad_subtitle">Watch a short video to hide banner and transition ads for one hour.</string>
-    <string name="rewarded_ad_earned">Ad-free time is active for 60 minutes.</string>
-    <string name="rewarded_ad_unavailable">The video is not ready yet. Please try again in a moment.</string>
     <string name="nothing_selected_hint">Select files to clean</string>
     <string name="premium_duplicate_copy_of">Copy of %1$s</string>
     <string name="cache_modern_not_measured">Not measured – allow Usage Access</string>
@@ -489,11 +483,11 @@
         <item quantity="one">%1$d reviewed · %2$s marked</item>
         <item quantity="other">%1$d reviewed · %2$s marked</item>
     </plurals>
-    <string name="deep_check_action">Watch and verify</string>
+    <string name="deep_check_action">Verify</string>
     <string name="deep_check_running">Checking possible duplicates…</string>
     <plurals name="deep_check_row">
-        <item quantity="one">Possible duplicates: %1$d · up to %2$s. Watch a short video to verify them.</item>
-        <item quantity="other">Possible duplicates: %1$d · up to %2$s. Watch a short video to verify them.</item>
+        <item quantity="one">Possible duplicates: %1$d · up to %2$s. Tap Verify to check them.</item>
+        <item quantity="other">Possible duplicates: %1$d · up to %2$s. Tap Verify to check them.</item>
     </plurals>
     <plurals name="trash_full_body">
         <item quantity="one">%1$d file couldn’t be moved to Trash, possibly because storage is full. Delete it permanently instead? This can’t be undone.</item>
@@ -583,7 +577,6 @@
     <string name="trash_restore_all">Restore all</string>
     <string name="trash_empty_v2">Empty Trash and get %1$s back</string>
     <string name="tool_move_to_trash">Move to Trash</string>
-    <string name="ad_label">Ad</string>
     <string name="home_review_rest">See what else I found</string>
     <string name="home_hard_photos">Photos &amp; videos</string>
     <string name="home_hard_apps">Apps</string>
@@ -658,10 +651,6 @@
     <string name="tools_row_apps_sub">Unused apps and app cache</string>
     <string name="tools_row_storage_sub">What\'s taking your space</string>
     <string name="tools_storage_full">%1$s full</string>
-    <string name="ad_free_card_title">No ads for 60 minutes</string>
-    <string name="ad_free_card_sub">Watch one short video</string>
-    <string name="ad_free_offer_bar">Don\'t want ads? Turn them off for 60 minutes</string>
-    <string name="ad_free_offer_watch">Watch</string>
     <plurals name="confirm_camera_files">
         <item quantity="one">%1$d file from your camera</item>
         <item quantity="other">%1$d files from your camera</item>
@@ -669,10 +658,6 @@
     <plurals name="tools_apps_unused">
         <item quantity="one">%1$d unused</item>
         <item quantity="other">%1$d unused</item>
-    </plurals>
-    <plurals name="ad_free_left">
-        <item quantity="one">Ad-free · %1$d min left</item>
-        <item quantity="other">Ad-free · %1$d min left</item>
     </plurals>
     <plurals name="result_files_moved">
         <item quantity="one">%1$d file moved</item>
@@ -696,4 +681,38 @@
         <item quantity="one">%1$d exact copy selected</item>
         <item quantity="other">%1$d exact copies selected</item>
     </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <string name="pro_subtitle">Pro features arrive in upcoming updates. Everything you use today stays as it is.</string>
+    <string name="pro_loading">Loading plans…</string>
+    <string name="pro_coming_soon_title">Coming soon</string>
+    <string name="pro_coming_soon_body">Pro plans are not available yet. Everything in the app keeps working as before.</string>
+    <string name="pro_active_title">Pro is on</string>
+    <string name="pro_active_body">Thank you. Pro is linked to your Google Play account.</string>
+    <string name="pro_pending">Your purchase is waiting for payment. Pro turns on when Google Play completes it.</string>
+    <string name="pro_plan_yearly">%s / year</string>
+    <string name="pro_plan_week">%s / 1 week</string>
+    <string name="pro_plan_week_detail">Prepaid. Does not renew.</string>
+    <string name="pro_plan_lifetime">%s one time</string>
+    <string name="pro_plan_lifetime_detail">One payment. No renewal.</string>
+    <string name="pro_buy_yearly">Subscribe for %s/year</string>
+    <string name="pro_buy_week">1 week for %s · does not renew</string>
+    <string name="pro_buy_lifetime">Pay %s once</string>
+    <string name="pro_legal_renews">The yearly plan renews automatically. You can cancel anytime in Google Play &gt; Subscriptions. The rest of the app works without a subscription.</string>
+    <string name="pro_restore">Restore purchases</string>
+    <string name="pro_manage">Manage subscription</string>
+    <string name="pro_message_activated">Pro is on. Thank you!</string>
+    <string name="pro_message_pending">Purchase pending. Pro turns on when payment completes.</string>
+    <string name="pro_message_restored">Purchases restored. Pro is on.</string>
+    <string name="pro_message_nothing_to_restore">No Pro purchase was found on this Google account.</string>
+    <string name="pro_message_failed">The purchase could not be completed. Please try again.</string>
+    <string name="pro_message_unavailable">Google Play billing is not available right now.</string>
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="one">%1$d-day trial, then %2$s per year</item>
+        <item quantity="other">%1$d-day trial, then %2$s per year</item>
+    </plurals>
+    <plurals name="pro_buy_trial">
+        <item quantity="one">Try %1$d day, then %2$s/year</item>
+        <item quantity="other">Try %1$d days, then %2$s/year</item>
+    </plurals>
+    <string name="pro_message_restore_failed">Purchases could not be checked. Please try again.</string>
 </resources>

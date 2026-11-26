@@ -1,21 +1,16 @@
 package com.mrzekai.depoakilli
 
-import android.app.ActivityManager
 import android.app.Application
 import android.content.ComponentCallbacks2
-import com.mrzekai.depoakilli.ads.AdFreeWindowStore
+import com.mrzekai.depoakilli.billing.BillingRepository
 import com.mrzekai.depoakilli.data.TrashPurgeWorker
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.ui.media.MediaThumbnails
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class DepoAkilliApplication : Application() {
-    val adFreeWindow: AdFreeWindowStore by lazy { AdFreeWindowStore(this) }
-    private val _fullScreenAdSurfaceActive = MutableStateFlow(false)
-    val fullScreenAdSurfaceActive: StateFlow<Boolean> = _fullScreenAdSurfaceActive.asStateFlow()
+    /** Google Play Billing and the Pro entitlement; one client for the whole app. */
+    val billing: BillingRepository by lazy { BillingRepository(this) }
 
     override fun onCreate() {
         super.onCreate()
@@ -29,23 +24,5 @@ class DepoAkilliApplication : Application() {
         if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN) {
             MediaThumbnails.release()
         }
-    }
-
-    fun isSystemUnderMemoryPressure(): Boolean {
-        val manager = getSystemService(ActivityManager::class.java)
-        val info = ActivityManager.MemoryInfo()
-        manager.getMemoryInfo(info)
-        return info.lowMemory || (
-            info.threshold > 0L &&
-                info.availMem <= info.threshold * 3L / 2L
-        )
-    }
-
-    fun beginInterstitialSurface() {
-        _fullScreenAdSurfaceActive.value = true
-    }
-
-    fun endInterstitialSurface() {
-        _fullScreenAdSurfaceActive.value = false
     }
 }

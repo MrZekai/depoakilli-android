@@ -420,6 +420,73 @@ def main():
     check("Sorulacak dosyalar (video) izinsiz silinmedi",
           "qa-a-video.mp4" in sh("ls /sdcard/Movies") and "qa-b-video.mp4" in sh("ls /sdcard/Movies"))
 
+    # 10. 2.0 Faz 1: no ads; Settings > Smart Cleaner Pro opens the Pro page
+    # (no Play products on the emulator: "Coming soon"), Restore answers, and the
+    # app works in airplane mode.
+    pkg_dump = sh(f"dumpsys package {PKG}")
+    check("Reklam kimliği izni yok (AD_ID / ACCESS_ADSERVICES_AD_ID)",
+          "permission.AD_ID" not in pkg_dump and "ADSERVICES_AD_ID" not in pkg_dump)
+    check("Ödeme izni var (com.android.vending.BILLING)", "com.android.vending.BILLING" in pkg_dump)
+
+    def open_pro_page(tag):
+        to_home()
+        row = None
+        for _ in range(3):  # a just-finished scan can swallow the first tap
+            gear = wait_for(r"^Settings$", 10)
+            if not gear:
+                break
+            tap(gear)
+            row = wait_for(r"^Smart Cleaner Pro$", 8)
+            if row:
+                break
+        check(f"Ayarlar'da 'Smart Cleaner Pro' satırı var ({tag})", row, screenshot=shot(f"settings-pro-row-{tag}"))
+        if not row:
+            return False
+        tap(row)
+        page = wait_for(r"^(Coming soon|Loading plans…|.+ / year)$", 25, dismiss=False)
+        if page and page.label == "Loading plans…":
+            page = wait_for(r"^(Coming soon|.+ / year)$", 25, dismiss=False)
+        check(f"Pro sayfası açılıyor, çökmeden 'Coming soon' veya planlar ({tag})", page,
+              note=getattr(page, "label", ""), screenshot=shot(f"pro-page-{tag}"))
+        return bool(page)
+
+    if open_pro_page("online"):
+        legal = scroll_to(r"^The yearly plan renews automatically", 3)
+        check("Pro sayfasında yenileme/iptal satırı okunuyor", legal)
+        restore = scroll_to(r"^Restore purchases$", 3)
+        if restore:
+            tap(restore)
+            msg = wait_for(r"(No Pro purchase was found|Google Play billing is not available|Purchases restored|could not be checked)", 25, dismiss=False)
+            check("'Satın alımları geri yükle' bir sonuç mesajı veriyor", msg,
+                  note=getattr(msg, "label", ""), screenshot=shot("pro-restore"))
+        else:
+            check("Pro sayfasında 'Restore purchases' var", False)
+        back()
+    check("Ana ekranda reklam yok ('Test Ad' / 'Ad' etiketi yok)",
+          not find(r"^(Test Ad|Ad|Sponsored)$") and "AdActivity" not in resumed_activity(),
+          screenshot=shot("home-no-ads"))
+
+    sh("cmd connectivity airplane-mode enable")
+    time.sleep(3)
+    # A fresh app state, so the offline run includes a full scan.
+    sh(f"pm clear {PKG}")
+    sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
+    sh(f"appops set {PKG} GET_USAGE_STATS allow")
+    launch()
+    home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 40, dismiss=False)
+    if not home_offline:
+        tap_text(r"^Clean$", 10)
+        home_offline = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20, dismiss=False)
+    check("Uçak modunda uygulama açılıyor, Home çalışıyor", home_offline, screenshot=shot("home-airplane"))
+    if home_offline and home_offline.label.upper() == "MAKE ROOM":
+        tap(home_offline)
+    check("Uçak modunda tarama bitiyor (plan 'CLEAN UP' geldi)", wait_for(r"^CLEAN UP$", 180, dismiss=False),
+          screenshot=shot("scan-airplane"))
+    open_pro_page("airplane")
+    back()
+    sh("cmd connectivity airplane-mode disable")
+    time.sleep(2)
+
     # 9. Big text and Arabic: Home fits (screenshots for the owner).
     sh("settings put system font_scale 1.3")
     sh(f"am force-stop {PKG}")

@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 2.0: kept for the Faz 3.6 Assistant (owner's decision). Until then the
+         app itself makes no network call; Google Play Billing talks to the Play
+         Store app on the device. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- Google Mobile Ads pulls WorkManager transitively. Smart Cleaner never
-         runs a long-running Worker/foreground service, so remove that generic
-         foreground-service surface from the merged manifest. -->
+    <!-- WorkManager (daily Trash purge) declares a foreground service. Smart
+         Cleaner never runs a long-running Worker/foreground service, so remove
+         that generic foreground-service surface from the merged manifest. -->
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
@@ -40,10 +42,6 @@
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />
-
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${ADMOB_APP_ID}" />
 
         <activity
             android:name=".MainActivity"

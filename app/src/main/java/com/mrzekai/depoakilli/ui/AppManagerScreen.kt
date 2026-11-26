@@ -33,7 +33,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.InstalledAppEntry
 import com.mrzekai.depoakilli.ui.common.LinkButton
@@ -54,7 +53,6 @@ internal fun AppManagerScreen(
     onUninstallApp: (String) -> Unit,
     onOpenAppInfo: (String) -> Unit,
     modifier: Modifier = Modifier,
-    listAd: @Composable () -> Unit = {},
 ) {
     PageFrame(modifier = modifier) {
     LazyColumn(
@@ -83,13 +81,8 @@ internal fun AppManagerScreen(
                 LinkButton(stringResource(R.string.cache_refresh), onClick = onRefresh)
             }
         }
-        // B7: one list native after the 4th row, in lists of 6 rows or more.
-        val showAd = state.installedApps.size >= AdPolicy.NATIVE_LIST_MIN_ROWS
-        state.installedApps.forEachIndexed { index, app ->
+        state.installedApps.forEach { app ->
             item(key = app.packageName) { AppManagerRow(app, onUninstallApp, onOpenAppInfo) }
-            if (showAd && index == AdPolicy.NATIVE_LIST_AFTER_REVIEW_ROW - 1) {
-                item(key = "app-manager-native") { listAd() }
-            }
         }
     }
     }

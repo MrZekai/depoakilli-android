@@ -20,7 +20,6 @@
     <string name="scan_focus_duplicates">Kopyalar</string>
     <string name="scan_focus_large">Büyük Dosyalar</string>
     <string name="language_settings">Uygulama dili</string>
-    <string name="ad_privacy_preferences">Reklam gizlilik tercihleri</string>
     <string name="message_scan_failed">Tarama tamamlanamadı. Medya izinlerini kontrol edip yeniden deneyin.</string>
     <string name="message_select_item">Temizlenecek en az bir öğe seç.</string>
     <string name="message_cache_already_empty">Uygulama önbelleği zaten boş.</string>
@@ -127,7 +126,7 @@
     <string name="message_all_files_required_for_cache">Derin önbellek temizliği için önce Android Tüm dosyalara erişim izni gerekir.</string>
     <string name="message_cache_system_unavailable">Önbelleğin temizlendiği doğrulanamadı. Aşağıdan bir uygulama seçip Android ayarlarından önbelleğini temizleyin.</string>
     <string name="message_whatsapp_not_found">Paylaşılan depolamada desteklenen WhatsApp veya WhatsApp Business Medya klasörü bulunamadı.</string>
-    <string name="privacy_policy_body_v050">Smart Cleaner erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Smart Cleaner tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nGoogle Mobile Ads ve onay platformu Google politikaları kapsamında reklam tanımlayıcılarını, tanılama verilerini ve onay seçimlerini işleyebilir. Dosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nSmart Cleaner üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nSmart Cleaner tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp’e taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.\n\nGoogle Mobile Ads SDK reklam göstermek için IP adresini (yaklaşık konumu tahmin etmek amacıyla), reklam kimliğini veya uygulama kümesi kimliğini, uygulama etkileşimlerini ve tanılama verilerini işler. Uygulamanın kendisi dosya adlarını, dosya içeriklerini veya arama metinlerini cihaz dışına göndermez.</string>
+    <string name="privacy_policy_body_v050">Smart Cleaner erişilebilir paylaşılan depolamadaki dosya meta verilerini ve kopya tespiti gerektiğinde cihaz içi içerik parmak izlerini analiz eder. Bu parmak izleri ve kişisel dosyalar Smart Cleaner tarafından yüklenmez.\n\nTüm dosyalara erişim; dosya yönetimi ve bakım uygulamanın temel özelliği olduğu için istenir: paylaşılan depolamadaki çöp, kopyalar, büyük dosyalar, indirilenler, APK kurulumları ve WhatsApp medyasını taramak ve yönetmek. Android diğer uygulamaların korunan özel veri dizinlerini engellemeye devam eder.\n\nKullanım Erişimi isteğe bağlıdır ve uygulama depolama/önbellek istatistikleri ile son kullanım zamanlarını okumak için kullanılır. Uygulama Önbelleği Yöneticisi Android’in resmî sistem temizleme işlemini çağırır ve gerekli onayı Android yönetir.\n\nDosyalar yalnız kullanıcı seçimi veya Android sistem onayı sonrasında kaldırılır.\n\nSmart Cleaner üçüncü taraf çökme raporlama hizmeti içermez. Dosya adları, yollar, dosya içerikleri ve kopya parmak izleri çökme raporlaması amacıyla yüklenmez.\n\nSmart Cleaner tercihleri ve toplu tarama/temizlik geçmişini yalnız yerel uygulama depolamasında, uygulama verilerini temizleyene veya uygulamayı kaldırana kadar saklar. Temizlenen dosyaların çoğu önce bu cihazdaki Çöp’e taşınır ve 7 gün içinde oradan geri yüklenebilir; kalıcı silinen dosyalar ve boşaltılan Çöp geri getirilemez. Google işlediği verileri kendi yayımlanmış politikalarına göre saklar.</string>
     <plurals name="reason_large_file">
         <item quantity="one">Büyük dosya • Yaş (gün): %1$d</item>
         <item quantity="other">Büyük dosya • Yaş (gün): %1$d</item>
@@ -153,7 +152,7 @@
     <string name="storage_type_images">Görseller</string>
     <string name="storage_type_other">Diğer dosyalar</string>
     <string name="storage_type_videos">Videolar</string>
-    <string name="terms_of_service_body_v050">Smart Cleaner cihaz içi depolama analizi ve dosya yönetimi araçları sunar. Tarama sonuçları öneridir, yedek değildir. Kullanıcı dosyalarını silmeden önce seçimi incele.\n\nSmart Cleaner, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Uygulama Önbelleği Yöneticisi Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.\n\nSmart Cleaner korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.\n\nSilmeden önce seçimleri incelemek kullanıcının sorumluluğundadır. Silinen dosyalar geri getirilemeyebilir. Reklamlar, ilgili üçüncü taraf hizmetlerin kendi şart ve politikalarına tabidir.</string>
+    <string name="terms_of_service_body_v050">Smart Cleaner cihaz içi depolama analizi ve dosya yönetimi araçları sunar. Tarama sonuçları öneridir, yedek değildir. Kullanıcı dosyalarını silmeden önce seçimi incele.\n\nSmart Cleaner, Android Tüm dosyalara erişim izni verildikten sonra erişilebilir paylaşılan depolama dosyalarını yönetebilir. Android diğer uygulamaların özel dahili verilerini korumaya devam eder. Uygulama Önbelleği Yöneticisi Android’in resmî sistem işlemini kullanır ve gerekli Android onayını gösterebilir.\n\nSmart Cleaner korunan üçüncü taraf uygulamaları zorla kapattığını, cihaz genelinde RAM artırdığını, işlemciyi soğuttuğunu veya gerçekte oluşmayan performans kazançları sağladığını iddia etmez. Kullanılabilirlik Android sürümüne ve cihaz üreticisine göre değişebilir.\n\nSilmeden önce seçimleri incelemek kullanıcının sorumluluğundadır. Silinen dosyalar geri getirilemeyebilir.</string>
     <string name="uninstall">Kaldır</string>
     <string name="whatsapp_category_statuses">Durumlar</string>
     <string name="whatsapp_category_statuses_description">Paylaşılan depolamadaki geçici WhatsApp durum medyaları</string>
@@ -303,7 +302,6 @@
 
     <string name="disclosure_usage_title">Kullanım Erişimi neden gerekli?</string>
     <string name="disclosure_usage_body">Kullanım Erişimi isteğe bağlıdır. Android’in bildirdiği uygulama depolama/önbellek toplamlarını ve son kullanım zamanlarını okuyarak büyük veya uzun süredir kullanılmayan uygulamaları incelemeni sağlar. Uygulamaların özel içeriğini okumaz ve korunan verilerini sessizce silmez.</string>
-    <string name="smart_cleanup_ad_notice">Smart Cleaner ücretsizdir ve reklam gösterir: banner, bazı listelerde \"Reklam\" etiketli tek bir yerel reklam, temizlik sonucunda bir reklam paneli, temizlikten sonra ya da Temizle sekmesine dönerken zaman zaman tam ekran reklam ve uygulama açılırken bir açılış reklamı. İzin ve onay adımlarında reklam çıkmaz; kısa bir video izleyerek banner ve tam ekran reklamları 60 dakika kaldırabilirsiniz.</string>
 
 
     <string name="cache_modern_total_label">Toplam uygulama önbelleği</string>
@@ -338,7 +336,7 @@
     <string name="permissions_manage_android">Android ayarlarında yönet</string>
     <string name="permissions_on_device_badge">CİHAZDA</string>
     <string name="permissions_privacy_policy_title">Gizlilik politikası</string>
-    <string name="permissions_privacy_policy_subtitle">Dosyaların, izinlerin, reklam gizliliğinin ve cihaz içi işlemenin nasıl ele alındığını gör.</string>
+    <string name="permissions_privacy_policy_subtitle">Dosyaların, izinlerin ve cihaz içi işlemenin nasıl ele alındığını gör.</string>
     <string name="storage_change_title">Depolama Değişimi</string>
     <string name="storage_change_hero_label">NE DEĞİŞTİ?</string>
     <string name="storage_change_hero_no_baseline">İlk ölçümü burada oluştur. Smart Cleaner gerçek bir depolama anlık görüntüsü kaydeder; geçmiş veri uydurulmaz.</string>
@@ -388,10 +386,6 @@
     <string name="storage_change_create_baseline">İlk ölçümü oluştur</string>
     <string name="storage_change_analysis_scope">Gerçek bir paylaşılan depolama analizi çalıştırır ve Depolama Değişimi için yeni bir anlık görüntü kaydeder. Bu işlem temizlik yapmaz.</string>
     <string name="storage_change_progress">Dosya: %1$d • Taranan klasör: %2$d</string>
-    <string name="rewarded_ad_title">60 dakika reklamsız kullanım</string>
-    <string name="rewarded_ad_subtitle">Kısa bir video izle; banner ve geçiş reklamları bir saat gizlensin.</string>
-    <string name="rewarded_ad_earned">60 dakika boyunca reklamsız kullanım aktif.</string>
-    <string name="rewarded_ad_unavailable">Video henüz hazır değil. Lütfen biraz sonra tekrar dene.</string>
     <string name="nothing_selected_hint">Temizlemek için dosya seç</string>
     <string name="premium_duplicate_copy_of">%1$s kopyası</string>
     <string name="cache_modern_not_measured">Ölçülmedi – Kullanım Erişimi’ne izin ver</string>
@@ -489,11 +483,11 @@
         <item quantity="one">%1$d incelendi · %2$s işaretli</item>
         <item quantity="other">%1$d incelendi · %2$s işaretli</item>
     </plurals>
-    <string name="deep_check_action">İzle ve doğrula</string>
+    <string name="deep_check_action">Doğrula</string>
     <string name="deep_check_running">Olası kopyalar kontrol ediliyor…</string>
     <plurals name="deep_check_row">
-        <item quantity="one">Olası kopyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izle.</item>
-        <item quantity="other">Olası kopyalar: %1$d · en fazla %2$s. Doğrulamak için kısa bir video izle.</item>
+        <item quantity="one">Olası kopyalar: %1$d · en fazla %2$s. Kontrol etmek için Doğrula\'ya dokun.</item>
+        <item quantity="other">Olası kopyalar: %1$d · en fazla %2$s. Kontrol etmek için Doğrula\'ya dokun.</item>
     </plurals>
     <plurals name="trash_full_body">
         <item quantity="one">%1$d dosya çöpe taşınamadı; depolama dolu olabilir. Bunun yerine kalıcı olarak silinsin mi? Bu geri alınamaz.</item>
@@ -583,7 +577,6 @@
     <string name="trash_restore_all">Hepsini geri al</string>
     <string name="trash_empty_v2">Çöpü boşalt ve %1$s yer aç</string>
     <string name="tool_move_to_trash">Çöpe taşı</string>
-    <string name="ad_label">Reklam</string>
     <string name="home_review_rest">Başka neler buldum, gör</string>
     <string name="home_hard_photos">Fotoğraf ve videolar</string>
     <string name="home_hard_apps">Uygulamalar</string>
@@ -658,10 +651,6 @@
     <string name="tools_row_apps_sub">Kullanılmayan uygulamalar ve önbellek</string>
     <string name="tools_row_storage_sub">Yerini neler tutuyor</string>
     <string name="tools_storage_full">%1$s dolu</string>
-    <string name="ad_free_card_title">60 dakika reklamsız</string>
-    <string name="ad_free_card_sub">Kısa bir video izle</string>
-    <string name="ad_free_offer_bar">Reklam istemiyor musun? 60 dakika kapat</string>
-    <string name="ad_free_offer_watch">İzle</string>
     <plurals name="confirm_camera_files">
         <item quantity="one">%1$d dosya kameranızdan</item>
         <item quantity="other">%1$d dosya kameranızdan</item>
@@ -669,10 +658,6 @@
     <plurals name="tools_apps_unused">
         <item quantity="one">%1$d kullanılmayan</item>
         <item quantity="other">%1$d kullanılmayan</item>
-    </plurals>
-    <plurals name="ad_free_left">
-        <item quantity="one">Reklamsız · %1$d dk kaldı</item>
-        <item quantity="other">Reklamsız · %1$d dk kaldı</item>
     </plurals>
     <plurals name="result_files_moved">
         <item quantity="one">%1$d dosya taşındı</item>
@@ -696,4 +681,38 @@
         <item quantity="one">%1$d birebir kopya seçildi</item>
         <item quantity="other">%1$d birebir kopya seçildi</item>
     </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <string name="pro_subtitle">Pro özellikleri sonraki güncellemelerle geliyor. Bugün kullandığın her şey olduğu gibi kalır.</string>
+    <string name="pro_loading">Planlar yükleniyor…</string>
+    <string name="pro_coming_soon_title">Yakında</string>
+    <string name="pro_coming_soon_body">Pro planları henüz hazır değil. Uygulamadaki her şey eskisi gibi çalışmaya devam ediyor.</string>
+    <string name="pro_active_title">Pro açık</string>
+    <string name="pro_active_body">Teşekkürler. Pro, Google Play hesabına bağlı.</string>
+    <string name="pro_pending">Satın alman ödeme bekliyor. Google Play tamamlayınca Pro açılır.</string>
+    <string name="pro_plan_yearly">%s / yıl</string>
+    <string name="pro_plan_week">%s / 1 hafta</string>
+    <string name="pro_plan_week_detail">Ön ödemeli. Yenilenmez.</string>
+    <string name="pro_plan_lifetime">%s tek sefer</string>
+    <string name="pro_plan_lifetime_detail">Tek ödeme. Yenileme yok.</string>
+    <string name="pro_buy_yearly">Yılda %s ile abone ol</string>
+    <string name="pro_buy_week">1 hafta %s · yenilenmez</string>
+    <string name="pro_buy_lifetime">%s tek sefer öde</string>
+    <string name="pro_legal_renews">Yıllık plan otomatik yenilenir. İstediğin an Google Play &gt; Abonelikler\'den iptal edebilirsin. Uygulamanın geri kalanı abonelik olmadan çalışır.</string>
+    <string name="pro_restore">Satın alımları geri yükle</string>
+    <string name="pro_manage">Aboneliği yönet</string>
+    <string name="pro_message_activated">Pro açıldı. Teşekkürler!</string>
+    <string name="pro_message_pending">Satın alma beklemede. Ödeme tamamlanınca Pro açılır.</string>
+    <string name="pro_message_restored">Satın alımlar geri yüklendi. Pro açık.</string>
+    <string name="pro_message_nothing_to_restore">Bu Google hesabında Pro satın alımı bulunamadı.</string>
+    <string name="pro_message_failed">Satın alma tamamlanamadı. Lütfen tekrar dene.</string>
+    <string name="pro_message_unavailable">Google Play ödeme sistemi şu an kullanılamıyor.</string>
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="one">%1$d gün deneme, sonra yılda %2$s</item>
+        <item quantity="other">%1$d gün deneme, sonra yılda %2$s</item>
+    </plurals>
+    <plurals name="pro_buy_trial">
+        <item quantity="one">%1$d gün dene, sonra %2$s/yıl</item>
+        <item quantity="other">%1$d gün dene, sonra %2$s/yıl</item>
+    </plurals>
+    <string name="pro_message_restore_failed">Satın alımlar kontrol edilemedi. Lütfen tekrar dene.</string>
 </resources>

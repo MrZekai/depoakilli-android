@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
-import com.mrzekai.depoakilli.ads.AdPolicy
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.model.CleanableItem
 import com.mrzekai.depoakilli.model.isAppSelectable
@@ -101,7 +100,6 @@ internal fun PremiumToolResults(
     onToggleItem: (String) -> Unit,
     onSetItemsSelected: (ids: Set<String>, selected: Boolean, bulk: Boolean) -> Unit,
     onClean: (Set<String>?) -> Unit,
-    listAd: @Composable () -> Unit = {},
     onRefresh: () -> Unit = onScan,
     suggested: List<CleanableItem> = emptyList(),
     onVerifyAndSelect: (Set<String>) -> Unit = {},
@@ -257,20 +255,12 @@ internal fun PremiumToolResults(
                         }
                     }
                 } else {
-                    val shownSections = listOfNotNull(pickSection) + if (showOthers) otherSections else emptyList()
-                    val totalRows = shownSections.sumOf { minOf(it.items.size, TOOL_ROWS_PER_SECTION) }
-                    var rowIndex = 0
-                    // C5: one small (row-sized) native after the 3rd row, in lists of 6 rows or more.
-                    val adAfterRow = if (totalRows >= AdPolicy.NATIVE_LIST_MIN_ROWS) AdPolicy.NATIVE_LIST_AFTER_ROW else -1
                     if (pickSection != null) {
                         val rows = sortItems(pickSection.items, sortMode)
                         toolSection(
                             section = pickSection,
                             rows = rows.take(TOOL_ROWS_PER_SECTION),
                             hiddenCount = (rows.size - TOOL_ROWS_PER_SECTION).coerceAtLeast(0),
-                            firstRowIndex = rowIndex,
-                            adAfterRow = adAfterRow,
-                            listAd = listAd,
                             onViewAll = { detailKey = pickSection.key },
                             onPreview = { previewId = it.id },
                             onToggleItem = onToggleItem,
@@ -288,7 +278,6 @@ internal fun PremiumToolResults(
                                 )
                             },
                         )
-                        rowIndex += minOf(pickSection.items.size, TOOL_ROWS_PER_SECTION)
                         if (otherItems.isNotEmpty()) {
                             item(key = "tool-others-toggle") {
                                 Surface(
@@ -327,15 +316,11 @@ internal fun PremiumToolResults(
                                 section = section,
                                 rows = rows.take(TOOL_ROWS_PER_SECTION),
                                 hiddenCount = (rows.size - TOOL_ROWS_PER_SECTION).coerceAtLeast(0),
-                                firstRowIndex = rowIndex,
-                                adAfterRow = adAfterRow,
-                                listAd = listAd,
                                 onViewAll = { detailKey = section.key },
                                 onPreview = { previewId = it.id },
                                 onToggleItem = onToggleItem,
                                 onToggleAll = { setSectionSelection(section.items, onSetItemsSelected, onVerifyAndSelect) },
                             )
-                            rowIndex += minOf(section.items.size, TOOL_ROWS_PER_SECTION)
                         }
                     }
                 }
@@ -384,9 +369,6 @@ internal fun LazyListScope.toolSection(
     section: ToolSection,
     rows: List<CleanableItem>,
     hiddenCount: Int,
-    firstRowIndex: Int,
-    adAfterRow: Int,
-    listAd: @Composable () -> Unit,
     onViewAll: () -> Unit,
     onPreview: (CleanableItem) -> Unit,
     onToggleItem: (String) -> Unit,
@@ -409,12 +391,6 @@ internal fun LazyListScope.toolSection(
                 onPreview = { onPreview(item) },
                 onToggle = { onToggleItem(item.id) },
             )
-        }
-        // The in-list native follows the 4th row of the whole list (T5.8).
-        if (firstRowIndex + index + 1 == adAfterRow) {
-            item(key = "tools-list-native") {
-                Column(Modifier.padding(vertical = 24.dp)) { listAd() }
-            }
         }
     }
     if (hiddenCount > 0) {

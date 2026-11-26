@@ -63,11 +63,15 @@ do
   fi
 done
 
-grep -Fq 'ca-app-pub-3940256099942544' "$DEX_STRINGS" \
-  || fail "Google sample AdMob IDs not found in QA binary"
-if grep -Fq 'ca-app-pub-1380972808968213' "$DEX_STRINGS"; then
-  fail "production AdMob publisher ID leaked into QA binary"
+# 2.0: no ad SDK in the QA binary either.
+if grep -Fq 'ca-app-pub-' "$DEX_STRINGS"; then
+  fail "AdMob id found in QA binary"
 fi
+for forbidden in 'Lcom/google/android/gms/ads/' 'Lcom/google/android/ump/'; do
+  if grep -Fq "$forbidden" "$DEX_STRINGS"; then
+    fail "ad SDK classes found in QA binary: $forbidden"
+  fi
+done
 
 APK_BYTES="$(wc -c < "$APK" | tr -d ' ')"
 {

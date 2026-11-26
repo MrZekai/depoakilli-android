@@ -6,38 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-val sampleAdMobAppId = "ca-app-pub-3940256099942544~3347511713"
-val sampleBannerId = "ca-app-pub-3940256099942544/6300978111"
-val sampleInterstitialId = "ca-app-pub-3940256099942544/1033173712"
-val sampleRewardedId = "ca-app-pub-3940256099942544/5224354917"
-val sampleResultNativeVideoId = "ca-app-pub-3940256099942544/1044960115"
-val sampleAppOpenId = "ca-app-pub-3940256099942544/9257395921"
-val sampleListNativeId = "ca-app-pub-3940256099942544/2247696110"
-
-// AdMob ad-unit IDs are public identifiers embedded in the APK/AAB.
-// Keep QA/debug on Google's official sample IDs and bind production only
-// to Smart Cleaner's own live AdMob application/ad units.
-val liveAdMobAppId = "ca-app-pub-1380972808968213~9043355268"
-val liveBannerId = "ca-app-pub-1380972808968213/2118175647"
-val liveInterstitialId = "ca-app-pub-1380972808968213/8492012303"
-val liveRewardedId = "ca-app-pub-1380972808968213/4039180256"
-// App open unit created by the owner in AdMob (16 Nov 2026).
-val liveAppOpenId = "ca-app-pub-1380972808968213/1593948887"
-// In-list Native advanced unit created by the owner in AdMob (16 Nov 2026).
-val liveListNativeId = "ca-app-pub-1380972808968213/6870326296"
-// Result-screen Native unit: an explicit ADMOB_RESULT_NATIVE_ID wins; otherwise
-// the owner's Native advanced unit is reused. MREC (banner unit, 300x250) stays
-// the fallback when no native ad fills.
-val liveResultNativeId = providers.environmentVariable("ADMOB_RESULT_NATIVE_ID")
-    .orNull
-    ?.trim()
-    .orEmpty()
-    .ifBlank { "ca-app-pub-1380972808968213/6870326296" }
-// Result-screen MREC (300x250) unit; empty means the existing banner unit at MREC size.
-val liveResultMrecId = providers.environmentVariable("ADMOB_RESULT_MREC_ID")
-    .orNull
-    ?.trim()
-    .orEmpty()
 val supportEmail = providers.environmentVariable("SUPPORT_EMAIL")
     .orNull
     ?.trim()
@@ -60,21 +28,11 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 52
-        versionName = "1.1.1"
+        versionCode = 53
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-        // Safe default for local/debug builds.
-        manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
-
-        buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
-        buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
-        buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
-        buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
-        buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
-            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
-            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
         buildConfigField("String", "SUPPORT_EMAIL", quotedBuildConfig(supportEmail))
     }
 
@@ -126,7 +84,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         create("qa") {
-            // External-test APK: release-like binary, Google sample ads, stable QA signing.
+            // External-test APK: release-like binary, stable QA signing.
             initWith(getByName("release"))
             applicationIdSuffix = ".qa"
             versionNameSuffix = "-qa"
@@ -137,28 +95,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
-            buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
-            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
-            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
-            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
         }
         release {
-            // Production AAB always uses Smart Cleaner's own AdMob IDs.
-            manifestPlaceholders["ADMOB_APP_ID"] = liveAdMobAppId
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"$liveBannerId\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$liveInterstitialId\"")
-            buildConfigField("String", "ADMOB_REWARDED_ID", "\"$liveRewardedId\"")
-            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$liveResultNativeId\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$liveAppOpenId\"")
-            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"${liveResultMrecId.ifBlank { liveBannerId }}\"")
-            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$liveListNativeId\"")
-
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -168,8 +108,7 @@ android {
             signingConfig = signingConfigs.findByName("release")
         }
         create("closedTest") {
-            // Play closed testing must exercise the real Play package and upload
-            // certificate without generating live ad traffic.
+            // Play closed testing exercises the real Play package and upload certificate.
             initWith(getByName("release"))
             isDebuggable = false
             isMinifyEnabled = true
@@ -178,14 +117,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            manifestPlaceholders["ADMOB_APP_ID"] = sampleAdMobAppId
-            buildConfigField("String", "ADMOB_BANNER_ID", "\"$sampleBannerId\"")
-            buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$sampleInterstitialId\"")
-            buildConfigField("String", "ADMOB_REWARDED_ID", "\"$sampleRewardedId\"")
-            buildConfigField("String", "ADMOB_RESULT_NATIVE_ID", "\"$sampleResultNativeVideoId\"")
-            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$sampleAppOpenId\"")
-            buildConfigField("String", "ADMOB_RESULT_MREC_ID", "\"$sampleBannerId\"")
-            buildConfigField("String", "ADMOB_LIST_NATIVE_ID", "\"$sampleListNativeId\"")
             signingConfig = signingConfigs.findByName("release")
             matchingFallbacks += listOf("release")
         }
@@ -250,12 +181,12 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.coroutines.android)
 
-    implementation(libs.google.play.services.ads)
-    implementation(libs.google.ump)
+    // Google Play Billing (2.0): Smart Cleaner Pro subscription and lifetime purchase.
+    implementation(libs.android.billing.ktx)
     implementation(libs.google.play.review)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
-    // Explicit (already present through Google Mobile Ads) for the daily trash purge.
+    // The daily trash purge.
     implementation(libs.androidx.work.runtime)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -265,32 +196,10 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
-val validateReleaseAds by tasks.registering {
+val validateRelease by tasks.registering {
     group = "verification"
-    description = "Fails release builds that still use Google sample AdMob IDs."
+    description = "Fails release builds without a support address or the upload keystore."
     doLast {
-        val values = listOf(
-            liveAdMobAppId,
-            liveBannerId,
-            liveInterstitialId,
-            liveRewardedId,
-            liveAppOpenId,
-            liveListNativeId,
-        )
-        check(values.none { it.contains("3940256099942544") }) {
-            "Release blocked: Google sample AdMob IDs cannot be used in production."
-        }
-        check(values.all { it.startsWith("ca-app-pub-1380972808968213") }) {
-            "Release blocked: Smart Cleaner AdMob publisher IDs are inconsistent."
-        }
-        if (liveResultNativeId.isNotBlank()) {
-            check(!liveResultNativeId.contains("3940256099942544")) {
-                "Release blocked: Google sample Native ad ID cannot be used in production."
-            }
-            check(liveResultNativeId.startsWith("ca-app-pub-1380972808968213/")) {
-                "Release blocked: Result Native ad unit must belong to Smart Cleaner."
-            }
-        }
         check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
             "Release blocked: configure a valid public SUPPORT_EMAIL."
         }
@@ -306,28 +215,13 @@ val validateReleaseAds by tasks.registering {
 }
 
 tasks.matching { it.name == "preReleaseBuild" }.configureEach {
-    dependsOn(validateReleaseAds)
+    dependsOn(validateRelease)
 }
 
 val validateClosedTestConfiguration by tasks.registering {
     group = "verification"
-    description = "Validates Play closed-test signing, diagnostics, support and sample ads."
+    description = "Validates Play closed-test signing and support address."
     doLast {
-        val sampleIds = listOf(
-            sampleAdMobAppId,
-            sampleBannerId,
-            sampleInterstitialId,
-            sampleRewardedId,
-            sampleResultNativeVideoId,
-            sampleAppOpenId,
-            sampleListNativeId,
-        )
-        check(sampleIds.all { it.contains("3940256099942544") }) {
-            "Closed test blocked: every ad format must use an official Google sample ID."
-        }
-        check(sampleIds.none { it.contains("1380972808968213") }) {
-            "Closed test blocked: production AdMob IDs cannot be used."
-        }
         check(supportEmail.matches(Regex("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))) {
             "Closed test blocked: configure a valid public SUPPORT_EMAIL."
         }

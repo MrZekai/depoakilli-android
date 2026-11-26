@@ -26,4 +26,4 @@ if [[ ! "$SUPPORT_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]; 
   exit 1
 fi
 
-echo "Release signing and public support contact are complete; AdMob IDs are variant-pinned in Gradle."
+echo "Release signing and public support contact are complete."

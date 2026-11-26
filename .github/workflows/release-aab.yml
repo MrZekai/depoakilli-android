@@ -56,7 +56,6 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
-          ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: |
           chmod +x gradlew
           # CI-only heap, as android-ci.yml full-checks: the 768 MB Kotlin daemon
@@ -71,13 +70,11 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
-          ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: ./gradlew --stacktrace bundleRelease assembleRelease "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
-      - name: Verify production binaries, live ads and existing upload certificate
+      - name: Verify production binaries, no ad SDK and existing upload certificate
         env:
           SUPPORT_EMAIL: ${{ secrets.SUPPORT_EMAIL }}
-          ADMOB_RESULT_NATIVE_ID: ${{ secrets.ADMOB_RESULT_NATIVE_ID }}
         run: bash ./scripts/verify-release-aab.sh
 
       - name: Upload signed production AAB

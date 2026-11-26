@@ -1,7 +1,6 @@
 package com.mrzekai.depoakilli
 
 import android.app.Activity
-import android.content.ComponentCallbacks2
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -15,41 +14,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.mrzekai.depoakilli.ads.ConsentManager
-import com.mrzekai.depoakilli.ads.AdFrequencyStore
-import com.mrzekai.depoakilli.ads.AdPolicy
-import com.mrzekai.depoakilli.ads.AppOpenCover
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.Box
-import com.mrzekai.depoakilli.ads.AppOpenAdController
-import com.mrzekai.depoakilli.ads.InterstitialAdController
-import com.mrzekai.depoakilli.ads.InterstitialTrigger
-import com.mrzekai.depoakilli.ads.RewardedAdController
+import com.mrzekai.depoakilli.billing.BillingEvent
+import com.mrzekai.depoakilli.billing.BillingProducts
+import com.mrzekai.depoakilli.billing.ProPlanOption
 import com.mrzekai.depoakilli.data.DeviceRepository
 import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
-    private lateinit var consentManager: ConsentManager
-    private lateinit var interstitialAds: InterstitialAdController
-    private lateinit var adFrequency: AdFrequencyStore
-    private lateinit var appOpenAds: AppOpenAdController
-    private lateinit var rewardedAds: RewardedAdController
+    private val billing by lazy { (application as DepoAkilliApplication).billing }
     private var pendingDeepCacheAfterStorageAccess = false
-    private var reviewPromptInFlight = false
-
-    /** D5: the once-a-day "turn ads off for 60 minutes" bar after an interstitial. */
-    private var adFreeOfferVisible by androidx.compose.runtime.mutableStateOf(false)
-    private val adFreeOfferStore by lazy { com.mrzekai.depoakilli.ads.AdFreeOfferStore(this) }
 
     private val allFilesAccessLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -106,93 +90,40 @@ class MainActivity : ComponentActivity() {
         if (resources.configuration.smallestScreenWidthDp < 600) {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
-        consentManager = ConsentManager(applicationContext)
-        adFrequency = AdFrequencyStore(applicationContext)
-        if (savedInstanceState == null) adFrequency.recordLaunch()
-        interstitialAds = InterstitialAdController(applicationContext, adFrequency)
-        rewardedAds = RewardedAdController(applicationContext)
-        appOpenAds = AppOpenAdController(applicationContext, adFrequency)
-        consentManager.gatherConsent(this)
-        if (savedInstanceState == null) {
-            val app = application as DepoAkilliApplication
-            appOpenAds.onColdStart(
-                activity = this,
-                adsAllowedNow = consentManager.canRequestAds.value && !app.adFreeWindow.isActiveNow(),
-                otherFullScreenActive = { app.fullScreenAdSurfaceActive.value },
-            )
+        // Billing events (purchase done, pending, restore) become one short message.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                billing.events.collect(::showBillingMessage)
+            }
         }
 
         setContent {
-            val canRequestAds by consentManager.canRequestAds.collectAsStateWithLifecycle()
-            val privacyOptionsRequired by consentManager.privacyOptionsRequired.collectAsStateWithLifecycle()
-            val app = application as DepoAkilliApplication
-            val adFreeRemainingMillis by app.adFreeWindow.remainingMillis.collectAsStateWithLifecycle()
-            val rewardedReady by rewardedAds.isReady.collectAsStateWithLifecycle()
-            val fullScreenAdActive by app.fullScreenAdSurfaceActive.collectAsStateWithLifecycle()
-            val appOpenCover by appOpenAds.coverVisible.collectAsStateWithLifecycle()
-            val adFreeActive = adFreeRemainingMillis > 0L
-            LaunchedEffect(canRequestAds, adFreeActive) {
-                interstitialAds.setAdsAllowed(canRequestAds && !adFreeActive)
-                appOpenAds.setAdsAllowed(canRequestAds && !adFreeActive)
-                rewardedAds.setAdsAllowed(canRequestAds && !adFreeActive)
-            }
-            // D5: "Ad-free · N min left" stays current while the window runs.
-            LaunchedEffect(adFreeActive) {
-                while (adFreeActive) {
-                    kotlinx.coroutines.delay(30_000L)
-                    app.adFreeWindow.refresh()
-                }
-            }
-
+            val pro by billing.state.collectAsStateWithLifecycle()
             DepoAkilliTheme {
-                Box(Modifier.fillMaxSize()) {
-                    CleanerApp(
-                        viewModel = cleanerViewModel,
-                        // A rewarded ad promises an ad-free window. Pass one
-                        // effective UI flag to every ad surface, including the
-                        // cleanup-result Native/MREC placement.
-                        canRequestAds =
-                            canRequestAds &&
-                                adFreeRemainingMillis <= 0L &&
-                                !fullScreenAdActive,
-                        fullScreenAdActive = fullScreenAdActive,
-                        appOpenCoverVisible = appOpenCover,
-                        privacyOptionsRequired = privacyOptionsRequired,
-                        adFreeRemainingMillis = adFreeRemainingMillis,
-                        rewardedAdReady = rewardedReady,
-                        onRequestAllFilesAccess = ::requestAllFilesAccess,
-                        onRequestUsageAccess = ::requestUsageAccess,
-                        onClearAllAppCaches = ::requestDeepCacheCleanup,
-                        onOpenAppDetails = ::openAppCacheSettings,
-                        onPrepareCleanup = ::cleanSelected,
-                        onPrepareStorageCleanup = ::cleanStorage,
-                        onPrepareWhatsAppCleanup = ::cleanWhatsApp,
-                        onCleanupResultDismissed = ::onCleanupResultDismissed,
-                        onCleanupSucceeded = ::onCleanupSucceeded,
-                        onReturnedToClean = ::onReturnedToClean,
-                        onNaturalBreak = ::onNaturalBreak,
-                        onDeepDuplicateCheck = ::runDeepDuplicateCheck,
-                        onUninstallApp = ::uninstallApp,
-                        onOpenAppInfo = ::openAppInfo,
-                        onOpenLanguageSettings = ::openLanguageSettings,
-                        onShowPrivacyOptions = ::showPrivacyOptions,
-                        onShowRewardedAd = ::showRewardedAd,
-                        onRateApp = ::rateApp,
-                        onSendFeedback = ::sendFeedback,
-                        onShareApp = ::shareApp,
-                    )
-                    if (adFreeOfferVisible && !adFreeActive) {
-                        com.mrzekai.depoakilli.ads.AdFreeOfferBar(
-                            onWatch = {
-                                adFreeOfferVisible = false
-                                showRewardedAd()
-                            },
-                            onTimeout = { adFreeOfferVisible = false },
-                            modifier = Modifier.align(androidx.compose.ui.Alignment.BottomCenter),
-                        )
-                    }
-                    if (appOpenCover) AppOpenCover()
-                }
+                CleanerApp(
+                    viewModel = cleanerViewModel,
+                    pro = pro,
+                    onRequestAllFilesAccess = ::requestAllFilesAccess,
+                    onRequestUsageAccess = ::requestUsageAccess,
+                    onClearAllAppCaches = ::requestDeepCacheCleanup,
+                    onOpenAppDetails = ::openAppCacheSettings,
+                    onPrepareCleanup = ::cleanSelected,
+                    onPrepareStorageCleanup = ::cleanStorage,
+                    onPrepareWhatsAppCleanup = ::cleanWhatsApp,
+                    onCleanupResultDismissed = ::onCleanupResultDismissed,
+                    onCleanupSucceeded = ::onCleanupSucceeded,
+                    onDeepDuplicateCheck = cleanerViewModel::runDeepDuplicateCheck,
+                    onUninstallApp = ::uninstallApp,
+                    onOpenAppInfo = ::openAppInfo,
+                    onOpenLanguageSettings = ::openLanguageSettings,
+                    onOpenPro = billing::loadProducts,
+                    onBuyPlan = ::buyPlan,
+                    onRestorePurchases = { billing.refreshPurchases(userRequested = true) },
+                    onManageSubscription = ::openSubscriptionManagement,
+                    onRateApp = ::rateApp,
+                    onSendFeedback = ::sendFeedback,
+                    onShareApp = ::shareApp,
+                )
             }
         }
     }
@@ -204,71 +135,8 @@ class MainActivity : ComponentActivity() {
         // E1: back from Android's uninstall or app settings, the apps section
         // shows fresh sizes and a removed app's row disappears.
         cleanerViewModel.refreshInstalledAppsIfAllowed()
-        if (::interstitialAds.isInitialized) interstitialAds.onHostResumed(this)
-        if (::rewardedAds.isInitialized) rewardedAds.onHostResumed(this)
-        val app = application as DepoAkilliApplication
-        app.adFreeWindow.refresh()
-        if (::appOpenAds.isInitialized) {
-            appOpenAds.onReturnedToForeground(
-                activity = this,
-                otherFullScreenActive = app.fullScreenAdSurfaceActive.value,
-                blocked = reviewPromptInFlight || app.adFreeWindow.isActiveNow(),
-            )
-        }
-    }
-
-    // Every screen the app opens itself (system settings, permission pages,
-    // cache dialog, uninstall, share, email, Play review, ad activities) passes
-    // through one of these, so the return from it never shows an app open ad.
-    override fun startActivity(intent: android.content.Intent?, options: Bundle?) {
-        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
-        super.startActivity(intent, options)
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
-    override fun startActivityForResult(intent: android.content.Intent, requestCode: Int, options: Bundle?) {
-        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
-        super.startActivityForResult(intent, requestCode, options)
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
-    override fun startIntentSenderForResult(
-        intent: android.content.IntentSender,
-        requestCode: Int,
-        fillInIntent: android.content.Intent?,
-        flagsMask: Int,
-        flagsValues: Int,
-        extraFlags: Int,
-        options: Bundle?,
-    ) {
-        if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
-        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
-    }
-
-    /** Home/Recents pressed by the user; ignored right after the app opened a screen itself. */
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        if (::appOpenAds.isInitialized) appOpenAds.onUserLeftApp()
-    }
-
-    override fun onPause() {
-        if (::interstitialAds.isInitialized) interstitialAds.onHostPaused(this)
-        if (::rewardedAds.isInitialized) rewardedAds.onHostPaused(this)
-        super.onPause()
-    }
-
-    override fun onTrimMemory(level: Int) {
-        super.onTrimMemory(level)
-        if (
-            level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND &&
-            ::interstitialAds.isInitialized &&
-            (application as DepoAkilliApplication).isSystemUnderMemoryPressure()
-        ) {
-            interstitialAds.releaseCachedAd()
-            if (::rewardedAds.isInitialized) rewardedAds.releaseCachedAd()
-        }
+        // Re-read purchases on every start and return (plan §1.2); offline keeps the last known state.
+        billing.refreshPurchases()
     }
 
     private fun cleanSelected(itemIds: Set<String>? = null) {
@@ -290,11 +158,7 @@ class MainActivity : ComponentActivity() {
 
     private fun onCleanupResultDismissed() {
         // The destructive operation and measured result are already complete.
-        // Monetization happens only after the user closes the result.
         cleanerViewModel.refreshDeviceState(force = true)
-        // Never stack a full-screen ad on top of the Play rating sheet.
-        if (reviewPromptInFlight) return
-        showPostTaskInterstitial()
     }
 
     /**
@@ -303,77 +167,20 @@ class MainActivity : ComponentActivity() {
      * app additionally asks at most once every [REVIEW_PROMPT_INTERVAL_MILLIS].
      */
     private fun onCleanupSucceeded() {
-        adFrequency.recordCleanupCompleted()
         maybeAskForReview()
-    }
-
-    /** Trigger (b): back on the Clean tab after at least 20 s on a tool or detail screen. */
-    private fun onReturnedToClean(dwellMillis: Long) {
-        if (reviewPromptInFlight) return
-        showPostTaskInterstitial(trigger = InterstitialTrigger.RETURN_TO_CLEAN, dwellMillis = dwellMillis)
-    }
-
-    /** Faz 5 triggers: findings opened after a scan, swipe review confirmed. Same AdPolicy limits. */
-    private fun onNaturalBreak(trigger: InterstitialTrigger) {
-        if (reviewPromptInFlight) return
-        showPostTaskInterstitial(trigger = trigger)
     }
 
     private fun maybeAskForReview() {
         val prefs = getSharedPreferences("review_prompt", MODE_PRIVATE)
         val now = System.currentTimeMillis()
         if (now - prefs.getLong("last_asked", 0L) < REVIEW_PROMPT_INTERVAL_MILLIS) return
-        reviewPromptInFlight = true
         val manager = ReviewManagerFactory.create(this)
         manager.requestReviewFlow().addOnCompleteListener { request ->
             if (request.isSuccessful && !isFinishing && !isDestroyed) {
                 prefs.edit().putLong("last_asked", now).apply()
-                if (::appOpenAds.isInitialized) appOpenAds.onAppStartingScreen()
                 manager.launchReviewFlow(this, request.result)
-                    .addOnCompleteListener { reviewPromptInFlight = false }
-            } else {
-                reviewPromptInFlight = false
             }
         }
-    }
-
-    private fun showPostTaskInterstitial(
-        trigger: InterstitialTrigger = InterstitialTrigger.CLEANUP_DONE,
-        dwellMillis: Long = Long.MAX_VALUE,
-        onFinished: () -> Unit = {},
-    ) {
-        if ((application as DepoAkilliApplication).adFreeWindow.isActiveNow()) {
-            onFinished()
-            return
-        }
-        val app = application as DepoAkilliApplication
-        // Only cover the screen when an ad will really be shown; otherwise the
-        // banner and native ads stay as they are (no blink, no reload).
-        if (!interstitialAds.canShowNow(this, trigger, dwellMillis)) {
-            onFinished()
-            return
-        }
-
-        // Short neutral settle surface prevents the cleanup-confirm tap from
-        // carrying into a suddenly appearing full-screen ad.
-        app.beginInterstitialSurface()
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
-            {
-                var adShown = false
-                interstitialAds.showAtNaturalBreak(
-                    activity = this,
-                    trigger = trigger,
-                    dwellMillis = dwellMillis,
-                    onWillShow = { adShown = true },
-                    onFinished = {
-                        app.endInterstitialSurface()
-                        if (adShown) maybeOfferAdFree()
-                        onFinished()
-                    },
-                )
-            },
-            POST_TASK_AD_SETTLE_MILLIS,
-        )
     }
 
     private fun executeCleanupPlan(itemIds: Set<String>? = null) {
@@ -381,7 +188,6 @@ class MainActivity : ComponentActivity() {
             itemIds = itemIds,
             onCleanupCompleted = {
                 // Result state is already produced by CleanerViewModel.
-                // Never gate that result on a Google Mobile Ads callback.
             },
         )
     }
@@ -535,65 +341,28 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showPrivacyOptions() {
-        consentManager.showPrivacyOptions(this)
+    private fun buyPlan(plan: ProPlanOption) {
+        billing.launchPurchase(this, plan)
     }
 
-    /**
-     * "Watch and verify" (T1B.6): the reward runs the deep duplicate check.
-     * Without a ready ad, inside the ad-free window or without consent the
-     * check runs right away; the user is never locked out. Closing the ad
-     * early (no reward) does not start it.
-     */
-    private fun runDeepDuplicateCheck() {
-        val app = application as DepoAkilliApplication
-        if (app.adFreeWindow.isActiveNow() || !consentManager.canRequestAds.value || !rewardedAds.isReady.value) {
-            cleanerViewModel.runDeepDuplicateCheck()
-            return
-        }
-        rewardedAds.show(
-            activity = this,
-            onWillShow = {
-                adFrequency.update { AdPolicy.recordFullScreen(it, System.currentTimeMillis()) }
-                app.beginInterstitialSurface()
-            },
-            onUserEarnedReward = { cleanerViewModel.runDeepDuplicateCheck() },
-            onFinished = { app.endInterstitialSurface() },
-            onUnavailable = { cleanerViewModel.runDeepDuplicateCheck() },
+    /** Google Play's own subscription page (plan §1.2 "Aboneliği yönet"). */
+    private fun openSubscriptionManagement() {
+        startFirstAvailable(
+            Intent(Intent.ACTION_VIEW, Uri.parse(BillingProducts.MANAGE_SUBSCRIPTIONS_URL)),
         )
     }
 
-    /** D5: after an interstitial closed, at most once a day, offer the ad-free window. */
-    private fun maybeOfferAdFree() {
-        val app = application as DepoAkilliApplication
-        val today = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.dayOf(System.currentTimeMillis())
-        val offer = com.mrzekai.depoakilli.ads.AdFreeOfferPolicy.shouldOffer(
-            lastOfferDay = adFreeOfferStore.lastOfferDay(),
-            today = today,
-            adsAllowed = consentManager.canRequestAds.value,
-            adFreeActive = app.adFreeWindow.isActiveNow(),
-            rewardedReady = rewardedAds.isReady.value,
-        )
-        if (!offer) return
-        adFreeOfferStore.markOffered(today)
-        adFreeOfferVisible = true
-    }
-
-    private fun showRewardedAd() {
-        val adFreeWindow = (application as DepoAkilliApplication).adFreeWindow
-        if (adFreeWindow.isActiveNow()) return
-        rewardedAds.show(
-            activity = this,
-            onWillShow = {
-                adFrequency.update { AdPolicy.recordFullScreen(it, System.currentTimeMillis()) }
-                (application as DepoAkilliApplication).beginInterstitialSurface()
+    private fun showBillingMessage(event: BillingEvent) {
+        cleanerViewModel.showMessage(
+            when (event) {
+                BillingEvent.PRO_ACTIVATED -> R.string.pro_message_activated
+                BillingEvent.PENDING -> R.string.pro_message_pending
+                BillingEvent.RESTORED -> R.string.pro_message_restored
+                BillingEvent.NOTHING_TO_RESTORE -> R.string.pro_message_nothing_to_restore
+                BillingEvent.RESTORE_FAILED -> R.string.pro_message_restore_failed
+                BillingEvent.FAILED -> R.string.pro_message_failed
+                BillingEvent.UNAVAILABLE -> R.string.pro_message_unavailable
             },
-            onUserEarnedReward = {
-                adFreeWindow.grant()
-                cleanerViewModel.showMessage(R.string.rewarded_ad_earned)
-            },
-            onFinished = { (application as DepoAkilliApplication).endInterstitialSurface() },
-            onUnavailable = { cleanerViewModel.showMessage(R.string.rewarded_ad_unavailable) },
         )
     }
 
@@ -607,7 +376,6 @@ class MainActivity : ComponentActivity() {
     private companion object {
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
         const val PLAY_STORE_PACKAGE = "com.android.vending"
-        const val POST_TASK_AD_SETTLE_MILLIS = 350L
         const val REVIEW_PROMPT_INTERVAL_MILLIS = 30L * 24L * 60L * 60L * 1000L
     }
 }

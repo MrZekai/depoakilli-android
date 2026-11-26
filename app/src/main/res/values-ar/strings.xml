@@ -22,7 +22,6 @@
     <string name="scan_focus_duplicates">النسخ المكررة</string>
     <string name="scan_focus_large">ملفات كبيرة</string>
     <string name="language_settings">لغة التطبيق</string>
-    <string name="ad_privacy_preferences">تفضيلات خصوصية الإعلان</string>
     <string name="message_scan_failed">تعذر إنهاء الفحص. تحقق من أذونات الوسائط وحاول مرة أخرى.</string>
     <string name="message_select_item">حدد عنصرًا واحدًا على الأقل لتنظيفه.</string>
     <string name="message_cache_already_empty">ذاكرة التخزين المؤقت للتطبيق فارغة بالفعل.</string>
@@ -154,7 +153,7 @@
     <string name="message_all_files_required_for_cache">يتطلب التنظيف العميق لذاكرة التخزين المؤقت الوصول إلى جميع الملفات Android أولاً.</string>
     <string name="message_cache_system_unavailable">لا يمكن تأكيد مسح ذاكرة التخزين المؤقت. حدد أحد التطبيقات أدناه وافتح إعدادات Android لمسح ذاكرة التخزين المؤقت الخاصة به.</string>
     <string name="message_whatsapp_not_found">لم يتم العثور على مجلد وسائط WhatsApp أو WhatsApp Business مدعوم في وحدة التخزين المشتركة.</string>
-    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nقد تعالج Google Mobile Ads ومنصة الموافقة معرّفات الإعلانات وبيانات التشخيص وخيارات الموافقة وفق سياسات Google. تختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تنتقل معظم الملفات التي تنظفها أولًا إلى سلة مهملات Smart Cleaner على هذا الجهاز ويمكن استعادتها منها خلال 7 أيام؛ أما الملفات المحذوفة نهائيًا وسلة المهملات بعد إفراغها فلا يمكن استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.\n\nتعالج حزمة Google Mobile Ads عنوان IP لتقدير الموقع التقريبي، ومعرّف الإعلان أو معرّف مجموعة التطبيقات، وتفاعلات التطبيق وبيانات التشخيص لعرض الإعلانات. لا يرسل التطبيق نفسه أسماء الملفات أو محتوياتها أو عبارات البحث خارج الجهاز.</string>
+    <string name="privacy_policy_body_v050">يحلل Smart Cleaner بيانات الملفات المتاحة في التخزين المشترك، وعند الحاجة لاكتشاف النسخ المكررة، بصمات محتواها على الجهاز. لا يرفع Smart Cleaner هذه البصمات أو الملفات الشخصية.\n\nيُطلب الوصول إلى جميع الملفات لأن إدارة الملفات وصيانتها من الوظائف الأساسية: فحص الملفات غير الضرورية والمكررة والكبيرة والتنزيلات ومثبتات APK ووسائط WhatsApp في التخزين المشترك وإدارتها. يواصل Android حماية مجلدات البيانات الخاصة بالتطبيقات الأخرى.\n\nالوصول إلى بيانات الاستخدام اختياري، ويُستخدم لقراءة إحصاءات تخزين التطبيقات وذاكرتها المؤقتة وأوقات آخر استخدام. يستخدم مدير ذاكرة التطبيقات المؤقتة إجراء التنظيف الرسمي في Android، ويتحكم Android في التأكيد المطلوب.\n\nتختار الملفات وتؤكد حذفها، وقد يطلب Android تأكيد النظام.\n\nلا يتضمن Smart Cleaner خدمة خارجية للإبلاغ عن الأعطال. لا تُرفع أسماء الملفات أو مساراتها أو محتوياتها أو بصمات الملفات المكررة للإبلاغ عن الأعطال.\n\nيحتفظ Smart Cleaner بالتفضيلات وملخص سجل الفحص والتنظيف في تخزين التطبيق المحلي فقط، حتى تمسح بيانات التطبيق أو تزيله. تنتقل معظم الملفات التي تنظفها أولًا إلى سلة مهملات Smart Cleaner على هذا الجهاز ويمكن استعادتها منها خلال 7 أيام؛ أما الملفات المحذوفة نهائيًا وسلة المهملات بعد إفراغها فلا يمكن استعادتها. تحتفظ Google بالبيانات التي تعالجها وفق سياساتها المنشورة.</string>
     <plurals name="reason_large_file">
         <item quantity="zero">ملف كبير • العمر بالأيام: %1$d</item>
         <item quantity="one">ملف كبير • العمر بالأيام: %1$d</item>
@@ -192,7 +191,7 @@
     <string name="storage_type_images">الصور</string>
     <string name="storage_type_other">ملفات أخرى</string>
     <string name="storage_type_videos">فيديوهات</string>
-    <string name="terms_of_service_body_v050">يوفر Smart Cleaner تحليل التخزين على الجهاز وأدوات إدارة الملفات. نتائج المسح هي توصيات وليست نسخًا احتياطية. قم بمراجعة ملفات المستخدم المحددة قبل حذفها. يمكن لـ \n\nSmart Cleaner إدارة ملفات التخزين المشتركة التي يمكن الوصول إليها بعد أن يمنح Android حق الوصول إلى جميع الملفات. لا يزال Android يحمي البيانات الداخلية الخاصة للتطبيقات الأخرى. يستخدم App Cache Manager إجراء النظام الرسمي لـ Android وقد يعرض تأكيد Android المطلوب. لا يدعي \n\nلا يعد Smart Cleaner بالتدخل في تطبيقات الجهات الخارجية المحمية أو ذاكرة النظام أو درجة حرارة المعالج، ولا يدّعي نتائج أداء وهمية. قد يختلف التوفر حسب إصدار Android والشركة المصنعة للجهاز.\n\n أنت مسؤول عن مراجعة التحديدات قبل الحذف. قد لا تكون الملفات المحذوفة قابلة للاسترداد. يتم توفير الإعلانات بواسطة خدمات تابعة لجهات خارجية بموجب الشروط والسياسات الخاصة بكل منها.</string>
+    <string name="terms_of_service_body_v050">يوفر Smart Cleaner تحليل التخزين على الجهاز وأدوات إدارة الملفات. نتائج المسح هي توصيات وليست نسخًا احتياطية. قم بمراجعة ملفات المستخدم المحددة قبل حذفها. يمكن لـ \n\nSmart Cleaner إدارة ملفات التخزين المشتركة التي يمكن الوصول إليها بعد أن يمنح Android حق الوصول إلى جميع الملفات. لا يزال Android يحمي البيانات الداخلية الخاصة للتطبيقات الأخرى. يستخدم App Cache Manager إجراء النظام الرسمي لـ Android وقد يعرض تأكيد Android المطلوب. لا يدعي \n\nلا يعد Smart Cleaner بالتدخل في تطبيقات الجهات الخارجية المحمية أو ذاكرة النظام أو درجة حرارة المعالج، ولا يدّعي نتائج أداء وهمية. قد يختلف التوفر حسب إصدار Android والشركة المصنعة للجهاز.\n\n أنت مسؤول عن مراجعة التحديدات قبل الحذف. قد لا تكون الملفات المحذوفة قابلة للاسترداد.</string>
     <string name="uninstall">إلغاء التثبيت</string>
     <string name="whatsapp_category_statuses">الحالات</string>
     <string name="whatsapp_category_statuses_description">وسائط الحالة WhatsApp المؤقتة المخزنة في وحدة التخزين المشتركة</string>
@@ -354,8 +353,6 @@
     <string name="cleanup_result_storage_snapshot">المساحة الفارغة: %1$s → %2$s</string>
     <string name="disclosure_usage_title">لماذا الوصول إلى الاستخدام؟</string>
     <string name="disclosure_usage_body">الوصول إلى الاستخدام اختياري. فهو يتيح لـ Smart Cleaner قراءة إجماليات تخزين/ذاكرة التخزين المؤقت للتطبيقات التي أبلغ عنها Android وأوقات الاستخدام الأخيرة حتى تتمكن من مراجعة التطبيقات الكبيرة أو غير المستخدمة. ولا يقرأ المحتوى الخاص داخل تلك التطبيقات ولا يحذف بياناتها المحمية بصمت.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="smart_cleanup_ad_notice">Smart Cleaner مجاني ويعرض إعلانات: شريط إعلاني، وإعلان مدمج واحد مميز في بعض القوائم، ولوحة إعلانية في نتيجة التنظيف، وأحيانًا إعلان بملء الشاشة بعد التنظيف أو عند العودة إلى علامة التنظيف، وإعلان عند فتح التطبيق أثناء التحميل. لا تظهر الإعلانات أبدًا في خطوات الأذونات أو التأكيد، ويزيل فيديو قصير الشريط والإعلانات بملء الشاشة لمدة 60 دقيقة.</string>
     <string name="cache_modern_total_label">إجمالي ذاكرة التخزين المؤقت للتطبيق</string>
     <plurals name="cache_modern_measured_apps">
         <item quantity="zero">عدد التطبيقات التي تم قياس حجمها: %1$d</item>
@@ -390,7 +387,8 @@
     <string name="permissions_manage_android">الإدارة في Android</string>
     <string name="permissions_on_device_badge">على الجهاز</string>
     <string name="permissions_privacy_policy_title">سياسة الخصوصية</string>
-    <string name="permissions_privacy_policy_subtitle">تعرف على كيفية التعامل مع الملفات والأذونات وخصوصية الإعلانات والمعالجة على الجهاز.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="permissions_privacy_policy_subtitle">تعرف على كيفية التعامل مع الملفات والأذونات والمعالجة على الجهاز.</string>
     <string name="storage_change_title">تغيّر التخزين</string>
     <string name="storage_change_hero_label">ما الذي تغير؟</string>
     <string name="storage_change_hero_no_baseline">قم بإنشاء القياس الأول هنا. يحفظ Smart Cleaner لقطة تخزين حقيقية؛ لم يتم اختراع أي تاريخ.</string>
@@ -445,10 +443,6 @@
     <string name="storage_change_create_baseline">إنشاء القياس الأول</string>
     <string name="storage_change_analysis_scope">يقوم بتشغيل تحليل حقيقي للتخزين المشترك ويحفظ لقطة جديدة لتغيير التخزين. لا يتم تنفيذ أي تنظيف بواسطة هذا الإجراء.</string>
     <string name="storage_change_progress">الملفات: %1$d • المجلدات التي تم فحصها: %2$d</string>
-    <string name="rewarded_ad_title">خالية من الإعلانات لمدة 60 دقيقة</string>
-    <string name="rewarded_ad_subtitle">شاهد فيديو قصير لإخفاء البانر والإعلانات الانتقالية لمدة ساعة واحدة.</string>
-    <string name="rewarded_ad_earned">الوقت الخالي من الإعلانات نشط لمدة 60 دقيقة.</string>
-    <string name="rewarded_ad_unavailable">الفيديو ليس جاهزا بعد. الرجاء المحاولة مرة أخرى في لحظة.</string>
     <string name="nothing_selected_hint">حدد الملفات لتنظيفها</string>
     <string name="premium_duplicate_copy_of">نسخة من %1$s</string>
     <string name="cache_modern_not_measured">لا يتم قياسه - السماح بالوصول إلى الاستخدام</string>
@@ -595,17 +589,18 @@
         <item quantity="many">تمت مراجعة: %1$d · المحدد: %2$s</item>
         <item quantity="other">تمت مراجعة: %1$d · المحدد: %2$s</item>
     </plurals>
-    <string name="deep_check_action">شاهد وتحقق</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="deep_check_action">تحقّق</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_running">جارٍ فحص النسخ المكررة المحتملة…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="deep_check_row">
-        <item quantity="zero">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
-        <item quantity="one">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
-        <item quantity="two">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
-        <item quantity="few">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
-        <item quantity="many">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
-        <item quantity="other">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. شاهد فيديو قصيرًا للتحقق منها.</item>
+        <item quantity="zero">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
+        <item quantity="one">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
+        <item quantity="two">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
+        <item quantity="few">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
+        <item quantity="many">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
+        <item quantity="other">ملفات كبيرة تبدو متطابقة: %1$d · حتى %2$s. اضغط تحقّق لفحصها.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="trash_full_body">
@@ -768,8 +763,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tool_move_to_trash">نقل إلى المهملات</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_label">إعلان</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_review_rest">شاهد ما وجدته أيضًا</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="home_hard_photos">الصور والفيديوهات</string>
@@ -927,14 +920,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="tools_storage_full">%1$s ممتلئ</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_title">بدون إعلانات لمدة 60 دقيقة</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_card_sub">شاهد فيديو قصيرًا</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_bar">لا تريد الإعلانات؟ أوقفها لمدة 60 دقيقة</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="ad_free_offer_watch">شاهد</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="confirm_camera_files">
         <item quantity="zero">%1$d ملف من الكاميرا</item>
         <item quantity="one">%1$d ملف من الكاميرا</item>
@@ -951,15 +936,6 @@
         <item quantity="few">%1$d غير مستخدم</item>
         <item quantity="many">%1$d غير مستخدم</item>
         <item quantity="other">%1$d غير مستخدم</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="ad_free_left">
-        <item quantity="zero">بدون إعلانات · متبقٍ %1$d دقيقة</item>
-        <item quantity="one">بدون إعلانات · متبقٍ %1$d دقيقة</item>
-        <item quantity="two">بدون إعلانات · متبقٍ %1$d دقيقة</item>
-        <item quantity="few">بدون إعلانات · متبقٍ %1$d دقيقة</item>
-        <item quantity="many">بدون إعلانات · متبقٍ %1$d دقيقة</item>
-        <item quantity="other">بدون إعلانات · متبقٍ %1$d دقيقة</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="result_files_moved">
@@ -1008,4 +984,73 @@
         <item quantity="many">تم تحديد %1$d نسخة مطابقة</item>
         <item quantity="other">تم تحديد %1$d نسخة مطابقة</item>
     </plurals>
+    <string name="pro_title">Smart Cleaner Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_subtitle">ستصل ميزات Pro في التحديثات القادمة. كل ما تستخدمه اليوم يبقى كما هو.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_loading">جارٍ تحميل الخطط…</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_title">قريبًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_coming_soon_body">خطط Pro غير متاحة بعد. كل شيء في التطبيق يعمل كما كان.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_title">Pro مفعّل</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_active_body">شكرًا لك. Pro مرتبط بحسابك على Google Play.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_pending">عملية الشراء بانتظار الدفع. يتفعّل Pro عندما يكملها Google Play.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly">%s / سنة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week">%s / أسبوع واحد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_week_detail">مدفوع مسبقًا. لا يتجدد.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime">%s دفعة واحدة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_lifetime_detail">دفعة واحدة. بلا تجديد.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_yearly">اشترك مقابل %s/سنة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_week">أسبوع واحد مقابل %s · بلا تجديد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_buy_lifetime">ادفع %s مرة واحدة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_legal_renews">تتجدد الخطة السنوية تلقائيًا. يمكنك الإلغاء في أي وقت من Google Play &gt; الاشتراكات. باقي التطبيق يعمل دون اشتراك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_restore">استعادة المشتريات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_manage">إدارة الاشتراك</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_activated">تم تفعيل Pro. شكرًا لك!</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_pending">الشراء معلّق. يتفعّل Pro عند اكتمال الدفع.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restored">تمت استعادة المشتريات. Pro مفعّل.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_nothing_to_restore">لم يتم العثور على شراء Pro في حساب Google هذا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_failed">تعذّر إتمام الشراء. يُرجى المحاولة مرة أخرى.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_unavailable">الفوترة عبر Google Play غير متاحة حاليًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial">
+        <item quantity="zero">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+        <item quantity="one">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+        <item quantity="two">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+        <item quantity="few">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+        <item quantity="many">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+        <item quantity="other">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_buy_trial">
+        <item quantity="zero">جرّب %1$d أيام، ثم %2$s/سنة</item>
+        <item quantity="one">جرّب %1$d أيام، ثم %2$s/سنة</item>
+        <item quantity="two">جرّب %1$d أيام، ثم %2$s/سنة</item>
+        <item quantity="few">جرّب %1$d أيام، ثم %2$s/سنة</item>
+        <item quantity="many">جرّب %1$d أيام، ثم %2$s/سنة</item>
+        <item quantity="other">جرّب %1$d أيام، ثم %2$s/سنة</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_message_restore_failed">تعذّر التحقق من المشتريات. يُرجى المحاولة مرة أخرى.</string>
 </resources>

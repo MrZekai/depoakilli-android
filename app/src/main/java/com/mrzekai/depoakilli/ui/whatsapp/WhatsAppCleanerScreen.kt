@@ -32,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,7 +79,6 @@ internal fun WhatsAppCleanerDetailScreen(
     onToggleCategory: (WhatsAppMediaCategory) -> Unit,
     onDeleteSelected: () -> Unit,
     modifier: Modifier = Modifier,
-    listAd: @Composable () -> Unit = {},
     suggested: List<com.mrzekai.depoakilli.model.CleanableItem> = emptyList(),
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = WaBackground, contentColor = Ink) {
@@ -108,7 +106,6 @@ internal fun WhatsAppCleanerDetailScreen(
                 onToggleItem = onToggleItem,
                 onToggleCategory = onToggleCategory,
                 onDeleteSelected = onDeleteSelected,
-                listAd = listAd,
                 suggested = suggested,
             )
         }
