@@ -38,6 +38,7 @@ internal fun CleanScreen(
     onSuggestionOpened: () -> Unit = {},
     scrollToApps: Boolean = false,
     onScrolledToApps: () -> Unit = {},
+    onOpenPaywall: () -> Unit = {},
 ) {
     if (
         state.scanFocus == ScanFocus.SMART ||
@@ -66,7 +67,6 @@ internal fun CleanScreen(
             onOpenPlanGrid = { group, items -> viewModel?.openPlanGroupGrid(group, items) },
             onSwipeMark = { delete -> viewModel?.swipeMark(delete) },
             onSwipeUndo = { viewModel?.swipeUndo() },
-            onSwipeContinue = { viewModel?.swipeContinue() },
             onSwipeGrid = { viewModel?.switchSwipeToGrid() },
             onSwipeFinished = { viewModel?.closeSwipeReview(clearMarks = true) },
             onCancelScan = { viewModel?.cancelScan() },
@@ -83,6 +83,8 @@ internal fun CleanScreen(
             scrollToApps = scrollToApps,
             onScrolledToApps = onScrolledToApps,
             onExcludeFolder = { root, path -> viewModel?.excludeFolder(root, path) },
+            onOpenPaywall = onOpenPaywall,
+            onCleanupOrigin = { origin -> viewModel?.setNextCleanupOrigin(origin) },
         )
         return
     }

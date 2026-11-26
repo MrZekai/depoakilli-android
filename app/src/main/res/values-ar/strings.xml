@@ -522,7 +522,6 @@
     <string name="swipe_keep">الاحتفاظ</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">إنهاء</string>
-    <string name="swipe_continue">متابعة</string>
     <string name="swipe_review_view">المراجعة بالسحب</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -580,14 +579,6 @@
         <item quantity="few">المحدد: %1$d · %2$s</item>
         <item quantity="many">المحدد: %1$d · %2$s</item>
         <item quantity="other">المحدد: %1$d · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="zero">تمت مراجعة: %1$d · المحدد: %2$s</item>
-        <item quantity="one">تمت مراجعة: %1$d · المحدد: %2$s</item>
-        <item quantity="two">تمت مراجعة: %1$d · المحدد: %2$s</item>
-        <item quantity="few">تمت مراجعة: %1$d · المحدد: %2$s</item>
-        <item quantity="many">تمت مراجعة: %1$d · المحدد: %2$s</item>
-        <item quantity="other">تمت مراجعة: %1$d · المحدد: %2$s</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_action">تحقّق</string>
@@ -735,8 +726,6 @@
     <string name="confirm_permanent_action">احذف نهائيًا</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="plan_found_title">إضافية يمكنني تحريرها. هذا ما وجدته:</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_start_biggest">ابدأ بالأكبر</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="swipe_title">هل تحتفظ بهذا؟</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -986,8 +975,6 @@
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_subtitle">ستصل ميزات Pro في التحديثات القادمة. كل ما تستخدمه اليوم يبقى كما هو.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_loading">جارٍ تحميل الخطط…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_coming_soon_title">قريبًا</string>
@@ -996,27 +983,23 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_active_title">Pro مفعّل</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_active_body">شكرًا لك. Pro مرتبط بحسابك على Google Play.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_pending">عملية الشراء بانتظار الدفع. يتفعّل Pro عندما يكملها Google Play.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_yearly">%s / سنة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_week">%s / أسبوع واحد</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_plan_week_detail">مدفوع مسبقًا. لا يتجدد.</string>
+    <string name="pro_plan_week_detail">مدفوع مسبقًا. ينتهي من تلقاء نفسه ولا يتجدد.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime">%s دفعة واحدة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime_detail">دفعة واحدة. بلا تجديد.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_buy_yearly">اشترك مقابل %s/سنة</string>
+    <string name="pro_buy_yearly">ابدأ بـ %s سنويًا</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_week">أسبوع واحد مقابل %s · بلا تجديد</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_lifetime">ادفع %s مرة واحدة</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_legal_renews">تتجدد الخطة السنوية تلقائيًا. يمكنك الإلغاء في أي وقت من Google Play &gt; الاشتراكات. باقي التطبيق يعمل دون اشتراك.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_restore">استعادة المشتريات</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1034,15 +1017,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_unavailable">الفوترة عبر Google Play غير متاحة حاليًا.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="zero">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-        <item quantity="one">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-        <item quantity="two">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-        <item quantity="few">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-        <item quantity="many">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-        <item quantity="other">تجربة لمدة %1$d أيام، ثم %2$s سنويًا</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_buy_trial">
         <item quantity="zero">جرّب %1$d أيام، ثم %2$s/سنة</item>
         <item quantity="one">جرّب %1$d أيام، ثم %2$s/سنة</item>
@@ -1053,4 +1027,181 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_restore_failed">تعذّر التحقق من المشتريات. يُرجى المحاولة مرة أخرى.</string>
+    <string name="pro_badge">PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub_ready">يمكنني تحريرها. أول %s جاهزة:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title">%s إضافية مع Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title_about">نحو %s إضافية مع Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_value_about">نحو %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_see">عرض Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_now">الآن</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_with_pro">مع PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_full">%s ممتلئ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note">تم القياس على هذا الهاتف.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note_estimate">تم القياس على هذا الهاتف. توفير الفيديو تقريبي.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_close">إغلاق</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title">حرّر %s إضافية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title_unknown">حرّر المساحة أسرع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_sub">تم القياس على هذا الهاتف. صورك لا تغادره أبدًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_undo">تراجع لـ 7 أيام</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_on_phone">يبقى على هاتفك</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_cancel">ألغِ متى شئت</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_yearly">سنوي</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_week">تصريح أسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_lifetime">مدى الحياة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly_renews">%s سنويًا. يتجدد تلقائيًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_weekly_equivalent">نحو %s أسبوعيًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_first_charge">لا رسوم اليوم. أول دفعة في %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_legal">ألغِ متى شئت من Google Play &gt; الاشتراكات. التنظيف الأساسي يعمل دون اشتراك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_title">لا تحتاج إلى Pro الآن.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body">سيحرر Pro فقط %s إضافية على هذا الهاتف. لن أهدر أموالك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body_zero">الآن لن يحرر Pro أي مساحة إضافية على هذا الهاتف؛ أول تنظيف كبير علينا. لن أهدر أموالك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_ok">حسنًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_see_plans">عرض الخطط على أي حال</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_header">اليوم %1$d / %2$d قرارًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title">هذا كل شيء لليوم. حددت %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title_none">هذا كل شيء لليوم.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_clear">حرّر %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_pro">تابع بلا حدود</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_tomorrow">سأكمل غدًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_yearly">الخطة السنوية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_week">تصريح أسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_lifetime">مدى الحياة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_not_renewing">اشتراك · لا يتجدد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_label">هذا الشهر مع PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_cleared">حُرّرت %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_none">لم تحرّر أي شيء مع Pro هذا الشهر.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_add_time">أضف أسبوعًا · %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_on_cancel_note">يمكنك الإلغاء في أي وقت من Google Play &gt; الاشتراكات. يبقى Pro مفعّلًا حتى نهاية الفترة.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_title">جاهز للتنظيف</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_body">بقايا التطبيقات وملفات APK قديمة ونسخ مطابقة.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_action">نظّف</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_title">اختياري</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_locked">كان أول تنظيف كبير علينا. التنظيف بلمسة واحدة في Pro؛ واختيار الملفات بنفسك متاح دائمًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_by_hand">اختر واحدًا تلو الآخر</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_one_tap">نظّف بلمسة واحدة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_one_by_one">اعرض واحدًا تلو الآخر</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_pick">
+        <item quantity="zero">%d ملفات من اختياري، بلمسة واحدة</item>
+        <item quantity="one">%d ملفات من اختياري، بلمسة واحدة</item>
+        <item quantity="two">%d ملفات من اختياري، بلمسة واحدة</item>
+        <item quantity="few">%d ملفات من اختياري، بلمسة واحدة</item>
+        <item quantity="many">%d ملفات من اختياري، بلمسة واحدة</item>
+        <item quantity="other">%d ملفات من اختياري، بلمسة واحدة</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_video">
+        <item quantity="zero">%d فيديوهات كبيرة تُضغط</item>
+        <item quantity="one">%d فيديوهات كبيرة تُضغط</item>
+        <item quantity="two">%d فيديوهات كبيرة تُضغط</item>
+        <item quantity="few">%d فيديوهات كبيرة تُضغط</item>
+        <item quantity="many">%d فيديوهات كبيرة تُضغط</item>
+        <item quantity="other">%d فيديوهات كبيرة تُضغط</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_card_try">
+        <item quantity="zero">جرّب Pro لمدة %d أيام</item>
+        <item quantity="one">جرّب Pro لمدة %d أيام</item>
+        <item quantity="two">جرّب Pro لمدة %d أيام</item>
+        <item quantity="few">جرّب Pro لمدة %d أيام</item>
+        <item quantity="many">جرّب Pro لمدة %d أيام</item>
+        <item quantity="other">جرّب Pro لمدة %d أيام</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_photos">
+        <item quantity="zero">مساحة نحو %d صورة.</item>
+        <item quantity="one">مساحة نحو %d صورة.</item>
+        <item quantity="two">مساحة نحو %d صورة.</item>
+        <item quantity="few">مساحة نحو %d صورة.</item>
+        <item quantity="many">مساحة نحو %d صورة.</item>
+        <item quantity="other">مساحة نحو %d صورة.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="zero">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+        <item quantity="one">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+        <item quantity="two">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+        <item quantity="few">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+        <item quantity="many">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+        <item quantity="other">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_anchor">
+        <item quantity="zero">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+        <item quantity="one">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+        <item quantity="two">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+        <item quantity="few">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+        <item quantity="many">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+        <item quantity="other">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="limit_body">
+        <item quantity="zero">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+        <item quantity="one">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+        <item quantity="two">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+        <item quantity="few">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+        <item quantity="many">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+        <item quantity="other">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_ask_daily">
+        <item quantity="zero">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+        <item quantity="one">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+        <item quantity="two">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+        <item quantity="few">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+        <item quantity="many">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+        <item quantity="other">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
+    </plurals>
 </resources>

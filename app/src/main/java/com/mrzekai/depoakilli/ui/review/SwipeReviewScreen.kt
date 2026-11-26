@@ -18,9 +18,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
@@ -76,9 +74,9 @@ import kotlin.math.roundToInt
  * Swipe review (T1.11, Faz 5 T5.5): the only black screen that shows a file,
  * one at a time, largest first. Left / DELETE marks, right / KEEP keeps (and
  * is remembered, V10); the two giant buttons are the accessible equivalent of
- * the gestures. Videos play silently. Every 8 cards a break card with a
- * native ad; nothing is deleted here: the end opens one confirmation. No
- * banner on this screen.
+ * the gestures. Videos play silently. Nothing is deleted here: the end
+ * opens one confirmation. Free users decide on up to 20 files a day (Faz 2
+ * Y4); the 20th decision opens the daily-limit sheet.
  */
 @Composable
 internal fun SwipeReviewScreen(
@@ -86,12 +84,15 @@ internal fun SwipeReviewScreen(
     items: List<CleanableItem>,
     onMark: (Boolean) -> Unit,
     onUndo: () -> Unit,
-    onContinue: () -> Unit,
     onShowGrid: () -> Unit,
     onConfirmClean: (Set<String>) -> Unit,
     modifier: Modifier = Modifier,
     groupTitle: String = "",
     onClose: () -> Unit = {},
+    /** Decisions made today and the free daily limit; [dailyLimit] is null with Pro (Faz 2 Y4). */
+    dailyUsed: Int = 0,
+    dailyLimit: Int? = null,
+    onOpenPaywall: () -> Unit = {},
 ) {
     val byId = remember(items) { items.associateBy(CleanableItem::id) }
     var showPreview by remember { mutableStateOf(false) }
@@ -136,20 +137,22 @@ internal fun SwipeReviewScreen(
                 LinkButton(stringResource(R.string.swipe_list), onClick = onShowGrid, color = Lime)
             }
 
-            if (review.breakPending) {
-                // Break card: a short progress summary every few cards.
-                Column(
-                    Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
-                ) {
-                    BreakCard(
-                        reviewed = review.reviewedCount,
-                        markedBytes = review.markedBytes,
-                        onContinue = onContinue,
-                    )
-                }
-            } else {
+            run {
                 val currentItem = review.currentId?.let(byId::get)
-                if (currentItem != null) {
+                val limitReached = dailyLimit != null && dailyUsed >= dailyLimit
+                if (currentItem != null && limitReached) {
+                    // Y4: the day's free decisions are used; marks so far can still be cleaned.
+                    Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
+                        com.mrzekai.depoakilli.ui.pro.DailyLimitSheet(
+                            used = dailyUsed,
+                            limit = dailyLimit ?: 0,
+                            markedBytes = review.markedBytes,
+                            onClean = openConfirmation,
+                            onOpenPaywall = onOpenPaywall,
+                            onClose = onClose,
+                        )
+                    }
+                } else if (currentItem != null) {
                     Text(
                         stringResource(R.string.swipe_title),
                         color = OnBlack,
@@ -355,25 +358,3 @@ private fun SwipeCard(item: CleanableItem, onMark: (Boolean) -> Unit) {
     }
 }
 
-@Composable
-private fun BreakCard(reviewed: Int, markedBytes: Long, onContinue: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            pluralStringResource(R.plurals.swipe_break, reviewed, reviewed, ByteFormatter.format(markedBytes)),
-            color = OnBlack,
-            fontSize = 20.sp,
-            lineHeight = 26.sp,
-            fontWeight = AppWeights.Title,
-            textAlign = TextAlign.Center,
-        )
-        PillButton(
-            text = stringResource(R.string.swipe_continue),
-            onClick = onContinue,
-            style = PillStyle.LIME,
-        )
-    }
-}

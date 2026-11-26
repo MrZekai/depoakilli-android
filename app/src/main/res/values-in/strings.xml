@@ -425,7 +425,6 @@
     <string name="swipe_keep">SIMPAN</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Selesai</string>
-    <string name="swipe_continue">Lanjutkan</string>
     <string name="swipe_review_view">Tinjau dengan geser</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -448,9 +447,6 @@
     </plurals>
     <plurals name="swipe_marked">
         <item quantity="other">Ditandai: %1$d file · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="other">%1$d ditinjau · %2$s ditandai</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_action">Verifikasi</string>
@@ -561,8 +557,6 @@
     <string name="confirm_permanent_action">Hapus permanen</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="plan_found_title">lagi yang bisa kukosongkan. Ini temuanku:</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_start_biggest">Mulai dari yang terbesar</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="swipe_title">Simpan yang ini?</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -742,8 +736,6 @@
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_subtitle">Fitur Pro hadir di pembaruan berikutnya. Semua yang Anda gunakan hari ini tetap seperti biasa.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_loading">Memuat paket…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_coming_soon_title">Segera hadir</string>
@@ -752,27 +744,23 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_active_title">Pro aktif</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_active_body">Terima kasih. Pro terhubung ke akun Google Play Anda.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_pending">Pembelian Anda menunggu pembayaran. Pro aktif setelah Google Play menyelesaikannya.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_yearly">%s / tahun</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_week">%s / 1 minggu</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_plan_week_detail">Prabayar. Tidak diperpanjang.</string>
+    <string name="pro_plan_week_detail">Prabayar. Berakhir sendiri, tidak diperpanjang.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime">%s sekali bayar</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime_detail">Satu kali bayar. Tanpa perpanjangan.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_buy_yearly">Berlangganan %s/tahun</string>
+    <string name="pro_buy_yearly">Mulai %s per tahun</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_week">1 minggu %s · tidak diperpanjang</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_lifetime">Bayar %s sekali</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_legal_renews">Paket tahunan diperpanjang otomatis. Anda dapat membatalkannya kapan saja di Google Play &gt; Langganan. Bagian lain aplikasi berfungsi tanpa langganan.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_restore">Pulihkan pembelian</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -790,13 +778,146 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_unavailable">Penagihan Google Play sedang tidak tersedia.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="other">Uji coba %1$d hari, lalu %2$s per tahun</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_buy_trial">
         <item quantity="other">Coba %1$d hari, lalu %2$s/tahun</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_restore_failed">Pembelian tidak dapat diperiksa. Coba lagi.</string>
+    <string name="pro_badge">PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub_ready">bisa saya kosongkan. %s pertama siap:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title">%s lagi dengan Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title_about">Sekitar %s lagi dengan Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_value_about">sekitar %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_see">Lihat Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_now">SEKARANG</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_with_pro">DENGAN PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_full">%s penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note">Diukur di ponsel ini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note_estimate">Diukur di ponsel ini. Hemat video bersifat perkiraan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_close">Tutup</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title">Kosongkan %s lagi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title_unknown">Kosongkan ruang lebih cepat</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_sub">Diukur di ponsel ini. Foto Anda tidak pernah keluar darinya.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_undo">Batal 7 hari</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_on_phone">Tetap di ponsel</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_cancel">Batalkan kapan saja</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_yearly">TAHUNAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_week">PASS 1 MINGGU</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_lifetime">SEUMUR HIDUP</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly_renews">%s per tahun. Diperpanjang otomatis.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_weekly_equivalent">sekitar %s per minggu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_first_charge">Tidak ada biaya hari ini. Pembayaran pertama %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_legal">Batalkan kapan saja di Google Play &gt; Langganan. Pembersihan dasar berfungsi tanpa langganan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_title">Anda belum butuh Pro sekarang.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body">Pro hanya akan mengosongkan %s lagi di ponsel ini. Saya tidak akan membuang uang Anda.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body_zero">Saat ini Pro tidak akan mengosongkan ruang tambahan di ponsel ini; pembersihan besar pertama Anda dari kami. Saya tidak akan membuang uang Anda.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_ok">Oke</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_see_plans">Tetap lihat paket</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_header">HARI INI %1$d / %2$d KEPUTUSAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title">Cukup untuk hari ini. Anda menandai %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title_none">Cukup untuk hari ini.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_clear">Bersihkan %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_pro">Lanjut tanpa batas</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_tomorrow">Lanjut besok</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_yearly">Paket tahunan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_week">Pass 1 minggu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_lifetime">Seumur hidup</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_not_renewing">Langganan · tidak diperpanjang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_label">BULAN INI DENGAN PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_cleared">Mengosongkan %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_none">Bulan ini Anda belum mengosongkan apa pun dengan Pro.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_add_time">Tambah seminggu · %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_on_cancel_note">Anda dapat membatalkan kapan saja di Google Play &gt; Langganan. Pro tetap aktif hingga akhir periode.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_title">Siap dibersihkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_body">Sisa aplikasi, APK lama, salinan persis.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_action">Bersihkan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_title">Pilihan saya</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_locked">Pembersihan besar pertama Anda dari kami. Pembersihan sekali ketuk ada di Pro; memilih file sendiri selalu terbuka.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_by_hand">Pilih satu per satu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_one_tap">Bersihkan sekali ketuk</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_one_by_one">Tampilkan satu per satu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_pick">
+        <item quantity="other">%d file pilihan saya, sekali ketuk</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_video">
+        <item quantity="other">%d video besar diperkecil</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_card_try">
+        <item quantity="other">Coba Pro %d hari</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_photos">
+        <item quantity="other">Ruang untuk sekitar %d foto.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="other">Uji coba %1$d hari, lalu %2$s per tahun. Diperpanjang otomatis.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_anchor">
+        <item quantity="other">52 minggu seharga %d pass mingguan</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="limit_body">
+        <item quantity="other">Tanpa Pro Anda memutuskan %d file per hari. Hitungan mulai lagi besok; pembersihan manual di Alat selalu terbuka.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_ask_daily">
+        <item quantity="other">%d keputusan hari ini; tanpa batas dengan Pro</item>
+    </plurals>
 </resources>

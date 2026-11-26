@@ -207,6 +207,24 @@ def seed_files(tag, count=2, mb=300):
     sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1")
 
 
+def seed_pick(tag, mb):
+    """An old, non-media download: the plan's "My pick" tier (sparse, so no real disk use)."""
+    stamp = time.strftime("%Y%m%d%H%M", time.gmtime(time.time() - 120 * DAY))
+    path = f"/sdcard/Download/qa-{tag}.zip"
+    sh(f"truncate -s {mb}M {path}; touch -m -t {stamp} {path}")
+    sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1")
+
+
+def seed_swipe_videos(count):
+    """Old mid-size videos: the "I'll ask you" tier shown one by one (Y4)."""
+    stamp = time.strftime("%Y%m%d%H%M", time.gmtime(time.time() - 220 * DAY))
+    sh("mkdir -p /sdcard/Movies")
+    for i in range(count):
+        path = f"/sdcard/Movies/qa-swipe-{i:02d}.mp4"
+        sh(f"truncate -s {30 + i}M {path}; touch -m -t {stamp} {path}")
+    sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1")
+
+
 BIG_APP = os.environ.get("QA_BIG_APP", "com.mrzekai.depoakilli.debug")
 
 
@@ -428,7 +446,7 @@ def main():
           "permission.AD_ID" not in pkg_dump and "ADSERVICES_AD_ID" not in pkg_dump)
     check("Ödeme izni var (com.android.vending.BILLING)", "com.android.vending.BILLING" in pkg_dump)
 
-    def open_pro_page(tag):
+    def open_settings_pro(tag):
         to_home()
         row = None
         for _ in range(3):  # a just-finished scan can swallow the first tap
@@ -440,28 +458,134 @@ def main():
             if row:
                 break
         check(f"Ayarlar'da 'Smart Cleaner Pro' satırı var ({tag})", row, screenshot=shot(f"settings-pro-row-{tag}"))
-        if not row:
-            return False
-        tap(row)
-        page = wait_for(r"^(Coming soon|Loading plans…|.+ / year)$", 25, dismiss=False)
-        if page and page.label == "Loading plans…":
-            page = wait_for(r"^(Coming soon|.+ / year)$", 25, dismiss=False)
-        check(f"Pro sayfası açılıyor, çökmeden 'Coming soon' veya planlar ({tag})", page,
-              note=getattr(page, "label", ""), screenshot=shot(f"pro-page-{tag}"))
-        return bool(page)
+        if row:
+            tap(row)
+        return bool(row)
 
-    if open_pro_page("online"):
-        legal = scroll_to(r"^The yearly plan renews automatically", 3)
-        check("Pro sayfasında yenileme/iptal satırı okunuyor", legal)
-        restore = scroll_to(r"^Restore purchases$", 3)
-        if restore:
-            tap(restore)
-            msg = wait_for(r"(No Pro purchase was found|Google Play billing is not available|Purchases restored|could not be checked)", 25, dismiss=False)
-            check("'Satın alımları geri yükle' bir sonuç mesajı veriyor", msg,
-                  note=getattr(msg, "label", ""), screenshot=shot("pro-restore"))
+    def paywall_checks(tag):
+        """Y2: ✕ from the first frame, restore, legal line; Back closes."""
+        nodes = dump()
+        close = find(r"^Close$", nodes)
+        check(f"Y2 paywall: ✕ ilk anda görünür ({tag})", close, screenshot=shot(f"paywall-{tag}"))
+        check(f"Y2 paywall: 'Restore purchases' sağ üstte ({tag})", find(r"^Restore purchases$", nodes))
+        legal = scroll_to(r"^Cancel anytime in Google Play", 4)
+        check(f"Y2 paywall: iptal/yasal satır okunuyor ({tag})", legal)
+        plans = find(r"^(Coming soon|.+ / year)$")
+        check(f"Y2 paywall: planlar ya da 'Coming soon' ({tag})", plans, note=getattr(plans, "label", ""))
+        return bool(close)
+
+    # 11. Faz 2: honest paywall (Y3), paywall open/close (Y2), daily limit (Y4),
+    # the free first "My pick" and the Pro gate after it (Y7), Home card (Y1).
+    seed_pick("p0", 300)
+    seed_swipe_videos(22)
+    sh(f"pm clear {PKG}")
+    sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
+    sh(f"appops set {PKG} GET_USAGE_STATS allow")
+    launch()
+    n = wait_for(r"^(MAKE ROOM|CLEAN UP)$", 30) or (tap_text(r"^Clean$", 10) and wait_for(r"^(MAKE ROOM|CLEAN UP)$", 20))
+    if n and n.label.upper() == "MAKE ROOM":
+        tap(n)
+    wait_for(r"^CLEAN UP$", 180)
+
+    # Y3: before the free first cleanup is spent, Pro adds nothing here.
+    if open_settings_pro("y3"):
+        honest = wait_for(r"^You don't need Pro right now\.$", 15, dismiss=False)
+        check("Y3: kazanç < 2 GB iken 'You don't need Pro right now.'", honest, screenshot=shot("y3-honest"))
+        see = scroll_to(r"^See plans anyway$", 3)
+        if see:
+            tap(see)
+            if paywall_checks("from-y3"):
+                back()
+                check("Y2: sistem geri tuşu paywall'u kapatıyor", wait_for(r"^You don't need Pro right now\.$", 10, dismiss=False),
+                      screenshot=shot("y2-back-closed"))
+                tap_text(r"^See plans anyway$", 10)
+                close = wait_for(r"^Close$", 10, dismiss=False)
+                if close:
+                    tap(close)
+                check("Y2: ✕ paywall'u kapatıyor", wait_for(r"^You don't need Pro right now\.$", 10, dismiss=False))
         else:
-            check("Pro sayfasında 'Restore purchases' var", False)
+            check("Y3: 'See plans anyway' var", False)
         back()
+
+    # Y4: 20 decisions, then the daily-limit sheet.
+    to_home()
+    if tap_text(r"^See what else I found$", 20):
+        ask = scroll_to(r"^Show one by one$", 6)
+        check("Y7: 'I'll ask you' kartında günlük karar satırı",
+              find(r"20 decisions today; unlimited with Pro"), screenshot=shot("y7-ask-card"))
+        if ask:
+            tap(ask)
+            decided = 0
+            for _ in range(20):
+                btn = wait_for(r"^DELETE$", 8, dismiss=False)
+                if not btn:
+                    break
+                tap(btn)
+                decided += 1
+                time.sleep(0.4)
+            sheet = wait_for(r"^That's it for today\.", 10, dismiss=False)
+            nodes = dump()
+            check("Y4: 20. kararda günlük sınır sayfası", sheet and find(r"^TODAY 20 / 20 DECISIONS$", nodes),
+                  note=f"karar: {decided}", screenshot=shot("y4-limit"))
+            check("Y4: ana düğme işaretlenenleri temizle, ikincil 'Keep going without limits'",
+                  find(r"^Clear .+$", nodes) and find(r"^Keep going without limits$", nodes))
+            check("Y4: 21. kart gösterilmiyor (DELETE yok)", not find(r"^DELETE$", nodes))
+            tap_text(r"^I'll continue tomorrow$", 10)
+        else:
+            check("Y7: 'Show one by one' düğmesi var", False, screenshot=shot("y7-no-ask"))
+        to_home()
+
+    # Y7: the first "My pick" cleanup is free and complete.
+    if tap_text(r"^See what else I found$", 20):
+        move = scroll_to(r"^Move .+ to Trash$", 4)
+        check("Y7: ilk 'Önerim' temizliği açık ('Move X to Trash')", move, screenshot=shot("y7-first-free"))
+        if move:
+            tap(move)
+            tap_text(r"^Yes, clean up$", 20) or tap_text(r"^Move .+ to Trash$", 10)
+            check("Y7: ilk 'Önerim' temizliği bitti", wait_for(r"^Done$", 90), screenshot=shot("y7-first-done"))
+            tap_text(r"^Done$", 10)
+    # New files the app would pick: after the free first cleanup, one tap is Pro.
+    seed_pick("p1", 1100)
+    seed_pick("p2", 1150)
+    to_home()
+    if tap_text(r"^See what else I found$", 20):
+        rescan = scroll_to(r"^Scan again$", 14)
+        if rescan:
+            tap(rescan)
+        wait_for(r"^(Show one by one|Clear with one tap|Move .+ to Trash)$", 180, dismiss=False)
+        locked = scroll_to(r"^Clear with one tap$", 4)
+        nodes = dump()
+        check("Y7: ikinci 'Önerim' Pro'da (PRO rozeti, 'Pick one by one' + 'Clear with one tap')",
+              locked and find(r"^Pick one by one$", nodes) and find(r"^PRO$", nodes), screenshot=shot("y7-locked"))
+        if locked:
+            tap(locked)
+            check("Y7: 'Clear with one tap' paywall'u açıyor", wait_for(r"^Close$", 10, dismiss=False), screenshot=shot("y7-paywall"))
+            back()
+        to_home()
+
+    # Y1: Home card with Pro's measured extra (>= 2 GB), "Not now" hides it.
+    card = scroll_to(r"more with Pro$", 4)
+    check("Y1: Home'da 'X more with Pro' kartı (kazanç >= 2 GB)", card, screenshot=shot("y1-card"))
+    if card:
+        cta = find(r"^(Try Pro for .+|See Pro)$")
+        if cta:
+            tap(cta)
+            check("Y1: kart düğmesi paywall'u açıyor", wait_for(r"^Close$", 10, dismiss=False))
+            back()
+        tap_text(r"^Not now$", 10)
+        time.sleep(1)
+        check("Y1: 'Not now' kartı gizliyor", not find(r"more with Pro$"), screenshot=shot("y1-hidden"))
+
+    # Settings > Pro with a real gain opens the paywall; restore answers there.
+    if open_settings_pro("paywall"):
+        if paywall_checks("from-settings"):
+            restore = find(r"^Restore purchases$")
+            if restore:
+                tap(restore)
+                msg = wait_for(r"(No Pro purchase was found|Google Play billing is not available|Purchases restored|could not be checked)", 25, dismiss=False)
+                check("'Satın alımları geri yükle' bir sonuç mesajı veriyor", msg,
+                      note=getattr(msg, "label", ""), screenshot=shot("pro-restore"))
+            back()
     check("Ana ekranda reklam yok ('Test Ad' / 'Ad' etiketi yok)",
           not find(r"^(Test Ad|Ad|Sponsored)$") and "AdActivity" not in resumed_activity(),
           screenshot=shot("home-no-ads"))
@@ -482,8 +606,10 @@ def main():
         tap(home_offline)
     check("Uçak modunda tarama bitiyor (plan 'CLEAN UP' geldi)", wait_for(r"^CLEAN UP$", 180, dismiss=False),
           screenshot=shot("scan-airplane"))
-    open_pro_page("airplane")
-    back()
+    if open_settings_pro("airplane"):
+        check("Uçak modunda Ayarlar > Pro açılıyor (Y3 ya da paywall)",
+              wait_for(r"^(You don't need Pro right now\.|Close)$", 20, dismiss=False), screenshot=shot("pro-airplane"))
+        back()
     sh("cmd connectivity airplane-mode disable")
     time.sleep(2)
 

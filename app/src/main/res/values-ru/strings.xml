@@ -482,7 +482,6 @@
     <string name="swipe_keep">ОСТАВИТЬ</string>
     <string name="swipe_counter">%1$d / %2$d</string>
     <string name="swipe_finish">Готово</string>
-    <string name="swipe_continue">Продолжить</string>
     <string name="swipe_review_view">Просмотр свайпами</string>
     <string name="swipe_age_days">%1$s · %2$s</string>
     <plurals name="plan_unused_apps">
@@ -526,12 +525,6 @@
         <item quantity="few">Отмечено: %1$d · %2$s</item>
         <item quantity="many">Отмечено: %1$d · %2$s</item>
         <item quantity="other">Отмечено: %1$d · %2$s</item>
-    </plurals>
-    <plurals name="swipe_break">
-        <item quantity="one">Просмотрено: %1$d · отмечено: %2$s</item>
-        <item quantity="few">Просмотрено: %1$d · отмечено: %2$s</item>
-        <item quantity="many">Просмотрено: %1$d · отмечено: %2$s</item>
-        <item quantity="other">Просмотрено: %1$d · отмечено: %2$s</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="deep_check_action">Проверить</string>
@@ -661,8 +654,6 @@
     <string name="confirm_permanent_action">Удалить навсегда</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="plan_found_title">ещё можно освободить. Вот что я нашёл:</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="plan_start_biggest">Начать с самого большого</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="swipe_title">Оставить?</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -884,8 +875,6 @@
     </plurals>
     <string name="pro_title">Smart Cleaner Pro</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_subtitle">Функции Pro появятся в следующих обновлениях. Всё, чем вы пользуетесь сейчас, останется как есть.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_loading">Загрузка тарифов…</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_coming_soon_title">Скоро</string>
@@ -894,27 +883,23 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_active_title">Pro включён</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_active_body">Спасибо. Pro привязан к вашему аккаунту Google Play.</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_pending">Покупка ожидает оплаты. Pro включится, когда Google Play её завершит.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_yearly">%s / год</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_week">%s / 1 неделя</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_plan_week_detail">Предоплата. Не продлевается.</string>
+    <string name="pro_plan_week_detail">Предоплата. Заканчивается сам, не продлевается.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime">%s один раз</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_plan_lifetime_detail">Один платёж. Без продления.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_buy_yearly">Подписаться за %s/год</string>
+    <string name="pro_buy_yearly">Начать за %s в год</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_week">1 неделя за %s · без продления</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_buy_lifetime">Оплатить %s один раз</string>
-    <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="pro_legal_renews">Годовой тариф продлевается автоматически. Отменить можно в любой момент в Google Play &gt; Подписки. Остальная часть приложения работает без подписки.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_restore">Восстановить покупки</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -932,13 +917,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_unavailable">Оплата через Google Play сейчас недоступна.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="pro_plan_yearly_trial">
-        <item quantity="one">Пробный период %1$d день, затем %2$s в год</item>
-        <item quantity="few">Пробный период %1$d дня, затем %2$s в год</item>
-        <item quantity="many">Пробный период %1$d дней, затем %2$s в год</item>
-        <item quantity="other">Пробный период %1$d дней, затем %2$s в год</item>
-    </plurals>
-    <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="pro_buy_trial">
         <item quantity="one">Попробовать %1$d день, затем %2$s/год</item>
         <item quantity="few">Попробовать %1$d дня, затем %2$s/год</item>
@@ -947,4 +925,165 @@
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="pro_message_restore_failed">Не удалось проверить покупки. Попробуйте ещё раз.</string>
+    <string name="pro_badge">PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="home_plan_sub_ready">могу освободить. Первые %s готовы:</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title">Ещё %s с Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_title_about">Ещё около %s с Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_value_about">около %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_card_see">Посмотреть Pro</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_now">СЕЙЧАС</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_with_pro">С PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_full">занято %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note">Измерено на этом телефоне.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_fill_note_estimate">Измерено на этом телефоне. Выигрыш на видео приблизительный.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_close">Закрыть</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title">Освободить ещё %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_title_unknown">Освобождайте место быстрее</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_sub">Измерено на этом телефоне. Ваши фото никуда не уходят.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_undo">Отмена 7 дней</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_on_phone">Остаётся на телефоне</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_chip_cancel">Отмена в любое время</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_yearly">НА ГОД</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_week">ПРОПУСК НА 1 НЕДЕЛЮ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_plan_lifetime">НАВСЕГДА</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_plan_yearly_renews">%s в год. Продлевается автоматически.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_weekly_equivalent">около %s в неделю</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_first_charge">Сегодня без оплаты. Первый платёж %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="paywall_legal">Отмена в любое время в Google Play &gt; Подписки. Базовая очистка работает без подписки.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_title">Сейчас Pro вам не нужен.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body">Pro освободил бы на этом телефоне всего %s. Не буду тратить ваши деньги зря.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_body_zero">Сейчас Pro ничего дополнительно не освободит на этом телефоне; первая большая очистка — за наш счёт. Не буду тратить ваши деньги зря.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_ok">Хорошо</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="honest_see_plans">Всё равно посмотреть тарифы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_header">СЕГОДНЯ %1$d / %2$d РЕШЕНИЙ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title">На сегодня всё. Вы отметили %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_title_none">На сегодня всё.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_clear">Очистить %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_pro">Продолжить без ограничений</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="limit_tomorrow">Продолжу завтра</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_yearly">Годовой тариф</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_week">Пропуск на 1 неделю</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_lifetime">Навсегда</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_owned_not_renewing">Подписка · не продлевается</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_label">В ЭТОМ МЕСЯЦЕ С PRO</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_cleared">Освобождено %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_month_none">В этом месяце вы ничего не освободили с Pro.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_add_time">Добавить неделю · %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="pro_on_cancel_note">Отменить можно в любой момент в Google Play &gt; Подписки. Pro работает до конца периода.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_title">Готово к очистке</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_body">Остатки приложений, старые APK, точные копии.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_now_action">Очистить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_title">Мой выбор</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_locked">Первая большая очистка была за наш счёт. Очистка одним касанием — в Pro; выбирать файлы самому можно всегда.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_by_hand">Выбрать по одному</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_tier_pick_one_tap">Очистить одним касанием</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="plan_ask_one_by_one">Показать по одному</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_pick">
+        <item quantity="one">%d файл из моих советов, одно касание</item>
+        <item quantity="few">%d файла из моих советов, одно касание</item>
+        <item quantity="many">%d файлов из моих советов, одно касание</item>
+        <item quantity="other">%d файлов из моих советов, одно касание</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_gain_video">
+        <item quantity="one">%d большое видео сжимается</item>
+        <item quantity="few">%d больших видео сжимаются</item>
+        <item quantity="many">%d больших видео сжимаются</item>
+        <item quantity="other">%d больших видео сжимаются</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_card_try">
+        <item quantity="one">Попробовать Pro %d день</item>
+        <item quantity="few">Попробовать Pro %d дня</item>
+        <item quantity="many">Попробовать Pro %d дней</item>
+        <item quantity="other">Попробовать Pro %d дней</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_photos">
+        <item quantity="one">Место примерно для %d фото.</item>
+        <item quantity="few">Место примерно для %d фото.</item>
+        <item quantity="many">Место примерно для %d фото.</item>
+        <item quantity="other">Место примерно для %d фото.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="pro_plan_yearly_trial_renews">
+        <item quantity="one">Пробный период %1$d день, затем %2$s в год. Продлевается автоматически.</item>
+        <item quantity="few">Пробный период %1$d дня, затем %2$s в год. Продлевается автоматически.</item>
+        <item quantity="many">Пробный период %1$d дней, затем %2$s в год. Продлевается автоматически.</item>
+        <item quantity="other">Пробный период %1$d дней, затем %2$s в год. Продлевается автоматически.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="paywall_anchor">
+        <item quantity="one">52 недели по цене %d недельного пропуска</item>
+        <item quantity="few">52 недели по цене %d недельных пропусков</item>
+        <item quantity="many">52 недели по цене %d недельных пропусков</item>
+        <item quantity="other">52 недели по цене %d недельных пропусков</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="limit_body">
+        <item quantity="one">Без Pro можно решать по %d файлу в день. Счётчик обнулится завтра; ручная очистка в Инструментах доступна всегда.</item>
+        <item quantity="few">Без Pro можно решать по %d файлам в день. Счётчик обнулится завтра; ручная очистка в Инструментах доступна всегда.</item>
+        <item quantity="many">Без Pro можно решать по %d файлам в день. Счётчик обнулится завтра; ручная очистка в Инструментах доступна всегда.</item>
+        <item quantity="other">Без Pro можно решать по %d файлам в день. Счётчик обнулится завтра; ручная очистка в Инструментах доступна всегда.</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="plan_ask_daily">
+        <item quantity="one">%d решение сегодня; без ограничений с Pro</item>
+        <item quantity="few">%d решения сегодня; без ограничений с Pro</item>
+        <item quantity="many">%d решений сегодня; без ограничений с Pro</item>
+        <item quantity="other">%d решений сегодня; без ограничений с Pro</item>
+    </plurals>
 </resources>
