@@ -430,11 +430,15 @@ def main():
 
     def open_pro_page(tag):
         to_home()
-        gear = wait_for(r"^Settings$", 10)
-        if not gear:
-            return False
-        tap(gear)
-        row = wait_for(r"^Smart Cleaner Pro$", 10)
+        row = None
+        for _ in range(3):  # a just-finished scan can swallow the first tap
+            gear = wait_for(r"^Settings$", 10)
+            if not gear:
+                break
+            tap(gear)
+            row = wait_for(r"^Smart Cleaner Pro$", 8)
+            if row:
+                break
         check(f"Ayarlar'da 'Smart Cleaner Pro' satırı var ({tag})", row, screenshot=shot(f"settings-pro-row-{tag}"))
         if not row:
             return False

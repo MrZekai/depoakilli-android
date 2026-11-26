@@ -125,6 +125,8 @@ audit_binary "AAB universal APK" "$UNIVERSAL" "universal"
   echo "AAB: $AAB ($(wc -c < "$AAB" | tr -d ' ') bytes)"
   echo "APK: $APK ($(wc -c < "$APK" | tr -d ' ') bytes)"
   echo "AAB universal APK: $UNIVERSAL ($(wc -c < "$UNIVERSAL" | tr -d ' ') bytes)"
+  echo "Merged manifest permissions (release APK):"
+  grep -oP "name='\K[^']+" "$OUT/apk-permissions.txt" | sed 's/^/  - /'
 } | tee "$OUT/release-verification.txt"
 sha256sum "$AAB" "$APK" > "$OUT/SHA256SUMS.txt"
 echo "RELEASE_BINARY_GATE_PASS"
