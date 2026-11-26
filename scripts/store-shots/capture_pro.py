@@ -192,7 +192,7 @@ def capture(listing, app_locale, values_dir):
         shot(out, "00-error-scan2")
         return False
     time.sleep(2)
-    card = qa.scroll_to(rx(s["pro_card_title"]), 4)
+    card = qa.scroll_to(rx(s["pro_card_title"]) + "|" + rx(s["paywall_title_one_tap"]), 4)
     shot(out, "02-y1-home-card")
     if card:
         tries = "|".join(rx(t) for t in s["pro_card_try@all"])
