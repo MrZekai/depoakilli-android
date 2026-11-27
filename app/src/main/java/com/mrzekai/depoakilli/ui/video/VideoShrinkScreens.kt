@@ -92,6 +92,7 @@ import com.mrzekai.depoakilli.video.ShrinkOutcome
 import com.mrzekai.depoakilli.video.VideoCompressionService
 import com.mrzekai.depoakilli.video.VideoFinderState
 import com.mrzekai.depoakilli.video.VideoQueue
+import com.mrzekai.depoakilli.video.VideoRules
 import com.mrzekai.depoakilli.video.VideoShrinkRepository
 import java.io.File
 import java.text.DateFormat
@@ -200,7 +201,7 @@ private fun CandidatesScreen(
     val selected = remember(candidates) { mutableStateListOf<String>().apply { addAll(candidates.map { it.meta.path }) } }
     var notice by remember { mutableStateOf<String?>(null) }
     val chosen = candidates.filter { it.meta.path in selected }
-    val noRoomText = stringResource(R.string.video_no_room)
+    val noRoomText = stringResource(R.string.video_no_room, ByteFormatter.format(VideoQueue.RESERVE_BYTES))
     val lowBatteryText = stringResource(R.string.video_low_battery)
     val hotText = stringResource(R.string.video_too_hot)
 
@@ -264,7 +265,7 @@ private fun CandidatesScreen(
                         fontWeight = AppWeights.Giant,
                         modifier = Modifier.semantics { heading() },
                     )
-                    Text(stringResource(R.string.video_none_body), color = InkSoft, fontSize = 15.sp, lineHeight = 21.sp)
+                    Text(stringResource(R.string.video_none_body, ByteFormatter.format(VideoRules.MIN_VIDEO_BYTES)), color = InkSoft, fontSize = 15.sp, lineHeight = 21.sp)
                 }
             }
             else -> {

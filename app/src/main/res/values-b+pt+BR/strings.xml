@@ -1133,8 +1133,8 @@
     <string name="video_try_one">Experimente um sem custo</string>
     <string name="video_looking">Olhando seus vídeos grandes…</string>
     <string name="video_none_title">Nenhum vídeo vale a pena reduzir</string>
-    <string name="video_none_body">Olho vídeos de 100 MB ou mais. Os seus já são compactos ou de tipos que não mexo (HDR, câmera lenta, 360°).</string>
-    <string name="video_no_room">Não há espaço livre suficiente para reduzir com segurança. Libere um pouco antes; preciso de 1 GB livre.</string>
+    <string name="video_none_body">Olho vídeos de %1$s ou mais. Os seus já são compactos ou de tipos que não mexo (HDR, câmera lenta, 360°).</string>
+    <string name="video_no_room">Não há espaço livre suficiente para reduzir com segurança. Libere um pouco antes; preciso de %1$s livre.</string>
     <string name="video_low_battery">A bateria está abaixo de 20%. Conecte o carregador e comece.</string>
     <string name="video_too_hot">O celular está quente. Deixe esfriar e comece de novo.</string>
     <string name="video_pending_note">Cópias não aprovadas em 7 dias são removidas; os originais ficam.</string>

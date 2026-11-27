@@ -1370,8 +1370,8 @@
     <string name="video_try_one">جرّب واحدًا دون تكلفة</string>
     <string name="video_looking">أنظر في فيديوهاتك الكبيرة…</string>
     <string name="video_none_title">لا يوجد فيديو يستحق التصغير</string>
-    <string name="video_none_body">أنظر في الفيديوهات بحجم 100 ميغابايت أو أكثر. فيديوهاتك مضغوطة أصلًا أو من أنواع لا ألمسها (HDR، الحركة البطيئة، 360°).</string>
-    <string name="video_no_room">المساحة الفارغة لا تكفي للتصغير بأمان. حرّر قليلًا أولًا؛ أحتاج نحو 1 غيغابايت.</string>
+    <string name="video_none_body">أنظر في الفيديوهات بحجم %1$s أو أكثر. فيديوهاتك مضغوطة أصلًا أو من أنواع لا ألمسها (HDR، الحركة البطيئة، 360°).</string>
+    <string name="video_no_room">المساحة الفارغة لا تكفي للتصغير بأمان. حرّر قليلًا أولًا؛ أحتاج نحو %1$s.</string>
     <string name="video_low_battery">البطارية أقل من 20%. صِل الشاحن ثم ابدأ.</string>
     <string name="video_too_hot">الهاتف ساخن. دعه يبرد ثم ابدأ من جديد.</string>
     <string name="video_pending_note">تُزال النسخ التي لا توافق عليها خلال 7 أيام؛ تبقى الأصول.</string>

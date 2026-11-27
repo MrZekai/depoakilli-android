@@ -874,8 +874,8 @@
     <string name="video_try_one">Try one at no cost</string>
     <string name="video_looking">Looking at your big videos…</string>
     <string name="video_none_title">No video worth shrinking</string>
-    <string name="video_none_body">I look at videos of 100 MB or more. Yours are already compact, or are kinds I don’t touch (HDR, slow motion, 360°).</string>
-    <string name="video_no_room">Not enough free space to shrink safely. Clear a little first; I need about 1 GB free.</string>
+    <string name="video_none_body">I look at videos of %1$s or more. Yours are already compact, or are kinds I don’t touch (HDR, slow motion, 360°).</string>
+    <string name="video_no_room">Not enough free space to shrink safely. Clear a little first; I need about %1$s free.</string>
     <string name="video_low_battery">Battery is below 20%. Plug in the charger, then start.</string>
     <string name="video_too_hot">The phone is hot. Let it cool down, then start again.</string>
     <string name="video_pending_note">Copies you don’t approve within 7 days are removed; the originals stay.</string>

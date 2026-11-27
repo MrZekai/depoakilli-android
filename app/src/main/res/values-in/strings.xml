@@ -1066,8 +1066,8 @@
     <string name="video_try_one">Coba satu tanpa biaya</string>
     <string name="video_looking">Melihat video besarmu…</string>
     <string name="video_none_title">Tak ada video yang layak diperkecil</string>
-    <string name="video_none_body">Aku melihat video 100 MB ke atas. Punyamu sudah ringkas atau jenis yang tak kusentuh (HDR, gerak lambat, 360°).</string>
-    <string name="video_no_room">Ruang kosong kurang untuk memperkecil dengan aman. Kosongkan sedikit dulu; perlu sekitar 1 GB.</string>
+    <string name="video_none_body">Aku melihat video %1$s ke atas. Punyamu sudah ringkas atau jenis yang tak kusentuh (HDR, gerak lambat, 360°).</string>
+    <string name="video_no_room">Ruang kosong kurang untuk memperkecil dengan aman. Kosongkan sedikit dulu; perlu sekitar %1$s.</string>
     <string name="video_low_battery">Baterai di bawah 20%. Colokkan pengisi daya, lalu mulai.</string>
     <string name="video_too_hot">Ponsel panas. Biarkan dingin, lalu mulai lagi.</string>
     <string name="video_pending_note">Salinan yang tak disetujui dalam 7 hari dihapus; aslinya tetap.</string>

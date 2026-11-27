@@ -874,8 +874,8 @@
     <string name="video_try_one">Birini ücretsiz dene</string>
     <string name="video_looking">Büyük videolarına bakıyorum…</string>
     <string name="video_none_title">Küçültmeye değer video yok</string>
-    <string name="video_none_body">100 MB ve üstü videolara bakarım. Seninkiler zaten sıkı ya da dokunmadığım türden (HDR, ağır çekim, 360°).</string>
-    <string name="video_no_room">Güvenle küçültmek için boş yer az. Önce biraz yer aç; yaklaşık 1 GB boş yer gerekiyor.</string>
+    <string name="video_none_body">%1$s ve üstü videolara bakarım. Seninkiler zaten sıkı ya da dokunmadığım türden (HDR, ağır çekim, 360°).</string>
+    <string name="video_no_room">Güvenle küçültmek için boş yer az. Önce biraz yer aç; yaklaşık %1$s boş yer gerekiyor.</string>
     <string name="video_low_battery">Pil %20’nin altında. Şarja tak, sonra başla.</string>
     <string name="video_too_hot">Telefon ısınmış. Biraz soğusun, sonra yeniden başla.</string>
     <string name="video_pending_note">7 gün içinde onaylamadığın kopyalar silinir; özgünler yerinde kalır.</string>

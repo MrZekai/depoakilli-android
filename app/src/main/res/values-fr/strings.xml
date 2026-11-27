@@ -1183,8 +1183,8 @@
     <string name="video_try_one">Essaie-en un sans frais</string>
     <string name="video_looking">Je regarde tes grandes vidéos…</string>
     <string name="video_none_title">Aucune vidéo à réduire</string>
-    <string name="video_none_body">Je regarde les vidéos de 100 Mo ou plus. Les tiennes sont déjà compactes ou d’un type que je ne touche pas (HDR, ralenti, 360°).</string>
-    <string name="video_no_room">Pas assez d’espace libre pour réduire en sécurité. Libère un peu d’abord ; il faut environ 1 Go.</string>
+    <string name="video_none_body">Je regarde les vidéos de %1$s ou plus. Les tiennes sont déjà compactes ou d’un type que je ne touche pas (HDR, ralenti, 360°).</string>
+    <string name="video_no_room">Pas assez d’espace libre pour réduire en sécurité. Libère un peu d’abord ; il faut environ %1$s.</string>
     <string name="video_low_battery">La batterie est sous 20 %. Branche le chargeur, puis lance.</string>
     <string name="video_too_hot">Le téléphone est chaud. Laisse-le refroidir, puis relance.</string>
     <string name="video_pending_note">Les copies non validées sous 7 jours sont retirées ; les originaux restent.</string>
