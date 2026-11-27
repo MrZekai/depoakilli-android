@@ -143,8 +143,10 @@ def fresh_app(app_locale):
     qa.sh(f"cmd locale set-app-locales {PKG} --locales {app_locale}")
 
 
-def start(demo=None):
+def start(demo=None, watch=None):
     extra = f" --es demo_pro {demo}" if demo else ""
+    if watch:
+        extra += f" --es demo_watch {watch}"
     qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity{extra}")
     time.sleep(4)
     clear_system_dialogs()
@@ -225,7 +227,47 @@ def capture(listing, app_locale, values_dir):
     start("on")
     if open_settings_pro(s):
         shot(out, "08-y5-pro-on")
+
+    # Faz 3A-1 Storage Watch: Z2 (off), then Z1 and Z3 with a demo week (Pro on), then notices.
+    fresh_app(app_locale)
+    start()
+    if scan(s) and open_settings_row(s, s["watch_settings_row"]):
+        time.sleep(2)
+        shot(out, "12-z2-intro")
+    fresh_app(app_locale)
+    qa.sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS")
+    start("on", watch="seed")
+    if scan(s):
+        time.sleep(3)
+        qa.scroll_to(rx(s["watch_home_see_new"]), 4)
+        shot(out, "09-z1-home")
+        if open_settings_row(s, s["watch_settings_row"]):
+            time.sleep(2)
+            shot(out, "10-z3-watch")
+            qa.scroll_down()
+            time.sleep(1)
+            shot(out, "11-z3-bottom")
+    for topic in ("WEEKLY", "WHATSAPP", "THRESHOLD_90"):
+        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_watch {topic}")
+        time.sleep(3)
+    qa.sh("cmd statusbar expand-notifications")
+    time.sleep(2)
+    shot(out, "13-notifications")
+    qa.sh("cmd statusbar collapse")
     return True
+
+
+def open_settings_row(s, title):
+    qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity")
+    time.sleep(1)
+    gear = qa.wait_for("^" + re.escape(s["settings_title"]) + "$", 10)
+    if not gear:
+        return False
+    qa.tap(gear)
+    row = qa.scroll_to("^" + re.escape(title) + "$", 4)
+    if row:
+        qa.tap(row)
+    return bool(row)
 
 
 def main():
