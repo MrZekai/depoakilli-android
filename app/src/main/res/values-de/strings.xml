@@ -1133,7 +1133,7 @@
     <string name="video_progress_label">VERKLEINERE</string>
     <string name="video_progress_so_far">Bisher %1$s kleiner</string>
     <string name="video_progress_remaining">Noch etwa %1$s</string>
-    <string name="video_progress_note">Du kannst die App verlassen; es läuft in der Benachrichtigung weiter. Ich stoppe von selbst, wenn das Handy heiß wird oder der Akku unter 20 % ist.</string>
+    <string name="video_progress_note">Du kannst die App verlassen; es läuft in der Benachrichtigung weiter. Ich stoppe von selbst, wenn das Handy zu heiß wird oder bei einem Akku unter 20 %.</string>
     <string name="video_stop">Stoppen</string>
     <string name="video_stop_note">Wenn du stoppst, bleiben fertige Kopien und kein Original wird angefasst.</string>
     <string name="video_compare_label">NOCH %1$d · %2$s</string>
