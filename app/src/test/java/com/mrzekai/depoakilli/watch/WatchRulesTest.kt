@@ -109,7 +109,7 @@ class WatchRulesTest {
     }
 
     @Test
-    fun `WhatsApp disjoint by path, then videos, then photos; Trash and work files in none`() {
+    fun `WhatsApp by path first then videos then photos and Trash or work files in none`() {
         assertEquals(WatchKind.WHATSAPP, WatchKinds.kindOf("Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Video/", "a.mp4", WatchKinds.MEDIA_TYPE_VIDEO))
         assertEquals(WatchKind.WHATSAPP, WatchKinds.kindOf("Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Images/", "a.jpg", WatchKinds.MEDIA_TYPE_IMAGE))
         assertEquals(WatchKind.VIDEOS, WatchKinds.kindOf("DCIM/Camera/", "a.mp4", WatchKinds.MEDIA_TYPE_VIDEO))
