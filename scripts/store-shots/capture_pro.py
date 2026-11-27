@@ -247,9 +247,10 @@ def capture(listing, app_locale, values_dir):
             qa.scroll_down()
             time.sleep(1)
             shot(out, "11-z3-bottom")
-    for topic in ("WEEKLY", "WHATSAPP", "THRESHOLD_90"):
-        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_watch {topic}")
-        time.sleep(3)
+    qa.sh(f"am start -S -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_watch notices")
+    time.sleep(6)
+    qa.sh("input keyevent KEYCODE_HOME")
+    time.sleep(1)
     qa.sh("cmd statusbar expand-notifications")
     time.sleep(2)
     shot(out, "13-notifications")
