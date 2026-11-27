@@ -883,7 +883,7 @@
     <string name="video_progress_label">SHRINKING</string>
     <string name="video_progress_so_far">%1$s smaller so far</string>
     <string name="video_progress_remaining">About %1$s left</string>
-    <string name="video_progress_note">You can leave the app; it continues in the notification. If the phone gets hot or the battery drops below 20%, I stop by myself.</string>
+    <string name="video_progress_note">You can leave the app; it continues in the notification. I stop by myself if the phone gets hot or the battery drops below 20%.</string>
     <string name="video_stop">Stop</string>
     <string name="video_stop_note">If you stop, finished copies stay and no original is touched.</string>
     <string name="video_compare_label">%1$d LEFT · %2$s</string>

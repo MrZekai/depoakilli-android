@@ -1192,7 +1192,7 @@
     <string name="video_progress_label">RIDUCO</string>
     <string name="video_progress_so_far">%1$s in meno finora</string>
     <string name="video_progress_remaining">Mancano circa %1$s</string>
-    <string name="video_progress_note">Puoi uscire dall’app; continua nella notifica. Se il telefono si scalda o la batteria scende sotto il 20%, mi fermo da solo.</string>
+    <string name="video_progress_note">Puoi uscire dall’app; continua nella notifica. Mi fermo da solo se il telefono si scalda o la batteria scende sotto il 20%.</string>
     <string name="video_stop">Ferma</string>
     <string name="video_stop_note">Se ti fermi, le copie finite restano e nessun originale viene toccato.</string>
     <string name="video_compare_label">NE MANCANO %1$d · %2$s</string>

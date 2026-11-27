@@ -1142,7 +1142,7 @@
     <string name="video_progress_label">REDUCIENDO</string>
     <string name="video_progress_so_far">%1$s menos hasta ahora</string>
     <string name="video_progress_remaining">Quedan unos %1$s</string>
-    <string name="video_progress_note">Puedes salir de la app; sigue en la notificación. Si el teléfono se calienta o la batería baja del 20 %, me detengo solo.</string>
+    <string name="video_progress_note">Puedes salir de la app; sigue en la notificación. Me detengo solo si el teléfono se calienta o la batería baja del 20 %.</string>
     <string name="video_stop">Detener</string>
     <string name="video_stop_note">Si te detienes, las copias terminadas se quedan y no se toca ningún original.</string>
     <string name="video_compare_label">QUEDAN %1$d · %2$s</string>

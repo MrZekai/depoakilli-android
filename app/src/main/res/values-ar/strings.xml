@@ -1415,64 +1415,64 @@
     <string name="watch_toggle_videos_sub">التي يمكن تصغيرها دون حذف.</string>
     <plurals name="video_pending_title">
         <item quantity="zero">%d نسخة مصغّرة بانتظار موافقتك</item>
-        <item quantity="one">نسخة مصغّرة واحدة بانتظار موافقتك</item>
-        <item quantity="two">نسختان مصغّرتان بانتظار موافقتك</item>
+        <item quantity="one">%d نسخة مصغّرة بانتظار موافقتك</item>
+        <item quantity="two">%d نسختان مصغّرتان بانتظار موافقتك</item>
         <item quantity="few">%d نسخ مصغّرة بانتظار موافقتك</item>
         <item quantity="many">%d نسخة مصغّرة بانتظار موافقتك</item>
         <item quantity="other">%d نسخة مصغّرة بانتظار موافقتك</item>
     </plurals>
     <plurals name="video_head_body">
         <item quantity="zero">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
-        <item quantity="one">سأصغّر فيديو واحدًا. الدقة تبقى كما هي.</item>
-        <item quantity="two">سأصغّر فيديوين. الدقة تبقى كما هي.</item>
+        <item quantity="one">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+        <item quantity="two">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
         <item quantity="few">سأصغّر %d فيديوهات. الدقة تبقى كما هي.</item>
         <item quantity="many">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
         <item quantity="other">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
     </plurals>
     <plurals name="video_list_label">
         <item quantity="zero">%1$d فيديو · %2$s</item>
-        <item quantity="one">فيديو واحد · %2$s</item>
-        <item quantity="two">فيديوهان · %2$s</item>
+        <item quantity="one">%1$d فيديو · %2$s</item>
+        <item quantity="two">%1$d فيديو · %2$s</item>
         <item quantity="few">%1$d فيديوهات · %2$s</item>
         <item quantity="many">%1$d فيديو · %2$s</item>
         <item quantity="other">%1$d فيديو · %2$s</item>
     </plurals>
     <plurals name="video_shrink_button">
         <item quantity="zero">صغّر %d فيديو</item>
-        <item quantity="one">صغّر فيديو واحدًا</item>
-        <item quantity="two">صغّر فيديوين</item>
+        <item quantity="one">صغّر %d فيديو</item>
+        <item quantity="two">صغّر %d فيديو</item>
         <item quantity="few">صغّر %d فيديوهات</item>
         <item quantity="many">صغّر %d فيديو</item>
         <item quantity="other">صغّر %d فيديو</item>
     </plurals>
     <plurals name="video_apply_rest">
         <item quantity="zero">طبّق على %d فيديو متبقٍّ</item>
-        <item quantity="one">طبّق على الفيديو المتبقي</item>
-        <item quantity="two">طبّق على الفيديوين المتبقيين</item>
+        <item quantity="one">طبّق على %d فيديو متبقٍ</item>
+        <item quantity="two">طبّق على %d فيديو متبقيين</item>
         <item quantity="few">طبّق على %d فيديوهات متبقية</item>
         <item quantity="many">طبّق على %d فيديو متبقيًا</item>
         <item quantity="other">طبّق على %d فيديو متبقٍّ</item>
     </plurals>
     <plurals name="video_result_shrunk">
         <item quantity="zero">%d فيديو مصغّر</item>
-        <item quantity="one">فيديو واحد مصغّر</item>
-        <item quantity="two">فيديوهان مصغّران</item>
+        <item quantity="one">%d فيديو مصغّر</item>
+        <item quantity="two">%d فيديو مصغّران</item>
         <item quantity="few">%d فيديوهات مصغّرة</item>
         <item quantity="many">%d فيديو مصغّرًا</item>
         <item quantity="other">%d فيديو مصغّر</item>
     </plurals>
     <plurals name="video_result_skipped">
         <item quantity="zero">%d فيديو متخطّى</item>
-        <item quantity="one">فيديو واحد متخطّى</item>
-        <item quantity="two">فيديوهان متخطّيان</item>
+        <item quantity="one">%d فيديو متخطّى</item>
+        <item quantity="two">%d فيديو متخطّيان</item>
         <item quantity="few">%d فيديوهات متخطّاة</item>
         <item quantity="many">%d فيديو متخطّى</item>
         <item quantity="other">%d فيديو متخطّى</item>
     </plurals>
     <plurals name="video_notif_done_title">
         <item quantity="zero">%d فيديو مصغّر</item>
-        <item quantity="one">فيديو واحد مصغّر</item>
-        <item quantity="two">فيديوهان مصغّران</item>
+        <item quantity="one">%d فيديو مصغّر</item>
+        <item quantity="two">%d فيديو مصغّران</item>
         <item quantity="few">%d فيديوهات مصغّرة</item>
         <item quantity="many">%d فيديو مصغّرًا</item>
         <item quantity="other">%d فيديو مصغّر</item>

@@ -1075,7 +1075,7 @@
     <string name="video_progress_label">MEMPERKECIL</string>
     <string name="video_progress_so_far">%1$s lebih kecil sejauh ini</string>
     <string name="video_progress_remaining">Sisa sekitar %1$s</string>
-    <string name="video_progress_note">Kamu bisa keluar dari aplikasi; proses lanjut di notifikasi. Jika ponsel panas atau baterai di bawah 20%, aku berhenti sendiri.</string>
+    <string name="video_progress_note">Kamu bisa keluar dari aplikasi; proses lanjut di notifikasi. Aku berhenti sendiri jika ponsel panas atau baterai di bawah 20%.</string>
     <string name="video_stop">Hentikan</string>
     <string name="video_stop_note">Jika dihentikan, salinan yang selesai tetap ada dan aslinya tak tersentuh.</string>
     <string name="video_compare_label">SISA %1$d · %2$s</string>

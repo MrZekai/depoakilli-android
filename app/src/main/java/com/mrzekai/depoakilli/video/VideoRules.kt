@@ -228,7 +228,7 @@ object OutputVerifier {
             check.originalHasAudio && !check.outputHasAudio -> VerifyFailure.AUDIO_LOST
             originalShown != outputShown -> VerifyFailure.RESOLUTION
             sameStorage && normalized(check.originalRotation) != normalized(check.outputRotation) -> VerifyFailure.ROTATION
-            check.outputBytes > check.originalBytes * MAX_OUTPUT_RATIO -> VerifyFailure.NOT_SMALLER
+            check.outputBytes * 100 > check.originalBytes * Math.round(MAX_OUTPUT_RATIO * 100) -> VerifyFailure.NOT_SMALLER
             else -> null
         }
     }
