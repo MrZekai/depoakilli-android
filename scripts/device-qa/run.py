@@ -648,7 +648,9 @@ def main():
                   screenshot=shot("watch-z3-notif-row"))
             time.sleep(3)
             jobs_on = watch_jobs()
-            log("jobs: " + " | ".join(l.strip()[:140] for l in sh(f"dumpsys jobscheduler {PKG}", timeout=60).splitlines() if "JOB #" in l)[:900])
+            dump_all = sh("dumpsys jobscheduler", timeout=60)
+            log("jobs(all): " + " | ".join(l.strip()[:160] for l in dump_all.splitlines() if PKG in l)[:1500])
+            log("wm logcat: " + " | ".join(adb("logcat", "-d", "-s", "WM-WorkerWrapper", "WM-SystemJobScheduler", "WM-WorkManagerImpl", "AndroidRuntime").splitlines()[-15:])[:1500])
             check("Nöbetçi açılınca günlük iş kuruldu", jobs_on > jobs_off, note=f"{jobs_off} -> {jobs_on}")
             # A notice's tap: the launch intent carries the target screen.
             sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target whatsapp")
