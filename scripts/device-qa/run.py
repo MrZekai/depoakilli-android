@@ -10,6 +10,7 @@ step and checks the texts the owner would otherwise check by eye.
 Writes OUT/report.md (also appended to $GITHUB_STEP_SUMMARY) and OUT/*.png.
 Exit code 1 if any check failed.
 """
+import json
 import os
 import re
 import subprocess
@@ -237,6 +238,128 @@ def seed_big_app():
     sh(f"run-as {BIG_APP} sh -c 'mkdir -p files && dd if=/dev/urandom of=files/qa-big.bin bs=1048576 count=700 2>/dev/null'", timeout=240)
     log("big app data: " + sh(f"run-as {BIG_APP} ls -l files").strip())
     return True
+
+
+def app_notices():
+    out = sh("dumpsys notification --noredact", timeout=60)
+    return len(re.findall(rf"pkg={re.escape(PKG)}\b", out))
+
+
+def video_section():
+    src = os.path.abspath(os.environ.get("QA_SHRINK_VIDEO", "qa-shrink.mp4"))
+    if not os.path.exists(src):
+        check("3A-2: test videosu üretildi (ffmpeg)", False, note=src)
+        return
+    folder = "/sdcard/DCIM/Camera"
+    dev = f"{folder}/qa-shrink.mp4"
+    out_dev = f"{folder}/qa-shrink_sc.mp4"
+    # Room for the 1 GB reserve: remove only the QA's own seed files.
+    sh("rm -f /sdcard/Download/qa-*.crdownload /sdcard/Movies/qa-*-video.mp4")
+    sh(f"mkdir -p {folder}")
+    adb("push", src, dev, timeout=300)
+    stamp = time.strftime("%Y%m%d%H%M", time.gmtime(time.time() - 30 * DAY))
+    sh(f"touch -m -t {stamp} {dev}")
+    sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=120)
+    orig_size = sh(f"stat -c %s {dev}").strip()
+    log(f"shrink source: {orig_size} bytes, free {free_bytes()}")
+    target = f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target "
+    sh(f"am force-stop {PKG}")
+    sh(target + "videos")
+    listed = wait_for(r"^1 VIDEO · ", 90, dismiss=False)
+    check("Z5: büyük video listede (1 VIDEO · ~X)", listed, note=getattr(listed, "label", ""), screenshot=shot("video-z5"))
+    if not listed:
+        log("video log: " + " | ".join(adb("logcat", "-d", "-s", "SmartCleanerVideo").splitlines()[-20:])[:1500])
+        return
+    check("Z5: Pro olmayan için düğme PRO rozetli, 'Try one at no cost' var", find(r"^Try one at no cost$"))
+    check("Z5: notlar (orijinal onaya kadar kalır)", scroll_to(r"^Originals stay until you see the result and approve\.$", 3))
+
+    # Start, then Stop: nothing changes, the free try stays.
+    tap_text(r"^Try one at no cost$", 10)
+    running = wait_for(r"^SHRINKING$", 30, dismiss=False)
+    check("Z6: küçültme kullanıcı dokunuşuyla başladı", running, screenshot=shot("video-z6"))
+    check("Z6: ön plan bildirimi var (Stop düğmeli)", app_notices() > 0)
+    if running:
+        tap_text(r"^Stop$", 10)
+    back_to_list = wait_for(r"^Try one at no cost$", 40, dismiss=False)
+    check("Durdur: liste geri geldi, ücretsiz deneme hâlâ duruyor", back_to_list, screenshot=shot("video-stopped"))
+    files = sh(f"ls -a {folder}")
+    check("Durdur: orijinal yerinde, boyutu aynı", sh(f"stat -c %s {dev}").strip() == orig_size)
+    check("Durdur: yarım kopya kalmadı (.sc.tmp / _sc.mp4 yok)", ".sc.tmp" not in files and "_sc.mp4" not in files, note=files[-300:])
+
+    # Start again; leave the app and come back from the notification target.
+    if back_to_list:
+        tap(back_to_list)
+    started = time.time()
+    wait_for(r"^SHRINKING$", 30, dismiss=False)
+    sh("input keyevent KEYCODE_HOME")
+    time.sleep(4)
+    check("Uygulamadan çıkınca küçültme bildirimde sürüyor", app_notices() > 0)
+    sh(target + "SHRINK")
+    back_in = wait_for(r"^(SHRINKING|Watch both and judge for yourself\.)$", 20, dismiss=False)
+    check("Bildirimden dönüş: ilerleme ya da karşılaştırma ekranı", back_in, screenshot=shot("video-return"))
+    compare = wait_for(r"^Watch both and judge for yourself\.$", 600, dismiss=False)
+    took = int(time.time() - started)
+    log("video log: " + " | ".join(adb("logcat", "-d", "-s", "SmartCleanerVideo").splitlines()[-20:])[:2000])
+    check("Z7: küçük kopya hazır, karşılaştırma açıldı", compare, note=f"{took} s", screenshot=shot("video-z7"))
+    if not compare:
+        return
+    out_size = sh(f"stat -c %s {out_dev}").strip()
+    check("Çıktı: orijinalin en fazla %70'i", out_size.isdigit() and int(out_size) <= 0.7 * int(orig_size),
+          note=f"{orig_size} -> {out_size}")
+    local_out = os.path.join(OUT, "qa-shrink_sc.mp4")
+    adb("pull", out_dev, local_out, timeout=120)
+    probe = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+                            "format=duration:format_tags=creation_time:stream=codec_type,codec_name,width,height",
+                            "-of", "json", local_out], capture_output=True, text=True).stdout
+    probe_src = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration:format_tags=creation_time",
+                                "-of", "json", src], capture_output=True, text=True).stdout
+    log("ffprobe out: " + probe.replace("\n", " ")[:900])
+    log("ffprobe src: " + probe_src.replace("\n", " ")[:400])
+    try:
+        po, ps = json.loads(probe), json.loads(probe_src)
+        types = [st.get("codec_type") for st in po.get("streams", [])]
+        check("Çıktı: ses korunmuş, görüntü aynı boyutta",
+              "audio" in types and any(st.get("width") == 1280 and st.get("height") == 720 for st in po["streams"]),
+              note=str([(st.get("codec_name"), st.get("width"), st.get("height")) for st in po["streams"]]))
+        check("Çıktı: süre 1 sn içinde aynı",
+              abs(float(po["format"]["duration"]) - float(ps["format"]["duration"])) <= 1.0,
+              note=f'{ps["format"]["duration"]} -> {po["format"]["duration"]}')
+        src_day = ps["format"].get("tags", {}).get("creation_time", "")[:10]
+        out_day = po["format"].get("tags", {}).get("creation_time", "")[:10]
+        check("Çıktı: çekim tarihi korunmuş", src_day and src_day == out_day, note=f"{src_day} -> {out_day}")
+    except (ValueError, KeyError, TypeError) as error:
+        check("Çıktı ffprobe ile okunabiliyor", False, note=str(error))
+    approve = scroll_to(r"^OK, remove the original$", 4)
+    check("Z7: oynatmadan önce onay kapalı (açıklama görünür)",
+          find(r"^Play the smaller one at least once to approve\.$") is not None, screenshot=shot("video-z7-locked"))
+    play = find(r"^Play SMALLER$") or (scroll_to(r"^Play SMALLER$", 3))
+    if play:
+        tap(play)
+        time.sleep(5)
+    approve = scroll_to(r"^OK, remove the original$", 4)
+    if approve:
+        tap(approve)
+    result = wait_for(r"gained\. Without deleting a single video\.$", 30, dismiss=False)
+    check("Z8: sonuç ekranı ('…gained. Without deleting a single video.')", result, screenshot=shot("video-z8"))
+    check("Onay: orijinal Çöp'e taşındı (yerinde yok)", "No such file" in sh(f"stat -c %s {dev} 2>&1"))
+    check("Onay: küçük kopya yerinde", sh(f"stat -c %s {out_dev}").strip() == out_size)
+    tap_text(r"^Done$", 10)
+
+    # Restore the original from the Trash.
+    to_home()
+    chip = wait_for(r"^Trash: .+ · Empty now$", 15) or wait_for(r"^Trash$", 5)
+    if chip:
+        tap(chip)
+    row = scroll_to(r"qa-shrink\.mp4", 6)
+    check("Çöp: orijinal video listede", row, screenshot=shot("video-trash"))
+    if row:
+        tap(row)
+        tap_text(r"^Restore$", 10)
+        time.sleep(3)
+    check("Çöp'ten geri al: orijinal eski yerinde, boyutu aynı", sh(f"stat -c %s {dev}").strip() == orig_size)
+    # Leave the device as it was for the next sections.
+    sh(f"rm -f {dev} {out_dev}")
+    sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=120)
 
 
 def launch():
@@ -678,6 +801,15 @@ def main():
             check("Nöbetçi kapanınca iş iptal edildi", jobs_after <= jobs_off, note=f"{jobs_on} -> {jobs_after}")
             check("Nöbetçi boyunca hiç bildirim gönderilmedi (eşik yok)", notices() == 0)
         to_home()
+
+    # 13. Faz 3A-2 video shrinking, end to end with a real video (made on the
+    # runner by ffmpeg; never stored in the repo): list (Z5) -> start -> Stop
+    # keeps the original and the free try -> start again -> leave and return
+    # -> watch both (Z7; approve needs the small copy played) -> original to
+    # Trash -> result (Z8) -> restore the original from Trash. The output is
+    # pulled back and read with ffprobe (duration, audio, date kept).
+    video_section()
+    to_home()
 
     sh("cmd connectivity airplane-mode enable")
     time.sleep(3)
