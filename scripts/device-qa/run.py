@@ -251,8 +251,9 @@ def video_service_foreground():
 
 
 def video_log(tail=25):
-    lines = adb("logcat", "-d", "-v", "brief", "SmartCleanerVideo:V", "TransformerInternal:V", "MediaCodec:E", "CCodec:E", "*:S").splitlines()
-    return " | ".join(lines[-tail:])[:2500]
+    own = adb("logcat", "-d", "-v", "brief", "SmartCleanerVideo:V", "*:S").splitlines()
+    rest = adb("logcat", "-d", "-v", "brief", "TransformerInternal:V", "MediaCodec:E", "CCodec:E", "*:S").splitlines()
+    return (" | ".join(own[-tail:])[:2000] + " || " + " | ".join(l[:300] for l in rest[-8:]))[:4000]
 
 
 def video_section():
