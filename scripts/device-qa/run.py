@@ -601,6 +601,65 @@ def main():
           not find(r"^(Test Ad|Ad|Sponsored)$") and "AdActivity" not in resumed_activity(),
           screenshot=shot("home-no-ads"))
 
+    # 12. Faz 3A-1 Storage Watch: off by default (no job, no notice); turned on
+    # only by the user; a "no" to notifications keeps the app working; a
+    # notice's tap target opens the right screen; off cancels the job.
+    def watch_jobs():
+        out = sh(f"dumpsys jobscheduler {PKG}", timeout=60)
+        return len(set(re.findall(r"JOB #u\d+a\d+/(\d+)", out)))
+
+    def notices():
+        out = sh("dumpsys notification --noredact", timeout=60)
+        return len(re.findall(rf"pkg={re.escape(PKG)}\b", out))
+
+    jobs_off = watch_jobs()
+    check("Nöbetçi varsayılan olarak kapalı: uygulamadan bildirim yok", notices() == 0, note=f"jobs={jobs_off}")
+    to_home()
+    watch_row = None
+    for _ in range(3):
+        gear = wait_for(r"^Settings$", 10)
+        if not gear:
+            break
+        tap(gear)
+        watch_row = scroll_to(r"^Storage Watch$", 4)
+        if watch_row:
+            break
+    check("Ayarlar'da 'Storage Watch' satırı var", watch_row, screenshot=shot("watch-settings-row"))
+    if watch_row:
+        tap(watch_row)
+        intro = wait_for(r"^I'll tell you before your phone fills up\.$", 10, dismiss=False)
+        check("Z2: Nöbetçi tanıtımı açılıyor (dokunuşla)", intro, screenshot=shot("watch-z2"))
+        turn_on = find(r"^Turn on the watch$")
+        if turn_on:
+            tap(turn_on)
+            deny = wait_for(r"^Don.t allow$", 10, dismiss=False)
+            check("Android 13+: bildirim izni yalnız Nöbetçi açılırken soruluyor", deny, screenshot=shot("watch-permission"))
+            if deny:
+                tap(deny)
+            on = wait_for(r"^Watch is on$", 15, dismiss=False)
+            check("İzin reddinde Nöbetçi açık, uygulama çalışıyor (Z3)", on, screenshot=shot("watch-z3-denied"))
+            check("Z3: izin yokken 'Turn on notifications' satırı var", scroll_to(r"^Turn on notifications$", 3),
+                  screenshot=shot("watch-z3-notif-row"))
+            time.sleep(3)
+            jobs_on = watch_jobs()
+            check("Nöbetçi açılınca günlük iş kuruldu", jobs_on > jobs_off, note=f"{jobs_off} -> {jobs_on}")
+            # A notice's tap: the launch intent carries the target screen.
+            sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target whatsapp")
+            check("Bildirim dokunuşu (whatsapp) WhatsApp ekranını açıyor",
+                  wait_for(r"^WhatsApp Cleaner$", 15, dismiss=False), screenshot=shot("watch-target-whatsapp"))
+            sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target watch")
+            check("Bildirim dokunuşu (watch) Nöbetçi ekranını açıyor",
+                  wait_for(r"^Watch is on$", 15, dismiss=False), screenshot=shot("watch-target-watch"))
+            off = scroll_to(r"^Turn off the watch$", 6)
+            if off:
+                tap(off)
+            check("Nöbetçi kapatılabiliyor", wait_for(r"^Watch is off$", 10, dismiss=False), screenshot=shot("watch-off"))
+            time.sleep(3)
+            jobs_after = watch_jobs()
+            check("Nöbetçi kapanınca iş iptal edildi", jobs_after <= jobs_off, note=f"{jobs_on} -> {jobs_after}")
+            check("Nöbetçi boyunca hiç bildirim gönderilmedi (eşik yok)", notices() == 0)
+        to_home()
+
     sh("cmd connectivity airplane-mode enable")
     time.sleep(3)
     # A fresh app state, so the offline run includes a full scan.

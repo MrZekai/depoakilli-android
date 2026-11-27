@@ -32,6 +32,7 @@ import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
 import com.mrzekai.depoakilli.ui.watch.WatchHost
+import com.mrzekai.depoakilli.watch.WatchDemo
 import com.mrzekai.depoakilli.watch.WatchHibernation
 import com.mrzekai.depoakilli.watch.WatchMeasurer
 import com.mrzekai.depoakilli.watch.WatchNotifier
@@ -123,6 +124,13 @@ class MainActivity : ComponentActivity() {
         // Faz 3A-1: the watch's background job reads the last Pro answer.
         lifecycleScope.launch { billing.state.collect { watchStore.setPro(it.isPro) } }
         watchTarget.value = intent?.getStringExtra(WatchNotifier.EXTRA_TARGET)
+        // Debug builds: demo watch history / notices for QA and screenshots (WatchDemo).
+        if (BuildConfig.DEBUG) {
+            val demoWatch = intent?.getStringExtra("demo_watch")
+            if (demoWatch != null) {
+                lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) { WatchDemo.apply(applicationContext, demoWatch) }
+            }
+        }
 
         setContent {
             val realPro by billing.state.collectAsStateWithLifecycle()
