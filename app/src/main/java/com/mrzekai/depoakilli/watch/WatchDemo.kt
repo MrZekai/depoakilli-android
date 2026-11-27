@@ -34,6 +34,8 @@ object WatchDemo {
                     )
                 }
             }
+            // Every notice once (a forced restart would clear earlier ones).
+            "notices" -> listOf(WatchTopic.WEEKLY, WatchTopic.WHATSAPP, WatchTopic.THRESHOLD_90).forEach { apply(context, it.name) }
             else -> {
                 val topic = runCatching { WatchTopic.valueOf(mode) }.getOrNull() ?: return
                 val demo = now.copy(
