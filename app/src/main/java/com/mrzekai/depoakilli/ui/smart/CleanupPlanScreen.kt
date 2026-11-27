@@ -226,10 +226,8 @@ internal fun LazyListScope.cleanupPlanItems(
         }
     }
     // Faz 3A-2 Y7: "About X without deleting" when big videos can be shrunk.
-    LocalVideoShrinkEntry.current?.let { entry ->
-        item(key = "plan-video-shrink") {
-            VideoShrinkCard(entry)
-        }
+    item(key = "plan-video-shrink") {
+        LocalVideoShrinkEntry.current?.let { entry -> VideoShrinkCard(entry) }
     }
     if (rows.isNotEmpty()) {
         item(key = "plan-ask-card") {
