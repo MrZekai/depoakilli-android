@@ -39,6 +39,16 @@ object CleaningThresholds {
     /** Files at or below this size are fully hashed during the quick scan. */
     const val QUICK_FULL_HASH_BYTES = 32L * MB
 
+    /** Faz 3A-1 Storage Watch: WhatsApp grew this much in a week. */
+    const val WATCH_WHATSAPP_GROWTH_BYTES = 1L * GB
+
+    /** Faz 3A-1: new big-video candidates since the last notice (on with 3A-2). */
+    const val WATCH_NEW_VIDEO_BYTES = 1L * GB
+    const val WATCH_NEW_VIDEO_ENABLED = false
+
+    /** Faz 3A-1: the weekly summary is not sent below this much growth. */
+    const val WATCH_WEEKLY_MIN_BYTES = 500L * MB
+
     /** Minimum size considered by the duplicate finder. */
     const val MIN_DUPLICATE_BYTES = 32L * 1024L
 }

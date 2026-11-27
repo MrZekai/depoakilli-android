@@ -106,6 +106,13 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTier.kt",
     "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTierStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/billing/BillingConnect.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/watch/WatchRules.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/watch/WatchStore.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/watch/WatchMeasurer.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/watch/WatchNotifier.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/watch/WatchWorker.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/watch/WatchScreens.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/watch/WatchRulesTest.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/AiCleaningEngine.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/StoragePathRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/data/DeviceRepository.kt",
@@ -440,6 +447,46 @@ if "estimate.showsFillBars" not in read("app/src/main/java/com/mrzekai/depoakill
 for forbidden in ("delay(", "countdown", "Countdown", "Coral"):
     if forbidden in paywall_src:
         errors.append(f"paywall must not use {forbidden} (no timers, no fear colours)")
+# Faz 3A-1 Storage Watch: measures only, never deletes, never sells.
+if "android.permission.POST_NOTIFICATIONS" not in manifest:
+    errors.append("the Storage Watch needs POST_NOTIFICATIONS in the manifest")
+for watch_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/watch").rglob("*.kt"):
+    watch_src = watch_file.read_text(encoding="utf-8")
+    for forbidden in (".delete(", "delete(", "moveToTrash", "emptyTrash", "deleteRecursively", "StorageIndexer"):
+        if forbidden in watch_src:
+            errors.append(f"watch/{watch_file.name} must only measure (found {forbidden})")
+    if re.search(r"paywall|ProDemo|launchPurchase", watch_src, re.I):
+        errors.append(f"watch/{watch_file.name} must not open or sell Pro")
+watch_worker = read("app/src/main/java/com/mrzekai/depoakilli/watch/WatchWorker.kt")
+for expected in (
+    "setRequiresBatteryNotLow(true)",
+    "delayToNextDaytime",
+    "scheduleMorning",
+    "RUN_LIMIT_MILLIS = 30_000L",
+    "isAutoRevokeWhitelisted",
+):
+    if expected not in watch_worker:
+        errors.append(f"missing Storage Watch job invariant: {expected}")
+for forbidden in ("setRequiresCharging", "setRequiresDeviceIdle", "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS", "setForeground"):
+    if forbidden in watch_worker:
+        errors.append(f"Storage Watch job must not use {forbidden}")
+watch_rules = read("app/src/main/java/com/mrzekai/depoakilli/watch/WatchRules.kt")
+for expected in ("MAX_PER_DAY = 1", "MAX_PER_WEEK = 3", "QUIET_FROM_HOUR = 21", "QUIET_UNTIL_HOUR = 9", "THRESHOLD_REARM = 85", "input.isPro || !it.proOnly"):
+    if expected not in watch_rules:
+        errors.append(f"missing Storage Watch rule: {expected}")
+# Notice texts: no exclamation marks, no fear words, in every language.
+for strings_file in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml")):
+    for element in ET.parse(strings_file).getroot():
+        name = element.get("name", "")
+        if not name.startswith("watch_"):
+            continue
+        texts = [element.text or ""] if element.tag == "string" else [item.text or "" for item in element]
+        for text in texts:
+            if "!" in text or "¡" in text:
+                errors.append(f"{strings_file.parent.name}/{name}: no exclamation marks in watch texts")
+            if re.search(r"danger|urgent|slow|tehlike|acil|yavaş|peligro|urgente|perigo|pericolo|gefahr|dringend|опасн|срочн|bahaya|mendesak|خطر|عاجل", text, re.I):
+                errors.append(f"{strings_file.parent.name}/{name}: no fear words in watch texts")
+
 # No paywall opens by itself: only the openPaywall() taps set it.
 if read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").count("paywallOpen = true") != 1:
     errors.append("the paywall must open only through openPaywall() (user taps)")

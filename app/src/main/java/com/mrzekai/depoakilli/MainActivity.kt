@@ -31,11 +31,24 @@ import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.ui.CleanerApp
 import com.mrzekai.depoakilli.ui.CleanerViewModel
 import com.mrzekai.depoakilli.ui.theme.DepoAkilliTheme
+import com.mrzekai.depoakilli.ui.watch.WatchHost
+import com.mrzekai.depoakilli.watch.WatchHibernation
+import com.mrzekai.depoakilli.watch.WatchMeasurer
+import com.mrzekai.depoakilli.watch.WatchNotifier
+import com.mrzekai.depoakilli.watch.WatchRules
+import com.mrzekai.depoakilli.watch.WatchScheduler
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val cleanerViewModel: CleanerViewModel by viewModels()
     private val billing by lazy { (application as DepoAkilliApplication).billing }
+    private val watchStore by lazy { (application as DepoAkilliApplication).watch }
+
+    /** Faz 3A-1: Android's answers that change while the app is away (read on every resume). */
+    private val watchSystem = kotlinx.coroutines.flow.MutableStateFlow(Pair(true, false))
+
+    /** The screen a watch notice asked for (consumed once). */
+    private val watchTarget = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
     private var pendingDeepCacheAfterStorageAccess = false
 
     private val allFilesAccessLauncher = registerForActivityResult(
@@ -107,11 +120,17 @@ class MainActivity : ComponentActivity() {
         }
         // Plans (and whether a trial is offered) for the Y1 card and the paywall.
         billing.loadProducts()
+        // Faz 3A-1: the watch's background job reads the last Pro answer.
+        lifecycleScope.launch { billing.state.collect { watchStore.setPro(it.isPro) } }
+        watchTarget.value = intent?.getStringExtra(WatchNotifier.EXTRA_TARGET)
 
         setContent {
             val realPro by billing.state.collectAsStateWithLifecycle()
             val pro = ProDemo.apply(applicationContext, realPro)
             val photoBytes by averagePhotoBytes.collectAsStateWithLifecycle()
+            val watchSnapshot by watchStore.state.collectAsStateWithLifecycle()
+            val system by watchSystem.collectAsStateWithLifecycle()
+            val target by watchTarget.collectAsStateWithLifecycle()
             DepoAkilliTheme {
                 CleanerApp(
                     viewModel = cleanerViewModel,
@@ -138,6 +157,20 @@ class MainActivity : ComponentActivity() {
                     onRateApp = ::rateApp,
                     onSendFeedback = ::sendFeedback,
                     onShareApp = ::shareApp,
+                    watch = WatchHost(
+                        snapshot = watchSnapshot,
+                        notificationsOn = system.first,
+                        hibernationRestricted = system.second,
+                        target = target,
+                        enable = ::enableWatch,
+                        disable = ::disableWatch,
+                        updateSettings = watchStore::setSettings,
+                        markNotificationAsked = { watchStore.update { it.copy(notificationAsked = true) } },
+                        markHibernationExplained = { watchStore.update { it.copy(hibernationExplained = true) } },
+                        markPromoDone = { watchStore.update { it.copy(promoDone = true) } },
+                        consumeTarget = { watchTarget.value = null },
+                        openSystem = { runCatching { startActivity(it) } },
+                    ),
                 )
             }
         }
@@ -152,6 +185,54 @@ class MainActivity : ComponentActivity() {
         cleanerViewModel.refreshInstalledAppsIfAllowed()
         // Re-read purchases on every start and return (plan §1.2); offline keeps the last known state.
         billing.refreshPurchases()
+        refreshWatch()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.getStringExtra(WatchNotifier.EXTRA_TARGET)?.let { watchTarget.value = it }
+    }
+
+    /**
+     * Faz 3A-1: on every return, Android's notification and hibernation answers;
+     * with the watch on, one sample too (at most hourly) so data builds up even
+     * when the daily job does not run. Measuring only.
+     */
+    private fun refreshWatch() {
+        watchSystem.value = WatchNotifier.canPost(this) to WatchHibernation.isRestricted(this)
+        val snapshot = watchStore.state.value
+        if (!snapshot.settings.enabled) return
+        if (System.currentTimeMillis() - snapshot.lastLookMillis < WATCH_SAMPLE_GAP_MILLIS) return
+        lifecycleScope.launch {
+            val sample = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                WatchMeasurer(applicationContext).measure()
+            }
+            watchStore.addSample(sample)
+        }
+    }
+
+    /** The user turned the watch on: measure now, arm the levels already passed, start the daily job. */
+    private fun enableWatch() {
+        WatchNotifier.ensureChannels(this)
+        lifecycleScope.launch {
+            val sample = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                WatchMeasurer(applicationContext).measure()
+            }
+            watchStore.update {
+                it.copy(
+                    settings = it.settings.copy(enabled = true),
+                    samples = WatchRules.add(it.samples, sample),
+                    threshold = WatchRules.initialThreshold(sample.usedPercent),
+                )
+            }
+            WatchScheduler.schedule(applicationContext, restart = true)
+        }
+        watchStore.setSettings { it.copy(enabled = true) }
+    }
+
+    private fun disableWatch() {
+        watchStore.disable()
+        WatchScheduler.cancel(applicationContext)
     }
 
     private fun cleanSelected(itemIds: Set<String>? = null) {
@@ -420,6 +501,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
+        const val WATCH_SAMPLE_GAP_MILLIS = 60L * 60L * 1000L
         const val PLAY_PACKAGE_NAME = "com.mrzekai.depoakilli"
         const val PLAY_STORE_PACKAGE = "com.android.vending"
         const val REVIEW_PROMPT_INTERVAL_MILLIS = 30L * 24L * 60L * 60L * 1000L

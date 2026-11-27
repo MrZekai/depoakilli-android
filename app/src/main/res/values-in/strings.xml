@@ -922,4 +922,134 @@
     <plurals name="plan_ask_daily">
         <item quantity="other">%d keputusan hari ini; tanpa batas dengan Pro</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_storage">Peringatan penyimpanan penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_weekly">Ringkasan mingguan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_growth">Pertumbuhan cepat</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_title">Penyimpanan %1$s penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_body">Tersisa %1$s. Mau lihat apa yang makan tempat?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_title">Minggu ini bertambah %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_body">Paling bertambah: %1$s +%2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_title">WhatsApp bertambah %1$s minggu ini</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_body">Kalau mau, aku tunjukkan satu per satu.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_videos_body">Aku bisa mengosongkan sekitar %1$s tanpa menghapus.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_videos">Video</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_whatsapp">WhatsApp</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_photos">Foto</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_other">Lainnya</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_screen_title">Penjaga</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_settings_row">Penjaga penyimpanan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_label">PENJAGA PENYIMPANAN</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_title">Aku kabari sebelum ponselmu penuh.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_look">Aku memeriksa secara rutin. Hemat baterai.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_measure">Aku ukur apa yang menumpuk dan memberitahumu.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_never">Aku tidak pernah menghapus apa pun sendiri.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_on">Nyalakan penjaga</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_off">Matikan penjaga</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_note">Aku akan meminta izin notifikasi. Paling banyak 1 per hari; senyap 21:00–09:00. Jika tidak diizinkan, aku tampilkan di layar utama.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_title">Jaga penjaga tetap aktif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_body">Jika lama tidak dibuka, Android menjedaku. Kamu bisa mematikannya agar penjaga tetap bekerja.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_open_setting">Buka setelan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_on">Penjaga aktif</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_off">Penjaga mati</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_last_check">Cek terakhir %1$s · %2$s penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_today">hari ini %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_yesterday">kemarin %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_no_check">Belum diperiksa</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_stale_fix">Periksa setelan baterai dan latar belakang</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_label">MINGGU INI</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_label">PENJAGA · MINGGU INI</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_added">Bertambah %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_freed">Ruang yang lega minggu ini: %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_pending">Akan kutampilkan setelah minggu pertama lewat.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_breakdown_pro">Lihat apa yang menumpuk</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold">Beri tahu sebelum penuh</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold_sub">Saat %1$s dan %2$s penuh.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly">Ringkasan mingguan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly_sub">Apa yang menumpuk dan berapa yang bisa dilegakan.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp">Jika WhatsApp cepat membesar</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp_sub">Jika lebih dari %s dalam seminggu.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos">Video besar baru</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos_soon">Hadir bersama fitur pengecil video.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off">Nyalakan notifikasi</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off_sub">Sampai saat itu aku tampilkan di layar utama.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_row">Android bisa menjedaku</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_footer">Paling banyak 1 notifikasi per hari. Aku tidak pernah menghapus sendiri; selalu bertanya.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_line">Penjaga aktif · cek terakhir %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_see_new">Lihat yang baru</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_details">Detail</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_title">Mau kukabari sebelum penuh?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_open">Ceritakan</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_notif_videos_title">
+        <item quantity="other">%1$d video besar baru</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_stale">
+        <item quantity="other">Penjaga tidak bisa memeriksa selama %1$d hari</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_week_days">
+        <item quantity="other">dalam %1$d hari terakhir</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_pro_sent">
+        <item quantity="other">Penjaga memberi tahu %1$d kali bulan ini</item>
+    </plurals>
 </resources>

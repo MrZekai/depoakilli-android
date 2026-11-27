@@ -99,6 +99,8 @@ internal fun ProOnScreen(
     onAddTime: (ProPlanOption) -> Unit,
     onOpenLegalPage: (LegalPage) -> Unit,
     modifier: Modifier = Modifier,
+    /** Faz 3A-1: notices the watch really posted this month (shown only when > 0). */
+    watchNoticesThisMonth: Int = 0,
 ) {
     val owned = state.ownedPlan
     val weekPlan = state.plans.firstOrNull { it.kind == ProPlanKind.WEEK_PASS }
@@ -162,6 +164,18 @@ internal fun ProOnScreen(
                                 modifier = Modifier.padding(top = 14.dp),
                             )
                         }
+                    }
+                }
+            }
+            if (watchNoticesThisMonth > 0) {
+                item(key = "pro-on-watch") {
+                    BlackCard(contentPadding = PaddingValues(18.dp)) {
+                        Text(
+                            androidx.compose.ui.res.pluralStringResource(R.plurals.watch_pro_sent, watchNoticesThisMonth, watchNoticesThisMonth),
+                            color = OnBlack,
+                            fontSize = 15.sp,
+                            fontWeight = AppWeights.Strong,
+                        )
                     }
                 }
             }

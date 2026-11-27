@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrzekai.depoakilli.R
@@ -74,6 +75,7 @@ internal enum class DetailScreen(@StringRes val titleRes: Int) {
     TERMS(R.string.terms_of_service),
     ABOUT(R.string.about_app),
     PRO(R.string.pro_title),
+    WATCH(R.string.watch_screen_title),
 }
 
 internal enum class AccessDisclosure {
@@ -109,6 +111,8 @@ fun CleanerApp(
     onRateApp: () -> Unit,
     onSendFeedback: () -> Unit,
     onShareApp: () -> Unit,
+    /** Faz 3A-1 Storage Watch. */
+    watch: com.mrzekai.depoakilli.ui.watch.WatchHost = com.mrzekai.depoakilli.ui.watch.WatchHost(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -128,6 +132,37 @@ fun CleanerApp(
         onOpenPro()
         onPaywallOpened()
         paywallOpen = true
+    }
+    // Faz 3A-1: Z2 before the watch is on; the hibernation note once after it.
+    var watchIntroOpen by rememberSaveable { mutableStateOf(false) }
+    var hibernationSheet by rememberSaveable { mutableStateOf(false) }
+    val watchContext = androidx.compose.ui.platform.LocalContext.current
+    fun afterWatchOn() {
+        if (watch.hibernationRestricted && !watch.snapshot.hibernationExplained) {
+            watch.markHibernationExplained()
+            hibernationSheet = true
+        }
+    }
+    val notificationLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { _ -> afterWatchOn() }
+    fun turnWatchOn() {
+        watch.enable()
+        watchIntroOpen = false
+        detailScreen = DetailScreen.WATCH
+        // Android 13+: asked once, only now; after a "no" it is never asked again.
+        val needsAsk = android.os.Build.VERSION.SDK_INT >= 33 &&
+            !watch.snapshot.notificationAsked &&
+            !com.mrzekai.depoakilli.watch.WatchNotifier.canPost(watchContext)
+        if (needsAsk) {
+            watch.markNotificationAsked()
+            notificationLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            afterWatchOn()
+        }
+    }
+    fun openWatch() {
+        if (watch.snapshot.settings.enabled) detailScreen = DetailScreen.WATCH else watchIntroOpen = true
     }
     // A purchase that turned Pro on goes from the paywall to "Pro is on" (Y5).
     LaunchedEffect(pro.isPro) {
@@ -234,6 +269,47 @@ fun CleanerApp(
                 selectedTabIndex = AppTab.HOME.ordinal
         }
     }
+
+    // Faz 3A-1: a tapped notice opens its screen; anything else starts from there by the user.
+    LaunchedEffect(watch.target) {
+        when (watch.target) {
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_WHATSAPP -> {
+                selectedTabIndex = AppTab.HOME.ordinal
+                detailScreen = DetailScreen.WHATSAPP
+            }
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_WATCH,
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_VIDEOS -> {
+                selectedTabIndex = AppTab.HOME.ordinal
+                detailScreen = DetailScreen.WATCH
+            }
+            else -> return@LaunchedEffect
+        }
+        watch.consumeTarget()
+    }
+    val watchUi = com.mrzekai.depoakilli.ui.watch.WatchUi(
+        snapshot = watch.snapshot,
+        isPro = pro.isPro,
+        notificationsOn = watch.notificationsOn,
+        hibernationRestricted = watch.hibernationRestricted,
+        nowMillis = System.currentTimeMillis(),
+    )
+    val watchActions = com.mrzekai.depoakilli.ui.watch.WatchActions(
+        turnOn = { watchIntroOpen = true },
+        turnOff = watch.disable,
+        setThreshold = { on -> watch.updateSettings { it.copy(thresholdAlerts = on) } },
+        setWeekly = { on -> watch.updateSettings { it.copy(weeklySummary = on) } },
+        setWhatsApp = { on -> watch.updateSettings { it.copy(whatsAppAlerts = on) } },
+        openPaywall = ::openPaywall,
+        openNotificationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchNotifier.notificationSettingsIntent(watchContext)) },
+        openHibernationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchHibernation.settingsIntent(watchContext)) },
+        openAppInfo = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchNotifier.appInfoIntent(watchContext)) },
+        lookAtNew = {
+            detailScreen = null
+            selectedTabIndex = AppTab.HOME.ordinal
+            if (!state.hasAllFilesAccess) requestAllFilesWithDisclosure() else viewModel.scan(ScanFocus.SMART)
+        },
+        openDetails = { detailScreen = DetailScreen.WATCH },
+    )
 
     val hasInAppBackTarget =
         detailScreen != null ||
@@ -483,6 +559,8 @@ fun CleanerApp(
                         onIncludeFolder = viewModel::includeFolder,
                         hasAllFilesAccess = state.hasAllFilesAccess,
                         hasUsageAccess = state.hasUsageAccess,
+                        watchOn = watch.snapshot.settings.enabled,
+                        onOpenWatch = ::openWatch,
                     )
 
                     DetailScreen.ACCESS -> SecurityCenterScreen(
@@ -512,6 +590,7 @@ fun CleanerApp(
                         pro.isPro -> com.mrzekai.depoakilli.ui.pro.ProOnScreen(
                             state = pro,
                             monthBytes = state.freeTier.monthBytes(),
+                            watchNoticesThisMonth = watch.snapshot.sentThisMonth(),
                             onManageSubscription = onManageSubscription,
                             onRestore = onRestorePurchases,
                             onAddTime = onBuyPlan,
@@ -530,6 +609,12 @@ fun CleanerApp(
                             openPaywall()
                         }
                     }
+
+                    DetailScreen.WATCH -> com.mrzekai.depoakilli.ui.watch.WatchScreen(
+                        ui = watchUi,
+                        actions = watchActions,
+                        modifier = Modifier,
+                    )
 
                     DetailScreen.PRIVACY,
                     DetailScreen.TERMS,
@@ -605,6 +690,31 @@ fun CleanerApp(
                                 } else {
                                     null
                                 },
+                                // Faz 3A-1 Z1: the watch line, its week card or the one-time offer.
+                                watchLine = if (watch.snapshot.settings.enabled) {
+                                    { com.mrzekai.depoakilli.ui.watch.WatchHomeLine(watchUi, onOpen = ::openWatch) }
+                                } else {
+                                    null
+                                },
+                                watchCard = when {
+                                    watch.snapshot.settings.enabled && watch.snapshot.growth != null -> {
+                                        { com.mrzekai.depoakilli.ui.watch.WatchHomeCard(watchUi, watchActions, Modifier.padding(top = 14.dp)) }
+                                    }
+                                    !watch.snapshot.settings.enabled && !watch.snapshot.promoDone &&
+                                        (state.freeTier.firstCleanupUsed || state.trashEntries.isNotEmpty()) -> {
+                                        {
+                                            com.mrzekai.depoakilli.ui.watch.WatchPromoCard(
+                                                onOpen = {
+                                                    watch.markPromoDone()
+                                                    watchIntroOpen = true
+                                                },
+                                                onNotNow = watch.markPromoDone,
+                                                modifier = Modifier.padding(top = 14.dp),
+                                            )
+                                        }
+                                    }
+                                    else -> null
+                                },
                             )
                         }
 
@@ -634,6 +744,23 @@ fun CleanerApp(
                 }
             }
         }
+    }
+
+    // Faz 3A-1 Z2: over everything; "Not now" and Back close it.
+    if (watchIntroOpen) {
+        com.mrzekai.depoakilli.ui.watch.WatchIntroOverlay(
+            onTurnOn = ::turnWatchOn,
+            onNotNow = { watchIntroOpen = false },
+        )
+    }
+    if (hibernationSheet) {
+        com.mrzekai.depoakilli.ui.watch.WatchHibernationSheet(
+            onOpenSetting = {
+                hibernationSheet = false
+                watch.openSystem(com.mrzekai.depoakilli.watch.WatchHibernation.settingsIntent(watchContext))
+            },
+            onDismiss = { hibernationSheet = false },
+        )
     }
 
     // Y2: over everything (bottom bar included); ✕ and system Back close it.

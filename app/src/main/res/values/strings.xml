@@ -788,4 +788,77 @@
         <item quantity="one">%d decision today; unlimited with Pro</item>
         <item quantity="other">%d decisions today; unlimited with Pro</item>
     </plurals>
+    <string name="watch_channel_storage">Storage full alerts</string>
+    <string name="watch_channel_weekly">Weekly summary</string>
+    <string name="watch_channel_growth">Fast growth</string>
+    <string name="watch_notif_full_title">Storage is %1$s full</string>
+    <string name="watch_notif_full_body">%1$s left. Want to see what\'s taking space?</string>
+    <string name="watch_notif_weekly_title">%1$s added this week</string>
+    <string name="watch_notif_weekly_body">%1$s grew the most: +%2$s.</string>
+    <string name="watch_notif_whatsapp_title">WhatsApp grew %1$s this week</string>
+    <string name="watch_notif_whatsapp_body">I can show them one by one.</string>
+    <string name="watch_notif_videos_body">I can clear about %1$s without deleting.</string>
+    <string name="watch_kind_videos">Videos</string>
+    <string name="watch_kind_whatsapp">WhatsApp</string>
+    <string name="watch_kind_photos">Photos</string>
+    <string name="watch_kind_other">Other</string>
+    <string name="watch_screen_title">Watch</string>
+    <string name="watch_settings_row">Storage Watch</string>
+    <string name="watch_intro_label">STORAGE WATCH</string>
+    <string name="watch_intro_title">I\'ll tell you before your phone fills up.</string>
+    <string name="watch_intro_point_look">I look regularly. Easy on the battery.</string>
+    <string name="watch_intro_point_measure">I measure what\'s piling up and tell you.</string>
+    <string name="watch_intro_point_never">I never delete anything on my own.</string>
+    <string name="watch_turn_on">Turn on the watch</string>
+    <string name="watch_turn_off">Turn off the watch</string>
+    <string name="watch_intro_note">I\'ll ask for notification permission. At most 1 notice a day; quiet 21:00–09:00. If you say no, I\'ll show the same info on the home screen.</string>
+    <string name="watch_hibernation_title">Keep the watch awake</string>
+    <string name="watch_hibernation_body">If you don\'t open me for a long time, Android pauses me. You can turn that off so the watch keeps working.</string>
+    <string name="watch_open_setting">Open setting</string>
+    <string name="watch_title_on">Watch is on</string>
+    <string name="watch_title_off">Watch is off</string>
+    <string name="watch_last_check">Last check %1$s · %2$s full</string>
+    <string name="watch_time_today">today %s</string>
+    <string name="watch_time_yesterday">yesterday %s</string>
+    <string name="watch_no_check">No check yet</string>
+    <string name="watch_stale_fix">Check battery and background settings</string>
+    <string name="watch_week_label">THIS WEEK</string>
+    <string name="watch_home_label">WATCH · THIS WEEK</string>
+    <string name="watch_week_added">%s added</string>
+    <string name="watch_week_freed">Space freed this week: %s</string>
+    <string name="watch_week_pending">I\'ll show this once the first week is in.</string>
+    <string name="watch_breakdown_pro">See what piled up</string>
+    <string name="watch_toggle_threshold">Warn me before it fills</string>
+    <string name="watch_toggle_threshold_sub">When %1$s and %2$s full.</string>
+    <string name="watch_toggle_weekly">Weekly summary</string>
+    <string name="watch_toggle_weekly_sub">What piled up, how much can be freed.</string>
+    <string name="watch_toggle_whatsapp">If WhatsApp grows fast</string>
+    <string name="watch_toggle_whatsapp_sub">If it passes %s in a week.</string>
+    <string name="watch_toggle_videos">New big videos</string>
+    <string name="watch_toggle_videos_soon">Comes with video shrinking.</string>
+    <string name="watch_notifications_off">Turn on notifications</string>
+    <string name="watch_notifications_off_sub">Until then I show it on the home screen.</string>
+    <string name="watch_hibernation_row">Android may pause me</string>
+    <string name="watch_footer">At most 1 notice a day. I never delete anything on my own; I always ask you.</string>
+    <string name="watch_home_line">Watch on · last check %s</string>
+    <string name="watch_home_see_new">Look at what\'s new</string>
+    <string name="watch_home_details">Details</string>
+    <string name="watch_promo_title">Want a heads-up before it fills?</string>
+    <string name="watch_promo_open">Tell me more</string>
+    <plurals name="watch_notif_videos_title">
+        <item quantity="one">%1$d new big video</item>
+        <item quantity="other">%1$d new big videos</item>
+    </plurals>
+    <plurals name="watch_stale">
+        <item quantity="one">The watch couldn\'t look for %1$d day</item>
+        <item quantity="other">The watch couldn\'t look for %1$d days</item>
+    </plurals>
+    <plurals name="watch_week_days">
+        <item quantity="one">in the last %1$d day</item>
+        <item quantity="other">in the last %1$d days</item>
+    </plurals>
+    <plurals name="watch_pro_sent">
+        <item quantity="one">The watch told you %1$d time this month</item>
+        <item quantity="other">The watch told you %1$d times this month</item>
+    </plurals>
 </resources>

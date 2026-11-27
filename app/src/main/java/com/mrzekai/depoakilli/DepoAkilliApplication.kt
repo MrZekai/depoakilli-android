@@ -8,6 +8,8 @@ import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.pro.FreeTierStore
 import com.mrzekai.depoakilli.ui.media.MediaThumbnails
+import com.mrzekai.depoakilli.watch.WatchScheduler
+import com.mrzekai.depoakilli.watch.WatchStore
 
 class DepoAkilliApplication : Application() {
     /** Google Play Billing and the Pro entitlement; one client for the whole app. */
@@ -16,11 +18,16 @@ class DepoAkilliApplication : Application() {
     /** Free tier memory (Faz 2): local to this device. */
     val freeTier: FreeTierStore by lazy { FreeTierStore(this) }
 
+    /** Faz 3A-1 Storage Watch: settings, daily samples and sent notices, on this device only. */
+    val watch: WatchStore by lazy { WatchStore(this) }
+
     override fun onCreate() {
         super.onCreate()
         ByteFormatter.install(this)
         AppDiagnostics.initialize(this)
         TrashPurgeWorker.schedule(this)
+        // Keeps the existing daily job; it is only ever enqueued after the user turned the watch on.
+        if (watch.state.value.settings.enabled) WatchScheduler.schedule(this, restart = false)
     }
 
     override fun onTrimMemory(level: Int) {

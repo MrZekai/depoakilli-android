@@ -1206,4 +1206,154 @@
         <item quantity="many">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
         <item quantity="other">%d قرارًا اليوم؛ بلا حدود مع Pro</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_storage">تنبيهات امتلاء التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_weekly">ملخص أسبوعي</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_growth">نمو سريع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_title">التخزين ممتلئ بنسبة %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_body">تبقى %1$s. هل نرى ما الذي يشغل المساحة؟</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_title">تراكم %1$s هذا الأسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_body">الأكثر نموًا: %1$s ‎+%2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_title">نما واتساب %1$s هذا الأسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_body">يمكنني عرضها واحدًا تلو الآخر.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_videos_body">يمكنني توفير نحو %1$s دون حذف.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_videos">الفيديوهات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_whatsapp">واتساب</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_photos">الصور</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_other">أخرى</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_screen_title">الحارس</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_settings_row">حارس التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_label">حارس التخزين</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_title">سأخبرك قبل أن يمتلئ هاتفك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_look">أتحقق بانتظام. دون إرهاق البطارية.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_measure">أقيس ما يتراكم وأخبرك.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_never">لا أحذف أي شيء من تلقاء نفسي.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_on">شغّل الحارس</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_off">أوقف الحارس</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_note">سأطلب إذن الإشعارات. إشعار واحد يوميًا على الأكثر؛ صمت من 21:00 إلى 09:00. إن رفضت، أعرض المعلومات نفسها في الشاشة الرئيسية.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_title">أبقِ الحارس مستيقظًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_body">إذا لم تفتحني لمدة طويلة، يوقفني أندرويد مؤقتًا. يمكنك إيقاف ذلك ليستمر الحارس في العمل.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_open_setting">افتح الإعداد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_on">الحارس يعمل</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_off">الحارس متوقف</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_last_check">آخر فحص %1$s · ممتلئ %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_today">اليوم %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_yesterday">أمس %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_no_check">لم أتحقق بعد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_stale_fix">تحقق من إعدادات البطارية والخلفية</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_label">هذا الأسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_label">الحارس · هذا الأسبوع</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_added">تراكم %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_freed">مساحة تحررت هذا الأسبوع: %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_pending">سأعرض هذا بعد اكتمال الأسبوع الأول.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_breakdown_pro">اعرف ما الذي تراكم</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold">نبّهني قبل الامتلاء</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold_sub">عند %1$s و%2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly">ملخص أسبوعي</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly_sub">ما الذي تراكم وكم يمكن تحريره.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp">إذا نما واتساب بسرعة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp_sub">إذا تجاوز %s في أسبوع.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos">فيديوهات كبيرة جديدة</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos_soon">يأتي مع تصغير الفيديو.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off">شغّل الإشعارات</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off_sub">إلى ذلك الحين أعرضه في الشاشة الرئيسية.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_row">قد يوقفني أندرويد مؤقتًا</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_footer">إشعار واحد يوميًا على الأكثر. لا أحذف أي شيء من تلقاء نفسي؛ أسألك دائمًا.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_line">الحارس يعمل · آخر فحص %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_see_new">اطّلع على الجديد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_details">التفاصيل</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_title">هل أنبهك قبل الامتلاء؟</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_open">أخبرني المزيد</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_notif_videos_title">
+        <item quantity="zero">%1$d فيديو كبير جديد</item>
+        <item quantity="one">%1$d فيديو كبير جديد</item>
+        <item quantity="two">%1$d فيديو كبير جديد</item>
+        <item quantity="few">%1$d فيديو كبير جديد</item>
+        <item quantity="many">%1$d فيديو كبير جديد</item>
+        <item quantity="other">%1$d فيديو كبير جديد</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_stale">
+        <item quantity="zero">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+        <item quantity="one">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+        <item quantity="two">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+        <item quantity="few">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+        <item quantity="many">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+        <item quantity="other">لم يتمكن الحارس من الفحص منذ %1$d يوم</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_week_days">
+        <item quantity="zero">خلال آخر %1$d يوم</item>
+        <item quantity="one">خلال آخر %1$d يوم</item>
+        <item quantity="two">خلال آخر %1$d يوم</item>
+        <item quantity="few">خلال آخر %1$d يوم</item>
+        <item quantity="many">خلال آخر %1$d يوم</item>
+        <item quantity="other">خلال آخر %1$d يوم</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_pro_sent">
+        <item quantity="zero">نبّهك الحارس %1$d مرة هذا الشهر</item>
+        <item quantity="one">نبّهك الحارس %1$d مرة هذا الشهر</item>
+        <item quantity="two">نبّهك الحارس %1$d مرة هذا الشهر</item>
+        <item quantity="few">نبّهك الحارس %1$d مرة هذا الشهر</item>
+        <item quantity="many">نبّهك الحارس %1$d مرة هذا الشهر</item>
+        <item quantity="other">نبّهك الحارس %1$d مرة هذا الشهر</item>
+    </plurals>
 </resources>

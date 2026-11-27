@@ -13,6 +13,8 @@
     <uses-permission
         android:name="android.permission.FOREGROUND_SERVICE"
         tools:node="remove" />
+    <!-- Faz 3A-1 Storage Watch notices; asked only when the user turns the watch on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
