@@ -28,7 +28,7 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 55
+        versionCode = 56
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -186,6 +186,8 @@ dependencies {
     implementation(libs.google.play.review)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    // Faz 3A-2: shrinking big videos on the phone (owner approved; same Media3 version).
+    implementation(libs.androidx.media3.transformer)
     // The daily trash purge.
     implementation(libs.androidx.work.runtime)
 

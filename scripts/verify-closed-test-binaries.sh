@@ -98,7 +98,6 @@ audit_binary() {
   fi
 
   for forbidden in \
-    android.permission.FOREGROUND_SERVICE \
     androidx.work.impl.foreground.SystemForegroundService \
     androidx.compose.ui.tooling.PreviewActivity
   do
@@ -106,6 +105,14 @@ audit_binary() {
       fail "$label contains forbidden merged surface: $forbidden"
     fi
   done
+  # Faz 3A-2: a foreground service only for shrinking videos (user tap):
+  # exactly FOREGROUND_SERVICE + _DATA_SYNC + _MEDIA_PROCESSING, our own service.
+  fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$permissions" | sort -u | tr '\n' ' ')"
+  if [ "$fgs_perms" != "android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING " ]; then
+    fail "$label foreground-service permissions differ: $fgs_perms"
+  fi
+  grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$manifest" \
+    || fail "$label is missing the video shrinking service"
 
   # 2.0: no ad SDK. No AdMob id, no advertising-id permission, no ads classes;
   # Google Play Billing is present.

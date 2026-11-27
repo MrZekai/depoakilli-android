@@ -9,15 +9,15 @@ object ProGainEstimator {
     /** Below this, the app does not sell Pro (honest paywall, Y3). Decimal GB, like the app's sizes. */
     const val PRO_MIN_GAIN_BYTES = 2_000_000_000L
 
-    /** Lower-bound saving of compressing a big video (Faz 3.4). */
-    const val COMPRESSION_FLOOR_RATIO = 0.30
     const val COMPRESSION_MIN_VIDEO_BYTES = 100_000_000L
 
     /**
-     * Video compression arrives in Faz 3.4. Until then its estimate is computed
-     * only in tests and never counts (2.2b: no feature that is not in the app).
+     * Faz 3A-2: video shrinking is in the app. Its row is the sum of the
+     * per-video estimates of the real candidates (headers read, rules applied;
+     * a video whose headers could not be read is not a candidate). Off, the row
+     * and every text about it disappear.
      */
-    const val VIDEO_COMPRESSION_AVAILABLE = false
+    const val VIDEO_COMPRESSION_AVAILABLE = true
 
     enum class Kind {
         /** "My pick" cleaned with one tap (after the first, free cleanup). */
@@ -50,24 +50,26 @@ object ProGainEstimator {
      * @param suggestedBytes the "My pick" layer of the current scan.
      * @param firstCleanupUsed the free first "My pick" cleanup is spent; before
      *   that, one-tap cleanup is not a Pro gain (it is still free).
-     * @param videoSizes sizes of the videos found by the scan.
+     * @param videoSavingBytes sum of the lower-bound estimates of the video
+     *   shrinking candidates ([com.mrzekai.depoakilli.video.VideoRules]); shown as "about".
+     * @param videoCount number of those candidates.
      */
     fun estimate(
         suggestedBytes: Long,
         suggestedCount: Int,
         firstCleanupUsed: Boolean,
-        videoSizes: List<Long> = emptyList(),
+        videoSavingBytes: Long = 0L,
+        videoCount: Int = 0,
         videoCompressionAvailable: Boolean = VIDEO_COMPRESSION_AVAILABLE,
     ): Estimate {
         val rows = mutableListOf<Row>()
+        if (videoCompressionAvailable && videoSavingBytes > 0L && videoCount > 0) {
+            rows += Row(Kind.VIDEO_COMPRESSION, videoSavingBytes, videoCount, measured = false)
+        }
         if (firstCleanupUsed && suggestedBytes > 0L) {
             rows += Row(Kind.ONE_TAP_PICK, suggestedBytes, suggestedCount, measured = true)
         }
-        if (videoCompressionAvailable) {
-            val big = videoSizes.filter { it >= COMPRESSION_MIN_VIDEO_BYTES }
-            val floor = (big.sum() * COMPRESSION_FLOOR_RATIO).toLong()
-            if (floor > 0L) rows += Row(Kind.VIDEO_COMPRESSION, floor, big.size, measured = false)
-        }
-        return Estimate(rows)
+        // Biggest measured gain first (paywall order).
+        return Estimate(rows.sortedByDescending(Row::bytes))
     }
 }

@@ -67,7 +67,8 @@ data class WatchSettings(
     val thresholdAlerts: Boolean = true,
     val weeklySummary: Boolean = true,
     val whatsAppAlerts: Boolean = true,
-    val newVideoAlerts: Boolean = false,
+    /** Faz 3A-2: on by default like the other Pro alerts (they only run while Pro is on). */
+    val newVideoAlerts: Boolean = true,
 )
 
 /** Everything the decision needs; built by the worker, pure here. */

@@ -76,6 +76,9 @@ internal enum class DetailScreen(@StringRes val titleRes: Int) {
     ABOUT(R.string.about_app),
     PRO(R.string.pro_title),
     WATCH(R.string.watch_screen_title),
+
+    /** Faz 3A-2 Z5–Z8: shrinking big videos without deleting. */
+    VIDEOS(R.string.video_title),
 }
 
 internal enum class AccessDisclosure {
@@ -127,7 +130,14 @@ fun CleanerApp(
     var scrollToAppsRequested by rememberSaveable { mutableStateOf(false) }
     // Faz 2 Y2: the paywall opens only when the user taps (Y1 card, Y4, Y7, Settings).
     var paywallOpen by rememberSaveable { mutableStateOf(false) }
-    val proEstimate = remember(state.summary, state.freeTier.firstCleanupUsed, state.scanFocus) { state.proEstimate() }
+    // Faz 3A-2: video candidates (headers only, cached) feed the paywall's measured estimate.
+    val shrinkApp = androidx.compose.ui.platform.LocalContext.current.applicationContext as? com.mrzekai.depoakilli.DepoAkilliApplication
+    val videoFinder = shrinkApp?.videoShrink?.state?.collectAsStateWithLifecycle()?.value
+    val videoResult = (videoFinder as? com.mrzekai.depoakilli.video.VideoFinderState.Ready)?.result
+    LaunchedEffect(state.summary, state.hasAllFilesAccess) {
+        if (state.hasAllFilesAccess && com.mrzekai.depoakilli.pro.ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE) shrinkApp?.videoShrink?.refresh()
+    }
+    val proEstimate = remember(state.summary, state.freeTier.firstCleanupUsed, state.scanFocus, videoResult) { state.proEstimate(videoResult) }
     fun openPaywall() {
         onOpenPro()
         onPaywallOpened()
@@ -277,10 +287,15 @@ fun CleanerApp(
                 selectedTabIndex = AppTab.HOME.ordinal
                 detailScreen = DetailScreen.WHATSAPP
             }
-            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_WATCH,
-            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_VIDEOS -> {
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_WATCH -> {
                 selectedTabIndex = AppTab.HOME.ordinal
                 detailScreen = DetailScreen.WATCH
+            }
+            // Faz 3A-2: the new-videos notice and the shrinking notification open the video screens.
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_VIDEOS,
+            com.mrzekai.depoakilli.video.VideoCompressionService.TARGET_SHRINK -> {
+                selectedTabIndex = AppTab.HOME.ordinal
+                detailScreen = DetailScreen.VIDEOS
             }
             else -> return@LaunchedEffect
         }
@@ -299,6 +314,7 @@ fun CleanerApp(
         setThreshold = { on -> watch.updateSettings { it.copy(thresholdAlerts = on) } },
         setWeekly = { on -> watch.updateSettings { it.copy(weeklySummary = on) } },
         setWhatsApp = { on -> watch.updateSettings { it.copy(whatsAppAlerts = on) } },
+        setNewVideos = { on -> watch.updateSettings { it.copy(newVideoAlerts = on) } },
         openPaywall = ::openPaywall,
         openNotificationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchNotifier.notificationSettingsIntent(watchContext)) },
         openHibernationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchHibernation.settingsIntent(watchContext)) },
@@ -330,6 +346,15 @@ fun CleanerApp(
         darkNavigationIcons = detailScreen != null && !swipeVisible,
     )
 
+    // Faz 3A-2 Y7: the plan offers shrinking only while there are candidates and the switch is on.
+    val videoEntry = videoResult
+        ?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE && it.candidates.isNotEmpty() }
+        ?.let { result ->
+            com.mrzekai.depoakilli.ui.smart.VideoShrinkEntry(result.totalSavingBytes, result.candidates.size) {
+                detailScreen = DetailScreen.VIDEOS
+            }
+        }
+    androidx.compose.runtime.CompositionLocalProvider(com.mrzekai.depoakilli.ui.smart.LocalVideoShrinkEntry provides videoEntry) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -616,6 +641,23 @@ fun CleanerApp(
                         modifier = Modifier,
                     )
 
+                    DetailScreen.VIDEOS -> if (shrinkApp != null) {
+                        com.mrzekai.depoakilli.ui.video.VideoShrinkFlow(
+                            repo = shrinkApp.videoShrink,
+                            actions = com.mrzekai.depoakilli.ui.video.VideoShrinkActions(
+                                isPro = pro.isPro,
+                                videoTrialUsed = state.freeTier.videoTrialUsed,
+                                freeBytes = { state.storage.availableBytes },
+                                onOpenPaywall = ::openPaywall,
+                                onTrialUsed = { viewModel.markVideoTrialUsed() },
+                                onProBytes = { bytes -> viewModel.addProBytes(bytes) },
+                                onDeleteOriginalsNow = { ids -> viewModel.emptyTrash(ids) },
+                                onDone = { navigateBackInApp() },
+                            ),
+                            modifier = Modifier,
+                        )
+                    }
+
                     DetailScreen.PRIVACY,
                     DetailScreen.TERMS,
                     DetailScreen.ABOUT -> LegalDetailScreen(
@@ -730,6 +772,8 @@ fun CleanerApp(
                                 detailScreen = DetailScreen.APP_MANAGER
                                 viewModel.refreshInstalledApps()
                             },
+                            videoSavingBytes = videoResult?.totalSavingBytes,
+                            onOpenVideos = { detailScreen = DetailScreen.VIDEOS },
                             modifier = Modifier,
                         )
 
@@ -901,6 +945,7 @@ fun CleanerApp(
         }
     }
 
+    }
     }
 }
 

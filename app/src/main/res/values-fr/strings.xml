@@ -1126,7 +1126,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_videos">Nouvelles grandes vidéos</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_videos_soon">Arrive avec la réduction des vidéos.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off">Activer les notifications</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1168,5 +1167,103 @@
         <item quantity="one">Le veilleur t\'a prévenu %1$d fois ce mois-ci</item>
         <item quantity="many">Le veilleur t\'a prévenu %1$d fois ce mois-ci</item>
         <item quantity="other">Le veilleur t\'a prévenu %1$d fois ce mois-ci</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2 video shrinking: draft translation, needs a native review -->
+    <string name="video_title">Réduire les vidéos</string>
+    <string name="video_tools_detail">Libère de la place sans supprimer</string>
+    <string name="video_y7_card">Environ %1$s sans supprimer</string>
+    <string name="video_head_label">Environ, sans supprimer</string>
+    <string name="video_about">environ %1$s</string>
+    <string name="video_select_all">Tout sélectionner</string>
+    <string name="video_select_none">Tout est sélectionné</string>
+    <string name="video_note_originals">Les originaux restent jusqu’à ce que tu voies le résultat et valides.</string>
+    <string name="video_note_backup">Ton app de sauvegarde photo peut aussi envoyer le nouveau fichier.</string>
+    <string name="video_try_one">Essaie-en un sans frais</string>
+    <string name="video_looking">Je regarde tes grandes vidéos…</string>
+    <string name="video_none_title">Aucune vidéo à réduire</string>
+    <string name="video_none_body">Je regarde les vidéos de 100 Mo ou plus. Les tiennes sont déjà compactes ou d’un type que je ne touche pas (HDR, ralenti, 360°).</string>
+    <string name="video_no_room">Pas assez d’espace libre pour réduire en sécurité. Libère un peu d’abord ; il faut environ 1 Go.</string>
+    <string name="video_low_battery">La batterie est sous 20 %. Branche le chargeur, puis lance.</string>
+    <string name="video_too_hot">Le téléphone est chaud. Laisse-le refroidir, puis relance.</string>
+    <string name="video_pending_note">Les copies non validées sous 7 jours sont retirées ; les originaux restent.</string>
+    <string name="video_pending_review">Regarder et valider</string>
+    <string name="video_progress_label">RÉDUCTION</string>
+    <string name="video_progress_so_far">%1$s de moins jusqu’ici</string>
+    <string name="video_progress_remaining">Environ %1$s restantes</string>
+    <string name="video_progress_note">Tu peux quitter l’app ; ça continue dans la notification. Si le téléphone chauffe ou si la batterie passe sous 20 %, je m’arrête seul.</string>
+    <string name="video_stop">Arrêter</string>
+    <string name="video_stop_note">Si tu arrêtes, les copies terminées restent et aucun original n’est touché.</string>
+    <string name="video_compare_label">RESTE %1$d · %2$s</string>
+    <string name="video_compare_later">Plus tard</string>
+    <string name="video_compare_title">Regarde les deux et juge toi-même.</string>
+    <string name="video_original">ORIGINAL</string>
+    <string name="video_smaller">RÉDUIT</string>
+    <string name="video_play">Lire %1$s</string>
+    <string name="video_fact_resolution">Résolution et cadence</string>
+    <string name="video_fact_same">Identique</string>
+    <string name="video_fact_gain">Gain</string>
+    <string name="video_compare_play_first">Lis la version réduite au moins une fois pour valider.</string>
+    <string name="video_compare_failed">Impossible de mettre l’original à la corbeille. Il est toujours en place.</string>
+    <string name="video_approve">OK, retirer l’original</string>
+    <string name="video_keep_original">Garder l’original, supprimer la version réduite</string>
+    <string name="video_compare_note">L’original retiré attend 7 jours dans la corbeille ; tu peux le récupérer.</string>
+    <string name="video_result_title">gagnés. Sans supprimer une seule vidéo.</string>
+    <string name="video_result_what">CE QUI S’EST PASSÉ</string>
+    <string name="video_skip_low_gain">Gain trop faible</string>
+    <string name="video_skip_failed">Réduction impossible</string>
+    <string name="video_result_estimate">Mon estimation</string>
+    <string name="video_result_trash_note">Les originaux sont 7 jours dans la corbeille. L’espace se libère quand elle se vide.</string>
+    <string name="video_delete_now">Supprimer les originaux définitivement maintenant</string>
+    <string name="video_delete_now_confirm">Les originaux (%1$s) seront supprimés définitivement. C’est irréversible.</string>
+    <string name="video_done">Terminé</string>
+    <string name="video_duration_hm">%1$d h %2$d min</string>
+    <string name="video_duration_ms">%1$d min %2$d s</string>
+    <string name="video_duration_s">%1$d s</string>
+    <string name="video_channel">Réduction des vidéos</string>
+    <string name="video_notif_progress_title">Réduction %1$d / %2$d</string>
+    <string name="video_notif_progress_body">%1$s de moins jusqu’ici</string>
+    <string name="video_notif_done_body">Regarde et valide. Les originaux sont toujours en place.</string>
+    <string name="watch_toggle_videos_sub">Celles que je peux réduire sans supprimer.</string>
+    <plurals name="video_pending_title">
+        <item quantity="one">%d copie réduite attend ta validation</item>
+        <item quantity="many">%d copies réduites attendent ta validation</item>
+        <item quantity="other">%d copies réduites attendent ta validation</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="one">Je réduis %d vidéo. La résolution reste la même.</item>
+        <item quantity="many">Je réduis %d vidéos. La résolution reste la même.</item>
+        <item quantity="other">Je réduis %d vidéos. La résolution reste la même.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="one">%1$d VIDÉO · %2$s</item>
+        <item quantity="many">%1$d VIDÉOS · %2$s</item>
+        <item quantity="other">%1$d VIDÉOS · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="one">Réduire %d vidéo</item>
+        <item quantity="many">Réduire %d vidéos</item>
+        <item quantity="other">Réduire %d vidéos</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="one">Appliquer à l’autre vidéo (%d)</item>
+        <item quantity="many">Appliquer aux %d autres vidéos</item>
+        <item quantity="other">Appliquer aux %d autres vidéos</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="one">%d vidéo réduite</item>
+        <item quantity="many">%d vidéos réduites</item>
+        <item quantity="other">%d vidéos réduites</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="one">%d vidéo ignorée</item>
+        <item quantity="many">%d vidéos ignorées</item>
+        <item quantity="other">%d vidéos ignorées</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="one">%d vidéo réduite</item>
+        <item quantity="many">%d vidéos réduites</item>
+        <item quantity="other">%d vidéos réduites</item>
     </plurals>
 </resources>

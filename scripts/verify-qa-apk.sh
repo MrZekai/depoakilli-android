@@ -45,7 +45,6 @@ if grep -q "application-debuggable" "$BADGING"; then
 fi
 
 for forbidden in \
-  'android.permission.FOREGROUND_SERVICE' \
   'androidx.work.impl.foreground.SystemForegroundService' \
   'androidx.compose.ui.tooling.PreviewActivity'
 do
@@ -53,6 +52,14 @@ do
     fail "packaged QA manifest still contains: $forbidden"
   fi
 done
+# Faz 3A-2: a foreground service only for shrinking videos (user tap):
+# exactly FOREGROUND_SERVICE + _DATA_SYNC + _MEDIA_PROCESSING, our own service.
+fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$PERMS" | sort -u | tr '\n' ' ')"
+if [ "$fgs_perms" != "android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING " ]; then
+  fail "QA APK foreground-service permissions differ: $fgs_perms"
+fi
+grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$MANIFEST" \
+  || fail "QA APK is missing the video shrinking service"
 
 # DEX printable-string scanning is valid for Compose PreviewActivity.
 for forbidden in \

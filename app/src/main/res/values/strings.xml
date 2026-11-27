@@ -835,7 +835,6 @@
     <string name="watch_toggle_whatsapp">If WhatsApp grows fast</string>
     <string name="watch_toggle_whatsapp_sub">If it passes %s in a week.</string>
     <string name="watch_toggle_videos">New big videos</string>
-    <string name="watch_toggle_videos_soon">Comes with video shrinking.</string>
     <string name="watch_notifications_off">Turn on notifications</string>
     <string name="watch_notifications_off_sub">Until then I show it on the home screen.</string>
     <string name="watch_hibernation_row">Android may pause me</string>
@@ -860,5 +859,94 @@
     <plurals name="watch_pro_sent">
         <item quantity="one">The watch told you %1$d time this month</item>
         <item quantity="other">The watch told you %1$d times this month</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <string name="video_title">Shrink videos</string>
+    <string name="video_tools_detail">Make room without deleting</string>
+    <string name="video_y7_card">About %1$s without deleting</string>
+    <string name="video_head_label">About, without deleting</string>
+    <string name="video_about">about %1$s</string>
+    <string name="video_select_all">Select all</string>
+    <string name="video_select_none">All selected</string>
+    <string name="video_note_originals">Originals stay until you see the result and approve.</string>
+    <string name="video_note_backup">Your photo backup app may upload the new file too.</string>
+    <string name="video_try_one">Try one at no cost</string>
+    <string name="video_looking">Looking at your big videos…</string>
+    <string name="video_none_title">No video worth shrinking</string>
+    <string name="video_none_body">I look at videos of 100 MB or more. Yours are already compact, or are kinds I don’t touch (HDR, slow motion, 360°).</string>
+    <string name="video_no_room">Not enough free space to shrink safely. Clear a little first; I need about 1 GB free.</string>
+    <string name="video_low_battery">Battery is below 20%. Plug in the charger, then start.</string>
+    <string name="video_too_hot">The phone is hot. Let it cool down, then start again.</string>
+    <string name="video_pending_note">Copies you don’t approve within 7 days are removed; the originals stay.</string>
+    <string name="video_pending_review">Watch and approve</string>
+    <string name="video_progress_label">SHRINKING</string>
+    <string name="video_progress_so_far">%1$s smaller so far</string>
+    <string name="video_progress_remaining">About %1$s left</string>
+    <string name="video_progress_note">You can leave the app; it continues in the notification. If the phone gets hot or the battery drops below 20%, I stop by myself.</string>
+    <string name="video_stop">Stop</string>
+    <string name="video_stop_note">If you stop, finished copies stay and no original is touched.</string>
+    <string name="video_compare_label">%1$d LEFT · %2$s</string>
+    <string name="video_compare_later">Later</string>
+    <string name="video_compare_title">Watch both and judge for yourself.</string>
+    <string name="video_original">ORIGINAL</string>
+    <string name="video_smaller">SMALLER</string>
+    <string name="video_play">Play %1$s</string>
+    <string name="video_fact_resolution">Resolution and frame rate</string>
+    <string name="video_fact_same">Same</string>
+    <string name="video_fact_gain">Gain</string>
+    <string name="video_compare_play_first">Play the smaller one at least once to approve.</string>
+    <string name="video_compare_failed">The original could not be moved to the Trash. It is still in place.</string>
+    <string name="video_approve">OK, remove the original</string>
+    <string name="video_keep_original">Keep the original, delete the smaller one</string>
+    <string name="video_compare_note">The removed original waits 7 days in the Trash; you can put it back.</string>
+    <string name="video_result_title">gained. Without deleting a single video.</string>
+    <string name="video_result_what">WHAT HAPPENED</string>
+    <string name="video_skip_low_gain">Too little gain</string>
+    <string name="video_skip_failed">Couldn’t be shrunk</string>
+    <string name="video_result_estimate">My estimate</string>
+    <string name="video_result_trash_note">The originals are in the Trash for 7 days. The space opens on the phone when the Trash empties.</string>
+    <string name="video_delete_now">Delete the originals permanently now</string>
+    <string name="video_delete_now_confirm">The originals (%1$s) will be deleted for good. This cannot be undone.</string>
+    <string name="video_done">Done</string>
+    <string name="video_duration_hm">%1$d h %2$d min</string>
+    <string name="video_duration_ms">%1$d min %2$d s</string>
+    <string name="video_duration_s">%1$d s</string>
+    <string name="video_channel">Shrinking videos</string>
+    <string name="video_notif_progress_title">Shrinking %1$d / %2$d</string>
+    <string name="video_notif_progress_body">%1$s smaller so far</string>
+    <string name="video_notif_done_body">Watch and approve. The originals are still in place.</string>
+    <string name="watch_toggle_videos_sub">Ones I can shrink without deleting.</string>
+    <plurals name="video_pending_title">
+        <item quantity="one">%d smaller copy waits for your approval</item>
+        <item quantity="other">%d smaller copies wait for your approval</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="one">I’ll shrink %d video. Resolution stays the same.</item>
+        <item quantity="other">I’ll shrink %d videos. Resolution stays the same.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="one">%1$d VIDEO · %2$s</item>
+        <item quantity="other">%1$d VIDEOS · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="one">Shrink %d video</item>
+        <item quantity="other">Shrink %d videos</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="one">Apply to the other %d video</item>
+        <item quantity="other">Apply to the other %d videos</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="one">%d video shrunk</item>
+        <item quantity="other">%d videos shrunk</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="one">%d video skipped</item>
+        <item quantity="other">%d videos skipped</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="one">%d video shrunk</item>
+        <item quantity="other">%d videos shrunk</item>
     </plurals>
 </resources>
