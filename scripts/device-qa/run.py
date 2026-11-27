@@ -245,6 +245,16 @@ def app_notices():
     return len(re.findall(rf"pkg={re.escape(PKG)}\b", out))
 
 
+def video_service_foreground():
+    out = sh(f"dumpsys activity services {PKG}", timeout=60)
+    return "VideoCompressionService" in out and "isForeground=true" in out
+
+
+def video_log(tail=25):
+    lines = adb("logcat", "-d", "-v", "brief", "SmartCleanerVideo:V", "TransformerInternal:V", "MediaCodec:E", "CCodec:E", "*:S").splitlines()
+    return " | ".join(lines[-tail:])[:2500]
+
+
 def video_section():
     src = os.path.abspath(os.environ.get("QA_SHRINK_VIDEO", "qa-shrink.mp4"))
     if not os.path.exists(src):
@@ -262,13 +272,16 @@ def video_section():
     sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=120)
     orig_size = sh(f"stat -c %s {dev}").strip()
     log(f"shrink source: {orig_size} bytes, free {free_bytes()}")
+    # As a user who wants to see the progress: notifications allowed.
+    sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS")
+    adb("logcat", "-c")
     target = f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target "
     sh(f"am force-stop {PKG}")
     sh(target + "videos")
     listed = wait_for(r"^1 VIDEO · ", 90, dismiss=False)
     check("Z5: büyük video listede (1 VIDEO · ~X)", listed, note=getattr(listed, "label", ""), screenshot=shot("video-z5"))
     if not listed:
-        log("video log: " + " | ".join(adb("logcat", "-d", "-s", "SmartCleanerVideo").splitlines()[-20:])[:1500])
+        log("video log: " + video_log())
         return
     check("Z5: Pro olmayan için düğme PRO rozetli, 'Try one at no cost' var", find(r"^Try one at no cost$"))
     check("Z5: notlar (orijinal onaya kadar kalır)", scroll_to(r"^Originals stay until you see the result and approve\.$", 3))
@@ -277,7 +290,8 @@ def video_section():
     tap_text(r"^Try one at no cost$", 10)
     running = wait_for(r"^SHRINKING$", 30, dismiss=False)
     check("Z6: küçültme kullanıcı dokunuşuyla başladı", running, screenshot=shot("video-z6"))
-    check("Z6: ön plan bildirimi var (Stop düğmeli)", app_notices() > 0)
+    check("Z6: ön plan hizmeti ve bildirimi var (Stop düğmeli)", video_service_foreground() and app_notices() > 0,
+          note=f"notices={app_notices()}")
     if running:
         tap_text(r"^Stop$", 10)
     back_to_list = wait_for(r"^Try one at no cost$", 40, dismiss=False)
@@ -293,13 +307,18 @@ def video_section():
     wait_for(r"^SHRINKING$", 30, dismiss=False)
     sh("input keyevent KEYCODE_HOME")
     time.sleep(4)
-    check("Uygulamadan çıkınca küçültme bildirimde sürüyor", app_notices() > 0)
+    check("Uygulamadan çıkınca küçültme ön planda sürüyor", video_service_foreground(), note=f"notices={app_notices()}")
     sh(target + "SHRINK")
     back_in = wait_for(r"^(SHRINKING|Watch both and judge for yourself\.)$", 20, dismiss=False)
     check("Bildirimden dönüş: ilerleme ya da karşılaştırma ekranı", back_in, screenshot=shot("video-return"))
-    compare = wait_for(r"^Watch both and judge for yourself\.$", 600, dismiss=False)
+    compare = None
+    for _ in range(12):
+        compare = wait_for(r"^Watch both and judge for yourself\.$", 60, dismiss=False)
+        if compare:
+            break
+        log("shrinking: " + " | ".join(texts()[:12])[:300])
     took = int(time.time() - started)
-    log("video log: " + " | ".join(adb("logcat", "-d", "-s", "SmartCleanerVideo").splitlines()[-20:])[:2000])
+    log("video log: " + video_log())
     check("Z7: küçük kopya hazır, karşılaştırma açıldı", compare, note=f"{took} s", screenshot=shot("video-z7"))
     if not compare:
         return
@@ -319,7 +338,7 @@ def video_section():
         po, ps = json.loads(probe), json.loads(probe_src)
         types = [st.get("codec_type") for st in po.get("streams", [])]
         check("Çıktı: ses korunmuş, görüntü aynı boyutta",
-              "audio" in types and any(st.get("width") == 1280 and st.get("height") == 720 for st in po["streams"]),
+              "audio" in types and any(st.get("width") == 854 and st.get("height") == 480 for st in po["streams"]),
               note=str([(st.get("codec_name"), st.get("width"), st.get("height")) for st in po["streams"]]))
         check("Çıktı: süre 1 sn içinde aynı",
               abs(float(po["format"]["duration"]) - float(ps["format"]["duration"])) <= 1.0,

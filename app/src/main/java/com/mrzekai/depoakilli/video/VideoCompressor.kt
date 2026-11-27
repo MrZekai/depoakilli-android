@@ -3,6 +3,7 @@ package com.mrzekai.depoakilli.video
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Metadata
@@ -126,19 +127,28 @@ class VideoCompressor(private val context: Context) {
             var transformer: Transformer? = null
             val poller = launch {
                 val holder = ProgressHolder()
+                var lastLogged = -10
                 while (true) {
                     delay(PROGRESS_POLL_MS)
                     val current = transformer ?: continue
-                    if (current.getProgress(holder) == Transformer.PROGRESS_STATE_AVAILABLE) onProgress(holder.progress)
+                    if (current.getProgress(holder) == Transformer.PROGRESS_STATE_AVAILABLE) {
+                        if (holder.progress / 10 != lastLogged / 10) {
+                            lastLogged = holder.progress
+                            Log.i(TAG, "progress ${holder.progress}%")
+                        }
+                        onProgress(holder.progress)
+                    }
                 }
             }
             val outcome = suspendCancellableCoroutine<Outcome?> { continuation ->
                 val listener = object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
+                        Log.i(TAG, "export done: ${exportResult.videoEncoderName} ${exportResult.averageVideoBitrate} b/s, audio ${exportResult.audioEncoderName ?: "copied"}")
                         if (continuation.isActive) continuation.resume(null)
                     }
 
                     override fun onError(composition: Composition, exportResult: ExportResult, exportException: ExportException) {
+                        Log.w(TAG, "export failed: ${exportException.errorCodeName}", exportException)
                         if (continuation.isActive) continuation.resume(Outcome.Failed(null))
                     }
                 }
@@ -155,6 +165,7 @@ class VideoCompressor(private val context: Context) {
                     .addListener(listener)
                     .build()
                 transformer = built
+                Log.i(TAG, "export start: ${if (hevc) "H.265" else "H.264"} ${candidate.targetVideoBitrate} b/s, ${candidate.meta.width}x${candidate.meta.height}")
                 continuation.invokeOnCancellation { runCatching { built.cancel() } }
                 runCatching {
                     built.start(EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(original))).build(), temp.absolutePath)
@@ -181,6 +192,7 @@ class VideoCompressor(private val context: Context) {
 
     companion object {
         private const val PROGRESS_POLL_MS = 500L
+        private const val TAG = "SmartCleanerVideo"
 
         /** "+41.0082+028.9784/" → (41.0082, 28.9784). */
         internal fun parseIso6709(raw: String?): Pair<Float, Float>? {
