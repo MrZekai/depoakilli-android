@@ -418,9 +418,14 @@ def main():
         n = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20)
     if n and n.label.upper() == "MAKE ROOM":
         tap(n)
-    wait_for(r"^(?-i:CLEAN UP)$", 180)
-    tap_text(r"^(?-i:CLEAN UP)$", 20)
-    tap_text(r"^Yes, clean up$", 20)
+    # On a saved summary "CLEAN UP" first starts a fresh scan (HomeLogic.SCAN);
+    # the confirmation comes on the plan that scan shows, so tap again then.
+    for _ in range(3):
+        wait_for(r"^(?-i:CLEAN UP)$", 180)
+        tap_text(r"^(?-i:CLEAN UP)$", 20)
+        if tap_text(r"^Yes, clean up$", 15):
+            break
+        log("second cleanup: no confirmation yet: " + " | ".join(texts())[:300])
     free_now = wait_for(r"^Get .+ back now$", 90)
     before = free_bytes()
     if free_now:
@@ -606,8 +611,13 @@ def main():
     # only by the user; a "no" to notifications keeps the app working; a
     # notice's tap target opens the right screen; off cancels the job.
     def watch_jobs():
+        # WorkManager's jobs only (Trash purge + Watch). API 34+ prints them in a
+        # namespace ("JOB androidx.work.systemjobscheduler:u0a192/2"), older
+        # versions as "JOB #u0a192/2 ... SystemJobService".
         out = sh(f"dumpsys jobscheduler {PKG}", timeout=60)
-        return len(set(re.findall(r"JOB #u\d+a\d+/(\d+)", out)))
+        ids = set(re.findall(r"JOB androidx\.work\.systemjobscheduler:u\d+a\d+/(\d+)", out))
+        ids |= set(re.findall(r"JOB #u\d+a\d+/(\d+): \S+ \S+/androidx\.work\.impl\.background\.systemjob\.SystemJobService", out))
+        return len(ids)
 
     def notices():
         out = sh("dumpsys notification --noredact", timeout=60)
