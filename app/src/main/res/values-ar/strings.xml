@@ -1221,7 +1221,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notif_weekly_body">الأكثر نموًا: %1$s ‎+%2$s.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_notif_whatsapp_title">نما واتساب %1$s هذا الأسبوع</string>
+    <string name="watch_notif_whatsapp_title">نما WhatsApp %1$s هذا الأسبوع</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notif_whatsapp_body">يمكنني عرضها واحدًا تلو الآخر.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1229,7 +1229,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_kind_videos">الفيديوهات</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_kind_whatsapp">واتساب</string>
+    <string name="watch_kind_whatsapp">WhatsApp</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_kind_photos">الصور</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1257,7 +1257,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_hibernation_title">أبقِ الحارس مستيقظًا</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_hibernation_body">إذا لم تفتحني لمدة طويلة، يوقفني أندرويد مؤقتًا. يمكنك إيقاف ذلك ليستمر الحارس في العمل.</string>
+    <string name="watch_hibernation_body">إذا لم تفتحني لمدة طويلة، يوقفني Android مؤقتًا. يمكنك إيقاف ذلك ليستمر الحارس في العمل.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_open_setting">افتح الإعداد</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1295,7 +1295,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_weekly_sub">ما الذي تراكم وكم يمكن تحريره.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_whatsapp">إذا نما واتساب بسرعة</string>
+    <string name="watch_toggle_whatsapp">إذا نما WhatsApp بسرعة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_whatsapp_sub">إذا تجاوز %s في أسبوع.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1307,7 +1307,7 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off_sub">إلى ذلك الحين أعرضه في الشاشة الرئيسية.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_hibernation_row">قد يوقفني أندرويد مؤقتًا</string>
+    <string name="watch_hibernation_row">قد يوقفني Android مؤقتًا</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_footer">إشعار واحد يوميًا على الأكثر. لا أحذف أي شيء من تلقاء نفسي؛ أسألك دائمًا.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
