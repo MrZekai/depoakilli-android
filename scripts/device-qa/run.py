@@ -418,9 +418,14 @@ def main():
         n = wait_for(r"^(?-i:MAKE ROOM|CLEAN UP)$", 20)
     if n and n.label.upper() == "MAKE ROOM":
         tap(n)
-    wait_for(r"^(?-i:CLEAN UP)$", 180)
-    tap_text(r"^(?-i:CLEAN UP)$", 20)
-    tap_text(r"^Yes, clean up$", 20)
+    # On a saved summary "CLEAN UP" first starts a fresh scan (HomeLogic.SCAN);
+    # the confirmation comes on the plan that scan shows, so tap again then.
+    for _ in range(3):
+        wait_for(r"^(?-i:CLEAN UP)$", 180)
+        tap_text(r"^(?-i:CLEAN UP)$", 20)
+        if tap_text(r"^Yes, clean up$", 15):
+            break
+        log("second cleanup: no confirmation yet: " + " | ".join(texts())[:300])
     free_now = wait_for(r"^Get .+ back now$", 90)
     before = free_bytes()
     if free_now:
@@ -464,6 +469,7 @@ def main():
             row = wait_for(r"^Smart Cleaner Pro$", 8)
             if row:
                 break
+            log(f"settings tap ({tag}): {resumed_activity()[-60:]} :: " + " | ".join(texts())[:300])
         check(f"Ayarlar'da 'Smart Cleaner Pro' satırı var ({tag})", row, screenshot=shot(f"settings-pro-row-{tag}"))
         if row:
             tap(row)
@@ -600,6 +606,78 @@ def main():
     check("Ana ekranda reklam yok ('Test Ad' / 'Ad' etiketi yok)",
           not find(r"^(Test Ad|Ad|Sponsored)$") and "AdActivity" not in resumed_activity(),
           screenshot=shot("home-no-ads"))
+
+    # 12. Faz 3A-1 Storage Watch: off by default (no job, no notice); turned on
+    # only by the user; a "no" to notifications keeps the app working; a
+    # notice's tap target opens the right screen; off cancels the job.
+    def watch_jobs():
+        # WorkManager's jobs only (Trash purge + Watch). API 34+ prints them in a
+        # namespace ("JOB androidx.work.systemjobscheduler:u0a192/2"), older
+        # versions as "JOB #u0a192/2 ... SystemJobService".
+        out = sh(f"dumpsys jobscheduler {PKG}", timeout=60)
+        ids = set(re.findall(r"JOB androidx\.work\.systemjobscheduler:u\d+a\d+/(\d+)", out))
+        ids |= set(re.findall(r"JOB #u\d+a\d+/(\d+): \S+ \S+/androidx\.work\.impl\.background\.systemjob\.SystemJobService", out))
+        return len(ids)
+
+    def notices():
+        out = sh("dumpsys notification --noredact", timeout=60)
+        return len(re.findall(rf"pkg={re.escape(PKG)}\b", out))
+
+    jobs_off = watch_jobs()
+    check("Nöbetçi varsayılan olarak kapalı: uygulamadan bildirim yok", notices() == 0, note=f"jobs={jobs_off}")
+    to_home()
+    watch_row = None
+    for _ in range(3):
+        gear = wait_for(r"^Settings$", 10)
+        if not gear:
+            break
+        tap(gear)
+        watch_row = scroll_to(r"^Storage Watch$", 4)
+        if watch_row:
+            break
+    check("Ayarlar'da 'Storage Watch' satırı var", watch_row, screenshot=shot("watch-settings-row"))
+    if watch_row:
+        tap(watch_row)
+        intro = wait_for(r"^I'll tell you before your phone fills up\.$", 10, dismiss=False)
+        check("Z2: Nöbetçi tanıtımı açılıyor (dokunuşla)", intro, screenshot=shot("watch-z2"))
+        turn_on = find(r"^Turn on the watch$")
+        if turn_on:
+            tap(turn_on)
+            deny = wait_for(r"^Don.t allow$", 10, dismiss=False)
+            check("Android 13+: bildirim izni yalnız Nöbetçi açılırken soruluyor", deny, screenshot=shot("watch-permission"))
+            if deny:
+                tap(deny)
+            # Android may put unused apps to sleep: explained once, right after turning on.
+            sheet = wait_for(r"^Keep the watch awake$", 6, dismiss=False)
+            if sheet:
+                check("Uyku (hibernation) açıklaması bir kez gösteriliyor", sheet, screenshot=shot("watch-hibernation"))
+                tap_text(r"^Not now$", 5)
+            on = wait_for(r"^Watch is on$", 15, dismiss=False)
+            check("İzin reddinde Nöbetçi açık, uygulama çalışıyor (Z3)", on, screenshot=shot("watch-z3-denied"))
+            check("Z3: izin yokken 'Turn on notifications' satırı var", scroll_to(r"^Turn on notifications$", 3),
+                  screenshot=shot("watch-z3-notif-row"))
+            time.sleep(3)
+            jobs_on = watch_jobs()
+            dump_all = sh("dumpsys jobscheduler", timeout=60)
+            log("jobs(all): " + " | ".join(l.strip()[:160] for l in dump_all.splitlines() if PKG in l)[:1500])
+            log("wm logcat: " + " | ".join(adb("logcat", "-d", "-s", "WM-WorkerWrapper", "WM-SystemJobScheduler", "WM-WorkManagerImpl", "AndroidRuntime").splitlines()[-15:])[:1500])
+            check("Nöbetçi açılınca günlük iş kuruldu", jobs_on > jobs_off, note=f"{jobs_off} -> {jobs_on}")
+            # A notice's tap: the launch intent carries the target screen.
+            sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target whatsapp")
+            check("Bildirim dokunuşu (whatsapp) WhatsApp ekranını açıyor",
+                  wait_for(r"^WhatsApp Cleaner$", 15, dismiss=False), screenshot=shot("watch-target-whatsapp"))
+            sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target watch")
+            check("Bildirim dokunuşu (watch) Nöbetçi ekranını açıyor",
+                  wait_for(r"^Watch is on$", 15, dismiss=False), screenshot=shot("watch-target-watch"))
+            off = scroll_to(r"^Turn off the watch$", 6)
+            if off:
+                tap(off)
+            check("Nöbetçi kapatılabiliyor", wait_for(r"^Watch is off$", 10, dismiss=False), screenshot=shot("watch-off"))
+            time.sleep(3)
+            jobs_after = watch_jobs()
+            check("Nöbetçi kapanınca iş iptal edildi", jobs_after <= jobs_off, note=f"{jobs_on} -> {jobs_after}")
+            check("Nöbetçi boyunca hiç bildirim gönderilmedi (eşik yok)", notices() == 0)
+        to_home()
 
     sh("cmd connectivity airplane-mode enable")
     time.sleep(3)

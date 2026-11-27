@@ -976,4 +976,138 @@
         <item quantity="one">%d Entscheidung heute; unbegrenzt mit Pro</item>
         <item quantity="other">%d Entscheidungen heute; unbegrenzt mit Pro</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_storage">Hinweise bei vollem Speicher</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_weekly">Wochenübersicht</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_growth">Schnelles Wachstum</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_title">Speicher zu %1$s voll</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_body">Noch %1$s frei. Sollen wir sehen, was Platz belegt?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_title">Diese Woche %1$s dazugekommen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_body">Am meisten gewachsen: %1$s +%2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_title">WhatsApp ist diese Woche um %1$s gewachsen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_body">Wenn du willst, zeige ich sie dir einzeln.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_videos_body">Ich kann etwa %1$s freigeben, ohne zu löschen.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_videos">Videos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_whatsapp">WhatsApp</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_photos">Fotos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_other">Sonstiges</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_screen_title">Wächter</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_settings_row">Speicherwächter</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_label">SPEICHERWÄCHTER</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_title">Ich sage dir Bescheid, bevor dein Handy voll ist.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_look">Ich schaue regelmäßig nach. Schont den Akku.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_measure">Ich messe, was sich ansammelt, und sage es dir.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_never">Ich lösche nie etwas von selbst.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_on">Wächter einschalten</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_off">Wächter ausschalten</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_note">Ich frage nach der Erlaubnis für Mitteilungen. Höchstens 1 pro Tag; Ruhe von 21:00 bis 09:00. Sagst du nein, zeige ich es auf dem Startbildschirm.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_title">Wächter wach halten</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_body">Wenn du mich lange nicht öffnest, pausiert Android mich. Du kannst das abschalten, damit der Wächter weiterläuft.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_open_setting">Einstellung öffnen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_on">Wächter an</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_off">Wächter aus</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_last_check">Zuletzt geprüft %1$s · %2$s voll</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_today">heute %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_yesterday">gestern %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_no_check">Noch nicht geprüft</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_stale_fix">Akku- und Hintergrundeinstellungen prüfen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_label">DIESE WOCHE</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_label">WÄCHTER · DIESE WOCHE</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_added">%s dazugekommen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_freed">Diese Woche frei geworden: %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_pending">Ich zeige das, sobald die erste Woche vorbei ist.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_breakdown_pro">Sehen, was dazukam</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold">Warnen, bevor er voll ist</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold_sub">Bei %1$s und %2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly">Wochenübersicht</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly_sub">Was dazukam und wie viel frei werden kann.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp">Wenn WhatsApp schnell wächst</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp_sub">Wenn es in einer Woche %s übersteigt.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos">Neue große Videos</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos_soon">Kommt mit dem Verkleinern von Videos.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off">Mitteilungen einschalten</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off_sub">Bis dahin zeige ich es auf dem Startbildschirm.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_row">Android kann mich pausieren</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_footer">Höchstens 1 Mitteilung pro Tag. Ich lösche nie etwas von selbst; ich frage dich immer.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_line">Wächter an · zuletzt geprüft %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_see_new">Neues ansehen</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_details">Details</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_title">Soll ich dir Bescheid sagen, bevor er voll ist?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_open">Mehr dazu</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_notif_videos_title">
+        <item quantity="one">%1$d neues großes Video</item>
+        <item quantity="other">%1$d neue große Videos</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_stale">
+        <item quantity="one">Der Wächter konnte seit %1$d Tag nicht nachsehen</item>
+        <item quantity="other">Der Wächter konnte seit %1$d Tagen nicht nachsehen</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_week_days">
+        <item quantity="one">am letzten %1$d Tag</item>
+        <item quantity="other">in den letzten %1$d Tagen</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_pro_sent">
+        <item quantity="one">Der Wächter hat dich diesen Monat %1$d Mal informiert</item>
+        <item quantity="other">Der Wächter hat dich diesen Monat %1$d Mal informiert</item>
+    </plurals>
 </resources>

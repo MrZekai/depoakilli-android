@@ -86,6 +86,10 @@ internal fun CleanTab(
     onOpenAppsSection: () -> Unit = onOpenFindings,
     /** Faz 2 Y1: Pro's measured extra, or null when the card must not show. */
     proCard: HomeProCard? = null,
+    /** Faz 3A-1 Z1: "Watch on · last check …" under the giant button. */
+    watchLine: (@Composable () -> Unit)? = null,
+    /** Faz 3A-1 Z1: this week's card or the one-time offer; never with the Y1 Pro card. */
+    watchCard: (@Composable () -> Unit)? = null,
 ) {
     val showingPlan = state.scanFocus == ScanFocus.SMART && state.summary.scannedFileCount > 0
     val savedSummary = !showingPlan && state.dashboardSnapshotAtMillis > 0L
@@ -181,6 +185,8 @@ internal fun CleanTab(
                         appsMoreBytes = if (showingPlan) appsMoreBytes else 0L,
                         onOpenApps = onOpenAppsSection,
                         proCard = if (showingPlan && !state.cleanupInProgress) proCard else null,
+                        watchLine = watchLine,
+                        watchCard = if (proCard != null && showingPlan && !state.cleanupInProgress) null else watchCard,
                         totalBytes = state.storage.totalBytes,
                         availableBytes = state.storage.availableBytes,
                     )
@@ -196,6 +202,8 @@ internal fun CleanTab(
                         onCheckAgain = onStartScan,
                         trashEntries = state.trashEntries,
                         onOpenTrash = onOpenTrash,
+                        watchLine = watchLine,
+                        watchCard = watchCard,
                     )
                 }
             }
@@ -284,6 +292,8 @@ private fun PlanHome(
     appsMoreBytes: Long = 0L,
     onOpenApps: () -> Unit = {},
     proCard: HomeProCard? = null,
+    watchLine: (@Composable () -> Unit)? = null,
+    watchCard: (@Composable () -> Unit)? = null,
     totalBytes: Long = 0L,
     availableBytes: Long = 0L,
 ) {
@@ -309,7 +319,13 @@ private fun PlanHome(
             diameter = scale.buttonDp.dp,
             busy = busy,
         )
-        Spacer(Modifier.height(16.dp))
+        if (watchLine != null) {
+            Spacer(Modifier.height(8.dp))
+            watchLine()
+            Spacer(Modifier.height(8.dp))
+        } else {
+            Spacer(Modifier.height(16.dp))
+        }
     }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         if (safeBytes > 0L) {
@@ -349,6 +365,8 @@ private fun PlanHome(
                 onNotNow = proCard.onNotNow,
                 modifier = Modifier.padding(top = 14.dp),
             )
+        } else {
+            watchCard?.invoke()
         }
         // D7: at least 12 dp between the last line and the bottom bar.
         Spacer(Modifier.height(12.dp))
@@ -439,6 +457,8 @@ private fun TidyHome(
     onCheckAgain: () -> Unit,
     trashEntries: List<TrashEntry>,
     onOpenTrash: () -> Unit,
+    watchLine: (@Composable () -> Unit)? = null,
+    watchCard: (@Composable () -> Unit)? = null,
 ) {
     Spacer(Modifier.height(8.dp))
     Text(
@@ -456,7 +476,9 @@ private fun TidyHome(
             diameter = scale.buttonDp.dp,
         )
         Spacer(Modifier.height(12.dp))
+        watchLine?.invoke()
         HomeTrashLine(trashEntries, onOpenTrash)
+        watchCard?.invoke()
     }
 }
 

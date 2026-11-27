@@ -1088,4 +1088,146 @@
         <item quantity="many">%d решений сегодня; без ограничений с Pro</item>
         <item quantity="other">%d решений сегодня; без ограничений с Pro</item>
     </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_storage">Уведомления о заполнении памяти</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_weekly">Сводка за неделю</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_channel_growth">Быстрый рост</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_title">Память заполнена на %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_full_body">Осталось %1$s. Посмотрим, что занимает место?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_title">За неделю накопилось %1$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_weekly_body">Больше всего выросло: %1$s +%2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_title">WhatsApp вырос на %1$s за неделю</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_whatsapp_body">Могу показать по очереди.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notif_videos_body">Могу освободить около %1$s без удаления.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_videos">Видео</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_whatsapp">WhatsApp</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_photos">Фото</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_kind_other">Другое</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_screen_title">Дозорный</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_settings_row">Дозорный памяти</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_label">ДОЗОРНЫЙ ПАМЯТИ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_title">Предупрежу, пока телефон не заполнился.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_look">Смотрю регулярно. Батарею не тратит.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_measure">Измеряю, что накапливается, и говорю тебе.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_point_never">Никогда ничего не удаляю сам.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_on">Включить дозорного</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_turn_off">Выключить дозорного</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_intro_note">Я попрошу разрешение на уведомления. Не больше 1 в день; тишина с 21:00 до 09:00. Если откажешь, покажу это на главном экране.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_title">Не давай дозорному уснуть</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_body">Если долго меня не открывать, Android приостановит меня. Это можно отключить, чтобы дозорный работал.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_open_setting">Открыть настройку</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_on">Дозорный включён</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_title_off">Дозорный выключен</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_last_check">Последняя проверка %1$s · заполнено %2$s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_today">сегодня %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_time_yesterday">вчера %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_no_check">Ещё не проверял</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_stale_fix">Проверь настройки батареи и фоновой работы</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_label">ЗА НЕДЕЛЮ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_label">ДОЗОРНЫЙ · ЗА НЕДЕЛЮ</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_added">Накопилось %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_freed">За неделю освободилось: %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_week_pending">Покажу, когда пройдёт первая неделя.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_breakdown_pro">Посмотреть, что накопилось</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold">Предупредить до заполнения</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_threshold_sub">При %1$s и %2$s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly">Сводка за неделю</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_weekly_sub">Что накопилось и сколько можно освободить.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp">Если WhatsApp быстро растёт</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_whatsapp_sub">Если за неделю больше %s.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos">Новые большие видео</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_toggle_videos_soon">Появится вместе со сжатием видео.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off">Включить уведомления</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_notifications_off_sub">А пока показываю на главном экране.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_hibernation_row">Android может меня приостановить</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_footer">Не больше 1 уведомления в день. Ничего не удаляю сам — всегда спрашиваю.</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_line">Дозорный включён · проверка %s</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_see_new">Посмотреть новое</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_home_details">Подробнее</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_title">Предупредить, пока не заполнилось?</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <string name="watch_promo_open">Подробнее</string>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_notif_videos_title">
+        <item quantity="one">%1$d новое большое видео</item>
+        <item quantity="few">%1$d новых больших видео</item>
+        <item quantity="many">%1$d новых больших видео</item>
+        <item quantity="other">%1$d новых больших видео</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_stale">
+        <item quantity="one">Дозорный не мог проверить %1$d день</item>
+        <item quantity="few">Дозорный не мог проверить %1$d дня</item>
+        <item quantity="many">Дозорный не мог проверить %1$d дней</item>
+        <item quantity="other">Дозорный не мог проверить %1$d дня</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_week_days">
+        <item quantity="one">за последний %1$d день</item>
+        <item quantity="few">за последние %1$d дня</item>
+        <item quantity="many">за последние %1$d дней</item>
+        <item quantity="other">за последние %1$d дня</item>
+    </plurals>
+    <!-- [ÇEVİRİ GEREKLİ] -->
+    <plurals name="watch_pro_sent">
+        <item quantity="one">Дозорный предупредил %1$d раз в этом месяце</item>
+        <item quantity="few">Дозорный предупредил %1$d раза в этом месяце</item>
+        <item quantity="many">Дозорный предупредил %1$d раз в этом месяце</item>
+        <item quantity="other">Дозорный предупредил %1$d раза в этом месяце</item>
+    </plurals>
 </resources>

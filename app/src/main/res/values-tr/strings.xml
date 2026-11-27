@@ -788,4 +788,77 @@
         <item quantity="one">Bugün %d karar; Pro\'da sınırsız</item>
         <item quantity="other">Bugün %d karar; Pro\'da sınırsız</item>
     </plurals>
+    <string name="watch_channel_storage">Depolama doluluk uyarıları</string>
+    <string name="watch_channel_weekly">Haftalık özet</string>
+    <string name="watch_channel_growth">Hızlı büyüme</string>
+    <string name="watch_notif_full_title">Depolama %1$s doldu</string>
+    <string name="watch_notif_full_body">%1$s boş kaldı. Neyin yer kapladığına bakalım mı?</string>
+    <string name="watch_notif_weekly_title">Bu hafta %1$s birikti</string>
+    <string name="watch_notif_weekly_body">En çok büyüyen: %1$s +%2$s.</string>
+    <string name="watch_notif_whatsapp_title">WhatsApp bu hafta %1$s büyüdü</string>
+    <string name="watch_notif_whatsapp_body">İstersen sırayla gösteririm.</string>
+    <string name="watch_notif_videos_body">Silmeden yaklaşık %1$s açabilirim.</string>
+    <string name="watch_kind_videos">Videolar</string>
+    <string name="watch_kind_whatsapp">WhatsApp</string>
+    <string name="watch_kind_photos">Fotoğraflar</string>
+    <string name="watch_kind_other">Diğer</string>
+    <string name="watch_screen_title">Nöbetçi</string>
+    <string name="watch_settings_row">Depolama Nöbetçisi</string>
+    <string name="watch_intro_label">DEPOLAMA NÖBETÇİSİ</string>
+    <string name="watch_intro_title">Telefonun dolmadan haber vereyim.</string>
+    <string name="watch_intro_point_look">Düzenli olarak bakarım. Pili yormam.</string>
+    <string name="watch_intro_point_measure">Neyin biriktiğini ölçer, sana söylerim.</string>
+    <string name="watch_intro_point_never">Hiçbir şeyi kendiliğinden silmem.</string>
+    <string name="watch_turn_on">Nöbetçi\'yi aç</string>
+    <string name="watch_turn_off">Nöbetçi\'yi kapat</string>
+    <string name="watch_intro_note">Bildirim izni isteyeceğim. Günde en çok 1 bildirim; 21:00–09:00 arası sessiz. İzin vermezsen aynı bilgiyi ana ekranda gösteririm.</string>
+    <string name="watch_hibernation_title">Nöbetçi uyumasın</string>
+    <string name="watch_hibernation_body">Uzun süre açmazsan Android beni duraklatır. Nöbetçi çalışsın diye bunu kapatabilirsin.</string>
+    <string name="watch_open_setting">Ayarı aç</string>
+    <string name="watch_title_on">Nöbetçi açık</string>
+    <string name="watch_title_off">Nöbetçi kapalı</string>
+    <string name="watch_last_check">Son kontrol %1$s · %2$s dolu</string>
+    <string name="watch_time_today">bugün %s</string>
+    <string name="watch_time_yesterday">dün %s</string>
+    <string name="watch_no_check">Henüz bakmadım</string>
+    <string name="watch_stale_fix">Pil ve arka plan ayarlarına bak</string>
+    <string name="watch_week_label">BU HAFTA</string>
+    <string name="watch_home_label">NÖBETÇİ · BU HAFTA</string>
+    <string name="watch_week_added">%s birikti</string>
+    <string name="watch_week_freed">Bu hafta yer açıldı: %s</string>
+    <string name="watch_week_pending">İlk hafta dolunca göstereceğim.</string>
+    <string name="watch_breakdown_pro">Neyin biriktiğini gör</string>
+    <string name="watch_toggle_threshold">Dolmadan haber ver</string>
+    <string name="watch_toggle_threshold_sub">%1$s ve %2$s dolunca.</string>
+    <string name="watch_toggle_weekly">Haftalık özet</string>
+    <string name="watch_toggle_weekly_sub">Ne birikti, ne kadarı açılır.</string>
+    <string name="watch_toggle_whatsapp">WhatsApp hızlı büyürse</string>
+    <string name="watch_toggle_whatsapp_sub">Bir haftada %s\'ı geçerse.</string>
+    <string name="watch_toggle_videos">Yeni büyük videolar</string>
+    <string name="watch_toggle_videos_soon">Video küçültmeyle birlikte açılacak.</string>
+    <string name="watch_notifications_off">Bildirimleri aç</string>
+    <string name="watch_notifications_off_sub">O zamana kadar ana ekranda gösteririm.</string>
+    <string name="watch_hibernation_row">Android beni duraklatabilir</string>
+    <string name="watch_footer">Günde en çok 1 bildirim. Hiçbir şeyi kendiliğinden silmem; her zaman sana sorarım.</string>
+    <string name="watch_home_line">Nöbetçi açık · son kontrol %s</string>
+    <string name="watch_home_see_new">Yeni gelenlere bak</string>
+    <string name="watch_home_details">Ayrıntı</string>
+    <string name="watch_promo_title">Dolmadan haber vereyim mi?</string>
+    <string name="watch_promo_open">Anlat</string>
+    <plurals name="watch_notif_videos_title">
+        <item quantity="one">%1$d yeni büyük video</item>
+        <item quantity="other">%1$d yeni büyük video</item>
+    </plurals>
+    <plurals name="watch_stale">
+        <item quantity="one">Nöbetçi %1$d gündür bakamadı</item>
+        <item quantity="other">Nöbetçi %1$d gündür bakamadı</item>
+    </plurals>
+    <plurals name="watch_week_days">
+        <item quantity="one">son %1$d günde</item>
+        <item quantity="other">son %1$d günde</item>
+    </plurals>
+    <plurals name="watch_pro_sent">
+        <item quantity="one">Nöbetçi bu ay %1$d kez haber verdi</item>
+        <item quantity="other">Nöbetçi bu ay %1$d kez haber verdi</item>
+    </plurals>
 </resources>

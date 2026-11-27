@@ -23,6 +23,7 @@ import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.FolderOff
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.MailOutline
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Share
@@ -90,6 +91,9 @@ internal fun SettingsDetailScreen(
     onIncludeFolder: (com.mrzekai.depoakilli.data.ExcludedFolder) -> Unit = {},
     hasAllFilesAccess: Boolean = false,
     hasUsageAccess: Boolean = false,
+    /** Faz 3A-1: Storage Watch row (opens Z3 when on, Z2 when off). */
+    watchOn: Boolean = false,
+    onOpenWatch: () -> Unit = {},
 ) {
     var showFeedbackDialog by rememberSaveable { mutableStateOf(false) }
     var confirmClearKept by rememberSaveable { mutableStateOf(false) }
@@ -191,6 +195,13 @@ internal fun SettingsDetailScreen(
                         status = if (isPro) on else null,
                         icon = Icons.Outlined.AutoAwesome,
                         onClick = onOpenPro,
+                    )
+                    CardDivider()
+                    CardRow(
+                        title = stringResource(R.string.watch_settings_row),
+                        status = if (watchOn) on else off,
+                        icon = Icons.Outlined.NotificationsActive,
+                        onClick = onOpenWatch,
                     )
                 }
             }
