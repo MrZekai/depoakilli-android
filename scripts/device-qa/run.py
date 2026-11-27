@@ -464,6 +464,7 @@ def main():
             row = wait_for(r"^Smart Cleaner Pro$", 8)
             if row:
                 break
+            log(f"settings tap ({tag}): {resumed_activity()[-60:]} :: " + " | ".join(texts())[:300])
         check(f"Ayarlar'da 'Smart Cleaner Pro' satırı var ({tag})", row, screenshot=shot(f"settings-pro-row-{tag}"))
         if row:
             tap(row)
@@ -636,12 +637,18 @@ def main():
             check("Android 13+: bildirim izni yalnız Nöbetçi açılırken soruluyor", deny, screenshot=shot("watch-permission"))
             if deny:
                 tap(deny)
+            # Android may put unused apps to sleep: explained once, right after turning on.
+            sheet = wait_for(r"^Keep the watch awake$", 6, dismiss=False)
+            if sheet:
+                check("Uyku (hibernation) açıklaması bir kez gösteriliyor", sheet, screenshot=shot("watch-hibernation"))
+                tap_text(r"^Not now$", 5)
             on = wait_for(r"^Watch is on$", 15, dismiss=False)
             check("İzin reddinde Nöbetçi açık, uygulama çalışıyor (Z3)", on, screenshot=shot("watch-z3-denied"))
             check("Z3: izin yokken 'Turn on notifications' satırı var", scroll_to(r"^Turn on notifications$", 3),
                   screenshot=shot("watch-z3-notif-row"))
             time.sleep(3)
             jobs_on = watch_jobs()
+            log("jobs: " + " | ".join(l.strip()[:140] for l in sh(f"dumpsys jobscheduler {PKG}", timeout=60).splitlines() if "JOB #" in l)[:900])
             check("Nöbetçi açılınca günlük iş kuruldu", jobs_on > jobs_off, note=f"{jobs_off} -> {jobs_on}")
             # A notice's tap: the launch intent carries the target screen.
             sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es watch_target whatsapp")
