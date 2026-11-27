@@ -80,7 +80,7 @@ object WatchNotifier {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val notification = NotificationCompat.Builder(context, channel)
-            .setSmallIcon(R.drawable.ic_launcher_monochrome)
+            .setSmallIcon(R.drawable.ic_stat_watch)
             .setContentTitle(text.first)
             .setContentText(text.second)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text.second))
