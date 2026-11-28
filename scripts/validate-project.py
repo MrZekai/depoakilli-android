@@ -671,9 +671,26 @@ for res_dir in (ROOT / "app/src/main/res").glob("values*"):
         if ai_words.search(match.group(3)) and match.group(2) not in AI_ALLOWED:
             errors.append(f"{res_dir.name}/{match.group(2)}: 'AI' only where a model really runs")
 
-# No paywall opens by itself: only the openPaywall() taps set it.
-if read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").count("paywallOpen = true") != 1:
-    errors.append("the paywall must open only through openPaywall() (user taps)")
+# The paywall opens through openPaywall() only: from the user's taps, plus
+# exactly one self-opening call (Sales S1) that checks the measured 2 GB gain
+# (Estimate.qualifies) and the once-only flag.
+cleaner_app_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
+if cleaner_app_src.count("paywallOpen = true") != 1:
+    errors.append("the paywall must open only through openPaywall()")
+if cleaner_app_src.count("SalesRules.autoPaywall(") != 1 or "if (succeeded && !state.freeTier.autoPaywallDecided)" not in cleaner_app_src:
+    errors.append("only one self-opening paywall (S1): after the first successful cleanup, once, with the 2 GB gain")
+sales_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/SalesRules.kt")
+for expected in ("!isPro && qualifies && !alreadyDecided", "!isPro && offerAvailable && trialEligible && !alreadyShown",
+                 "const val REMINDER_BEFORE_MILLIS = DAY_MILLIS", "autoRenewing && nowMillis < trialEndMillis"):
+    if expected not in sales_src:
+        errors.append(f"missing sales rule: {expected}")
+for sales_word in ("son şans", "yalnız bugün", "last chance", "only today", "CountDownTimer"):
+    if sales_word.lower() in read("app/src/main/java/com/mrzekai/depoakilli/ui/pro/SalesScreens.kt").lower():
+        errors.append(f"SalesScreens.kt: no countdown or 'last chance' ({sales_word})")
+for res_dir in (ROOT / "app/src/main/res").glob("values*"):
+    for match in re.finditer(r'<string name="(offer_[a-z_]+|trial_[a-z_]+)">(.*?)</string>', (res_dir / "strings.xml").read_text(encoding="utf-8")):
+        if re.search(r"(?i)son şans|yalnız bugün|last chance|only today|countdown|\d+:\d\d", match.group(2)):
+            errors.append(f"{res_dir.name}/{match.group(1)}: no countdown or 'last chance' wording")
 
 for billing_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/billing").rglob("*.kt"):
     if re.search(r'"[^"]*(\$|USD|€|₺)\s?\d', billing_file.read_text(encoding="utf-8")):

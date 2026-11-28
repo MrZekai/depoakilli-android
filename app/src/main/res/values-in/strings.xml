@@ -911,9 +911,6 @@
         <item quantity="other">Uji coba %1$d hari, lalu %2$s per tahun. Diperpanjang otomatis.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="other">52 minggu seharga %d pass mingguan</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="other">Tanpa Pro Anda memutuskan %d file per hari. Hitungan mulai lagi besok; pembersihan manual di Alat selalu terbuka.</item>
@@ -1304,6 +1301,17 @@
         <item quantity="other">Tampilkan %d file</item>
     </plurals>
 
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">Opsi lain: sekali bayar</string>
+    <string name="offer_label">SEKALI SAJA</string>
+    <string name="offer_title">Tahun pertama %1$s. Lalu %2$s per tahun.</string>
+    <string name="offer_accept">Ambil Pro · %1$s</string>
+    <string name="offer_decline">Tidak, terima kasih</string>
+    <string name="trial_channel">Akun</string>
+    <string name="trial_reminder_title">Masa uji cobamu berakhir besok</string>
+    <string name="trial_reminder_body">Jika tak ingin lanjut, batalkan di Google Play > Langganan.</string>
+    <string name="pro_total_cleared">Sejauh ini: %1$s</string>
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Belum ada yang bisa dibersihkan. Pindai ponselmu dulu.</string>

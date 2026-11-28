@@ -38,6 +38,7 @@ import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 /**
  * Y3 honest paywall: when Pro would clear less than 2 GB on this phone, the
@@ -94,6 +95,8 @@ internal fun HonestProScreen(gainBytes: Long, onOk: () -> Unit, onSeePlans: () -
 internal fun ProOnScreen(
     state: ProScreenState,
     monthBytes: Long,
+    /** S5: everything cleared with Pro since the start (measured). */
+    totalBytes: Long = 0L,
     onManageSubscription: () -> Unit,
     onRestore: () -> Unit,
     onAddTime: (ProPlanOption) -> Unit,
@@ -147,6 +150,15 @@ internal fun ProOnScreen(
                             fontWeight = AppWeights.Giant,
                             modifier = Modifier.padding(top = 6.dp),
                         )
+                        if (totalBytes > monthBytes) {
+                            Text(
+                                stringResource(R.string.pro_total_cleared, ByteFormatter.format(totalBytes)),
+                                color = OnBlackSoft,
+                                fontSize = 15.sp,
+                                fontWeight = AppWeights.Strong,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
                     } else {
                         Text(
                             stringResource(R.string.pro_month_none),

@@ -58,6 +58,13 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
 
     private var productDetails: Map<String, ProductDetails> = emptyMap()
     private var launchedKind: ProPlanKind? = null
+    private var launchedTrialDays: Int? = null
+
+    /** S3: end of a trial bought on this device (Play does not give it otherwise); null without one. */
+    val trialEndMillis: Long? get() = prefs.getLong(KEY_TRIAL_END, 0L).takeIf { it > 0L }
+
+    /** S3: the subscription still renews (a cancelled trial must not be reminded). */
+    val autoRenewing: Boolean get() = state.value.ownedPlan == OwnedPlan.YEARLY
 
     private val client: BillingClient = BillingClient.newBuilder(appContext)
         .setListener(this)
@@ -168,6 +175,7 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
             .setProductDetailsParamsList(listOf(productParams))
             .build()
         launchedKind = plan.kind
+        launchedTrialDays = plan.trialDays
         val result = client.launchBillingFlow(activity, flowParams)
         when (result.responseCode) {
             BillingClient.BillingResponseCode.OK,
@@ -184,6 +192,16 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
             BillingClient.BillingResponseCode.OK -> {
                 val owned = purchases.orEmpty().map(::toOwned)
                 val kind = launchedKind
+                // S3: a trial started now ends after its days; the reminder comes a day before.
+                val trialDays = launchedTrialDays
+                val trialPurchase = purchases.orEmpty().firstOrNull {
+                    BillingProducts.SUBSCRIPTION in it.products && it.purchaseState == Purchase.PurchaseState.PURCHASED
+                }
+                if (kind == ProPlanKind.YEARLY && trialDays != null && trialPurchase != null) {
+                    val end = com.mrzekai.depoakilli.pro.SalesRules.trialEnd(trialPurchase.purchaseTime, trialDays)
+                    prefs.edit().putLong(KEY_TRIAL_END, end).apply()
+                    TrialReminder.schedule(appContext, end)
+                }
                 if (EntitlementRules.isPro(owned) && kind != null && kind != ProPlanKind.LIFETIME) {
                     // Remembered so Y5 can name a pass (Play does not say which base plan a purchase is).
                     prefs.edit().putString(KEY_LAST_KIND, kind.name).apply()
@@ -283,5 +301,6 @@ class BillingRepository(context: Context) : PurchasesUpdatedListener {
     private companion object {
         const val PREFS = "pro_billing"
         const val KEY_LAST_KIND = "last_bought_kind"
+        const val KEY_TRIAL_END = "trial_end_millis"
     }
 }

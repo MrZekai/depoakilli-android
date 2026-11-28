@@ -21,9 +21,13 @@ object ProDemo {
         val id = context.resources.getIdentifier("demo_pro_plans", "array", context.packageName)
         if (id == 0) return real
         val plans = context.resources.getStringArray(id).mapNotNull(::parse)
+        @Suppress("DiscouragedApi")
+        val upId = context.resources.getIdentifier("demo_pro_upgrade", "string", context.packageName)
+        val upgrade = if (upId == 0) null else context.getString(upId).split('|').takeIf { it.size == 2 }
+            ?.let { UpgradeOffer(firstYearPrice = it[0], laterYearPrice = it[1], offerToken = "demo") }
         return when (current) {
             "on" -> real.copy(isPro = true, plans = plans, loading = false, ownedPlan = OwnedPlan.YEARLY)
-            else -> real.copy(isPro = false, plans = plans, loading = false, ownedPlan = null)
+            else -> real.copy(isPro = false, plans = plans, loading = false, ownedPlan = null, upgrade = upgrade)
         }
     }
 

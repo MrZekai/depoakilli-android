@@ -971,10 +971,6 @@
         <item quantity="other">%1$d dias de teste, depois %2$s por ano. Renovação automática.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="one">52 semanas pelo preço de %d passe semanal</item>
-        <item quantity="other">52 semanas pelo preço de %d passes semanais</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="one">Sem o Pro você decide sobre %d arquivo por dia. A contagem recomeça amanhã; limpar à mão em Ferramentas está sempre liberado.</item>
@@ -1407,6 +1403,17 @@
         <item quantity="other">Mostrar %d arquivos</item>
     </plurals>
 
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">Outra opção: pagamento único</string>
+    <string name="offer_label">UMA ÚNICA VEZ</string>
+    <string name="offer_title">Primeiro ano %1$s. Depois %2$s por ano.</string>
+    <string name="offer_accept">Assinar Pro · %1$s</string>
+    <string name="offer_decline">Não, obrigado</string>
+    <string name="trial_channel">Conta</string>
+    <string name="trial_reminder_title">Seu teste termina amanhã</string>
+    <string name="trial_reminder_body">Se não quiser continuar, cancele em Google Play > Assinaturas.</string>
+    <string name="pro_total_cleared">Até agora: %1$s</string>
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Ainda não encontrei nada para liberar. Analise o celular primeiro.</string>

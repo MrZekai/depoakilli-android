@@ -971,10 +971,6 @@
         <item quantity="other">%1$d días de prueba, luego %2$s al año. Se renueva automáticamente.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="one">52 semanas por el precio de %d pase semanal</item>
-        <item quantity="other">52 semanas por el precio de %d pases semanales</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="one">Sin Pro decides sobre %d archivo al día. El contador se reinicia mañana; limpiar a mano en Herramientas siempre está abierto.</item>
@@ -1407,6 +1403,17 @@
         <item quantity="other">Mostrar %d archivos</item>
     </plurals>
 
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">Otra opción: un solo pago</string>
+    <string name="offer_label">UNA SOLA VEZ</string>
+    <string name="offer_title">Primer año %1$s. Después %2$s al año.</string>
+    <string name="offer_accept">Pasar a Pro · %1$s</string>
+    <string name="offer_decline">No, gracias</string>
+    <string name="trial_channel">Cuenta</string>
+    <string name="trial_reminder_title">Tu prueba termina mañana</string>
+    <string name="trial_reminder_body">Si no quieres seguir, cancela en Google Play > Suscripciones.</string>
+    <string name="pro_total_cleared">Hasta ahora: %1$s</string>
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Aún no encontré nada que liberar. Analiza primero tu teléfono.</string>
