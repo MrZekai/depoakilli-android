@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - run: pip install -q mediapipe numpy pillow
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libgles2 libgl1 >/dev/null; pip install -q mediapipe numpy pillow
       - name: Model
         run: |
           curl -fsSL -o model.tflite https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/latest/mobilenet_v3_small.tflite
