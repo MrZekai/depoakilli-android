@@ -1,6 +1,7 @@
 package com.mrzekai.depoakilli.video
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -87,6 +88,9 @@ class VideoCompressionService : Service() {
 
     // ---------------------------------------------------------- notification
 
+    // With VIDEO_COMPRESSION_FGS off the manifest drops this service's type, and
+    // lint flags the call; that build never starts the service (validator-checked).
+    @SuppressLint("ForegroundServiceType")
     private fun goForeground(state: ShrinkJobState): Boolean = runCatching {
         ensureChannel(this)
         val notification = progressNotification(state)

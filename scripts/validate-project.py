@@ -538,6 +538,8 @@ if not fgs_match:
 if "if (!VideoRunMode.VIDEO_COMPRESSION_FGS) {" not in service_src or service_src.index("if (!VideoRunMode.VIDEO_COMPRESSION_FGS) {") > service_src.index("ContextCompat.startForegroundService("):
     errors.append("startFromUserTap must check VIDEO_COMPRESSION_FGS before starting the service")
 fgs_on = bool(fgs_match) and fgs_match.group(1) == "true"
+if fgs_on and 'android:foregroundServiceType="dataSync|mediaProcessing"' not in manifest:
+    errors.append("VIDEO_COMPRESSION_FGS is on: the video service must declare dataSync|mediaProcessing")
 if not fgs_on and ("FOREGROUND_SERVICE" in manifest or "VideoCompressionService" in manifest):
     errors.append("VIDEO_COMPRESSION_FGS is off: remove the FOREGROUND_SERVICE permissions and the service from the manifest")
 starters = []
