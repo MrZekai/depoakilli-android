@@ -141,8 +141,8 @@ def main():
     # 3. one group to the Trash and back (English)
     s = strings("values")
     launch("en")
-    first = qa.wait_for(rx(s["similar_open_first"]), 120, dismiss=False) or qa.scroll_to(rx(s["similar_open_first"]), 6)
-    check("grup: 'İlk grubu aç' bulundu", first, note="" if first else " | ".join(qa.texts()[:15]))
+    first = qa.wait_for(r"^.+ · \d+ frames$", 120, dismiss=False)
+    check("grup: bir grup kartı bulundu", first, note="" if first else " | ".join(qa.texts()[:15]))
     if first:
         qa.tap(first)
         time.sleep(2)
@@ -173,7 +173,16 @@ def main():
                 time.sleep(2)
         th = threading.Thread(target=sampler, daemon=True); th.start()
         launch("en")
-        out = wait_log(r"similar: looked=", 2400)
+        out = None
+        for minute in range(40):
+            out = wait_log(r"similar: looked=", 60)
+            if out:
+                break
+            pid = qa.sh(f"pidof {PKG}").strip()
+            top = qa.sh("dumpsys activity activities | grep -m1 topResumedActivity").strip()
+            tail = qa.adb("logcat", "-d", "-v", "brief", "SmartCleanerPhotos:W", "SmartCleaner:W", "AndroidRuntime:E", "ActivityManager:E", "*:S")[-300:]
+            log(f"speed {minute + 1} min: pid={pid or '-'} top={top[-80:]} log={tail!r}")
+            clear_system_dialogs()
         stop[0] = True
         check("hız: ilk tarama 40 dk içinde bitti", out is not None, note="" if out else qa.adb("logcat", "-d", "-v", "raw", "SmartCleanerPhotos:W", "*:S")[-600:])
         if out:
