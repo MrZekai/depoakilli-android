@@ -10,10 +10,11 @@ class SalesRulesTest {
 
     @Test
     fun `S1 - once, only when it qualifies, never for Pro`() {
-        assertTrue(SalesRules.autoPaywall(isPro = false, qualifies = true, alreadyDecided = false))
-        assertFalse(SalesRules.autoPaywall(isPro = false, qualifies = true, alreadyDecided = true))
-        assertFalse(SalesRules.autoPaywall(isPro = false, qualifies = false, alreadyDecided = false))
-        assertFalse(SalesRules.autoPaywall(isPro = true, qualifies = true, alreadyDecided = false))
+        val twoGb = ProGainEstimator.PRO_MIN_GAIN_BYTES
+        assertTrue(SalesRules.autoPaywall(isPro = false, proOnlyBytes = twoGb, alreadyShown = false))
+        assertFalse(SalesRules.autoPaywall(isPro = false, proOnlyBytes = twoGb, alreadyShown = true))
+        assertFalse(SalesRules.autoPaywall(isPro = false, proOnlyBytes = twoGb - 1, alreadyShown = false))
+        assertFalse(SalesRules.autoPaywall(isPro = true, proOnlyBytes = twoGb, alreadyShown = false))
     }
 
     @Test
@@ -50,5 +51,26 @@ class SalesRulesTest {
         assertEquals(490_000L, SalesRules.weeklyMicrosRoundedUp(24_990_000L))
         assertEquals(1_000_000L, SalesRules.weeklyMicrosRoundedUp(52_000_000L))
         assertEquals(0L, SalesRules.weeklyMicrosRoundedUp(0L))
+    }
+
+    @Test
+    fun `S1 counts only what Pro alone can clear`() {
+        // 3 GB of one-tap "My pick" (free by hand) + 1 GB of video shrinking: no auto paywall.
+        val est = ProGainEstimator.Estimate(
+            listOf(
+                ProGainEstimator.Row(ProGainEstimator.Kind.ONE_TAP_PICK, 3_000_000_000L, 10, measured = true),
+                ProGainEstimator.Row(ProGainEstimator.Kind.VIDEO_COMPRESSION, 1_000_000_000L, 3, measured = false),
+            ),
+        )
+        assertTrue(est.qualifies)
+        assertFalse(SalesRules.autoPaywall(isPro = false, proOnlyBytes = est.proOnlyBytes, alreadyShown = false))
+    }
+
+    @Test
+    fun `S1 not met at the first cleanup is checked again at a later one`() {
+        // First cleanup: the similar scan has not run yet (0 B); nothing is marked.
+        assertFalse(SalesRules.autoPaywall(isPro = false, proOnlyBytes = 0L, alreadyShown = false))
+        // A later cleanup, after the scan found 2.5 GB that only Pro clears: it opens.
+        assertTrue(SalesRules.autoPaywall(isPro = false, proOnlyBytes = 2_500_000_000L, alreadyShown = false))
     }
 }

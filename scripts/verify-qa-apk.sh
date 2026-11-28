@@ -54,16 +54,28 @@ do
 done
 # Faz 3A-2: a foreground service only for shrinking videos (user tap):
 # exactly FOREGROUND_SERVICE + _DATA_SYNC + _MEDIA_PROCESSING, our own service.
+# VIDEO_COMPRESSION_FGS off (task 2.4): no foreground service at all.
+fgs_on="$(grep -c 'const val VIDEO_COMPRESSION_FGS = true' "$(dirname "$0")/../app/src/main/java/com/mrzekai/depoakilli/video/VideoRunMode.kt" || true)"
+fgs_expected="android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING "
+[ "$fgs_on" = "1" ] || fgs_expected=""
 fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$PERMS" | sort -u | tr '\n' ' ')"
-if [ "$fgs_perms" != "android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING " ]; then
+if [ "$fgs_perms" != "$fgs_expected" ]; then
   fail "QA APK foreground-service permissions differ: $fgs_perms"
+fi
+# Fable review: Google's usage-log uploader has no sender (CCT backend unregistered).
+if grep -Fq "CctBackendFactory" "$MANIFEST"; then
+  fail "the datatransport CCT backend is still registered (would try the network)"
 fi
 # Faz 3C: the app needs no internet (Play Billing talks to the Play Store app).
 if grep -Eq 'android\.permission\.INTERNET([^_A-Z]|$)' "$PERMS"; then
   fail "QA APK still asks for the internet permission"
 fi
-grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$MANIFEST" \
-  || fail "QA APK is missing the video shrinking service"
+if [ "$fgs_on" = "1" ]; then
+  grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$MANIFEST" \
+    || fail "QA APK is missing the video shrinking service"
+elif grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$MANIFEST"; then
+  fail "the video service is declared although VIDEO_COMPRESSION_FGS is off"
+fi
 
 # DEX printable-string scanning is valid for Compose PreviewActivity.
 for forbidden in \

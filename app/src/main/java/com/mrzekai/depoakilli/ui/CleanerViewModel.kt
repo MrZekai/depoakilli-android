@@ -246,8 +246,8 @@ class CleanerViewModel internal constructor(
     }
 
     /** Sales S1 / S4: remembered once. */
-    fun markAutoPaywallDecided() {
-        freeTierStore?.markAutoPaywallDecided()
+    fun markAutoPaywallShown() {
+        freeTierStore?.markAutoPaywallShown()
     }
 
     fun markLeaveOfferShown() {

@@ -1556,4 +1556,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Пока не нашёл, что освободить. Сначала проверьте телефон.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">Не закрывайте этот экран: при выходе из приложения работа остановится, готовые копии останутся. Я также остановлюсь, если телефон нагреется или заряд будет низким.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">на %s меньше</string>
 </resources>

@@ -12,13 +12,15 @@ object SalesRules {
     const val REMINDER_BEFORE_MILLIS = DAY_MILLIS
 
     /**
-     * S1: the paywall opens by itself only once in the app's life, right after
-     * the first successful cleanup's result is closed, and only when Pro alone
-     * would clear at least 2 GB on this phone. If that first time does not
-     * qualify, it never opens by itself.
+     * S1: the paywall opens by itself only once in the app's life, after a
+     * successful cleanup's result is closed, when what only Pro can clear
+     * ([ProGainEstimator.Estimate.proOnlyBytes]: no gain the free tier can
+     * also give) is at least 2 GB. Checked again after every successful
+     * cleanup until it has really been shown once (the similar-photos scan
+     * usually finishes after the first cleanup).
      */
-    fun autoPaywall(isPro: Boolean, qualifies: Boolean, alreadyDecided: Boolean): Boolean =
-        !isPro && qualifies && !alreadyDecided
+    fun autoPaywall(isPro: Boolean, proOnlyBytes: Long, alreadyShown: Boolean): Boolean =
+        !isPro && proOnlyBytes >= ProGainEstimator.PRO_MIN_GAIN_BYTES && !alreadyShown
 
     /**
      * S4: after the first "no" (the paywall closed without a purchase), once:

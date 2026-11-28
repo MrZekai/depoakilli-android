@@ -1474,4 +1474,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Non ho ancora trovato nulla da liberare. Prima analizza il telefono.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">Tieni aperta questa schermata: se esci dall’app si ferma e le copie finite restano. Mi fermo anche se il telefono si scalda o la batteria è bassa.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">%s in meno</string>
 </resources>

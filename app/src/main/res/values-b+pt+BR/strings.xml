@@ -1417,4 +1417,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Ainda não encontrei nada para liberar. Analise o celular primeiro.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">Mantenha esta tela aberta: se sair do app, para, e as cópias prontas ficam. Também paro se o celular esquentar ou a bateria ficar baixa.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">%s a menos</string>
 </resources>

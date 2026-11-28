@@ -1139,4 +1139,10 @@
     <string name="pro_total_cleared">So far: %1$s</string>
     <!-- Faz 3C -->
     <string name="plan_nothing_yet">I haven’t found anything to clear yet. Scan your phone first.</string>
+
+    <!-- Faz 3A-2 -->
+    <string name="video_progress_note_screen">Keep this screen open: leaving the app stops it, and finished copies stay. I also stop if the phone gets hot or the battery runs low.</string>
+
+    <!-- Faz 3A-1 -->
+    <string name="watch_kind_decreased">%s less</string>
 </resources>
