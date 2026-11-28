@@ -1,0 +1,65 @@
+name: Size probe (per-device download)
+# Builds the debug AAB of each stacked branch and measures, with bundletool,
+# what one phone downloads per ABI, plus native libs and model assets.
+# Results go to `size-probe-raw` (text only; no app code, no keys).
+on:
+  push:
+    branches: [size-probe]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: [claude/faz3a2-video, claude/faz3b1-benzer, claude/faz3b2-kotu, claude/faz3c-plan, claude/satis-optimizasyon]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref }}
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Build debug AAB and APK
+        run: |
+          chmod +x gradlew
+          ./gradlew bundleDebug assembleDebug "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
+      - name: Measure
+        run: |
+          set -e
+          curl -sSL -o bt.jar https://github.com/google/bundletool/releases/download/1.18.1/bundletool-all-1.18.1.jar
+          name=$(echo "${{ matrix.ref }}" | tr '/' '_')
+          mkdir -p out
+          f=out/$name.txt
+          aab=app/build/outputs/bundle/debug/app-debug.aab
+          java -jar bt.jar build-apks --bundle=$aab --output=a.apks --mode=default
+          { echo "ref ${{ matrix.ref }} $(git rev-parse --short HEAD)"; ls -l $aab;
+            echo "--- get-size total (bytes, per ABI)"; java -jar bt.jar get-size total --apks=a.apks --dimensions=ABI;
+            echo "--- native libs per ABI (debug APK, uncompressed)";
+            unzip -l app/build/outputs/apk/debug/app-debug.apk | awk '/lib\//{split($4,a,"/"); s[a[2]]+=$1} END{for(k in s) print k, s[k]}';
+            echo "--- biggest libs (arm64-v8a)"; unzip -l app/build/outputs/apk/debug/app-debug.apk | grep "lib/arm64-v8a" | sort -k1 -n -r | head -12;
+            echo "--- assets"; unzip -l app/build/outputs/apk/debug/app-debug.apk | grep -E "assets/" | sort -k1 -n -r | head -15; } > $f
+          cat $f
+      - uses: actions/upload-artifact@v6
+        with:
+          name: size-${{ strategy.job-index }}
+          path: out/
+  publish:
+    needs: probe
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: res
+          merge-multiple: true
+      - run: |
+          cd res
+          git init -q -b size-probe-raw
+          git config user.name "size-bot"; git config user.email "size-bot@users.noreply.github.com"
+          git add -A; git commit -q -m "size probe" || exit 0
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" size-probe-raw
