@@ -91,6 +91,8 @@ data class Candidate(
     val targetVideoBitrate: Long,
     /** Lower-bound saving, rounded down; shown as "about". */
     val estimatedSavingBytes: Long,
+    /** H.265 when this phone has an H.265 encoder for this size and frame rate, else H.264. */
+    val hevc: Boolean = true,
 ) {
     val estimatedOutputBytes: Long get() = (meta.sizeBytes - estimatedSavingBytes).coerceAtLeast(0L)
 }
@@ -176,7 +178,7 @@ object VideoRules {
         if (skipReason(meta, context, hevcAvailable) != null) return null
         val target = targetBitrate(meta, hevcAvailable)
         val saving = estimateSaving(meta, target)
-        return if (saving > 0L) Candidate(meta, target, saving) else null
+        return if (saving > 0L) Candidate(meta, target, saving, hevcAvailable) else null
     }
 
     fun isOutputName(name: String): Boolean =

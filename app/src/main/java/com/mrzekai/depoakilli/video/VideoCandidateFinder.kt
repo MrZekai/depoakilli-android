@@ -71,7 +71,8 @@ class VideoCandidateFinder(private val context: Context) {
                         excludedFolder = excluded.any { it.contains(volumeRoot, relative) },
                         alreadyShrunk = sibling.exists() || file.absolutePath in pendingOriginals || cache.wasShrunk(file.absolutePath),
                     )
-                    VideoRules.candidate(meta, videoContext, hevc)?.let(candidates::add)
+                    val codec = VideoProbe.encoderFor(meta) ?: continue
+                    VideoRules.candidate(meta, videoContext, codec == VideoProbe.Codec.HEVC)?.let(candidates::add)
                 }
             }
         }

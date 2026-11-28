@@ -94,6 +94,16 @@ class VideoRulesTest {
         assertEquals(1_400 * mb - candidate.estimatedSavingBytes, candidate.estimatedOutputBytes)
     }
 
+    @Test
+    fun `the codec choice travels with the candidate`() {
+        val hevc = VideoRules.candidate(video(), VideoContext(), hevcAvailable = true)!!
+        val avc = VideoRules.candidate(video(), VideoContext(), hevcAvailable = false)!!
+        assertEquals(true, hevc.hevc)
+        assertEquals(false, avc.hevc)
+        assertEquals(9_600_000L, avc.targetVideoBitrate)
+        assert(avc.estimatedSavingBytes < hevc.estimatedSavingBytes)
+    }
+
     // --- one test per exclusion ---
 
     @Test fun `under 100 MB is out`() = assertEquals(SkipReason.TOO_SMALL, skip(video(size = 99 * mb)))

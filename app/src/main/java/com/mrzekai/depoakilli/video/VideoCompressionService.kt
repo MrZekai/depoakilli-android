@@ -84,7 +84,6 @@ class VideoCompressionService : Service() {
     private suspend fun runRound() {
         val app = application as DepoAkilliApplication
         val compressor = VideoCompressor(this)
-        val hevc = VideoProbe.hevcEncoderAvailable()
         val queue = ShrinkJobs.state.value.queue
         ShrinkJobs.update { it.copy(running = true, index = 0, progress = 0, results = emptyList(), stoppedByUser = false, blocked = null) }
         var encodeMs = 0L
@@ -98,7 +97,7 @@ class VideoCompressionService : Service() {
             ShrinkJobs.update { it.copy(index = index, progress = 0) }
             updateNotification()
             val started = SystemClock.elapsedRealtime()
-            val outcome = compressor.compress(candidate, hevc) { progress ->
+            val outcome = compressor.compress(candidate, candidate.hevc) { progress ->
                 ShrinkJobs.update { it.copy(progress = progress) }
                 updateNotification()
             }

@@ -150,6 +150,30 @@ object VideoProbe {
         }
     }.getOrDefault(false)
 
+    /**
+     * Which codec can keep this video's size: H.265 first, then H.264, null if
+     * neither has an encoder for this width, height and frame rate (an encoder
+     * that falls back to a smaller size would change the picture; the output
+     * check would reject it anyway, after the work).
+     */
+    enum class Codec { HEVC, AVC }
+
+    fun encoderFor(meta: VideoMeta): Codec? = when {
+        encoderFits(MediaFormat.MIMETYPE_VIDEO_HEVC, meta) -> Codec.HEVC
+        encoderFits(MediaFormat.MIMETYPE_VIDEO_AVC, meta) -> Codec.AVC
+        else -> null
+    }
+
+    private fun encoderFits(mime: String, meta: VideoMeta): Boolean = runCatching {
+        MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos.any { info ->
+            if (!info.isEncoder || info.supportedTypes.none { it.equals(mime, ignoreCase = true) }) return@any false
+            val caps = info.getCapabilitiesForType(mime).videoCapabilities ?: return@any false
+            val fps = meta.frameRate.toDouble().coerceAtLeast(1.0)
+            caps.areSizeAndRateSupported(meta.width, meta.height, fps) ||
+                caps.areSizeAndRateSupported(meta.height, meta.width, fps)
+        }
+    }.getOrDefault(false)
+
     private fun frameRate(video: MediaFormat?, retriever: MediaMetadataRetriever, durationMs: Long): Float {
         val fromFormat = video?.let {
             runCatching { it.getInteger(MediaFormat.KEY_FRAME_RATE).toFloat() }.getOrNull()
