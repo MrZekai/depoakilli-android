@@ -8,5 +8,5 @@
         <item>LIFETIME|$49.99||49990000|USD</item>
     </string-array>
     <!-- first-year | later-year price of the demo upgrade-yearly offer (Sales S4 shots) -->
-    <string name="demo_pro_upgrade" tools:ignore="UnusedResources">$12.49|$24.99</string>
+    <string name="demo_pro_upgrade" translatable="false" tools:ignore="UnusedResources">$12.49|$24.99</string>
 </resources>
