@@ -354,13 +354,16 @@ internal fun FiltersScreen(
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 12.dp)) {
             Text(stringResource(R.string.filters_label), color = Lime, fontSize = 13.sp, fontWeight = AppWeights.Giant)
             val r = result
-            Text(
-                if (r != null) ByteFormatter.format(r.bytes) else "—",
-                color = OnBlack,
-                fontSize = 52.sp,
-                lineHeight = 56.sp,
-                fontWeight = AppWeights.Giant,
-            )
+            // No big number before a filter is picked (a lone "—" looked like a stray bar).
+            if (!filter.isEmpty) {
+                Text(
+                    if (r != null) ByteFormatter.format(r.bytes) else "—",
+                    color = OnBlack,
+                    fontSize = 52.sp,
+                    lineHeight = 56.sp,
+                    fontWeight = AppWeights.Giant,
+                )
+            }
             Text(
                 when {
                     filter.isEmpty -> stringResource(R.string.filters_pick)

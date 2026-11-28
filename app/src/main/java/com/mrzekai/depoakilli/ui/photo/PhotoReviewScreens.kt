@@ -211,16 +211,21 @@ internal fun PhotoTypesScreen(
         Text(stringResource(R.string.types_title), color = Ink, fontSize = 38.sp, lineHeight = 42.sp, fontWeight = AppWeights.Giant, modifier = Modifier.semantics { heading() })
         Text(stringResource(R.string.types_body), color = Ink, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = AppWeights.Strong, modifier = Modifier.padding(top = 6.dp, bottom = 14.dp))
         BlackCard(contentPadding = PaddingValues(vertical = 4.dp)) {
-            TypeRow(
-                stringResource(R.string.types_documents),
-                pluralStringResource(R.plurals.types_photo_count, documents.size, documents.size) +
-                    if (documents.any(ReviewPhoto::important)) " · " + stringResource(R.string.types_important_note) else "",
-                documents.sumOf { it.item.sizeBytes },
-                documents.firstOrNull(),
-                onClick = null,
-            )
+            // Only kinds that have photos (an empty "0 photos · 0 B" row says nothing).
+            var rows = 0
+            if (documents.isNotEmpty()) {
+                rows++
+                TypeRow(
+                    stringResource(R.string.types_documents),
+                    pluralStringResource(R.plurals.types_photo_count, documents.size, documents.size) +
+                        if (documents.any(ReviewPhoto::important)) " · " + stringResource(R.string.types_important_note) else "",
+                    documents.sumOf { it.item.sizeBytes },
+                    documents.firstOrNull(),
+                    onClick = null,
+                )
+            }
             if (screenshots != null && screenshots.first > 0) {
-                CardDivider()
+                if (rows++ > 0) CardDivider()
                 TypeRow(
                     stringResource(R.string.types_screenshots),
                     pluralStringResource(R.plurals.types_photo_count, screenshots.first, screenshots.first),
@@ -229,14 +234,16 @@ internal fun PhotoTypesScreen(
                     onClick = onOpenScreenshots,
                 )
             }
-            CardDivider()
-            TypeRow(
-                stringResource(R.string.types_memes),
-                pluralStringResource(R.plurals.types_photo_count, memes.size, memes.size),
-                memes.sumOf { it.item.sizeBytes },
-                memes.firstOrNull(),
-                onClick = null,
-            )
+            if (memes.isNotEmpty()) {
+                if (rows > 0) CardDivider()
+                TypeRow(
+                    stringResource(R.string.types_memes),
+                    pluralStringResource(R.plurals.types_photo_count, memes.size, memes.size),
+                    memes.sumOf { it.item.sizeBytes },
+                    memes.firstOrNull(),
+                    onClick = null,
+                )
+            }
         }
         Text(stringResource(R.string.types_note_ai), color = Ink, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 14.dp))
         Spacer(Modifier.height(20.dp))
