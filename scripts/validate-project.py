@@ -592,6 +592,14 @@ thresholds_src = read("app/src/main/java/com/mrzekai/depoakilli/data/CleaningThr
 for expected in ("const val SIMILAR_COSINE_MIN", "const val DHASH_MAX_DISTANCE", "const val WATCH_NEW_SIMILAR_COUNT = 20"):
     if expected not in thresholds_src:
         errors.append(f"missing similar-photo threshold: {expected}")
+# Faz 3B-2: face and label models come with Google Play services (small app);
+# a failed model call leaves the photo unmeasured instead of "no face".
+if 'android:name="com.google.mlkit.vision.DEPENDENCIES"' not in read("app/src/main/AndroidManifest.xml") or 'android:value="face,ica"' not in read("app/src/main/AndroidManifest.xml"):
+    errors.append("ML Kit models must be declared for Play services (com.google.mlkit.vision.DEPENDENCIES = face,ica)")
+if "play-services-mlkit-face-detection" not in read("gradle/libs.versions.toml") or "play-services-mlkit-image-labeling" not in read("gradle/libs.versions.toml"):
+    errors.append("use the Play services ML Kit models, not the bundled ones (~14 MB larger download)")
+if "!eyes.isNaN()" not in read("app/src/main/java/com/mrzekai/depoakilli/photo/SimilarFinder.kt"):
+    errors.append("a face model that could not run must not mark a photo as having no face")
 model = ROOT / "app/src/main/assets/models/similar_embedder.tflite"
 if not model.is_file():
     errors.append("the similar-photo model must be bundled (assets/models/similar_embedder.tflite)")
@@ -599,6 +607,23 @@ else:
     import hashlib
     if hashlib.sha256(model.read_bytes()).hexdigest() != "bbbb4c51a55a53905af1daec995ca1aae355046f8839bb8c9f5ce9271394bc40":
         errors.append("assets/models/similar_embedder.tflite is not the measured MediaPipe mobilenet_v3_small embedder")
+# Faz 3B-2: closed eyes only inside similar groups (never "delete the
+# closed-eye photo" on its own); bad shots and types only one by one, never in
+# a bulk approval, never a Pro gain row; each behind its switch.
+finder_src = read("app/src/main/java/com/mrzekai/depoakilli/photo/SimilarFinder.kt")
+if "for (i in clusters.flatten())" not in finder_src or finder_src.count("models.eyesOpen(") != 1:
+    errors.append("the face model runs only on photos inside similar groups")
+for expected in ("if (!BAD_SHOTS_ON) emptyList()", "if (!TYPES_ON) emptyList()", "PhotoReviewRules.TYPE_MIN_AGE_MILLIS"):
+    if expected not in finder_src:
+        errors.append(f"missing photo review invariant: {expected}")
+if "BAD_SHOTS_AVAILABLE" not in pro_gain_src or "PHOTO_TYPES_AVAILABLE" not in pro_gain_src:
+    errors.append("BAD_SHOTS_AVAILABLE and PHOTO_TYPES_AVAILABLE switches are required")
+if "BAD_SHOT" in pro_gain_src.split("enum class Kind")[1].split("}")[0] or "PHOTO_TYPE" in pro_gain_src.split("enum class Kind")[1].split("}")[0]:
+    errors.append("bad shots and photo types never add a Pro gain row")
+review_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/photo/PhotoReviewScreens.kt")
+if "repo.trashReviewed(current)" not in review_src or "forEach" in review_src.split("fun PhotoReviewScreen")[1].split("fun reviewTitle")[0]:
+    errors.append("bad shots and typed photos are decided one at a time, never in bulk")
+
 # The app itself makes no network call (Faz 3B/3C).
 for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
     kt_src = kt.read_text(encoding="utf-8")
@@ -606,7 +631,7 @@ for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
         if forbidden in kt_src:
             errors.append(f"{kt.name}: no network library or call in the app ({forbidden})")
 ai_words = re.compile(r"[Yy]apay zek|\bAI\b|\bIA\b|\bKI\b|\bИИ\b|الذكاء الاصطناعي|kecerdasan buatan")
-AI_ALLOWED = {"similar_note_ai"}
+AI_ALLOWED = {"similar_note_ai", "types_note_ai"}
 for res_dir in (ROOT / "app/src/main/res").glob("values*"):
     strings_file = res_dir / "strings.xml"
     if not strings_file.exists():

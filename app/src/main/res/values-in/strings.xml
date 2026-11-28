@@ -1193,4 +1193,43 @@
     <plurals name="watch_notif_similar_title">
         <item quantity="other">%d foto mirip baru</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d foto</string>
+    <string name="review_keep">Simpan</string>
+    <string name="review_trash">Ke Sampah</string>
+    <string name="review_keep_if_meant">Simpan jika memang disengaja.</string>
+    <string name="review_keep_if_needed">Simpan jika masih perlu.</string>
+    <string name="review_important">Mungkin dokumen penting.</string>
+    <string name="review_blurry">Tampak buram</string>
+    <string name="review_dark">Tampak gelap</string>
+    <string name="review_document">Dokumen atau struk</string>
+    <string name="review_meme">Tangkapan layar atau meme</string>
+    <string name="review_no_bulk">Tak ada hapus massal di sini; kamu memutuskan tiap foto.</string>
+    <string name="review_all_done">Semua selesai di sini</string>
+    <string name="review_done">Selesai</string>
+    <string name="review_move_failed">Foto ini tak bisa dipindah.</string>
+    <string name="review_bad_title">Buram dan gelap</string>
+    <string name="types_entry">Jenis foto</string>
+    <string name="types_title">Urusan kerja di galerimu</string>
+    <string name="types_body">Bukan kenangan, foto untuk urusan. Lebih dari 30 hari.</string>
+    <string name="types_documents">Foto dokumen dan struk</string>
+    <string name="types_screenshots">Tangkapan layar</string>
+    <string name="types_memes">Tangkapan dan meme</string>
+    <string name="types_important_note">mungkin dokumen penting</string>
+    <string name="types_note_ai">Jenis dipilah oleh AI di perangkat. Kutunjukkan satu per satu; yang mirip kartu identitas atau uang akan kuberi peringatan.</string>
+    <string name="types_show">Tampilkan satu per satu</string>
+    <string name="similar_eyes_closed">mata tertutup</string>
+    <string name="similar_eyes_open">mata terbuka</string>
+    <string name="plan_group_bad_shot">Foto buram dan gelap</string>
+    <string name="reason_bad_shot">Tampak buram atau gelap</string>
+    <string name="plan_group_photo_type">Foto dokumen dan meme</string>
+    <string name="reason_photo_type">Tampak seperti dokumen atau meme</string>
+    <plurals name="review_decisions_left">
+        <item quantity="other">Sisa %d keputusan hari ini</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="other">%d foto</item>
+    </plurals>
 </resources>

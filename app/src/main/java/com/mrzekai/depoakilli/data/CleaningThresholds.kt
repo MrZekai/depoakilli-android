@@ -69,6 +69,12 @@ object CleaningThresholds {
     const val BLUR_VARIANCE_MAX = 40.0
     const val DARK_LUMA_MAX = 30.0
 
+    /**
+     * Faz 3B-2 photo types: a label counts from this confidence. Checked on
+     * the emulator set (see the PR report); below it a photo gets no type.
+     */
+    const val PHOTO_TYPE_MIN_CONFIDENCE = 0.7f
+
     /** Faz 3B-2: a face's eyes count as open from this probability. */
     const val EYES_OPEN_MIN = 0.5f
 

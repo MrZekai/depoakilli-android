@@ -1425,4 +1425,49 @@
         <item quantity="many">%d новых похожих фото</item>
         <item quantity="other">%d новых похожих фото</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d фото</string>
+    <string name="review_keep">Оставить</string>
+    <string name="review_trash">В корзину</string>
+    <string name="review_keep_if_meant">Оставьте, если снимали так намеренно.</string>
+    <string name="review_keep_if_needed">Оставьте, если ещё нужно.</string>
+    <string name="review_important">Возможно, это важный документ.</string>
+    <string name="review_blurry">Похоже, размыто</string>
+    <string name="review_dark">Похоже, слишком темно</string>
+    <string name="review_document">Документ или чек</string>
+    <string name="review_meme">Снимок экрана или мем</string>
+    <string name="review_no_bulk">Здесь нет массового удаления; вы решаете по каждому фото.</string>
+    <string name="review_all_done">Здесь всё готово</string>
+    <string name="review_done">Готово</string>
+    <string name="review_move_failed">Не удалось переместить фото.</string>
+    <string name="review_bad_title">Размытые и тёмные</string>
+    <string name="types_entry">Типы фото</string>
+    <string name="types_title">Рабочее в вашей галерее</string>
+    <string name="types_body">Не воспоминания, а снимки для дел. Старше 30 дней.</string>
+    <string name="types_documents">Фото документов и чеков</string>
+    <string name="types_screenshots">Скриншоты</string>
+    <string name="types_memes">Снимки экрана и мемы</string>
+    <string name="types_important_note">возможны важные документы</string>
+    <string name="types_note_ai">Типы разделил ИИ на устройстве. Показываю каждое фото; если похоже на удостоверение или деньги, предупрежу отдельно.</string>
+    <string name="types_show">Показать по одному</string>
+    <string name="similar_eyes_closed">глаза закрыты</string>
+    <string name="similar_eyes_open">глаза открыты</string>
+    <string name="plan_group_bad_shot">Размытые и тёмные фото</string>
+    <string name="reason_bad_shot">Выглядело размытым или тёмным</string>
+    <string name="plan_group_photo_type">Фото документов и мемов</string>
+    <string name="reason_photo_type">Похоже на документ или мем</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">Сегодня осталось %d решение</item>
+        <item quantity="few">Сегодня осталось %d решения</item>
+        <item quantity="many">Сегодня осталось %d решений</item>
+        <item quantity="other">Сегодня осталось %d решения</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d фото</item>
+        <item quantity="few">%d фото</item>
+        <item quantity="many">%d фото</item>
+        <item quantity="other">%d фото</item>
+    </plurals>
 </resources>

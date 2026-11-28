@@ -24,6 +24,15 @@ import java.io.File
  * Nothing is moved here. Stops between photos when [shouldStop] says so; the
  * cache keeps the work, so the next run continues where this one stopped.
  */
+/** A photo offered one by one (Faz 3B-2): a bad shot or a typed photo. */
+data class ReviewPhoto(
+    val item: PhotoItem,
+    val badKind: PhotoReviewRules.BadKind? = null,
+    val type: PhotoReviewRules.PhotoType? = null,
+    /** Looks like an important document (passport, money): a warning line. */
+    val important: Boolean = false,
+)
+
 class SimilarFinder(private val context: Context) {
     private val cache = PhotoFeatureCache(context)
 
@@ -37,6 +46,12 @@ class SimilarFinder(private val context: Context) {
         val stopped: Boolean,
         /** The model could not load: nothing is grouped rather than guessed. */
         val modelMissing: Boolean = false,
+        /** Faz 3B-2: blurry / dark shots outside the groups, one by one only. */
+        val badShots: List<ReviewPhoto> = emptyList(),
+        /** Faz 3B-2: document and meme photos (30 days or older), one by one only. */
+        val typed: List<ReviewPhoto> = emptyList(),
+        /** Frames of the groups whose eyes look closed (a note on the tile). */
+        val eyesClosed: Set<Long> = emptySet(),
     ) {
         val trashBytes: Long get() = groups.sumOf(SimilarGroup::trashBytes)
         val trashCount: Int get() = groups.sumOf { it.others.size }
@@ -45,6 +60,8 @@ class SimilarFinder(private val context: Context) {
     fun find(
         all: Boolean,
         dismissed: Set<String>,
+        /** Photos the user kept in a one-by-one review: not asked again. */
+        reviewedKeep: Set<Long> = emptySet(),
         onProgress: (Progress) -> Unit = {},
         shouldStop: () -> Boolean = { false },
     ): Result {
@@ -89,14 +106,84 @@ class SimilarFinder(private val context: Context) {
             cache.save()
         }
         val embeddings = usable.map { v -> v.entry!!.embedding?.let(PhotoMath::dequantize) }
+        val clusters = SimilarRules.cluster(items.size, pairs, embeddings)
+        val now = System.currentTimeMillis()
+        val models = if (BAD_SHOTS_ON || TYPES_ON) PhotoModels() else null
+        try {
+            // Faz 3B-2: eyes only inside similar groups (choosing the best frame).
+            if (BAD_SHOTS_ON && models != null) {
+                for (i in clusters.flatten()) {
+                    if (shouldStop()) {
+                        cache.save()
+                        return Result(emptyList(), photos.size, totalOnPhone - photos.size, stopped = true)
+                    }
+                    val entry = usable[i].entry!!
+                    if (entry.eyesOpen != PhotoFeatureCache.NO_VALUE) continue
+                    thumbnail(usable[i].item, FACE_SIZE)?.let { bmp ->
+                        val eyes = models.eyesOpen(bmp)
+                        bmp.recycle()
+                        // A model that could not run leaves the photo unmeasured (tried on a later run).
+                        if (eyes == null || !eyes.isNaN()) {
+                            entry.eyesOpen = eyes ?: PhotoFeatureCache.NO_FACE
+                            cache.markDirty()
+                        }
+                    }
+                }
+            }
+            // Faz 3B-2: types for photos of 30 days or more (cached).
+            if (TYPES_ON && models != null) {
+                for (v in usable) {
+                    if (shouldStop()) {
+                        cache.save()
+                        return Result(emptyList(), photos.size, totalOnPhone - photos.size, stopped = true)
+                    }
+                    val entry = v.entry!!
+                    if (entry.typeCode >= 0 || now - v.item.takenMillis < PhotoReviewRules.TYPE_MIN_AGE_MILLIS) continue
+                    thumbnail(v.item, EMBED_SIZE)?.let { bmp ->
+                        val labels = models.labels(bmp)
+                        bmp.recycle()
+                        if (labels != null) {
+                            entry.typeCode = PhotoReviewRules.encodeType(
+                                PhotoReviewRules.type(labels, v.item.takenMillis, now),
+                                PhotoReviewRules.important(labels),
+                            )
+                            cache.markDirty()
+                        }
+                    }
+                }
+            }
+        } finally {
+            models?.close()
+            cache.save()
+        }
         val photoFeatures = usable.map { v ->
             val e = v.entry!!
             PhotoFeatures(e.dHash, null, e.sharpness, e.eyesOpen.takeIf { it >= 0f })
         }
-        val clusters = SimilarRules.cluster(items.size, pairs, embeddings)
         val groups = SimilarRules.groups(items, photoFeatures, clusters, dismissed)
+        val inGroups = groups.flatMapTo(HashSet()) { g -> g.members.map(PhotoItem::id) }
+        val badShots = if (!BAD_SHOTS_ON) emptyList() else usable.mapNotNull { v ->
+            val e = v.entry!!
+            if (v.item.id in inGroups || v.item.id in reviewedKeep) return@mapNotNull null
+            PhotoReviewRules.badKind(e.sharpness, e.luma.toDouble(), v.item.takenMillis, now)?.let { ReviewPhoto(v.item, badKind = it) }
+        }
+        val typed = if (!TYPES_ON) emptyList() else usable.mapNotNull { v ->
+            if (v.item.id in reviewedKeep) return@mapNotNull null
+            val (type, important) = PhotoReviewRules.decodeType(v.entry!!.typeCode) ?: return@mapNotNull null
+            type?.let { ReviewPhoto(v.item, type = it, important = important) }
+        }
+        val eyesClosed = usable.filter { PhotoReviewRules.eyesClosed(it.entry!!.eyesOpen.takeIf { e -> e >= 0f }) }.mapTo(HashSet()) { it.item.id }
         onProgress(Progress(steps, steps))
-        return Result(groups, photos.size, (totalOnPhone - photos.size).coerceAtLeast(0), stopped = false, modelMissing = missingModel)
+        return Result(
+            groups,
+            photos.size,
+            (totalOnPhone - photos.size).coerceAtLeast(0),
+            stopped = false,
+            modelMissing = missingModel,
+            badShots = badShots,
+            typed = typed,
+            eyesClosed = eyesClosed,
+        )
     }
 
     private class PhotoCacheView(val item: PhotoItem, val entry: PhotoFeatureCache.Entry?)
@@ -206,5 +293,8 @@ class SimilarFinder(private val context: Context) {
     companion object {
         private const val MEASURE_SIZE = 256
         private const val EMBED_SIZE = 256
+        private const val FACE_SIZE = 640
+        private val BAD_SHOTS_ON get() = com.mrzekai.depoakilli.pro.ProGainEstimator.BAD_SHOTS_AVAILABLE
+        private val TYPES_ON get() = com.mrzekai.depoakilli.pro.ProGainEstimator.PHOTO_TYPES_AVAILABLE
     }
 }

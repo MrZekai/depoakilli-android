@@ -74,6 +74,12 @@ enum class CleanupGroup(
 
     /** Faz 3B-1: frames moved from a similar-photo group; the engine never assigns it. */
     SIMILAR_PHOTO(R.string.plan_group_similar_photo, R.string.reason_similar_photo, null, false, DeleteMode.TRASH, groupSelectable = false),
+
+    /** Faz 3B-2: blurry or dark shots moved one by one; the engine never assigns it. */
+    BAD_SHOT(R.string.plan_group_bad_shot, R.string.reason_bad_shot, null, false, DeleteMode.TRASH, groupSelectable = false),
+
+    /** Faz 3B-2: document / meme photos moved one by one; the engine never assigns it. */
+    PHOTO_TYPE(R.string.plan_group_photo_type, R.string.reason_photo_type, null, false, DeleteMode.TRASH, groupSelectable = false),
     ;
 
     /** Tier 2 ("My pick", Faz 5C); see [SUGGESTED]. */

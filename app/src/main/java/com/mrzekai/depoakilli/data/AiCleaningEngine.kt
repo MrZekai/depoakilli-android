@@ -384,6 +384,8 @@ class AiCleaningEngine(
             CleanupGroup.DUPLICATE_PERSONAL,
             CleanupGroup.DUPLICATE_UNVERIFIED,
             CleanupGroup.SIMILAR_PHOTO -> CleanCategory.DUPLICATE
+            CleanupGroup.BAD_SHOT,
+            CleanupGroup.PHOTO_TYPE -> CleanCategory.LARGE_FILE
             CleanupGroup.LARGE_VIDEO,
             CleanupGroup.OLD_VIDEO,
             CleanupGroup.RAW_COPY,

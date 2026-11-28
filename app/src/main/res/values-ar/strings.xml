@@ -1587,4 +1587,53 @@
         <item quantity="many">%d صورة متشابهة جديدة</item>
         <item quantity="other">%d صورة متشابهة جديدة</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d صور</string>
+    <string name="review_keep">إبقاء</string>
+    <string name="review_trash">إلى السلة</string>
+    <string name="review_keep_if_meant">احتفظ بها إن التقطتها عمدًا.</string>
+    <string name="review_keep_if_needed">احتفظ بها إن كنت ما زلت تحتاجها.</string>
+    <string name="review_important">قد تكون وثيقة مهمة.</string>
+    <string name="review_blurry">تبدو ضبابية</string>
+    <string name="review_dark">تبدو مظلمة</string>
+    <string name="review_document">مستند أو إيصال</string>
+    <string name="review_meme">لقطة شاشة أو ميم</string>
+    <string name="review_no_bulk">لا حذف جماعي هنا؛ أنت تقرر في كل صورة.</string>
+    <string name="review_all_done">انتهى كل شيء هنا</string>
+    <string name="review_done">تم</string>
+    <string name="review_move_failed">تعذّر نقل هذه الصورة.</string>
+    <string name="review_bad_title">ضبابية ومظلمة</string>
+    <string name="types_entry">أنواع الصور</string>
+    <string name="types_title">أعمال مخبأة في معرضك</string>
+    <string name="types_body">ليست ذكريات بل صور لمهام. أقدم من 30 يومًا.</string>
+    <string name="types_documents">صور المستندات والإيصالات</string>
+    <string name="types_screenshots">لقطات الشاشة</string>
+    <string name="types_memes">لقطات وميمات</string>
+    <string name="types_important_note">قد تكون وثائق مهمة</string>
+    <string name="types_note_ai">فرز الذكاء الاصطناعي على الجهاز الأنواع. أعرض كل صورة؛ وأنبّهك على ما يشبه الهوية أو النقود.</string>
+    <string name="types_show">اعرض واحدة تلو الأخرى</string>
+    <string name="similar_eyes_closed">عينان مغمضتان</string>
+    <string name="similar_eyes_open">عينان مفتوحتان</string>
+    <string name="plan_group_bad_shot">صور ضبابية ومظلمة</string>
+    <string name="reason_bad_shot">بدت ضبابية أو مظلمة</string>
+    <string name="plan_group_photo_type">صور مستندات وميمات</string>
+    <string name="reason_photo_type">بدت مثل مستند أو ميم</string>
+    <plurals name="review_decisions_left">
+        <item quantity="zero">تبقّى %d قرار اليوم</item>
+        <item quantity="one">تبقّى %d قرار اليوم</item>
+        <item quantity="two">تبقّى %d قراران اليوم</item>
+        <item quantity="few">تبقّت %d قرارات اليوم</item>
+        <item quantity="many">تبقّى %d قرارًا اليوم</item>
+        <item quantity="other">تبقّى %d قرار اليوم</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="zero">%d صورة</item>
+        <item quantity="one">%d صورة</item>
+        <item quantity="two">%d صورتان</item>
+        <item quantity="few">%d صور</item>
+        <item quantity="many">%d صورة</item>
+        <item quantity="other">%d صورة</item>
+    </plurals>
 </resources>

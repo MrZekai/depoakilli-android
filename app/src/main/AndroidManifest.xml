@@ -43,6 +43,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DepoAkilli">
 
+        <!-- Faz 3B-2: Google Play services keeps the face and label models on the phone (not in the app). -->
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="face,ica" />
+
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />

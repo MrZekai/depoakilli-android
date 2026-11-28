@@ -1346,4 +1346,47 @@
         <item quantity="many">%d di nuove foto simili</item>
         <item quantity="other">%d nuove foto simili</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d foto</string>
+    <string name="review_keep">Tieni</string>
+    <string name="review_trash">Nel Cestino</string>
+    <string name="review_keep_if_meant">Tienila se l’hai scattata apposta.</string>
+    <string name="review_keep_if_needed">Tienila se ti serve ancora.</string>
+    <string name="review_important">Potrebbe essere un documento importante.</string>
+    <string name="review_blurry">Sembra sfocata</string>
+    <string name="review_dark">Sembra scura</string>
+    <string name="review_document">Documento o scontrino</string>
+    <string name="review_meme">Cattura o meme</string>
+    <string name="review_no_bulk">Qui niente eliminazione in blocco; decidi tu ogni foto.</string>
+    <string name="review_all_done">Qui è tutto fatto</string>
+    <string name="review_done">Fatto</string>
+    <string name="review_move_failed">Impossibile spostare questa foto.</string>
+    <string name="review_bad_title">Sfocate e scure</string>
+    <string name="types_entry">Tipi di foto</string>
+    <string name="types_title">Lavoro nascosto nella galleria</string>
+    <string name="types_body">Non ricordi, ma foto per qualcosa da fare. Più vecchie di 30 giorni.</string>
+    <string name="types_documents">Foto di documenti e scontrini</string>
+    <string name="types_screenshots">Screenshot</string>
+    <string name="types_memes">Catture e meme</string>
+    <string name="types_important_note">possibili documenti importanti</string>
+    <string name="types_note_ai">I tipi li ha separati l’IA sul dispositivo. Ti mostro ogni foto; per ciò che sembra un documento d’identità o denaro ti avviso a parte.</string>
+    <string name="types_show">Mostra una alla volta</string>
+    <string name="similar_eyes_closed">occhi chiusi</string>
+    <string name="similar_eyes_open">occhi aperti</string>
+    <string name="plan_group_bad_shot">Foto sfocate e scure</string>
+    <string name="reason_bad_shot">Sembrava sfocata o scura</string>
+    <string name="plan_group_photo_type">Foto di documenti e meme</string>
+    <string name="reason_photo_type">Sembrava un documento o un meme</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">Oggi ti resta %d decisione</item>
+        <item quantity="many">Oggi ti restano %d di decisioni</item>
+        <item quantity="other">Oggi ti restano %d decisioni</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d foto</item>
+        <item quantity="many">%d di foto</item>
+        <item quantity="other">%d foto</item>
+    </plurals>
 </resources>
