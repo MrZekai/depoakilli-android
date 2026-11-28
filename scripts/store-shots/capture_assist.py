@@ -99,7 +99,11 @@ def main():
             if listing == "en-US":
                 check("fotoğraf türleri: giriş kartı var", False)
         # 3C: plan goal + plan
-        launch(tag, "debug_plan")
+        # The plan uses what this run found: open the photos first, then the plan in the same process.
+        launch(tag, "similar")
+        find_any(s, ["similar_open_first"], 120, 1)
+        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro on --es watch_target debug_plan")
+        time.sleep(4)
         goal = find_any(s, ["plan_question", "plan_build"], 90, 2)
         chip = qa.find(r"^\S+\s?GB$")
         if chip:
