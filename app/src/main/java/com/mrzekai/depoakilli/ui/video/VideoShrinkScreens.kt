@@ -141,10 +141,8 @@ internal fun VideoShrinkFlow(repo: VideoShrinkRepository, actions: VideoShrinkAc
     // again when every original was kept), with fresh figures.
     LaunchedEffect(reviewing, pending.isEmpty()) {
         if (reviewing && pending.isEmpty()) {
-            // Let the approval that emptied the list finish counting first.
-            kotlinx.coroutines.delay(300)
             reviewing = false
-            showResult = approvedCount > 0
+            showResult = showResult || approvedCount > 0
             repo.refresh()
         }
     }
@@ -157,6 +155,8 @@ internal fun VideoShrinkFlow(repo: VideoShrinkRepository, actions: VideoShrinkAc
                 onApprove = { item, onDone ->
                     approvedBytes += item.savedBytes
                     approvedCount++
+                    // Shown once the last copy is handled (Compare comes first while copies remain).
+                    showResult = true
                     if (actions.isPro) actions.onProBytes(item.savedBytes)
                     onDone()
                 },
