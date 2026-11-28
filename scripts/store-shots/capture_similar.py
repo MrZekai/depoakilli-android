@@ -60,10 +60,27 @@ def scan():
     qa.sh("content call --uri content://media --method scan_volume --arg external_primary >/dev/null 2>&1", timeout=300)
 
 
+def clear_system_dialogs():
+    """A slow emulator shows "Pixel Launcher isn't responding" over everything; not our app."""
+    for _ in range(3):
+        nodes = qa.dump()
+        if not qa.find(r"isn.t responding|has stopped|keeps stopping", nodes):
+            return
+        btn = qa.find(r"^(Wait|Close app|OK)$", nodes)
+        if btn:
+            qa.tap(btn)
+        else:
+            qa.back()
+
+
 def launch(locale_tag):
+    qa.sh("settings put global hide_error_dialogs 1")
+    clear_system_dialogs()
     qa.sh(f"am force-stop {PKG}")
     qa.sh(f"cmd locale set-app-locales {PKG} --locales {locale_tag}")
     qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro on --es watch_target similar")
+    time.sleep(3)
+    clear_system_dialogs()
 
 
 def wait_log(pattern, timeout):
