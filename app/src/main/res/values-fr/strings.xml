@@ -1185,14 +1185,14 @@
     <string name="video_none_title">Aucune vidéo à réduire</string>
     <string name="video_none_body">Je regarde les vidéos de %1$s ou plus. Les tiennes sont déjà compactes ou d’un type que je ne touche pas (HDR, ralenti, 360°).</string>
     <string name="video_no_room">Pas assez d’espace libre pour réduire en sécurité. Libère un peu d’abord ; il faut environ %1$s.</string>
-    <string name="video_low_battery">La batterie est sous 20 %. Branche le chargeur, puis lance.</string>
+    <string name="video_low_battery">La batterie est sous 20 %. Branche le chargeur, puis lance.</string>
     <string name="video_too_hot">Le téléphone est chaud. Laisse-le refroidir, puis relance.</string>
     <string name="video_pending_note">Les copies non validées sous 7 jours sont retirées ; les originaux restent.</string>
     <string name="video_pending_review">Regarder et valider</string>
     <string name="video_progress_label">RÉDUCTION</string>
     <string name="video_progress_so_far">%1$s de moins jusqu’ici</string>
     <string name="video_progress_remaining">Environ %1$s restantes</string>
-    <string name="video_progress_note">Tu peux quitter l’app ; ça continue dans la notification. Je m’arrête seul si le téléphone chauffe ou si la batterie passe sous 20 %.</string>
+    <string name="video_progress_note">Tu peux quitter l’app ; ça continue dans la notification. Je m’arrête seul si le téléphone chauffe ou si la batterie passe sous 20 %.</string>
     <string name="video_stop">Arrêter</string>
     <string name="video_stop_note">Si tu arrêtes, les copies terminées restent et aucun original n’est touché.</string>
     <string name="video_compare_label">RESTE %1$d · %2$s</string>

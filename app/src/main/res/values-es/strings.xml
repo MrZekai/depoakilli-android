@@ -1135,14 +1135,14 @@
     <string name="video_none_title">Ningún vídeo merece reducirse</string>
     <string name="video_none_body">Miro vídeos de %1$s o más. Los tuyos ya son compactos o son de tipos que no toco (HDR, cámara lenta, 360°).</string>
     <string name="video_no_room">No hay espacio libre suficiente para reducir con seguridad. Libera un poco antes; necesito %1$s libre.</string>
-    <string name="video_low_battery">La batería está por debajo del 20 %. Conecta el cargador y empieza.</string>
+    <string name="video_low_battery">La batería está por debajo del 20 %. Conecta el cargador y empieza.</string>
     <string name="video_too_hot">El teléfono está caliente. Deja que se enfríe y vuelve a empezar.</string>
     <string name="video_pending_note">Las copias que no apruebes en 7 días se eliminan; los originales se quedan.</string>
     <string name="video_pending_review">Ver y aprobar</string>
     <string name="video_progress_label">REDUCIENDO</string>
     <string name="video_progress_so_far">%1$s menos hasta ahora</string>
     <string name="video_progress_remaining">Quedan unos %1$s</string>
-    <string name="video_progress_note">Puedes salir de la app; sigue en la notificación. Me detengo solo si el teléfono se calienta o la batería baja del 20 %.</string>
+    <string name="video_progress_note">Puedes salir de la app; sigue en la notificación. Me detengo solo si el teléfono se calienta o la batería baja del 20 %.</string>
     <string name="video_stop">Detener</string>
     <string name="video_stop_note">Si te detienes, las copias terminadas se quedan y no se toca ningún original.</string>
     <string name="video_compare_label">QUEDAN %1$d · %2$s</string>

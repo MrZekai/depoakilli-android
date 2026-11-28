@@ -1126,14 +1126,14 @@
     <string name="video_none_title">Kein Video lohnt das Verkleinern</string>
     <string name="video_none_body">Ich prüfe Videos ab %1$s. Deine sind schon kompakt oder von einer Art, die ich nicht anfasse (HDR, Zeitlupe, 360°).</string>
     <string name="video_no_room">Zu wenig freier Speicher zum sicheren Verkleinern. Erst etwas Platz schaffen; ich brauche etwa %1$s frei.</string>
-    <string name="video_low_battery">Akku unter 20 %. Schließ das Ladegerät an, dann starte.</string>
+    <string name="video_low_battery">Akku unter 20 %. Schließ das Ladegerät an, dann starte.</string>
     <string name="video_too_hot">Das Handy ist heiß. Lass es abkühlen, dann neu starten.</string>
     <string name="video_pending_note">Nicht bestätigte Kopien werden nach 7 Tagen entfernt; die Originale bleiben.</string>
     <string name="video_pending_review">Ansehen und bestätigen</string>
     <string name="video_progress_label">VERKLEINERE</string>
     <string name="video_progress_so_far">Bisher %1$s kleiner</string>
     <string name="video_progress_remaining">Noch etwa %1$s</string>
-    <string name="video_progress_note">Du kannst die App verlassen; es läuft in der Benachrichtigung weiter. Ich stoppe von selbst, wenn das Handy zu heiß wird oder bei einem Akku unter 20 %.</string>
+    <string name="video_progress_note">Du kannst die App verlassen; es läuft in der Benachrichtigung weiter. Ich stoppe von selbst, wenn das Handy zu heiß wird oder bei einem Akku unter 20 %.</string>
     <string name="video_stop">Stoppen</string>
     <string name="video_stop_note">Wenn du stoppst, bleiben fertige Kopien und kein Original wird angefasst.</string>
     <string name="video_compare_label">NOCH %1$d · %2$s</string>
