@@ -962,10 +962,6 @@
         <item quantity="other">%1$d Tage Testzeitraum, dann %2$s pro Jahr. Verlängert sich automatisch.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="one">52 Wochen zum Preis von %d Wochenpass</item>
-        <item quantity="other">52 Wochen zum Preis von %d Wochenpässen</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="one">Ohne Pro entscheiden Sie über %d Datei pro Tag. Der Zähler beginnt morgen neu; Aufräumen von Hand unter Werkzeuge ist immer möglich.</item>
@@ -1383,4 +1379,16 @@
         <item quantity="one">%d Datei zeigen</item>
         <item quantity="other">%d Dateien zeigen</item>
     </plurals>
+
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">Andere Option: Einmalzahlung</string>
+    <string name="offer_label">EINMALIG</string>
+    <string name="offer_title">Erstes Jahr %1$s. Danach %2$s pro Jahr.</string>
+    <string name="offer_accept">Pro holen · %1$s</string>
+    <string name="offer_decline">Nein, danke</string>
+    <string name="trial_channel">Konto</string>
+    <string name="trial_reminder_title">Dein Test endet morgen</string>
+    <string name="trial_reminder_body">Wenn du nicht weitermachen willst, kündige in Google Play > Abos.</string>
+    <string name="pro_total_cleared">Bisher: %1$s</string>
 </resources>

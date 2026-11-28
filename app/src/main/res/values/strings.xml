@@ -776,10 +776,6 @@
         <item quantity="one">%1$d-day trial, then %2$s per year. Renews automatically.</item>
         <item quantity="other">%1$d-day trial, then %2$s per year. Renews automatically.</item>
     </plurals>
-    <plurals name="paywall_anchor">
-        <item quantity="one">52 weeks for the price of %d week pass</item>
-        <item quantity="other">52 weeks for the price of %d week passes</item>
-    </plurals>
     <plurals name="limit_body">
         <item quantity="one">Without Pro you decide on %d file a day. The count starts over tomorrow; cleaning by hand in Tools is always open.</item>
         <item quantity="other">Without Pro you decide on %d files a day. The count starts over tomorrow; cleaning by hand in Tools is always open.</item>
@@ -1130,4 +1126,15 @@
         <item quantity="one">Show %d file</item>
         <item quantity="other">Show %d files</item>
     </plurals>
+
+    <!-- Sales optimization -->
+    <string name="paywall_other_option">Other option: one payment</string>
+    <string name="offer_label">ONE TIME</string>
+    <string name="offer_title">First year %1$s. Then %2$s a year.</string>
+    <string name="offer_accept">Get Pro · %1$s</string>
+    <string name="offer_decline">No, thanks</string>
+    <string name="trial_channel">Account</string>
+    <string name="trial_reminder_title">Your trial ends tomorrow</string>
+    <string name="trial_reminder_body">If you don’t want to continue, cancel in Google Play > Subscriptions.</string>
+    <string name="pro_total_cleared">So far: %1$s</string>
 </resources>

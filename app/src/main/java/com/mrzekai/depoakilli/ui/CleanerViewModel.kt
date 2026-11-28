@@ -245,6 +245,15 @@ class CleanerViewModel internal constructor(
         (getApplication<Application>() as? com.mrzekai.depoakilli.DepoAkilliApplication)?.preferences?.record(kind, delete)
     }
 
+    /** Sales S1 / S4: remembered once. */
+    fun markAutoPaywallDecided() {
+        freeTierStore?.markAutoPaywallDecided()
+    }
+
+    fun markLeaveOfferShown() {
+        freeTierStore?.markLeaveOfferShown()
+    }
+
     /** Faz 3B-1: a similar-photo group was cleaned without Pro. */
     fun markSimilarGroupUsed() {
         freeTierStore?.markSimilarGroupUsed()

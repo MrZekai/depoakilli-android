@@ -1180,14 +1180,6 @@
         <item quantity="other">تجربة لمدة %1$d أيام، ثم %2$s سنويًا. يتجدد تلقائيًا.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="zero">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-        <item quantity="one">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-        <item quantity="two">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-        <item quantity="few">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-        <item quantity="many">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-        <item quantity="other">52 أسبوعًا بسعر %d تصاريح أسبوعية</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="zero">بدون Pro تقرر بشأن %d ملفات يوميًا. يبدأ العدّ من جديد غدًا؛ التنظيف اليدوي في الأدوات متاح دائمًا.</item>
@@ -1717,4 +1709,16 @@
         <item quantity="many">اعرض %d ملفًا</item>
         <item quantity="other">اعرض %d ملف</item>
     </plurals>
+
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">خيار آخر: دفعة واحدة</string>
+    <string name="offer_label">لمرة واحدة</string>
+    <string name="offer_title">السنة الأولى %1$s. ثم %2$s سنويًا.</string>
+    <string name="offer_accept">احصل على Pro · %1$s</string>
+    <string name="offer_decline">لا، شكرًا</string>
+    <string name="trial_channel">الحساب</string>
+    <string name="trial_reminder_title">تنتهي تجربتك غدًا</string>
+    <string name="trial_reminder_body">إن لم ترغب في المتابعة فألغِ من Google Play > الاشتراكات.</string>
+    <string name="pro_total_cleared">حتى الآن: %1$s</string>
 </resources>

@@ -19,6 +19,12 @@ data class FreeTierSnapshot(
     val videoTrialUsed: Boolean = false,
     /** Faz 3B-1: similar-photo groups cleaned without Pro (lifetime; the first 3 are free). */
     val similarGroupsUsed: Int = 0,
+    /** S1: the first successful cleanup decided the one self-opening paywall (shown or not). */
+    val autoPaywallDecided: Boolean = false,
+    /** S4: the one-time offer after a "no" was shown. */
+    val leaveOfferShown: Boolean = false,
+    /** S5: everything cleared with Pro features since the subscription started. */
+    val totalProBytes: Long = 0L,
 ) {
     fun decisionsToday(today: Long = FreeTierStore.today()): Int = decisions.used(today)
 
@@ -40,7 +46,13 @@ class FreeTierStore(context: Context) {
     fun snoozeProCard(nowMillis: Long = System.currentTimeMillis()) =
         write { it.copy(proCardHiddenUntil = nowMillis + FreeTierRules.PRO_CARD_SNOOZE_MILLIS) }
 
-    fun addProBytes(bytes: Long) = write { it.copy(monthly = it.monthly.add(currentMonth(), bytes)) }
+    fun addProBytes(bytes: Long) = write {
+        it.copy(monthly = it.monthly.add(currentMonth(), bytes), totalProBytes = it.totalProBytes + bytes.coerceAtLeast(0L))
+    }
+
+    fun markAutoPaywallDecided() = write { it.copy(autoPaywallDecided = true) }
+
+    fun markLeaveOfferShown() = write { it.copy(leaveOfferShown = true) }
 
     /** Faz 3A-2: set once the free video has been shrunk (a failed try does not use it up). */
     fun markVideoTrialUsed() = write { it.copy(videoTrialUsed = true) }
@@ -60,6 +72,9 @@ class FreeTierStore(context: Context) {
             .putLong(KEY_MONTH_BYTES, next.monthly.bytes)
             .putBoolean(KEY_VIDEO_TRIAL, next.videoTrialUsed)
             .putInt(KEY_SIMILAR_GROUPS, next.similarGroupsUsed)
+            .putBoolean(KEY_AUTO_PAYWALL, next.autoPaywallDecided)
+            .putBoolean(KEY_LEAVE_OFFER, next.leaveOfferShown)
+            .putLong(KEY_TOTAL_PRO_BYTES, next.totalProBytes)
             .apply()
     }
 
@@ -70,6 +85,9 @@ class FreeTierStore(context: Context) {
         monthly = MonthlyProBytes(prefs.getInt(KEY_MONTH, 0), prefs.getLong(KEY_MONTH_BYTES, 0L)),
         videoTrialUsed = prefs.getBoolean(KEY_VIDEO_TRIAL, false),
         similarGroupsUsed = prefs.getInt(KEY_SIMILAR_GROUPS, 0),
+        autoPaywallDecided = prefs.getBoolean(KEY_AUTO_PAYWALL, false),
+        leaveOfferShown = prefs.getBoolean(KEY_LEAVE_OFFER, false),
+        totalProBytes = prefs.getLong(KEY_TOTAL_PRO_BYTES, 0L),
     )
 
     companion object {
@@ -82,6 +100,9 @@ class FreeTierStore(context: Context) {
         private const val KEY_MONTH_BYTES = "pro_month_bytes"
         private const val KEY_VIDEO_TRIAL = "video_trial_used"
         private const val KEY_SIMILAR_GROUPS = "similar_groups_used"
+        private const val KEY_AUTO_PAYWALL = "auto_paywall_decided"
+        private const val KEY_LEAVE_OFFER = "leave_offer_shown"
+        private const val KEY_TOTAL_PRO_BYTES = "total_pro_bytes"
 
         /** Local calendar day of the device clock. */
         fun today(): Long = LocalDate.now().toEpochDay()

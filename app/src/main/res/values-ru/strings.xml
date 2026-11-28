@@ -1068,12 +1068,6 @@
         <item quantity="other">Пробный период %1$d дней, затем %2$s в год. Продлевается автоматически.</item>
     </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <plurals name="paywall_anchor">
-        <item quantity="one">52 недели по цене %d недельного пропуска</item>
-        <item quantity="few">52 недели по цене %d недельных пропусков</item>
-        <item quantity="many">52 недели по цене %d недельных пропусков</item>
-        <item quantity="other">52 недели по цене %d недельных пропусков</item>
-    </plurals>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="limit_body">
         <item quantity="one">Без Pro можно решать по %d файлу в день. Счётчик обнулится завтра; ручная очистка в Инструментах доступна всегда.</item>
@@ -1547,4 +1541,16 @@
         <item quantity="many">Показать %d файлов</item>
         <item quantity="other">Показать %d файла</item>
     </plurals>
+
+    <!-- Sales optimization -->
+    <!-- [ÇEVİRİ GEREKLİ] Sales optimization: draft translation, needs a native review -->
+    <string name="paywall_other_option">Другой вариант: разовая оплата</string>
+    <string name="offer_label">ОДИН РАЗ</string>
+    <string name="offer_title">Первый год %1$s. Затем %2$s в год.</string>
+    <string name="offer_accept">Перейти на Pro · %1$s</string>
+    <string name="offer_decline">Нет, спасибо</string>
+    <string name="trial_channel">Аккаунт</string>
+    <string name="trial_reminder_title">Пробный период закончится завтра</string>
+    <string name="trial_reminder_body">Если не хотите продолжать, отмените в Google Play > Подписки.</string>
+    <string name="pro_total_cleared">Всего: %1$s</string>
 </resources>

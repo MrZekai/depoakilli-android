@@ -16,8 +16,8 @@ object ProPricing {
         return (yearlyMicros / weeklyMicros).toInt().takeIf { it in 1..51 }
     }
 
-    /** Yearly price ÷ 52 in micros (a smaller, secondary line; never the main price). */
-    fun weeklyEquivalentMicros(yearlyMicros: Long): Long = yearlyMicros / 52L
+    /** Yearly price ÷ 52 in micros, rounded up to a cent (a smaller, secondary line; never the main price). */
+    fun weeklyEquivalentMicros(yearlyMicros: Long): Long = SalesRules.weeklyMicrosRoundedUp(yearlyMicros)
 
     /** Formats [micros] in Play's currency; null when the currency is unknown. */
     fun format(micros: Long, currencyCode: String, locale: Locale): String? {

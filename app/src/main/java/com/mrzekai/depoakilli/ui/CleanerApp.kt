@@ -136,6 +136,8 @@ fun CleanerApp(
     var scrollToAppsRequested by rememberSaveable { mutableStateOf(false) }
     // Faz 2 Y2: the paywall opens only when the user taps (Y1 card, Y4, Y7, Settings).
     var paywallOpen by rememberSaveable { mutableStateOf(false) }
+    // Sales S4: the one-time offer after the first "no" (not saved across process death: once is enough).
+    var leaveOffer by remember { mutableStateOf<com.mrzekai.depoakilli.billing.UpgradeOffer?>(null) }
     // Faz 3A-2: video candidates (headers only, cached) feed the paywall's measured estimate.
     val shrinkApp = androidx.compose.ui.platform.LocalContext.current.applicationContext as? com.mrzekai.depoakilli.DepoAkilliApplication
     val videoFinder = shrinkApp?.videoShrink?.state?.collectAsStateWithLifecycle()?.value
@@ -660,6 +662,7 @@ fun CleanerApp(
                         pro.isPro -> com.mrzekai.depoakilli.ui.pro.ProOnScreen(
                             state = pro,
                             monthBytes = state.freeTier.monthBytes(),
+                            totalBytes = state.freeTier.totalProBytes,
                             watchNoticesThisMonth = watch.snapshot.sentThisMonth(),
                             onManageSubscription = onManageSubscription,
                             onRestore = onRestorePurchases,
@@ -873,6 +876,15 @@ fun CleanerApp(
                                     null
                                 },
                                 watchCard = when {
+                                    // Sales S3 without notifications: the trial reminder on the last day.
+                                    shrinkApp != null && com.mrzekai.depoakilli.pro.SalesRules.showReminderCard(
+                                        System.currentTimeMillis(),
+                                        shrinkApp.billing.trialEndMillis,
+                                        shrinkApp.billing.autoRenewing,
+                                        com.mrzekai.depoakilli.watch.WatchNotifier.canPost(watchContext),
+                                    ) -> {
+                                        { com.mrzekai.depoakilli.ui.pro.TrialReminderCard(onManage = onManageSubscription, modifier = Modifier.padding(top = 14.dp)) }
+                                    }
                                     watch.snapshot.settings.enabled && watch.snapshot.growth != null -> {
                                         { com.mrzekai.depoakilli.ui.watch.WatchHomeCard(watchUi, watchActions, Modifier.padding(top = 14.dp)) }
                                     }
@@ -964,7 +976,32 @@ fun CleanerApp(
                 paywallOpen = false
                 openLegalPage(page)
             },
-            onClose = { paywallOpen = false },
+            onClose = {
+                paywallOpen = false
+                // Sales S4: after the first "no", once, only with Play's offer and a trial-eligible user.
+                val upgrade = pro.upgrade
+                val trialEligible = pro.plans.any { it.kind == com.mrzekai.depoakilli.billing.ProPlanKind.YEARLY && it.trialDays != null }
+                if (upgrade != null && com.mrzekai.depoakilli.pro.SalesRules.leaveOffer(pro.isPro, true, trialEligible, state.freeTier.leaveOfferShown)) {
+                    viewModel.markLeaveOfferShown()
+                    leaveOffer = upgrade
+                }
+            },
+        )
+    }
+    leaveOffer?.let { offer ->
+        com.mrzekai.depoakilli.ui.pro.LeaveOfferScreen(
+            offer = offer,
+            onAccept = {
+                leaveOffer = null
+                onBuyPlan(
+                    com.mrzekai.depoakilli.billing.ProPlanOption(
+                        kind = com.mrzekai.depoakilli.billing.ProPlanKind.YEARLY,
+                        formattedPrice = offer.firstYearPrice,
+                        offerToken = offer.offerToken,
+                    ),
+                )
+            },
+            onClose = { leaveOffer = null },
         )
     }
 
@@ -1081,6 +1118,14 @@ fun CleanerApp(
 
                     if (succeeded && result.failedCount == 0) onCleanupSucceeded()
                     if (succeeded) onCleanupResultDismissed()
+                    // Sales S1: the only self-opening paywall, once, right after the first
+                    // successful cleanup's result, and only with a measured Pro gain of 2 GB+.
+                    if (succeeded && !state.freeTier.autoPaywallDecided) {
+                        viewModel.markAutoPaywallDecided()
+                        if (com.mrzekai.depoakilli.pro.SalesRules.autoPaywall(pro.isPro, proEstimate.qualifies, alreadyDecided = false)) {
+                            openPaywall()
+                        }
+                    }
                 },
             )
         }

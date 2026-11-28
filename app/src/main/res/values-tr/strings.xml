@@ -776,10 +776,6 @@
         <item quantity="one">%1$d gün deneme, sonra yılda %2$s. Otomatik yenilenir.</item>
         <item quantity="other">%1$d gün deneme, sonra yılda %2$s. Otomatik yenilenir.</item>
     </plurals>
-    <plurals name="paywall_anchor">
-        <item quantity="one">%d haftalık geçiş fiyatına 52 hafta</item>
-        <item quantity="other">%d haftalık geçiş fiyatına 52 hafta</item>
-    </plurals>
     <plurals name="limit_body">
         <item quantity="one">Pro olmadan günde %d dosyaya karar verebilirsin. Sayaç yarın sıfırlanır; Araçlar\'da elle temizlik her zaman açık.</item>
         <item quantity="other">Pro olmadan günde %d dosyaya karar verebilirsin. Sayaç yarın sıfırlanır; Araçlar\'da elle temizlik her zaman açık.</item>
@@ -1130,4 +1126,15 @@
         <item quantity="one">%d dosyayı göster</item>
         <item quantity="other">%d dosyayı göster</item>
     </plurals>
+
+    <!-- Sales optimization -->
+    <string name="paywall_other_option">Diğer seçenek: tek ödeme</string>
+    <string name="offer_label">BİR KERELİĞİNE</string>
+    <string name="offer_title">İlk yıl %1$s. Sonra yılda %2$s.</string>
+    <string name="offer_accept">Pro’ya geç · %1$s</string>
+    <string name="offer_decline">Hayır, teşekkürler</string>
+    <string name="trial_channel">Hesap</string>
+    <string name="trial_reminder_title">Denemen yarın bitiyor</string>
+    <string name="trial_reminder_body">Devam etmek istemiyorsan Google Play > Abonelikler’den iptal edebilirsin.</string>
+    <string name="pro_total_cleared">Bugüne kadar: %1$s</string>
 </resources>

@@ -101,8 +101,11 @@ internal fun PaywallScreen(
     BackHandler(onBack = onClose)
     SystemBarIcons(darkStatusIcons = false, darkNavigationIcons = false)
     var selectedKind by rememberSaveable { mutableStateOf(ProPlanKind.YEARLY) }
+    // S2: yearly (selected) and the week pass; the one payment behind a small link.
+    var showLifetime by rememberSaveable { mutableStateOf(false) }
+    val shownPlans = state.plans.filter { it.kind != ProPlanKind.LIFETIME || showLifetime }
+        .ifEmpty { state.plans }
     val selected = state.plans.firstOrNull { it.kind == selectedKind } ?: state.plans.firstOrNull()
-    val weekly = state.plans.firstOrNull { it.kind == ProPlanKind.WEEK_PASS }
     val gain = facts.estimate.totalBytes
 
     Box(modifier.fillMaxSize().background(Black), contentAlignment = Alignment.TopCenter) {
@@ -176,13 +179,22 @@ internal fun PaywallScreen(
                         stringResource(R.string.pro_coming_soon_title),
                         stringResource(R.string.pro_coming_soon_body),
                     )
-                    else -> state.plans.forEach { plan ->
-                        PlanCard(
-                            plan = plan,
-                            weekly = weekly,
-                            selected = plan.kind == selected?.kind,
-                            onSelect = { selectedKind = plan.kind },
-                        )
+                    else -> {
+                        shownPlans.forEach { plan ->
+                            PlanCard(
+                                plan = plan,
+                                selected = plan.kind == selected?.kind,
+                                onSelect = { selectedKind = plan.kind },
+                            )
+                        }
+                        if (!showLifetime && state.plans.any { it.kind == ProPlanKind.LIFETIME } && shownPlans.size < state.plans.size) {
+                            LinkButton(
+                                stringResource(R.string.paywall_other_option),
+                                onClick = { showLifetime = true },
+                                color = OnBlackSoft,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
                 if (state.pending) {
@@ -287,7 +299,7 @@ private fun PaywallInfo(title: String, body: String?) {
 }
 
 @Composable
-private fun PlanCard(plan: ProPlanOption, weekly: ProPlanOption?, selected: Boolean, onSelect: () -> Unit) {
+private fun PlanCard(plan: ProPlanOption, selected: Boolean, onSelect: () -> Unit) {
     val trialDays = plan.trialDays
     val header = stringResource(
         when (plan.kind) {
@@ -310,16 +322,11 @@ private fun PlanCard(plan: ProPlanOption, weekly: ProPlanOption?, selected: Bool
         ProPlanKind.WEEK_PASS -> stringResource(R.string.pro_plan_week_detail)
         ProPlanKind.LIFETIME -> stringResource(R.string.pro_plan_lifetime_detail)
     }
-    // Yearly: a small secondary line, never bigger than the yearly amount.
+    // S2 yearly: "about X a week" (÷ 52, rounded up), small and below the yearly amount, which stays the biggest.
     val small = if (plan.kind == ProPlanKind.YEARLY) {
-        val weeks = weekly?.let { ProPricing.anchorWeeks(plan.priceMicros, it.priceMicros) }
-        if (weeks != null) {
-            pluralStringResource(R.plurals.paywall_anchor, weeks, weeks)
-        } else {
-            val locale = LocalConfiguration.current.locales[0]
-            ProPricing.format(ProPricing.weeklyEquivalentMicros(plan.priceMicros), plan.currencyCode, locale)
-                ?.let { stringResource(R.string.paywall_weekly_equivalent, it) }
-        }
+        val locale = LocalConfiguration.current.locales[0]
+        ProPricing.format(ProPricing.weeklyEquivalentMicros(plan.priceMicros), plan.currencyCode, locale)
+            ?.let { stringResource(R.string.paywall_weekly_equivalent, it) }
     } else {
         null
     }

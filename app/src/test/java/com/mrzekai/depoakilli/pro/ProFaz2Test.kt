@@ -201,11 +201,11 @@ class ProFaz2Test {
     }
 
     @Test
-    fun `weekly equivalent is smaller than the yearly amount`() {
+    fun `weekly equivalent is smaller than the yearly amount, rounded up to a cent`() {
         val weekly = ProPricing.weeklyEquivalentMicros(24_990_000L)
-        assertEquals(480_576L, weekly)
+        assertEquals(490_000L, weekly)
         assertTrue(weekly < 24_990_000L)
-        assertEquals("$0.48", ProPricing.format(weekly, "USD", Locale.US))
+        assertEquals("$0.49", ProPricing.format(weekly, "USD", Locale.US))
         assertNull(ProPricing.format(weekly, "", Locale.US))
     }
 
