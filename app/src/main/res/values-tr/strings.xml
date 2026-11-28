@@ -1130,4 +1130,7 @@
         <item quantity="one">%d dosyayı göster</item>
         <item quantity="other">%d dosyayı göster</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <string name="plan_nothing_yet">Henüz temizlenecek bir şey bulmadım. Önce telefonunu tara.</string>
 </resources>

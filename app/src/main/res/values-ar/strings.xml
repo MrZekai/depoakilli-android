@@ -1717,4 +1717,8 @@
         <item quantity="many">اعرض %d ملفًا</item>
         <item quantity="other">اعرض %d ملف</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">لم أجد بعد ما يمكن تحريره. افحص هاتفك أولًا.</string>
 </resources>

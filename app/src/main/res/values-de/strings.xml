@@ -1383,4 +1383,8 @@
         <item quantity="one">%d Datei zeigen</item>
         <item quantity="other">%d Dateien zeigen</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Ich habe noch nichts zum Freimachen gefunden. Scanne zuerst dein Handy.</string>
 </resources>

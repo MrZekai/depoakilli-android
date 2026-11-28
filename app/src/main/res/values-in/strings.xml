@@ -1303,4 +1303,8 @@
     <plurals name="filters_show">
         <item quantity="other">Tampilkan %d file</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Belum ada yang bisa dibersihkan. Pindai ponselmu dulu.</string>
 </resources>

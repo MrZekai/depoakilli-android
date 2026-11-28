@@ -1547,4 +1547,8 @@
         <item quantity="many">Показать %d файлов</item>
         <item quantity="other">Показать %d файла</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Пока не нашёл, что освободить. Сначала проверьте телефон.</string>
 </resources>

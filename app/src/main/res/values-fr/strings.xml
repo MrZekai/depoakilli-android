@@ -1464,4 +1464,8 @@
         <item quantity="many">Montrer %d de fichiers</item>
         <item quantity="other">Montrer %d fichiers</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Je n’ai encore rien trouvé à libérer. Analyse d’abord ton téléphone.</string>
 </resources>

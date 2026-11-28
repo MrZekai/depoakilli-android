@@ -1130,4 +1130,7 @@
         <item quantity="one">Show %d file</item>
         <item quantity="other">Show %d files</item>
     </plurals>
+
+    <!-- Faz 3C -->
+    <string name="plan_nothing_yet">I haven’t found anything to clear yet. Scan your phone first.</string>
 </resources>
