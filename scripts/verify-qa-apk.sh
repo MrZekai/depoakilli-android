@@ -58,7 +58,7 @@ done
 fgs_on="$(grep -c 'const val VIDEO_COMPRESSION_FGS = true' "$(dirname "$0")/../app/src/main/java/com/mrzekai/depoakilli/video/VideoRunMode.kt" || true)"
 fgs_expected="android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING "
 [ "$fgs_on" = "1" ] || fgs_expected=""
-fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$PERMS" | sort -u | tr '\n' ' ')"
+fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$PERMS" | sort -u | tr '\n' ' ' || true)"
 if [ "$fgs_perms" != "$fgs_expected" ]; then
   fail "QA APK foreground-service permissions differ: $fgs_perms"
 fi
