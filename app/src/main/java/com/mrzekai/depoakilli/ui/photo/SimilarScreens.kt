@@ -339,10 +339,12 @@ private fun PhotoTile(
         modifier
             .clip(RoundedCornerShape(if (small) 10.dp else 14.dp))
             .background(BlackChip)
-            .then(if (keeper) Modifier.border(2.dp, Lime, RoundedCornerShape(if (small) 10.dp else 14.dp)) else Modifier),
+            .then(if (keeper) Modifier.border(if (small) 3.dp else 2.dp, Lime, RoundedCornerShape(if (small) 10.dp else 14.dp)) else Modifier),
     ) {
         bitmap?.let { Image(it, contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize()) }
-        if (keeper) {
+        // Small tiles are too narrow for the word in every language (it was cut to "KEE"):
+        // the thick lime frame marks the kept frame there; the word stays on the big tiles.
+        if (keeper && !small) {
             Text(
                 stringResource(R.string.similar_keep_badge),
                 color = Ink,
