@@ -30,6 +30,8 @@ jobs:
           mkdir -p aar && for f in *.aar; do mkdir -p aar/$f && (cd aar/$f && unzip -q -o ../../$f); done
           find aar -type f | head -100
           find aar -type f \( -name "*.txt" -o -name "*label*" \) -exec sh -c 'echo "== $1"; head -c 300 "$1"; echo' _ {} \;
+          strings -n 3 aar/image-labeling-17.0.9.aar/assets/mlkit_label_default_model/mobile_ica_8bit_with_metadata_tflite | tail -600 | tr '\n' '|' | head -c 12000; echo
+          for f in aar/*/AndroidManifest.xml; do echo "== $f"; grep -E "uses-permission|<service|<provider" $f; done
           for f in $(find aar -name "*.tflite" -o -name "*.bin"); do ls -l $f; strings -n 4 $f | grep -iE "receipt|document|paper|menu|poster|screenshot|text|meme|cartoon|font|handwriting" | sort -u | head -40; done
           rm -rf aar *.aar
           sha256sum *.tflite > SHA256SUMS
