@@ -27,6 +27,10 @@ class DepoAkilliApplication : Application() {
     val pendingVideos: PendingOutputStore by lazy { PendingOutputStore(this) }
 
     /** Faz 3A-2: big videos worth shrinking, and the user's answers for each copy. */
+    /** Faz 3C: keep / delete counts (numbers only) and the started Personal Plan. */
+    val preferences: com.mrzekai.depoakilli.plan.PreferenceStore by lazy { com.mrzekai.depoakilli.plan.PreferenceStore(this) }
+    val personalPlan: com.mrzekai.depoakilli.plan.PlanStore by lazy { com.mrzekai.depoakilli.plan.PlanStore(this) }
+
     /** Faz 3B-1 similar photos (looks only while the app is in front). */
     val similarPhotos: com.mrzekai.depoakilli.photo.SimilarRepository by lazy { com.mrzekai.depoakilli.photo.SimilarRepository(this) }
 

@@ -1470,4 +1470,81 @@
         <item quantity="many">%d фото</item>
         <item quantity="other">%d фото</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C Personal Plan: draft translation, needs a native review -->
+    <string name="plan_title">Личный план</string>
+    <string name="plan_tools_sub">Самый безболезненный порядок к цели</string>
+    <string name="plan_question">Сколько места нужно?</string>
+    <string name="plan_now">Сейчас заполнено %1$s, свободно %2$s. Составлю самый безболезненный порядок.</string>
+    <string name="plan_below">Опуститься ниже %1$s</string>
+    <string name="plan_found_label">ПО НАЙДЕННОМУ</string>
+    <string name="plan_enough">Хватит на %1$s</string>
+    <string name="plan_not_enough">По найденному — не больше %1$s</string>
+    <string name="plan_total">Всего могу освободить %1$s, из них %2$s — ничего не удаляя.</string>
+    <string name="plan_build">Составить план</string>
+    <string name="plan_footer">План — это совет; каждый шаг подтверждаете вы. Данные не покидают телефон.</string>
+    <string name="plan_goal">Цель %1$s</string>
+    <string name="plan_learning">Пока учусь: %1$d из %2$d решений. До тех пор порядок одинаков для всех.</string>
+    <string name="plan_step_no_loss">Остатки и копии</string>
+    <string name="plan_step_done_title">Готово</string>
+    <string name="plan_step_done">Готово. Вы ничего не потеряли.</string>
+    <string name="plan_reason_no_loss">Ничего вашего не теряется.</string>
+    <string name="plan_reason_without_deleting">Место без удаления, поэтому раньше.</string>
+    <string name="plan_reason_best_stays">Лучшее из каждой группы остаётся.</string>
+    <string name="plan_reason_you_delete">Большинство такого вы удаляете; поставил раньше.</string>
+    <string name="plan_reason_you_keep">Большинство такого вы оставляете; отложил на конец.</string>
+    <string name="plan_reason_old">Старше года; решаете по каждому.</string>
+    <string name="plan_reason_your_call">Решаете по каждому.</string>
+    <string name="plan_next">Следующий шаг: %1$s</string>
+    <string name="plan_reached">Цель достигнута.</string>
+    <string name="plan_free_footer">План открыт всем. Без шагов PRO — не больше %1$s.</string>
+    <string name="plan_free_enough">Цель достижима и без PRO.</string>
+    <string name="plan_change">Сменить цель</string>
+    <string name="filters_tools">Готовые фильтры</string>
+    <string name="filters_tools_sub">Тип, источник, дата, размер</string>
+    <string name="filters_label">ГОТОВЫЕ ФИЛЬТРЫ</string>
+    <string name="filters_pick">Выберите, что смотреть.</string>
+    <string name="filters_counting">Считаю…</string>
+    <string name="filters_shortcuts">БЫСТРЫЙ ВЫБОР</string>
+    <string name="filters_preset_screenshots">Скриншоты прошлого года</string>
+    <string name="filters_preset_whatsapp">Большие видео из WhatsApp</string>
+    <string name="filters_preset_downloads">Загрузки старше года</string>
+    <string name="filters_row_type">ТИП</string>
+    <string name="filters_row_source">ИСТОЧНИК</string>
+    <string name="filters_row_date">ДАТА</string>
+    <string name="filters_row_size">РАЗМЕР</string>
+    <string name="filter_photo">Фото</string>
+    <string name="filter_video">Видео</string>
+    <string name="filter_screenshot">Скриншот</string>
+    <string name="filter_downloaded">Загруженное</string>
+    <string name="filter_audio">Аудио</string>
+    <string name="filter_document">Документ</string>
+    <string name="filter_camera">Камера</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">Другие приложения</string>
+    <string name="filter_downloads">Загрузки</string>
+    <string name="filter_this_year">Этот год</string>
+    <string name="filter_last_year">Прошлый год</string>
+    <string name="filter_older_6m">Старше 6 месяцев</string>
+    <string name="filter_older_1y">Старше года</string>
+    <string name="filters_footer">Показать — не удалить; выбор на следующем экране.</string>
+    <string name="learned_link">Что я узнал</string>
+    <string name="learned_title">Что я узнал из ваших решений</string>
+    <string name="learned_body">Меняется только порядок. Подтверждения не пропускаются.</string>
+    <string name="learned_row">удалено %1$d / %2$d</string>
+    <string name="learned_footer">Эти числа остаются на телефоне. Удаляемое — раньше, оставляемое — в конце.</string>
+    <string name="learned_reset">Сбросить изученное</string>
+    <plurals name="filters_match">
+        <item quantity="one">%d файл подходит</item>
+        <item quantity="few">%d файла подходят</item>
+        <item quantity="many">%d файлов подходят</item>
+        <item quantity="other">%d файла подходят</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="one">Показать %d файл</item>
+        <item quantity="few">Показать %d файла</item>
+        <item quantity="many">Показать %d файлов</item>
+        <item quantity="other">Показать %d файла</item>
+    </plurals>
 </resources>

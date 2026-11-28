@@ -285,6 +285,34 @@ class DeviceRepository(
         )
     }
 
+    /**
+     * Faz 3C ready-made filters: files of the storage index that match, biggest
+     * first (showing only; nothing is selected or moved).
+     */
+    suspend fun filterFiles(filter: com.mrzekai.depoakilli.plan.FileFilter): List<IndexedFile> = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess() || filter.isEmpty) return@withContext emptyList()
+        val indexed = cachedSharedIndex() ?: indexSharedStorage { _, _ -> }.also(::cacheSharedIndex)
+        val now = System.currentTimeMillis()
+        indexed.asSequence()
+            .filter { !StoragePathRules.isSystemMarkerFile(it.name) }
+            .filter { !it.relativePath.split('/').any { part -> part.equals(TrashStore.TRASH_DIRECTORY, ignoreCase = true) } }
+            .filter { f ->
+                filter.matches(com.mrzekai.depoakilli.plan.FilterFile(f.name, f.relativePath, f.mimeType, f.sizeBytes, f.modifiedAtMillis), now)
+            }
+            .sortedByDescending(IndexedFile::sizeBytes)
+            .toList()
+    }
+
+    /** The filter result as a review list (same limit as the other reviews). */
+    fun filterReview(files: List<IndexedFile>, label: String): StorageReviewSummary = StorageReviewSummary(
+        type = StorageFileType.OTHER,
+        folder = FolderSize(volumeRoot = "", relativePath = FILTER_FOLDER_PATH, name = label, bytes = files.sumOf(IndexedFile::sizeBytes), fileCount = files.size),
+        items = files.take(storageReviewItemLimit()).map { StorageReviewItem(file = it, selected = false) },
+        scannedFileCount = files.size,
+        scanLimitReached = files.size > storageReviewItemLimit(),
+        loading = false,
+    )
+
     suspend fun scanStorageReview(
         type: StorageFileType,
         excludeWhatsAppMedia: Boolean = false,
@@ -678,6 +706,9 @@ class DeviceRepository(
     }
 
     companion object {
+        /** Marks a review that shows a filter result (Faz 3C), not a real folder. */
+        const val FILTER_FOLDER_PATH = "\u0000filter"
+
         private const val APK_MIME = "application/vnd.android.package-archive"
         private const val TRASH_INDEX_FILE = "trash_index.json"
         private const val MAX_INDEXED_FILES = 200_000

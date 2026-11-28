@@ -233,9 +233,16 @@ class CleanerViewModel internal constructor(
         freeTierStore?.markVideoTrialUsed()
     }
 
-    /** Faz 3B-2: one one-by-one photo decision (keep or Trash). */
-    fun countPhotoDecision() {
+    /** Faz 3B-2: one one-by-one photo decision (keep or Trash); Faz 3C learns from it. */
+    fun countPhotoDecision(kind: String, delete: Boolean) {
         freeTierStore?.countDecision()
+        learn(kind, delete)
+    }
+
+    /** Faz 3C: keep / delete counts per kind (numbers only, on this phone). */
+    private fun learn(kind: String, delete: Boolean) {
+        if (!com.mrzekai.depoakilli.pro.ProGainEstimator.PERSONAL_PLAN_AVAILABLE) return
+        (getApplication<Application>() as? com.mrzekai.depoakilli.DepoAkilliApplication)?.preferences?.record(kind, delete)
     }
 
     /** Faz 3B-1: a similar-photo group was cleaned without Pro. */
@@ -262,6 +269,7 @@ class CleanerViewModel internal constructor(
         if (FreeTierRules.decisionsLocked(state.isPro, usedToday)) return
         val currentId = state.swipeReviewGroup?.let(state.swipeStates::get)?.currentId
         updateSwipe { it.mark(delete) }
+        state.swipeReviewGroup?.let { group -> if (currentId != null) learn(group.name, delete) }
         if (currentId != null) {
             if (state.isPro && delete && usedToday >= FreeTierRules.DAILY_DECISIONS) proDecisionIds += currentId
             freeTierStore?.countDecision()

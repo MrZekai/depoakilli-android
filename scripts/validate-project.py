@@ -616,6 +616,37 @@ review_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/photo/PhotoReview
 if "repo.trashReviewed(current)" not in review_src or "forEach" in review_src.split("fun PhotoReviewScreen")[1].split("fun reviewTitle")[0]:
     errors.append("bad shots and typed photos are decided one at a time, never in bulk")
 
+# Faz 3C Personal Plan: open to everyone, rules and statistics only, never
+# deletes, never skips an approval, chips instead of free text, no "AI /
+# assistant" wording, no internet permission.
+plan_src = read("app/src/main/java/com/mrzekai/depoakilli/plan/PersonalPlan.kt")
+for expected in ("const val LEARN_MIN_DECISIONS = 20", "val learned: Boolean get() = totalDecisions >= PreferenceRules.LEARN_MIN_DECISIONS"):
+    if expected not in plan_src:
+        errors.append(f"missing Personal Plan rule: {expected}")
+for plan_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/plan").rglob("*.kt"):
+    plan_file_src = plan_file.read_text(encoding="utf-8")
+    for forbidden in ("moveToTrash", "delete(", "emptyTrash", "TensorFlow", "mediapipe", "mlkit"):
+        if forbidden in plan_file_src:
+            errors.append(f"plan/{plan_file.name}: the plan only orders and explains ({forbidden})")
+for ui_file in (ROOT / "app/src/main/java/com/mrzekai/depoakilli/ui/plan").rglob("*.kt"):
+    if "TextField" in ui_file.read_text(encoding="utf-8"):
+        errors.append(f"ui/plan/{ui_file.name}: ready-made filters use chips, no free-text box")
+if "const val PERSONAL_PLAN_AVAILABLE" not in pro_gain_src:
+    errors.append("PERSONAL_PLAN_AVAILABLE switch is required")
+for surface in ("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt", "app/src/main/java/com/mrzekai/depoakilli/ui/SettingsScreen.kt"):
+    if "PERSONAL_PLAN_AVAILABLE" not in read(surface):
+        errors.append(f"{surface}: the Personal Plan entry must sit behind its switch")
+plan_words = re.compile(r"[Yy]apay zek|\bAI\b|\bIA\b|\bKI\b|\bИИ\b|الذكاء|kecerdasan|[Aa]sistan|[Aa]ssistant|[Aa]sistente|[Aa]ssistente|[Aa]ssistent|[Аа]ссистент|مساعد")
+for res_dir in (ROOT / "app/src/main/res").glob("values*"):
+    strings_file = res_dir / "strings.xml"
+    if not strings_file.exists():
+        continue
+    for match in re.finditer(r'<(string|plurals) name="((?:plan|filters?|learned)_[a-z_0-9]+)"[^>]*>(.*?)</\1>', strings_file.read_text(encoding="utf-8"), re.S):
+        if plan_words.search(match.group(3)):
+            errors.append(f"{res_dir.name}/{match.group(2)}: the Personal Plan is rules and statistics, not 'AI' or an assistant")
+if 'android.permission.INTERNET" tools:node="remove"' not in manifest:
+    errors.append("the app needs no internet: INTERNET must be removed from the merged manifest")
+
 # The app itself makes no network call (Faz 3B/3C).
 for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
     kt_src = kt.read_text(encoding="utf-8")

@@ -131,7 +131,7 @@ internal fun PhotoReviewScreen(
                         actions.onOpenPaywall()
                         return@PillButton
                     }
-                    actions.onDecision()
+                    actions.onDecision(learnKey(current), false)
                     repo.keepReviewed(current)
                     index++
                 },
@@ -151,7 +151,7 @@ internal fun PhotoReviewScreen(
                         val moved = repo.trashReviewed(current)
                         busy = false
                         if (moved > 0L) {
-                            actions.onDecision()
+                            actions.onDecision(learnKey(current), true)
                             if (actions.isPro) actions.onProBytes(moved)
                             index++
                         } else {
@@ -174,6 +174,10 @@ internal fun PhotoReviewScreen(
         )
     }
 }
+
+/** The Personal Plan learns per kind (cleanup group name). */
+private fun learnKey(photo: ReviewPhoto): String =
+    if (photo.badKind != null) com.mrzekai.depoakilli.model.CleanupGroup.BAD_SHOT.name else com.mrzekai.depoakilli.model.CleanupGroup.PHOTO_TYPE.name
 
 @Composable
 private fun reviewTitle(photo: ReviewPhoto): String = stringResource(

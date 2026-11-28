@@ -34,6 +34,13 @@ object ProGainEstimator {
     const val BAD_SHOTS_AVAILABLE = true
     const val PHOTO_TYPES_AVAILABLE = true
 
+    /**
+     * Faz 3C: Personal Plan, learning from decisions and ready-made filters.
+     * Open to everyone; rules and statistics on this phone (no model, no
+     * network). It never adds a gain row here.
+     */
+    const val PERSONAL_PLAN_AVAILABLE = true
+
     enum class Kind {
         /** "My pick" cleaned with one tap (after the first, free cleanup). */
         ONE_TAP_PICK,

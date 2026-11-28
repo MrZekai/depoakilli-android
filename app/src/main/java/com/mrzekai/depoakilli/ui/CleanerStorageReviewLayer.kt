@@ -153,6 +153,27 @@ abstract class CleanerStorageReviewLayer(
         StoragePathRules.isWhatsAppPath(relativePath)
 
     /** Opens one of the biggest folders as a review list; nothing is selected (V7). */
+    /** Faz 3C: files matching a ready-made filter (live count on the filter screen). */
+    suspend fun filterFiles(filter: com.mrzekai.depoakilli.plan.FileFilter) = repository.filterFiles(filter)
+
+    /** Faz 3C: shows the files of a ready-made filter in the usual review (selection is the user's). */
+    fun openFilterReview(filter: com.mrzekai.depoakilli.plan.FileFilter, label: String) {
+        storageReviewJob?.cancel()
+        ++storageReviewGeneration
+        _state.update {
+            it.copy(
+                storageReview = StorageReviewSummary(type = StorageFileType.OTHER, loading = true),
+                storageReviewProgressFiles = 0,
+                storageReviewProgressDirectories = 0,
+                message = null,
+            )
+        }
+        storageReviewJob = viewModelScope.launch {
+            val files = runSuspendCatching { repository.filterFiles(filter) }.getOrDefault(emptyList())
+            _state.update { it.copy(storageReview = repository.filterReview(files, label)) }
+        }
+    }
+
     fun openFolderReview(folder: FolderSize) {
         if (!repository.hasAllFilesAccess()) {
             _state.update {

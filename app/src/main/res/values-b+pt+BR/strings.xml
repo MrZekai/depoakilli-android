@@ -1331,4 +1331,79 @@
         <item quantity="many">%d de fotos</item>
         <item quantity="other">%d fotos</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C Personal Plan: draft translation, needs a native review -->
+    <string name="plan_title">Plano pessoal</string>
+    <string name="plan_tools_sub">A ordem menos dolorosa até sua meta</string>
+    <string name="plan_question">De quanto espaço você precisa?</string>
+    <string name="plan_now">Agora %1$s cheio, %2$s livre. Monto a ordem menos dolorosa.</string>
+    <string name="plan_below">Ficar abaixo de %1$s</string>
+    <string name="plan_found_label">COM O QUE ENCONTREI</string>
+    <string name="plan_enough">Suficiente para %1$s</string>
+    <string name="plan_not_enough">Com o que encontrei, abrem no máximo %1$s</string>
+    <string name="plan_total">Posso liberar %1$s no total; %2$s sem apagar nada.</string>
+    <string name="plan_build">Montar meu plano</string>
+    <string name="plan_footer">O plano é uma sugestão; você aprova cada passo. Nenhum dado sai do celular.</string>
+    <string name="plan_goal">Meta %1$s</string>
+    <string name="plan_learning">Ainda aprendendo: %1$d de %2$d decisões. Até lá a ordem é igual para todos.</string>
+    <string name="plan_step_no_loss">Sobras e cópias</string>
+    <string name="plan_step_done_title">Feito</string>
+    <string name="plan_step_done">Feito. Você não perdeu nada.</string>
+    <string name="plan_reason_no_loss">Você não perde nada seu.</string>
+    <string name="plan_reason_without_deleting">Você ganha sem apagar; por isso vem cedo.</string>
+    <string name="plan_reason_best_stays">Fica a melhor de cada grupo.</string>
+    <string name="plan_reason_you_delete">Você apaga a maioria; coloquei antes.</string>
+    <string name="plan_reason_you_keep">Você mantém a maioria; deixei por último.</string>
+    <string name="plan_reason_old">Com mais de um ano; você decide cada um.</string>
+    <string name="plan_reason_your_call">Você decide cada um.</string>
+    <string name="plan_next">Próximo passo: %1$s</string>
+    <string name="plan_reached">Meta alcançada.</string>
+    <string name="plan_free_footer">O plano é aberto a todos. Sem passos PRO, abrem no máximo %1$s.</string>
+    <string name="plan_free_enough">Você alcança sua meta sem PRO também.</string>
+    <string name="plan_change">Mudar meta</string>
+    <string name="filters_tools">Filtros prontos</string>
+    <string name="filters_tools_sub">Tipo, origem, data, tamanho</string>
+    <string name="filters_label">FILTROS PRONTOS</string>
+    <string name="filters_pick">Escolha o que ver.</string>
+    <string name="filters_counting">Contando…</string>
+    <string name="filters_shortcuts">ATALHOS</string>
+    <string name="filters_preset_screenshots">Capturas do ano passado</string>
+    <string name="filters_preset_whatsapp">Vídeos grandes do WhatsApp</string>
+    <string name="filters_preset_downloads">Downloads com mais de um ano</string>
+    <string name="filters_row_type">TIPO</string>
+    <string name="filters_row_source">ORIGEM</string>
+    <string name="filters_row_date">DATA</string>
+    <string name="filters_row_size">TAMANHO</string>
+    <string name="filter_photo">Foto</string>
+    <string name="filter_video">Vídeo</string>
+    <string name="filter_screenshot">Captura</string>
+    <string name="filter_downloaded">Baixado</string>
+    <string name="filter_audio">Áudio</string>
+    <string name="filter_document">Documento</string>
+    <string name="filter_camera">Câmera</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">Outros apps</string>
+    <string name="filter_downloads">Downloads</string>
+    <string name="filter_this_year">Este ano</string>
+    <string name="filter_last_year">Ano passado</string>
+    <string name="filter_older_6m">Mais de 6 meses</string>
+    <string name="filter_older_1y">Mais de um ano</string>
+    <string name="filters_footer">Mostrar não é apagar; você escolhe na próxima tela.</string>
+    <string name="learned_link">O que aprendi</string>
+    <string name="learned_title">O que aprendi com suas decisões</string>
+    <string name="learned_body">Só muda a ordem. Nunca pula uma aprovação.</string>
+    <string name="learned_row">apagadas %1$d / %2$d</string>
+    <string name="learned_footer">Esses números ficam neste celular. O que você apaga vem antes; o que mantém, por último.</string>
+    <string name="learned_reset">Redefinir o que aprendi</string>
+    <plurals name="filters_match">
+        <item quantity="one">%d arquivo corresponde</item>
+        <item quantity="many">%d de arquivos correspondem</item>
+        <item quantity="other">%d arquivos correspondem</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="one">Mostrar %d arquivo</item>
+        <item quantity="many">Mostrar %d de arquivos</item>
+        <item quantity="other">Mostrar %d arquivos</item>
+    </plurals>
 </resources>

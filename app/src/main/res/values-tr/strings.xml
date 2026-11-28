@@ -1058,4 +1058,76 @@
         <item quantity="one">%d fotoğraf</item>
         <item quantity="other">%d fotoğraf</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <string name="plan_title">Kişisel plan</string>
+    <string name="plan_tools_sub">Hedefine en az acıtan sıra</string>
+    <string name="plan_question">Ne kadar yer lazım?</string>
+    <string name="plan_now">Şu an %1$s dolu, %2$s boş. En az acıtan sırayı kurarım.</string>
+    <string name="plan_below">%1$s’in altına in</string>
+    <string name="plan_found_label">BULDUKLARIMLA</string>
+    <string name="plan_enough">%1$s için yeterli</string>
+    <string name="plan_not_enough">Bulduklarımla en fazla %1$s açılır</string>
+    <string name="plan_total">Toplam %1$s açabilirim. Bunun %2$s kadarı hiçbir şey silmeden.</string>
+    <string name="plan_build">Planımı kur</string>
+    <string name="plan_footer">Plan öneridir; her adımı sen onaylarsın. Hiçbir veri telefonundan çıkmaz.</string>
+    <string name="plan_goal">Hedef %1$s</string>
+    <string name="plan_learning">Henüz öğreniyorum: şimdiye kadar %2$d kararın %1$d tanesi. O zamana kadar sıra herkes için aynı.</string>
+    <string name="plan_step_no_loss">Artıklar ve kopyalar</string>
+    <string name="plan_step_done_title">Bitti</string>
+    <string name="plan_step_done">Bitti. Hiçbir şey kaybetmedin.</string>
+    <string name="plan_reason_no_loss">Senden hiçbir şey eksilmez.</string>
+    <string name="plan_reason_without_deleting">Silmeden kazanırsın; o yüzden erken sırada.</string>
+    <string name="plan_reason_best_stays">Her grubun en iyisi kalır.</string>
+    <string name="plan_reason_you_delete">Bunların çoğunu siliyorsun; öne aldım.</string>
+    <string name="plan_reason_you_keep">Çoğunu tutuyorsun; sona bıraktım.</string>
+    <string name="plan_reason_old">Bir yıldan eski; her birine sen karar verirsin.</string>
+    <string name="plan_reason_your_call">Her birine sen karar verirsin.</string>
+    <string name="plan_next">Sıradaki adım: %1$s</string>
+    <string name="plan_reached">Hedefe ulaştın.</string>
+    <string name="plan_free_footer">Plan herkese açık. PRO adımlar olmadan en fazla %1$s açılır.</string>
+    <string name="plan_free_enough">Hedefine PRO olmadan da ulaşırsın.</string>
+    <string name="plan_change">Hedefi değiştir</string>
+    <string name="filters_tools">Hazır filtreler</string>
+    <string name="filters_tools_sub">Tür, kaynak, tarih, boyut</string>
+    <string name="filters_label">HAZIR FİLTRELER</string>
+    <string name="filters_pick">Neye bakılacağını seç.</string>
+    <string name="filters_counting">Sayıyorum…</string>
+    <string name="filters_shortcuts">KISAYOLLAR</string>
+    <string name="filters_preset_screenshots">Geçen yılın ekran görüntüleri</string>
+    <string name="filters_preset_whatsapp">WhatsApp’tan gelen büyük videolar</string>
+    <string name="filters_preset_downloads">1 yıldan eski indirilenler</string>
+    <string name="filters_row_type">TÜR</string>
+    <string name="filters_row_source">KAYNAK</string>
+    <string name="filters_row_date">TARİH</string>
+    <string name="filters_row_size">BOYUT</string>
+    <string name="filter_photo">Fotoğraf</string>
+    <string name="filter_video">Video</string>
+    <string name="filter_screenshot">Ekran görüntüsü</string>
+    <string name="filter_downloaded">İndirilen</string>
+    <string name="filter_audio">Ses</string>
+    <string name="filter_document">Belge</string>
+    <string name="filter_camera">Kamera</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">Diğer uygulamalar</string>
+    <string name="filter_downloads">İndirilenler</string>
+    <string name="filter_this_year">Bu yıl</string>
+    <string name="filter_last_year">Geçen yıl</string>
+    <string name="filter_older_6m">6 aydan eski</string>
+    <string name="filter_older_1y">1 yıldan eski</string>
+    <string name="filters_footer">Göstermek silmek değildir; seçimi sonraki ekranda sen yaparsın.</string>
+    <string name="learned_link">Öğrendiklerim</string>
+    <string name="learned_title">Kararlarından öğrendiklerim</string>
+    <string name="learned_body">Yalnız sıralamayı değiştirir. Hiçbir onayı atlamam.</string>
+    <string name="learned_row">silinen %1$d / %2$d</string>
+    <string name="learned_footer">Bu sayılar yalnız bu telefonda durur. Sildiklerini öne, tuttuklarını sona alırım.</string>
+    <string name="learned_reset">Öğrendiklerimi sıfırla</string>
+    <plurals name="filters_match">
+        <item quantity="one">%d dosya bu seçime uyuyor</item>
+        <item quantity="other">%d dosya bu seçime uyuyor</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="one">%d dosyayı göster</item>
+        <item quantity="other">%d dosyayı göster</item>
+    </plurals>
 </resources>

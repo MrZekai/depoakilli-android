@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- 2.0: kept for the Faz 3.6 Assistant (owner's decision). Until then the
-         app itself makes no network call; Google Play Billing talks to the Play
-         Store app on the device. -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Faz 3C: the app needs no internet. Play Billing 9.1.0 declares only
+         com.android.vending.BILLING and talks to the Play Store app on the
+         device; the cloud Assistant was cancelled. The bundled ML Kit models
+         pull a diagnostics uploader (datatransport) that declares INTERNET:
+         removed here, so no usage data can leave the phone. -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 
     <!-- WorkManager (daily Trash purge) declares a foreground service. Smart
          Cleaner never runs a long-running Worker/foreground service, so remove
