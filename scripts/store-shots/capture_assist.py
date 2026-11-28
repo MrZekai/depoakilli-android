@@ -75,8 +75,15 @@ def main():
         qa.sh(f"pm clear {PKG}")
         qa.sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
         qa.sh(f"appops set {PKG} GET_USAGE_STATS allow")
+        time.sleep(3)
         qa.sh(f"cmd locale set-app-locales {PKG} --locales {tag}")
-        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity")
+        time.sleep(2)
+        for attempt in range(3):
+            out = qa.sh(f"am start -W -n {PKG}/com.mrzekai.depoakilli.MainActivity")
+            time.sleep(5)
+            if qa.sh(f"pidof {PKG}").strip():
+                break
+            log(f"{listing}: app not started (attempt {attempt + 1}): {out.strip()[-200:]}")
         ctas = [s["home_cta_make_room"], s["home_cta_clean"]]
         ctas += [c.upper() for c in ctas] + [c.replace("i", "İ").upper() for c in ctas]
         btn_rx = "|".join(cs.rx(c) for c in dict.fromkeys(ctas))
