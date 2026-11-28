@@ -30,15 +30,19 @@ def check(name, ok, note=""):
 
 
 def launch(tag, target, demo="on"):
+    qa.sh("settings put global hide_error_dialogs 1")
+    cs.clear_system_dialogs()
     qa.sh(f"am force-stop {PKG}")
     qa.sh(f"cmd locale set-app-locales {PKG} --locales {tag}")
     qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro {demo} --es watch_target {target}")
     time.sleep(4)
+    cs.clear_system_dialogs()
 
 
 def find_any(s, keys, timeout=60, scroll=6):
     pats = "|".join(cs.rx(s[k]) for k in keys if k in s)
-    n = qa.wait_for(pats, timeout, dismiss=False)
+    cs.clear_system_dialogs()
+    n = qa.wait_for(pats, timeout, dismiss=True)
     return n or qa.scroll_to(pats, scroll)
 
 
