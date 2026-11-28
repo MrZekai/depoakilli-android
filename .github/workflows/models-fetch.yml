@@ -21,6 +21,17 @@ jobs:
             curl -fsSL https://dl.google.com/dl/android/maven2/$a/maven-metadata.xml | grep -oE "<(latest|release)>[^<]+" | sed "s|^|$a |" >> versions.txt || echo "$a ?" >> versions.txt
           done
           curl -fsSL https://dl.google.com/dl/android/maven2/com/google/mediapipe/tasks-vision/maven-metadata.xml -o tasks-vision-meta.xml || true
+          M=https://dl.google.com/dl/android/maven2/com/google/mlkit
+          for a in image-labeling/17.0.9/image-labeling-17.0.9.aar image-labeling-default-common/17.0.0/image-labeling-default-common-17.0.0.aar image-labeling-common/18.1.0/image-labeling-common-18.1.0.aar face-detection/16.1.7/face-detection-16.1.7.aar; do
+            curl -fsSL -o $(basename $a) $M/$a || echo "missing $a"
+          done
+          curl -fsSL https://dl.google.com/dl/android/maven2/com/google/mlkit/image-labeling/17.0.9/image-labeling-17.0.9.pom -o il.pom || true
+          cat il.pom || true
+          mkdir -p aar && for f in *.aar; do mkdir -p aar/$f && (cd aar/$f && unzip -q -o ../../$f); done
+          find aar -type f | head -100
+          find aar -type f \( -name "*.txt" -o -name "*label*" \) -exec sh -c 'echo "== $1"; head -c 300 "$1"; echo' _ {} \;
+          for f in $(find aar -name "*.tflite" -o -name "*.bin"); do ls -l $f; strings -n 4 $f | grep -iE "receipt|document|paper|menu|poster|screenshot|text|meme|cartoon|font|handwriting" | sort -u | head -40; done
+          rm -rf aar *.aar
           sha256sum *.tflite > SHA256SUMS
           ls -l; cat versions.txt
       - name: Push
