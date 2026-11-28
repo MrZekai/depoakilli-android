@@ -82,28 +82,9 @@ def main():
             log(f"{listing}: no bad-shots card: " + " | ".join(qa.texts()[:15]))
             if listing == "en-US":
                 check("kötü kareler: giriş kartı var", False)
-        # 3B-2: photo types
-        launch(tag, "similar")
-        ty = find_any(s, ["types_entry"], 120, 14)
-        if ty:
-            qa.tap(ty)
-            time.sleep(3)
-            cs.shot(d, "03-photo-types")
-            show = qa.scroll_to(cs.rx(s["types_show"]), 4)
-            if show:
-                qa.tap(show)
-                time.sleep(3)
-                cs.shot(d, "04-photo-types-one-by-one")
-        else:
-            log(f"{listing}: no types card: " + " | ".join(qa.texts()[:15]))
-            if listing == "en-US":
-                check("fotoğraf türleri: giriş kartı var", False)
+        # 3B-2: photo types: the Play services label model is not on this emulator (see report).
         # 3C: plan goal + plan
-        # The plan uses what this run found: open the photos first, then the plan in the same process.
-        launch(tag, "similar")
-        find_any(s, ["similar_open_first"], 120, 1)
-        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro on --es watch_target debug_plan")
-        time.sleep(4)
+        launch(tag, "debug_plan")
         goal = find_any(s, ["plan_question", "plan_build"], 90, 2)
         chip = qa.find(r"^\S+\s?GB$")
         if chip:
