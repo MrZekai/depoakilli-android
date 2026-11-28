@@ -1,0 +1,21 @@
+750:|    |    +--- com.google.android.datatransport:transport-api:3.0.0
+752:|    |    +--- com.google.android.datatransport:transport-backend-cct:3.1.8
+754:|    |    |    +--- com.google.android.datatransport:transport-api:3.0.0 (*)
+755:|    |    |    +--- com.google.android.datatransport:transport-runtime:3.1.8
+757:|    |    |    |    +--- com.google.android.datatransport:transport-api:3.0.0 (*)
+768:|    |    +--- com.google.android.datatransport:transport-runtime:3.1.8 (*)
+883:|         +--- com.google.android.datatransport:transport-api:3.0.0 (*)
+884:|         +--- com.google.android.datatransport:transport-backend-cct:3.1.0 -> 3.1.8 (*)
+885:|         \--- com.google.android.datatransport:transport-runtime:3.1.0 -> 3.1.8 (*)
+887:|    +--- com.google.android.datatransport:transport-api:2.2.1 -> 3.0.0 (*)
+888:|    +--- com.google.android.datatransport:transport-backend-cct:2.3.3 -> 3.1.8 (*)
+889:|    +--- com.google.android.datatransport:transport-runtime:2.2.6 -> 3.1.8 (*)
+901:|    |    +--- com.google.android.datatransport:transport-api:2.2.1 -> 3.0.0 (*)
+902:|    |    +--- com.google.android.datatransport:transport-backend-cct:2.3.3 -> 3.1.8 (*)
+903:|    |    +--- com.google.android.datatransport:transport-runtime:2.2.6 -> 3.1.8 (*)
+912:|    |    +--- com.google.android.datatransport:transport-api:2.2.1 -> 3.0.0 (*)
+913:|    |    +--- com.google.android.datatransport:transport-backend-cct:2.3.3 -> 3.1.8 (*)
+914:|    |    +--- com.google.android.datatransport:transport-runtime:2.2.6 -> 3.1.8 (*)
+927:|    +--- com.google.android.datatransport:transport-api:2.2.1 -> 3.0.0 (*)
+928:|    +--- com.google.android.datatransport:transport-backend-cct:2.3.3 -> 3.1.8 (*)
+929:|    +--- com.google.android.datatransport:transport-runtime:2.2.6 -> 3.1.8 (*)
