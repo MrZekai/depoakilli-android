@@ -488,7 +488,7 @@ private fun ShrinkProgressScreen() {
             Spacer(Modifier.height(16.dp))
             Text(stringResource(R.string.video_progress_note), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 20.sp)
             Spacer(Modifier.weight(1f).height(24.dp))
-            PillButton(text = stringResource(R.string.video_stop), onClick = { VideoCompressionService.stop(context) }, style = PillStyle.INK_OUTLINE)
+            PillButton(text = stringResource(R.string.video_stop), onClick = { VideoCompressionService.stop(context) }, style = PillStyle.LIME_OUTLINE)
             Text(
                 stringResource(R.string.video_stop_note),
                 color = OnBlackSoft,
