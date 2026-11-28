@@ -1,0 +1,6 @@
+com/google/mediapipe/tasks-vision <latest>1.2.3
+com/google/mediapipe/tasks-vision <release>1.2.3
+com/google/mlkit/face-detection <latest>16.1.7
+com/google/mlkit/face-detection <release>16.1.7
+com/google/mlkit/image-labeling <latest>17.0.9
+com/google/mlkit/image-labeling <release>17.0.9
