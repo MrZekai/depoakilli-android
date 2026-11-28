@@ -137,6 +137,18 @@ internal fun VideoShrinkFlow(repo: VideoShrinkRepository, actions: VideoShrinkAc
         }
     }
 
+    // The last copy was approved or dropped: show what was gained (or the list
+    // again when every original was kept), with fresh figures.
+    LaunchedEffect(reviewing, pending.isEmpty()) {
+        if (reviewing && pending.isEmpty()) {
+            // Let the approval that emptied the list finish counting first.
+            kotlinx.coroutines.delay(300)
+            reviewing = false
+            showResult = approvedCount > 0
+            repo.refresh()
+        }
+    }
+
     PageFrame(modifier = modifier) {
         when {
             job.running -> ShrinkProgressScreen()
