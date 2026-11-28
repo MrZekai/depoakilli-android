@@ -1,0 +1,94 @@
+build: v61-after
+image: google/sdk_gphone64_x86_64/emu64xa:14/UE1A.230829.036.A4/12096271:user/release-keys
+Play Store: yes
+Play services: versionName=23.18.18 (190800-535401451)
+INTERNET granted: False
+run 1: scan looked=167 groups=21 frames=66 bytes=33785150 ms=17907 model=true
+run 1: photo types card shown: False
+run 1 log: 11-28 15:56:50.856 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:52.399 W/DynamiteModule( 6168): Local module descriptor class for com.google.android.gms.tflite_dynamite not found.
+run 1 log: 11-28 15:56:52.401 I/DynamiteModule( 6168): Considering local module com.google.android.gms.tflite_dynamite:0 and remote module com.google.android.gms.tflite_dynamite:264010405
+run 1 log: 11-28 15:56:52.401 I/DynamiteModule( 6168): Selected remote version of com.google.android.gms.tflite_dynamite, version >= 264010405
+run 1 log: 11-28 15:56:52.478 I/DynamiteModule( 6168): Considering local module com.google.android.gms.googlecertificates:7 and remote module com.google.android.gms.googlecertificates:7
+run 1 log: 11-28 15:56:52.479 I/DynamiteModule( 6168): Selected local version of com.google.android.gms.googlecertificates
+run 1 log: 11-28 15:56:53.388 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.388 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.437 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.437 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.636 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.636 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.641 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.642 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.752 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.752 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.955 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.955 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:53.999 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:53.999 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.027 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.027 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.036 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.036 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.162 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.162 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.170 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.170 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.186 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.186 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.234 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.234 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.238 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.238 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.245 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.245 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:54.351 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:54.351 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 1 log: 11-28 15:56:57.377 I/DynamiteModule( 6241): Considering local module com.google.android.gms.providerinstaller.dynamite:1 and remote module com.google.android.gms.providerinstaller.dynamite:0
+run 1 log: 11-28 15:56:57.377 I/DynamiteModule( 6241): Selected local version of com.google.android.gms.providerinstaller.dynamite
+run 2: scan looked=167 groups=21 frames=66 bytes=33785150 ms=12968 model=true
+run 2: photo types card shown: True
+run 2 log: 11-28 16:00:39.927 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:39.952 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:40.978 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:43.007 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:43.007 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:43.043 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:44.091 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:44.869 I/DynamiteModule( 7537): Considering local module com.google.android.gms.vision.ica:0 and remote module com.google.android.gms.vision.ica:231818000
+run 2 log: 11-28 16:00:44.869 I/DynamiteModule( 7537): Selected remote version of com.google.android.gms.vision.ica, version >= 231818000
+run 2 log: 11-28 16:00:44.870 V/DynamiteModule( 7537): Dynamite loader version >= 2, using loadModule2NoCrashUtils
+run 2 log: 11-28 16:00:44.876 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:44.907 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:44.950 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:44.952 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:46.123 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:46.123 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:48.470 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:48.474 W/TransportRuntime( 7537): Transport backend 'cct' is not registered
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar: looked=167 groups=21 frames=66 bytes=33785150 ms=12968 model=true
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B19_2.jpg,IMG_B19_0.jpg,IMG_B19_1.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B18_1.jpg,IMG_B18_0.jpg,IMG_B18_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B17_0.jpg,IMG_B17_1.jpg,IMG_B17_3.jpg,IMG_B17_2.jpg,IMG_B17_4.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B16_4.jpg,IMG_B16_0.jpg,IMG_B16_1.jpg,IMG_B16_2.jpg,IMG_B16_3.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B15_1.jpg,IMG_B15_0.jpg,IMG_B15_3.jpg,IMG_B15_2.jpg,IMG_B15_4.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B14_1.jpg,IMG_B14_0.jpg,IMG_B14_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B13_0.jpg,IMG_B13_1.jpg,IMG_B13_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B12_5.jpg,IMG_B12_0.jpg,IMG_B12_2.jpg,IMG_B12_1.jpg,IMG_B12_4.jpg,IMG_B12_3.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B11_2.jpg,IMG_B11_0.jpg,IMG_B11_1.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B10_2.jpg,IMG_B10_0.jpg,IMG_B10_1.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B09_1.jpg,IMG_B09_0.jpg,IMG_B09_2.jpg,IMG_B09_3.jpg,IMG_B09_4.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B08_1.jpg,IMG_B08_0.jpg,IMG_B08_3.jpg,IMG_B08_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B07_1.jpg,IMG_B07_0.jpg,IMG_B07_2.jpg,IMG_B07_4.jpg,IMG_B07_5.jpg,IMG_B07_3.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B06_0.jpg,IMG_B06_1.jpg,IMG_B06_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B05_4.jpg,IMG_B05_0.jpg,IMG_B05_1.jpg,IMG_B05_3.jpg,IMG_B05_2.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B04_5.jpg,IMG_B04_0.jpg,IMG_B04_2.jpg,IMG_B04_1.jpg,IMG_B04_3.jpg,IMG_B04_4.jpg
+run 2 log: 11-28 16:00:48.478 W/SmartCleanerPhotos( 7537): similar group: IMG_B03_0.jpg,IMG_B03_1.jpg,IMG_B03_2.jpg
+run 2 log: 11-28 16:00:48.479 W/SmartCleanerPhotos( 7537): similar group: IMG_B02_3.jpg,IMG_B02_0.jpg,IMG_B02_1.jpg,IMG_B02_2.jpg
+run 2 log: 11-28 16:00:48.479 W/SmartCleanerPhotos( 7537): similar group: IMG_B01_2.jpg,IMG_B01_0.jpg,IMG_B01_1.jpg,IMG_B01_3.jpg,IMG_B01_4.jpg
+run 2 log: 11-28 16:00:48.479 W/SmartCleanerPhotos( 7537): similar group: IMG_B00_2.jpg,IMG_B00_0.jpg,IMG_B00_1.jpg,IMG_B00_3.jpg
+run 2 log: 11-28 16:00:48.479 W/SmartCleanerPhotos( 7537): similar group: IMG_D05.jpg,IMG_D03.jpg,IMG_D09.jpg
+datatransport jobs: none
+crash lines after forcing the uploader: 0
+RESULT: no crash; types card: True
+
+--- full datatransport log ---
