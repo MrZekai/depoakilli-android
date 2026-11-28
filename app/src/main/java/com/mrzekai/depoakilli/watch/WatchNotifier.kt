@@ -83,6 +83,7 @@ object WatchNotifier {
         )
         val notification = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_stat_watch)
+            .setColor(BRAND_COLOR)
             .setContentTitle(text.first)
             .setContentText(text.second)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text.second))
@@ -129,6 +130,9 @@ object WatchNotifier {
             }
         }
     }
+
+    /** Deep brand green behind the small icon (Fable review). */
+    const val BRAND_COLOR = 0xFF0B4A25.toInt()
 
     fun kindName(kind: WatchKind): Int = when (kind) {
         WatchKind.VIDEOS -> R.string.watch_kind_videos

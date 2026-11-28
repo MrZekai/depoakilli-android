@@ -52,6 +52,7 @@ object TrialReminder {
         val pending = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val notification = NotificationCompat.Builder(context, CHANNEL_ACCOUNT)
             .setSmallIcon(R.drawable.ic_stat_watch)
+            .setColor(com.mrzekai.depoakilli.watch.WatchNotifier.BRAND_COLOR)
             .setContentTitle(context.getString(R.string.trial_reminder_title))
             .setContentText(context.getString(R.string.trial_reminder_body))
             .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.trial_reminder_body)))

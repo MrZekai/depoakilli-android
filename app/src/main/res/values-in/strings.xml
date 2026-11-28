@@ -1315,4 +1315,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Belum ada yang bisa dibersihkan. Pindai ponselmu dulu.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">Biarkan layar ini terbuka: keluar dari aplikasi akan menghentikannya, salinan yang selesai tetap ada. Aku juga berhenti jika ponsel panas atau baterai lemah.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">berkurang %s</string>
 </resources>

@@ -465,10 +465,11 @@ internal fun WeekCard(
     }
 }
 
-/** Disjoint kinds; the rows (Other included) add up to the headline. */
+/** Disjoint kinds; rows under 50 MB either way are left out (Fable review). */
 @Composable
 private fun KindBars(growth: WatchGrowth, modifier: Modifier = Modifier) {
-    val rows = WatchKind.entries.map { it to growth.bytes(it) }
+    val rows = WatchRules.visibleKindRows(growth)
+    if (rows.isEmpty()) return
     val max = rows.maxOf { kotlin.math.abs(it.second) }.coerceAtLeast(1L)
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         rows.forEach { (kind, bytes) ->
@@ -488,7 +489,7 @@ private fun KindBars(growth: WatchGrowth, modifier: Modifier = Modifier) {
                     modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
                 )
                 Text(
-                    (if (bytes >= 0L) "+" else "−") + ByteFormatter.format(kotlin.math.abs(bytes)),
+                    if (bytes >= 0L) "+" + ByteFormatter.format(bytes) else stringResource(R.string.watch_kind_decreased, ByteFormatter.format(-bytes)),
                     color = if (bytes >= 0L) Lime else OnBlackSoft,
                     fontSize = 14.sp,
                     fontWeight = AppWeights.Title,

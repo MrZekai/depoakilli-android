@@ -1394,4 +1394,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">Ich habe noch nichts zum Freimachen gefunden. Scanne zuerst dein Handy.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">Lass diesen Bildschirm offen: Verlässt du die App, stoppt es, fertige Kopien bleiben. Ich stoppe auch, wenn das Handy heiß wird oder der Akku schwach ist.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">%s weniger</string>
 </resources>

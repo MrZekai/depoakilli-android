@@ -20,7 +20,7 @@ data class FreeTierSnapshot(
     /** Faz 3B-1: similar-photo groups cleaned without Pro (lifetime; the first 3 are free). */
     val similarGroupsUsed: Int = 0,
     /** S1: the first successful cleanup decided the one self-opening paywall (shown or not). */
-    val autoPaywallDecided: Boolean = false,
+    val autoPaywallShown: Boolean = false,
     /** S4: the one-time offer after a "no" was shown. */
     val leaveOfferShown: Boolean = false,
     /** S5: everything cleared with Pro features since the subscription started. */
@@ -50,7 +50,7 @@ class FreeTierStore(context: Context) {
         it.copy(monthly = it.monthly.add(currentMonth(), bytes), totalProBytes = it.totalProBytes + bytes.coerceAtLeast(0L))
     }
 
-    fun markAutoPaywallDecided() = write { it.copy(autoPaywallDecided = true) }
+    fun markAutoPaywallShown() = write { it.copy(autoPaywallShown = true) }
 
     fun markLeaveOfferShown() = write { it.copy(leaveOfferShown = true) }
 
@@ -72,7 +72,7 @@ class FreeTierStore(context: Context) {
             .putLong(KEY_MONTH_BYTES, next.monthly.bytes)
             .putBoolean(KEY_VIDEO_TRIAL, next.videoTrialUsed)
             .putInt(KEY_SIMILAR_GROUPS, next.similarGroupsUsed)
-            .putBoolean(KEY_AUTO_PAYWALL, next.autoPaywallDecided)
+            .putBoolean(KEY_AUTO_PAYWALL, next.autoPaywallShown)
             .putBoolean(KEY_LEAVE_OFFER, next.leaveOfferShown)
             .putLong(KEY_TOTAL_PRO_BYTES, next.totalProBytes)
             .apply()
@@ -85,7 +85,7 @@ class FreeTierStore(context: Context) {
         monthly = MonthlyProBytes(prefs.getInt(KEY_MONTH, 0), prefs.getLong(KEY_MONTH_BYTES, 0L)),
         videoTrialUsed = prefs.getBoolean(KEY_VIDEO_TRIAL, false),
         similarGroupsUsed = prefs.getInt(KEY_SIMILAR_GROUPS, 0),
-        autoPaywallDecided = prefs.getBoolean(KEY_AUTO_PAYWALL, false),
+        autoPaywallShown = prefs.getBoolean(KEY_AUTO_PAYWALL, false),
         leaveOfferShown = prefs.getBoolean(KEY_LEAVE_OFFER, false),
         totalProBytes = prefs.getLong(KEY_TOTAL_PRO_BYTES, 0L),
     )
@@ -100,7 +100,7 @@ class FreeTierStore(context: Context) {
         private const val KEY_MONTH_BYTES = "pro_month_bytes"
         private const val KEY_VIDEO_TRIAL = "video_trial_used"
         private const val KEY_SIMILAR_GROUPS = "similar_groups_used"
-        private const val KEY_AUTO_PAYWALL = "auto_paywall_decided"
+        private const val KEY_AUTO_PAYWALL = "auto_paywall_shown"
         private const val KEY_LEAVE_OFFER = "leave_offer_shown"
         private const val KEY_TOTAL_PRO_BYTES = "total_pro_bytes"
 
