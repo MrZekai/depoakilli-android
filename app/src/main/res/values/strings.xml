@@ -1137,4 +1137,6 @@
     <string name="trial_reminder_title">Your trial ends tomorrow</string>
     <string name="trial_reminder_body">If you don’t want to continue, cancel in Google Play > Subscriptions.</string>
     <string name="pro_total_cleared">So far: %1$s</string>
+    <!-- Faz 3C -->
+    <string name="plan_nothing_yet">I haven’t found anything to clear yet. Scan your phone first.</string>
 </resources>

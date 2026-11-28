@@ -1721,4 +1721,7 @@
     <string name="trial_reminder_title">تنتهي تجربتك غدًا</string>
     <string name="trial_reminder_body">إن لم ترغب في المتابعة فألغِ من Google Play > الاشتراكات.</string>
     <string name="pro_total_cleared">حتى الآن: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">لم أجد بعد ما يمكن تحريره. افحص هاتفك أولًا.</string>
 </resources>

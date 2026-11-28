@@ -1553,4 +1553,7 @@
     <string name="trial_reminder_title">Пробный период закончится завтра</string>
     <string name="trial_reminder_body">Если не хотите продолжать, отмените в Google Play > Подписки.</string>
     <string name="pro_total_cleared">Всего: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Пока не нашёл, что освободить. Сначала проверьте телефон.</string>
 </resources>

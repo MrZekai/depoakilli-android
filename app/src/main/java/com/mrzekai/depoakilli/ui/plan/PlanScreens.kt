@@ -155,7 +155,11 @@ private fun TargetScreen(inputs: PlanInputs, onBuild: (PlanTarget) -> Unit) {
         Spacer(Modifier.height(10.dp))
         Chip(stringResource(R.string.plan_below, percentText(PlanBuilder.PRESET_PERCENT / 100.0)), selected = target == 3, modifier = Modifier.fillMaxWidth()) { target = 3 }
         Spacer(Modifier.height(16.dp))
-        if (preview != null) {
+        if (preview != null && preview.reachableBytes <= 0L) {
+            // Nothing measured yet: no "at most 0 B" card.
+            Text(stringResource(R.string.plan_nothing_yet), color = Ink, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = AppWeights.Strong)
+            Spacer(Modifier.height(16.dp))
+        } else if (preview != null) {
             BlackCard(contentPadding = PaddingValues(18.dp)) {
                 Text(stringResource(R.string.plan_found_label), color = Lime, fontSize = 13.sp, fontWeight = AppWeights.Giant)
                 Text(
@@ -242,7 +246,9 @@ private fun PlanScreen(inputs: PlanInputs, saved: SavedPlan, actions: PlanAction
                 modifier = Modifier.padding(bottom = 8.dp),
             )
         }
-        BlackCard(contentPadding = PaddingValues(vertical = 6.dp)) {
+        if (keys.isEmpty()) {
+            Text(stringResource(R.string.plan_nothing_yet), color = Ink, fontSize = 16.sp, lineHeight = 21.sp, fontWeight = AppWeights.Strong, modifier = Modifier.padding(vertical = 8.dp))
+        } else BlackCard(contentPadding = PaddingValues(vertical = 6.dp)) {
             keys.forEachIndexed { i, key ->
                 val c = byKey[key]
                 if (i > 0) CardDivider()
@@ -255,7 +261,7 @@ private fun PlanScreen(inputs: PlanInputs, saved: SavedPlan, actions: PlanAction
         } else if (next != null) {
             PillButton(text = stringResource(R.string.plan_next, inputs.titleOf(next)), onClick = { actions.onOpenStep(next) }, style = PillStyle.BLACK_LIME)
         }
-        Text(
+        if (keys.isNotEmpty()) Text(
             if (plan.freeReachableBytes >= saved.targetBytes) {
                 stringResource(R.string.plan_free_enough)
             } else {
@@ -266,7 +272,8 @@ private fun PlanScreen(inputs: PlanInputs, saved: SavedPlan, actions: PlanAction
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
         )
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        // One per line: three side by side squeezed the last one into a letter column.
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             LinkButton(stringResource(R.string.plan_change), onClick = onChangeGoal)
             LinkButton(stringResource(R.string.filters_tools), onClick = actions.onOpenFilters)
             LinkButton(stringResource(R.string.learned_link), onClick = actions.onOpenLearned)
