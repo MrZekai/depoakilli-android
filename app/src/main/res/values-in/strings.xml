@@ -1232,4 +1232,79 @@
     <plurals name="types_photo_count">
         <item quantity="other">%d foto</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C Personal Plan: draft translation, needs a native review -->
+    <string name="plan_title">Rencana pribadi</string>
+    <string name="plan_tools_sub">Urutan paling ringan menuju targetmu</string>
+    <string name="plan_question">Butuh ruang berapa?</string>
+    <string name="plan_now">Sekarang %1$s penuh, %2$s kosong. Kususun urutan paling ringan.</string>
+    <string name="plan_below">Turun di bawah %1$s</string>
+    <string name="plan_found_label">DENGAN YANG KUTEMUKAN</string>
+    <string name="plan_enough">Cukup untuk %1$s</string>
+    <string name="plan_not_enough">Dengan temuanku paling banyak %1$s</string>
+    <string name="plan_total">Total bisa %1$s; %2$s di antaranya tanpa menghapus apa pun.</string>
+    <string name="plan_build">Susun rencanaku</string>
+    <string name="plan_footer">Rencana ini saran; kamu menyetujui tiap langkah. Tak ada data yang keluar dari ponsel.</string>
+    <string name="plan_goal">Target %1$s</string>
+    <string name="plan_learning">Masih belajar: %1$d dari %2$d keputusan. Sampai saat itu urutannya sama untuk semua.</string>
+    <string name="plan_step_no_loss">Sisa dan salinan</string>
+    <string name="plan_step_done_title">Selesai</string>
+    <string name="plan_step_done">Selesai. Tak ada yang hilang.</string>
+    <string name="plan_reason_no_loss">Tak ada milikmu yang hilang.</string>
+    <string name="plan_reason_without_deleting">Dapat ruang tanpa menghapus; karena itu di awal.</string>
+    <string name="plan_reason_best_stays">Yang terbaik tiap grup tetap.</string>
+    <string name="plan_reason_you_delete">Sebagian besar kamu hapus; kutaruh di depan.</string>
+    <string name="plan_reason_you_keep">Sebagian besar kamu simpan; kutaruh di akhir.</string>
+    <string name="plan_reason_old">Lebih dari setahun; kamu putuskan tiap satu.</string>
+    <string name="plan_reason_your_call">Kamu putuskan tiap satu.</string>
+    <string name="plan_next">Langkah berikutnya: %1$s</string>
+    <string name="plan_reached">Target tercapai.</string>
+    <string name="plan_free_footer">Rencana terbuka untuk semua. Tanpa langkah PRO paling banyak %1$s.</string>
+    <string name="plan_free_enough">Targetmu tercapai tanpa PRO juga.</string>
+    <string name="plan_change">Ubah target</string>
+    <string name="filters_tools">Filter siap pakai</string>
+    <string name="filters_tools_sub">Jenis, sumber, tanggal, ukuran</string>
+    <string name="filters_label">FILTER SIAP PAKAI</string>
+    <string name="filters_pick">Pilih yang ingin dilihat.</string>
+    <string name="filters_counting">Menghitung…</string>
+    <string name="filters_shortcuts">PINTASAN</string>
+    <string name="filters_preset_screenshots">Tangkapan layar tahun lalu</string>
+    <string name="filters_preset_whatsapp">Video besar dari WhatsApp</string>
+    <string name="filters_preset_downloads">Unduhan lebih dari setahun</string>
+    <string name="filters_row_type">JENIS</string>
+    <string name="filters_row_source">SUMBER</string>
+    <string name="filters_row_date">TANGGAL</string>
+    <string name="filters_row_size">UKURAN</string>
+    <string name="filter_photo">Foto</string>
+    <string name="filter_video">Video</string>
+    <string name="filter_screenshot">Tangkapan layar</string>
+    <string name="filter_downloaded">Diunduh</string>
+    <string name="filter_audio">Audio</string>
+    <string name="filter_document">Dokumen</string>
+    <string name="filter_camera">Kamera</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">Aplikasi lain</string>
+    <string name="filter_downloads">Unduhan</string>
+    <string name="filter_this_year">Tahun ini</string>
+    <string name="filter_last_year">Tahun lalu</string>
+    <string name="filter_older_6m">Lebih dari 6 bulan</string>
+    <string name="filter_older_1y">Lebih dari setahun</string>
+    <string name="filters_footer">Menampilkan bukan menghapus; kamu memilih di layar berikutnya.</string>
+    <string name="learned_link">Yang kupelajari</string>
+    <string name="learned_title">Yang kupelajari dari keputusanmu</string>
+    <string name="learned_body">Hanya mengubah urutan. Tak pernah melewati persetujuan.</string>
+    <string name="learned_row">dihapus %1$d / %2$d</string>
+    <string name="learned_footer">Angka ini tetap di ponsel ini. Yang kamu hapus di depan, yang kamu simpan di akhir.</string>
+    <string name="learned_reset">Atur ulang yang kupelajari</string>
+    <plurals name="filters_match">
+        <item quantity="other">%d file cocok</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="other">Tampilkan %d file</item>
+    </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Belum ada yang bisa dibersihkan. Pindai ponselmu dulu.</string>
 </resources>

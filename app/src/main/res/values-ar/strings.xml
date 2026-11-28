@@ -1636,4 +1636,89 @@
         <item quantity="many">%d صورة</item>
         <item quantity="other">%d صورة</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C Personal Plan: draft translation, needs a native review -->
+    <string name="plan_title">خطة شخصية</string>
+    <string name="plan_tools_sub">أقل ترتيب إزعاجًا نحو هدفك</string>
+    <string name="plan_question">كم مساحة تحتاج؟</string>
+    <string name="plan_now">الآن ممتلئ %1$s، والفارغ %2$s. سأرتب أقل ترتيب إزعاجًا.</string>
+    <string name="plan_below">النزول تحت %1$s</string>
+    <string name="plan_found_label">بما وجدته</string>
+    <string name="plan_enough">يكفي لـ %1$s</string>
+    <string name="plan_not_enough">بما وجدته تتحرر %1$s على الأكثر</string>
+    <string name="plan_total">يمكنني تحرير %1$s إجمالًا؛ منها %2$s دون حذف أي شيء.</string>
+    <string name="plan_build">أنشئ خطتي</string>
+    <string name="plan_footer">الخطة اقتراح؛ أنت توافق على كل خطوة. لا تغادر أي بيانات هاتفك.</string>
+    <string name="plan_goal">الهدف %1$s</string>
+    <string name="plan_learning">ما زلت أتعلم: %1$d من %2$d قرارًا. حتى ذلك الحين الترتيب نفسه للجميع.</string>
+    <string name="plan_step_no_loss">البقايا والنسخ</string>
+    <string name="plan_step_done_title">تم</string>
+    <string name="plan_step_done">تم. لم تخسر شيئًا.</string>
+    <string name="plan_reason_no_loss">لا تخسر شيئًا من ملفاتك.</string>
+    <string name="plan_reason_without_deleting">تكسب دون حذف؛ لذلك يأتي مبكرًا.</string>
+    <string name="plan_reason_best_stays">تبقى الأفضل من كل مجموعة.</string>
+    <string name="plan_reason_you_delete">تحذف معظمها؛ فوضعتها أولًا.</string>
+    <string name="plan_reason_you_keep">تحتفظ بمعظمها؛ فتركتها للنهاية.</string>
+    <string name="plan_reason_old">أقدم من سنة؛ تقرر في كل واحد.</string>
+    <string name="plan_reason_your_call">تقرر في كل واحد.</string>
+    <string name="plan_next">الخطوة التالية: %1$s</string>
+    <string name="plan_reached">بلغت الهدف.</string>
+    <string name="plan_free_footer">الخطة متاحة للجميع. دون خطوات PRO تتحرر %1$s على الأكثر.</string>
+    <string name="plan_free_enough">تبلغ هدفك دون PRO أيضًا.</string>
+    <string name="plan_change">غيّر الهدف</string>
+    <string name="filters_tools">فلاتر جاهزة</string>
+    <string name="filters_tools_sub">النوع، المصدر، التاريخ، الحجم</string>
+    <string name="filters_label">فلاتر جاهزة</string>
+    <string name="filters_pick">اختر ما تريد رؤيته.</string>
+    <string name="filters_counting">أعدّ…</string>
+    <string name="filters_shortcuts">اختصارات</string>
+    <string name="filters_preset_screenshots">لقطات شاشة العام الماضي</string>
+    <string name="filters_preset_whatsapp">فيديوهات كبيرة من WhatsApp</string>
+    <string name="filters_preset_downloads">تنزيلات أقدم من سنة</string>
+    <string name="filters_row_type">النوع</string>
+    <string name="filters_row_source">المصدر</string>
+    <string name="filters_row_date">التاريخ</string>
+    <string name="filters_row_size">الحجم</string>
+    <string name="filter_photo">صورة</string>
+    <string name="filter_video">فيديو</string>
+    <string name="filter_screenshot">لقطة شاشة</string>
+    <string name="filter_downloaded">مُنزَّل</string>
+    <string name="filter_audio">صوت</string>
+    <string name="filter_document">مستند</string>
+    <string name="filter_camera">الكاميرا</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">تطبيقات أخرى</string>
+    <string name="filter_downloads">التنزيلات</string>
+    <string name="filter_this_year">هذا العام</string>
+    <string name="filter_last_year">العام الماضي</string>
+    <string name="filter_older_6m">أقدم من 6 أشهر</string>
+    <string name="filter_older_1y">أقدم من سنة</string>
+    <string name="filters_footer">العرض ليس حذفًا؛ تختار في الشاشة التالية.</string>
+    <string name="learned_link">ما تعلمته</string>
+    <string name="learned_title">ما تعلمته من قراراتك</string>
+    <string name="learned_body">يغيّر الترتيب فقط. لا يتخطى أي موافقة أبدًا.</string>
+    <string name="learned_row">محذوف %1$d / %2$d</string>
+    <string name="learned_footer">تبقى هذه الأرقام على هذا الهاتف. ما تحذفه يأتي أولًا وما تحتفظ به أخيرًا.</string>
+    <string name="learned_reset">إعادة تعيين ما تعلمته</string>
+    <plurals name="filters_match">
+        <item quantity="zero">%d ملف يطابق</item>
+        <item quantity="one">%d ملف يطابق</item>
+        <item quantity="two">%d ملفان يطابقان</item>
+        <item quantity="few">%d ملفات تطابق</item>
+        <item quantity="many">%d ملفًا يطابق</item>
+        <item quantity="other">%d ملف يطابق</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="zero">اعرض %d ملف</item>
+        <item quantity="one">اعرض %d ملف</item>
+        <item quantity="two">اعرض %d ملفين</item>
+        <item quantity="few">اعرض %d ملفات</item>
+        <item quantity="many">اعرض %d ملفًا</item>
+        <item quantity="other">اعرض %d ملف</item>
+    </plurals>
+
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">لم أجد بعد ما يمكن تحريره. افحص هاتفك أولًا.</string>
 </resources>

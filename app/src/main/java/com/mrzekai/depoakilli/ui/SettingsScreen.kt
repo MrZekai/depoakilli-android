@@ -94,6 +94,8 @@ internal fun SettingsDetailScreen(
     /** Faz 3A-1: Storage Watch row (opens Z3 when on, Z2 when off). */
     watchOn: Boolean = false,
     onOpenWatch: () -> Unit = {},
+    /** Faz 3C: "What I learned" (shown only while the Personal Plan is on). */
+    onOpenLearned: (() -> Unit)? = null,
 ) {
     var showFeedbackDialog by rememberSaveable { mutableStateOf(false) }
     var confirmClearKept by rememberSaveable { mutableStateOf(false) }
@@ -203,6 +205,15 @@ internal fun SettingsDetailScreen(
                         icon = Icons.Outlined.NotificationsActive,
                         onClick = onOpenWatch,
                     )
+                    onOpenLearned?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.PERSONAL_PLAN_AVAILABLE }?.let { open ->
+                        CardDivider()
+                        CardRow(
+                            title = stringResource(R.string.learned_link),
+                            status = null,
+                            icon = Icons.Outlined.AutoAwesome,
+                            onClick = open,
+                        )
+                    }
                 }
             }
             item(key = "settings-access") {

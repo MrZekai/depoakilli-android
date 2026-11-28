@@ -48,6 +48,8 @@ import com.mrzekai.depoakilli.billing.ProPlanOption
 import com.mrzekai.depoakilli.billing.ProScreenState
 import com.mrzekai.depoakilli.data.CleaningThresholds
 import com.mrzekai.depoakilli.model.ScanFocus
+import com.mrzekai.depoakilli.model.ageDays
+import com.mrzekai.depoakilli.model.rowGroup
 import com.mrzekai.depoakilli.model.ToolSuggestion
 import com.mrzekai.depoakilli.model.SuggestionTool
 import com.mrzekai.depoakilli.ui.common.HubTabs
@@ -80,6 +82,9 @@ internal enum class DetailScreen(@StringRes val titleRes: Int) {
     /** Faz 3A-2 Z5–Z8: shrinking big videos without deleting. */
     VIDEOS(R.string.video_title),
     SIMILAR(R.string.similar_title),
+    PLAN(R.string.plan_title),
+    FILTERS(R.string.filters_tools),
+    LEARNED(R.string.learned_link),
 }
 
 internal enum class AccessDisclosure {
@@ -625,6 +630,7 @@ fun CleanerApp(
                         hasUsageAccess = state.hasUsageAccess,
                         watchOn = watch.snapshot.settings.enabled,
                         onOpenWatch = ::openWatch,
+                        onOpenLearned = { detailScreen = DetailScreen.LEARNED },
                     )
 
                     DetailScreen.ACCESS -> SecurityCenterScreen(
@@ -707,7 +713,7 @@ fun CleanerApp(
                                 onFreeGroupUsed = { viewModel.markSimilarGroupUsed() },
                                 onProBytes = { bytes -> viewModel.addProBytes(bytes) },
                                 decisionsLeft = com.mrzekai.depoakilli.ui.photo.decisionsLeft(pro.isPro, state.freeTier.decisionsToday()),
-                                onDecision = { viewModel.countPhotoDecision() },
+                                onDecision = { kind, delete -> viewModel.countPhotoDecision(kind, delete) },
                                 screenshots = state.summary.items
                                     .filter { it.assessment.group == com.mrzekai.depoakilli.model.CleanupGroup.SCREENSHOT }
                                     .takeIf { it.isNotEmpty() }
@@ -717,6 +723,71 @@ fun CleanerApp(
                                     detailScreen = DetailScreen.CLEAN_RESULTS
                                 },
                             ),
+                            modifier = Modifier,
+                        )
+                    }
+
+                    DetailScreen.PLAN -> if (shrinkApp != null) {
+                        val learner by shrinkApp.preferences.state.collectAsStateWithLifecycle()
+                        val saved by shrinkApp.personalPlan.state.collectAsStateWithLifecycle()
+                        com.mrzekai.depoakilli.ui.plan.PersonalPlanFlow(
+                            inputs = com.mrzekai.depoakilli.ui.plan.PlanInputs(
+                                candidates = planCandidates(state, videoResult, similarResult, pro.isPro),
+                                totalBytes = state.storage.totalBytes,
+                                availableBytes = state.storage.availableBytes,
+                                isPro = pro.isPro,
+                                learner = learner,
+                                saved = saved,
+                                titleOf = { c -> planStepTitle(c.key) },
+                            ),
+                            actions = com.mrzekai.depoakilli.ui.plan.PlanActions(
+                                onStart = { shrinkApp.personalPlan.save(it) },
+                                onClear = { shrinkApp.personalPlan.clear() },
+                                onOpenStep = { c ->
+                                    when (c.key) {
+                                        com.mrzekai.depoakilli.ui.plan.NO_LOSS_KEY -> {
+                                            openSuggestionRequested = false
+                                            openFindings()
+                                        }
+                                        com.mrzekai.depoakilli.ui.plan.SHRINK_KEY -> detailScreen = DetailScreen.VIDEOS
+                                        com.mrzekai.depoakilli.ui.plan.SIMILAR_KEY -> detailScreen = DetailScreen.SIMILAR
+                                        else -> com.mrzekai.depoakilli.model.CleanupGroup.entries.firstOrNull { it.name == c.key }?.let { group ->
+                                            val items = state.summary.plan.askRows.firstOrNull { it.group == group }?.items
+                                                ?: state.summary.items.filter { it.assessment.group.rowGroup == group }
+                                            if (group in com.mrzekai.depoakilli.ui.review.SwipeReviewState.SWIPE_GROUPS) {
+                                                viewModel.openSwipeReview(group)
+                                            } else {
+                                                viewModel.openPlanGroupGrid(group, items)
+                                            }
+                                            detailScreen = DetailScreen.CLEAN_RESULTS
+                                        }
+                                    }
+                                },
+                                onOpenFilters = { detailScreen = DetailScreen.FILTERS },
+                                onOpenLearned = { detailScreen = DetailScreen.LEARNED },
+                            ),
+                            modifier = Modifier,
+                        )
+                    }
+
+                    DetailScreen.FILTERS -> com.mrzekai.depoakilli.ui.plan.FiltersScreen(
+                        count = { filter ->
+                            val files = viewModel.filterFiles(filter)
+                            com.mrzekai.depoakilli.ui.plan.FilterResult(files.size, files.sumOf { it.sizeBytes })
+                        },
+                        onShow = { filter, label ->
+                            viewModel.openFilterReview(filter, label)
+                            detailScreen = DetailScreen.CLEAN_RESULTS
+                        },
+                        modifier = Modifier,
+                    )
+
+                    DetailScreen.LEARNED -> if (shrinkApp != null) {
+                        val learner by shrinkApp.preferences.state.collectAsStateWithLifecycle()
+                        com.mrzekai.depoakilli.ui.plan.LearnedScreen(
+                            learner = learner,
+                            titleOf = { key -> planStepTitle(key) },
+                            onReset = { shrinkApp.preferences.reset() },
                             modifier = Modifier,
                         )
                     }
@@ -837,6 +908,8 @@ fun CleanerApp(
                             },
                             videoSavingBytes = videoResult?.totalSavingBytes,
                             onOpenVideos = { detailScreen = DetailScreen.VIDEOS },
+                            onOpenPlan = { detailScreen = DetailScreen.PLAN },
+                            onOpenFilters = { detailScreen = DetailScreen.FILTERS },
                             similarBytes = similarResult?.trashBytes,
                             onOpenSimilar = {
                                 detailScreen = DetailScreen.SIMILAR
@@ -1046,4 +1119,67 @@ internal fun hubOf(detailScreen: DetailScreen?, state: CleanerUiState): HubSpec?
     detailScreen == DetailScreen.STORAGE_CHANGE ->
         HubSpec(HubKind.STORAGE, listOf(R.string.storage_analyzer_title, R.string.storage_change_title), 1)
     else -> null
+}
+
+/**
+ * Faz 3C: the measured sources of space for the Personal Plan. Bytes come
+ * from the current scans only; nothing here is a guess.
+ */
+private fun planCandidates(
+    state: CleanerUiState,
+    videos: com.mrzekai.depoakilli.video.VideoCandidateFinder.Result?,
+    similar: com.mrzekai.depoakilli.photo.SimilarFinder.Result?,
+    isPro: Boolean,
+): List<com.mrzekai.depoakilli.plan.PlanCandidate> {
+    val now = System.currentTimeMillis()
+    val plan = state.summary.plan
+    val out = mutableListOf<com.mrzekai.depoakilli.plan.PlanCandidate>()
+    val auto = plan.autoItems
+    if (auto.isNotEmpty()) {
+        out += com.mrzekai.depoakilli.plan.PlanCandidate(
+            com.mrzekai.depoakilli.ui.plan.NO_LOSS_KEY,
+            com.mrzekai.depoakilli.plan.StepKind.NO_LOSS,
+            auto.sumOf { it.sizeBytes },
+            auto.size,
+        )
+    }
+    if (com.mrzekai.depoakilli.pro.ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE && videos != null && videos.candidates.isNotEmpty()) {
+        out += com.mrzekai.depoakilli.plan.PlanCandidate(
+            com.mrzekai.depoakilli.ui.plan.SHRINK_KEY,
+            com.mrzekai.depoakilli.plan.StepKind.SHRINK,
+            videos.totalSavingBytes,
+            videos.candidates.size,
+            proOnly = !isPro,
+            estimate = true,
+        )
+    }
+    if (com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE && similar != null && similar.groups.isNotEmpty()) {
+        out += com.mrzekai.depoakilli.plan.PlanCandidate(
+            com.mrzekai.depoakilli.ui.plan.SIMILAR_KEY,
+            com.mrzekai.depoakilli.plan.StepKind.SIMILAR,
+            similar.trashBytes,
+            similar.trashCount,
+            proOnly = !isPro,
+        )
+    }
+    // "My pick" and "I'll ask you" rows, one step per kind (each opens its own review).
+    plan.review.flatMap { it.items }.groupBy { it.assessment.group.rowGroup }.forEach { (group, items) ->
+        out += com.mrzekai.depoakilli.plan.PlanCandidate(
+            group.name,
+            com.mrzekai.depoakilli.plan.StepKind.ASK,
+            items.sumOf { it.sizeBytes },
+            items.size,
+            ageDays = items.map { it.ageDays(now) }.average().toLong(),
+        )
+    }
+    return out
+}
+
+@androidx.compose.runtime.Composable
+private fun planStepTitle(key: String): String = when (key) {
+    com.mrzekai.depoakilli.ui.plan.NO_LOSS_KEY -> androidx.compose.ui.res.stringResource(R.string.plan_step_no_loss)
+    com.mrzekai.depoakilli.ui.plan.SHRINK_KEY -> androidx.compose.ui.res.stringResource(R.string.video_title)
+    com.mrzekai.depoakilli.ui.plan.SIMILAR_KEY -> androidx.compose.ui.res.stringResource(R.string.similar_title)
+    else -> com.mrzekai.depoakilli.model.CleanupGroup.entries.firstOrNull { it.name == key }
+        ?.let { androidx.compose.ui.res.stringResource(it.titleRes) } ?: key
 }

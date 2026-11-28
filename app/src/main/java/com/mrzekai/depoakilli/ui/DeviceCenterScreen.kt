@@ -26,6 +26,8 @@ import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
@@ -122,6 +124,9 @@ internal fun DeviceCenterScreen(
     /** Faz 3B-1: bytes of the similar frames offered (null before the first look); the row needs the switch. */
     similarBytes: Long? = null,
     onOpenSimilar: (() -> Unit)? = null,
+    /** Faz 3C: Personal Plan and ready-made filters (open to everyone; behind their switch). */
+    onOpenPlan: (() -> Unit)? = null,
+    onOpenFilters: (() -> Unit)? = null,
 ) {
     val smartPlan = state.smartSummary()?.plan
     fun suggested(tool: SuggestionTool): ToolValue =
@@ -137,7 +142,19 @@ internal fun DeviceCenterScreen(
         val formatted = java.text.NumberFormat.getPercentInstance(LocalConfiguration.current.locales[0]).format(percent / 100.0)
         ToolValue.Fact(stringResource(R.string.tools_storage_full, formatted))
     } ?: ToolValue.Unknown
-    val rows = listOf(
+    val planRows = if (!com.mrzekai.depoakilli.pro.ProGainEstimator.PERSONAL_PLAN_AVAILABLE) emptyList() else listOfNotNull(
+        onOpenPlan?.let { open ->
+            ToolRow(
+                stringResource(R.string.plan_title),
+                stringResource(R.string.plan_tools_sub),
+                Icons.Outlined.Flag,
+                ToolValue.Empty,
+                stringResource(R.string.plan_tools_sub),
+                open,
+            )
+        },
+    )
+    val rows = planRows + listOf(
         ToolRow(
             stringResource(R.string.category_large_files),
             stringResource(R.string.tools_row_large_sub),
@@ -218,6 +235,17 @@ internal fun DeviceCenterScreen(
             storageValue,
             stringResource(R.string.storage_analyzer_subtitle) + " " + stringResource(R.string.tools_storage_change_subtitle),
         ) { onScan(ScanFocus.ANALYZE) },
+    ) + listOfNotNull(
+        onOpenFilters?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.PERSONAL_PLAN_AVAILABLE }?.let { open ->
+            ToolRow(
+                stringResource(R.string.filters_tools),
+                stringResource(R.string.filters_tools_sub),
+                Icons.Outlined.FilterList,
+                ToolValue.Empty,
+                stringResource(R.string.filters_tools_sub),
+                open,
+            )
+        },
     )
     PageFrame(modifier = modifier) {
         BoxWithConstraints(Modifier.fillMaxSize()) {

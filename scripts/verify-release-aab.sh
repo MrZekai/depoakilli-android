@@ -115,6 +115,10 @@ audit_binary() {
   if [ "$fgs_perms" != "android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING " ]; then
     fail "$label foreground-service permissions differ: $fgs_perms"
   fi
+  # Faz 3C: the app needs no internet (Play Billing talks to the Play Store app).
+  if grep -Eq 'android\.permission\.INTERNET([^_A-Z]|$)' "$perms"; then
+    fail "$label still asks for the internet permission"
+  fi
   grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$manifest" \
     || fail "$label is missing the video shrinking service"
 }

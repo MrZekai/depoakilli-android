@@ -1058,4 +1058,79 @@
         <item quantity="one">%d photo</item>
         <item quantity="other">%d photos</item>
     </plurals>
+
+    <!-- Faz 3C Personal Plan -->
+    <string name="plan_title">Personal plan</string>
+    <string name="plan_tools_sub">The least painful order to your goal</string>
+    <string name="plan_question">How much space do you need?</string>
+    <string name="plan_now">Now %1$s full, %2$s free. I’ll set the least painful order.</string>
+    <string name="plan_below">Get below %1$s</string>
+    <string name="plan_found_label">WITH WHAT I FOUND</string>
+    <string name="plan_enough">Enough for %1$s</string>
+    <string name="plan_not_enough">At most %1$s opens with what I found</string>
+    <string name="plan_total">I can free %1$s in total; %2$s of it without deleting anything.</string>
+    <string name="plan_build">Build my plan</string>
+    <string name="plan_footer">The plan is a suggestion; you approve each step. No data leaves your phone.</string>
+    <string name="plan_goal">Goal %1$s</string>
+    <string name="plan_learning">Still learning: %1$d of %2$d decisions so far. Until then the order is the same for everyone.</string>
+    <string name="plan_step_no_loss">Leftovers and copies</string>
+    <string name="plan_step_done_title">Done</string>
+    <string name="plan_step_done">Done. You lost nothing.</string>
+    <string name="plan_reason_no_loss">Nothing of yours is lost.</string>
+    <string name="plan_reason_without_deleting">You gain without deleting; that’s why it comes early.</string>
+    <string name="plan_reason_best_stays">The best of each group stays.</string>
+    <string name="plan_reason_you_delete">You delete most of these; I put them first.</string>
+    <string name="plan_reason_you_keep">You keep most of these; I left them for last.</string>
+    <string name="plan_reason_old">Older than a year; you decide each one.</string>
+    <string name="plan_reason_your_call">You decide each one.</string>
+    <string name="plan_next">Next step: %1$s</string>
+    <string name="plan_reached">Goal reached.</string>
+    <string name="plan_free_footer">The plan is open to everyone. Without PRO steps at most %1$s opens.</string>
+    <string name="plan_free_enough">You reach your goal without PRO too.</string>
+    <string name="plan_change">Change goal</string>
+    <string name="filters_tools">Ready-made filters</string>
+    <string name="filters_tools_sub">Type, source, date, size</string>
+    <string name="filters_label">READY-MADE FILTERS</string>
+    <string name="filters_pick">Pick what to look at.</string>
+    <string name="filters_counting">Counting…</string>
+    <string name="filters_shortcuts">SHORTCUTS</string>
+    <string name="filters_preset_screenshots">Last year’s screenshots</string>
+    <string name="filters_preset_whatsapp">Big videos from WhatsApp</string>
+    <string name="filters_preset_downloads">Downloads older than a year</string>
+    <string name="filters_row_type">TYPE</string>
+    <string name="filters_row_source">SOURCE</string>
+    <string name="filters_row_date">DATE</string>
+    <string name="filters_row_size">SIZE</string>
+    <string name="filter_photo">Photo</string>
+    <string name="filter_video">Video</string>
+    <string name="filter_screenshot">Screenshot</string>
+    <string name="filter_downloaded">Downloaded</string>
+    <string name="filter_audio">Audio</string>
+    <string name="filter_document">Document</string>
+    <string name="filter_camera">Camera</string>
+    <string name="filter_whatsapp">WhatsApp</string>
+    <string name="filter_other_apps">Other apps</string>
+    <string name="filter_downloads">Downloads</string>
+    <string name="filter_this_year">This year</string>
+    <string name="filter_last_year">Last year</string>
+    <string name="filter_older_6m">Older than 6 months</string>
+    <string name="filter_older_1y">Older than a year</string>
+    <string name="filters_footer">Showing isn’t deleting; you choose on the next screen.</string>
+    <string name="learned_link">What I learned</string>
+    <string name="learned_title">What I learned from your decisions</string>
+    <string name="learned_body">It only changes the order. It never skips an approval.</string>
+    <string name="learned_row">deleted %1$d / %2$d</string>
+    <string name="learned_footer">These numbers stay on this phone. What you delete comes first, what you keep comes last.</string>
+    <string name="learned_reset">Reset what I learned</string>
+    <plurals name="filters_match">
+        <item quantity="one">%d file matches this choice</item>
+        <item quantity="other">%d files match this choice</item>
+    </plurals>
+    <plurals name="filters_show">
+        <item quantity="one">Show %d file</item>
+        <item quantity="other">Show %d files</item>
+    </plurals>
+
+    <!-- Faz 3C -->
+    <string name="plan_nothing_yet">I haven’t found anything to clear yet. Scan your phone first.</string>
 </resources>

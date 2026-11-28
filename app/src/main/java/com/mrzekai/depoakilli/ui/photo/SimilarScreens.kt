@@ -101,7 +101,8 @@ internal data class SimilarActions(
     val onProBytes: (Long) -> Unit,
     /** Faz 3B-2: one-by-one decisions left today (null with Pro) and counting one. */
     val decisionsLeft: Int? = null,
-    val onDecision: () -> Unit = {},
+    /** Counts one decision (free daily limit) and teaches the Personal Plan (kind, delete?). */
+    val onDecision: (String, Boolean) -> Unit = { _, _ -> },
     /** Faz 3B-2: the scan's old screenshots (count, bytes) and opening their review. */
     val screenshots: Pair<Int, Long>? = null,
     val onOpenScreenshots: (() -> Unit)? = null,
