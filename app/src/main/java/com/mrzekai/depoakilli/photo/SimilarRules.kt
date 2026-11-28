@@ -120,25 +120,43 @@ object SimilarRules {
      * Candidate pairs (indices into [items]): same folder and taken within a
      * minute, or dHash distance at most [maxDistance]. Only these are embedded.
      */
+    /** Pairs per photo, each way (time and look); enough to chain a burst. */
+    const val MAX_NEIGHBOURS = 6
+
+    /** Upper bound for one run (memory); 3,000 photos x 6 stays far below it. */
+    const val MAX_PAIRS = 40_000
+
     fun candidatePairs(
         items: List<PhotoItem>,
         hashes: List<Long>,
         maxDistance: Int = CleaningThresholds.DHASH_MAX_DISTANCE,
     ): Set<Pair<Int, Int>> {
         val pairs = LinkedHashSet<Pair<Int, Int>>()
+        // Each photo is paired with its next few neighbours only: a burst still
+        // chains into one group (union-find), and thousands of photos with the
+        // same time (a restored backup) no longer make millions of pairs.
         val byTime = items.indices.sortedBy { items[it].takenMillis }
         for ((p, i) in byTime.withIndex()) {
             var q = p + 1
-            while (q < byTime.size && items[byTime[q]].takenMillis - items[i].takenMillis <= BURST_WINDOW_MILLIS) {
+            var added = 0
+            while (q < byTime.size && added < MAX_NEIGHBOURS && items[byTime[q]].takenMillis - items[i].takenMillis <= BURST_WINDOW_MILLIS) {
                 val j = byTime[q]
-                if (items[i].folder.equals(items[j].folder, ignoreCase = true)) pairs += ordered(i, j)
+                if (items[i].folder.equals(items[j].folder, ignoreCase = true)) {
+                    pairs += ordered(i, j)
+                    added++
+                }
                 q++
             }
+            if (pairs.size >= MAX_PAIRS) return pairs
         }
         for (i in items.indices) {
+            var added = 0
             for (j in i + 1 until items.size) {
-                if (hamming(hashes[i], hashes[j]) <= maxDistance) pairs += ordered(i, j)
+                if (hamming(hashes[i], hashes[j]) <= maxDistance && pairs.add(ordered(i, j))) {
+                    if (++added >= MAX_NEIGHBOURS || pairs.size >= MAX_PAIRS) break
+                }
             }
+            if (pairs.size >= MAX_PAIRS) return pairs
         }
         return pairs
     }
