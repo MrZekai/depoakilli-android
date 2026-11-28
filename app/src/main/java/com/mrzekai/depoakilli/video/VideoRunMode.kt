@@ -17,7 +17,7 @@ object VideoRunMode {
      * refused; then also remove the FOREGROUND_SERVICE permissions and the
      * service from the manifest (validator-checked).
      */
-    const val VIDEO_COMPRESSION_FGS = true
+    const val VIDEO_COMPRESSION_FGS = false
 
     enum class Runner { FOREGROUND_SERVICE, IN_APP }
 

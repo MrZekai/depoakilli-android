@@ -16,9 +16,6 @@
          that generic foreground-service surface from the merged manifest. -->
     <!-- Faz 3A-2: shrinking videos runs in a foreground service the user starts
          with a tap; mediaProcessing on Android 15+, dataSync on Android 11–14. -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <!-- Faz 3A-1 Storage Watch notices; asked only when the user turns the watch on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission
@@ -68,10 +65,6 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />
 
-        <service
-            android:name=".video.VideoCompressionService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync|mediaProcessing" />
 
         <activity
             android:name=".MainActivity"
