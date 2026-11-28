@@ -122,7 +122,7 @@ def main():
         check("benzer: seri çekimlerin en az %80'i bulundu", len(found) >= 16, note=f"{len(found)}/20 seri, {len(groups)} grup")
         check("benzer: bulanık/alakasız tekler grupta yok", not any(n.startswith(("IMG_X", "IMG_O")) for g in groups for n in g))
     # 2. screenshots in every language
-    for listing, tag, vdir in LOCALES:
+    for listing, tag, vdir in ([] if os.environ.get("SPEED_ONLY") else LOCALES):
         s = strings(vdir)
         launch(tag)
         first = qa.wait_for(rx(s["similar_open_first"]), 120, dismiss=False) or qa.scroll_to(rx(s["similar_open_first"]), 6)
@@ -184,6 +184,9 @@ def main():
             log(f"speed {minute + 1} min: pid={pid or '-'} top={top[-80:]} log={tail!r}")
             clear_system_dialogs()
         stop[0] = True
+        os.makedirs(OUT, exist_ok=True)
+        with open(os.path.join(OUT, "speed-crash.txt"), "w") as f:
+            f.write(qa.adb("logcat", "-d", "-v", "threadtime", "AndroidRuntime:E", "SmartCleanerPhotos:W", "*:S", timeout=120))
         check("hız: ilk tarama 40 dk içinde bitti", out is not None, note="" if out else qa.adb("logcat", "-d", "-v", "raw", "SmartCleanerPhotos:W", "*:S")[-600:])
         if out:
             line = re.findall(r"similar: (.+)", out)[-1]

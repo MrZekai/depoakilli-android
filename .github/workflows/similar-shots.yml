@@ -1,7 +1,7 @@
 name: Similar photos device check and shots
 # Faz 3B-1: on an emulator with a generated photo set (never stored in the
 # repo): grouping check, screenshots in every app language, Trash move,
-# speed run. Pushes the PNGs to `similar-shots-raw` (no app code, no keys).
+# speed run. Pushes the PNGs to `similar-speed-raw` (no app code, no keys).
 on:
   push:
     branches: [similar-shots]
@@ -49,15 +49,15 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r -g app/build/outputs/apk/debug/app-debug.apk
-            python3 scripts/store-shots/capture_similar.py photo-set photo-set-fill similar-out || true
+            SPEED_ONLY=1 python3 scripts/store-shots/capture_similar.py photo-set photo-set-fill similar-out || true
       - name: Push screenshots
         if: always()
         run: |
           set -e
           rm -rf /tmp/pub && mkdir /tmp/pub && cp -r similar-out/. /tmp/pub/ || true
           cd /tmp/pub
-          git init -q -b similar-shots-raw
+          git init -q -b similar-speed-raw
           git config user.name "store-shots-bot"; git config user.email "store-shots-bot@users.noreply.github.com"
           git add -A
           git commit -q -m "Similar photos screenshots ${GITHUB_SHA::7}" || exit 0
-          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" similar-shots-raw
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" similar-speed-raw
