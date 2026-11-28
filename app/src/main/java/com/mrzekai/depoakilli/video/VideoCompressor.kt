@@ -74,6 +74,7 @@ class VideoCompressor(private val context: Context) {
             throw cancelled
         }
         if (result != null) {
+            Log.w(TAG, "export stopped: $result")
             OutputFiles.deleteOutput(temp)
             return result
         }
@@ -100,6 +101,7 @@ class VideoCompressor(private val context: Context) {
             )
         }
         if (failure != null) {
+            Log.w(TAG, "check failed: $failure, ${temp.length()} bytes, $facts")
             OutputFiles.deleteOutput(temp)
             return Outcome.Failed(failure)
         }
@@ -134,7 +136,7 @@ class VideoCompressor(private val context: Context) {
                     if (current.getProgress(holder) == Transformer.PROGRESS_STATE_AVAILABLE) {
                         if (holder.progress / 10 != lastLogged / 10) {
                             lastLogged = holder.progress
-                            Log.i(TAG, "progress ${holder.progress}%")
+                            Log.w(TAG, "progress ${holder.progress}%")
                         }
                         onProgress(holder.progress)
                     }
@@ -143,7 +145,7 @@ class VideoCompressor(private val context: Context) {
             val outcome = suspendCancellableCoroutine<Outcome?> { continuation ->
                 val listener = object : Transformer.Listener {
                     override fun onCompleted(composition: Composition, exportResult: ExportResult) {
-                        Log.i(TAG, "export done: ${exportResult.videoEncoderName} ${exportResult.averageVideoBitrate} b/s, audio ${exportResult.audioEncoderName ?: "copied"}")
+                        Log.w(TAG, "export done: ${exportResult.videoEncoderName} ${exportResult.averageVideoBitrate} b/s, audio ${exportResult.audioEncoderName ?: "copied"}")
                         if (continuation.isActive) continuation.resume(null)
                     }
 
@@ -165,7 +167,7 @@ class VideoCompressor(private val context: Context) {
                     .addListener(listener)
                     .build()
                 transformer = built
-                Log.i(TAG, "export start: ${if (hevc) "H.265" else "H.264"} ${candidate.targetVideoBitrate} b/s, ${candidate.meta.width}x${candidate.meta.height}")
+                Log.w(TAG, "export start: ${if (hevc) "H.265" else "H.264"} ${candidate.targetVideoBitrate} b/s, ${candidate.meta.width}x${candidate.meta.height}")
                 continuation.invokeOnCancellation { runCatching { built.cancel() } }
                 runCatching {
                     built.start(EditedMediaItem.Builder(MediaItem.fromUri(Uri.fromFile(original))).build(), temp.absolutePath)

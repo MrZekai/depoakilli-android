@@ -115,11 +115,11 @@ class VideoCompressionService : Service() {
                         ),
                     )
                     val real = candidate.meta.sizeBytes - outcome.outputBytes
-                    Log.i(TAG, "shrunk ${candidate.meta.sizeBytes}→${outcome.outputBytes} real/estimate=${PendingRules.accuracy(real, candidate.estimatedSavingBytes)}")
+                    Log.w(TAG, "shrunk ${candidate.meta.sizeBytes}→${outcome.outputBytes} real/estimate=${PendingRules.accuracy(real, candidate.estimatedSavingBytes)}")
                     ShrinkResult(candidate, ShrinkOutcome.SHRUNK, outcome.outputBytes)
                 }
                 is VideoCompressor.Outcome.Failed -> {
-                    Log.i(TAG, "skipped: ${outcome.reason}")
+                    Log.w(TAG, "skipped: ${outcome.reason}")
                     ShrinkResult(
                         candidate,
                         if (outcome.reason == VerifyFailure.NOT_SMALLER) ShrinkOutcome.TOO_LITTLE_GAIN else ShrinkOutcome.COULD_NOT,
