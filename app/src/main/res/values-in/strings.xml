@@ -1312,4 +1312,7 @@
     <string name="trial_reminder_title">Masa uji cobamu berakhir besok</string>
     <string name="trial_reminder_body">Jika tak ingin lanjut, batalkan di Google Play > Langganan.</string>
     <string name="pro_total_cleared">Sejauh ini: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Belum ada yang bisa dibersihkan. Pindai ponselmu dulu.</string>
 </resources>

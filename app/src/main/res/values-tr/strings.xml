@@ -1137,4 +1137,6 @@
     <string name="trial_reminder_title">Denemen yarın bitiyor</string>
     <string name="trial_reminder_body">Devam etmek istemiyorsan Google Play > Abonelikler’den iptal edebilirsin.</string>
     <string name="pro_total_cleared">Bugüne kadar: %1$s</string>
+    <!-- Faz 3C -->
+    <string name="plan_nothing_yet">Henüz temizlenecek bir şey bulmadım. Önce telefonunu tara.</string>
 </resources>

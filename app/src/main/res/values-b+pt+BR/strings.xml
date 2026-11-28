@@ -1414,4 +1414,7 @@
     <string name="trial_reminder_title">Seu teste termina amanhã</string>
     <string name="trial_reminder_body">Se não quiser continuar, cancele em Google Play > Assinaturas.</string>
     <string name="pro_total_cleared">Até agora: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Ainda não encontrei nada para liberar. Analise o celular primeiro.</string>
 </resources>

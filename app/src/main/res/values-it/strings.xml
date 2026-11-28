@@ -1471,4 +1471,7 @@
     <string name="trial_reminder_title">La prova finisce domani</string>
     <string name="trial_reminder_body">Se non vuoi continuare, annulla in Google Play > Abbonamenti.</string>
     <string name="pro_total_cleared">Finora: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Non ho ancora trovato nulla da liberare. Prima analizza il telefono.</string>
 </resources>

@@ -1391,4 +1391,7 @@
     <string name="trial_reminder_title">Dein Test endet morgen</string>
     <string name="trial_reminder_body">Wenn du nicht weitermachen willst, kündige in Google Play > Abos.</string>
     <string name="pro_total_cleared">Bisher: %1$s</string>
+    <!-- Faz 3C -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
+    <string name="plan_nothing_yet">Ich habe noch nichts zum Freimachen gefunden. Scanne zuerst dein Handy.</string>
 </resources>
