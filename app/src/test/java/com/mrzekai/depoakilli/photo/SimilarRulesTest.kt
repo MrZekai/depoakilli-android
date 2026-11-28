@@ -123,6 +123,22 @@ class SimilarRulesTest {
         assertFalse(SimilarRules.isCameraFolder("DCIM/Screenshots"))
         assertFalse(SimilarRules.isCameraFolder("Pictures/WhatsApp"))
     }
+
+    @Test
+    fun `thousands of photos with the same time stay a bounded number of pairs`() {
+        val items = (0L until 3000L).map { photo(it, taken = 1_000_000L, folder = "Pictures/Restored") }
+        val hashes = items.map { 0L }
+        val pairs = SimilarRules.candidatePairs(items, hashes, maxDistance = 10)
+        assertTrue(pairs.size <= SimilarRules.MAX_PAIRS)
+    }
+
+    @Test
+    fun `a long burst still chains into one group`() {
+        val items = (0L until 30L).map { photo(it, taken = 1_000L + it * 100L) }
+        val pairs = SimilarRules.candidatePairs(items, items.map { it.id * 0x0F0F0F0F0FL }, maxDistance = 0)
+        val same = items.map { vec(1f, 0f) }
+        assertEquals(listOf(items.indices.toList()), SimilarRules.cluster(items.size, pairs, same).map { it.sorted() })
+    }
 }
 
 class PhotoMathTest {
@@ -171,21 +187,5 @@ class SimilarGainTest {
     fun `switch off - no similar row`() {
         val e = com.mrzekai.depoakilli.pro.ProGainEstimator.estimate(0L, 0, false, similarBytes = 9_000_000_000L, similarCount = 9, similarAvailable = false)
         assertTrue(e.rows.isEmpty())
-    }
-
-    @Test
-    fun `thousands of photos with the same time stay a bounded number of pairs`() {
-        val items = (0L until 3000L).map { photo(it, taken = 1_000_000L, folder = "Pictures/Restored") }
-        val hashes = items.map { 0L }
-        val pairs = SimilarRules.candidatePairs(items, hashes, maxDistance = 10)
-        assertTrue(pairs.size <= SimilarRules.MAX_PAIRS)
-    }
-
-    @Test
-    fun `a long burst still chains into one group`() {
-        val items = (0L until 30L).map { photo(it, taken = 1_000L + it * 100L) }
-        val pairs = SimilarRules.candidatePairs(items, items.map { it.id * 0x0F0F0F0F0FL }, maxDistance = 0)
-        val same = items.map { vec(1f, 0f) }
-        assertEquals(listOf(items.indices.toList()), SimilarRules.cluster(items.size, pairs, same).map { it.sorted() })
     }
 }
