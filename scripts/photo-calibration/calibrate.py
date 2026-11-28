@@ -142,3 +142,32 @@ for dthr in [6, 8, 10, 12, 14]:
     diff = sum(1 for _, h in pairs["diff"] + pairs["blur_vs"] if h <= dthr)
     print(f"dhash<={dthr}: same-recall={same:.3f} diff-pairs={diff}")
 json.dump({"rows": rows}, open(os.path.join(OUT, "pairs.json"), "w"))
+
+# ---- Faz 3B-2: blur and dark (classic image processing, same math as the app) ----
+def lap_var(im):
+    t = im.copy(); t.thumbnail((256, 256))
+    g = np.asarray(t.convert("L"), dtype=np.float64)
+    lap = g[1:-1, :-2] + g[1:-1, 2:] + g[:-2, 1:-1] + g[2:, 1:-1] - 4 * g[1:-1, 1:-1]
+    return float(lap.var())
+
+def luma(im):
+    t = im.copy(); t.thumbnail((256, 256))
+    return float(np.asarray(t.convert("L"), dtype=np.float64).mean())
+
+sharp = [im for n, im, l, g in items if l in ("other",) or n.endswith("_0")]
+blurry = [im for n, im, l, g in items if l == "blur"]
+darkset = [ImageEnhance.Brightness(im).enhance(random.uniform(0.05, 0.18)) for im in sharp[:30]]
+normal_lum = [luma(im) for im in sharp]
+dark_lum = [luma(im) for im in darkset]
+sv = sorted(lap_var(im) for im in sharp)
+bv = sorted(lap_var(im) for im in blurry)
+print("sharp lapvar", stats(sv)); print("blurry lapvar", stats(bv))
+print("normal luma", stats(sorted(normal_lum))); print("dark luma", stats(sorted(dark_lum)))
+for thr in [20, 30, 40, 50, 60, 80, 100, 150]:
+    caught = sum(1 for v in bv if v < thr) / len(bv)
+    false = sum(1 for v in sv if v < thr) / len(sv)
+    print(f"blur<{thr}: caught={caught:.2f} false-alarm={false:.2f}")
+for thr in [20, 25, 30, 35, 40, 50]:
+    caught = sum(1 for v in dark_lum if v < thr) / len(dark_lum)
+    false = sum(1 for v in normal_lum if v < thr) / len(normal_lum)
+    print(f"dark<{thr}: caught={caught:.2f} false-alarm={false:.2f}")
