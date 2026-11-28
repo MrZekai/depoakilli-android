@@ -66,7 +66,9 @@ def main():
         log("run: " + re.findall(r"similar: (.+)", out)[-1])
         log("all similar log: " + " | ".join(re.findall(r"similar[^\n]*", out)[-6:]))
     # Fable review: on the first open after the scan, Home's giant number and
-    # giant button are fully on screen (every language).
+    # giant button are fully on screen (every language). Old unfinished
+    # downloads make sure there is something to clear.
+    qa.seed_files("home")
     for listing, tag, vdir in cs.LOCALES:
         s = cs.strings(vdir)
         qa.sh(f"am force-stop {PKG}")
@@ -76,24 +78,30 @@ def main():
         qa.sh(f"cmd locale set-app-locales {PKG} --locales {tag}")
         qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity")
         btn_rx = cs.rx(s["home_cta_make_room"]) + "|" + cs.rx(s["home_cta_clean"])
-        btn = qa.wait_for(btn_rx, 120, dismiss=False)
+        # After the first scan the button reads "CLEAN UP" under the giant number.
+        qa.wait_for(cs.rx(s["home_cta_clean"]), 180, dismiss=False) or qa.wait_for(btn_rx, 30, dismiss=False)
         time.sleep(2)
         nodes = qa.dump()
-        btn = qa.find(btn_rx, nodes) or btn
-        big = None
-        for n in nodes:
-            if n.label and re.search(r"\d", n.label) and (n.y2 - n.y1) >= 100:
-                big = n
-                break
+        rx_btn = re.compile(btn_rx, re.I)
+        btns = [n for n in nodes if n.label and rx_btn.search(n.label)]
+        btn = max(btns, key=lambda n: n.y2 - n.y1) if btns else None  # the giant circle, not the tab label
+        nums = [n for n in nodes if n.label and re.search(r"\d", n.label) and re.search(r"(GB|MB|kB|Go|Mo|ГБ|МБ|غ\.ب|م\.ب)", n.label)]
+        big = max(nums, key=lambda n: n.y2 - n.y1) if nums else None
         cs.shot(os.path.join(OUT, listing), "00-home-first-open")
         limit = qa.H - 60  # above the gesture bar
         ok_btn = bool(btn) and btn.y1 >= 0 and btn.y2 <= limit
         ok_big = bool(big) and big.y1 >= 0 and big.y2 <= limit
+        nav_top = min((n.y1 for n in nodes if n.label and re.search(cs.rx(s["tab_tools"]), n.label)), default=limit)
+        ok_btn = ok_btn and btn.y2 <= nav_top
+        ok_big = ok_big and big.y2 <= nav_top
         check(f"Ana ekran ilk açılış: dev düğme tam görünüyor ({listing})", ok_btn,
               note=f"btn={getattr(btn, 'label', None)} y={getattr(btn, 'y1', None)}-{getattr(btn, 'y2', None)} H={qa.H}")
         check(f"Ana ekran ilk açılış: büyük sayı tam görünüyor ({listing})", ok_big,
               note=f"big={getattr(big, 'label', None)} y={getattr(big, 'y1', None)}-{getattr(big, 'y2', None)}")
     qa.sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS")
+    if os.environ.get("HOME_ONLY"):
+        log(f"{sum(1 for _, r in results if r)}/{len(results)} PASS")
+        return 0 if all(r for _, r in results) else 1
 
     for listing, tag, vdir in cs.LOCALES:
         s = cs.strings(vdir)

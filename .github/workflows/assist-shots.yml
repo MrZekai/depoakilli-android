@@ -49,7 +49,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: |
             adb install -r -g app/build/outputs/apk/debug/app-debug.apk
-            python3 scripts/store-shots/capture_assist.py photo-set assist-out || true
+            HOME_ONLY=1 python3 scripts/store-shots/capture_assist.py photo-set assist-out || true
       - name: Push screenshots
         if: always()
         run: |
