@@ -1,0 +1,16 @@
+ref claude/faz3a2-video eb2b114
+-rw-r--r-- 1 runner runner 22248230 Nov 28 06:07 app/build/outputs/bundle/debug/app-debug.aab
+--- get-size total (bytes, per ABI)
+ABI,MIN,MAX
+x86,21940157,21995277
+x86_64,21939989,21995109
+arm64-v8a,21939766,21994886
+armeabi-v7a,21939443,21994563
+--- native libs per ABI (debug APK, uncompressed)
+x86_64 10760
+armeabi-v7a 7252
+x86 9284
+arm64-v8a 10096
+--- biggest libs (arm64-v8a)
+    10096  1981-01-01 01:01   lib/arm64-v8a/libandroidx.graphics.path.so
+--- assets

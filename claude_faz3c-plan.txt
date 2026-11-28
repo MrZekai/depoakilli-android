@@ -1,0 +1,18 @@
+ref claude/faz3c-plan 6dbc627
+-rw-r--r-- 1 runner runner 47554940 Nov 28 06:07 app/build/outputs/bundle/debug/app-debug.aab
+--- get-size total (bytes, per ABI)
+ABI,MIN,MAX
+x86,33035908,33091029
+x86_64,32586887,32642008
+arm64-v8a,31852362,31907483
+armeabi-v7a,31155827,31210948
+--- native libs per ABI (debug APK, uncompressed)
+x86_64 13043504
+armeabi-v7a 7412276
+x86 14970676
+arm64-v8a 10543752
+--- biggest libs (arm64-v8a)
+ 10533656  1981-01-01 01:01   lib/arm64-v8a/libmediapipe_tasks_jni.so
+    10096  1981-01-01 01:01   lib/arm64-v8a/libandroidx.graphics.path.so
+--- assets
+  4117670  1981-01-01 01:01   assets/models/similar_embedder.tflite

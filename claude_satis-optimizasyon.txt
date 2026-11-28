@@ -1,0 +1,18 @@
+ref claude/satis-optimizasyon 438b34e
+-rw-r--r-- 1 runner runner 47574015 Nov 28 06:08 app/build/outputs/bundle/debug/app-debug.aab
+--- get-size total (bytes, per ABI)
+ABI,MIN,MAX
+x86,33053696,33108815
+x86_64,32604675,32659794
+arm64-v8a,31870151,31925270
+armeabi-v7a,31173617,31228736
+--- native libs per ABI (debug APK, uncompressed)
+x86_64 13043504
+armeabi-v7a 7412276
+x86 14970676
+arm64-v8a 10543752
+--- biggest libs (arm64-v8a)
+ 10533656  1981-01-01 01:01   lib/arm64-v8a/libmediapipe_tasks_jni.so
+    10096  1981-01-01 01:01   lib/arm64-v8a/libandroidx.graphics.path.so
+--- assets
+  4117670  1981-01-01 01:01   assets/models/similar_embedder.tflite
