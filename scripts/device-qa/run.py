@@ -67,7 +67,7 @@ class Node:
 
 def dump():
     for _ in range(3):
-        sh("uiautomator dump /sdcard/qa-ui.xml >/dev/null 2>&1", timeout=40)
+        sh("rm -f /sdcard/qa-ui.xml; uiautomator dump /sdcard/qa-ui.xml >/dev/null 2>&1", timeout=40)
         xml = sh("cat /sdcard/qa-ui.xml")
         if "<hierarchy" in xml:
             try:

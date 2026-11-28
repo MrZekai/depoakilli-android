@@ -77,13 +77,30 @@ def main():
         qa.sh(f"appops set {PKG} GET_USAGE_STATS allow")
         qa.sh(f"cmd locale set-app-locales {PKG} --locales {tag}")
         qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity")
-        btn_rx = cs.rx(s["home_cta_make_room"]) + "|" + cs.rx(s["home_cta_clean"])
+        ctas = [s["home_cta_make_room"], s["home_cta_clean"]]
+        ctas += [c.upper() for c in ctas] + [c.replace("i", "İ").upper() for c in ctas]
+        btn_rx = "|".join(cs.rx(c) for c in dict.fromkeys(ctas))
         # After the first scan the button reads "CLEAN UP" under the giant number.
-        qa.wait_for(cs.rx(s["home_cta_clean"]), 180, dismiss=False) or qa.wait_for(btn_rx, 30, dismiss=False)
+        qa.adb("logcat", "-c")
+        started = time.time()
+        found = None
+        for _ in range(12):
+            found = qa.wait_for(btn_rx, 20, dismiss=False)
+            if found:
+                break
+            pid = qa.sh(f"pidof {PKG}").strip()
+            focus = qa.sh("dumpsys window | grep -m1 mCurrentFocus").strip()
+            log(f"{listing} home wait {int(time.time() - started)} s: pid={pid or '-'} {focus[-90:]}")
+        log(f"{listing} home ready after {int(time.time() - started)} s: {bool(found)}")
+        if not found:
+            out = qa.adb("logcat", "-d", "-v", "time", "AndroidRuntime:E", "ActivityManager:W", "ActivityTaskManager:W", "SmartCleaner:W", "SmartCleanerPhotos:W", "*:S", timeout=60)
+            for line in out.splitlines()[-40:]:
+                log(f"{listing} log: {line[:220]}")
         time.sleep(2)
         nodes = qa.dump()
         rx_btn = re.compile(btn_rx, re.I)
-        btns = [n for n in nodes if n.label and rx_btn.search(n.label)]
+        ctas = {s["home_cta_make_room"].upper(), s["home_cta_clean"].upper(), s["home_cta_make_room"], s["home_cta_clean"]}
+        btns = [n for n in nodes if n.label and (rx_btn.search(n.label) or n.label in ctas)]
         btn = max(btns, key=lambda n: n.y2 - n.y1) if btns else None  # the giant circle, not the tab label
         nums = [n for n in nodes if n.label and re.search(r"\d", n.label) and re.search(r"(GB|MB|kB|Go|Mo|ГБ|МБ|غ\.ب|م\.ب)", n.label)]
         big = max(nums, key=lambda n: n.y2 - n.y1) if nums else None
