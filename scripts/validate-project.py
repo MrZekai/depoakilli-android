@@ -592,6 +592,14 @@ thresholds_src = read("app/src/main/java/com/mrzekai/depoakilli/data/CleaningThr
 for expected in ("const val SIMILAR_COSINE_MIN", "const val DHASH_MAX_DISTANCE", "const val WATCH_NEW_SIMILAR_COUNT = 20"):
     if expected not in thresholds_src:
         errors.append(f"missing similar-photo threshold: {expected}")
+# Faz 3B-2: face and label models come with Google Play services (small app);
+# a failed model call leaves the photo unmeasured instead of "no face".
+if 'android:name="com.google.mlkit.vision.DEPENDENCIES"' not in read("app/src/main/AndroidManifest.xml") or 'android:value="face,ica"' not in read("app/src/main/AndroidManifest.xml"):
+    errors.append("ML Kit models must be declared for Play services (com.google.mlkit.vision.DEPENDENCIES = face,ica)")
+if "play-services-mlkit-face-detection" not in read("gradle/libs.versions.toml") or "play-services-mlkit-image-labeling" not in read("gradle/libs.versions.toml"):
+    errors.append("use the Play services ML Kit models, not the bundled ones (~14 MB larger download)")
+if "!eyes.isNaN()" not in read("app/src/main/java/com/mrzekai/depoakilli/photo/SimilarFinder.kt"):
+    errors.append("a face model that could not run must not mark a photo as having no face")
 model = ROOT / "app/src/main/assets/models/similar_embedder.tflite"
 if not model.is_file():
     errors.append("the similar-photo model must be bundled (assets/models/similar_embedder.tflite)")
