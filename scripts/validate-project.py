@@ -540,8 +540,10 @@ if "if (!VideoRunMode.VIDEO_COMPRESSION_FGS) {" not in service_src or service_sr
 fgs_on = bool(fgs_match) and fgs_match.group(1) == "true"
 if fgs_on and 'android:foregroundServiceType="dataSync|mediaProcessing"' not in manifest:
     errors.append("VIDEO_COMPRESSION_FGS is on: the video service must declare dataSync|mediaProcessing")
-if not fgs_on and ("FOREGROUND_SERVICE" in manifest or "VideoCompressionService" in manifest):
-    errors.append("VIDEO_COMPRESSION_FGS is off: remove the FOREGROUND_SERVICE permissions and the service from the manifest")
+if not fgs_on:
+    kept = [m for m in re.findall(r'<uses-permission[^>]*android\.permission\.FOREGROUND_SERVICE[^>]*>', manifest) if 'tools:node="remove"' not in m]
+    if kept or "VideoCompressionService" in manifest or 'android.permission.FOREGROUND_SERVICE" tools:node="remove"' not in manifest:
+        errors.append("VIDEO_COMPRESSION_FGS is off: no video service, and FOREGROUND_SERVICE removed with tools:node=\"remove\" (libraries add it)")
 starters = []
 for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
     if "startFromUserTap(" in kt.read_text(encoding="utf-8") and kt.name != "VideoCompressionService.kt":

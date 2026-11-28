@@ -14,8 +14,9 @@ object VideoRunMode {
      * service declaration). false: no service ever starts; shrinking runs only
      * while the shrinking screen is open and stops when the app goes to the
      * background (finished copies are kept). Turn off if the declaration is
-     * refused; then also remove the FOREGROUND_SERVICE permissions and the
-     * service from the manifest (validator-checked).
+     * refused; then also remove the video service from the manifest and mark
+     * android.permission.FOREGROUND_SERVICE tools:node="remove" (a library adds
+     * it); validator- and build-checked.
      */
     const val VIDEO_COMPRESSION_FGS = true
 
