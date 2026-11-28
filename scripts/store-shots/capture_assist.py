@@ -65,6 +65,36 @@ def main():
     if out:
         log("run: " + re.findall(r"similar: (.+)", out)[-1])
         log("all similar log: " + " | ".join(re.findall(r"similar[^\n]*", out)[-6:]))
+    # Fable review: on the first open after the scan, Home's giant number and
+    # giant button are fully on screen (every language).
+    for listing, tag, vdir in cs.LOCALES:
+        s = cs.strings(vdir)
+        qa.sh(f"am force-stop {PKG}")
+        qa.sh(f"pm clear {PKG}")
+        qa.sh(f"appops set {PKG} MANAGE_EXTERNAL_STORAGE allow")
+        qa.sh(f"appops set {PKG} GET_USAGE_STATS allow")
+        qa.sh(f"cmd locale set-app-locales {PKG} --locales {tag}")
+        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity")
+        btn_rx = cs.rx(s["home_cta_make_room"]) + "|" + cs.rx(s["home_cta_clean"])
+        btn = qa.wait_for(btn_rx, 120, dismiss=False)
+        time.sleep(2)
+        nodes = qa.dump()
+        btn = qa.find(btn_rx, nodes) or btn
+        big = None
+        for n in nodes:
+            if n.label and re.search(r"\d", n.label) and (n.y2 - n.y1) >= 100:
+                big = n
+                break
+        cs.shot(os.path.join(OUT, listing), "00-home-first-open")
+        limit = qa.H - 60  # above the gesture bar
+        ok_btn = bool(btn) and btn.y1 >= 0 and btn.y2 <= limit
+        ok_big = bool(big) and big.y1 >= 0 and big.y2 <= limit
+        check(f"Ana ekran ilk açılış: dev düğme tam görünüyor ({listing})", ok_btn,
+              note=f"btn={getattr(btn, 'label', None)} y={getattr(btn, 'y1', None)}-{getattr(btn, 'y2', None)} H={qa.H}")
+        check(f"Ana ekran ilk açılış: büyük sayı tam görünüyor ({listing})", ok_big,
+              note=f"big={getattr(big, 'label', None)} y={getattr(big, 'y1', None)}-{getattr(big, 'y2', None)}")
+    qa.sh(f"pm grant {PKG} android.permission.POST_NOTIFICATIONS")
+
     for listing, tag, vdir in cs.LOCALES:
         s = cs.strings(vdir)
         d = os.path.join(OUT, listing)
