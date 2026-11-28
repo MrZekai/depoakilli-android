@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -56,6 +57,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
@@ -85,6 +89,7 @@ import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 import com.mrzekai.depoakilli.video.Candidate
 import com.mrzekai.depoakilli.video.DeviceBlock
+import com.mrzekai.depoakilli.video.InAppShrink
 import com.mrzekai.depoakilli.video.PendingOutput
 import com.mrzekai.depoakilli.video.PendingRules
 import com.mrzekai.depoakilli.video.ShrinkJobs
@@ -93,6 +98,7 @@ import com.mrzekai.depoakilli.video.VideoCompressionService
 import com.mrzekai.depoakilli.video.VideoFinderState
 import com.mrzekai.depoakilli.video.VideoQueue
 import com.mrzekai.depoakilli.video.VideoRules
+import com.mrzekai.depoakilli.video.VideoRunMode
 import com.mrzekai.depoakilli.video.VideoShrinkRepository
 import java.io.File
 import java.text.DateFormat
@@ -443,6 +449,24 @@ private fun ShrinkProgressScreen() {
     val context = LocalContext.current
     val job by ShrinkJobs.state.collectAsState()
     val current = job.current
+    val inApp = VideoRunMode.stopsOnLeave(VideoRunMode.VIDEO_COMPRESSION_FGS)
+    if (inApp) {
+        // Without the foreground service the round runs only on this screen:
+        // the screen stays on, and the app going to the background stops it.
+        val view = LocalView.current
+        val lifecycle = LocalLifecycleOwner.current.lifecycle
+        DisposableEffect(view, lifecycle) {
+            view.keepScreenOn = true
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_STOP && ShrinkJobs.state.value.running) InAppShrink.stop(byUser = false)
+            }
+            lifecycle.addObserver(observer)
+            onDispose {
+                view.keepScreenOn = false
+                lifecycle.removeObserver(observer)
+            }
+        }
+    }
     BlackCard(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp)) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Text(stringResource(R.string.video_progress_label), color = Lime, fontSize = 13.sp, fontWeight = AppWeights.Giant)
@@ -486,7 +510,7 @@ private fun ShrinkProgressScreen() {
                 }
             }
             Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.video_progress_note), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 20.sp)
+            Text(stringResource(if (inApp) R.string.video_progress_note_screen else R.string.video_progress_note), color = OnBlackSoft, fontSize = 14.sp, lineHeight = 20.sp)
             Spacer(Modifier.weight(1f).height(24.dp))
             PillButton(text = stringResource(R.string.video_stop), onClick = { VideoCompressionService.stop(context) }, style = PillStyle.LIME_OUTLINE)
             Text(

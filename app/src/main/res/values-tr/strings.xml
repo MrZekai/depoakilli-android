@@ -1139,4 +1139,10 @@
     <string name="pro_total_cleared">Bugüne kadar: %1$s</string>
     <!-- Faz 3C -->
     <string name="plan_nothing_yet">Henüz temizlenecek bir şey bulmadım. Önce telefonunu tara.</string>
+
+    <!-- Faz 3A-2 -->
+    <string name="video_progress_note_screen">Bu ekranı açık tut: uygulamadan çıkarsan durur, biten kopyalar kalır. Telefon ısınırsa ya da pil azalırsa da dururum.</string>
+
+    <!-- Faz 3A-1 -->
+    <string name="watch_kind_decreased">%s azaldı</string>
 </resources>

@@ -105,10 +105,12 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
             history = WatchRules.pruneHistory(snapshot.history, now),
             lastWeeklyWeek = snapshot.lastWeeklyWeek,
         )
-        store.update { it.copy(threshold = nextThreshold, history = input.history) }
+        store.update { it.copy(history = input.history) }
+        var delivered: WatchTopic? = null
         when (val decision = WatchRules.decide(input)) {
             is WatchDecision.Send -> {
                 if (WatchNotifier.post(applicationContext, decision.topic, sampleWithSimilar, growth)) {
+                    delivered = decision.topic
                     store.update {
                         it.copy(
                             history = it.history + SentNotice(decision.topic, now),
@@ -119,9 +121,14 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
                     }
                 }
             }
-            is WatchDecision.Defer -> WatchScheduler.scheduleMorning(applicationContext, decision.topic)
+            is WatchDecision.Defer -> {
+                WatchScheduler.scheduleMorning(applicationContext, decision.topic)
+                delivered = decision.topic
+            }
             WatchDecision.Nothing -> Unit
         }
+        // The level is saved as "fired" only once its notice went out or waits for the morning.
+        store.update { it.copy(threshold = WatchRules.committedThreshold(snapshot.threshold, nextThreshold, crossed, delivered)) }
     }
 
     /** Google Play's answer if it comes quickly; otherwise the last known one. */

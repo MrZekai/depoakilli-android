@@ -163,6 +163,27 @@ object WatchRules {
         return state to null
     }
 
+    /**
+     * What to keep as the threshold state after this run (Fable review): a
+     * crossed level counts as "fired" only when its notice really went out or
+     * was held for the morning. Otherwise (another topic won, the daily limit,
+     * notices off, the post failed) the old state stays, so the "90% full"
+     * notice is not lost.
+     */
+    fun committedThreshold(
+        previous: ThresholdState,
+        next: ThresholdState,
+        crossed: WatchTopic?,
+        delivered: WatchTopic?,
+    ): ThresholdState = if (crossed == null || delivered == crossed) next else previous
+
+    /** Kind rows smaller than this (either way) are not shown. */
+    const val MIN_KIND_ROW_BYTES = 50_000_000L
+
+    /** The kind rows worth showing: grew or shrank by at least 50 MB. */
+    fun visibleKindRows(growth: WatchGrowth): List<Pair<WatchKind, Long>> =
+        WatchKind.entries.map { it to growth.bytes(it) }.filter { kotlin.math.abs(it.second) >= MIN_KIND_ROW_BYTES }
+
     fun isQuiet(localHour: Int): Boolean = localHour >= QUIET_FROM_HOUR || localHour < QUIET_UNTIL_HOUR
 
     /** Topics that hold now, highest priority first: threshold > WhatsApp > new videos > new similar photos > weekly. */

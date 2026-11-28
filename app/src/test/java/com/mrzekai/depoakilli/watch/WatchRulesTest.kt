@@ -231,4 +231,34 @@ class WatchRulesTest {
             }
         }
     }
+
+    @Test
+    fun `a crossed level is saved only when its notice went out or waits for the morning`() {
+        val before = ThresholdState()
+        val (next, crossed) = WatchRules.threshold(before, 91)
+        assertEquals(WatchTopic.THRESHOLD_90, crossed)
+        // Not delivered (daily limit, notices off, post failed): the 90% notice is not lost.
+        assertEquals(before, WatchRules.committedThreshold(before, next, crossed, delivered = null))
+        assertEquals(before, WatchRules.committedThreshold(before, next, crossed, delivered = WatchTopic.WEEKLY))
+        // Sent or held for the morning: now it counts as fired.
+        assertEquals(next, WatchRules.committedThreshold(before, next, crossed, delivered = WatchTopic.THRESHOLD_90))
+        // Re-arming below 85% is always kept.
+        val (rearmed, none) = WatchRules.threshold(ThresholdState(true, true), 80)
+        assertEquals(ThresholdState(), WatchRules.committedThreshold(ThresholdState(true, true), rearmed, none, delivered = null))
+    }
+
+    @Test
+    fun `kind rows under 50 MB either way are hidden`() {
+        val g = WatchGrowth(
+            days = 7,
+            totalBytes = 0L,
+            byKind = mapOf(
+                WatchKind.VIDEOS to 900_000_000L,
+                WatchKind.PHOTOS to -60_000_000L,
+                WatchKind.WHATSAPP to 49_999_999L,
+                WatchKind.OTHER to -10_000_000L,
+            ),
+        )
+        assertEquals(listOf(WatchKind.VIDEOS to 900_000_000L, WatchKind.PHOTOS to -60_000_000L), WatchRules.visibleKindRows(g))
+    }
 }

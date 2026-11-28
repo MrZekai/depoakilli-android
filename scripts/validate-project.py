@@ -524,9 +524,22 @@ if "moveShrunkOriginalToTrash" not in video_repo_src:
     errors.append("an approved original must go to the Trash (moveShrunkOriginalToTrash)")
 service_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressionService.kt")
 for expected in ("override fun onTimeout(startId: Int, fgsType: Int)", "FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING",
-                 "FOREGROUND_SERVICE_TYPE_DATA_SYNC", "fun startFromUserTap(", "VideoQueue.block("):
+                 "FOREGROUND_SERVICE_TYPE_DATA_SYNC", "fun startFromUserTap(", "ShrinkRound.run("):
     if expected not in service_src:
         errors.append(f"missing video service invariant: {expected}")
+if "VideoQueue.block(" not in read("app/src/main/java/com/mrzekai/depoakilli/video/ShrinkRound.kt"):
+    errors.append("a shrinking round must stop on low battery or a hot phone (VideoQueue.block)")
+# Task 2.4: VIDEO_COMPRESSION_FGS. Off: no service starts (the round runs only
+# on the open shrinking screen) and the manifest declares no foreground service.
+run_mode_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoRunMode.kt")
+fgs_match = re.search(r"const val VIDEO_COMPRESSION_FGS = (true|false)", run_mode_src)
+if not fgs_match:
+    errors.append("VideoRunMode.VIDEO_COMPRESSION_FGS switch is missing")
+if "if (!VideoRunMode.VIDEO_COMPRESSION_FGS) {" not in service_src or service_src.index("if (!VideoRunMode.VIDEO_COMPRESSION_FGS) {") > service_src.index("ContextCompat.startForegroundService("):
+    errors.append("startFromUserTap must check VIDEO_COMPRESSION_FGS before starting the service")
+fgs_on = bool(fgs_match) and fgs_match.group(1) == "true"
+if not fgs_on and ("FOREGROUND_SERVICE" in manifest or "VideoCompressionService" in manifest):
+    errors.append("VIDEO_COMPRESSION_FGS is off: remove the FOREGROUND_SERVICE permissions and the service from the manifest")
 starters = []
 for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
     if "startFromUserTap(" in kt.read_text(encoding="utf-8") and kt.name != "VideoCompressionService.kt":
@@ -539,7 +552,7 @@ for expected in ("MIN_VIDEO_BYTES = 100_000_000L", "MIN_GAIN_RATIO = 0.40", "MAX
                  "MAX_OUTPUT_RATIO = 0.70", "EXPIRE_MILLIS = 7L * 24L * 60L * 60L * 1000L", "fun canApprove(playedSmallCopy: Boolean)"):
     if expected not in video_rules_src:
         errors.append(f"missing video shrinking rule: {expected}")
-if "com.mrzekai.depoakilli.video.VideoCompressionService" not in manifest and ".video.VideoCompressionService" not in manifest:
+if fgs_on and "com.mrzekai.depoakilli.video.VideoCompressionService" not in manifest and ".video.VideoCompressionService" not in manifest:
     errors.append("the video shrinking service must be declared")
 lossless = re.compile(r"(lossless|kayıpsız|kalite kaybı yok|no quality loss|without quality loss|yapay zek|\bAI\b)", re.IGNORECASE)
 for res_dir in (ROOT / "app/src/main/res").glob("values*"):
@@ -677,10 +690,31 @@ for res_dir in (ROOT / "app/src/main/res").glob("values*"):
 cleaner_app_src = read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt")
 if cleaner_app_src.count("paywallOpen = true") != 1:
     errors.append("the paywall must open only through openPaywall()")
-if cleaner_app_src.count("SalesRules.autoPaywall(") != 1 or "if (succeeded && !state.freeTier.autoPaywallDecided)" not in cleaner_app_src:
-    errors.append("only one self-opening paywall (S1): after the first successful cleanup, once, with the 2 GB gain")
+# Fable review: the datatransport CCT backend (the only network sender of
+# Google's usage logs) is unregistered; INTERNET stays removed.
+manifest_src_dt = read("app/src/main/AndroidManifest.xml")
+if 'android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"\n                tools:node="remove"' not in manifest_src_dt:
+    errors.append("unregister the datatransport CCT backend in the manifest (tools:node=remove)")
+if "bundled ML Kit" in manifest_src_dt:
+    errors.append("the manifest comment still says bundled ML Kit (models come from Play services)")
+# Fable review (Storage Watch): a crossed level is saved only after its notice
+# went out or was held; small kind rows hidden; a decrease is said in words.
+watch_worker_src = read("app/src/main/java/com/mrzekai/depoakilli/watch/WatchWorker.kt")
+if "WatchRules.committedThreshold(snapshot.threshold, nextThreshold, crossed, delivered)" not in watch_worker_src or "threshold = nextThreshold" in watch_worker_src:
+    errors.append("the watch must save a crossed level only once its notice was sent or deferred")
+if "WatchRules.visibleKindRows(growth)" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/watch/WatchScreens.kt") or "R.string.watch_kind_decreased" not in read("app/src/main/java/com/mrzekai/depoakilli/ui/watch/WatchScreens.kt"):
+    errors.append("watch kind rows: hide rows under 50 MB and say a decrease in words")
+if ".setColor(BRAND_COLOR)" not in read("app/src/main/java/com/mrzekai/depoakilli/watch/WatchNotifier.kt") or "0xFF0B4A25" not in read("app/src/main/java/com/mrzekai/depoakilli/watch/WatchNotifier.kt"):
+    errors.append("watch notices use the brand colour #0B4A25")
+# Converted (Fable review): the once-only flag is set only when the paywall
+# really opens, checked after every successful cleanup, on the Pro-only gain.
+if (cleaner_app_src.count("SalesRules.autoPaywall(") != 1
+        or "alreadyShown = state.freeTier.autoPaywallShown" not in cleaner_app_src
+        or "proEstimate.proOnlyBytes" not in cleaner_app_src
+        or cleaner_app_src.count("viewModel.markAutoPaywallShown()") != 1):
+    errors.append("only one self-opening paywall (S1): once, after a successful cleanup, with 2 GB+ that only Pro can clear")
 sales_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/SalesRules.kt")
-for expected in ("!isPro && qualifies && !alreadyDecided", "!isPro && offerAvailable && trialEligible && !alreadyShown",
+for expected in ("!isPro && proOnlyBytes >= ProGainEstimator.PRO_MIN_GAIN_BYTES && !alreadyShown", "!isPro && offerAvailable && trialEligible && !alreadyShown",
                  "const val REMINDER_BEFORE_MILLIS = DAY_MILLIS", "autoRenewing && nowMillis < trialEndMillis"):
     if expected not in sales_src:
         errors.append(f"missing sales rule: {expected}")

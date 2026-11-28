@@ -1123,13 +1123,18 @@ fun CleanerApp(
 
                     if (succeeded && result.failedCount == 0) onCleanupSucceeded()
                     if (succeeded) onCleanupResultDismissed()
-                    // Sales S1: the only self-opening paywall, once, right after the first
-                    // successful cleanup's result, and only with a measured Pro gain of 2 GB+.
-                    if (succeeded && !state.freeTier.autoPaywallDecided) {
-                        viewModel.markAutoPaywallDecided()
-                        if (com.mrzekai.depoakilli.pro.SalesRules.autoPaywall(pro.isPro, proEstimate.qualifies, alreadyDecided = false)) {
-                            openPaywall()
-                        }
+                    // Sales S1: the only self-opening paywall. Checked after every successful
+                    // cleanup's result; marked only when it really opens (once in the app's life),
+                    // and only when what Pro alone can clear is 2 GB+.
+                    if (succeeded &&
+                        com.mrzekai.depoakilli.pro.SalesRules.autoPaywall(
+                            pro.isPro,
+                            proEstimate.proOnlyBytes,
+                            alreadyShown = state.freeTier.autoPaywallShown,
+                        )
+                    ) {
+                        viewModel.markAutoPaywallShown()
+                        openPaywall()
                     }
                 },
             )

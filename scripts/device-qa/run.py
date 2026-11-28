@@ -256,7 +256,15 @@ def video_log(tail=25):
     return (" | ".join(own[-tail:])[:2000] + " || " + " | ".join(l[:300] for l in rest[-8:]))[:4000]
 
 
+def video_fgs_on():
+    """Task 2.4 switch, read from the source the APK was built from."""
+    path = os.path.join(os.path.dirname(__file__), "..", "..", "app/src/main/java/com/mrzekai/depoakilli/video/VideoRunMode.kt")
+    return "const val VIDEO_COMPRESSION_FGS = true" in open(path, encoding="utf-8").read()
+
+
 def video_section():
+    fgs = video_fgs_on()
+    log(f"VIDEO_COMPRESSION_FGS = {fgs}")
     src = os.path.abspath(os.environ.get("QA_SHRINK_VIDEO", "qa-shrink.mp4"))
     if not os.path.exists(src):
         check("3A-2: test videosu üretildi (ffmpeg)", False, note=src)
@@ -291,8 +299,12 @@ def video_section():
     tap_text(r"^Try one at no cost$", 10)
     running = wait_for(r"^SHRINKING$", 30, dismiss=False)
     check("Z6: küçültme kullanıcı dokunuşuyla başladı", running, screenshot=shot("video-z6"))
-    check("Z6: ön plan hizmeti ve bildirimi var (Stop düğmeli)", video_service_foreground() and app_notices() > 0,
-          note=f"notices={app_notices()}")
+    if fgs:
+        check("Z6: ön plan hizmeti ve bildirimi var (Stop düğmeli)", video_service_foreground() and app_notices() > 0,
+              note=f"notices={app_notices()}")
+    else:
+        check("Şalter kapalı: ön plan hizmeti başlamadı", not video_service_foreground())
+        check("Şalter kapalı: 'ekranı açık tut' notu var", scroll_to(r"^Keep this screen open", 3))
     if running:
         tap_text(r"^Stop$", 10)
     back_to_list = wait_for(r"^Try one at no cost$", 40, dismiss=False)
@@ -308,10 +320,25 @@ def video_section():
     wait_for(r"^SHRINKING$", 30, dismiss=False)
     sh("input keyevent KEYCODE_HOME")
     time.sleep(4)
-    check("Uygulamadan çıkınca küçültme ön planda sürüyor", video_service_foreground(), note=f"notices={app_notices()}")
-    sh(target + "SHRINK")
-    back_in = wait_for(r"^(SHRINKING|Watch both and judge for yourself\.)$", 20, dismiss=False)
-    check("Bildirimden dönüş: ilerleme ya da karşılaştırma ekranı", back_in, screenshot=shot("video-return"))
+    if fgs:
+        check("Uygulamadan çıkınca küçültme ön planda sürüyor", video_service_foreground(), note=f"notices={app_notices()}")
+        sh(target + "SHRINK")
+        back_in = wait_for(r"^(SHRINKING|Watch both and judge for yourself\.)$", 20, dismiss=False)
+        check("Bildirimden dönüş: ilerleme ya da karşılaştırma ekranı", back_in, screenshot=shot("video-return"))
+    else:
+        # Without the service, leaving the app stops the round; nothing half-made stays.
+        check("Şalter kapalı: uygulamadan çıkınca hizmet yok", not video_service_foreground())
+        sh(target + "videos")
+        again = wait_for(r"^Try one at no cost$", 40, dismiss=False)
+        files = sh(f"ls -a {folder}")
+        check("Şalter kapalı: çıkınca durdu, liste geri geldi", again, screenshot=shot("video-left-stopped"))
+        check("Şalter kapalı: yarım kopya yok, orijinal aynı",
+              ".sc.tmp" not in files and "_sc.mp4" not in files and sh(f"stat -c %s {dev}").strip() == orig_size, note=files[-300:])
+        # Now stay on the screen until the copy is ready.
+        if again:
+            tap(again)
+        started = time.time()
+        wait_for(r"^SHRINKING$", 30, dismiss=False)
     compare = None
     for _ in range(12):
         compare = wait_for(r"^Watch both and judge for yourself\.$", 60, dismiss=False)

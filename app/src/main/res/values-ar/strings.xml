@@ -1724,4 +1724,12 @@
     <!-- Faz 3C -->
     <!-- [ÇEVİRİ GEREKLİ] Faz 3C: draft translation, needs a native review -->
     <string name="plan_nothing_yet">لم أجد بعد ما يمكن تحريره. افحص هاتفك أولًا.</string>
+
+    <!-- Faz 3A-2 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2: draft translation, needs a native review -->
+    <string name="video_progress_note_screen">أبقِ هذه الشاشة مفتوحة: مغادرة التطبيق توقف العمل، وتبقى النسخ المكتملة. أتوقف أيضًا إذا سخن الهاتف أو ضعفت البطارية.</string>
+
+    <!-- Faz 3A-1 -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-1: draft translation, needs a native review -->
+    <string name="watch_kind_decreased">انخفض %s</string>
 </resources>

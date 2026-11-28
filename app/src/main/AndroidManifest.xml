@@ -4,9 +4,11 @@
 
     <!-- Faz 3C: the app needs no internet. Play Billing 9.1.0 declares only
          com.android.vending.BILLING and talks to the Play Store app on the
-         device; the cloud Assistant was cancelled. The bundled ML Kit models
-         pull a diagnostics uploader (datatransport) that declares INTERNET:
-         removed here, so no usage data can leave the phone. -->
+         device; the cloud Assistant was cancelled. ML Kit (models from Google
+         Play services), MediaPipe and Play Billing bring Google's usage-log
+         uploader (datatransport) that declares INTERNET: removed here, and its
+         only sender (the CCT backend) is unregistered below, so it never tries
+         the network (Fable review). -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 
     <!-- WorkManager (daily Trash purge) declares a foreground service. Smart
@@ -44,6 +46,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DepoAkilli">
+
+        <!-- Fable review: no uploader for Google's usage logs. Without a registered
+             backend, datatransport drops its log batches instead of opening a
+             connection (which, without INTERNET, could throw). Its scheduler
+             components stay: they are only used to run that cleanup. -->
+        <service
+            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+            tools:node="merge">
+            <meta-data
+                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+                tools:node="remove" />
+        </service>
 
         <!-- Faz 3B-2: Google Play services keeps the face and label models on the phone (not in the app). -->
         <meta-data
