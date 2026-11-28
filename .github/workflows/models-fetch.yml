@@ -9,6 +9,8 @@ permissions:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    env:
+      BILLINGV: "9.1.0"
     steps:
       - name: Download
         run: |
@@ -34,6 +36,14 @@ jobs:
           for f in aar/*/AndroidManifest.xml; do echo "== $f"; grep -E "uses-permission|<service|<provider" $f; done
           for f in $(find aar -name "*.tflite" -o -name "*.bin"); do ls -l $f; strings -n 4 $f | grep -iE "receipt|document|paper|menu|poster|screenshot|text|meme|cartoon|font|handwriting" | sort -u | head -40; done
           rm -rf aar *.aar
+          G=https://dl.google.com/dl/android/maven2
+          for a in com/android/billingclient/billing/BILLINGV/billing-BILLINGV.aar com/google/android/datatransport/transport-backend-cct/2.3.3/transport-backend-cct-2.3.3.aar com/google/android/datatransport/transport-runtime/2.2.6/transport-runtime-2.2.6.aar com/google/mlkit/common/18.11.0/common-18.11.0.aar com/google/mediapipe/tasks-core/0.10.35/tasks-core-0.10.35.aar com/google/mediapipe/tasks-vision/0.10.35/tasks-vision-0.10.35.aar com/google/android/play/review/2.0.2/review-2.0.2.aar; do
+            a=${a//BILLINGV/$BILLINGV}
+            f=$(basename $a); curl -fsSL -o $f $G/$a || { echo "missing $a"; continue; }
+            echo "== $f"; unzip -p $f AndroidManifest.xml | grep -E "uses-permission|<service|<receiver|<provider" || echo "(no permissions)"
+            unzip -l $f | grep -E "\.so$" | awk '{print $1, $4}' | head -8
+            rm -f $f
+          done
           sha256sum *.tflite > SHA256SUMS
           ls -l; cat versions.txt
       - name: Push
