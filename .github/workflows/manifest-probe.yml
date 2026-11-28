@@ -1,0 +1,33 @@
+name: Manifest probe
+# Prints the merged manifest components and datatransport dependency paths. Text only.
+on:
+  push:
+    branches: [manifest-probe]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v6
+      - run: |
+          chmod +x gradlew
+          ./gradlew :app:processDebugMainManifest :app:dependencies --configuration releaseRuntimeClasspath > deps.txt
+          mkdir out
+          find app/build/intermediates -name AndroidManifest.xml -path "*merged_manifest*debug*" | head -1 | xargs -I{} cp {} out/merged-debug.xml
+          grep -n -i "transport\|datatransport\|cct" deps.txt > out/deps-transport.txt || true
+          grep -n -i "mlkit\|mediapipe" deps.txt > out/deps-ml.txt || true
+          cat out/deps-transport.txt
+          grep -n -i -B2 -A6 "transport\|mlkit\|permission" out/merged-debug.xml | head -200
+      - run: |
+          cd out
+          git init -q -b manifest-probe-raw
+          git config user.name probe; git config user.email probe@users.noreply.github.com
+          git add -A; git commit -qm probe
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" manifest-probe-raw
