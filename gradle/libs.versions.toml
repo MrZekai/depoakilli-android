@@ -11,8 +11,8 @@ billing = "9.1.0"
 play-review = "2.0.2"
 media3 = "1.10.1"
 mediapipe = "0.10.35"
-mlkitFace = "16.1.7"
-mlkitLabeling = "17.0.9"
+mlkitFace = "17.1.0"
+mlkitLabeling = "16.0.8"
 work = "2.10.1"
 junit = "4.13.2"
 
@@ -38,8 +38,8 @@ androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", versi
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 androidx-media3-transformer = { module = "androidx.media3:media3-transformer", version.ref = "media3" }
 mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipe" }
-mlkit-face-detection = { module = "com.google.mlkit:face-detection", version.ref = "mlkitFace" }
-mlkit-image-labeling = { module = "com.google.mlkit:image-labeling", version.ref = "mlkitLabeling" }
+mlkit-face-detection = { module = "com.google.android.gms:play-services-mlkit-face-detection", version.ref = "mlkitFace" }
+mlkit-image-labeling = { module = "com.google.android.gms:play-services-mlkit-image-labeling", version.ref = "mlkitLabeling" }
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
 junit = { module = "junit:junit", version.ref = "junit" }
 

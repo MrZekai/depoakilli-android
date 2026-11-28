@@ -120,9 +120,13 @@ class SimilarFinder(private val context: Context) {
                     val entry = usable[i].entry!!
                     if (entry.eyesOpen != PhotoFeatureCache.NO_VALUE) continue
                     thumbnail(usable[i].item, FACE_SIZE)?.let { bmp ->
-                        entry.eyesOpen = models.eyesOpen(bmp) ?: PhotoFeatureCache.NO_FACE
+                        val eyes = models.eyesOpen(bmp)
                         bmp.recycle()
-                        cache.markDirty()
+                        // A model that could not run leaves the photo unmeasured (tried on a later run).
+                        if (eyes == null || !eyes.isNaN()) {
+                            entry.eyesOpen = eyes ?: PhotoFeatureCache.NO_FACE
+                            cache.markDirty()
+                        }
                     }
                 }
             }
