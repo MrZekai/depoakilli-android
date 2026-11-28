@@ -19,11 +19,20 @@ object ProGainEstimator {
      */
     const val VIDEO_COMPRESSION_AVAILABLE = true
 
+    /**
+     * Faz 3B-1: similar photos. Its row is the measured size of the frames the
+     * last in-app look offered for the Trash (the best of each group stays).
+     * Off, the row, the screens, the Watch alert and every text disappear.
+     */
+    const val SIMILAR_PHOTOS_AVAILABLE = true
+
     enum class Kind {
         /** "My pick" cleaned with one tap (after the first, free cleanup). */
         ONE_TAP_PICK,
         /** Big videos shrunk without deleting (Faz 3.4). */
         VIDEO_COMPRESSION,
+        /** Similar frames beyond the best of each group (Faz 3B-1). */
+        SIMILAR_PHOTOS,
     }
 
     data class Row(val kind: Kind, val bytes: Long, val count: Int, val measured: Boolean)
@@ -53,6 +62,7 @@ object ProGainEstimator {
      * @param videoSavingBytes sum of the lower-bound estimates of the video
      *   shrinking candidates ([com.mrzekai.depoakilli.video.VideoRules]); shown as "about".
      * @param videoCount number of those candidates.
+     * @param similarBytes measured size of the similar frames offered (Faz 3B-1).
      */
     fun estimate(
         suggestedBytes: Long,
@@ -61,10 +71,16 @@ object ProGainEstimator {
         videoSavingBytes: Long = 0L,
         videoCount: Int = 0,
         videoCompressionAvailable: Boolean = VIDEO_COMPRESSION_AVAILABLE,
+        similarBytes: Long = 0L,
+        similarCount: Int = 0,
+        similarAvailable: Boolean = SIMILAR_PHOTOS_AVAILABLE,
     ): Estimate {
         val rows = mutableListOf<Row>()
         if (videoCompressionAvailable && videoSavingBytes > 0L && videoCount > 0) {
             rows += Row(Kind.VIDEO_COMPRESSION, videoSavingBytes, videoCount, measured = false)
+        }
+        if (similarAvailable && similarBytes > 0L && similarCount > 0) {
+            rows += Row(Kind.SIMILAR_PHOTOS, similarBytes, similarCount, measured = true)
         }
         if (firstCleanupUsed && suggestedBytes > 0L) {
             rows += Row(Kind.ONE_TAP_PICK, suggestedBytes, suggestedCount, measured = true)

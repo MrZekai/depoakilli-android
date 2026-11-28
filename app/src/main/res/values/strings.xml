@@ -949,4 +949,73 @@
         <item quantity="one">%d video shrunk</item>
         <item quantity="other">%d videos shrunk</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <string name="similar_title">Similar photos</string>
+    <string name="similar_tools_detail">The best of each group stays</string>
+    <string name="similar_looking">Looking at your photos…</string>
+    <string name="similar_paused">Paused while the app is in the background; it continues when you come back.</string>
+    <string name="similar_none_title">No similar photos</string>
+    <string name="similar_note_ai">Found with on-device AI. Your photos never leave your phone.</string>
+    <string name="similar_model_missing">The photo model could not start on this phone, so nothing was grouped.</string>
+    <string name="similar_open_first">Open the first group</string>
+    <string name="similar_approve_all">Approve all groups</string>
+    <string name="similar_free_note">The first %1$d groups are open to everyone. Nothing moves until you approve.</string>
+    <string name="similar_sub_pro">from group %1$d on: Pro</string>
+    <string name="similar_sub_alike">look alike</string>
+    <string name="similar_within_seconds">taken within %1$d s</string>
+    <string name="similar_within_minutes">taken within %1$d min</string>
+    <string name="similar_keep_badge">KEEP</string>
+    <string name="similar_also_kept">kept too</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Not similar</string>
+    <string name="similar_sharpest">Sharpest</string>
+    <string name="similar_skip">Skip this group</string>
+    <string name="similar_trash_note">They wait 7 days in the Trash; you can bring them back.</string>
+    <string name="similar_y7_card">%1$s in similar photos</string>
+    <string name="similar_watch_toggle">New similar photos</string>
+    <string name="similar_watch_toggle_sub">Counted from your last look in the app</string>
+    <string name="watch_notif_similar_body">The best of each group stays; %1$s to free.</string>
+    <string name="plan_group_similar_photo">Similar photos</string>
+    <string name="reason_similar_photo">A similar, better frame was kept</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d similar frame in %2$d groups. The best of each group stays.</item>
+        <item quantity="other">%1$d similar frames in %2$d groups. The best of each group stays.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">I looked at %d photo and found none alike.</item>
+        <item quantity="other">I looked at %d photos and found none alike.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Also look at %d older photo</item>
+        <item quantity="other">Also look at %d older photos</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d frame</item>
+        <item quantity="other">%1$s · %2$d frames</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d frame to Trash · tap one to keep it too</item>
+        <item quantity="other">%d frames to Trash · tap one to keep it too</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">Move %1$d frame to Trash · %2$s</item>
+        <item quantity="other">Move %1$d frames to Trash · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d frame moved to Trash · %2$s</item>
+        <item quantity="other">%1$d frames moved to Trash · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Open %d group one by one first</item>
+        <item quantity="other">Open %d groups one by one first</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d similar frame goes</item>
+        <item quantity="other">%d similar frames go</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d new similar photo</item>
+        <item quantity="other">%d new similar photos</item>
+    </plurals>
 </resources>

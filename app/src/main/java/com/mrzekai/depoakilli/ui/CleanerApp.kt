@@ -79,6 +79,7 @@ internal enum class DetailScreen(@StringRes val titleRes: Int) {
 
     /** Faz 3A-2 Z5–Z8: shrinking big videos without deleting. */
     VIDEOS(R.string.video_title),
+    SIMILAR(R.string.similar_title),
 }
 
 internal enum class AccessDisclosure {
@@ -137,7 +138,31 @@ fun CleanerApp(
     LaunchedEffect(state.summary, state.hasAllFilesAccess) {
         if (state.hasAllFilesAccess && com.mrzekai.depoakilli.pro.ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE) shrinkApp?.videoShrink?.refresh()
     }
-    val proEstimate = remember(state.summary, state.freeTier.firstCleanupUsed, state.scanFocus, videoResult) { state.proEstimate(videoResult) }
+    // Faz 3B-1: similar photos, looked at only while the app is in front (no service).
+    val similarState = shrinkApp?.similarPhotos?.state?.collectAsStateWithLifecycle()?.value
+    val similarResult = (similarState as? com.mrzekai.depoakilli.photo.SimilarState.Ready)?.result
+    LaunchedEffect(state.summary, state.hasAllFilesAccess) {
+        if (state.hasAllFilesAccess && com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE &&
+            shrinkApp?.similarPhotos?.state?.value is com.mrzekai.depoakilli.photo.SimilarState.Idle && state.summary.scannedFileCount > 0
+        ) {
+            shrinkApp.similarPhotos.start()
+        }
+    }
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    androidx.compose.runtime.DisposableEffect(lifecycleOwner, shrinkApp) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> shrinkApp?.similarPhotos?.pause()
+                androidx.lifecycle.Lifecycle.Event.ON_START -> shrinkApp?.similarPhotos?.resume()
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val proEstimate = remember(state.summary, state.freeTier.firstCleanupUsed, state.scanFocus, videoResult, similarResult) {
+        state.proEstimate(videoResult, similarResult)
+    }
     fun openPaywall() {
         onOpenPro()
         onPaywallOpened()
@@ -292,6 +317,9 @@ fun CleanerApp(
                 detailScreen = DetailScreen.WATCH
             }
             // Faz 3A-2: the new-videos notice and the shrinking notification open the video screens.
+            com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_SIMILAR -> {
+                if (com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE) detailScreen = DetailScreen.SIMILAR
+            }
             com.mrzekai.depoakilli.watch.WatchNotifier.TARGET_VIDEOS,
             com.mrzekai.depoakilli.video.VideoCompressionService.TARGET_SHRINK -> {
                 selectedTabIndex = AppTab.HOME.ordinal
@@ -315,6 +343,7 @@ fun CleanerApp(
         setWeekly = { on -> watch.updateSettings { it.copy(weeklySummary = on) } },
         setWhatsApp = { on -> watch.updateSettings { it.copy(whatsAppAlerts = on) } },
         setNewVideos = { on -> watch.updateSettings { it.copy(newVideoAlerts = on) } },
+        setNewSimilar = { on -> watch.updateSettings { it.copy(newSimilarAlerts = on) } },
         openPaywall = ::openPaywall,
         openNotificationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchNotifier.notificationSettingsIntent(watchContext)) },
         openHibernationSettings = { watch.openSystem(com.mrzekai.depoakilli.watch.WatchHibernation.settingsIntent(watchContext)) },
@@ -354,7 +383,17 @@ fun CleanerApp(
                 detailScreen = DetailScreen.VIDEOS
             }
         }
-    androidx.compose.runtime.CompositionLocalProvider(com.mrzekai.depoakilli.ui.smart.LocalVideoShrinkEntry provides videoEntry) {
+    val similarEntry = similarResult
+        ?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE && it.groups.isNotEmpty() }
+        ?.let { result ->
+            com.mrzekai.depoakilli.ui.smart.SimilarEntry(result.trashBytes, result.trashCount, result.groups.size) {
+                detailScreen = DetailScreen.SIMILAR
+            }
+        }
+    androidx.compose.runtime.CompositionLocalProvider(
+        com.mrzekai.depoakilli.ui.smart.LocalVideoShrinkEntry provides videoEntry,
+        com.mrzekai.depoakilli.ui.smart.LocalSimilarEntry provides similarEntry,
+    ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -658,6 +697,20 @@ fun CleanerApp(
                         )
                     }
 
+                    DetailScreen.SIMILAR -> if (shrinkApp != null) {
+                        com.mrzekai.depoakilli.ui.photo.SimilarPhotosFlow(
+                            repo = shrinkApp.similarPhotos,
+                            actions = com.mrzekai.depoakilli.ui.photo.SimilarActions(
+                                isPro = pro.isPro,
+                                freeGroupsUsed = state.freeTier.similarGroupsUsed,
+                                onOpenPaywall = ::openPaywall,
+                                onFreeGroupUsed = { viewModel.markSimilarGroupUsed() },
+                                onProBytes = { bytes -> viewModel.addProBytes(bytes) },
+                            ),
+                            modifier = Modifier,
+                        )
+                    }
+
                     DetailScreen.PRIVACY,
                     DetailScreen.TERMS,
                     DetailScreen.ABOUT -> LegalDetailScreen(
@@ -774,6 +827,11 @@ fun CleanerApp(
                             },
                             videoSavingBytes = videoResult?.totalSavingBytes,
                             onOpenVideos = { detailScreen = DetailScreen.VIDEOS },
+                            similarBytes = similarResult?.trashBytes,
+                            onOpenSimilar = {
+                                detailScreen = DetailScreen.SIMILAR
+                                if (shrinkApp?.similarPhotos?.state?.value is com.mrzekai.depoakilli.photo.SimilarState.Idle) shrinkApp.similarPhotos.start()
+                            },
                             modifier = Modifier,
                         )
 

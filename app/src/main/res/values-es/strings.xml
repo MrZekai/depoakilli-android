@@ -1208,4 +1208,84 @@
         <item quantity="one">%d vídeo reducido</item>
         <item quantity="other">%d vídeos reducidos</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Fotos parecidas</string>
+    <string name="similar_tools_detail">Se queda la mejor de cada grupo</string>
+    <string name="similar_looking">Revisando tus fotos…</string>
+    <string name="similar_paused">En pausa mientras la app está en segundo plano; sigue cuando vuelvas.</string>
+    <string name="similar_none_title">No hay fotos parecidas</string>
+    <string name="similar_note_ai">Encontradas con IA en el dispositivo. Tus fotos no salen del teléfono.</string>
+    <string name="similar_model_missing">El modelo de fotos no pudo iniciarse en este teléfono; no se agrupó nada.</string>
+    <string name="similar_open_first">Abrir el primer grupo</string>
+    <string name="similar_approve_all">Aprobar todos los grupos</string>
+    <string name="similar_free_note">Los primeros %1$d grupos están abiertos a todos. Nada se mueve sin tu aprobación.</string>
+    <string name="similar_sub_pro">desde el grupo %1$d: Pro</string>
+    <string name="similar_sub_alike">se parecen</string>
+    <string name="similar_within_seconds">tomadas en %1$d s</string>
+    <string name="similar_within_minutes">tomadas en %1$d min</string>
+    <string name="similar_keep_badge">SE QUEDA</string>
+    <string name="similar_also_kept">también se queda</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">No se parecen</string>
+    <string name="similar_sharpest">La más nítida</string>
+    <string name="similar_skip">Saltar este grupo</string>
+    <string name="similar_trash_note">Esperan 7 días en la Papelera; puedes recuperarlas.</string>
+    <string name="similar_y7_card">%1$s en fotos parecidas</string>
+    <string name="similar_watch_toggle">Nuevas fotos parecidas</string>
+    <string name="similar_watch_toggle_sub">Se cuentan desde tu última revisión en la app</string>
+    <string name="watch_notif_similar_body">Se queda la mejor de cada grupo; libera %1$s.</string>
+    <string name="plan_group_similar_photo">Fotos parecidas</string>
+    <string name="reason_similar_photo">Se conservó una toma parecida y mejor</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d foto parecida en %2$d grupos. Se queda la mejor de cada grupo.</item>
+        <item quantity="many">%1$d de fotos parecidas en %2$d grupos. Se queda la mejor de cada grupo.</item>
+        <item quantity="other">%1$d fotos parecidas en %2$d grupos. Se queda la mejor de cada grupo.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">Revisé %d foto y ninguna se parece.</item>
+        <item quantity="many">Revisé %d de fotos y ninguna se parece.</item>
+        <item quantity="other">Revisé %d fotos y ninguna se parece.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Revisar también %d foto más antigua</item>
+        <item quantity="many">Revisar también %d de fotos más antiguas</item>
+        <item quantity="other">Revisar también %d fotos más antiguas</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d foto</item>
+        <item quantity="many">%1$s · %2$d de fotos</item>
+        <item quantity="other">%1$s · %2$d fotos</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d foto a la Papelera · toca una para conservarla</item>
+        <item quantity="many">%d de fotos a la Papelera · toca una para conservarla</item>
+        <item quantity="other">%d fotos a la Papelera · toca una para conservarla</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">Mover %1$d foto a la Papelera · %2$s</item>
+        <item quantity="many">Mover %1$d de fotos a la Papelera · %2$s</item>
+        <item quantity="other">Mover %1$d fotos a la Papelera · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d foto movida a la Papelera · %2$s</item>
+        <item quantity="many">%1$d de fotos movidas a la Papelera · %2$s</item>
+        <item quantity="other">%1$d fotos movidas a la Papelera · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Abre antes %d grupo uno a uno</item>
+        <item quantity="many">Abre antes %d de grupos uno a uno</item>
+        <item quantity="other">Abre antes %d grupos uno a uno</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d foto parecida se va</item>
+        <item quantity="many">%d de fotos parecidas se van</item>
+        <item quantity="other">%d fotos parecidas se van</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d foto parecida nueva</item>
+        <item quantity="many">%d de fotos parecidas nuevas</item>
+        <item quantity="other">%d fotos parecidas nuevas</item>
+    </plurals>
 </resources>

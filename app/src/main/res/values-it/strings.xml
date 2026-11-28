@@ -1266,4 +1266,84 @@
         <item quantity="many">%d video ridotti</item>
         <item quantity="other">%d video ridotti</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Foto simili</string>
+    <string name="similar_tools_detail">Resta la migliore di ogni gruppo</string>
+    <string name="similar_looking">Guardo le tue foto…</string>
+    <string name="similar_paused">In pausa con l’app in background; riprende quando torni.</string>
+    <string name="similar_none_title">Nessuna foto simile</string>
+    <string name="similar_note_ai">Trovate con l’IA sul dispositivo. Le foto non lasciano il telefono.</string>
+    <string name="similar_model_missing">Il modello foto non si è avviato su questo telefono; nulla è stato raggruppato.</string>
+    <string name="similar_open_first">Apri il primo gruppo</string>
+    <string name="similar_approve_all">Approva tutti i gruppi</string>
+    <string name="similar_free_note">I primi %1$d gruppi sono aperti a tutti. Nulla si sposta senza la tua approvazione.</string>
+    <string name="similar_sub_pro">dal gruppo %1$d: Pro</string>
+    <string name="similar_sub_alike">si somigliano</string>
+    <string name="similar_within_seconds">scattate in %1$d s</string>
+    <string name="similar_within_minutes">scattate in %1$d min</string>
+    <string name="similar_keep_badge">RESTA</string>
+    <string name="similar_also_kept">resta anche</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Non simili</string>
+    <string name="similar_sharpest">La più nitida</string>
+    <string name="similar_skip">Salta questo gruppo</string>
+    <string name="similar_trash_note">Restano 7 giorni nel Cestino; puoi recuperarle.</string>
+    <string name="similar_y7_card">%1$s in foto simili</string>
+    <string name="similar_watch_toggle">Nuove foto simili</string>
+    <string name="similar_watch_toggle_sub">Contate dall’ultimo controllo nell’app</string>
+    <string name="watch_notif_similar_body">Resta la migliore di ogni gruppo; liberi %1$s.</string>
+    <string name="plan_group_similar_photo">Foto simili</string>
+    <string name="reason_similar_photo">È stato tenuto uno scatto simile e migliore</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d scatto simile in %2$d gruppi. Resta il migliore di ogni gruppo.</item>
+        <item quantity="many">%1$d di scatti simili in %2$d gruppi. Resta il migliore di ogni gruppo.</item>
+        <item quantity="other">%1$d scatti simili in %2$d gruppi. Resta il migliore di ogni gruppo.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">Ho guardato %d foto e nessuna si somiglia.</item>
+        <item quantity="many">Ho guardato %d di foto e nessuna si somiglia.</item>
+        <item quantity="other">Ho guardato %d foto e nessuna si somiglia.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Guarda anche %d foto più vecchia</item>
+        <item quantity="many">Guarda anche %d di foto più vecchie</item>
+        <item quantity="other">Guarda anche %d foto più vecchie</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d scatto</item>
+        <item quantity="many">%1$s · %2$d di scatti</item>
+        <item quantity="other">%1$s · %2$d scatti</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d scatto nel Cestino · tocca per tenerlo</item>
+        <item quantity="many">%d di scatti nel Cestino · tocca uno per tenerlo</item>
+        <item quantity="other">%d scatti nel Cestino · tocca uno per tenerlo</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">Sposta %1$d scatto nel Cestino · %2$s</item>
+        <item quantity="many">Sposta %1$d di scatti nel Cestino · %2$s</item>
+        <item quantity="other">Sposta %1$d scatti nel Cestino · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d scatto spostato nel Cestino · %2$s</item>
+        <item quantity="many">%1$d di scatti spostati nel Cestino · %2$s</item>
+        <item quantity="other">%1$d scatti spostati nel Cestino · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Apri prima %d gruppo uno per uno</item>
+        <item quantity="many">Apri prima %d di gruppi uno per uno</item>
+        <item quantity="other">Apri prima %d gruppi uno per uno</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d scatto simile va via</item>
+        <item quantity="many">%d di scatti simili vanno via</item>
+        <item quantity="other">%d scatti simili vanno via</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d nuova foto simile</item>
+        <item quantity="many">%d di nuove foto simili</item>
+        <item quantity="other">%d nuove foto simili</item>
+    </plurals>
 </resources>

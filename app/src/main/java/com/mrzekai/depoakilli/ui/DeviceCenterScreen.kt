@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.VideoFile
@@ -118,6 +119,9 @@ internal fun DeviceCenterScreen(
     /** Faz 3A-2: about how much shrinking saves (null before the first look); the row needs the switch. */
     videoSavingBytes: Long? = null,
     onOpenVideos: (() -> Unit)? = null,
+    /** Faz 3B-1: bytes of the similar frames offered (null before the first look); the row needs the switch. */
+    similarBytes: Long? = null,
+    onOpenSimilar: (() -> Unit)? = null,
 ) {
     val smartPlan = state.smartSummary()?.plan
     fun suggested(tool: SuggestionTool): ToolValue =
@@ -180,6 +184,23 @@ internal fun DeviceCenterScreen(
             suggested(SuggestionTool.DUPLICATES),
             stringResource(R.string.duplicates_tool_subtitle_v050),
         ) { onScan(ScanFocus.DUPLICATES) },
+    ) + listOfNotNull(
+        // Faz 3B-1: similar photos (on-device model); shown only while the switch is on.
+        onOpenSimilar?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE }?.let { open ->
+            ToolRow(
+                stringResource(R.string.similar_title),
+                stringResource(R.string.similar_tools_detail),
+                Icons.Outlined.PhotoLibrary,
+                when (similarBytes) {
+                    null -> ToolValue.Unknown
+                    0L -> ToolValue.Empty
+                    else -> ToolValue.Suggested(similarBytes)
+                },
+                stringResource(R.string.similar_tools_detail),
+                open,
+            )
+        },
+    ) + listOf(
         // Apps and app cache share one screen with two tabs (C4).
         ToolRow(
             stringResource(R.string.home_hard_apps),

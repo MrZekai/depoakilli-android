@@ -1477,4 +1477,114 @@
         <item quantity="many">%d فيديو مصغّرًا</item>
         <item quantity="other">%d فيديو مصغّر</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">صور متشابهة</string>
+    <string name="similar_tools_detail">تبقى الأفضل من كل مجموعة</string>
+    <string name="similar_looking">أنظر في صورك…</string>
+    <string name="similar_paused">متوقف مؤقتًا والتطبيق في الخلفية؛ يتابع عند عودتك.</string>
+    <string name="similar_none_title">لا توجد صور متشابهة</string>
+    <string name="similar_note_ai">عُثر عليها بالذكاء الاصطناعي على الجهاز. لا تغادر صورك هاتفك.</string>
+    <string name="similar_model_missing">تعذّر تشغيل نموذج الصور على هذا الهاتف؛ لم يُجمَّع شيء.</string>
+    <string name="similar_open_first">افتح المجموعة الأولى</string>
+    <string name="similar_approve_all">وافق على كل المجموعات</string>
+    <string name="similar_free_note">أول %1$d مجموعات متاحة للجميع. لا يُنقل شيء دون موافقتك.</string>
+    <string name="similar_sub_pro">من المجموعة %1$d: Pro</string>
+    <string name="similar_sub_alike">متشابهة</string>
+    <string name="similar_within_seconds">التُقطت خلال %1$d ث</string>
+    <string name="similar_within_minutes">التُقطت خلال %1$d د</string>
+    <string name="similar_keep_badge">تبقى</string>
+    <string name="similar_also_kept">تبقى أيضًا</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">غير متشابهة</string>
+    <string name="similar_sharpest">الأوضح</string>
+    <string name="similar_skip">تخطَّ هذه المجموعة</string>
+    <string name="similar_trash_note">تبقى 7 أيام في سلة المهملات؛ يمكنك استعادتها.</string>
+    <string name="similar_y7_card">%1$s في صور متشابهة</string>
+    <string name="similar_watch_toggle">صور متشابهة جديدة</string>
+    <string name="similar_watch_toggle_sub">تُحسب منذ آخر مرة نظرت فيها داخل التطبيق</string>
+    <string name="watch_notif_similar_body">تبقى الأفضل من كل مجموعة؛ تتحرر %1$s.</string>
+    <string name="plan_group_similar_photo">صور متشابهة</string>
+    <string name="reason_similar_photo">احتُفظ بلقطة مشابهة أفضل</string>
+    <plurals name="similar_head_body">
+        <item quantity="zero">%1$d صورة متشابهة في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+        <item quantity="one">%1$d صورة متشابهة في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+        <item quantity="two">%1$d صورتان متشابهتان في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+        <item quantity="few">%1$d صور متشابهة في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+        <item quantity="many">%1$d صورة متشابهة في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+        <item quantity="other">%1$d صورة متشابهة في %2$d مجموعات. تبقى الأفضل من كل مجموعة.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="zero">نظرت في %d صورة ولا توجد صور متشابهة.</item>
+        <item quantity="one">نظرت في %d صورة ولا توجد صور متشابهة.</item>
+        <item quantity="two">نظرت في %d صورتين ولا توجد صور متشابهة.</item>
+        <item quantity="few">نظرت في %d صور ولا توجد صور متشابهة.</item>
+        <item quantity="many">نظرت في %d صورة ولا توجد صور متشابهة.</item>
+        <item quantity="other">نظرت في %d صورة ولا توجد صور متشابهة.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="zero">انظر أيضًا في %d صورة أقدم</item>
+        <item quantity="one">انظر أيضًا في %d صورة أقدم</item>
+        <item quantity="two">انظر أيضًا في %d صورتين أقدم</item>
+        <item quantity="few">انظر أيضًا في %d صور أقدم</item>
+        <item quantity="many">انظر أيضًا في %d صورة أقدم</item>
+        <item quantity="other">انظر أيضًا في %d صورة أقدم</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="zero">%1$s · %2$d صورة</item>
+        <item quantity="one">%1$s · %2$d صورة</item>
+        <item quantity="two">%1$s · %2$d صورتان</item>
+        <item quantity="few">%1$s · %2$d صور</item>
+        <item quantity="many">%1$s · %2$d صورة</item>
+        <item quantity="other">%1$s · %2$d صورة</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="zero">%d صورة إلى السلة · المس واحدة لإبقائها</item>
+        <item quantity="one">%d صورة إلى السلة · المسها لإبقائها</item>
+        <item quantity="two">%d صورتان إلى السلة · المس واحدة لإبقائها</item>
+        <item quantity="few">%d صور إلى السلة · المس واحدة لإبقائها</item>
+        <item quantity="many">%d صورة إلى السلة · المس واحدة لإبقائها</item>
+        <item quantity="other">%d صورة إلى السلة · المس واحدة لإبقائها</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="zero">انقل %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="one">انقل %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="two">انقل %1$d صورتين إلى السلة · %2$s</item>
+        <item quantity="few">انقل %1$d صور إلى السلة · %2$s</item>
+        <item quantity="many">انقل %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="other">انقل %1$d صورة إلى السلة · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="zero">نُقلت %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="one">نُقلت %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="two">نُقلت %1$d صورتان إلى السلة · %2$s</item>
+        <item quantity="few">نُقلت %1$d صور إلى السلة · %2$s</item>
+        <item quantity="many">نُقلت %1$d صورة إلى السلة · %2$s</item>
+        <item quantity="other">نُقلت %1$d صورة إلى السلة · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="zero">افتح أولًا %d مجموعة واحدة تلو الأخرى</item>
+        <item quantity="one">افتح أولًا %d مجموعة واحدة تلو الأخرى</item>
+        <item quantity="two">افتح أولًا %d مجموعتين واحدة تلو الأخرى</item>
+        <item quantity="few">افتح أولًا %d مجموعات واحدة تلو الأخرى</item>
+        <item quantity="many">افتح أولًا %d مجموعة واحدة تلو الأخرى</item>
+        <item quantity="other">افتح أولًا %d مجموعة واحدة تلو الأخرى</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="zero">تذهب %d صورة متشابهة</item>
+        <item quantity="one">تذهب %d صورة متشابهة</item>
+        <item quantity="two">تذهب %d صورتان متشابهتان</item>
+        <item quantity="few">تذهب %d صور متشابهة</item>
+        <item quantity="many">تذهب %d صورة متشابهة</item>
+        <item quantity="other">تذهب %d صورة متشابهة</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="zero">%d صورة متشابهة جديدة</item>
+        <item quantity="one">%d صورة متشابهة جديدة</item>
+        <item quantity="two">%d صورتان متشابهتان جديدتان</item>
+        <item quantity="few">%d صور متشابهة جديدة</item>
+        <item quantity="many">%d صورة متشابهة جديدة</item>
+        <item quantity="other">%d صورة متشابهة جديدة</item>
+    </plurals>
 </resources>

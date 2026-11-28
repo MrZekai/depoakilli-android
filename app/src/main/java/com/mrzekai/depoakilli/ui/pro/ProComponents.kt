@@ -53,6 +53,7 @@ internal fun ProBadge(modifier: Modifier = Modifier) {
 internal fun gainRowLabel(row: ProGainEstimator.Row): String = when (row.kind) {
     ProGainEstimator.Kind.ONE_TAP_PICK -> pluralStringResource(R.plurals.pro_gain_pick, row.count, row.count)
     ProGainEstimator.Kind.VIDEO_COMPRESSION -> pluralStringResource(R.plurals.pro_gain_video, row.count, row.count)
+    ProGainEstimator.Kind.SIMILAR_PHOTOS -> pluralStringResource(R.plurals.pro_gain_similar, row.count, row.count)
 }
 
 /** A gain row's value; estimates say "about". */

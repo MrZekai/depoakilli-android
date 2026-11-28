@@ -1133,4 +1133,64 @@
     <plurals name="video_notif_done_title">
         <item quantity="other">%d video diperkecil</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Foto mirip</string>
+    <string name="similar_tools_detail">Yang terbaik tiap grup tetap</string>
+    <string name="similar_looking">Melihat fotomu…</string>
+    <string name="similar_paused">Dijeda saat aplikasi di latar; lanjut saat kamu kembali.</string>
+    <string name="similar_none_title">Tak ada foto mirip</string>
+    <string name="similar_note_ai">Ditemukan dengan AI di perangkat. Fotomu tak keluar dari ponsel.</string>
+    <string name="similar_model_missing">Model foto tak bisa jalan di ponsel ini; tak ada yang dikelompokkan.</string>
+    <string name="similar_open_first">Buka grup pertama</string>
+    <string name="similar_approve_all">Setujui semua grup</string>
+    <string name="similar_free_note">%1$d grup pertama terbuka untuk semua. Tak ada yang dipindah tanpa persetujuanmu.</string>
+    <string name="similar_sub_pro">mulai grup ke-%1$d: Pro</string>
+    <string name="similar_sub_alike">mirip</string>
+    <string name="similar_within_seconds">diambil dalam %1$d dtk</string>
+    <string name="similar_within_minutes">diambil dalam %1$d mnt</string>
+    <string name="similar_keep_badge">SIMPAN</string>
+    <string name="similar_also_kept">ikut disimpan</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Tidak mirip</string>
+    <string name="similar_sharpest">Paling tajam</string>
+    <string name="similar_skip">Lewati grup ini</string>
+    <string name="similar_trash_note">Menunggu 7 hari di Sampah; bisa dikembalikan.</string>
+    <string name="similar_y7_card">%1$s di foto mirip</string>
+    <string name="similar_watch_toggle">Foto mirip baru</string>
+    <string name="similar_watch_toggle_sub">Dihitung sejak terakhir kamu melihat di aplikasi</string>
+    <string name="watch_notif_similar_body">Yang terbaik tiap grup tetap; %1$s bisa dikosongkan.</string>
+    <string name="plan_group_similar_photo">Foto mirip</string>
+    <string name="reason_similar_photo">Bingkai mirip yang lebih baik disimpan</string>
+    <plurals name="similar_head_body">
+        <item quantity="other">%1$d foto mirip di %2$d grup. Yang terbaik tiap grup tetap.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="other">Aku melihat %d foto; tak ada yang mirip.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="other">Lihat juga %d foto lama</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="other">%1$s · %2$d foto</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="other">%d foto ke Sampah · ketuk untuk ikut menyimpannya</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="other">Pindahkan %1$d foto ke Sampah · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="other">%1$d foto dipindah ke Sampah · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="other">Buka dulu %d grup satu per satu</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="other">%d foto mirip pergi</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="other">%d foto mirip baru</item>
+    </plurals>
 </resources>

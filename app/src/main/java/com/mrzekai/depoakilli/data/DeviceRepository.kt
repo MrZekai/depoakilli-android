@@ -488,6 +488,21 @@ class DeviceRepository(
         trashStore.moveToTrash(file, root, CleanupGroup.LARGE_VIDEO)?.also { invalidateStorageIndex() }
     }
 
+    /**
+     * Faz 3B: frames the user chose (similar photos, one by one) go to the
+     * app's Trash, 7 days, restorable. Only after the user's tap.
+     */
+    suspend fun moveToTrash(paths: List<String>, group: CleanupGroup): List<TrashEntry> = withContext(Dispatchers.IO) {
+        val roots = sharedStorageRoots()
+        val moved = paths.mapNotNull { path ->
+            val file = File(path)
+            val root = roots.firstOrNull { file.absolutePath.startsWith(it.absolutePath + File.separator) } ?: return@mapNotNull null
+            trashStore.moveToTrash(file, root, group)
+        }
+        if (moved.isNotEmpty()) invalidateStorageIndex()
+        moved
+    }
+
     fun trashEntries(): List<TrashEntry> = trashStore.entries()
 
     fun trashBytes(): Long = trashStore.trashBytes()

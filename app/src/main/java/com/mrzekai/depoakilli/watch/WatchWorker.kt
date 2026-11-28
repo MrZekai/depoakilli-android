@@ -67,7 +67,17 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
         } else {
             measured
         }
-        store.addSample(sample)
+        // Faz 3B-1: new similar frames come from the last in-app look; no model runs here.
+        val similarOffered = if (com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE && isPro &&
+            store.state.value.settings.newSimilarAlerts
+        ) {
+            app.similarPhotos.store.deletable()
+        } else {
+            emptyMap()
+        }
+        val freshSimilar = similarOffered.filterKeys { it !in store.state.value.notifiedSimilar }
+        val sampleWithSimilar = sample.copy(newSimilarFrames = freshSimilar.size, newSimilarBytes = freshSimilar.values.sum())
+        store.addSample(sampleWithSimilar)
         val now = System.currentTimeMillis()
         val snapshot = store.state.value
         val (nextThreshold, crossed) = WatchRules.threshold(snapshot.threshold, sample.usedPercent)
@@ -91,18 +101,20 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
             threshold = crossed ?: deferredTopic?.takeIf { stillFull },
             growth = growth,
             newVideoBytes = sample.bigVideoCandidateBytes,
+            newSimilarFrames = sampleWithSimilar.newSimilarFrames,
             history = WatchRules.pruneHistory(snapshot.history, now),
             lastWeeklyWeek = snapshot.lastWeeklyWeek,
         )
         store.update { it.copy(threshold = nextThreshold, history = input.history) }
         when (val decision = WatchRules.decide(input)) {
             is WatchDecision.Send -> {
-                if (WatchNotifier.post(applicationContext, decision.topic, sample, growth)) {
+                if (WatchNotifier.post(applicationContext, decision.topic, sampleWithSimilar, growth)) {
                     store.update {
                         it.copy(
                             history = it.history + SentNotice(decision.topic, now),
                             lastWeeklyWeek = if (decision.topic == WatchTopic.WEEKLY) week else it.lastWeeklyWeek,
                             notifiedVideos = if (decision.topic == WatchTopic.NEW_VIDEOS) it.notifiedVideos + videoPaths else it.notifiedVideos,
+                            notifiedSimilar = if (decision.topic == WatchTopic.NEW_SIMILAR) it.notifiedSimilar + similarOffered.keys else it.notifiedSimilar,
                         )
                     }
                 }

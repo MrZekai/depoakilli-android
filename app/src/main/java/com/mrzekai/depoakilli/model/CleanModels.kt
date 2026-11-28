@@ -71,6 +71,9 @@ enum class CleanupGroup(
     WHATSAPP_OLD_IMAGE(R.string.plan_group_whatsapp_old_image, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH),
     WHATSAPP_OLD_AUDIO(R.string.plan_group_whatsapp_old_audio, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH),
     WHATSAPP_DOCUMENT(R.string.plan_group_whatsapp_document, 0, R.plurals.reason_whatsapp_old, false, DeleteMode.TRASH, groupSelectable = false),
+
+    /** Faz 3B-1: frames moved from a similar-photo group; the engine never assigns it. */
+    SIMILAR_PHOTO(R.string.plan_group_similar_photo, R.string.reason_similar_photo, null, false, DeleteMode.TRASH, groupSelectable = false),
     ;
 
     /** Tier 2 ("My pick", Faz 5C); see [SUGGESTED]. */

@@ -107,6 +107,11 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTierStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/billing/BillingConnect.kt",
     "app/src/main/java/com/mrzekai/depoakilli/video/VideoRules.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/photo/SimilarRules.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/photo/SimilarFinder.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/photo/PhotoEmbedder.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/photo/SimilarScreens.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/photo/SimilarRulesTest.kt",
     "app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressor.kt",
     "app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressionService.kt",
     "app/src/main/java/com/mrzekai/depoakilli/ui/video/VideoShrinkScreens.kt",
@@ -545,6 +550,70 @@ for res_dir in (ROOT / "app/src/main/res").glob("values*"):
                              strings_file.read_text(encoding="utf-8"), re.S):
         if lossless.search(match.group(2)):
             errors.append(f"{res_dir.name}/{match.group(1)}: shrinking lowers the bitrate; never claim no loss or AI")
+
+# Faz 3B-1 similar photos. A frame only ever goes to the app's Trash (from the
+# user's tap); nothing in photo/ deletes a picture. The model is bundled (no
+# download), the app makes no network call, and "AI" wording appears only
+# where a model really runs (allowed keys below). Every surface is behind
+# SIMILAR_PHOTOS_AVAILABLE.
+photo_dir = ROOT / "app/src/main/java/com/mrzekai/depoakilli/photo"
+for photo_file in photo_dir.rglob("*.kt"):
+    photo_src = photo_file.read_text(encoding="utf-8")
+    for forbidden in ("deleteRecursively", "contentResolver.delete", "createDeleteRequest", "createTrashRequest", "deleteIfExists"):
+        if forbidden in photo_src:
+            errors.append(f"photo/{photo_file.name}: photos go only to the app's Trash: {forbidden}")
+    if ".delete()" in photo_src and photo_file.name != "PhotoFeatureCache.kt":
+        errors.append(f"photo/{photo_file.name}: only the feature cache may delete its own file")
+    for forbidden in ("ForegroundService", "startForeground"):
+        if forbidden in photo_src:
+            errors.append(f"photo/{photo_file.name}: similar photos run only while the app is in front, no service")
+similar_repo_src = read("app/src/main/java/com/mrzekai/depoakilli/photo/SimilarRepository.kt")
+if "moveToTrash(chosen.map(PhotoItem::path), CleanupGroup.SIMILAR_PHOTO)" not in similar_repo_src:
+    errors.append("similar frames must go to the app's Trash as SIMILAR_PHOTO")
+if "SIMILAR_PHOTO(" not in read("app/src/main/java/com/mrzekai/depoakilli/model/CleanModels.kt"):
+    errors.append("CleanupGroup.SIMILAR_PHOTO is required")
+pro_gain_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/ProGainEstimator.kt")
+if "const val SIMILAR_PHOTOS_AVAILABLE" not in pro_gain_src or "similarAvailable && similarBytes > 0L" not in pro_gain_src:
+    errors.append("the similar-photo row must sit behind SIMILAR_PHOTOS_AVAILABLE")
+for surface, needle in (
+    ("app/src/main/java/com/mrzekai/depoakilli/ui/DeviceCenterScreen.kt", "SIMILAR_PHOTOS_AVAILABLE"),
+    ("app/src/main/java/com/mrzekai/depoakilli/watch/WatchRules.kt", "SIMILAR_PHOTOS_AVAILABLE"),
+    ("app/src/main/java/com/mrzekai/depoakilli/ui/watch/WatchScreens.kt", "SIMILAR_PHOTOS_AVAILABLE"),
+    ("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt", "SIMILAR_PHOTOS_AVAILABLE && it.groups.isNotEmpty()"),
+):
+    if needle not in read(surface):
+        errors.append(f"{surface}: similar photos must sit behind the switch ({needle})")
+similar_rules_src = read("app/src/main/java/com/mrzekai/depoakilli/photo/SimilarRules.kt")
+for expected in ("const val FREE_GROUPS = 3", "const val VIEW_BEFORE_APPROVE_ALL = 3", "const val FIRST_RUN_PHOTOS = 3_000",
+                 "const val BURST_WINDOW_MILLIS = 60_000L"):
+    if expected not in similar_rules_src:
+        errors.append(f"missing similar-photo rule: {expected}")
+thresholds_src = read("app/src/main/java/com/mrzekai/depoakilli/data/CleaningThresholds.kt")
+for expected in ("const val SIMILAR_COSINE_MIN", "const val DHASH_MAX_DISTANCE", "const val WATCH_NEW_SIMILAR_COUNT = 20"):
+    if expected not in thresholds_src:
+        errors.append(f"missing similar-photo threshold: {expected}")
+model = ROOT / "app/src/main/assets/models/similar_embedder.tflite"
+if not model.is_file():
+    errors.append("the similar-photo model must be bundled (assets/models/similar_embedder.tflite)")
+else:
+    import hashlib
+    if hashlib.sha256(model.read_bytes()).hexdigest() != "bbbb4c51a55a53905af1daec995ca1aae355046f8839bb8c9f5ce9271394bc40":
+        errors.append("assets/models/similar_embedder.tflite is not the measured MediaPipe mobilenet_v3_small embedder")
+# The app itself makes no network call (Faz 3B/3C).
+for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
+    kt_src = kt.read_text(encoding="utf-8")
+    for forbidden in ("java.net.HttpURLConnection", "import java.net.URL", "okhttp3", "com.google.firebase", "retrofit2", "io.ktor"):
+        if forbidden in kt_src:
+            errors.append(f"{kt.name}: no network library or call in the app ({forbidden})")
+ai_words = re.compile(r"[Yy]apay zek|\bAI\b|\bIA\b|\bKI\b|\bИИ\b|الذكاء الاصطناعي|kecerdasan buatan")
+AI_ALLOWED = {"similar_note_ai"}
+for res_dir in (ROOT / "app/src/main/res").glob("values*"):
+    strings_file = res_dir / "strings.xml"
+    if not strings_file.exists():
+        continue
+    for match in re.finditer(r'<(string|plurals) name="([^"]+)"[^>]*>(.*?)</\1>', strings_file.read_text(encoding="utf-8"), re.S):
+        if ai_words.search(match.group(3)) and match.group(2) not in AI_ALLOWED:
+            errors.append(f"{res_dir.name}/{match.group(2)}: 'AI' only where a model really runs")
 
 # No paywall opens by itself: only the openPaywall() taps set it.
 if read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").count("paywallOpen = true") != 1:

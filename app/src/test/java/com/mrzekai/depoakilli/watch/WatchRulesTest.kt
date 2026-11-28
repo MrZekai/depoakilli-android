@@ -32,6 +32,7 @@ class WatchRulesTest {
         settings: WatchSettings = WatchSettings(enabled = true),
         lastWeeklyWeek: Int = 202647,
         now: Long = 20_000 * day,
+        similar: Int = 0,
     ) = WatchDecisionInput(
         nowMillis = now,
         localHour = hour,
@@ -44,7 +45,17 @@ class WatchRulesTest {
         newVideoBytes = 0L,
         history = history,
         lastWeeklyWeek = lastWeeklyWeek,
+        newSimilarFrames = similar,
     )
+
+    @Test
+    fun `new similar photos - Pro only, from 20 frames, after new videos`() {
+        assertEquals(emptyList<WatchTopic>(), WatchRules.candidates(input(similar = 19)))
+        assertEquals(listOf(WatchTopic.NEW_SIMILAR), WatchRules.candidates(input(similar = 20)))
+        assertEquals(emptyList<WatchTopic>(), WatchRules.candidates(input(similar = 50, isPro = false)))
+        val off = WatchSettings(enabled = true, newSimilarAlerts = false)
+        assertEquals(emptyList<WatchTopic>(), WatchRules.candidates(input(similar = 50, settings = off)))
+    }
 
     private fun growth(total: Long, whatsApp: Long = 0L) = WatchGrowth(
         days = 7,

@@ -1208,4 +1208,84 @@
         <item quantity="one">%d vídeo reduzido</item>
         <item quantity="other">%d vídeos reduzidos</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Fotos parecidas</string>
+    <string name="similar_tools_detail">Fica a melhor de cada grupo</string>
+    <string name="similar_looking">Olhando suas fotos…</string>
+    <string name="similar_paused">Pausado com o app em segundo plano; continua quando você voltar.</string>
+    <string name="similar_none_title">Nenhuma foto parecida</string>
+    <string name="similar_note_ai">Encontradas com IA no aparelho. Suas fotos não saem do celular.</string>
+    <string name="similar_model_missing">O modelo de fotos não iniciou neste celular; nada foi agrupado.</string>
+    <string name="similar_open_first">Abrir o primeiro grupo</string>
+    <string name="similar_approve_all">Aprovar todos os grupos</string>
+    <string name="similar_free_note">Os primeiros %1$d grupos são abertos a todos. Nada sai do lugar sem sua aprovação.</string>
+    <string name="similar_sub_pro">a partir do grupo %1$d: Pro</string>
+    <string name="similar_sub_alike">são parecidas</string>
+    <string name="similar_within_seconds">tiradas em %1$d s</string>
+    <string name="similar_within_minutes">tiradas em %1$d min</string>
+    <string name="similar_keep_badge">FICA</string>
+    <string name="similar_also_kept">também fica</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Não são parecidas</string>
+    <string name="similar_sharpest">A mais nítida</string>
+    <string name="similar_skip">Pular este grupo</string>
+    <string name="similar_trash_note">Ficam 7 dias na Lixeira; você pode recuperá-las.</string>
+    <string name="similar_y7_card">%1$s em fotos parecidas</string>
+    <string name="similar_watch_toggle">Novas fotos parecidas</string>
+    <string name="similar_watch_toggle_sub">Contadas desde sua última olhada no app</string>
+    <string name="watch_notif_similar_body">Fica a melhor de cada grupo; libera %1$s.</string>
+    <string name="plan_group_similar_photo">Fotos parecidas</string>
+    <string name="reason_similar_photo">Uma foto parecida e melhor foi mantida</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d foto parecida em %2$d grupos. Fica a melhor de cada grupo.</item>
+        <item quantity="many">%1$d de fotos parecidas em %2$d grupos. Fica a melhor de cada grupo.</item>
+        <item quantity="other">%1$d fotos parecidas em %2$d grupos. Fica a melhor de cada grupo.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">Olhei %d foto e nenhuma é parecida.</item>
+        <item quantity="many">Olhei %d de fotos e nenhuma é parecida.</item>
+        <item quantity="other">Olhei %d fotos e nenhuma é parecida.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Olhar também %d foto mais antiga</item>
+        <item quantity="many">Olhar também %d de fotos mais antigas</item>
+        <item quantity="other">Olhar também %d fotos mais antigas</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d foto</item>
+        <item quantity="many">%1$s · %2$d de fotos</item>
+        <item quantity="other">%1$s · %2$d fotos</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d foto para a Lixeira · toque em uma para mantê-la</item>
+        <item quantity="many">%d de fotos para a Lixeira · toque em uma para mantê-la</item>
+        <item quantity="other">%d fotos para a Lixeira · toque em uma para mantê-la</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">Mover %1$d foto para a Lixeira · %2$s</item>
+        <item quantity="many">Mover %1$d de fotos para a Lixeira · %2$s</item>
+        <item quantity="other">Mover %1$d fotos para a Lixeira · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d foto movida para a Lixeira · %2$s</item>
+        <item quantity="many">%1$d de fotos movidas para a Lixeira · %2$s</item>
+        <item quantity="other">%1$d fotos movidas para a Lixeira · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Abra antes %d grupo um a um</item>
+        <item quantity="many">Abra antes %d de grupos um a um</item>
+        <item quantity="other">Abra antes %d grupos um a um</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d foto parecida sai</item>
+        <item quantity="many">%d de fotos parecidas saem</item>
+        <item quantity="other">%d fotos parecidas saem</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d foto parecida nova</item>
+        <item quantity="many">%d de fotos parecidas novas</item>
+        <item quantity="other">%d fotos parecidas novas</item>
+    </plurals>
 </resources>
