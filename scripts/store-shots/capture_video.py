@@ -62,6 +62,7 @@ def log(m):
 
 
 def shot(locale_dir, name):
+    clear_system_dialogs()
     path = os.path.join(locale_dir, name + ".png")
     with open(path, "wb") as f:
         f.write(subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True, timeout=60).stdout)
@@ -79,6 +80,18 @@ def demo_status_bar():
     qa.sh("settings put global hide_error_dialogs 1")
 
 
+def clear_system_dialogs():
+    for _ in range(3):
+        nodes = qa.dump()
+        if not qa.find(r"isn.t responding|has stopped|keeps stopping", nodes):
+            return
+        btn = qa.find(r"^(Wait|Close app|OK)$", nodes)
+        if btn:
+            qa.tap(btn)
+        else:
+            qa.back()
+
+
 def capture(listing, app_locale, values_dir, index):
     s = strings(values_dir)
     out = os.path.join(OUT, listing)
@@ -93,7 +106,13 @@ def capture(listing, app_locale, values_dir, index):
     qa.sh(f"am force-stop {PKG}")
     qa.sh(f"cmd locale set-app-locales {PKG} --locales {app_locale}")
     qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro on --es watch_target videos")
+    time.sleep(3)
+    clear_system_dialogs()
     button = qa.wait_for(any_rx(s["video_shrink_button@all"]), 90, dismiss=False)
+    if not button:
+        clear_system_dialogs()
+        qa.sh(f"am start -n {PKG}/com.mrzekai.depoakilli.MainActivity --es demo_pro on --es watch_target videos")
+        button = qa.wait_for(any_rx(s["video_shrink_button@all"]), 60, dismiss=False)
     if not button:
         log("Z5 not shown: " + " | ".join(qa.texts()[:15]))
         return False
