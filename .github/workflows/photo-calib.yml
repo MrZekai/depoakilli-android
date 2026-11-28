@@ -1,0 +1,22 @@
+name: Photo threshold calibration
+# Faz 3B: measures the similar-photo thresholds on a synthetic set with the
+# exact model the app bundles. Prints the numbers; stores nothing in the repo.
+on:
+  push:
+    branches: [photo-calib]
+permissions:
+  contents: read
+jobs:
+  calib:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -q mediapipe numpy pillow
+      - name: Model
+        run: |
+          curl -fsSL -o model.tflite https://storage.googleapis.com/mediapipe-models/image_embedder/mobilenet_v3_small/float32/latest/mobilenet_v3_small.tflite
+          sha256sum model.tflite
+      - run: python3 scripts/photo-calibration/calibrate.py model.tflite calib-out
