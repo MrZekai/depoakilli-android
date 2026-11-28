@@ -38,6 +38,7 @@ import com.mrzekai.depoakilli.ui.theme.Ink
 import com.mrzekai.depoakilli.ui.theme.InkSoft
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
+import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
 
 /**
  * Y3 honest paywall: when Pro would clear less than 2 GB on this phone, the

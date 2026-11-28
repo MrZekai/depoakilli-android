@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.sp
 import com.mrzekai.depoakilli.R
 import com.mrzekai.depoakilli.billing.UpgradeOffer
 import com.mrzekai.depoakilli.ui.common.BlackCard
-import com.mrzekai.depoakilli.ui.common.GiantScale
 import com.mrzekai.depoakilli.ui.common.LinkButton
 import com.mrzekai.depoakilli.ui.common.PillButton
 import com.mrzekai.depoakilli.ui.common.PillStyle
 import com.mrzekai.depoakilli.ui.theme.AppWeights
 import com.mrzekai.depoakilli.ui.theme.Black
+import com.mrzekai.depoakilli.ui.theme.GiantScale
 import com.mrzekai.depoakilli.ui.theme.Lime
 import com.mrzekai.depoakilli.ui.theme.OnBlack
 import com.mrzekai.depoakilli.ui.theme.OnBlackSoft
