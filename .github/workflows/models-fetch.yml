@@ -14,7 +14,6 @@ jobs:
     steps:
       - name: Download
         run: |
-          set -e
           mkdir out && cd out
           B=https://storage.googleapis.com/mediapipe-models/image_embedder
           curl -fsSL -o mobilenet_v3_small.tflite $B/mobilenet_v3_small/float32/latest/mobilenet_v3_small.tflite
@@ -33,9 +32,10 @@ jobs:
           find aar -type f | head -100
           find aar -type f \( -name "*.txt" -o -name "*label*" \) -exec sh -c 'echo "== $1"; head -c 300 "$1"; echo' _ {} \;
           strings -n 3 aar/image-labeling-17.0.9.aar/assets/mlkit_label_default_model/mobile_ica_8bit_with_metadata_tflite | tail -600 | tr '\n' '|' | head -c 12000; echo
-          for f in aar/*/AndroidManifest.xml; do echo "== $f"; grep -E "uses-permission|<service|<provider" $f; done
+          for f in aar/*/AndroidManifest.xml; do echo "== $f"; grep -E "uses-permission|<service|<provider" $f || true; done
           for f in $(find aar -name "*.tflite" -o -name "*.bin"); do ls -l $f; strings -n 4 $f | grep -iE "receipt|document|paper|menu|poster|screenshot|text|meme|cartoon|font|handwriting" | sort -u | head -40; done
           rm -rf aar *.aar
+          set +e
           G=https://dl.google.com/dl/android/maven2
           for a in com/android/billingclient/billing/BILLINGV/billing-BILLINGV.aar com/google/android/datatransport/transport-backend-cct/2.3.3/transport-backend-cct-2.3.3.aar com/google/android/datatransport/transport-runtime/2.2.6/transport-runtime-2.2.6.aar com/google/mlkit/common/18.11.0/common-18.11.0.aar com/google/mediapipe/tasks-core/0.10.35/tasks-core-0.10.35.aar com/google/mediapipe/tasks-vision/0.10.35/tasks-vision-0.10.35.aar com/google/android/play/review/2.0.2/review-2.0.2.aar; do
             a=${a//BILLINGV/$BILLINGV}
