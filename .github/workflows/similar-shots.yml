@@ -30,7 +30,7 @@ jobs:
       - name: Make the photo set
         run: |
           pip install -q pillow
-          python3 scripts/store-shots/gen_similar_set.py photo-set 4900
+          python3 scripts/store-shots/gen_similar_set.py photo-set 3000
           du -sh photo-set photo-set-fill
       - name: Enable KVM
         run: |
