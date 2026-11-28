@@ -1,0 +1,81 @@
+name: ML Kit / datatransport proof (Play Store image)
+# Fable review item 1, on google_apis_playstore with network, for the build
+# before (v60) and after (v61) the fix. Text results go to `mlkit-proof-raw`.
+on:
+  push:
+    branches: [mlkit-proof]
+permissions:
+  contents: write
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ref: claude/satis-optimizasyon
+            label: v60-before
+          - ref: claude/fable-duzeltme-61
+            label: v61-after
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ matrix.ref }}
+          path: src
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Build debug APK of ${{ matrix.ref }}
+        working-directory: src
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
+          grep -c CctBackendFactory app/build/intermediates/merged_manifest/debug/*/AndroidManifest.xml || true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: |
+          pip install -q pillow
+          python3 scripts/store-shots/gen_assist_set.py photo-set
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run on a Play Store emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: playstore
+          arch: x86_64
+          profile: pixel_6
+          disk-size: 8000M
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb install -r -g src/app/build/outputs/apk/debug/app-debug.apk
+            python3 scripts/store-shots/mlkit_proof.py photo-set proof-out ${{ matrix.label }} || true
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: proof-${{ matrix.label }}
+          path: proof-out/
+  publish:
+    needs: proof
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: res
+          merge-multiple: true
+      - run: |
+          cd res
+          git init -q -b mlkit-proof-raw
+          git config user.name proof-bot; git config user.email proof-bot@users.noreply.github.com
+          git add -A; git commit -q -m "proof" || exit 0
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" mlkit-proof-raw
