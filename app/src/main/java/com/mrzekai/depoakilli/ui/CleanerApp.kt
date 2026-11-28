@@ -332,6 +332,11 @@ fun CleanerApp(
                 selectedTabIndex = AppTab.HOME.ordinal
                 detailScreen = DetailScreen.VIDEOS
             }
+            // Debug builds only: open a screen directly for store screenshots.
+            "debug_plan" -> if (com.mrzekai.depoakilli.BuildConfig.DEBUG) detailScreen = DetailScreen.PLAN
+            "debug_filters" -> if (com.mrzekai.depoakilli.BuildConfig.DEBUG) detailScreen = DetailScreen.FILTERS
+            "debug_learned" -> if (com.mrzekai.depoakilli.BuildConfig.DEBUG) detailScreen = DetailScreen.LEARNED
+            "debug_paywall" -> if (com.mrzekai.depoakilli.BuildConfig.DEBUG) openPaywall()
             else -> return@LaunchedEffect
         }
         watch.consumeTarget()
