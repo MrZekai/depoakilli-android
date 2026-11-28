@@ -66,7 +66,7 @@ def main():
         d = os.path.join(OUT, listing)
         # 3B-2: blurry/dark one by one
         launch(tag, "similar")
-        bad = find_any(s, ["review_bad_title"], 120, 8)
+        bad = find_any(s, ["review_bad_title"], 120, 14)
         if bad:
             cs.shot(d, "01-review-entries")
             qa.tap(bad)
@@ -80,7 +80,7 @@ def main():
                 check("kötü kareler: giriş kartı var", False)
         # 3B-2: photo types
         launch(tag, "similar")
-        ty = find_any(s, ["types_entry"], 120, 8)
+        ty = find_any(s, ["types_entry"], 120, 14)
         if ty:
             qa.tap(ty)
             time.sleep(3)
@@ -97,6 +97,10 @@ def main():
         # 3C: plan goal + plan
         launch(tag, "debug_plan")
         goal = find_any(s, ["plan_question", "plan_build"], 90, 2)
+        chip = qa.find(r"^\S+\s?GB$")
+        if chip:
+            qa.tap(chip)
+            time.sleep(2)
         cs.shot(d, "05-plan-goal")
         build = qa.scroll_to(cs.rx(s["plan_build"]), 4)
         if build:
@@ -105,7 +109,8 @@ def main():
             cs.shot(d, "06-plan")
         if listing == "en-US":
             check("plan: hedef ekranı açıldı", goal)
-            check("plan: plan kuruldu", build)
+            check("plan: hedef seçildi", chip)
+            check("plan: plan kuruldu", build and qa.find(cs.rx(s["plan_build"])) is None)
         # 3C: filters, learned
         launch(tag, "debug_filters")
         fl = find_any(s, ["filters_pick", "filters_label"], 60, 1)
