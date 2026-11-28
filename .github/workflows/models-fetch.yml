@@ -1,0 +1,32 @@
+name: Fetch on-device models
+# One-off helper: downloads the MediaPipe image embedder model and the latest
+# library versions, and pushes them to the `models-raw` branch (no app code).
+on:
+  push:
+    branches: [models-fetch]
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download
+        run: |
+          set -e
+          mkdir out && cd out
+          B=https://storage.googleapis.com/mediapipe-models/image_embedder
+          curl -fsSL -o mobilenet_v3_small.tflite $B/mobilenet_v3_small/float32/latest/mobilenet_v3_small.tflite
+          curl -fsSL -o mobilenet_v3_large.tflite $B/mobilenet_v3_large/float32/latest/mobilenet_v3_large.tflite || true
+          for a in com/google/mediapipe/tasks-vision com/google/mlkit/face-detection com/google/mlkit/image-labeling; do
+            curl -fsSL https://dl.google.com/dl/android/maven2/$a/maven-metadata.xml | grep -oE "<(latest|release)>[^<]+" | sed "s|^|$a |" >> versions.txt || echo "$a ?" >> versions.txt
+          done
+          curl -fsSL https://dl.google.com/dl/android/maven2/com/google/mediapipe/tasks-vision/maven-metadata.xml -o tasks-vision-meta.xml || true
+          sha256sum *.tflite > SHA256SUMS
+          ls -l; cat versions.txt
+      - name: Push
+        run: |
+          cd out
+          git init -q -b models-raw
+          git config user.name "models-bot"; git config user.email "models-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "models ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" models-raw
