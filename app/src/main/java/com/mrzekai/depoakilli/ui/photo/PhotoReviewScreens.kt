@@ -82,6 +82,7 @@ internal fun PhotoReviewScreen(
     val total = remember { photos.size.coerceAtLeast(1) }
     val current = photos.firstOrNull()
     val left = actions.decisionsLeft
+    val failedText = stringResource(R.string.review_move_failed)
     Column(Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
         Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -154,7 +155,7 @@ internal fun PhotoReviewScreen(
                             if (actions.isPro) actions.onProBytes(moved)
                             index++
                         } else {
-                            Toast.makeText(context, context.getString(R.string.review_move_failed), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, failedText, Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
