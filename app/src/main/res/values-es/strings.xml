@@ -1288,4 +1288,47 @@
         <item quantity="many">%d de fotos parecidas nuevas</item>
         <item quantity="other">%d fotos parecidas nuevas</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d fotos</string>
+    <string name="review_keep">Conservar</string>
+    <string name="review_trash">A la Papelera</string>
+    <string name="review_keep_if_meant">Consérvala si la hiciste a propósito.</string>
+    <string name="review_keep_if_needed">Consérvala si aún la necesitas.</string>
+    <string name="review_important">Podría ser un documento importante.</string>
+    <string name="review_blurry">Parece borrosa</string>
+    <string name="review_dark">Parece oscura</string>
+    <string name="review_document">Documento o recibo</string>
+    <string name="review_meme">Captura o meme</string>
+    <string name="review_no_bulk">Aquí no hay borrado en bloque; decides cada foto.</string>
+    <string name="review_all_done">Aquí ya está todo</string>
+    <string name="review_done">Listo</string>
+    <string name="review_move_failed">No se pudo mover esta foto.</string>
+    <string name="review_bad_title">Borrosas y oscuras</string>
+    <string name="types_entry">Tipos de foto</string>
+    <string name="types_title">Trabajo escondido en tu galería</string>
+    <string name="types_body">No son recuerdos, sino fotos de trámite. De más de 30 días.</string>
+    <string name="types_documents">Fotos de documentos y recibos</string>
+    <string name="types_screenshots">Capturas de pantalla</string>
+    <string name="types_memes">Capturas y memes</string>
+    <string name="types_important_note">puede haber documentos importantes</string>
+    <string name="types_note_ai">Los tipos los separó la IA del dispositivo. Te muestro cada una; si algo parece un documento de identidad o dinero, te aviso aparte.</string>
+    <string name="types_show">Mostrar una a una</string>
+    <string name="similar_eyes_closed">ojos cerrados</string>
+    <string name="similar_eyes_open">ojos abiertos</string>
+    <string name="plan_group_bad_shot">Fotos borrosas y oscuras</string>
+    <string name="reason_bad_shot">Parecía borrosa u oscura</string>
+    <string name="plan_group_photo_type">Fotos de documentos y memes</string>
+    <string name="reason_photo_type">Parecía un documento o un meme</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">Hoy te queda %d decisión</item>
+        <item quantity="many">Hoy te quedan %d de decisiones</item>
+        <item quantity="other">Hoy te quedan %d decisiones</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d foto</item>
+        <item quantity="many">%d de fotos</item>
+        <item quantity="other">%d fotos</item>
+    </plurals>
 </resources>

@@ -233,6 +233,11 @@ class CleanerViewModel internal constructor(
         freeTierStore?.markVideoTrialUsed()
     }
 
+    /** Faz 3B-2: one one-by-one photo decision (keep or Trash). */
+    fun countPhotoDecision() {
+        freeTierStore?.countDecision()
+    }
+
     /** Faz 3B-1: a similar-photo group was cleaned without Pro. */
     fun markSimilarGroupUsed() {
         freeTierStore?.markSimilarGroupUsed()

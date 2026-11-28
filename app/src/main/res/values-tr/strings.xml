@@ -1018,4 +1018,44 @@
         <item quantity="one">%d yeni benzer fotoğraf</item>
         <item quantity="other">%d yeni benzer fotoğraf</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <string name="review_position">%1$d / %2$d fotoğraf</string>
+    <string name="review_keep">Kalsın</string>
+    <string name="review_trash">Çöp’e</string>
+    <string name="review_keep_if_meant">Bilerek çektiysen tut.</string>
+    <string name="review_keep_if_needed">Hâlâ gerekiyorsa tut.</string>
+    <string name="review_important">Önemli belge olabilir.</string>
+    <string name="review_blurry">Bulanık görünüyor</string>
+    <string name="review_dark">Karanlık görünüyor</string>
+    <string name="review_document">Belge ya da fiş</string>
+    <string name="review_meme">Ekran alıntısı ya da mem</string>
+    <string name="review_no_bulk">Bu grupta toplu silme yok; her fotoğrafa sen karar verirsin.</string>
+    <string name="review_all_done">Burada iş bitti</string>
+    <string name="review_done">Tamam</string>
+    <string name="review_move_failed">Bu fotoğraf taşınamadı.</string>
+    <string name="review_bad_title">Bulanık ve karanlık</string>
+    <string name="types_entry">Fotoğraf türleri</string>
+    <string name="types_title">Galerinde saklanmış işler</string>
+    <string name="types_body">Anı değil, iş için çekilenler. 30 günden eski olanlar.</string>
+    <string name="types_documents">Belge ve fiş fotoğrafları</string>
+    <string name="types_screenshots">Ekran görüntüleri</string>
+    <string name="types_memes">Ekran alıntıları ve mem</string>
+    <string name="types_important_note">önemli belge olabilir</string>
+    <string name="types_note_ai">Türler cihaz içi yapay zekâ ile ayrıldı. Hepsini tek tek gösteririm; kimlik ya da para gibi görünenlerde ayrıca uyarırım.</string>
+    <string name="types_show">Sırayla göster</string>
+    <string name="similar_eyes_closed">gözler kapalı</string>
+    <string name="similar_eyes_open">gözler açık</string>
+    <string name="plan_group_bad_shot">Bulanık ve karanlık fotoğraflar</string>
+    <string name="reason_bad_shot">Bulanık ya da karanlık görünüyordu</string>
+    <string name="plan_group_photo_type">Belge ve mem fotoğrafları</string>
+    <string name="reason_photo_type">Belge ya da mem gibi görünüyordu</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">Bugün %d karar kaldı</item>
+        <item quantity="other">Bugün %d karar kaldı</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d fotoğraf</item>
+        <item quantity="other">%d fotoğraf</item>
+    </plurals>
 </resources>

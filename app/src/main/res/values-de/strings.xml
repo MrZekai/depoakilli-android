@@ -1269,4 +1269,45 @@
         <item quantity="one">%d neues ähnliches Foto</item>
         <item quantity="other">%d neue ähnliche Fotos</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-2 Bad shots and photo types: draft translation, needs a native review -->
+    <string name="review_position">%1$d / %2$d Fotos</string>
+    <string name="review_keep">Behalten</string>
+    <string name="review_trash">In den Papierkorb</string>
+    <string name="review_keep_if_meant">Behalte es, wenn es Absicht war.</string>
+    <string name="review_keep_if_needed">Behalte es, wenn du es noch brauchst.</string>
+    <string name="review_important">Könnte ein wichtiges Dokument sein.</string>
+    <string name="review_blurry">Wirkt unscharf</string>
+    <string name="review_dark">Wirkt dunkel</string>
+    <string name="review_document">Dokument oder Beleg</string>
+    <string name="review_meme">Bildschirmfoto oder Meme</string>
+    <string name="review_no_bulk">Hier gibt es kein Sammellöschen; du entscheidest bei jedem Foto.</string>
+    <string name="review_all_done">Hier ist alles erledigt</string>
+    <string name="review_done">Fertig</string>
+    <string name="review_move_failed">Dieses Foto konnte nicht verschoben werden.</string>
+    <string name="review_bad_title">Unscharf und dunkel</string>
+    <string name="types_entry">Fotoarten</string>
+    <string name="types_title">Arbeit in deiner Galerie</string>
+    <string name="types_body">Keine Erinnerungen, sondern Fotos für etwas Erledigtes. Älter als 30 Tage.</string>
+    <string name="types_documents">Fotos von Dokumenten und Belegen</string>
+    <string name="types_screenshots">Screenshots</string>
+    <string name="types_memes">Bildschirmfotos und Memes</string>
+    <string name="types_important_note">evtl. wichtige Dokumente</string>
+    <string name="types_note_ai">Die Arten hat die KI auf dem Gerät sortiert. Ich zeige dir jedes Foto; bei allem, was wie ein Ausweis oder Geld aussieht, warne ich extra.</string>
+    <string name="types_show">Einzeln zeigen</string>
+    <string name="similar_eyes_closed">Augen zu</string>
+    <string name="similar_eyes_open">Augen offen</string>
+    <string name="plan_group_bad_shot">Unscharfe und dunkle Fotos</string>
+    <string name="reason_bad_shot">Wirkte unscharf oder dunkel</string>
+    <string name="plan_group_photo_type">Fotos von Dokumenten und Memes</string>
+    <string name="reason_photo_type">Sah aus wie ein Dokument oder Meme</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">Heute noch %d Entscheidung</item>
+        <item quantity="other">Heute noch %d Entscheidungen</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d Foto</item>
+        <item quantity="other">%d Fotos</item>
+    </plurals>
 </resources>

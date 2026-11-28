@@ -706,6 +706,16 @@ fun CleanerApp(
                                 onOpenPaywall = ::openPaywall,
                                 onFreeGroupUsed = { viewModel.markSimilarGroupUsed() },
                                 onProBytes = { bytes -> viewModel.addProBytes(bytes) },
+                                decisionsLeft = com.mrzekai.depoakilli.ui.photo.decisionsLeft(pro.isPro, state.freeTier.decisionsToday()),
+                                onDecision = { viewModel.countPhotoDecision() },
+                                screenshots = state.summary.items
+                                    .filter { it.assessment.group == com.mrzekai.depoakilli.model.CleanupGroup.SCREENSHOT }
+                                    .takeIf { it.isNotEmpty() }
+                                    ?.let { list -> list.size to list.sumOf { it.sizeBytes } },
+                                onOpenScreenshots = {
+                                    viewModel.openSwipeReview(com.mrzekai.depoakilli.model.CleanupGroup.SCREENSHOT)
+                                    detailScreen = DetailScreen.CLEAN_RESULTS
+                                },
                             ),
                             modifier = Modifier,
                         )

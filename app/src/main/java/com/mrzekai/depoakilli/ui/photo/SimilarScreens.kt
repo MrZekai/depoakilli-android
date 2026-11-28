@@ -86,6 +86,10 @@ import java.text.DateFormat
 import java.util.Date
 import kotlinx.coroutines.launch
 
+private const val MODE_BAD = "bad"
+private const val MODE_TYPES = "types"
+private const val MODE_TYPES_REVIEW = "types_review"
+
 /** What the similar-photo screens need from the app. */
 internal data class SimilarActions(
     val isPro: Boolean,
@@ -95,6 +99,12 @@ internal data class SimilarActions(
     val onFreeGroupUsed: () -> Unit,
     /** Pro: moved bytes count into this month's figure (Y5). */
     val onProBytes: (Long) -> Unit,
+    /** Faz 3B-2: one-by-one decisions left today (null with Pro) and counting one. */
+    val decisionsLeft: Int? = null,
+    val onDecision: () -> Unit = {},
+    /** Faz 3B-2: the scan's old screenshots (count, bytes) and opening their review. */
+    val screenshots: Pair<Int, Long>? = null,
+    val onOpenScreenshots: (() -> Unit)? = null,
 )
 
 /**
@@ -114,10 +124,36 @@ internal fun SimilarPhotosFlow(repo: SimilarRepository, actions: SimilarActions,
         if (index >= freeLeft) actions.onOpenPaywall() else open = groups[index].key
     }
 
-    androidx.activity.compose.BackHandler(enabled = open != null) { open = null }
+    var mode by rememberSaveable { mutableStateOf<String?>(null) }
+    androidx.activity.compose.BackHandler(enabled = open != null || mode != null) {
+        if (mode == MODE_TYPES_REVIEW) mode = MODE_TYPES else if (mode != null) mode = null else open = null
+    }
     PageFrame(modifier = modifier) {
         val index = groups.indexOfFirst { it.key == open }
-        if (open != null && index >= 0) {
+        val typed = result?.typed.orEmpty()
+        if (mode == MODE_BAD && result != null) {
+            PhotoReviewScreen(
+                photos = result.badShots,
+                repo = repo,
+                actions = actions,
+                onDone = { mode = null },
+            )
+        } else if (mode == MODE_TYPES && result != null) {
+            PhotoTypesScreen(
+                documents = typed.filter { it.type == com.mrzekai.depoakilli.photo.PhotoReviewRules.PhotoType.DOCUMENT },
+                memes = typed.filter { it.type == com.mrzekai.depoakilli.photo.PhotoReviewRules.PhotoType.MEME },
+                screenshots = actions.screenshots,
+                onOpenScreenshots = actions.onOpenScreenshots,
+                onShow = { mode = MODE_TYPES_REVIEW },
+            )
+        } else if (mode == MODE_TYPES_REVIEW && result != null) {
+            PhotoReviewScreen(
+                photos = typed.sortedBy { it.type },
+                repo = repo,
+                actions = actions,
+                onDone = { mode = MODE_TYPES },
+            )
+        } else if (open != null && index >= 0) {
             GroupScreen(
                 group = groups[index],
                 position = index + 1,
@@ -131,9 +167,10 @@ internal fun SimilarPhotosFlow(repo: SimilarRepository, actions: SimilarActions,
                     val stillFree = if (actions.isPro) Int.MAX_VALUE else (SimilarRules.FREE_GROUPS - used).coerceAtLeast(0)
                     open = list.getOrNull(next)?.key?.takeIf { next < stillFree }
                 },
+                eyesClosed = result?.eyesClosed.orEmpty(),
             )
         } else {
-            ListScreen(state, result, groups, actions, freeLeft, repo, onOpen = ::openGroup)
+            ListScreen(state, result, groups, actions, freeLeft, repo, onOpen = ::openGroup, onMode = { mode = it })
         }
     }
 }
@@ -147,6 +184,7 @@ private fun ListScreen(
     freeLeft: Int,
     repo: SimilarRepository,
     onOpen: (Int) -> Unit,
+    onMode: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -234,6 +272,25 @@ private fun ListScreen(
                         )
                     }
                 }
+            }
+        }
+        // Faz 3B-2: one-by-one reviews, behind their switches.
+        if (com.mrzekai.depoakilli.pro.ProGainEstimator.BAD_SHOTS_AVAILABLE && result.badShots.isNotEmpty()) {
+            item(key = "bad") {
+                ReviewEntryCard(
+                    stringResource(R.string.review_bad_title),
+                    pluralStringResource(R.plurals.types_photo_count, result.badShots.size, result.badShots.size),
+                    result.badShots.sumOf { it.item.sizeBytes },
+                ) { onMode(MODE_BAD) }
+            }
+        }
+        if (com.mrzekai.depoakilli.pro.ProGainEstimator.PHOTO_TYPES_AVAILABLE && result.typed.isNotEmpty()) {
+            item(key = "types") {
+                ReviewEntryCard(
+                    stringResource(R.string.types_entry),
+                    pluralStringResource(R.plurals.types_photo_count, result.typed.size, result.typed.size),
+                    result.typed.sumOf { it.item.sizeBytes },
+                ) { onMode(MODE_TYPES) }
             }
         }
         if (result.photosLeft > 0) {
@@ -385,6 +442,7 @@ private fun GroupScreen(
     repo: SimilarRepository,
     actions: SimilarActions,
     onNext: (removed: Boolean, usedFree: Boolean) -> Unit,
+    eyesClosed: Set<Long> = emptySet(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -418,7 +476,11 @@ private fun GroupScreen(
             Box(Modifier.fillMaxWidth()) {
                 PhotoTile(group.keeper, Modifier.fillMaxWidth().aspectRatio(1f), keeper = true)
                 Text(
-                    stringResource(R.string.similar_sharpest) + " · " + ByteFormatter.format(group.keeper.sizeBytes),
+                    listOfNotNull(
+                        stringResource(R.string.similar_sharpest),
+                        stringResource(R.string.similar_eyes_open).takeIf { group.keeper.id !in eyesClosed && group.members.any { it.id in eyesClosed } },
+                        ByteFormatter.format(group.keeper.sizeBytes),
+                    ).joinToString(" · "),
                     color = OnBlack,
                     fontSize = 13.sp,
                     fontWeight = AppWeights.Title,
@@ -455,7 +517,11 @@ private fun GroupScreen(
                                 .semantics { stateDescription = desc },
                             checked = checked,
                             small = true,
-                            label = if (edited || !checked) stringResource(R.string.similar_also_kept) else null,
+                            label = when {
+                                edited || !checked -> stringResource(R.string.similar_also_kept)
+                                item.id in eyesClosed -> stringResource(R.string.similar_eyes_closed)
+                                else -> null
+                            },
                         )
                     }
                     repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }

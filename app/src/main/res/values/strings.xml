@@ -1018,4 +1018,44 @@
         <item quantity="one">%d new similar photo</item>
         <item quantity="other">%d new similar photos</item>
     </plurals>
+
+    <!-- Faz 3B-2 Bad shots and photo types -->
+    <string name="review_position">%1$d / %2$d photos</string>
+    <string name="review_keep">Keep</string>
+    <string name="review_trash">To Trash</string>
+    <string name="review_keep_if_meant">Keep it if you meant it.</string>
+    <string name="review_keep_if_needed">Keep it if you still need it.</string>
+    <string name="review_important">Might be an important document.</string>
+    <string name="review_blurry">Looks blurry</string>
+    <string name="review_dark">Looks dark</string>
+    <string name="review_document">Document or receipt</string>
+    <string name="review_meme">Screen capture or meme</string>
+    <string name="review_no_bulk">No bulk delete here; you decide each photo.</string>
+    <string name="review_all_done">All done here</string>
+    <string name="review_done">Done</string>
+    <string name="review_move_failed">Couldn’t move this photo.</string>
+    <string name="review_bad_title">Blurry and dark</string>
+    <string name="types_entry">Photo types</string>
+    <string name="types_title">Work hidden in your gallery</string>
+    <string name="types_body">Not memories, taken for a task. Older than 30 days.</string>
+    <string name="types_documents">Document and receipt photos</string>
+    <string name="types_screenshots">Screenshots</string>
+    <string name="types_memes">Screen captures and memes</string>
+    <string name="types_important_note">may be important documents</string>
+    <string name="types_note_ai">Types were sorted by on-device AI. I show each one; for anything that looks like an ID or money I warn you separately.</string>
+    <string name="types_show">Show one by one</string>
+    <string name="similar_eyes_closed">eyes closed</string>
+    <string name="similar_eyes_open">eyes open</string>
+    <string name="plan_group_bad_shot">Blurry and dark photos</string>
+    <string name="reason_bad_shot">Looked blurry or dark</string>
+    <string name="plan_group_photo_type">Document and meme photos</string>
+    <string name="reason_photo_type">Looked like a document or a meme</string>
+    <plurals name="review_decisions_left">
+        <item quantity="one">%d decision left today</item>
+        <item quantity="other">%d decisions left today</item>
+    </plurals>
+    <plurals name="types_photo_count">
+        <item quantity="one">%d photo</item>
+        <item quantity="other">%d photos</item>
+    </plurals>
 </resources>

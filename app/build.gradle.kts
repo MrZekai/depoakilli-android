@@ -28,7 +28,7 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 57
+        versionCode = 58
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -192,6 +192,9 @@ dependencies {
     implementation(libs.androidx.media3.transformer)
     // Faz 3B-1: on-device image embedder (similar photos). No network use by the app.
     implementation(libs.mediapipe.tasks.vision)
+    // Faz 3B-2: bundled ML Kit models (closed eyes inside similar groups, photo types).
+    implementation(libs.mlkit.face.detection)
+    implementation(libs.mlkit.image.labeling)
     // The daily trash purge.
     implementation(libs.androidx.work.runtime)
 

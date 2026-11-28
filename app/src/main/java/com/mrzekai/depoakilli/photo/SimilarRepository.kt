@@ -36,6 +36,11 @@ class SimilarStore(context: Context) {
      * Frames the last in-app look offered (MediaStore id -> bytes), for the
      * Watch: no model runs in the background.
      */
+    /** Faz 3B-2: photos kept in a one-by-one review (ids); not asked again. */
+    fun reviewedKeep(): Set<Long> = readSet(K_KEPT).mapNotNullTo(HashSet()) { it.toLongOrNull() }
+
+    fun keep(id: Long) = writeSet(K_KEPT, (readSet(K_KEPT) + id.toString()).toList().takeLast(10_000).toSet())
+
     fun deletable(): Map<String, Long> = readSet(K_DELETABLE).associate { e ->
         e.substringBefore('|') to (e.substringAfter('|').toLongOrNull() ?: 0L)
     }
@@ -56,6 +61,7 @@ class SimilarStore(context: Context) {
         const val K_DISMISSED = "dismissed"
         const val K_VIEWED = "viewed"
         const val K_DELETABLE = "deletable"
+        const val K_KEPT = "reviewed_keep"
     }
 }
 
@@ -90,6 +96,7 @@ class SimilarRepository(private val appContext: Context) {
             val result = finder.find(
                 all = all,
                 dismissed = store.dismissed(),
+                reviewedKeep = store.reviewedKeep(),
                 onProgress = { p -> if (_state.value !is SimilarState.Ready || all) _state.value = SimilarState.Looking(p.done, p.total) },
                 shouldStop = { stopRequested },
             )
@@ -149,6 +156,30 @@ class SimilarRepository(private val appContext: Context) {
     private fun drop(group: SimilarGroup) {
         val ready = _state.value as? SimilarState.Ready ?: return
         publish(ready.result.copy(groups = ready.result.groups.filter { it.key != group.key }))
+    }
+
+    /** Faz 3B-2: one photo kept in a one-by-one review. */
+    fun keepReviewed(photo: ReviewPhoto) {
+        store.keep(photo.item.id)
+        dropReview(photo)
+    }
+
+    /** Faz 3B-2: one photo to the app's Trash (7 days). Returns the moved bytes. */
+    suspend fun trashReviewed(photo: ReviewPhoto): Long = withContext(Dispatchers.IO) {
+        val group = if (photo.badKind != null) CleanupGroup.BAD_SHOT else CleanupGroup.PHOTO_TYPE
+        val entries = DeviceRepository(appContext).moveToTrash(listOf(photo.item.path), group)
+        if (entries.isNotEmpty()) dropReview(photo)
+        entries.sumOf { it.sizeBytes }
+    }
+
+    private fun dropReview(photo: ReviewPhoto) {
+        val ready = _state.value as? SimilarState.Ready ?: return
+        _state.value = SimilarState.Ready(
+            ready.result.copy(
+                badShots = ready.result.badShots.filter { it.item.id != photo.item.id },
+                typed = ready.result.typed.filter { it.item.id != photo.item.id },
+            ),
+        )
     }
 
     fun reset() {

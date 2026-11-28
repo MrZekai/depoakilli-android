@@ -83,7 +83,7 @@ internal fun planGroupIcon(group: CleanupGroup?): ImageVector = when (group) {
     CleanupGroup.DOWNLOAD_MEDIA -> Icons.Outlined.Movie
     CleanupGroup.SCREEN_RECORDING -> Icons.Outlined.Videocam
     CleanupGroup.SCREENSHOT -> Icons.Outlined.Screenshot
-    CleanupGroup.RAW_COPY, CleanupGroup.SIMILAR_PHOTO -> Icons.Outlined.CameraAlt
+    CleanupGroup.RAW_COPY, CleanupGroup.SIMILAR_PHOTO, CleanupGroup.BAD_SHOT, CleanupGroup.PHOTO_TYPE -> Icons.Outlined.CameraAlt
     CleanupGroup.OTHER_APP_MEDIA,
     CleanupGroup.WHATSAPP_SENT,
     CleanupGroup.WHATSAPP_STATUS,

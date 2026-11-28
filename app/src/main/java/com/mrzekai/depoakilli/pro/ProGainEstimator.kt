@@ -26,6 +26,14 @@ object ProGainEstimator {
      */
     const val SIMILAR_PHOTOS_AVAILABLE = true
 
+    /**
+     * Faz 3B-2: blurry/dark shots and closed eyes (inside similar groups), and
+     * photo types (documents, memes). Offered one by one only; they never add
+     * a gain row here (the user may keep most of them).
+     */
+    const val BAD_SHOTS_AVAILABLE = true
+    const val PHOTO_TYPES_AVAILABLE = true
+
     enum class Kind {
         /** "My pick" cleaned with one tap (after the first, free cleanup). */
         ONE_TAP_PICK,

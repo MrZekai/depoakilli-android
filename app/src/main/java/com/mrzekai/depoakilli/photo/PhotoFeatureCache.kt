@@ -22,6 +22,8 @@ class PhotoFeatureCache(context: Context) {
         val luma: Float,
         var embedding: ByteArray?,
         var eyesOpen: Float = NO_VALUE,
+        /** Faz 3B-2 photo type, see [PhotoReviewRules.encodeType]; -1 not looked at yet. */
+        var typeCode: Int = -1,
     )
 
     private val entries: LinkedHashMap<String, Entry> = load()
@@ -59,6 +61,7 @@ class PhotoFeatureCache(context: Context) {
                     out.writeDouble(e.sharpness)
                     out.writeFloat(e.luma)
                     out.writeFloat(e.eyesOpen)
+                    out.writeByte(e.typeCode)
                     val emb = e.embedding
                     out.writeShort(emb?.size ?: 0)
                     if (emb != null) out.write(emb)
@@ -80,9 +83,10 @@ class PhotoFeatureCache(context: Context) {
                 val sharp = input.readDouble()
                 val luma = input.readFloat()
                 val eyes = input.readFloat()
+                val type = input.readByte().toInt()
                 val n = input.readShort().toInt()
                 val emb = if (n > 0) ByteArray(n).also { input.readFully(it) } else null
-                map[k] = Entry(hash, sharp, luma, emb, eyes)
+                map[k] = Entry(hash, sharp, luma, emb, eyes, type)
             }
         }
         map
@@ -97,8 +101,11 @@ class PhotoFeatureCache(context: Context) {
     }
 
     companion object {
-        private const val VERSION = 1
+        private const val VERSION = 2
         private const val MAX_ENTRIES = 30_000
         const val NO_VALUE = -1f
+
+        /** Looked at, no face. */
+        const val NO_FACE = -2f
     }
 }
