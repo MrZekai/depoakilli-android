@@ -65,6 +65,10 @@ class SimilarStore(context: Context) {
  * Moving to the Trash happens only from the user's tap.
  */
 class SimilarRepository(private val appContext: Context) {
+    private companion object {
+        const val TAG = "SmartCleanerPhotos"
+    }
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val finder = SimilarFinder(appContext)
     val store = SimilarStore(appContext)
@@ -82,6 +86,7 @@ class SimilarRepository(private val appContext: Context) {
         lastAll = all
         if (_state.value !is SimilarState.Ready || all) _state.value = SimilarState.Looking(0, 1)
         job = scope.launch {
+            val started = android.os.SystemClock.elapsedRealtime()
             val result = finder.find(
                 all = all,
                 dismissed = store.dismissed(),
@@ -93,6 +98,15 @@ class SimilarRepository(private val appContext: Context) {
                 return@launch
             }
             pausedAll = null
+            // Counts and time only (no names) so QA can read the run from logcat.
+            android.util.Log.w(
+                TAG,
+                "similar: looked=${result.photosLooked} groups=${result.groups.size} frames=${result.trashCount} " +
+                    "bytes=${result.trashBytes} ms=${android.os.SystemClock.elapsedRealtime() - started} model=${!result.modelMissing}",
+            )
+            if (com.mrzekai.depoakilli.BuildConfig.DEBUG) {
+                result.groups.forEach { g -> android.util.Log.w(TAG, "similar group: " + g.members.joinToString(",") { it.name }) }
+            }
             publish(result)
         }
     }

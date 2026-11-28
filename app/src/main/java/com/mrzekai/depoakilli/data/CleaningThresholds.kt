@@ -60,6 +60,15 @@ object CleaningThresholds {
     /** Faz 3B-1 Watch: new deletable similar frames since the last notice. */
     const val WATCH_NEW_SIMILAR_COUNT = 20
 
+    /**
+     * Faz 3B-2 bad shots (classic image processing on a 256 px thumbnail).
+     * Measured on the synthetic set: Laplacian variance below 40 caught 75 %
+     * of the blurry photos with no false alarm among 60 sharp ones; mean
+     * brightness below 30 caught 97 % of the dark ones with no false alarm.
+     */
+    const val BLUR_VARIANCE_MAX = 40.0
+    const val DARK_LUMA_MAX = 30.0
+
     /** Faz 3B-2: a face's eyes count as open from this probability. */
     const val EYES_OPEN_MIN = 0.5f
 
