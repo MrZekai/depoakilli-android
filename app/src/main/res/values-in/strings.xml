@@ -1017,7 +1017,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_videos">Video besar baru</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_videos_soon">Hadir bersama fitur pengecil video.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off">Nyalakan notifikasi</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1051,5 +1050,87 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <plurals name="watch_pro_sent">
         <item quantity="other">Penjaga memberi tahu %1$d kali bulan ini</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2 video shrinking: draft translation, needs a native review -->
+    <string name="video_title">Perkecil video</string>
+    <string name="video_tools_detail">Kosongkan ruang tanpa menghapus</string>
+    <string name="video_y7_card">Sekitar %1$s tanpa menghapus</string>
+    <string name="video_head_label">Sekitar, tanpa menghapus</string>
+    <string name="video_about">sekitar %1$s</string>
+    <string name="video_select_all">Pilih semua</string>
+    <string name="video_select_none">Semua dipilih</string>
+    <string name="video_note_originals">Aslinya tetap ada sampai kamu melihat hasilnya dan menyetujui.</string>
+    <string name="video_note_backup">Aplikasi cadangan fotomu mungkin juga mengunggah file baru.</string>
+    <string name="video_try_one">Coba satu tanpa biaya</string>
+    <string name="video_looking">Melihat video besarmu…</string>
+    <string name="video_none_title">Tak ada video yang layak diperkecil</string>
+    <string name="video_none_body">Aku melihat video %1$s ke atas. Punyamu sudah ringkas atau jenis yang tak kusentuh (HDR, gerak lambat, 360°).</string>
+    <string name="video_no_room">Ruang kosong kurang untuk memperkecil dengan aman. Kosongkan sedikit dulu; perlu sekitar %1$s.</string>
+    <string name="video_low_battery">Baterai di bawah 20%. Colokkan pengisi daya, lalu mulai.</string>
+    <string name="video_too_hot">Ponsel panas. Biarkan dingin, lalu mulai lagi.</string>
+    <string name="video_pending_note">Salinan yang tak disetujui dalam 7 hari dihapus; aslinya tetap.</string>
+    <string name="video_pending_review">Tonton dan setujui</string>
+    <string name="video_progress_label">MEMPERKECIL</string>
+    <string name="video_progress_so_far">%1$s lebih kecil sejauh ini</string>
+    <string name="video_progress_remaining">Sisa sekitar %1$s</string>
+    <string name="video_progress_note">Kamu bisa keluar dari aplikasi; proses lanjut di notifikasi. Aku berhenti sendiri jika ponsel panas atau baterai di bawah 20%.</string>
+    <string name="video_stop">Hentikan</string>
+    <string name="video_stop_note">Jika dihentikan, salinan yang selesai tetap ada dan aslinya tak tersentuh.</string>
+    <string name="video_compare_label">SISA %1$d · %2$s</string>
+    <string name="video_compare_later">Nanti</string>
+    <string name="video_compare_title">Tonton keduanya dan nilai sendiri.</string>
+    <string name="video_original">ASLI</string>
+    <string name="video_smaller">DIPERKECIL</string>
+    <string name="video_play">Putar %1$s</string>
+    <string name="video_fact_resolution">Resolusi dan laju bingkai</string>
+    <string name="video_fact_same">Sama</string>
+    <string name="video_fact_gain">Hemat</string>
+    <string name="video_compare_play_first">Putar yang diperkecil minimal sekali untuk menyetujui.</string>
+    <string name="video_compare_failed">Aslinya tak bisa dipindah ke Sampah. Masih di tempatnya.</string>
+    <string name="video_approve">Oke, singkirkan aslinya</string>
+    <string name="video_keep_original">Simpan aslinya, hapus yang diperkecil</string>
+    <string name="video_compare_note">Asli yang disingkirkan menunggu 7 hari di Sampah; bisa dikembalikan.</string>
+    <string name="video_result_title">didapat. Tanpa menghapus satu video pun.</string>
+    <string name="video_result_what">YANG TERJADI</string>
+    <string name="video_skip_low_gain">Hematnya terlalu kecil</string>
+    <string name="video_skip_failed">Tak bisa diperkecil</string>
+    <string name="video_result_estimate">Perkiraanku</string>
+    <string name="video_result_trash_note">Aslinya ada di Sampah selama 7 hari. Ruang terbuka saat Sampah dikosongkan.</string>
+    <string name="video_delete_now">Hapus aslinya permanen sekarang</string>
+    <string name="video_delete_now_confirm">Aslinya (%1$s) akan dihapus permanen. Tidak bisa dibatalkan.</string>
+    <string name="video_done">Selesai</string>
+    <string name="video_duration_hm">%1$d j %2$d mnt</string>
+    <string name="video_duration_ms">%1$d mnt %2$d dtk</string>
+    <string name="video_duration_s">%1$d dtk</string>
+    <string name="video_channel">Memperkecil video</string>
+    <string name="video_notif_progress_title">Memperkecil %1$d / %2$d</string>
+    <string name="video_notif_progress_body">%1$s lebih kecil sejauh ini</string>
+    <string name="video_notif_done_body">Tonton dan setujui. Aslinya masih di tempat.</string>
+    <string name="watch_toggle_videos_sub">Yang bisa kuperkecil tanpa menghapus.</string>
+    <plurals name="video_pending_title">
+        <item quantity="other">%d salinan diperkecil menunggu persetujuanmu</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="other">Aku perkecil %d video. Resolusi tetap sama.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="other">%1$d VIDEO · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="other">Perkecil %d video</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="other">Terapkan ke %d video lainnya</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="other">%d video diperkecil</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="other">%d video dilewati</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="other">%d video diperkecil</item>
     </plurals>
 </resources>

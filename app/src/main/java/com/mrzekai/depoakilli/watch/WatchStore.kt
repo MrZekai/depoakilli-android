@@ -24,6 +24,8 @@ data class WatchSnapshot(
     val hibernationExplained: Boolean = false,
     /** Home's "Want a heads-up before it fills?" card was answered. */
     val promoDone: Boolean = false,
+    /** Faz 3A-2: videos already counted in a "new big videos" notice (paths only, never sent anywhere). */
+    val notifiedVideos: Set<String> = emptySet(),
 ) {
     val latest: WatchSample? get() = samples.maxByOrNull { it.measuredAtMillis }
     val lastLookMillis: Long get() = latest?.measuredAtMillis ?: 0L
@@ -75,6 +77,7 @@ class WatchStore(context: Context) {
             .putBoolean(K_NOTIF_ASKED, s.notificationAsked)
             .putBoolean(K_HIBERNATION, s.hibernationExplained)
             .putBoolean(K_PROMO, s.promoDone)
+            .putString(K_NOTIFIED_VIDEOS, JSONArray(s.notifiedVideos.toList().takeLast(500)).toString())
             .apply()
     }
 
@@ -84,7 +87,7 @@ class WatchStore(context: Context) {
             thresholdAlerts = prefs.getBoolean(K_THRESHOLD, true),
             weeklySummary = prefs.getBoolean(K_WEEKLY, true),
             whatsAppAlerts = prefs.getBoolean(K_WHATSAPP, true),
-            newVideoAlerts = prefs.getBoolean(K_NEW_VIDEOS, false),
+            newVideoAlerts = prefs.getBoolean(K_NEW_VIDEOS, true),
         ),
         samples = runCatching {
             val array = JSONArray(prefs.getString(K_SAMPLES, "[]"))
@@ -103,6 +106,10 @@ class WatchStore(context: Context) {
         notificationAsked = prefs.getBoolean(K_NOTIF_ASKED, false),
         hibernationExplained = prefs.getBoolean(K_HIBERNATION, false),
         promoDone = prefs.getBoolean(K_PROMO, false),
+        notifiedVideos = runCatching {
+            val array = JSONArray(prefs.getString(K_NOTIFIED_VIDEOS, "[]"))
+            (0 until array.length()).mapTo(LinkedHashSet()) { array.getString(it) }
+        }.getOrDefault(emptySet()),
     )
 
     private fun sampleJson(s: WatchSample) = JSONObject()
@@ -139,5 +146,6 @@ class WatchStore(context: Context) {
         private const val K_NOTIF_ASKED = "notification_asked"
         private const val K_HIBERNATION = "hibernation_explained"
         private const val K_PROMO = "promo_done"
+        private const val K_NOTIFIED_VIDEOS = "notified_videos"
     }
 }

@@ -1301,7 +1301,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_videos">فيديوهات كبيرة جديدة</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_videos_soon">يأتي مع تصغير الفيديو.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off">شغّل الإشعارات</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1355,5 +1354,127 @@
         <item quantity="few">نبّهك الحارس %1$d مرة هذا الشهر</item>
         <item quantity="many">نبّهك الحارس %1$d مرة هذا الشهر</item>
         <item quantity="other">نبّهك الحارس %1$d مرة هذا الشهر</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2 video shrinking: draft translation, needs a native review -->
+    <string name="video_title">تصغير الفيديوهات</string>
+    <string name="video_tools_detail">وفّر مساحة دون حذف</string>
+    <string name="video_y7_card">نحو %1$s دون حذف</string>
+    <string name="video_head_label">تقريبًا، دون حذف</string>
+    <string name="video_about">نحو %1$s</string>
+    <string name="video_select_all">تحديد الكل</string>
+    <string name="video_select_none">الكل محدد</string>
+    <string name="video_note_originals">تبقى الأصول حتى ترى النتيجة وتوافق.</string>
+    <string name="video_note_backup">قد يرفع تطبيق نسخ الصور الاحتياطي الملف الجديد أيضًا.</string>
+    <string name="video_try_one">جرّب واحدًا دون تكلفة</string>
+    <string name="video_looking">أنظر في فيديوهاتك الكبيرة…</string>
+    <string name="video_none_title">لا يوجد فيديو يستحق التصغير</string>
+    <string name="video_none_body">أنظر في الفيديوهات بحجم %1$s أو أكثر. فيديوهاتك مضغوطة أصلًا أو من أنواع لا ألمسها (HDR، الحركة البطيئة، 360°).</string>
+    <string name="video_no_room">المساحة الفارغة لا تكفي للتصغير بأمان. حرّر قليلًا أولًا؛ أحتاج نحو %1$s.</string>
+    <string name="video_low_battery">البطارية أقل من 20%. صِل الشاحن ثم ابدأ.</string>
+    <string name="video_too_hot">الهاتف ساخن. دعه يبرد ثم ابدأ من جديد.</string>
+    <string name="video_pending_note">تُزال النسخ التي لا توافق عليها خلال 7 أيام؛ تبقى الأصول.</string>
+    <string name="video_pending_review">شاهد ووافق</string>
+    <string name="video_progress_label">جارٍ التصغير</string>
+    <string name="video_progress_so_far">أصغر بمقدار %1$s حتى الآن</string>
+    <string name="video_progress_remaining">يتبقى نحو %1$s</string>
+    <string name="video_progress_note">يمكنك مغادرة التطبيق؛ يستمر العمل في الإشعار. إذا سخن الهاتف أو انخفضت البطارية عن 20%، أتوقف من تلقاء نفسي.</string>
+    <string name="video_stop">إيقاف</string>
+    <string name="video_stop_note">إن أوقفت، تبقى النسخ المنتهية ولا يُمسّ أي أصل.</string>
+    <string name="video_compare_label">المتبقي %1$d · %2$s</string>
+    <string name="video_compare_later">لاحقًا</string>
+    <string name="video_compare_title">شاهد الاثنين واحكم بنفسك.</string>
+    <string name="video_original">الأصل</string>
+    <string name="video_smaller">المصغّر</string>
+    <string name="video_play">تشغيل %1$s</string>
+    <string name="video_fact_resolution">الدقة ومعدل الإطارات</string>
+    <string name="video_fact_same">نفسها</string>
+    <string name="video_fact_gain">المكسب</string>
+    <string name="video_compare_play_first">شغّل النسخة المصغّرة مرة واحدة على الأقل للموافقة.</string>
+    <string name="video_compare_failed">تعذّر نقل الأصل إلى سلة المهملات. لا يزال في مكانه.</string>
+    <string name="video_approve">حسنًا، أزل الأصل</string>
+    <string name="video_keep_original">احتفظ بالأصل واحذف المصغّر</string>
+    <string name="video_compare_note">ينتظر الأصل المُزال 7 أيام في سلة المهملات؛ يمكنك استعادته.</string>
+    <string name="video_result_title">وفّرتها. دون حذف أي فيديو.</string>
+    <string name="video_result_what">ما الذي حدث</string>
+    <string name="video_skip_low_gain">المكسب قليل</string>
+    <string name="video_skip_failed">تعذّر التصغير</string>
+    <string name="video_result_estimate">تقديري</string>
+    <string name="video_result_trash_note">الأصول في سلة المهملات لمدة 7 أيام. تتوفر المساحة عند إفراغها.</string>
+    <string name="video_delete_now">احذف الأصول نهائيًا الآن</string>
+    <string name="video_delete_now_confirm">ستُحذف الأصول (%1$s) نهائيًا. لا يمكن التراجع.</string>
+    <string name="video_done">تم</string>
+    <string name="video_duration_hm">%1$d س %2$d د</string>
+    <string name="video_duration_ms">%1$d د %2$d ث</string>
+    <string name="video_duration_s">%1$d ث</string>
+    <string name="video_channel">تصغير الفيديوهات</string>
+    <string name="video_notif_progress_title">جارٍ التصغير %1$d / %2$d</string>
+    <string name="video_notif_progress_body">أصغر بمقدار %1$s حتى الآن</string>
+    <string name="video_notif_done_body">شاهد ووافق. الأصول لا تزال في مكانها.</string>
+    <string name="watch_toggle_videos_sub">التي يمكن تصغيرها دون حذف.</string>
+    <plurals name="video_pending_title">
+        <item quantity="zero">%d نسخة مصغّرة بانتظار موافقتك</item>
+        <item quantity="one">%d نسخة مصغّرة بانتظار موافقتك</item>
+        <item quantity="two">%d نسختان مصغّرتان بانتظار موافقتك</item>
+        <item quantity="few">%d نسخ مصغّرة بانتظار موافقتك</item>
+        <item quantity="many">%d نسخة مصغّرة بانتظار موافقتك</item>
+        <item quantity="other">%d نسخة مصغّرة بانتظار موافقتك</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="zero">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+        <item quantity="one">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+        <item quantity="two">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+        <item quantity="few">سأصغّر %d فيديوهات. الدقة تبقى كما هي.</item>
+        <item quantity="many">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+        <item quantity="other">سأصغّر %d فيديو. الدقة تبقى كما هي.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="zero">%1$d فيديو · %2$s</item>
+        <item quantity="one">%1$d فيديو · %2$s</item>
+        <item quantity="two">%1$d فيديو · %2$s</item>
+        <item quantity="few">%1$d فيديوهات · %2$s</item>
+        <item quantity="many">%1$d فيديو · %2$s</item>
+        <item quantity="other">%1$d فيديو · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="zero">صغّر %d فيديو</item>
+        <item quantity="one">صغّر %d فيديو</item>
+        <item quantity="two">صغّر %d فيديو</item>
+        <item quantity="few">صغّر %d فيديوهات</item>
+        <item quantity="many">صغّر %d فيديو</item>
+        <item quantity="other">صغّر %d فيديو</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="zero">طبّق على %d فيديو متبقٍّ</item>
+        <item quantity="one">طبّق على %d فيديو متبقٍ</item>
+        <item quantity="two">طبّق على %d فيديو متبقيين</item>
+        <item quantity="few">طبّق على %d فيديوهات متبقية</item>
+        <item quantity="many">طبّق على %d فيديو متبقيًا</item>
+        <item quantity="other">طبّق على %d فيديو متبقٍّ</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="zero">%d فيديو مصغّر</item>
+        <item quantity="one">%d فيديو مصغّر</item>
+        <item quantity="two">%d فيديو مصغّران</item>
+        <item quantity="few">%d فيديوهات مصغّرة</item>
+        <item quantity="many">%d فيديو مصغّرًا</item>
+        <item quantity="other">%d فيديو مصغّر</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="zero">%d فيديو متخطّى</item>
+        <item quantity="one">%d فيديو متخطّى</item>
+        <item quantity="two">%d فيديو متخطّيان</item>
+        <item quantity="few">%d فيديوهات متخطّاة</item>
+        <item quantity="many">%d فيديو متخطّى</item>
+        <item quantity="other">%d فيديو متخطّى</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="zero">%d فيديو مصغّر</item>
+        <item quantity="one">%d فيديو مصغّر</item>
+        <item quantity="two">%d فيديو مصغّران</item>
+        <item quantity="few">%d فيديوهات مصغّرة</item>
+        <item quantity="many">%d فيديو مصغّرًا</item>
+        <item quantity="other">%d فيديو مصغّر</item>
     </plurals>
 </resources>

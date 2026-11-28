@@ -1071,7 +1071,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_videos">Neue große Videos</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_videos_soon">Kommt mit dem Verkleinern von Videos.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off">Mitteilungen einschalten</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1109,5 +1108,95 @@
     <plurals name="watch_pro_sent">
         <item quantity="one">Der Wächter hat dich diesen Monat %1$d Mal informiert</item>
         <item quantity="other">Der Wächter hat dich diesen Monat %1$d Mal informiert</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2 video shrinking: draft translation, needs a native review -->
+    <string name="video_title">Videos verkleinern</string>
+    <string name="video_tools_detail">Platz schaffen ohne Löschen</string>
+    <string name="video_y7_card">Etwa %1$s ohne Löschen</string>
+    <string name="video_head_label">Etwa, ohne zu löschen</string>
+    <string name="video_about">etwa %1$s</string>
+    <string name="video_select_all">Alle auswählen</string>
+    <string name="video_select_none">Alle ausgewählt</string>
+    <string name="video_note_originals">Die Originale bleiben, bis du das Ergebnis gesehen und bestätigt hast.</string>
+    <string name="video_note_backup">Deine Foto-Backup-App lädt die neue Datei eventuell auch hoch.</string>
+    <string name="video_try_one">Eines ohne Kosten testen</string>
+    <string name="video_looking">Ich sehe mir deine großen Videos an…</string>
+    <string name="video_none_title">Kein Video lohnt das Verkleinern</string>
+    <string name="video_none_body">Ich prüfe Videos ab %1$s. Deine sind schon kompakt oder von einer Art, die ich nicht anfasse (HDR, Zeitlupe, 360°).</string>
+    <string name="video_no_room">Zu wenig freier Speicher zum sicheren Verkleinern. Erst etwas Platz schaffen; ich brauche etwa %1$s frei.</string>
+    <string name="video_low_battery">Akku unter 20 %. Schließ das Ladegerät an, dann starte.</string>
+    <string name="video_too_hot">Das Handy ist heiß. Lass es abkühlen, dann neu starten.</string>
+    <string name="video_pending_note">Nicht bestätigte Kopien werden nach 7 Tagen entfernt; die Originale bleiben.</string>
+    <string name="video_pending_review">Ansehen und bestätigen</string>
+    <string name="video_progress_label">VERKLEINERE</string>
+    <string name="video_progress_so_far">Bisher %1$s kleiner</string>
+    <string name="video_progress_remaining">Noch etwa %1$s</string>
+    <string name="video_progress_note">Du kannst die App verlassen; es läuft in der Benachrichtigung weiter. Ich stoppe von selbst, wenn das Handy zu heiß wird oder bei einem Akku unter 20 %.</string>
+    <string name="video_stop">Stoppen</string>
+    <string name="video_stop_note">Wenn du stoppst, bleiben fertige Kopien und kein Original wird angefasst.</string>
+    <string name="video_compare_label">NOCH %1$d · %2$s</string>
+    <string name="video_compare_later">Später</string>
+    <string name="video_compare_title">Sieh dir beide an und entscheide selbst.</string>
+    <string name="video_original">ORIGINAL</string>
+    <string name="video_smaller">VERKLEINERT</string>
+    <string name="video_play">%1$s abspielen</string>
+    <string name="video_fact_resolution">Auflösung und Bildrate</string>
+    <string name="video_fact_same">Gleich</string>
+    <string name="video_fact_gain">Gewinn</string>
+    <string name="video_compare_play_first">Spiel die kleinere Version mindestens einmal ab, um zu bestätigen.</string>
+    <string name="video_compare_failed">Das Original ließ sich nicht in den Papierkorb verschieben. Es ist noch da.</string>
+    <string name="video_approve">OK, Original entfernen</string>
+    <string name="video_keep_original">Original behalten, kleinere Version löschen</string>
+    <string name="video_compare_note">Das entfernte Original bleibt 7 Tage im Papierkorb; du kannst es zurückholen.</string>
+    <string name="video_result_title">gewonnen. Ohne ein einziges Video zu löschen.</string>
+    <string name="video_result_what">WAS PASSIERT IST</string>
+    <string name="video_skip_low_gain">Zu wenig Gewinn</string>
+    <string name="video_skip_failed">Ließ sich nicht verkleinern</string>
+    <string name="video_result_estimate">Meine Schätzung</string>
+    <string name="video_result_trash_note">Die Originale liegen 7 Tage im Papierkorb. Der Platz wird frei, wenn er geleert wird.</string>
+    <string name="video_delete_now">Originale jetzt endgültig löschen</string>
+    <string name="video_delete_now_confirm">Die Originale (%1$s) werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="video_done">Fertig</string>
+    <string name="video_duration_hm">%1$d Std. %2$d Min.</string>
+    <string name="video_duration_ms">%1$d Min. %2$d Sek.</string>
+    <string name="video_duration_s">%1$d Sek.</string>
+    <string name="video_channel">Videos verkleinern</string>
+    <string name="video_notif_progress_title">Verkleinere %1$d / %2$d</string>
+    <string name="video_notif_progress_body">Bisher %1$s kleiner</string>
+    <string name="video_notif_done_body">Ansehen und bestätigen. Die Originale sind noch da.</string>
+    <string name="watch_toggle_videos_sub">Solche, die ich ohne Löschen verkleinern kann.</string>
+    <plurals name="video_pending_title">
+        <item quantity="one">%d verkleinerte Kopie wartet auf deine Bestätigung</item>
+        <item quantity="other">%d verkleinerte Kopien warten auf deine Bestätigung</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="one">Ich verkleinere %d Video. Die Auflösung bleibt gleich.</item>
+        <item quantity="other">Ich verkleinere %d Videos. Die Auflösung bleibt gleich.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="one">%1$d VIDEO · %2$s</item>
+        <item quantity="other">%1$d VIDEOS · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="one">%d Video verkleinern</item>
+        <item quantity="other">%d Videos verkleinern</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="one">Auch auf das andere Video anwenden (%d)</item>
+        <item quantity="other">Auch auf die anderen %d Videos anwenden</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="one">%d Video verkleinert</item>
+        <item quantity="other">%d Videos verkleinert</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="one">%d Video übersprungen</item>
+        <item quantity="other">%d Videos übersprungen</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="one">%d Video verkleinert</item>
+        <item quantity="other">%d Videos verkleinert</item>
     </plurals>
 </resources>

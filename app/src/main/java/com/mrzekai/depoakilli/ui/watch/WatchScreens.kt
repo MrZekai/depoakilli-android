@@ -89,6 +89,7 @@ internal data class WatchActions(
     val setThreshold: (Boolean) -> Unit,
     val setWeekly: (Boolean) -> Unit,
     val setWhatsApp: (Boolean) -> Unit,
+    val setNewVideos: (Boolean) -> Unit,
     val openPaywall: () -> Unit,
     val openNotificationSettings: () -> Unit,
     val openHibernationSettings: () -> Unit,
@@ -306,15 +307,16 @@ internal fun WatchScreen(ui: WatchUi, actions: WatchActions, modifier: Modifier 
                             onChange = if (ui.isPro) actions.setWhatsApp else { _ -> actions.openPaywall() },
                         )
                         CardDivider()
-                        // Turns on with 3A-2 video shrinking.
-                        SwitchRow(
-                            title = stringResource(R.string.watch_toggle_videos),
-                            detail = stringResource(R.string.watch_toggle_videos_soon),
-                            checked = false,
-                            pro = true,
-                            enabled = false,
-                            onChange = {},
-                        )
+                        // Faz 3A-2: on with video shrinking (WATCH_NEW_VIDEO_ENABLED).
+                        if (CleaningThresholds.WATCH_NEW_VIDEO_ENABLED) {
+                            SwitchRow(
+                                title = stringResource(R.string.watch_toggle_videos),
+                                detail = stringResource(R.string.watch_toggle_videos_sub),
+                                checked = ui.isPro && s.settings.newVideoAlerts,
+                                pro = true,
+                                onChange = if (ui.isPro) actions.setNewVideos else { _ -> actions.openPaywall() },
+                            )
+                        }
                     }
                 }
             }

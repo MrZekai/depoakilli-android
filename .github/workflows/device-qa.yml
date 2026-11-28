@@ -38,6 +38,20 @@ jobs:
       - name: Build debug APK (stand-in big app)
         run: ./gradlew --stacktrace assembleDebug "-Dorg.gradle.jvmargs=-Xmx4g -Xss768k" "-Pkotlin.daemon.jvmargs=-Xmx4g -Xss768k"
 
+      # Faz 3A-2: a real >= 100 MB, >= 10 s video for the shrink check. Made
+      # here (never stored in the repo): 480p30, 20 s, ~45 Mbps H.264 High@4.2 + AAC,
+      # with a capture date.
+      - name: Make the shrink test video
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          ffmpeg -hide_banner -loglevel error -y \
+            -f lavfi -i "testsrc2=size=854x480:rate=30" -f lavfi -i "sine=frequency=440:sample_rate=48000" \
+            -t 20 -vf "noise=alls=40:allf=t" -pix_fmt yuv420p \
+            -c:v libx264 -preset veryfast -profile:v high -level 4.2 -b:v 45M -maxrate 50M -bufsize 50M \
+            -c:a aac -b:a 128k -metadata creation_time=2025-06-01T10:00:00Z -movflags +faststart qa-shrink.mp4
+          ls -l qa-shrink.mp4
+          test "$(stat -c %s qa-shrink.mp4)" -ge 100000000
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

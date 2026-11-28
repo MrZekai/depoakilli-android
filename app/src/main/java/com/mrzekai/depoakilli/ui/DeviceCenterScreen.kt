@@ -115,6 +115,9 @@ internal fun DeviceCenterScreen(
     onOpenWhatsApp: () -> Unit,
     onOpenAppManager: () -> Unit,
     modifier: Modifier = Modifier,
+    /** Faz 3A-2: about how much shrinking saves (null before the first look); the row needs the switch. */
+    videoSavingBytes: Long? = null,
+    onOpenVideos: (() -> Unit)? = null,
 ) {
     val smartPlan = state.smartSummary()?.plan
     fun suggested(tool: SuggestionTool): ToolValue =
@@ -138,6 +141,23 @@ internal fun DeviceCenterScreen(
             suggested(SuggestionTool.LARGE_FILES),
             stringResource(R.string.large_files_tool_subtitle_v050),
         ) { onScan(ScanFocus.LARGE_FILES) },
+    ) + listOfNotNull(
+        // Faz 3A-2: shrinking videos without deleting; shown only while the switch is on.
+        onOpenVideos?.takeIf { com.mrzekai.depoakilli.pro.ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE }?.let { open ->
+            ToolRow(
+                stringResource(R.string.video_title),
+                stringResource(R.string.video_tools_detail),
+                Icons.Outlined.VideoFile,
+                when (videoSavingBytes) {
+                    null -> ToolValue.Unknown
+                    0L -> ToolValue.Empty
+                    else -> ToolValue.Suggested(videoSavingBytes)
+                },
+                stringResource(R.string.video_tools_detail),
+                open,
+            )
+        },
+    ) + listOf(
         ToolRow(
             stringResource(R.string.scan_focus_downloads),
             stringResource(R.string.tools_row_downloads_sub),
@@ -180,10 +200,10 @@ internal fun DeviceCenterScreen(
     )
     PageFrame(modifier = modifier) {
         BoxWithConstraints(Modifier.fillMaxSize()) {
-            // D4: the six rows share the height under the title (and the access card).
+            // D4: the rows share the height under the title (and the access card).
             val header = if (state.hasAllFilesAccess) 80.dp else 240.dp
             val spacing = 10.dp
-            val rowHeight = ((maxHeight - header - 32.dp - spacing * 6) / 6).coerceAtLeast(96.dp)
+            val rowHeight = ((maxHeight - header - 32.dp - spacing * rows.size) / rows.size).coerceAtLeast(96.dp)
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 // The last row ends above the banner and the menu, never under them.

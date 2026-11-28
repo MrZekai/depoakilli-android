@@ -8,6 +8,8 @@ import com.mrzekai.depoakilli.diagnostics.AppDiagnostics
 import com.mrzekai.depoakilli.model.ByteFormatter
 import com.mrzekai.depoakilli.pro.FreeTierStore
 import com.mrzekai.depoakilli.ui.media.MediaThumbnails
+import com.mrzekai.depoakilli.video.PendingOutputStore
+import com.mrzekai.depoakilli.video.VideoShrinkRepository
 import com.mrzekai.depoakilli.watch.WatchScheduler
 import com.mrzekai.depoakilli.watch.WatchStore
 
@@ -20,6 +22,12 @@ class DepoAkilliApplication : Application() {
 
     /** Faz 3A-1 Storage Watch: settings, daily samples and sent notices, on this device only. */
     val watch: WatchStore by lazy { WatchStore(this) }
+
+    /** Faz 3A-2: shrunk copies waiting for the user's approval (7 days), on this device only. */
+    val pendingVideos: PendingOutputStore by lazy { PendingOutputStore(this) }
+
+    /** Faz 3A-2: big videos worth shrinking, and the user's answers for each copy. */
+    val videoShrink: VideoShrinkRepository by lazy { VideoShrinkRepository(this, pendingVideos) }
 
     override fun onCreate() {
         super.onCreate()

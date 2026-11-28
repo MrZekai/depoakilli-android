@@ -102,7 +102,6 @@ audit_binary() {
     || fail "$label is missing the Google Play Billing permission"
   grep -Fq "$SUPPORT_EMAIL" "$dex_strings" || fail "$label support contact missing"
   for forbidden in \
-    android.permission.FOREGROUND_SERVICE \
     androidx.work.impl.foreground.SystemForegroundService \
     androidx.compose.ui.tooling.PreviewActivity
   do
@@ -110,6 +109,14 @@ audit_binary() {
       fail "$label contains forbidden surface: $forbidden"
     fi
   done
+  # Faz 3A-2: a foreground service only for shrinking videos (user tap):
+  # exactly FOREGROUND_SERVICE + _DATA_SYNC + _MEDIA_PROCESSING, our own service.
+  fgs_perms="$(grep -Eo 'android\.permission\.FOREGROUND_SERVICE[A-Z_]*' "$perms" | sort -u | tr '\n' ' ')"
+  if [ "$fgs_perms" != "android.permission.FOREGROUND_SERVICE android.permission.FOREGROUND_SERVICE_DATA_SYNC android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING " ]; then
+    fail "$label foreground-service permissions differ: $fgs_perms"
+  fi
+  grep -Fq "com.mrzekai.depoakilli.video.VideoCompressionService" "$manifest" \
+    || fail "$label is missing the video shrinking service"
 }
 
 audit_binary "release APK" "$APK" "apk"

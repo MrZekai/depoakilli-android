@@ -44,7 +44,7 @@ object CleaningThresholds {
 
     /** Faz 3A-1: new big-video candidates since the last notice (on with 3A-2). */
     const val WATCH_NEW_VIDEO_BYTES = 1L * GB
-    const val WATCH_NEW_VIDEO_ENABLED = false
+    const val WATCH_NEW_VIDEO_ENABLED = true
 
     /** Faz 3A-1: the weekly summary is not sent below this much growth. */
     const val WATCH_WEEKLY_MIN_BYTES = 500L * MB

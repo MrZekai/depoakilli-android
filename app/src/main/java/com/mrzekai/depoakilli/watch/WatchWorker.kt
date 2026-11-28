@@ -1,5 +1,7 @@
 package com.mrzekai.depoakilli.watch
 
+import com.mrzekai.depoakilli.video.VideoCandidateFinder
+import com.mrzekai.depoakilli.data.CleaningThresholds
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -43,9 +45,29 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
             WatchScheduler.cancel(applicationContext)
             return
         }
-        val sample = WatchMeasurer(applicationContext).measure()
-        store.addSample(sample)
+        val measured = WatchMeasurer(applicationContext).measure()
         val isPro = currentPro(app)
+        // Faz 3A-2: new big videos worth shrinking since the last such notice.
+        // Headers only (cached); no frame is decoded and nothing is changed.
+        var videoPaths: Set<String> = emptySet()
+        val sample = if (CleaningThresholds.WATCH_NEW_VIDEO_ENABLED && isPro &&
+            store.state.value.settings.newVideoAlerts && store.state.value.settings.enabled
+        ) {
+            val deadline = System.currentTimeMillis() + VIDEO_LOOK_MILLIS
+            val found = runCatching {
+                VideoCandidateFinder(applicationContext).find(
+                    pendingOriginals = app.pendingVideos.originals(),
+                    shouldStop = { System.currentTimeMillis() > deadline },
+                )
+            }.getOrNull()
+            val notified = store.state.value.notifiedVideos
+            val fresh = found?.candidates.orEmpty().filter { it.meta.path !in notified }
+            videoPaths = found?.candidates.orEmpty().mapTo(HashSet()) { it.meta.path }
+            measured.copy(bigVideoCandidates = fresh.size, bigVideoCandidateBytes = fresh.sumOf { it.estimatedSavingBytes })
+        } else {
+            measured
+        }
+        store.addSample(sample)
         val now = System.currentTimeMillis()
         val snapshot = store.state.value
         val (nextThreshold, crossed) = WatchRules.threshold(snapshot.threshold, sample.usedPercent)
@@ -80,6 +102,7 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
                         it.copy(
                             history = it.history + SentNotice(decision.topic, now),
                             lastWeeklyWeek = if (decision.topic == WatchTopic.WEEKLY) week else it.lastWeeklyWeek,
+                            notifiedVideos = if (decision.topic == WatchTopic.NEW_VIDEOS) it.notifiedVideos + videoPaths else it.notifiedVideos,
                         )
                     }
                 }
@@ -103,6 +126,9 @@ class WatchWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
         const val KEY_DEFERRED = "deferred_topic"
         private const val RUN_LIMIT_MILLIS = 30_000L
         private const val BILLING_WAIT_MILLIS = 8_000L
+
+        /** Of the job's 30 s, at most this long for looking at new videos. */
+        private const val VIDEO_LOOK_MILLIS = 15_000L
     }
 }
 

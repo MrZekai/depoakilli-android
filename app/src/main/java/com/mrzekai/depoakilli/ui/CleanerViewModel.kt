@@ -228,6 +228,11 @@ class CleanerViewModel internal constructor(
         freeTierStore?.markFirstCleanupUsed()
     }
 
+    /** Faz 3A-2: the free video has been shrunk (a failed try does not count). */
+    fun markVideoTrialUsed() {
+        freeTierStore?.markVideoTrialUsed()
+    }
+
     fun addProBytes(bytes: Long) {
         if (bytes > 0L) freeTierStore?.addProBytes(bytes)
     }

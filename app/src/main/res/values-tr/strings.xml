@@ -835,7 +835,6 @@
     <string name="watch_toggle_whatsapp">WhatsApp hızlı büyürse</string>
     <string name="watch_toggle_whatsapp_sub">Bir haftada %s\'ı geçerse.</string>
     <string name="watch_toggle_videos">Yeni büyük videolar</string>
-    <string name="watch_toggle_videos_soon">Video küçültmeyle birlikte açılacak.</string>
     <string name="watch_notifications_off">Bildirimleri aç</string>
     <string name="watch_notifications_off_sub">O zamana kadar ana ekranda gösteririm.</string>
     <string name="watch_hibernation_row">Android beni duraklatabilir</string>
@@ -860,5 +859,94 @@
     <plurals name="watch_pro_sent">
         <item quantity="one">Nöbetçi bu ay %1$d kez haber verdi</item>
         <item quantity="other">Nöbetçi bu ay %1$d kez haber verdi</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <string name="video_title">Videoları küçült</string>
+    <string name="video_tools_detail">Silmeden yer aç</string>
+    <string name="video_y7_card">Silmeden yaklaşık %1$s</string>
+    <string name="video_head_label">Silmeden yaklaşık</string>
+    <string name="video_about">yaklaşık %1$s</string>
+    <string name="video_select_all">Hepsini seç</string>
+    <string name="video_select_none">Hepsi seçili</string>
+    <string name="video_note_originals">Özgünler, sen sonucu görüp onaylayana kadar yerinde durur.</string>
+    <string name="video_note_backup">Fotoğraf yedekleme uygulaman yeni dosyayı da yükleyebilir.</string>
+    <string name="video_try_one">Birini ücretsiz dene</string>
+    <string name="video_looking">Büyük videolarına bakıyorum…</string>
+    <string name="video_none_title">Küçültmeye değer video yok</string>
+    <string name="video_none_body">%1$s ve üstü videolara bakarım. Seninkiler zaten sıkı ya da dokunmadığım türden (HDR, ağır çekim, 360°).</string>
+    <string name="video_no_room">Güvenle küçültmek için boş yer az. Önce biraz yer aç; yaklaşık %1$s boş yer gerekiyor.</string>
+    <string name="video_low_battery">Pil %20’nin altında. Şarja tak, sonra başla.</string>
+    <string name="video_too_hot">Telefon ısınmış. Biraz soğusun, sonra yeniden başla.</string>
+    <string name="video_pending_note">7 gün içinde onaylamadığın kopyalar silinir; özgünler yerinde kalır.</string>
+    <string name="video_pending_review">İzle ve onayla</string>
+    <string name="video_progress_label">KÜÇÜLTÜYORUM</string>
+    <string name="video_progress_so_far">Şu ana kadar %1$s küçüldü</string>
+    <string name="video_progress_remaining">Yaklaşık %1$s kaldı</string>
+    <string name="video_progress_note">Uygulamadan çıkabilirsin; bildirimde sürer. Telefon ısınırsa ya da pil %20’nin altına inerse kendim dururum.</string>
+    <string name="video_stop">Durdur</string>
+    <string name="video_stop_note">Durdurursan bitenler kalır, özgünlerin hiçbirine dokunulmaz.</string>
+    <string name="video_compare_label">%1$d KALDI · %2$s</string>
+    <string name="video_compare_later">Sonra</string>
+    <string name="video_compare_title">İkisini de izle, farkı sen gör.</string>
+    <string name="video_original">ÖZGÜN</string>
+    <string name="video_smaller">KÜÇÜLTÜLMÜŞ</string>
+    <string name="video_play">%1$s oynat</string>
+    <string name="video_fact_resolution">Çözünürlük ve kare hızı</string>
+    <string name="video_fact_same">Aynı</string>
+    <string name="video_fact_gain">Kazanç</string>
+    <string name="video_compare_play_first">Onaylamak için küçültülmüşü en az bir kez oynat.</string>
+    <string name="video_compare_failed">Özgün Çöp’e taşınamadı. Yerinde duruyor.</string>
+    <string name="video_approve">Tamam, özgünü kaldır</string>
+    <string name="video_keep_original">Özgünü tut, küçültülmüşü sil</string>
+    <string name="video_compare_note">Kaldırılan özgün 7 gün Çöp’te bekler; geri alabilirsin.</string>
+    <string name="video_result_title">kazandın. Tek videonu silmeden.</string>
+    <string name="video_result_what">NE OLDU</string>
+    <string name="video_skip_low_gain">Kazanç azdı</string>
+    <string name="video_skip_failed">Küçültülemedi</string>
+    <string name="video_result_estimate">Tahminim</string>
+    <string name="video_result_trash_note">Özgünler 7 gün Çöp’te. Alan, Çöp boşalınca telefonda açılır.</string>
+    <string name="video_delete_now">Özgünleri şimdi kalıcı sil</string>
+    <string name="video_delete_now_confirm">Özgünler (%1$s) kalıcı olarak silinecek. Bu geri alınamaz.</string>
+    <string name="video_done">Tamam</string>
+    <string name="video_duration_hm">%1$d sa %2$d dk</string>
+    <string name="video_duration_ms">%1$d dk %2$d sn</string>
+    <string name="video_duration_s">%1$d sn</string>
+    <string name="video_channel">Video küçültme</string>
+    <string name="video_notif_progress_title">Küçültüyorum %1$d / %2$d</string>
+    <string name="video_notif_progress_body">Şu ana kadar %1$s küçüldü</string>
+    <string name="video_notif_done_body">Bakıp onaylaman yeterli. Özgünler yerinde duruyor.</string>
+    <string name="watch_toggle_videos_sub">Silmeden küçültülebilecekler.</string>
+    <plurals name="video_pending_title">
+        <item quantity="one">%d küçültülmüş kopya onayını bekliyor</item>
+        <item quantity="other">%d küçültülmüş kopya onayını bekliyor</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="one">%d videoyu küçültürüm. Çözünürlük aynı kalır.</item>
+        <item quantity="other">%d videoyu küçültürüm. Çözünürlük aynı kalır.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="one">%1$d VİDEO · %2$s</item>
+        <item quantity="other">%1$d VİDEO · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="one">%d videoyu küçült</item>
+        <item quantity="other">%d videoyu küçült</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="one">Kalan %d videoya da uygula</item>
+        <item quantity="other">Kalan %d videoya da uygula</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="one">%d video küçüldü</item>
+        <item quantity="other">%d video küçüldü</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="one">%d video atlandı</item>
+        <item quantity="other">%d video atlandı</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="one">%d video küçüldü</item>
+        <item quantity="other">%d video küçüldü</item>
     </plurals>
 </resources>

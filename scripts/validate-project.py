@@ -106,6 +106,11 @@ required = [
     "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTier.kt",
     "app/src/main/java/com/mrzekai/depoakilli/pro/FreeTierStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/billing/BillingConnect.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/video/VideoRules.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressor.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressionService.kt",
+    "app/src/main/java/com/mrzekai/depoakilli/ui/video/VideoShrinkScreens.kt",
+    "app/src/test/java/com/mrzekai/depoakilli/video/VideoRulesTest.kt",
     "app/src/main/java/com/mrzekai/depoakilli/watch/WatchRules.kt",
     "app/src/main/java/com/mrzekai/depoakilli/watch/WatchStore.kt",
     "app/src/main/java/com/mrzekai/depoakilli/watch/WatchMeasurer.kt",
@@ -423,13 +428,18 @@ if "BillingConnect.connect" not in billing_repo:
 
 # Faz 2 free tier and honest paywall (CODEX_TASK_FAZ2_ABONELIK).
 gain_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/ProGainEstimator.kt")
+# Faz 3A-2: the compression row is now the sum of the real candidates'
+# estimates (no flat ratio); the switch decides whether it exists at all.
 for expected in (
     "PRO_MIN_GAIN_BYTES = 2_000_000_000L",
-    "COMPRESSION_FLOOR_RATIO = 0.30",
-    "VIDEO_COMPRESSION_AVAILABLE = false",
+    "VIDEO_COMPRESSION_AVAILABLE = true",
+    "videoSavingBytes",
+    "if (videoCompressionAvailable && videoSavingBytes > 0L && videoCount > 0)",
 ):
     if expected not in gain_src:
         errors.append(f"missing Pro gain invariant: {expected}")
+if "COMPRESSION_FLOOR_RATIO" in gain_src:
+    errors.append("Pro gain: no flat compression ratio; only candidates' estimates count")
 free_src = read("app/src/main/java/com/mrzekai/depoakilli/pro/FreeTier.kt")
 for expected in ("DAILY_DECISIONS = 20", "if (today > day) DecisionCounter(today, 0) else this"):
     if expected not in free_src:
@@ -486,6 +496,55 @@ for strings_file in sorted((ROOT / "app/src/main/res").glob("values*/strings.xml
                 errors.append(f"{strings_file.parent.name}/{name}: no exclamation marks in watch texts")
             if re.search(r"danger|urgent|slow|tehlike|acil|yavaş|peligro|urgente|perigo|pericolo|gefahr|dringend|опасн|срочн|bahaya|mendesak|خطر|عاجل", text, re.I):
                 errors.append(f"{strings_file.parent.name}/{name}: no fear words in watch texts")
+
+# Faz 3A-2 video shrinking: an original is never deleted. In video/ only
+# OutputFiles may delete, and only Smart Cleaner's own copies; an approved
+# original goes to the Trash (moveShrunkOriginalToTrash -> TrashStore). The
+# foreground service starts only from the user's tap, stops on timeout, and the
+# texts never promise "no quality loss".
+video_dir = ROOT / "app/src/main/java/com/mrzekai/depoakilli/video"
+for video_file in video_dir.rglob("*.kt"):
+    video_src = video_file.read_text(encoding="utf-8")
+    without_output_files = re.sub(r"object OutputFiles \{.*?\n\}\n", "", video_src, flags=re.S)
+    for forbidden in (".delete(", "deleteRecursively", "deleteIfExists"):
+        if forbidden in without_output_files:
+            errors.append(f"video/{video_file.name}: only OutputFiles may delete (never an original): {forbidden}")
+    if "startForegroundService" in video_src and video_file.name != "VideoCompressionService.kt":
+        errors.append(f"video/{video_file.name}: only VideoCompressionService starts the foreground service")
+output_files_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressor.kt")
+if "if (!isOwnOutput(file)) return false" not in output_files_src:
+    errors.append("OutputFiles.deleteOutput must refuse anything but Smart Cleaner's own _sc.mp4 / .sc.tmp copies")
+video_repo_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoShrinkRepository.kt")
+if "moveShrunkOriginalToTrash" not in video_repo_src:
+    errors.append("an approved original must go to the Trash (moveShrunkOriginalToTrash)")
+service_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoCompressionService.kt")
+for expected in ("override fun onTimeout(startId: Int, fgsType: Int)", "FOREGROUND_SERVICE_TYPE_MEDIA_PROCESSING",
+                 "FOREGROUND_SERVICE_TYPE_DATA_SYNC", "fun startFromUserTap(", "VideoQueue.block("):
+    if expected not in service_src:
+        errors.append(f"missing video service invariant: {expected}")
+starters = []
+for kt in (ROOT / "app/src/main/java").rglob("*.kt"):
+    if "startFromUserTap(" in kt.read_text(encoding="utf-8") and kt.name != "VideoCompressionService.kt":
+        starters.append(kt.name)
+if starters != ["VideoShrinkScreens.kt"]:
+    errors.append(f"the video service starts only from the user's tap on the shrink screen, found: {starters}")
+video_rules_src = read("app/src/main/java/com/mrzekai/depoakilli/video/VideoRules.kt")
+for expected in ("MIN_VIDEO_BYTES = 100_000_000L", "MIN_GAIN_RATIO = 0.40", "MAX_TARGET_TO_SOURCE = 0.60",
+                 "TARGET_1080P = 6_000_000L", "TARGET_4K = 18_000_000L", "RESERVE_BYTES = 1_000_000_000L",
+                 "MAX_OUTPUT_RATIO = 0.70", "EXPIRE_MILLIS = 7L * 24L * 60L * 60L * 1000L", "fun canApprove(playedSmallCopy: Boolean)"):
+    if expected not in video_rules_src:
+        errors.append(f"missing video shrinking rule: {expected}")
+if "com.mrzekai.depoakilli.video.VideoCompressionService" not in manifest and ".video.VideoCompressionService" not in manifest:
+    errors.append("the video shrinking service must be declared")
+lossless = re.compile(r"(lossless|kayıpsız|kalite kaybı yok|no quality loss|without quality loss|yapay zek|\bAI\b)", re.IGNORECASE)
+for res_dir in (ROOT / "app/src/main/res").glob("values*"):
+    strings_file = res_dir / "strings.xml"
+    if not strings_file.exists():
+        continue
+    for match in re.finditer(r'<(?:string|plurals) name="(video_[a-z_0-9]+)"[^>]*>(.*?)</(?:string|plurals)>',
+                             strings_file.read_text(encoding="utf-8"), re.S):
+        if lossless.search(match.group(2)):
+            errors.append(f"{res_dir.name}/{match.group(1)}: shrinking lowers the bitrate; never claim no loss or AI")
 
 # No paywall opens by itself: only the openPaywall() taps set it.
 if read("app/src/main/java/com/mrzekai/depoakilli/ui/CleanerApp.kt").count("paywallOpen = true") != 1:

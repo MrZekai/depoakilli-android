@@ -28,13 +28,16 @@ internal fun CleanerUiState.planFigures(): PlanFigures? =
  * only. Before a scan, or before the free first "My pick" cleanup is spent,
  * there is nothing to add.
  */
-internal fun CleanerUiState.proEstimate(): com.mrzekai.depoakilli.pro.ProGainEstimator.Estimate {
+internal fun CleanerUiState.proEstimate(
+    videos: com.mrzekai.depoakilli.video.VideoCandidateFinder.Result? = null,
+): com.mrzekai.depoakilli.pro.ProGainEstimator.Estimate {
     val figures = planFigures()
     val plan = summary.plan
     return com.mrzekai.depoakilli.pro.ProGainEstimator.estimate(
         suggestedBytes = figures?.suggestedBytes ?: 0L,
         suggestedCount = if (figures != null) plan.suggestedItems.size else 0,
         firstCleanupUsed = freeTier.firstCleanupUsed,
-        videoSizes = summary.items.filter { it.mimeType.startsWith("video/") }.map { it.sizeBytes },
+        videoSavingBytes = videos?.totalSavingBytes ?: 0L,
+        videoCount = videos?.candidates?.size ?: 0,
     )
 }

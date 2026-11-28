@@ -1183,7 +1183,6 @@
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_toggle_videos">Новые большие видео</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
-    <string name="watch_toggle_videos_soon">Появится вместе со сжатием видео.</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
     <string name="watch_notifications_off">Включить уведомления</string>
     <!-- [ÇEVİRİ GEREKLİ] -->
@@ -1229,5 +1228,111 @@
         <item quantity="few">Дозорный предупредил %1$d раза в этом месяце</item>
         <item quantity="many">Дозорный предупредил %1$d раз в этом месяце</item>
         <item quantity="other">Дозорный предупредил %1$d раза в этом месяце</item>
+    </plurals>
+
+    <!-- Faz 3A-2 Video shrinking -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3A-2 video shrinking: draft translation, needs a native review -->
+    <string name="video_title">Сжать видео</string>
+    <string name="video_tools_detail">Место без удаления</string>
+    <string name="video_y7_card">Около %1$s без удаления</string>
+    <string name="video_head_label">Примерно, без удаления</string>
+    <string name="video_about">около %1$s</string>
+    <string name="video_select_all">Выбрать все</string>
+    <string name="video_select_none">Все выбраны</string>
+    <string name="video_note_originals">Оригиналы остаются, пока вы не посмотрите результат и не подтвердите.</string>
+    <string name="video_note_backup">Приложение резервного копирования фото может загрузить и новый файл.</string>
+    <string name="video_try_one">Попробовать одно бесплатно</string>
+    <string name="video_looking">Смотрю большие видео…</string>
+    <string name="video_none_title">Нет видео, которые стоит сжимать</string>
+    <string name="video_none_body">Я смотрю видео от %1$s. Ваши уже компактны или относятся к типам, которые я не трогаю (HDR, замедленные, 360°).</string>
+    <string name="video_no_room">Мало свободного места для безопасного сжатия. Освободите немного; нужно около %1$s.</string>
+    <string name="video_low_battery">Заряд ниже 20%. Подключите зарядку и начните.</string>
+    <string name="video_too_hot">Телефон нагрелся. Дайте ему остыть и начните снова.</string>
+    <string name="video_pending_note">Неподтверждённые за 7 дней копии удаляются; оригиналы остаются.</string>
+    <string name="video_pending_review">Посмотреть и подтвердить</string>
+    <string name="video_progress_label">СЖИМАЮ</string>
+    <string name="video_progress_so_far">Пока сжато на %1$s</string>
+    <string name="video_progress_remaining">Осталось около %1$s</string>
+    <string name="video_progress_note">Можно выйти из приложения — работа продолжится в уведомлении. Если телефон нагреется или заряд упадёт ниже 20%, я остановлюсь сам.</string>
+    <string name="video_stop">Остановить</string>
+    <string name="video_stop_note">При остановке готовые копии останутся, оригиналы не тронуты.</string>
+    <string name="video_compare_label">ОСТАЛОСЬ %1$d · %2$s</string>
+    <string name="video_compare_later">Позже</string>
+    <string name="video_compare_title">Посмотрите оба и решите сами.</string>
+    <string name="video_original">ОРИГИНАЛ</string>
+    <string name="video_smaller">СЖАТОЕ</string>
+    <string name="video_play">Воспроизвести: %1$s</string>
+    <string name="video_fact_resolution">Разрешение и частота кадров</string>
+    <string name="video_fact_same">Те же</string>
+    <string name="video_fact_gain">Выигрыш</string>
+    <string name="video_compare_play_first">Чтобы подтвердить, воспроизведите сжатое хотя бы раз.</string>
+    <string name="video_compare_failed">Не удалось переместить оригинал в корзину. Он на месте.</string>
+    <string name="video_approve">Да, убрать оригинал</string>
+    <string name="video_keep_original">Оставить оригинал, удалить сжатое</string>
+    <string name="video_compare_note">Убранный оригинал 7 дней лежит в корзине; его можно вернуть.</string>
+    <string name="video_result_title">освобождено. Ни одного видео не удалено.</string>
+    <string name="video_result_what">ЧТО ПРОИЗОШЛО</string>
+    <string name="video_skip_low_gain">Слишком мало выигрыша</string>
+    <string name="video_skip_failed">Не удалось сжать</string>
+    <string name="video_result_estimate">Моя оценка</string>
+    <string name="video_result_trash_note">Оригиналы 7 дней в корзине. Место освободится, когда корзина очистится.</string>
+    <string name="video_delete_now">Удалить оригиналы навсегда сейчас</string>
+    <string name="video_delete_now_confirm">Оригиналы (%1$s) будут удалены навсегда. Это нельзя отменить.</string>
+    <string name="video_done">Готово</string>
+    <string name="video_duration_hm">%1$d ч %2$d мин</string>
+    <string name="video_duration_ms">%1$d мин %2$d с</string>
+    <string name="video_duration_s">%1$d с</string>
+    <string name="video_channel">Сжатие видео</string>
+    <string name="video_notif_progress_title">Сжимаю %1$d / %2$d</string>
+    <string name="video_notif_progress_body">Пока сжато на %1$s</string>
+    <string name="video_notif_done_body">Посмотрите и подтвердите. Оригиналы на месте.</string>
+    <string name="watch_toggle_videos_sub">Те, что можно сжать без удаления.</string>
+    <plurals name="video_pending_title">
+        <item quantity="one">%d сжатая копия ждёт подтверждения</item>
+        <item quantity="few">%d сжатые копии ждут подтверждения</item>
+        <item quantity="many">%d сжатых копий ждут подтверждения</item>
+        <item quantity="other">%d сжатой копии ждут подтверждения</item>
+    </plurals>
+    <plurals name="video_head_body">
+        <item quantity="one">Сожму %d видео. Разрешение не изменится.</item>
+        <item quantity="few">Сожму %d видео. Разрешение не изменится.</item>
+        <item quantity="many">Сожму %d видео. Разрешение не изменится.</item>
+        <item quantity="other">Сожму %d видео. Разрешение не изменится.</item>
+    </plurals>
+    <plurals name="video_list_label">
+        <item quantity="one">%1$d ВИДЕО · %2$s</item>
+        <item quantity="few">%1$d ВИДЕО · %2$s</item>
+        <item quantity="many">%1$d ВИДЕО · %2$s</item>
+        <item quantity="other">%1$d ВИДЕО · %2$s</item>
+    </plurals>
+    <plurals name="video_shrink_button">
+        <item quantity="one">Сжать %d видео</item>
+        <item quantity="few">Сжать %d видео</item>
+        <item quantity="many">Сжать %d видео</item>
+        <item quantity="other">Сжать %d видео</item>
+    </plurals>
+    <plurals name="video_apply_rest">
+        <item quantity="one">Применить к оставшемуся %d видео</item>
+        <item quantity="few">Применить к оставшимся %d видео</item>
+        <item quantity="many">Применить к оставшимся %d видео</item>
+        <item quantity="other">Применить к оставшимся %d видео</item>
+    </plurals>
+    <plurals name="video_result_shrunk">
+        <item quantity="one">%d видео сжато</item>
+        <item quantity="few">%d видео сжато</item>
+        <item quantity="many">%d видео сжато</item>
+        <item quantity="other">%d видео сжато</item>
+    </plurals>
+    <plurals name="video_result_skipped">
+        <item quantity="one">%d видео пропущено</item>
+        <item quantity="few">%d видео пропущено</item>
+        <item quantity="many">%d видео пропущено</item>
+        <item quantity="other">%d видео пропущено</item>
+    </plurals>
+    <plurals name="video_notif_done_title">
+        <item quantity="one">%d видео сжато</item>
+        <item quantity="few">%d видео сжато</item>
+        <item quantity="many">%d видео сжато</item>
+        <item quantity="other">%d видео сжато</item>
     </plurals>
 </resources>

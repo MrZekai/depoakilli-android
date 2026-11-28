@@ -225,6 +225,10 @@ internal fun LazyListScope.cleanupPlanItems(
             }
         }
     }
+    // Faz 3A-2 Y7: "About X without deleting" when big videos can be shrunk.
+    item(key = "plan-video-shrink") {
+        LocalVideoShrinkEntry.current?.let { entry -> VideoShrinkCard(entry) }
+    }
     if (rows.isNotEmpty()) {
         item(key = "plan-ask-card") {
             AskCard(
@@ -567,6 +571,37 @@ private fun AskCard(plan: CleanupPlan, fileCount: Int, dailyLimit: Int?, onShowO
         PillButton(
             text = stringResource(R.string.plan_ask_one_by_one),
             onClick = onShowOneByOne,
+            style = PillStyle.LIME_OUTLINE,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+/** Faz 3A-2: what Y7 needs to offer shrinking videos; provided by CleanerApp only while there are candidates. */
+internal data class VideoShrinkEntry(val savingBytes: Long, val count: Int, val onOpen: () -> Unit)
+
+internal val LocalVideoShrinkEntry = androidx.compose.runtime.staticCompositionLocalOf<VideoShrinkEntry?> { null }
+
+@Composable
+private fun VideoShrinkCard(entry: VideoShrinkEntry) {
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Text(
+            stringResource(R.string.video_y7_card, ByteFormatter.format(entry.savingBytes)),
+            color = Lime,
+            fontSize = 20.sp,
+            lineHeight = 25.sp,
+            fontWeight = AppWeights.Giant,
+        )
+        Text(
+            pluralStringResource(R.plurals.video_head_body, entry.count, entry.count),
+            color = OnBlackSoft,
+            fontSize = 14.sp,
+            lineHeight = 19.sp,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        PillButton(
+            text = stringResource(R.string.video_title),
+            onClick = entry.onOpen,
             style = PillStyle.LIME_OUTLINE,
             modifier = Modifier.padding(top = 12.dp),
         )

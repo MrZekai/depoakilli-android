@@ -84,26 +84,29 @@ class ProFaz2Test {
         assertFalse(pickOnly.showsFillBars)
         assertEquals(0L, pickOnly.proOnlyBytes)
         // With video compression (Pro only), the bars show that part alone.
-        val withVideo = ProGainEstimator.estimate(18 * gb, 40, true, listOf(5 * gb), videoCompressionAvailable = true)
+        val withVideo = ProGainEstimator.estimate(18 * gb, 40, true, videoSavingBytes = 5 * gb, videoCount = 3)
         assertFalse(withVideo.oneTapOnly)
         assertTrue(withVideo.showsFillBars)
-        assertEquals(withVideo.totalBytes - 18 * gb, withVideo.proOnlyBytes)
+        assertEquals(5 * gb, withVideo.proOnlyBytes)
+        assertEquals(23 * gb, withVideo.totalBytes)
         assertFalse(ProGainEstimator.estimate(0L, 0, false).oneTapOnly)
     }
 
     @Test
-    fun `video compression stays out in Faz 2 even with big videos`() {
-        val videos = listOf(5 * gb, 3 * gb, 50_000_000L)
-        val off = ProGainEstimator.estimate(0L, 0, true, videos)
-        assertFalse(ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE)
-        assertEquals(0L, off.totalBytes)
-        // When Faz 3.4 turns it on: 30 % of videos of 100 MB or more, as an estimate.
-        val on = ProGainEstimator.estimate(0L, 0, true, videos, videoCompressionAvailable = true)
-        val row = on.rows.single()
-        assertEquals((8 * gb * 0.30).toLong(), row.bytes)
-        assertEquals(2, row.count)
-        assertFalse(row.measured)
+    fun `video shrinking counts the candidates' estimates, biggest row first`() {
+        assertTrue(ProGainEstimator.VIDEO_COMPRESSION_AVAILABLE)
+        val on = ProGainEstimator.estimate(1 * gb, 10, true, videoSavingBytes = 5_100_000_000L, videoCount = 7)
+        assertEquals(ProGainEstimator.Kind.VIDEO_COMPRESSION, on.rows.first().kind)
+        assertEquals(5_100_000_000L, on.rows.first().bytes)
+        assertEquals(7, on.rows.first().count)
+        assertFalse(on.rows.first().measured)
         assertTrue(on.hasEstimates)
+        // The switch off: no row, no bars, nothing said about it.
+        val off = ProGainEstimator.estimate(0L, 0, true, videoSavingBytes = 5 * gb, videoCount = 7, videoCompressionAvailable = false)
+        assertEquals(0L, off.totalBytes)
+        assertFalse(off.showsFillBars)
+        // No candidates, no row.
+        assertTrue(ProGainEstimator.estimate(0L, 0, true, videoSavingBytes = 0L, videoCount = 0).rows.isEmpty())
     }
 
     // ---- Free tier -----------------------------------------------------

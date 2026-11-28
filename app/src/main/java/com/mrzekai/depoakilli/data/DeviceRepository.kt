@@ -476,6 +476,18 @@ class DeviceRepository(
 
     fun includeFolder(folder: ExcludedFolder) = excludedFolders.remove(folder)
 
+    /**
+     * Faz 3A-2: the user approved a shrunk copy; the original goes to the
+     * app's Trash (7 days, restorable), never deleted here. Null when it could
+     * not be moved (the original then stays where it was).
+     */
+    suspend fun moveShrunkOriginalToTrash(path: String): TrashEntry? = withContext(Dispatchers.IO) {
+        val file = File(path)
+        val root = sharedStorageRoots().firstOrNull { file.absolutePath.startsWith(it.absolutePath + File.separator) }
+            ?: return@withContext null
+        trashStore.moveToTrash(file, root, CleanupGroup.LARGE_VIDEO)?.also { invalidateStorageIndex() }
+    }
+
     fun trashEntries(): List<TrashEntry> = trashStore.entries()
 
     fun trashBytes(): Long = trashStore.trashBytes()
