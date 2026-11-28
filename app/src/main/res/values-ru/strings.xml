@@ -1335,4 +1335,94 @@
         <item quantity="many">%d видео сжато</item>
         <item quantity="other">%d видео сжато</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Похожие фото</string>
+    <string name="similar_tools_detail">Лучшее из каждой группы остаётся</string>
+    <string name="similar_looking">Смотрю ваши фото…</string>
+    <string name="similar_paused">Пауза, пока приложение в фоне; продолжит, когда вы вернётесь.</string>
+    <string name="similar_none_title">Похожих фото нет</string>
+    <string name="similar_note_ai">Найдено ИИ на устройстве. Фото не покидают телефон.</string>
+    <string name="similar_model_missing">Модель фото не запустилась на этом телефоне; ничего не сгруппировано.</string>
+    <string name="similar_open_first">Открыть первую группу</string>
+    <string name="similar_approve_all">Подтвердить все группы</string>
+    <string name="similar_free_note">Первые %1$d группы открыты всем. Ничего не перемещается без вашего подтверждения.</string>
+    <string name="similar_sub_pro">с группы %1$d: Pro</string>
+    <string name="similar_sub_alike">похожи</string>
+    <string name="similar_within_seconds">сняты за %1$d с</string>
+    <string name="similar_within_minutes">сняты за %1$d мин</string>
+    <string name="similar_keep_badge">ОСТАВИТЬ</string>
+    <string name="similar_also_kept">тоже остаётся</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Не похожи</string>
+    <string name="similar_sharpest">Самое чёткое</string>
+    <string name="similar_skip">Пропустить группу</string>
+    <string name="similar_trash_note">Они 7 дней лежат в корзине; их можно вернуть.</string>
+    <string name="similar_y7_card">%1$s в похожих фото</string>
+    <string name="similar_watch_toggle">Новые похожие фото</string>
+    <string name="similar_watch_toggle_sub">Считаются с последнего просмотра в приложении</string>
+    <string name="watch_notif_similar_body">Лучшее из каждой группы остаётся; освободится %1$s.</string>
+    <string name="plan_group_similar_photo">Похожие фото</string>
+    <string name="reason_similar_photo">Сохранён похожий, лучший кадр</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d похожий кадр в %2$d группах. Лучший в каждой группе остаётся.</item>
+        <item quantity="few">%1$d похожих кадра в %2$d группах. Лучший в каждой группе остаётся.</item>
+        <item quantity="many">%1$d похожих кадров в %2$d группах. Лучший в каждой группе остаётся.</item>
+        <item quantity="other">%1$d похожего кадра в %2$d группах. Лучший в каждой группе остаётся.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">Просмотрено %d фото, похожих нет.</item>
+        <item quantity="few">Просмотрено %d фото, похожих нет.</item>
+        <item quantity="many">Просмотрено %d фото, похожих нет.</item>
+        <item quantity="other">Просмотрено %d фото, похожих нет.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Посмотреть ещё %d старое фото</item>
+        <item quantity="few">Посмотреть ещё %d старых фото</item>
+        <item quantity="many">Посмотреть ещё %d старых фото</item>
+        <item quantity="other">Посмотреть ещё %d старых фото</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d кадр</item>
+        <item quantity="few">%1$s · %2$d кадра</item>
+        <item quantity="many">%1$s · %2$d кадров</item>
+        <item quantity="other">%1$s · %2$d кадра</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d кадр в корзину · нажмите, чтобы оставить</item>
+        <item quantity="few">%d кадра в корзину · нажмите, чтобы оставить</item>
+        <item quantity="many">%d кадров в корзину · нажмите, чтобы оставить</item>
+        <item quantity="other">%d кадра в корзину · нажмите, чтобы оставить</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">%1$d кадр в корзину · %2$s</item>
+        <item quantity="few">%1$d кадра в корзину · %2$s</item>
+        <item quantity="many">%1$d кадров в корзину · %2$s</item>
+        <item quantity="other">%1$d кадра в корзину · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d кадр в корзине · %2$s</item>
+        <item quantity="few">%1$d кадра в корзине · %2$s</item>
+        <item quantity="many">%1$d кадров в корзине · %2$s</item>
+        <item quantity="other">%1$d кадра в корзине · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Сначала откройте %d группу по одной</item>
+        <item quantity="few">Сначала откройте %d группы по одной</item>
+        <item quantity="many">Сначала откройте %d групп по одной</item>
+        <item quantity="other">Сначала откройте %d группы по одной</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d похожий кадр уходит</item>
+        <item quantity="few">%d похожих кадра уходят</item>
+        <item quantity="many">%d похожих кадров уходят</item>
+        <item quantity="other">%d похожего кадра уходят</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d новое похожее фото</item>
+        <item quantity="few">%d новых похожих фото</item>
+        <item quantity="many">%d новых похожих фото</item>
+        <item quantity="other">%d новых похожих фото</item>
+    </plurals>
 </resources>

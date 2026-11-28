@@ -1266,4 +1266,84 @@
         <item quantity="many">%d vidéos réduites</item>
         <item quantity="other">%d vidéos réduites</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Photos similaires</string>
+    <string name="similar_tools_detail">La meilleure de chaque groupe reste</string>
+    <string name="similar_looking">Je regarde tes photos…</string>
+    <string name="similar_paused">En pause quand l’app est en arrière-plan ; reprend à ton retour.</string>
+    <string name="similar_none_title">Aucune photo similaire</string>
+    <string name="similar_note_ai">Trouvées par l’IA de l’appareil. Tes photos ne quittent pas ton téléphone.</string>
+    <string name="similar_model_missing">Le modèle photo n’a pas pu démarrer sur ce téléphone ; rien n’a été groupé.</string>
+    <string name="similar_open_first">Ouvrir le premier groupe</string>
+    <string name="similar_approve_all">Valider tous les groupes</string>
+    <string name="similar_free_note">Les %1$d premiers groupes sont ouverts à tous. Rien ne bouge sans ta validation.</string>
+    <string name="similar_sub_pro">dès le groupe %1$d : Pro</string>
+    <string name="similar_sub_alike">se ressemblent</string>
+    <string name="similar_within_seconds">prises en %1$d s</string>
+    <string name="similar_within_minutes">prises en %1$d min</string>
+    <string name="similar_keep_badge">GARDÉE</string>
+    <string name="similar_also_kept">gardée aussi</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Pas similaires</string>
+    <string name="similar_sharpest">La plus nette</string>
+    <string name="similar_skip">Passer ce groupe</string>
+    <string name="similar_trash_note">Elles restent 7 jours dans la Corbeille ; tu peux les récupérer.</string>
+    <string name="similar_y7_card">%1$s en photos similaires</string>
+    <string name="similar_watch_toggle">Nouvelles photos similaires</string>
+    <string name="similar_watch_toggle_sub">Comptées depuis ton dernier passage dans l’app</string>
+    <string name="watch_notif_similar_body">La meilleure de chaque groupe reste ; %1$s à libérer.</string>
+    <string name="plan_group_similar_photo">Photos similaires</string>
+    <string name="reason_similar_photo">Une prise similaire et meilleure a été gardée</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d photo similaire dans %2$d groupes. La meilleure de chaque groupe reste.</item>
+        <item quantity="many">%1$d de photos similaires dans %2$d groupes. La meilleure de chaque groupe reste.</item>
+        <item quantity="other">%1$d photos similaires dans %2$d groupes. La meilleure de chaque groupe reste.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">J’ai regardé %d photo, aucune ne se ressemble.</item>
+        <item quantity="many">J’ai regardé %d de photos, aucune ne se ressemble.</item>
+        <item quantity="other">J’ai regardé %d photos, aucune ne se ressemble.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Regarder aussi %d photo plus ancienne</item>
+        <item quantity="many">Regarder aussi %d de photos plus anciennes</item>
+        <item quantity="other">Regarder aussi %d photos plus anciennes</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d photo</item>
+        <item quantity="many">%1$s · %2$d de photos</item>
+        <item quantity="other">%1$s · %2$d photos</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d photo à la Corbeille · touche-la pour la garder</item>
+        <item quantity="many">%d de photos à la Corbeille · touche-en une pour la garder</item>
+        <item quantity="other">%d photos à la Corbeille · touche-en une pour la garder</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">Mettre %1$d photo à la Corbeille · %2$s</item>
+        <item quantity="many">Mettre %1$d de photos à la Corbeille · %2$s</item>
+        <item quantity="other">Mettre %1$d photos à la Corbeille · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d photo mise à la Corbeille · %2$s</item>
+        <item quantity="many">%1$d de photos mises à la Corbeille · %2$s</item>
+        <item quantity="other">%1$d photos mises à la Corbeille · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Ouvre d’abord %d groupe un par un</item>
+        <item quantity="many">Ouvre d’abord %d de groupes un par un</item>
+        <item quantity="other">Ouvre d’abord %d groupes un par un</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d photo similaire part</item>
+        <item quantity="many">%d de photos similaires partent</item>
+        <item quantity="other">%d photos similaires partent</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d nouvelle photo similaire</item>
+        <item quantity="many">%d de nouvelles photos similaires</item>
+        <item quantity="other">%d nouvelles photos similaires</item>
+    </plurals>
 </resources>

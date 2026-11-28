@@ -28,7 +28,7 @@ android {
         applicationId = "com.mrzekai.depoakilli"
         minSdk = 30
         targetSdk = 36
-        versionCode = 56
+        versionCode = 57
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -47,6 +47,8 @@ android {
 
     androidResources {
         localeFilters += listOf("en", "tr", "es", "it", "fr", "de", "ru", "pt-rBR", "in", "ar")
+        // Faz 3B: on-device models are memory-mapped, so they stay uncompressed.
+        noCompress += "tflite"
     }
 
     signingConfigs {
@@ -188,6 +190,8 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     // Faz 3A-2: shrinking big videos on the phone (owner approved; same Media3 version).
     implementation(libs.androidx.media3.transformer)
+    // Faz 3B-1: on-device image embedder (similar photos). No network use by the app.
+    implementation(libs.mediapipe.tasks.vision)
     // The daily trash purge.
     implementation(libs.androidx.work.runtime)
 

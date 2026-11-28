@@ -34,6 +34,7 @@ object WatchNotifier {
     const val TARGET_WATCH = "watch"
     const val TARGET_WHATSAPP = "whatsapp"
     const val TARGET_VIDEOS = "videos"
+    const val TARGET_SIMILAR = "similar"
 
     fun canPost(context: Context): Boolean {
         if (Build.VERSION.SDK_INT >= 33 &&
@@ -63,11 +64,12 @@ object WatchNotifier {
         val channel = when (topic) {
             WatchTopic.THRESHOLD_90, WatchTopic.THRESHOLD_95 -> CHANNEL_STORAGE
             WatchTopic.WEEKLY -> CHANNEL_WEEKLY
-            WatchTopic.WHATSAPP, WatchTopic.NEW_VIDEOS -> CHANNEL_GROWTH
+            WatchTopic.WHATSAPP, WatchTopic.NEW_VIDEOS, WatchTopic.NEW_SIMILAR -> CHANNEL_GROWTH
         }
         val target = when (topic) {
             WatchTopic.WHATSAPP -> TARGET_WHATSAPP
             WatchTopic.NEW_VIDEOS -> TARGET_VIDEOS
+            WatchTopic.NEW_SIMILAR -> TARGET_SIMILAR
             else -> TARGET_WATCH
         }
         val intent = Intent(context, MainActivity::class.java)
@@ -119,6 +121,11 @@ object WatchNotifier {
                 if (sample.bigVideoCandidates <= 0) return null
                 context.resources.getQuantityString(R.plurals.watch_notif_videos_title, sample.bigVideoCandidates, sample.bigVideoCandidates) to
                     context.getString(R.string.watch_notif_videos_body, ByteFormatter.format(sample.bigVideoCandidateBytes))
+            }
+            WatchTopic.NEW_SIMILAR -> {
+                if (sample.newSimilarFrames <= 0) return null
+                context.resources.getQuantityString(R.plurals.watch_notif_similar_title, sample.newSimilarFrames, sample.newSimilarFrames) to
+                    context.getString(R.string.watch_notif_similar_body, ByteFormatter.format(sample.newSimilarBytes))
             }
         }
     }

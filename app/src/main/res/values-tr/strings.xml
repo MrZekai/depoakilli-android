@@ -949,4 +949,73 @@
         <item quantity="one">%d video küçüldü</item>
         <item quantity="other">%d video küçüldü</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <string name="similar_title">Benzer fotoğraflar</string>
+    <string name="similar_tools_detail">Her grubun en iyisi kalır</string>
+    <string name="similar_looking">Fotoğraflarına bakıyorum…</string>
+    <string name="similar_paused">Uygulama arka plandayken durdu; geri gelince kaldığı yerden sürer.</string>
+    <string name="similar_none_title">Benzer fotoğraf yok</string>
+    <string name="similar_note_ai">Cihaz içi yapay zekâ ile bulundu. Fotoğrafların telefonundan çıkmaz.</string>
+    <string name="similar_model_missing">Fotoğraf modeli bu telefonda başlayamadı; bu yüzden hiçbir şey gruplanmadı.</string>
+    <string name="similar_open_first">İlk grubu aç</string>
+    <string name="similar_approve_all">Tüm grupları onayla</string>
+    <string name="similar_free_note">İlk %1$d grup herkese açık. Hiçbir şey sen onaylamadan taşınmaz.</string>
+    <string name="similar_sub_pro">%1$d. gruptan sonrası Pro</string>
+    <string name="similar_sub_alike">birbirine benziyor</string>
+    <string name="similar_within_seconds">%1$d sn içinde çekildi</string>
+    <string name="similar_within_minutes">%1$d dk içinde çekildi</string>
+    <string name="similar_keep_badge">KALSIN</string>
+    <string name="similar_also_kept">o da kalır</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Benzer değil</string>
+    <string name="similar_sharpest">En net</string>
+    <string name="similar_skip">Bu grubu geç</string>
+    <string name="similar_trash_note">Çöp’te 7 gün bekler; geri alabilirsin.</string>
+    <string name="similar_y7_card">Benzer fotoğraflarda %1$s</string>
+    <string name="similar_watch_toggle">Yeni benzer fotoğraflar</string>
+    <string name="similar_watch_toggle_sub">Uygulamadaki son bakıştan sayılır</string>
+    <string name="watch_notif_similar_body">Her grubun en iyisi kalır; %1$s yer açılır.</string>
+    <string name="plan_group_similar_photo">Benzer fotoğraflar</string>
+    <string name="reason_similar_photo">Benzer, daha iyi bir kare tutuldu</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%2$d grupta %1$d benzer kare. Her grubun en iyisi kalır.</item>
+        <item quantity="other">%2$d grupta %1$d benzer kare. Her grubun en iyisi kalır.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">%d fotoğrafa baktım; birbirine benzeyen yok.</item>
+        <item quantity="other">%d fotoğrafa baktım; birbirine benzeyen yok.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">%d eski fotoğrafa da bak</item>
+        <item quantity="other">%d eski fotoğrafa da bak</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d kare</item>
+        <item quantity="other">%1$s · %2$d kare</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">Çöp’e gidecek %d kare · başka birini tutmak için dokun</item>
+        <item quantity="other">Çöp’e gidecek %d kare · başka birini tutmak için dokun</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">%1$d kareyi Çöp’e taşı · %2$s</item>
+        <item quantity="other">%1$d kareyi Çöp’e taşı · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d kare Çöp’e taşındı · %2$s</item>
+        <item quantity="other">%1$d kare Çöp’e taşındı · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Önce %d grubu tek tek aç</item>
+        <item quantity="other">Önce %d grubu tek tek aç</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d benzer kare gider</item>
+        <item quantity="other">%d benzer kare gider</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d yeni benzer fotoğraf</item>
+        <item quantity="other">%d yeni benzer fotoğraf</item>
+    </plurals>
 </resources>

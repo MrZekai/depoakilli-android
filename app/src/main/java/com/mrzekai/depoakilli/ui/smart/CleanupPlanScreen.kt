@@ -83,7 +83,7 @@ internal fun planGroupIcon(group: CleanupGroup?): ImageVector = when (group) {
     CleanupGroup.DOWNLOAD_MEDIA -> Icons.Outlined.Movie
     CleanupGroup.SCREEN_RECORDING -> Icons.Outlined.Videocam
     CleanupGroup.SCREENSHOT -> Icons.Outlined.Screenshot
-    CleanupGroup.RAW_COPY -> Icons.Outlined.CameraAlt
+    CleanupGroup.RAW_COPY, CleanupGroup.SIMILAR_PHOTO -> Icons.Outlined.CameraAlt
     CleanupGroup.OTHER_APP_MEDIA,
     CleanupGroup.WHATSAPP_SENT,
     CleanupGroup.WHATSAPP_STATUS,
@@ -228,6 +228,9 @@ internal fun LazyListScope.cleanupPlanItems(
     // Faz 3A-2 Y7: "About X without deleting" when big videos can be shrunk.
     item(key = "plan-video-shrink") {
         LocalVideoShrinkEntry.current?.let { entry -> VideoShrinkCard(entry) }
+    }
+    item(key = "plan-similar") {
+        LocalSimilarEntry.current?.let { entry -> SimilarCard(entry) }
     }
     if (rows.isNotEmpty()) {
         item(key = "plan-ask-card") {
@@ -601,6 +604,37 @@ private fun VideoShrinkCard(entry: VideoShrinkEntry) {
         )
         PillButton(
             text = stringResource(R.string.video_title),
+            onClick = entry.onOpen,
+            style = PillStyle.LIME_OUTLINE,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+    }
+}
+
+/** Faz 3B-1: Y7 row for similar photos; provided by CleanerApp only while there are groups. */
+internal data class SimilarEntry(val bytes: Long, val frames: Int, val groups: Int, val onOpen: () -> Unit)
+
+internal val LocalSimilarEntry = androidx.compose.runtime.staticCompositionLocalOf<SimilarEntry?> { null }
+
+@Composable
+private fun SimilarCard(entry: SimilarEntry) {
+    BlackCard(modifier = Modifier.padding(top = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Text(
+            stringResource(R.string.similar_y7_card, ByteFormatter.format(entry.bytes)),
+            color = Lime,
+            fontSize = 20.sp,
+            lineHeight = 25.sp,
+            fontWeight = AppWeights.Giant,
+        )
+        Text(
+            pluralStringResource(R.plurals.similar_head_body, entry.frames, entry.frames, entry.groups),
+            color = OnBlackSoft,
+            fontSize = 14.sp,
+            lineHeight = 19.sp,
+            modifier = Modifier.padding(top = 6.dp),
+        )
+        PillButton(
+            text = stringResource(R.string.similar_title),
             onClick = entry.onOpen,
             style = PillStyle.LIME_OUTLINE,
             modifier = Modifier.padding(top = 12.dp),

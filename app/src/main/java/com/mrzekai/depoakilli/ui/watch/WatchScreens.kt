@@ -90,6 +90,7 @@ internal data class WatchActions(
     val setWeekly: (Boolean) -> Unit,
     val setWhatsApp: (Boolean) -> Unit,
     val setNewVideos: (Boolean) -> Unit,
+    val setNewSimilar: (Boolean) -> Unit = {},
     val openPaywall: () -> Unit,
     val openNotificationSettings: () -> Unit,
     val openHibernationSettings: () -> Unit,
@@ -315,6 +316,17 @@ internal fun WatchScreen(ui: WatchUi, actions: WatchActions, modifier: Modifier 
                                 checked = ui.isPro && s.settings.newVideoAlerts,
                                 pro = true,
                                 onChange = if (ui.isPro) actions.setNewVideos else { _ -> actions.openPaywall() },
+                            )
+                        }
+                        // Faz 3B-1: shown only while similar photos are on.
+                        if (com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE) {
+                            CardDivider()
+                            SwitchRow(
+                                title = stringResource(R.string.similar_watch_toggle),
+                                detail = stringResource(R.string.similar_watch_toggle_sub),
+                                checked = ui.isPro && s.settings.newSimilarAlerts,
+                                pro = true,
+                                onChange = if (ui.isPro) actions.setNewSimilar else { _ -> actions.openPaywall() },
                             )
                         }
                     }

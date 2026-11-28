@@ -233,6 +233,11 @@ class CleanerViewModel internal constructor(
         freeTierStore?.markVideoTrialUsed()
     }
 
+    /** Faz 3B-1: a similar-photo group was cleaned without Pro. */
+    fun markSimilarGroupUsed() {
+        freeTierStore?.markSimilarGroupUsed()
+    }
+
     fun addProBytes(bytes: Long) {
         if (bytes > 0L) freeTierStore?.addProBytes(bytes)
     }

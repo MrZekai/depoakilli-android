@@ -26,6 +26,8 @@ data class WatchSnapshot(
     val promoDone: Boolean = false,
     /** Faz 3A-2: videos already counted in a "new big videos" notice (paths only, never sent anywhere). */
     val notifiedVideos: Set<String> = emptySet(),
+    /** Faz 3B-1: similar frames already counted in a notice (MediaStore ids only, never sent anywhere). */
+    val notifiedSimilar: Set<String> = emptySet(),
 ) {
     val latest: WatchSample? get() = samples.maxByOrNull { it.measuredAtMillis }
     val lastLookMillis: Long get() = latest?.measuredAtMillis ?: 0L
@@ -68,6 +70,7 @@ class WatchStore(context: Context) {
             .putBoolean(K_WEEKLY, s.settings.weeklySummary)
             .putBoolean(K_WHATSAPP, s.settings.whatsAppAlerts)
             .putBoolean(K_NEW_VIDEOS, s.settings.newVideoAlerts)
+            .putBoolean(K_NEW_SIMILAR, s.settings.newSimilarAlerts)
             .putString(K_SAMPLES, JSONArray(s.samples.map(::sampleJson)).toString())
             .putString(K_HISTORY, JSONArray(s.history.map { JSONObject().put("t", it.topic.name).put("at", it.atMillis) }).toString())
             .putBoolean(K_FIRED90, s.threshold.fired90)
@@ -78,6 +81,7 @@ class WatchStore(context: Context) {
             .putBoolean(K_HIBERNATION, s.hibernationExplained)
             .putBoolean(K_PROMO, s.promoDone)
             .putString(K_NOTIFIED_VIDEOS, JSONArray(s.notifiedVideos.toList().takeLast(500)).toString())
+            .putString(K_NOTIFIED_SIMILAR, JSONArray(s.notifiedSimilar.toList().takeLast(5_000)).toString())
             .apply()
     }
 
@@ -88,6 +92,7 @@ class WatchStore(context: Context) {
             weeklySummary = prefs.getBoolean(K_WEEKLY, true),
             whatsAppAlerts = prefs.getBoolean(K_WHATSAPP, true),
             newVideoAlerts = prefs.getBoolean(K_NEW_VIDEOS, true),
+            newSimilarAlerts = prefs.getBoolean(K_NEW_SIMILAR, true),
         ),
         samples = runCatching {
             val array = JSONArray(prefs.getString(K_SAMPLES, "[]"))
@@ -110,6 +115,10 @@ class WatchStore(context: Context) {
             val array = JSONArray(prefs.getString(K_NOTIFIED_VIDEOS, "[]"))
             (0 until array.length()).mapTo(LinkedHashSet()) { array.getString(it) }
         }.getOrDefault(emptySet()),
+        notifiedSimilar = runCatching {
+            val array = JSONArray(prefs.getString(K_NOTIFIED_SIMILAR, "[]"))
+            (0 until array.length()).mapTo(LinkedHashSet()) { array.getString(it) }
+        }.getOrDefault(emptySet()),
     )
 
     private fun sampleJson(s: WatchSample) = JSONObject()
@@ -117,6 +126,7 @@ class WatchStore(context: Context) {
         .put("tot", s.totalBytes).put("av", s.availableBytes)
         .put("v", s.videoBytes).put("p", s.photoBytes).put("w", s.whatsAppBytes)
         .put("bc", s.bigVideoCandidates).put("bb", s.bigVideoCandidateBytes)
+        .put("sc", s.newSimilarFrames).put("sb", s.newSimilarBytes)
 
     private fun sampleFrom(o: JSONObject) = WatchSample(
         dayEpoch = o.getLong("d"),
@@ -128,6 +138,8 @@ class WatchStore(context: Context) {
         whatsAppBytes = o.getLong("w"),
         bigVideoCandidates = o.optInt("bc"),
         bigVideoCandidateBytes = o.optLong("bb"),
+        newSimilarFrames = o.optInt("sc"),
+        newSimilarBytes = o.optLong("sb"),
     )
 
     companion object {
@@ -137,6 +149,8 @@ class WatchStore(context: Context) {
         private const val K_WEEKLY = "weekly_summary"
         private const val K_WHATSAPP = "whatsapp_alerts"
         private const val K_NEW_VIDEOS = "new_video_alerts"
+        private const val K_NEW_SIMILAR = "new_similar_alerts"
+        private const val K_NOTIFIED_SIMILAR = "notified_similar"
         private const val K_SAMPLES = "samples"
         private const val K_HISTORY = "history"
         private const val K_FIRED90 = "fired90"

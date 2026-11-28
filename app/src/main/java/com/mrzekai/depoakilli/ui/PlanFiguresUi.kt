@@ -30,6 +30,7 @@ internal fun CleanerUiState.planFigures(): PlanFigures? =
  */
 internal fun CleanerUiState.proEstimate(
     videos: com.mrzekai.depoakilli.video.VideoCandidateFinder.Result? = null,
+    similar: com.mrzekai.depoakilli.photo.SimilarFinder.Result? = null,
 ): com.mrzekai.depoakilli.pro.ProGainEstimator.Estimate {
     val figures = planFigures()
     val plan = summary.plan
@@ -39,5 +40,7 @@ internal fun CleanerUiState.proEstimate(
         firstCleanupUsed = freeTier.firstCleanupUsed,
         videoSavingBytes = videos?.totalSavingBytes ?: 0L,
         videoCount = videos?.candidates?.size ?: 0,
+        similarBytes = similar?.trashBytes ?: 0L,
+        similarCount = similar?.trashCount ?: 0,
     )
 }

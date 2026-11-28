@@ -49,6 +49,20 @@ object CleaningThresholds {
     /** Faz 3A-1: the weekly summary is not sent below this much growth. */
     const val WATCH_WEEKLY_MIN_BYTES = 500L * MB
 
+    /**
+     * Faz 3B-1 similar photos. Measured on the synthetic set (20 bursts, 20
+     * blurry, 40 unrelated) with the bundled embedder: unrelated photos never
+     * went above 0.57; at 0.82 18 of 20 bursts were grouped whole, none mixed.
+     */
+    const val SIMILAR_COSINE_MIN = 0.82
+    const val DHASH_MAX_DISTANCE = 10
+
+    /** Faz 3B-1 Watch: new deletable similar frames since the last notice. */
+    const val WATCH_NEW_SIMILAR_COUNT = 20
+
+    /** Faz 3B-2: a face's eyes count as open from this probability. */
+    const val EYES_OPEN_MIN = 0.5f
+
     /** Minimum size considered by the duplicate finder. */
     const val MIN_DUPLICATE_BYTES = 32L * 1024L
 }

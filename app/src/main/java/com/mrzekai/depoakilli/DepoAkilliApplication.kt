@@ -27,6 +27,9 @@ class DepoAkilliApplication : Application() {
     val pendingVideos: PendingOutputStore by lazy { PendingOutputStore(this) }
 
     /** Faz 3A-2: big videos worth shrinking, and the user's answers for each copy. */
+    /** Faz 3B-1 similar photos (looks only while the app is in front). */
+    val similarPhotos: com.mrzekai.depoakilli.photo.SimilarRepository by lazy { com.mrzekai.depoakilli.photo.SimilarRepository(this) }
+
     val videoShrink: VideoShrinkRepository by lazy { VideoShrinkRepository(this, pendingVideos) }
 
     override fun onCreate() {

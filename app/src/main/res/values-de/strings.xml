@@ -1199,4 +1199,74 @@
         <item quantity="one">%d Video verkleinert</item>
         <item quantity="other">%d Videos verkleinert</item>
     </plurals>
+
+    <!-- Faz 3B-1 Similar photos -->
+    <!-- [ÇEVİRİ GEREKLİ] Faz 3B-1 Similar photos: draft translation, needs a native review -->
+    <string name="similar_title">Ähnliche Fotos</string>
+    <string name="similar_tools_detail">Das beste jeder Gruppe bleibt</string>
+    <string name="similar_looking">Ich sehe mir deine Fotos an…</string>
+    <string name="similar_paused">Pausiert, solange die App im Hintergrund ist; geht weiter, wenn du zurückkommst.</string>
+    <string name="similar_none_title">Keine ähnlichen Fotos</string>
+    <string name="similar_note_ai">Mit KI auf dem Gerät gefunden. Deine Fotos verlassen dein Handy nicht.</string>
+    <string name="similar_model_missing">Das Fotomodell konnte auf diesem Handy nicht starten; nichts wurde gruppiert.</string>
+    <string name="similar_open_first">Erste Gruppe öffnen</string>
+    <string name="similar_approve_all">Alle Gruppen bestätigen</string>
+    <string name="similar_free_note">Die ersten %1$d Gruppen sind für alle offen. Nichts wird ohne deine Bestätigung verschoben.</string>
+    <string name="similar_sub_pro">ab Gruppe %1$d: Pro</string>
+    <string name="similar_sub_alike">sehen gleich aus</string>
+    <string name="similar_within_seconds">in %1$d s aufgenommen</string>
+    <string name="similar_within_minutes">in %1$d Min. aufgenommen</string>
+    <string name="similar_keep_badge">BLEIBT</string>
+    <string name="similar_also_kept">bleibt auch</string>
+    <string name="similar_detail_position">%1$d / %2$d · %3$s</string>
+    <string name="similar_not_similar">Nicht ähnlich</string>
+    <string name="similar_sharpest">Am schärfsten</string>
+    <string name="similar_skip">Diese Gruppe überspringen</string>
+    <string name="similar_trash_note">Sie bleiben 7 Tage im Papierkorb; du kannst sie zurückholen.</string>
+    <string name="similar_y7_card">%1$s in ähnlichen Fotos</string>
+    <string name="similar_watch_toggle">Neue ähnliche Fotos</string>
+    <string name="similar_watch_toggle_sub">Gezählt ab deinem letzten Blick in der App</string>
+    <string name="watch_notif_similar_body">Das beste jeder Gruppe bleibt; %1$s werden frei.</string>
+    <string name="plan_group_similar_photo">Ähnliche Fotos</string>
+    <string name="reason_similar_photo">Ein ähnliches, besseres Bild wurde behalten</string>
+    <plurals name="similar_head_body">
+        <item quantity="one">%1$d ähnliches Bild in %2$d Gruppen. Das beste jeder Gruppe bleibt.</item>
+        <item quantity="other">%1$d ähnliche Bilder in %2$d Gruppen. Das beste jeder Gruppe bleibt.</item>
+    </plurals>
+    <plurals name="similar_none_body">
+        <item quantity="one">Ich habe %d Foto angesehen; keine ähnlichen.</item>
+        <item quantity="other">Ich habe %d Fotos angesehen; keine ähnlichen.</item>
+    </plurals>
+    <plurals name="similar_more">
+        <item quantity="one">Auch %d älteres Foto ansehen</item>
+        <item quantity="other">Auch %d ältere Fotos ansehen</item>
+    </plurals>
+    <plurals name="similar_group_title">
+        <item quantity="one">%1$s · %2$d Bild</item>
+        <item quantity="other">%1$s · %2$d Bilder</item>
+    </plurals>
+    <plurals name="similar_to_trash_label">
+        <item quantity="one">%d Bild in den Papierkorb · tippe, um es zu behalten</item>
+        <item quantity="other">%d Bilder in den Papierkorb · tippe eines an, um es zu behalten</item>
+    </plurals>
+    <plurals name="similar_move_button">
+        <item quantity="one">%1$d Bild in den Papierkorb · %2$s</item>
+        <item quantity="other">%1$d Bilder in den Papierkorb · %2$s</item>
+    </plurals>
+    <plurals name="similar_moved">
+        <item quantity="one">%1$d Bild im Papierkorb · %2$s</item>
+        <item quantity="other">%1$d Bilder im Papierkorb · %2$s</item>
+    </plurals>
+    <plurals name="similar_approve_all_locked">
+        <item quantity="one">Öffne zuerst %d Gruppe einzeln</item>
+        <item quantity="other">Öffne zuerst %d Gruppen einzeln</item>
+    </plurals>
+    <plurals name="pro_gain_similar">
+        <item quantity="one">%d ähnliches Bild geht</item>
+        <item quantity="other">%d ähnliche Bilder gehen</item>
+    </plurals>
+    <plurals name="watch_notif_similar_title">
+        <item quantity="one">%d neues ähnliches Foto</item>
+        <item quantity="other">%d neue ähnliche Fotos</item>
+    </plurals>
 </resources>

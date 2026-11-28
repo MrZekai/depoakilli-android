@@ -20,6 +20,9 @@ data class WatchSample(
     val whatsAppBytes: Long,
     val bigVideoCandidates: Int = 0,
     val bigVideoCandidateBytes: Long = 0L,
+    /** Faz 3B-1: similar frames offered by the last in-app look that no notice counted yet. */
+    val newSimilarFrames: Int = 0,
+    val newSimilarBytes: Long = 0L,
 ) {
     val usedBytes: Long get() = (totalBytes - availableBytes).coerceAtLeast(0L)
 
@@ -56,6 +59,7 @@ enum class WatchTopic(val proOnly: Boolean) {
     THRESHOLD_90(false),
     WHATSAPP(true),
     NEW_VIDEOS(true),
+    NEW_SIMILAR(true),
     WEEKLY(true),
 }
 
@@ -69,6 +73,8 @@ data class WatchSettings(
     val whatsAppAlerts: Boolean = true,
     /** Faz 3A-2: on by default like the other Pro alerts (they only run while Pro is on). */
     val newVideoAlerts: Boolean = true,
+    /** Faz 3B-1: on by default; runs only while Pro is on; counts from the last in-app look. */
+    val newSimilarAlerts: Boolean = true,
 )
 
 /** Everything the decision needs; built by the worker, pure here. */
@@ -85,6 +91,7 @@ data class WatchDecisionInput(
     val growth: WatchGrowth?,
     val newVideoBytes: Long,
     val history: List<SentNotice>,
+    val newSimilarFrames: Int = 0,
     val lastWeeklyWeek: Int,
 )
 
@@ -158,7 +165,7 @@ object WatchRules {
 
     fun isQuiet(localHour: Int): Boolean = localHour >= QUIET_FROM_HOUR || localHour < QUIET_UNTIL_HOUR
 
-    /** Topics that hold now, highest priority first: threshold > WhatsApp > new videos > weekly. */
+    /** Topics that hold now, highest priority first: threshold > WhatsApp > new videos > new similar photos > weekly. */
     fun candidates(input: WatchDecisionInput): List<WatchTopic> {
         val s = input.settings
         if (!s.enabled) return emptyList()
@@ -172,6 +179,11 @@ object WatchRules {
             input.newVideoBytes >= CleaningThresholds.WATCH_NEW_VIDEO_BYTES
         ) {
             list += WatchTopic.NEW_VIDEOS
+        }
+        if (com.mrzekai.depoakilli.pro.ProGainEstimator.SIMILAR_PHOTOS_AVAILABLE && s.newSimilarAlerts &&
+            input.newSimilarFrames >= CleaningThresholds.WATCH_NEW_SIMILAR_COUNT
+        ) {
+            list += WatchTopic.NEW_SIMILAR
         }
         // Once a week: on Monday, or the first run after it in the same week.
         val weeklyDue = input.lastWeeklyWeek != input.localWeek

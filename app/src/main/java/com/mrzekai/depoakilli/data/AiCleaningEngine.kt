@@ -382,7 +382,8 @@ class AiCleaningEngine(
             CleanupGroup.APK_OTHER -> CleanCategory.APK_PACKAGE
             CleanupGroup.DUPLICATE_SAFE,
             CleanupGroup.DUPLICATE_PERSONAL,
-            CleanupGroup.DUPLICATE_UNVERIFIED -> CleanCategory.DUPLICATE
+            CleanupGroup.DUPLICATE_UNVERIFIED,
+            CleanupGroup.SIMILAR_PHOTO -> CleanCategory.DUPLICATE
             CleanupGroup.LARGE_VIDEO,
             CleanupGroup.OLD_VIDEO,
             CleanupGroup.RAW_COPY,
